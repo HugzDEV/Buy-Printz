@@ -4,12 +4,16 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
+// API Configuration
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 // Debug: Log environment variables (remove in production)
 console.log('Environment check:', {
   hasUrl: !!supabaseUrl,
   hasKey: !!supabaseKey,
   urlPrefix: supabaseUrl?.substring(0, 20),
-  keyPrefix: supabaseKey?.substring(0, 20)
+  keyPrefix: supabaseKey?.substring(0, 20),
+  apiUrl: apiUrl
 })
 
 // Check if environment variables are loaded
@@ -234,7 +238,9 @@ class AuthService {
 
     try {
       const headers = await this.getAuthHeaders()
-      const response = await fetch(url, {
+      // Construct full URL if it's a relative path
+      const fullUrl = url.startsWith('http') ? url : `${apiUrl}${url}`
+      const response = await fetch(fullUrl, {
         ...options,
         headers: {
           ...headers,
@@ -247,7 +253,7 @@ class AuthService {
         try {
           await this.refreshToken()
           const newHeaders = await this.getAuthHeaders()
-          const retryResponse = await fetch(url, {
+          const retryResponse = await fetch(fullUrl, {
             ...options,
             headers: {
               ...newHeaders,
