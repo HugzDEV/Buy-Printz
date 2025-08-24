@@ -8,18 +8,39 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Initialize Supabase client
+# Initialize Supabase client with error handling for deployment
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-supabase: Client = create_client(supabase_url, supabase_key)
+supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
+
+# Initialize supabase client with proper error handling
+supabase = None
+
+if supabase_url and supabase_key:
+    try:
+        supabase: Client = create_client(supabase_url, supabase_key)
+        print("✅ Supabase client initialized successfully")
+    except Exception as e:
+        print(f"❌ Failed to initialize Supabase client: {e}")
+        supabase = None
+else:
+    print("⚠️ Supabase environment variables not set. Database features will be disabled.")
+    print(f"SUPABASE_URL: {'✓' if supabase_url else '✗'}")
+    print(f"SUPABASE_KEY: {'✓' if supabase_key else '✗'}")
+    print("Server will start but database operations will fail gracefully.")
 
 class DatabaseManager:
     def __init__(self):
         self.supabase = supabase
+        
+    def is_connected(self):
+        """Check if database is properly connected"""
+        return self.supabase is not None
 
     # User Management
     async def create_user(self, email: str, password: str, full_name: str) -> Dict[str, Any]:
         """Create a new user account"""
+        if not self.supabase:
+            return {"success": False, "error": "Database not connected"}
         try:
             # Create user in Supabase Auth
             auth_response = self.supabase.auth.sign_up({

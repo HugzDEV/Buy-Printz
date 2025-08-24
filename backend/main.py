@@ -622,7 +622,7 @@ async def get_config():
         "stripe_publishable_key": STRIPE_PUBLISHABLE_KEY,
         "stripe_configured": bool(STRIPE_SECRET_KEY and not STRIPE_SECRET_KEY.startswith("sk_test_your")),
         "supabase_url": os.getenv("SUPABASE_URL"),
-        "supabase_anon_key": os.getenv("SUPABASE_ANON_KEY")
+        "supabase_anon_key": os.getenv("SUPABASE_KEY")
     }
 
 # User Preferences endpoints
@@ -752,17 +752,22 @@ async def health_check():
     """
     try:
         # Check environment configuration
-        env_vars_ok = all([
-            os.getenv("SUPABASE_URL"),
-            os.getenv("SUPABASE_KEY"),
-            os.getenv("STRIPE_SECRET_KEY")
-        ])
+        supabase_configured = bool(os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_KEY"))
+        stripe_configured = bool(os.getenv("STRIPE_SECRET_KEY"))
+        db_connected = db_manager.is_connected() if hasattr(db_manager, 'is_connected') else False
         
+        # Determine overall status
+        status = "healthy" if (supabase_configured and db_connected) else "starting"
+        if not supabase_configured:
+            status = "missing_config"
+            
         return {
-            "status": "healthy" if env_vars_ok else "degraded",
+            "status": status,
             "timestamp": datetime.utcnow().isoformat(),
             "version": "2.0.0",
-            "environment": "configured" if env_vars_ok else "missing_vars",
+            "database": "connected" if db_connected else "disconnected",
+            "supabase_configured": supabase_configured,
+            "stripe_configured": stripe_configured,
             "uptime": "active"
         }
     except Exception as e:
