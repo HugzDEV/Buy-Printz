@@ -76,8 +76,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# Mount static files - create uploads directory if it doesn't exist
+uploads_dir = "uploads"
+if not os.path.exists(uploads_dir):
+    os.makedirs(uploads_dir, exist_ok=True)
+    print(f"✅ Created uploads directory: {uploads_dir}")
+
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 # Configuration
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
