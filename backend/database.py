@@ -1,0 +1,533 @@
+from supabase import create_client, Client
+import os
+from typing import Optional, Dict, Any, List
+from datetime import datetime, timedelta
+import json
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Initialize Supabase client
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+supabase: Client = create_client(supabase_url, supabase_key)
+
+class DatabaseManager:
+    def __init__(self):
+        self.supabase = supabase
+
+    # User Management
+    async def create_user(self, email: str, password: str, full_name: str) -> Dict[str, Any]:
+        """Create a new user account"""
+        try:
+            # Create user in Supabase Auth
+            auth_response = self.supabase.auth.sign_up({
+                "email": email,
+                "password": password
+            })
+            
+            user_id = auth_response.user.id
+            
+            # Create user profile
+            profile_data = {
+                "id": user_id,
+                "email": email,
+                "full_name": full_name,
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            profile_response = self.supabase.table("user_profiles").insert(profile_data).execute()
+            
+            return {
+                "user_id": user_id,
+                "email": email,
+                "full_name": full_name,
+                "success": True
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    async def get_user_profile(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Get user profile by ID"""
+        try:
+            response = self.supabase.table("user_profiles").select("*").eq("id", user_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting user profile: {e}")
+            return None
+
+    async def update_user_profile(self, user_id: str, profile_data: Dict[str, Any]) -> bool:
+        """Update user profile"""
+        try:
+            profile_data["updated_at"] = datetime.utcnow().isoformat()
+            response = self.supabase.table("user_profiles").update(profile_data).eq("id", user_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating user profile: {e}")
+            return False
+
+    # Order Management
+    async def create_order(self, user_id: str, order_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new order"""
+        try:
+            order_record = {
+                "user_id": user_id,
+                "product_type": order_data["product_type"],
+                "quantity": order_data["quantity"],
+                "dimensions": json.dumps(order_data["dimensions"]),
+                "canvas_data": json.dumps(order_data["canvas_data"]),
+                "total_amount": order_data["total_amount"],
+                "status": "pending",
+                "banner_type": order_data.get("banner_type"),
+                "banner_material": order_data.get("banner_material"),
+                "banner_finish": order_data.get("banner_finish"),
+                "banner_size": order_data.get("banner_size"),
+                "banner_category": order_data.get("banner_category"),
+                "print_options": json.dumps(order_data.get("print_options", {})),
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            response = self.supabase.table("orders").insert(order_record).execute()
+            
+            if response.data:
+                return {
+                    "order_id": response.data[0]["id"],
+                    "success": True
+                }
+            return {"success": False, "error": "Failed to create order"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    async def get_user_orders(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get all orders for a user"""
+        try:
+            response = self.supabase.table("orders").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting user orders: {e}")
+            return []
+
+    async def get_order(self, order_id: str) -> Optional[Dict[str, Any]]:
+        """Get specific order by ID"""
+        try:
+            response = self.supabase.table("orders").select("*").eq("id", order_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting order: {e}")
+            return None
+
+    async def update_order_status(self, order_id: str, status: str, stripe_payment_intent_id: str = None) -> bool:
+        """Update order status"""
+        try:
+            update_data = {
+                "status": status,
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            if stripe_payment_intent_id:
+                update_data["stripe_payment_intent_id"] = stripe_payment_intent_id
+            
+            response = self.supabase.table("orders").update(update_data).eq("id", order_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating order status: {e}")
+            return False
+
+    async def update_order_customer_info(self, order_id: str, customer_info: Dict[str, str]) -> bool:
+        """Update order with customer information"""
+        try:
+            update_data = {
+                "customer_info": json.dumps(customer_info),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            response = self.supabase.table("orders").update(update_data).eq("id", order_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating order customer info: {e}")
+            return False
+
+    # Canvas Data Management
+    async def save_canvas_design(self, user_id: str, design_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Save canvas design for later use"""
+        try:
+            design_record = {
+                "user_id": user_id,
+                "name": design_data.get("name", "Untitled Design"),
+                "canvas_data": json.dumps(design_data["canvas_data"]),
+                "product_type": design_data.get("product_type", "custom"),
+                "dimensions": json.dumps(design_data.get("dimensions", {})),
+                "banner_type": design_data.get("banner_type"),
+                "banner_material": design_data.get("banner_material"),
+                "banner_finish": design_data.get("banner_finish"),
+                "banner_size": design_data.get("banner_size"),
+                "banner_category": design_data.get("banner_category"),
+                "background_color": design_data.get("background_color", "#ffffff"),
+                "print_options": json.dumps(design_data.get("print_options", {})),
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            response = self.supabase.table("canvas_designs").insert(design_record).execute()
+            
+            if response.data:
+                return {
+                    "design_id": response.data[0]["id"],
+                    "success": True
+                }
+            return {"success": False, "error": "Failed to save design"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    async def get_user_designs(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get all saved designs for a user"""
+        try:
+            response = self.supabase.table("canvas_designs").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting user designs: {e}")
+            return []
+
+    async def get_design(self, design_id: str) -> Optional[Dict[str, Any]]:
+        """Get specific design by ID"""
+        try:
+            response = self.supabase.table("canvas_designs").select("*").eq("id", design_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting design: {e}")
+            return None
+
+    # Address Management
+    async def save_user_address(self, user_id: str, address_data: Dict[str, Any]) -> bool:
+        """Save user shipping address"""
+        try:
+            address_record = {
+                "user_id": user_id,
+                "full_name": address_data["full_name"],
+                "address_line1": address_data["address_line1"],
+                "address_line2": address_data.get("address_line2", ""),
+                "city": address_data["city"],
+                "state": address_data["state"],
+                "postal_code": address_data["postal_code"],
+                "country": address_data.get("country", "US"),
+                "phone": address_data.get("phone", ""),
+                "is_default": address_data.get("is_default", True),
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            # If this is the default address, unset other defaults
+            if address_record["is_default"]:
+                self.supabase.table("user_addresses").update({"is_default": False}).eq("user_id", user_id).execute()
+            
+            response = self.supabase.table("user_addresses").insert(address_record).execute()
+            return True
+        except Exception as e:
+            print(f"Error saving user address: {e}")
+            return False
+
+    async def get_user_addresses(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get all addresses for a user"""
+        try:
+            response = self.supabase.table("user_addresses").select("*").eq("user_id", user_id).order("is_default", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting user addresses: {e}")
+            return []
+
+    # User Preferences Management
+    async def get_user_preferences(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Get user editor preferences"""
+        try:
+            response = self.supabase.table("user_preferences").select("*").eq("user_id", user_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting user preferences: {e}")
+            return None
+
+    async def save_user_preferences(self, user_id: str, preferences: Dict[str, Any]) -> bool:
+        """Save or update user editor preferences"""
+        try:
+            # Check if preferences exist
+            existing = await self.get_user_preferences(user_id)
+            
+            if existing:
+                # Update existing preferences
+                update_data = {
+                    "default_banner_type": preferences.get("default_banner_type", existing.get("default_banner_type")),
+                    "default_banner_size": preferences.get("default_banner_size", existing.get("default_banner_size")),
+                    "editor_settings": json.dumps(preferences.get("editor_settings", {})),
+                    "updated_at": datetime.utcnow().isoformat()
+                }
+                response = self.supabase.table("user_preferences").update(update_data).eq("user_id", user_id).execute()
+            else:
+                # Create new preferences
+                preference_record = {
+                    "user_id": user_id,
+                    "default_banner_type": preferences.get("default_banner_type", "vinyl-13oz"),
+                    "default_banner_size": preferences.get("default_banner_size", "2ft x 4ft"),
+                    "editor_settings": json.dumps(preferences.get("editor_settings", {})),
+                    "created_at": datetime.utcnow().isoformat(),
+                    "updated_at": datetime.utcnow().isoformat()
+                }
+                response = self.supabase.table("user_preferences").insert(preference_record).execute()
+            
+            return True
+        except Exception as e:
+            print(f"Error saving user preferences: {e}")
+            return False
+
+    # Banner Templates Management
+    async def save_custom_template(self, user_id: str, template_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Save a custom banner template"""
+        try:
+            template_record = {
+                "user_id": user_id,
+                "name": template_data["name"],
+                "category": template_data.get("category", "Custom"),
+                "description": template_data.get("description", ""),
+                "canvas_data": json.dumps(template_data["canvas_data"]),
+                "banner_type": template_data.get("banner_type"),
+                "is_public": template_data.get("is_public", False),
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            response = self.supabase.table("banner_templates").insert(template_record).execute()
+            
+            if response.data:
+                return {
+                    "template_id": response.data[0]["id"],
+                    "success": True
+                }
+            return {"success": False, "error": "Failed to save template"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    async def get_user_templates(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get all custom templates for a user"""
+        try:
+            response = self.supabase.table("banner_templates").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting user templates: {e}")
+            return []
+
+    async def get_public_templates(self) -> List[Dict[str, Any]]:
+        """Get all public templates"""
+        try:
+            response = self.supabase.table("banner_templates").select("*").eq("is_public", True).order("created_at", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting public templates: {e}")
+            return []
+
+    # Design History Management
+    async def save_design_version(self, design_id: str, user_id: str, canvas_data: Dict[str, Any], changes_description: str = "") -> bool:
+        """Save a version of a design for history tracking"""
+        try:
+            # Get current version number
+            response = self.supabase.table("design_history").select("version_number").eq("design_id", design_id).order("version_number", desc=True).limit(1).execute()
+            
+            next_version = 1
+            if response.data:
+                next_version = response.data[0]["version_number"] + 1
+            
+            version_record = {
+                "design_id": design_id,
+                "user_id": user_id,
+                "version_number": next_version,
+                "canvas_data": json.dumps(canvas_data),
+                "changes_description": changes_description,
+                "created_at": datetime.utcnow().isoformat()
+            }
+            
+            response = self.supabase.table("design_history").insert(version_record).execute()
+            return True
+        except Exception as e:
+            print(f"Error saving design version: {e}")
+            return False
+
+    async def get_design_history(self, design_id: str) -> List[Dict[str, Any]]:
+        """Get version history for a design"""
+        try:
+            response = self.supabase.table("design_history").select("*").eq("design_id", design_id).order("version_number", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting design history: {e}")
+            return []
+
+    # Analytics and Tracking
+    async def get_user_stats(self, user_id: str) -> Dict[str, Any]:
+        """Get user statistics and usage data"""
+        try:
+            # Get order counts by status
+            orders_response = self.supabase.table("orders").select("status").eq("user_id", user_id).execute()
+            orders = orders_response.data or []
+            
+            # Get design count
+            designs_response = self.supabase.table("canvas_designs").select("id").eq("user_id", user_id).execute()
+            designs_count = len(designs_response.data or [])
+            
+            # Get template count
+            templates_response = self.supabase.table("banner_templates").select("id").eq("user_id", user_id).execute()
+            templates_count = len(templates_response.data or [])
+            
+            # Calculate order statistics
+            order_stats = {}
+            for order in orders:
+                status = order["status"]
+                order_stats[status] = order_stats.get(status, 0) + 1
+            
+            return {
+                "total_orders": len(orders),
+                "order_stats": order_stats,
+                "total_designs": designs_count,
+                "total_templates": templates_count,
+                "success": True
+            }
+        except Exception as e:
+            print(f"Error getting user stats: {e}")
+            return {"success": False, "error": str(e)}
+
+    # Canvas State Management
+    async def save_canvas_state(self, canvas_state_data: Dict[str, Any]) -> bool:
+        """Save or update user's canvas state"""
+        try:
+            user_id = canvas_state_data['user_id']
+            session_id = canvas_state_data.get('session_id')
+            
+            # Use upsert to handle both create and update
+            # If session_id is provided, use it for uniqueness, otherwise use user_id only
+            if session_id:
+                # Check if canvas state exists for this user and session
+                existing = self.supabase.table("canvas_states") \
+                    .select("id") \
+                    .eq("user_id", user_id) \
+                    .eq("session_id", session_id) \
+                    .execute()
+            else:
+                # Check if canvas state exists for this user (no specific session)
+                existing = self.supabase.table("canvas_states") \
+                    .select("id") \
+                    .eq("user_id", user_id) \
+                    .is_("session_id", "null") \
+                    .execute()
+            
+            if existing.data:
+                # Update existing canvas state
+                response = self.supabase.table("canvas_states") \
+                    .update({
+                        "canvas_data": canvas_state_data['canvas_data'],
+                        "banner_settings": canvas_state_data.get('banner_settings'),
+                        "is_checkout_session": canvas_state_data.get('is_checkout_session', False),
+                        "expires_at": canvas_state_data['expires_at'],
+                        "updated_at": datetime.utcnow().isoformat()
+                    }) \
+                    .eq("id", existing.data[0]['id']) \
+                    .execute()
+            else:
+                # Create new canvas state
+                response = self.supabase.table("canvas_states") \
+                    .insert(canvas_state_data) \
+                    .execute()
+            
+            if hasattr(response, 'data') and response.data:
+                print(f"Canvas state saved successfully: {len(response.data)} records affected")
+                return True
+            else:
+                print(f"Canvas state save returned unexpected response: {response}")
+                return False
+            
+        except Exception as e:
+            print(f"Error saving canvas state: {e}")
+            print(f"Canvas state data that failed: {canvas_state_data}")
+            return False
+
+    async def load_canvas_state(self, user_id: str, session_id: str = None, is_checkout_session: bool = None) -> Dict[str, Any]:
+        """Load user's canvas state"""
+        try:
+            query = self.supabase.table("canvas_states") \
+                .select("*") \
+                .eq("user_id", user_id) \
+                .gt("expires_at", datetime.utcnow().isoformat()) \
+                .order("updated_at", desc=True)
+            
+            # Filter by session if provided
+            if session_id:
+                query = query.eq("session_id", session_id)
+            else:
+                query = query.is_("session_id", "null")
+            
+            # Filter by checkout session if specified
+            if is_checkout_session is not None:
+                query = query.eq("is_checkout_session", is_checkout_session)
+            
+            response = query.limit(1).execute()
+            
+            if response.data:
+                canvas_state = response.data[0]
+                return {
+                    "canvas_data": canvas_state['canvas_data'],
+                    "banner_settings": canvas_state.get('banner_settings'),
+                    "created_at": canvas_state['created_at'],
+                    "updated_at": canvas_state['updated_at']
+                }
+            
+            return None
+            
+        except Exception as e:
+            print(f"Error loading canvas state: {e}")
+            return None
+
+    async def clear_canvas_state(self, user_id: str, session_id: str = None) -> bool:
+        """Clear user's canvas state"""
+        try:
+            query = self.supabase.table("canvas_states") \
+                .delete() \
+                .eq("user_id", user_id)
+            
+            if session_id:
+                query = query.eq("session_id", session_id)
+            else:
+                query = query.is_("session_id", "null")
+            
+            response = query.execute()
+            return True
+            
+        except Exception as e:
+            print(f"Error clearing canvas state: {e}")
+            return False
+
+    async def cleanup_expired_canvas_states(self) -> int:
+        """Clean up expired canvas states and return count of deleted records"""
+        try:
+            # Delete expired canvas states
+            response = self.supabase.table("canvas_states") \
+                .delete() \
+                .lt("expires_at", datetime.utcnow().isoformat()) \
+                .execute()
+            
+            deleted_count = len(response.data) if response.data else 0
+            if deleted_count > 0:
+                print(f"Cleaned up {deleted_count} expired canvas states")
+            
+            return deleted_count
+            
+        except Exception as e:
+            print(f"Error cleaning up expired canvas states: {e}")
+            return 0
+
+# Initialize database manager
+db_manager = DatabaseManager()

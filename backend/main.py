@@ -1,0 +1,941 @@
+from fastapi import FastAPI, HTTPException, UploadFile, File, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+import stripe
+import os
+import json
+import uuid
+import logging
+from datetime import datetime, timedelta
+from typing import Optional, Dict, Any
+import aiofiles
+from pydantic import BaseModel
+from dotenv import load_dotenv
+
+# Import our modules
+from backend.database import db_manager
+from backend.auth import auth_manager, get_current_user
+
+# Load environment variables
+load_dotenv()
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title="Buy Printz Banner Printing Platform",
+    description="""
+    ## Professional Banner Printing API
+    
+    Buy Printz provides a comprehensive platform for designing and ordering custom banners.
+    
+    ### Key Features:
+    - **Canvas Design Editor**: Full-featured banner design with Konva.js integration
+    - **User Authentication**: Secure user registration and login with Supabase
+    - **Canvas State Persistence**: Save and restore design sessions across devices
+    - **Payment Processing**: Stripe integration for secure transactions
+    - **Order Management**: Complete order tracking and management system
+    
+    ### API Endpoints:
+    - **Authentication**: Login, register, user management
+    - **Canvas Operations**: Save, load, and manage design states
+    - **Order Processing**: Create orders, handle payments, order tracking
+    - **File Management**: Upload and manage design assets
+    
+    """,
+    version="2.0.0",
+    contact={
+        "name": "Buy Printz Support",
+        "email": "order@buyprintz.com",
+        "url": "https://www.buyprintz.com"
+    },
+    license_info={
+        "name": "Proprietary",
+        "url": "https://www.buyprintz.com/terms"
+    },
+    servers=[
+        {
+            "url": "https://www.buyprintz.com/api",
+            "description": "Production server"
+        },
+        {
+            "url": "http://localhost:8000/api", 
+            "description": "Development server"
+        }
+    ]
+)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount static files
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+# Configuration
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+# Validate Stripe configuration
+if not STRIPE_SECRET_KEY or STRIPE_SECRET_KEY.startswith("sk_test_your") or STRIPE_SECRET_KEY == "sk_test_51234567890abcdefghijk":
+    print("⚠️  WARNING: Invalid or missing Stripe Secret Key!")
+    print("📝 Please set STRIPE_SECRET_KEY in your .env file with a real Stripe test key")
+    print("🔗 Get your keys from: https://dashboard.stripe.com/test/apikeys")
+
+if not STRIPE_PUBLISHABLE_KEY or STRIPE_PUBLISHABLE_KEY.startswith("pk_test_your") or STRIPE_PUBLISHABLE_KEY == "pk_test_51234567890abcdefghijk":
+    print("⚠️  WARNING: Invalid or missing Stripe Publishable Key!")
+    print("📝 Please set STRIPE_PUBLISHABLE_KEY in your .env file")
+
+# Initialize Stripe
+stripe.api_key = STRIPE_SECRET_KEY
+
+# Create uploads directory if it doesn't exist
+os.makedirs("uploads", exist_ok=True)
+
+# Pydantic models
+class UserRegistration(BaseModel):
+    email: str
+    password: str
+    full_name: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class CanvasData(BaseModel):
+    canvas_data: Dict[str, Any]
+    product_type: str
+    quantity: int
+    dimensions: Dict[str, Any]
+    name: Optional[str] = "Untitled Design"
+
+class OrderRequest(BaseModel):
+    canvas_data: Dict[str, Any]
+    product_type: str
+    quantity: int
+    dimensions: Dict[str, Any]
+    banner_type: Optional[str] = None
+    banner_material: Optional[str] = None
+    banner_finish: Optional[str] = None
+    banner_size: Optional[str] = None
+    banner_category: Optional[str] = None
+    background_color: Optional[str] = "#ffffff"
+    print_options: Optional[Dict[str, Any]] = {}
+    total_amount: Optional[float] = 0.0
+
+class AddressData(BaseModel):
+    full_name: str
+    address_line1: str
+    address_line2: Optional[str] = ""
+    city: str
+    state: str
+    postal_code: str
+    country: str = "US"
+    phone: Optional[str] = ""
+    is_default: bool = True
+
+class UserPreferences(BaseModel):
+    default_banner_type: Optional[str] = None
+    default_banner_size: Optional[str] = None
+    editor_settings: Optional[dict] = {}
+
+class TemplateData(BaseModel):
+    name: str
+    category: Optional[str] = "Custom"
+    description: Optional[str] = ""
+    canvas_data: dict
+    banner_type: Optional[str] = None
+    is_public: bool = False
+
+class EnhancedCanvasData(BaseModel):
+    name: str
+    canvas_data: dict
+    product_type: str = "banner"
+    dimensions: Optional[dict] = {}
+    banner_type: Optional[str] = None
+    banner_material: Optional[str] = None
+    banner_finish: Optional[str] = None
+    banner_size: Optional[str] = None
+    banner_category: Optional[str] = None
+    background_color: Optional[str] = "#ffffff"
+    print_options: Optional[dict] = {}
+
+# Authentication endpoints
+@app.post("/api/auth/register")
+async def register_user(user_data: UserRegistration):
+    """Register a new user"""
+    try:
+        result = await db_manager.create_user(
+            email=user_data.email,
+            password=user_data.password,
+            full_name=user_data.full_name
+        )
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "message": "User registered successfully",
+                "user_id": result["user_id"]
+            }
+        else:
+            raise HTTPException(status_code=400, detail=result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/auth/login")
+async def login_user(user_data: UserLogin):
+    """Login user"""
+    try:
+        auth_result = await auth_manager.authenticate_user(
+            email=user_data.email,
+            password=user_data.password
+        )
+        
+        if auth_result:
+            # Create JWT token
+            access_token = auth_manager.create_access_token(
+                data={"sub": auth_result["user_id"]}
+            )
+            
+            return {
+                "success": True,
+                "access_token": access_token,
+                "refresh_token": auth_result["refresh_token"],
+                "user_id": auth_result["user_id"],
+                "email": auth_result["email"]
+            }
+        else:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/auth/refresh")
+async def refresh_token(refresh_token: str):
+    """Refresh access token"""
+    try:
+        result = await auth_manager.refresh_token(refresh_token)
+        if result:
+            return {
+                "success": True,
+                "access_token": result["access_token"],
+                "refresh_token": result["refresh_token"]
+            }
+        else:
+            raise HTTPException(status_code=401, detail="Invalid refresh token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/auth/logout")
+async def logout_user(current_user: dict = Depends(get_current_user)):
+    """Logout user"""
+    try:
+        await auth_manager.sign_out(current_user["user_id"])
+        return {"success": True, "message": "Logged out successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# User profile endpoints
+@app.get("/api/user/profile")
+async def get_user_profile(current_user: dict = Depends(get_current_user)):
+    """Get current user profile"""
+    try:
+        profile = await db_manager.get_user_profile(current_user["user_id"])
+        if profile:
+            return {"success": True, "profile": profile}
+        else:
+            raise HTTPException(status_code=404, detail="Profile not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/user/profile")
+async def update_user_profile(
+    profile_data: Dict[str, Any],
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user profile"""
+    try:
+        success = await db_manager.update_user_profile(
+            current_user["user_id"], 
+            profile_data
+        )
+        if success:
+            return {"success": True, "message": "Profile updated successfully"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to update profile")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Address management
+@app.post("/api/user/addresses")
+async def save_address(
+    address_data: AddressData,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save user shipping address"""
+    try:
+        success = await db_manager.save_user_address(
+            current_user["user_id"],
+            address_data.dict()
+        )
+        if success:
+            return {"success": True, "message": "Address saved successfully"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to save address")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/user/addresses")
+async def get_user_addresses(current_user: dict = Depends(get_current_user)):
+    """Get user addresses"""
+    try:
+        addresses = await db_manager.get_user_addresses(current_user["user_id"])
+        return {"success": True, "addresses": addresses}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Canvas design management
+@app.post("/api/designs/save")
+async def save_canvas_design(
+    design_data: CanvasData,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save canvas design"""
+    try:
+        result = await db_manager.save_canvas_design(
+            current_user["user_id"],
+            design_data.dict()
+        )
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "design_id": result["design_id"],
+                "message": "Design saved successfully"
+            }
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/designs")
+async def get_user_designs(current_user: dict = Depends(get_current_user)):
+    """Get user's saved designs"""
+    try:
+        designs = await db_manager.get_user_designs(current_user["user_id"])
+        return {"success": True, "designs": designs}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/designs/{design_id}")
+async def get_design(design_id: str, current_user: dict = Depends(get_current_user)):
+    """Get specific design"""
+    try:
+        design = await db_manager.get_design(design_id)
+        if design and design["user_id"] == current_user["user_id"]:
+            return {"success": True, "design": design}
+        else:
+            raise HTTPException(status_code=404, detail="Design not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# File upload
+@app.post("/api/upload-artwork")
+async def upload_artwork(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload artwork file"""
+    if not file:
+        raise HTTPException(status_code=400, detail="No file provided")
+    
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/svg+xml", "application/pdf"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid file type")
+    
+    # Generate unique filename
+    file_id = str(uuid.uuid4())
+    file_extension = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = f"{file_id}.{file_extension}"
+    filepath = f"uploads/{filename}"
+    
+    # Save file
+    async with aiofiles.open(filepath, 'wb') as f:
+        content = await file.read()
+        await f.write(content)
+    
+    return {
+        "file_id": file_id,
+        "filename": filename,
+        "original_name": file.filename,
+        "file_url": f"/uploads/{filename}",
+        "size": len(content),
+        "content_type": file.content_type
+    }
+
+# Order management
+@app.post("/api/orders/create")
+async def create_order(
+    order_data: OrderRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a new order"""
+    try:
+        # Calculate total amount based on product type and quantity
+        base_prices = {
+            "banner": 25.00,
+            "sign": 35.00,
+            "sticker": 15.00,
+            "custom": 50.00
+        }
+        
+        base_price = base_prices.get(order_data.product_type, 50.00)
+        total_amount = base_price * order_data.quantity
+        
+        # Create comprehensive order data
+        order_payload = {
+            "product_type": order_data.product_type,
+            "quantity": order_data.quantity,
+            "dimensions": order_data.dimensions,
+            "canvas_data": order_data.canvas_data,
+            "banner_type": order_data.banner_type,
+            "banner_material": order_data.banner_material,
+            "banner_finish": order_data.banner_finish,
+            "banner_size": order_data.banner_size,
+            "banner_category": order_data.banner_category,
+            "background_color": order_data.background_color,
+            "print_options": order_data.print_options,
+            "total_amount": total_amount,
+            "status": "pending"
+        }
+        
+        # Create order in database
+        order_result = await db_manager.create_order(
+            current_user["user_id"],
+            order_payload
+        )
+        
+        if order_result["success"]:
+            return {
+                "success": True,
+                "order_id": order_result["order_id"],
+                "total_amount": total_amount,
+                "order_details": order_payload
+            }
+        else:
+            raise HTTPException(status_code=500, detail=order_result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/orders")
+async def get_user_orders(current_user: dict = Depends(get_current_user)):
+    """Get user's orders"""
+    try:
+        orders = await db_manager.get_user_orders(current_user["user_id"])
+        return {"success": True, "orders": orders}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/orders/{order_id}")
+async def get_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Get specific order"""
+    try:
+        order = await db_manager.get_order(order_id)
+        if order and order["user_id"] == current_user["user_id"]:
+            return {"success": True, "order": order}
+        else:
+            raise HTTPException(status_code=404, detail="Order not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/orders/{order_id}/customer-info")
+async def save_order_customer_info(
+    order_id: str,
+    customer_info: Dict[str, str],
+    current_user: dict = Depends(get_current_user)
+):
+    """Save customer information for an order"""
+    try:
+        # Verify order belongs to user
+        order = await db_manager.get_order(order_id)
+        if not order or order["user_id"] != current_user["user_id"]:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Update order with customer information
+        success = await db_manager.update_order_customer_info(order_id, customer_info)
+        
+        if success:
+            return {"success": True, "message": "Customer information saved"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to save customer information")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Payment request model
+class PaymentIntentRequest(BaseModel):
+    order_id: str
+
+# Customer information model
+class CustomerInfoRequest(BaseModel):
+    order_id: str
+    customer_info: Dict[str, str]
+
+# Payment endpoints
+@app.post("/api/payments/create-intent")
+async def create_payment_intent(
+    request: PaymentIntentRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create Stripe payment intent"""
+    try:
+        # Validate Stripe configuration
+        if not STRIPE_SECRET_KEY or STRIPE_SECRET_KEY.startswith("sk_test_your"):
+            raise HTTPException(
+                status_code=500, 
+                detail="Stripe not configured. Please set STRIPE_SECRET_KEY environment variable with a valid Stripe test key."
+            )
+        
+        # Get order details
+        order = await db_manager.get_order(request.order_id)
+        if not order or order["user_id"] != current_user["user_id"]:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Create payment intent
+        payment_intent = stripe.PaymentIntent.create(
+            amount=int(order["total_amount"] * 100),  # Convert to cents
+            currency="usd",
+            metadata={
+                "order_id": request.order_id,
+                "user_id": current_user["user_id"]
+            }
+        )
+        
+        return {
+            "client_secret": payment_intent.client_secret,
+            "amount": order["total_amount"],
+            "currency": "usd"
+        }
+    except stripe.error.AuthenticationError as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Stripe authentication failed: {str(e)}. Please check your STRIPE_SECRET_KEY."
+        )
+    except stripe.error.StripeError as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Stripe error: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/payments/webhook")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhooks"""
+    try:
+        payload = await request.body()
+        sig_header = request.headers.get("stripe-signature")
+        
+        if not sig_header:
+            raise HTTPException(status_code=400, detail="No signature header")
+        
+        # Verify webhook signature
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
+        
+        # Handle the event
+        if event["type"] == "payment_intent.succeeded":
+            payment_intent = event["data"]["object"]
+            order_id = payment_intent["metadata"]["order_id"]
+            
+            # Update order status
+            await db_manager.update_order_status(
+                order_id, 
+                "paid", 
+                payment_intent["id"]
+            )
+            
+        elif event["type"] == "payment_intent.payment_failed":
+            payment_intent = event["data"]["object"]
+            order_id = payment_intent["metadata"]["order_id"]
+            
+            # Update order status
+            await db_manager.update_order_status(order_id, "payment_failed")
+        
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+# Product endpoints
+@app.get("/api/products")
+async def get_products():
+    """Get available products"""
+    return {
+        "products": [
+            {
+                "id": "banner",
+                "name": "Vinyl Banner",
+                "base_price": 25.00,
+                "description": "High-quality vinyl banners for outdoor use",
+                "min_quantity": 1,
+                "max_quantity": 100
+            },
+            {
+                "id": "sign",
+                "name": "Corrugated Sign",
+                "base_price": 35.00,
+                "description": "Durable corrugated plastic signs",
+                "min_quantity": 1,
+                "max_quantity": 50
+            },
+            {
+                "id": "sticker",
+                "name": "Vinyl Sticker",
+                "base_price": 15.00,
+                "description": "Custom vinyl stickers and decals",
+                "min_quantity": 10,
+                "max_quantity": 1000
+            },
+            {
+                "id": "custom",
+                "name": "Custom Product",
+                "base_price": 50.00,
+                "description": "Custom signage solutions",
+                "min_quantity": 1,
+                "max_quantity": 25
+            }
+        ]
+    }
+
+@app.get("/api/config")
+async def get_config():
+    """Get frontend configuration"""
+    return {
+        "stripe_publishable_key": STRIPE_PUBLISHABLE_KEY,
+        "stripe_configured": bool(STRIPE_SECRET_KEY and not STRIPE_SECRET_KEY.startswith("sk_test_your")),
+        "supabase_url": os.getenv("SUPABASE_URL"),
+        "supabase_anon_key": os.getenv("SUPABASE_ANON_KEY")
+    }
+
+# User Preferences endpoints
+@app.get("/api/user/preferences")
+async def get_user_preferences(current_user: dict = Depends(get_current_user)):
+    """Get user editor preferences"""
+    try:
+        preferences = await db_manager.get_user_preferences(current_user["user_id"])
+        return {"success": True, "preferences": preferences}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/user/preferences")
+async def save_user_preferences(
+    preferences: UserPreferences,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save user editor preferences"""
+    try:
+        result = await db_manager.save_user_preferences(
+            current_user["user_id"],
+            preferences.dict()
+        )
+        
+        if result:
+            return {"success": True, "message": "Preferences saved successfully"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to save preferences")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Template management endpoints
+@app.post("/api/templates/save")
+async def save_custom_template(
+    template_data: TemplateData,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save a custom banner template"""
+    try:
+        result = await db_manager.save_custom_template(
+            current_user["user_id"],
+            template_data.dict()
+        )
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "template_id": result["template_id"],
+                "message": "Template saved successfully"
+            }
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/templates/user")
+async def get_user_templates(current_user: dict = Depends(get_current_user)):
+    """Get user's custom templates"""
+    try:
+        templates = await db_manager.get_user_templates(current_user["user_id"])
+        return {"success": True, "templates": templates}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/templates/public")
+async def get_public_templates():
+    """Get public templates"""
+    try:
+        templates = await db_manager.get_public_templates()
+        return {"success": True, "templates": templates}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Enhanced design save with banner specifications
+@app.post("/api/designs/save-enhanced")
+async def save_enhanced_canvas_design(
+    design_data: EnhancedCanvasData,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save enhanced canvas design with banner specifications"""
+    try:
+        result = await db_manager.save_canvas_design(
+            current_user["user_id"],
+            design_data.dict()
+        )
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "design_id": result["design_id"],
+                "message": "Enhanced design saved successfully"
+            }
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Analytics endpoints
+@app.get("/api/user/stats")
+async def get_user_stats(current_user: dict = Depends(get_current_user)):
+    """Get user statistics and usage data"""
+    try:
+        stats = await db_manager.get_user_stats(current_user["user_id"])
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Design history endpoints
+@app.get("/api/designs/{design_id}/history")
+async def get_design_history(design_id: str, current_user: dict = Depends(get_current_user)):
+    """Get design version history"""
+    try:
+        history = await db_manager.get_design_history(design_id)
+        return {"success": True, "history": history}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/")
+async def root():
+    return {"message": "Buy Printz Banner Printing Platform API v2.0 - Enhanced"}
+
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """
+    Health check endpoint for production monitoring
+    Returns system status and basic metrics
+    """
+    try:
+        # Check environment configuration
+        env_vars_ok = all([
+            os.getenv("SUPABASE_URL"),
+            os.getenv("SUPABASE_KEY"),
+            os.getenv("STRIPE_SECRET_KEY")
+        ])
+        
+        return {
+            "status": "healthy" if env_vars_ok else "degraded",
+            "timestamp": datetime.utcnow().isoformat(),
+            "version": "2.0.0",
+            "environment": "configured" if env_vars_ok else "missing_vars",
+            "uptime": "active"
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "error": str(e)
+        }
+
+@app.get("/api/status", tags=["Health"])
+async def api_status():
+    """
+    Detailed API status for monitoring and debugging
+    """
+    return {
+        "api_version": "2.0.0",
+        "environment": os.getenv("ENVIRONMENT", "development"),
+        "timestamp": datetime.utcnow().isoformat(),
+        "endpoints": {
+            "authentication": "active",
+            "canvas_operations": "active", 
+            "order_processing": "active",
+            "file_upload": "active"
+        },
+        "integrations": {
+            "supabase": "configured" if os.getenv("SUPABASE_URL") else "missing",
+            "stripe": "configured" if os.getenv("STRIPE_SECRET_KEY") else "missing"
+        }
+    }
+
+@app.get("/api/canvas/test")
+async def test_canvas_table(current_user: dict = Depends(get_current_user)):
+    """Test if canvas_states table exists and is accessible"""
+    try:
+        logger.info(f"Canvas test endpoint called by user: {current_user.get('user_id', 'unknown')}")
+        
+        # Try to count canvas states for this user
+        response = db_manager.supabase.table("canvas_states") \
+            .select("id", count="exact") \
+            .eq("user_id", current_user['user_id']) \
+            .execute()
+        
+        return {
+            "success": True, 
+            "message": "Canvas states table accessible",
+            "user_id": current_user['user_id'],
+            "count": response.count if hasattr(response, 'count') else 0
+        }
+    except Exception as e:
+        logger.error(f"Canvas states table test failed: {e}")
+        return {
+            "success": False, 
+            "error": str(e),
+            "message": "Canvas states table not accessible - please run canvas_state_schema.sql"
+        }
+
+@app.get("/api/debug/auth")
+async def debug_auth():
+    """Debug endpoint to test authentication without requiring auth"""
+    return {
+        "message": "This endpoint does not require authentication",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.get("/api/debug/auth-required")
+async def debug_auth_required(current_user: dict = Depends(get_current_user)):
+    """Debug endpoint to test authentication with auth required"""
+    return {
+        "message": "Authentication successful",
+        "user_id": current_user.get('user_id'),
+        "user_email": current_user.get('email'),
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+# Canvas State Management Endpoints
+class CanvasStateRequest(BaseModel):
+    canvas_data: dict
+    banner_settings: Optional[dict] = None
+    session_id: Optional[str] = None
+    is_checkout_session: Optional[bool] = False
+
+@app.post("/api/canvas/save")
+async def save_canvas_state(request: CanvasStateRequest, current_user: dict = Depends(get_current_user)):
+    """Save user's canvas state to database"""
+    try:
+        user_id = current_user['user_id']
+        logger.info(f"Saving canvas state for user: {user_id}")
+        
+        # Use upsert to either create new or update existing canvas state
+        canvas_state_data = {
+            'user_id': user_id,
+            'session_id': request.session_id,
+            'canvas_data': request.canvas_data,
+            'banner_settings': request.banner_settings,
+            'is_checkout_session': request.is_checkout_session,
+            'expires_at': (datetime.utcnow() + timedelta(days=7)).isoformat()
+        }
+        
+        logger.info(f"Canvas state data keys: {list(canvas_state_data.keys())}")
+        logger.info(f"Canvas data elements count: {len(canvas_state_data['canvas_data'].get('elements', []))}")
+        
+        result = await db_manager.save_canvas_state(canvas_state_data)
+        
+        if result:
+            logger.info("Canvas state saved successfully")
+            return {"success": True, "message": "Canvas state saved successfully"}
+        else:
+            logger.error("Database method returned False")
+            raise HTTPException(status_code=500, detail="Failed to save canvas state - database method returned False")
+            
+    except HTTPException:
+        # Re-raise HTTPExceptions as they are already properly formatted
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error saving canvas state: {str(e)}")
+        logger.error(f"Error type: {type(e).__name__}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/api/canvas/load")
+async def load_canvas_state(
+    session_id: Optional[str] = None, 
+    is_checkout_session: Optional[bool] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Load user's canvas state from database"""
+    try:
+        user_id = current_user['user_id']
+        
+        # Periodically clean up expired canvas states (roughly 1% of requests)
+        import random
+        if random.randint(1, 100) == 1:
+            await db_manager.cleanup_expired_canvas_states()
+        
+        canvas_state = await db_manager.load_canvas_state(user_id, session_id, is_checkout_session)
+        
+        if canvas_state:
+            return {
+                "success": True, 
+                "canvas_state": canvas_state
+            }
+        else:
+            return {
+                "success": False, 
+                "message": "No canvas state found"
+            }
+            
+    except Exception as e:
+        logger.error(f"Error loading canvas state: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/canvas/clear")
+async def clear_canvas_state(
+    session_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Clear user's canvas state from database"""
+    try:
+        user_id = current_user['user_id']
+        
+        result = await db_manager.clear_canvas_state(user_id, session_id)
+        
+        if result:
+            return {"success": True, "message": "Canvas state cleared successfully"}
+        else:
+            return {"success": False, "message": "No canvas state found to clear"}
+            
+    except Exception as e:
+        logger.error(f"Error clearing canvas state: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

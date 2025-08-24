@@ -1,0 +1,995 @@
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { 
+  User, Palette, ShoppingBag, Settings, LogOut, Plus, 
+  Eye, Download, Calendar, DollarSign, Package, 
+  FileText, BarChart3, TrendingUp, Activity, 
+  Star, Edit, Trash2, RefreshCw, Archive,
+  Filter, Search, Clock, CheckCircle, XCircle,
+  AlertCircle, Truck, Crown, Layers, Layout,
+  PaintBucket, Ruler, Tag, MapPin
+} from 'lucide-react'
+import toast from 'react-hot-toast'
+import authService from '../services/auth'
+
+const Dashboard = () => {
+  const navigate = useNavigate()
+  const [user, setUser] = useState(null)
+  const [designs, setDesigns] = useState([])
+  const [orders, setOrders] = useState([])
+  const [templates, setTemplates] = useState([])
+  const [userStats, setUserStats] = useState(null)
+  const [preferences, setPreferences] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [showOrderModal, setShowOrderModal] = useState(false)
+
+  useEffect(() => {
+    loadDashboardData()
+  }, [])
+
+  const loadDashboardData = async () => {
+    try {
+      const currentUser = await authService.getCurrentUser()
+      if (!currentUser) {
+        navigate('/login')
+        return
+      }
+
+      setUser(currentUser)
+
+      // Load all data in parallel for better performance
+      const [
+        designsResponse,
+        ordersResponse,
+        templatesResponse,
+        statsResponse,
+        preferencesResponse
+      ] = await Promise.all([
+        authService.authenticatedRequest('/api/designs'),
+        authService.authenticatedRequest('/api/orders'),
+        authService.authenticatedRequest('/api/templates/user'),
+        authService.authenticatedRequest('/api/user/stats'),
+        authService.authenticatedRequest('/api/user/preferences')
+      ])
+
+      // Load user designs
+      const designsData = await designsResponse.json()
+      if (designsData.success) {
+        setDesigns(designsData.designs)
+      }
+
+      // Load user orders
+      const ordersData = await ordersResponse.json()
+      if (ordersData.success) {
+        setOrders(ordersData.orders)
+      }
+
+      // Load user templates
+      const templatesData = await templatesResponse.json()
+      if (templatesData.success) {
+        setTemplates(templatesData.templates)
+      }
+
+      // Load user statistics
+      const statsData = await statsResponse.json()
+      if (statsData.success) {
+        setUserStats(statsData)
+      }
+
+      // Load user preferences
+      const preferencesData = await preferencesResponse.json()
+      if (preferencesData.success) {
+        setPreferences(preferencesData.preferences)
+      }
+
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+      toast.error('Failed to load dashboard data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+      toast.success('Logged out successfully')
+      navigate('/login')
+    } catch (error) {
+      toast.error('Logout failed')
+    }
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'paid':
+        return 'bg-green-100 text-green-800'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'processing':
+        return 'bg-blue-100 text-blue-800'
+      case 'shipped':
+        return 'bg-purple-100 text-purple-800'
+      case 'delivered':
+        return 'bg-green-100 text-green-800'
+      case 'cancelled':
+        return 'bg-red-100 text-red-800'
+      case 'payment_failed':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'paid':
+        return <CheckCircle className="w-4 h-4" />
+      case 'pending':
+        return <Clock className="w-4 h-4" />
+      case 'processing':
+        return <Activity className="w-4 h-4" />
+      case 'shipped':
+        return <Truck className="w-4 h-4" />
+      case 'delivered':
+        return <CheckCircle className="w-4 h-4" />
+      case 'cancelled':
+        return <XCircle className="w-4 h-4" />
+      case 'payment_failed':
+        return <AlertCircle className="w-4 h-4" />
+      default:
+        return <Package className="w-4 h-4" />
+    }
+  }
+
+  const getBannerTypeColor = (bannerType) => {
+    if (bannerType?.includes('vinyl')) return 'bg-blue-100 text-blue-800'
+    if (bannerType?.includes('mesh')) return 'bg-green-100 text-green-800'
+    if (bannerType?.includes('fabric')) return 'bg-purple-100 text-purple-800'
+    if (bannerType?.includes('indoor')) return 'bg-orange-100 text-orange-800'
+    return 'bg-gray-100 text-gray-800'
+  }
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount || 0)
+  }
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  // Filter orders based on search and status
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = searchTerm === '' || 
+      order.banner_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.banner_material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.id.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter
+    
+    return matchesSearch && matchesStatus
+  })
+
+  const loadDesignInEditor = (design) => {
+    // Store design data for the editor to load
+    localStorage.setItem('loadDesign', JSON.stringify(design))
+    navigate('/editor')
+  }
+
+  const deleteTemplate = async (templateId) => {
+    if (!confirm('Are you sure you want to delete this template?')) return
+    
+    try {
+      const response = await authService.authenticatedRequest(`/api/templates/${templateId}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        toast.success('Template deleted successfully')
+        setTemplates(templates.filter(t => t.id !== templateId))
+      } else {
+        throw new Error('Failed to delete template')
+      }
+    } catch (error) {
+      console.error('Error deleting template:', error)
+      toast.error('Failed to delete template')
+    }
+  }
+
+  const viewOrderDetails = (order) => {
+    setSelectedOrder(order)
+    setShowOrderModal(true)
+  }
+
+  const closeOrderModal = () => {
+    setSelectedOrder(null)
+    setShowOrderModal(false)
+  }
+
+  const reorderItem = (order) => {
+    // Store order data for reordering
+    localStorage.setItem('reorderData', JSON.stringify(order))
+    navigate('/editor')
+    toast.success('Order data loaded for reordering')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-8">
+            <div className="flex items-center">
+              <Link to="/" className="flex items-center">
+                <img 
+                  src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                  alt="Buy Printz" 
+                  className="w-32 h-32 object-contain hover:opacity-80 transition-opacity cursor-pointer"
+                />
+              </Link>
+              <h1 className="ml-3 text-2xl font-bold text-gray-900">Dashboard</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600">Welcome, {user?.email}</span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center text-gray-600 hover:text-gray-900"
+              >
+                <LogOut className="w-4 h-4 mr-1" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation Tabs */}
+        <div className="border-b border-gray-200 mb-8">
+          <nav className="-mb-px flex space-x-8">
+            {[
+              { id: 'overview', name: 'Overview', icon: BarChart3 },
+              { id: 'designs', name: 'My Designs', icon: Palette },
+              { id: 'templates', name: 'Templates', icon: Layout },
+              { id: 'orders', name: 'Orders', icon: ShoppingBag },
+              { id: 'profile', name: 'Profile', icon: Settings }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <tab.icon className="w-4 h-4 mr-2" />
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen p-6 -m-6">
+            {/* Welcome Section */}
+            <div className="neumorphic-container p-8 rounded-2xl bg-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                    Welcome back, {user?.email?.split('@')[0]}! 👋
+                  </h2>
+                  <p className="text-gray-600">
+                    Your banner design studio dashboard
+                  </p>
+                </div>
+                <div className="flex space-x-3">
+                  <Link
+                    to="/editor"
+                    className="neumorphic-button-primary px-6 py-3 rounded-xl text-white font-medium flex items-center"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    New Banner
+                  </Link>
+                  <button
+                    onClick={loadDashboardData}
+                    className="neumorphic-button p-3 rounded-xl text-gray-600"
+                  >
+                    <RefreshCw className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Enhanced Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="neumorphic-container p-6 rounded-xl bg-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-2">Total Designs</p>
+                    <p className="text-3xl font-bold text-gray-900">{userStats?.total_designs || designs.length}</p>
+                    <p className="text-xs text-green-600 flex items-center mt-1">
+                      <TrendingUp className="w-3 h-3 mr-1" />
+                      Active creations
+                    </p>
+                  </div>
+                  <div className="neumorphic-button p-4 rounded-xl bg-blue-50">
+                    <Palette className="w-8 h-8 text-blue-600" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="neumorphic-container p-6 rounded-xl bg-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-2">Templates</p>
+                    <p className="text-3xl font-bold text-gray-900">{userStats?.total_templates || templates.length}</p>
+                    <p className="text-xs text-purple-600 flex items-center mt-1">
+                      <Star className="w-3 h-3 mr-1" />
+                      Custom saved
+                    </p>
+                  </div>
+                  <div className="neumorphic-button p-4 rounded-xl bg-purple-50">
+                    <Layout className="w-8 h-8 text-purple-600" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="neumorphic-container p-6 rounded-xl bg-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-2">Total Orders</p>
+                    <p className="text-3xl font-bold text-gray-900">{userStats?.total_orders || orders.length}</p>
+                    <p className="text-xs text-green-600 flex items-center mt-1">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      {userStats?.order_stats?.paid || orders.filter(o => o.status === 'paid').length} paid
+                    </p>
+                  </div>
+                  <div className="neumorphic-button p-4 rounded-xl bg-green-50">
+                    <ShoppingBag className="w-8 h-8 text-green-600" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="neumorphic-container p-6 rounded-xl bg-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-2">Total Spent</p>
+                    <p className="text-3xl font-bold text-gray-900">
+                      {formatCurrency(orders.reduce((sum, order) => sum + (order.total_amount || 0), 0))}
+                    </p>
+                    <p className="text-xs text-blue-600 flex items-center mt-1">
+                      <DollarSign className="w-3 h-3 mr-1" />
+                      This year
+                    </p>
+                  </div>
+                  <div className="neumorphic-button p-4 rounded-xl bg-yellow-50">
+                    <Crown className="w-8 h-8 text-yellow-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Status Breakdown */}
+            {userStats?.order_stats && (
+              <div className="neumorphic-container p-6 rounded-xl bg-white">
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                  <Activity className="w-5 h-5 mr-2 text-blue-600" />
+                  Order Status Overview
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {Object.entries(userStats.order_stats).map(([status, count]) => (
+                    <div key={status} className="neumorphic-inset p-4 rounded-lg text-center">
+                      <div className="flex items-center justify-center mb-2">
+                        {getStatusIcon(status)}
+                      </div>
+                      <p className="text-2xl font-bold text-gray-900">{count}</p>
+                      <p className="text-xs text-gray-600 capitalize">{status.replace('_', ' ')}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Link
+                    to="/editor"
+                    className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors"
+                  >
+                    <Plus className="w-6 h-6 text-primary-600 mr-3" />
+                    <div>
+                      <h4 className="font-medium text-gray-900">Create New Design</h4>
+                      <p className="text-sm text-gray-600">Start designing a new sign</p>
+                    </div>
+                  </Link>
+
+                  <button
+                    onClick={() => setActiveTab('designs')}
+                    className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors w-full text-left"
+                  >
+                    <Eye className="w-6 h-6 text-primary-600 mr-3" />
+                    <div>
+                      <h4 className="font-medium text-gray-900">View My Designs</h4>
+                      <p className="text-sm text-gray-600">Browse your saved designs</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Orders */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">Recent Orders</h3>
+              </div>
+              <div className="p-6">
+                {orders.slice(0, 5).length > 0 ? (
+                  <div className="space-y-4">
+                    {orders.slice(0, 5).map((order) => (
+                      <div key={order.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center">
+                          <Package className="w-5 h-5 text-gray-400 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {order.product_type} - Qty: {order.quantity}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              ${order.total_amount} • {new Date(order.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600 text-center py-4">No orders yet. Create your first design!</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Templates Tab */}
+        {activeTab === 'templates' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">My Templates</h2>
+                <p className="text-gray-600">Custom banner templates you've created</p>
+              </div>
+              <Link
+                to="/editor"
+                className="neumorphic-button-primary flex items-center px-4 py-2 rounded-xl text-white font-medium"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Template
+              </Link>
+            </div>
+
+            {templates.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {templates.map((template) => (
+                  <div key={template.id} className="neumorphic-container bg-white rounded-xl overflow-hidden">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-900 text-lg mb-1">{template.name}</h3>
+                          <p className="text-sm text-gray-600 mb-2">{template.description}</p>
+                          <div className="flex items-center space-x-2">
+                            <span className="inline-block bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full font-medium">
+                              {template.category}
+                            </span>
+                            {template.banner_type && (
+                              <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${getBannerTypeColor(template.banner_type)}`}>
+                                {template.banner_type}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => deleteTemplate(template.id)}
+                          className="neumorphic-button p-2 rounded-lg text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                        <span>Created {formatDate(template.created_at)}</span>
+                        <span className="flex items-center">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {formatDate(template.updated_at)}
+                        </span>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => loadDesignInEditor(template)}
+                          className="neumorphic-button flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center justify-center"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Use Template
+                        </button>
+                        <button className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="neumorphic-container bg-white rounded-xl p-12 text-center">
+                <Layout className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No templates yet</h3>
+                <p className="text-gray-600 mb-6">Create your first custom template to reuse designs</p>
+                <Link 
+                  to="/editor" 
+                  className="neumorphic-button-primary px-6 py-3 rounded-xl text-white font-medium inline-flex items-center"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Create First Template
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Designs Tab */}
+        {activeTab === 'designs' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">My Designs</h2>
+              <Link
+                to="/editor"
+                className="btn-primary flex items-center"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Design
+              </Link>
+            </div>
+
+            {designs.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {designs.map((design) => (
+                  <div key={design.id} className="neumorphic-container bg-white rounded-xl overflow-hidden">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-900 text-lg mb-1">{design.name}</h3>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {design.product_type} design
+                          </p>
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {design.banner_type && (
+                              <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${getBannerTypeColor(design.banner_type)}`}>
+                                {design.banner_type}
+                              </span>
+                            )}
+                            {design.banner_size && (
+                              <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
+                                {design.banner_size}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="neumorphic-button p-2 rounded-lg">
+                          <Palette className="w-4 h-4 text-blue-600" />
+                        </div>
+                      </div>
+                      
+                      {design.banner_material && (
+                        <div className="mb-4 p-3 neumorphic-inset rounded-lg">
+                          <div className="flex items-center text-xs text-gray-600 mb-1">
+                            <Tag className="w-3 h-3 mr-1" />
+                            Material & Specs
+                          </div>
+                          <p className="text-sm font-medium text-gray-800">{design.banner_material}</p>
+                          {design.banner_finish && (
+                            <p className="text-xs text-gray-600">{design.banner_finish} finish</p>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                        <span>Created {formatDate(design.created_at)}</span>
+                        <span className="flex items-center">
+                          <Ruler className="w-3 h-3 mr-1" />
+                          {design.dimensions ? `${design.dimensions.width}×${design.dimensions.height}` : 'Custom'}
+                        </span>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => loadDesignInEditor(design)}
+                          className="neumorphic-button flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center justify-center"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </button>
+                        <button className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Palette className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No designs yet</h3>
+                <p className="text-gray-600 mb-6">Create your first design to get started</p>
+                <Link to="/editor" className="btn-primary">
+                  Create Design
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Orders Tab */}
+        {activeTab === 'orders' && (
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Order History</h2>
+                <p className="text-gray-600">{orders.length} total orders</p>
+              </div>
+              
+              {/* Search and Filter */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search orders..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="neumorphic-input-container pl-10 pr-4 py-2 rounded-lg border-none bg-white text-sm focus:outline-none w-full sm:w-64"
+                  />
+                </div>
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="neumorphic-input-container pl-10 pr-8 py-2 rounded-lg border-none bg-white text-sm focus:outline-none appearance-none"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {filteredOrders.length > 0 ? (
+              <div className="space-y-4">
+                {filteredOrders.map((order) => (
+                  <div key={order.id} className="neumorphic-container bg-white rounded-xl p-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-bold text-gray-900">
+                            Order #{order.id.slice(-8)}
+                          </h3>
+                          <div className="flex items-center gap-1">
+                            {getStatusIcon(order.status)}
+                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                              {order.status}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                          <div className="neumorphic-inset p-3 rounded-lg">
+                            <div className="flex items-center text-xs text-gray-600 mb-1">
+                              <Tag className="w-3 h-3 mr-1" />
+                              Banner Type
+                            </div>
+                            <p className="font-medium text-gray-900">
+                              {order.banner_material || order.product_type}
+                            </p>
+                            {order.banner_finish && (
+                              <p className="text-xs text-gray-600">{order.banner_finish} finish</p>
+                            )}
+                          </div>
+                          
+                          <div className="neumorphic-inset p-3 rounded-lg">
+                            <div className="flex items-center text-xs text-gray-600 mb-1">
+                              <Ruler className="w-3 h-3 mr-1" />
+                              Size & Quantity
+                            </div>
+                            <p className="font-medium text-gray-900">
+                              {order.banner_size || 'Custom Size'}
+                            </p>
+                            <p className="text-xs text-gray-600">Qty: {order.quantity}</p>
+                          </div>
+                          
+                          <div className="neumorphic-inset p-3 rounded-lg">
+                            <div className="flex items-center text-xs text-gray-600 mb-1">
+                              <DollarSign className="w-3 h-3 mr-1" />
+                              Order Total
+                            </div>
+                            <p className="font-bold text-gray-900 text-lg">
+                              {formatCurrency(order.total_amount)}
+                            </p>
+                            <p className="text-xs text-gray-600">{formatDate(order.created_at)}</p>
+                          </div>
+                        </div>
+                        
+                        {order.banner_type && (
+                          <div className="mt-3 flex flex-wrap gap-1">
+                            <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${getBannerTypeColor(order.banner_type)}`}>
+                              {order.banner_type}
+                            </span>
+                            {order.banner_category && (
+                              <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
+                                {order.banner_category}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button 
+                          onClick={() => viewOrderDetails(order)}
+                          className="neumorphic-button px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Details
+                        </button>
+                        {order.status === 'delivered' && (
+                          <button 
+                            onClick={() => reorderItem(order)}
+                            className="neumorphic-button px-4 py-2 rounded-lg text-sm font-medium text-green-600 hover:bg-green-50 flex items-center"
+                          >
+                            <RefreshCw className="w-4 h-4 mr-1" />
+                            Reorder
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <ShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
+                <p className="text-gray-600 mb-6">Create your first design and place an order</p>
+                <Link to="/editor" className="btn-primary">
+                  Start Designing
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Profile Tab */}
+        {activeTab === 'profile' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
+            
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">User ID</label>
+                  <p className="mt-1 text-sm text-gray-900">{user?.user_id}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Actions</h3>
+              <div className="space-y-3">
+                <button className="btn-secondary w-full text-left">
+                  Change Password
+                </button>
+                <button className="btn-secondary w-full text-left">
+                  Update Profile
+                </button>
+                <button className="btn-secondary w-full text-left text-red-600 hover:text-red-700">
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Order Details Modal */}
+      {showOrderModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Order Details #{selectedOrder.id.slice(-8)}
+                </h2>
+                <button
+                  onClick={closeOrderModal}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <XCircle className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Order Status */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(selectedOrder.status)}
+                    <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedOrder.status)}`}>
+                      {selectedOrder.status}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-gray-900">
+                      {formatCurrency(selectedOrder.total_amount)}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {formatDate(selectedOrder.created_at)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Product Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+                      <Tag className="w-4 h-4 mr-2" />
+                      Product Details
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Type:</span>
+                        <span className="font-medium">{selectedOrder.product_type}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Material:</span>
+                        <span className="font-medium">{selectedOrder.banner_material || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Finish:</span>
+                        <span className="font-medium">{selectedOrder.banner_finish || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Quantity:</span>
+                        <span className="font-medium">{selectedOrder.quantity}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+                      <Ruler className="w-4 h-4 mr-2" />
+                      Specifications
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Size:</span>
+                        <span className="font-medium">{selectedOrder.banner_size || 'Custom'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Category:</span>
+                        <span className="font-medium">{selectedOrder.banner_category || 'N/A'}</span>
+                      </div>
+                      {selectedOrder.banner_type && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Type:</span>
+                          <span className={`px-2 py-1 text-xs rounded-full font-medium ${getBannerTypeColor(selectedOrder.banner_type)}`}>
+                            {selectedOrder.banner_type}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Information */}
+                {selectedOrder.customer_info && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+                      <User className="w-4 h-4 mr-2" />
+                      Customer Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-600">Name:</p>
+                        <p className="font-medium">{selectedOrder.customer_info.fullName}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Email:</p>
+                        <p className="font-medium">{selectedOrder.customer_info.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Phone:</p>
+                        <p className="font-medium">{selectedOrder.customer_info.phone}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Company:</p>
+                        <p className="font-medium">{selectedOrder.customer_info.company || 'N/A'}</p>
+                      </div>
+                      {selectedOrder.customer_info.address && (
+                        <div className="md:col-span-2">
+                          <p className="text-gray-600">Address:</p>
+                          <p className="font-medium">{selectedOrder.customer_info.address}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Order Actions */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => reorderItem(selectedOrder)}
+                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Reorder This Item
+                  </button>
+                  <button
+                    onClick={closeOrderModal}
+                    className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  )
+}
+
+export default Dashboard
