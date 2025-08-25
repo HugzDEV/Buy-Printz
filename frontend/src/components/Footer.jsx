@@ -4,7 +4,7 @@ import { Palette, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'luci
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="text-white" style={{backgroundColor: '#0E1B4D'}}>
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -81,15 +81,15 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <div className="border-t border-blue-700 mt-8 pt-8 text-center text-gray-300">
           <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 mb-4">
-            <Link to="/terms" className="text-gray-400 hover:text-white transition-colors">
+            <Link to="/terms" className="text-gray-300 hover:text-white transition-colors">
               Terms of Service
             </Link>
-            <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">
+            <Link to="/privacy" className="text-gray-300 hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <a href="mailto:order@buyprintz.com" className="text-gray-400 hover:text-white transition-colors">
+            <a href="mailto:order@buyprintz.com" className="text-gray-300 hover:text-white transition-colors">
               Support
             </a>
           </div>

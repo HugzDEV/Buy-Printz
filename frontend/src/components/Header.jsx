@@ -48,7 +48,7 @@ const Header = () => {
   const currentNavigation = user ? authenticatedNavigation : navigation
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="shadow-sm border-b" style={{backgroundColor: '#0E1B4D'}}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -58,7 +58,7 @@ const Header = () => {
               alt="Buy Printz" 
               className="w-24 h-24 object-contain"
             />
-            <span className="text-xl font-bold text-gray-900">Buy Printz</span>
+            <span className="text-xl font-bold text-white">Buy Printz</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -69,8 +69,8 @@ const Header = () => {
                 to={item.href}
                 className={`text-sm font-medium transition-colors ${
                   location.pathname === item.href
-                    ? 'text-primary-600'
-                    : 'text-gray-600 hover:text-primary-600'
+                    ? 'text-white font-semibold'
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
                 {item.name}
@@ -82,10 +82,10 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                <span className="text-sm text-gray-600">Welcome, {user.email}</span>
+                <span className="text-sm text-gray-300">Welcome, {user.email}</span>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center text-gray-300 hover:text-white transition-colors"
                 >
                   <LogOut className="w-4 h-4 mr-1" />
                   Logout
@@ -95,13 +95,13 @@ const Header = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors"
+                  className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="btn-primary"
+                  className="bg-white text-blue-900 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                   Get Started
                 </Link>
@@ -112,7 +112,7 @@ const Header = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+            className="md:hidden p-2 rounded-lg hover:bg-blue-800 text-white transition-colors"
           >
             {mobileMenuOpen ? (
               <X className="w-6 h-6" />
@@ -124,7 +124,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t">
+          <div className="md:hidden py-4 border-t border-blue-700">
             <nav className="flex flex-col space-y-4">
               {currentNavigation.map((item) => (
                 <Link
@@ -133,8 +133,8 @@ const Header = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`text-sm font-medium transition-colors ${
                     location.pathname === item.href
-                      ? 'text-primary-600'
-                      : 'text-gray-600 hover:text-primary-600'
+                      ? 'text-white font-semibold'
+                      : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   {item.name}
@@ -142,8 +142,8 @@ const Header = () => {
               ))}
               
               {user ? (
-                <div className="pt-4 border-t border-gray-200">
-                  <div className="flex items-center text-sm text-gray-600 mb-2">
+                <div className="pt-4 border-t border-blue-700">
+                  <div className="flex items-center text-sm text-gray-300 mb-2">
                     <User className="w-4 h-4 mr-2" />
                     {user.email}
                   </div>
@@ -152,25 +152,25 @@ const Header = () => {
                       handleLogout()
                       setMobileMenuOpen(false)
                     }}
-                    className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="flex items-center text-sm text-gray-300 hover:text-white transition-colors"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </button>
                 </div>
               ) : (
-                <div className="pt-4 border-t border-gray-200 space-y-2">
+                <div className="pt-4 border-t border-blue-700 space-y-2">
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors"
+                    className="block text-sm font-medium text-gray-300 hover:text-white transition-colors"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="btn-primary w-full text-center"
+                    className="bg-white text-blue-900 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors w-full text-center block"
                   >
                     Get Started
                   </Link>
