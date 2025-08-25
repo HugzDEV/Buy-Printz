@@ -79,12 +79,16 @@ allowed_origins = [
 if frontend_url:
     allowed_origins.append(frontend_url)
 
+# Allow all Vercel preview deployments (they use random subdomains)
+vercel_pattern = "https://*.vercel.app"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_origin_regex=r"https://.*\.vercel\.app$"
 )
 
 # Mount static files - create uploads directory if it doesn't exist
