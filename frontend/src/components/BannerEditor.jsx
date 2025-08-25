@@ -117,6 +117,9 @@ const BannerEditor = () => {
   const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight })
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 640)
   
+  // Orientation state (must be declared before getResponsiveCanvasDimensions)
+  const [orientation, setOrientation] = useState('landscape') // 'landscape' or 'portrait'
+  
   // Get responsive canvas dimensions based on screen size
   const getResponsiveCanvasDimensions = () => {
     const isMobile = window.innerWidth < 640
@@ -160,7 +163,6 @@ const BannerEditor = () => {
   const [useCustomSize, setUseCustomSize] = useState(false)
   const [customWidth, setCustomWidth] = useState(2)
   const [customHeight, setCustomHeight] = useState(4)
-  const [orientation, setOrientation] = useState('landscape') // 'landscape' or 'portrait'
   
   // Ref to track canvas resizing state
   const isResizingRef = useRef(false)
