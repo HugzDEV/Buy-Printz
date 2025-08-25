@@ -26,6 +26,15 @@ const Dashboard = () => {
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [showOrderModal, setShowOrderModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileModalType, setProfileModalType] = useState('')
+  const [profileForm, setProfileForm] = useState({
+    fullName: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
 
   useEffect(() => {
     loadDashboardData()
@@ -222,6 +231,151 @@ const Dashboard = () => {
     localStorage.setItem('reorderData', JSON.stringify(order))
     navigate('/editor')
     toast.success('Order data loaded for reordering')
+  }
+
+  // Profile Management Functions
+  const openProfileModal = (type) => {
+    setProfileModalType(type)
+    if (type === 'update') {
+      setProfileForm({
+        fullName: user?.full_name || '',
+        email: user?.email || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
+    }
+    setShowProfileModal(true)
+  }
+
+  const closeProfileModal = () => {
+    setShowProfileModal(false)
+    setProfileModalType('')
+    setProfileForm({
+      fullName: '',
+      email: '',
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    })
+  }
+
+  const updateProfile = async () => {
+    try {
+      const response = await authService.authenticatedRequest('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          full_name: profileForm.fullName,
+          email: profileForm.email
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          toast.success('Profile updated successfully')
+          setUser(prev => ({
+            ...prev,
+            full_name: profileForm.fullName,
+            email: profileForm.email
+          }))
+          closeProfileModal()
+        } else {
+          throw new Error(data.error || 'Failed to update profile')
+        }
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to update profile')
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      toast.error(error.message || 'Failed to update profile')
+    }
+  }
+
+  const changePassword = async () => {
+    if (profileForm.newPassword !== profileForm.confirmPassword) {
+      toast.error('New passwords do not match')
+      return
+    }
+
+    if (profileForm.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
+
+    try {
+      const response = await authService.authenticatedRequest('/api/user/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          current_password: profileForm.currentPassword,
+          new_password: profileForm.newPassword
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          toast.success('Password changed successfully')
+          closeProfileModal()
+        } else {
+          throw new Error(data.error || 'Failed to change password')
+        }
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to change password')
+      }
+    } catch (error) {
+      console.error('Error changing password:', error)
+      toast.error(error.message || 'Failed to change password')
+    }
+  }
+
+  const deleteAccount = async () => {
+    if (!confirm('Are you sure you want to delete your account? This action cannot be undone and will delete all your designs, orders, and data.')) {
+      return
+    }
+
+    const confirmText = prompt('Type "DELETE" to confirm account deletion:')
+    if (confirmText !== 'DELETE') {
+      toast.error('Account deletion cancelled')
+      return
+    }
+
+    try {
+      const response = await authService.authenticatedRequest('/api/user/delete-account', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          password: profileForm.currentPassword
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          toast.success('Account deleted successfully')
+          await authService.logout()
+          navigate('/register')
+        } else {
+          throw new Error(data.error || 'Failed to delete account')
+        }
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to delete account')
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error)
+      toast.error(error.message || 'Failed to delete account')
+    }
   }
 
   if (loading) {
@@ -807,34 +961,108 @@ const Dashboard = () => {
         {/* Profile Tab */}
         {activeTab === 'profile' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
+              <div className="flex items-center space-x-2">
+                <User className="w-6 h-6 text-gray-400" />
+                <span className="text-sm text-gray-600">Manage your account</span>
+              </div>
+            </div>
             
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
+            {/* Profile Information Card */}
+            <div className="neumorphic-container bg-white rounded-xl p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <User className="w-5 h-5 mr-2 text-blue-600" />
+                Account Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="neumorphic-inset p-4 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <p className="text-gray-900 font-medium">{user?.full_name || 'Not set'}</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">User ID</label>
-                  <p className="mt-1 text-sm text-gray-900">{user?.user_id}</p>
+                <div className="neumorphic-inset p-4 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                  <p className="text-gray-900 font-medium">{user?.email}</p>
+                </div>
+                <div className="neumorphic-inset p-4 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">User ID</label>
+                  <p className="text-gray-600 text-xs font-mono">{user?.user_id}</p>
+                </div>
+                <div className="neumorphic-inset p-4 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Account Status</label>
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Active
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Actions</h3>
-              <div className="space-y-3">
-                <button className="btn-secondary w-full text-left">
-                  Change Password
+            {/* Account Actions Card */}
+            <div className="neumorphic-container bg-white rounded-xl p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <Settings className="w-5 h-5 mr-2 text-blue-600" />
+                Account Actions
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button 
+                  onClick={() => openProfileModal('update')}
+                  className="neumorphic-button p-6 rounded-xl text-center hover:bg-blue-50 transition-colors group"
+                >
+                  <Edit className="w-8 h-8 text-blue-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <h4 className="font-medium text-gray-900 mb-1">Update Profile</h4>
+                  <p className="text-sm text-gray-600">Edit your name and email</p>
                 </button>
-                <button className="btn-secondary w-full text-left">
-                  Update Profile
+
+                <button 
+                  onClick={() => openProfileModal('password')}
+                  className="neumorphic-button p-6 rounded-xl text-center hover:bg-yellow-50 transition-colors group"
+                >
+                  <Settings className="w-8 h-8 text-yellow-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <h4 className="font-medium text-gray-900 mb-1">Change Password</h4>
+                  <p className="text-sm text-gray-600">Update your password</p>
                 </button>
-                <button className="btn-secondary w-full text-left text-red-600 hover:text-red-700">
-                  Delete Account
+
+                <button 
+                  onClick={() => openProfileModal('delete')}
+                  className="neumorphic-button p-6 rounded-xl text-center hover:bg-red-50 transition-colors group"
+                >
+                  <Trash2 className="w-8 h-8 text-red-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <h4 className="font-medium text-gray-900 mb-1">Delete Account</h4>
+                  <p className="text-sm text-gray-600">Permanently delete account</p>
                 </button>
+              </div>
+            </div>
+
+            {/* Account Statistics */}
+            <div className="neumorphic-container bg-white rounded-xl p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-blue-600" />
+                Account Statistics
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                  <Palette className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900">{designs.length}</p>
+                  <p className="text-xs text-gray-600">Designs Created</p>
+                </div>
+                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                  <Layout className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900">{templates.length}</p>
+                  <p className="text-xs text-gray-600">Templates Saved</p>
+                </div>
+                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                  <ShoppingBag className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900">{orders.length}</p>
+                  <p className="text-xs text-gray-600">Orders Placed</p>
+                </div>
+                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                  <DollarSign className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900">
+                    {formatCurrency(orders.reduce((sum, order) => sum + (order.total_amount || 0), 0))}
+                  </p>
+                  <p className="text-xs text-gray-600">Total Spent</p>
+                </div>
               </div>
             </div>
           </div>
@@ -983,6 +1211,172 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Management Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">
+                  {profileModalType === 'update' && 'Update Profile'}
+                  {profileModalType === 'password' && 'Change Password'}
+                  {profileModalType === 'delete' && 'Delete Account'}
+                </h2>
+                <button
+                  onClick={closeProfileModal}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <XCircle className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {/* Update Profile Form */}
+              {profileModalType === 'update' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.fullName}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, fullName: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={profileForm.email}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      onClick={updateProfile}
+                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Update Profile
+                    </button>
+                    <button
+                      onClick={closeProfileModal}
+                      className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Change Password Form */}
+              {profileModalType === 'password' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Current Password
+                    </label>
+                    <input
+                      type="password"
+                      value={profileForm.currentPassword}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter current password"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={profileForm.newPassword}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter new password (min 6 characters)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Confirm New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={profileForm.confirmPassword}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Confirm new password"
+                    />
+                  </div>
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      onClick={changePassword}
+                      className="flex-1 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
+                    >
+                      Change Password
+                    </button>
+                    <button
+                      onClick={closeProfileModal}
+                      className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Delete Account Confirmation */}
+              {profileModalType === 'delete' && (
+                <div className="space-y-4">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+                      <p className="text-sm text-red-800 font-medium">Warning: This action cannot be undone!</p>
+                    </div>
+                    <p className="text-sm text-red-700 mt-2">
+                      Deleting your account will permanently remove all your designs, orders, templates, and account data.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Enter your password to confirm
+                    </label>
+                    <input
+                      type="password"
+                      value={profileForm.currentPassword}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      onClick={deleteAccount}
+                      className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Delete Account
+                    </button>
+                    <button
+                      onClick={closeProfileModal}
+                      className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

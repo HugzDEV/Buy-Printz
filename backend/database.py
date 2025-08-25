@@ -550,5 +550,44 @@ class DatabaseManager:
             print(f"Error cleaning up expired canvas states: {e}")
             return 0
 
+    async def delete_user_account(self, user_id: str) -> bool:
+        """Delete user account and all associated data"""
+        if not self.supabase:
+            return False
+            
+        try:
+            # Delete user data in the correct order (respecting foreign key constraints)
+            
+            # Delete canvas states
+            self.supabase.table("canvas_states").delete().eq("user_id", user_id).execute()
+            
+            # Delete design history
+            self.supabase.table("design_history").delete().eq("user_id", user_id).execute()
+            
+            # Delete banner templates
+            self.supabase.table("banner_templates").delete().eq("user_id", user_id).execute()
+            
+            # Delete canvas designs
+            self.supabase.table("canvas_designs").delete().eq("user_id", user_id).execute()
+            
+            # Delete orders
+            self.supabase.table("orders").delete().eq("user_id", user_id).execute()
+            
+            # Delete user addresses
+            self.supabase.table("user_addresses").delete().eq("user_id", user_id).execute()
+            
+            # Delete user preferences
+            self.supabase.table("user_preferences").delete().eq("user_id", user_id).execute()
+            
+            # Delete user profile (this should cascade due to foreign key)
+            self.supabase.table("user_profiles").delete().eq("id", user_id).execute()
+            
+            print(f"Successfully deleted all data for user: {user_id}")
+            return True
+            
+        except Exception as e:
+            print(f"Error deleting user account: {e}")
+            return False
+
 # Initialize database manager
 db_manager = DatabaseManager()
