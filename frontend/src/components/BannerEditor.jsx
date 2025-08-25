@@ -113,12 +113,37 @@ const BannerEditor = () => {
   const PORTRAIT_WIDTH = 800
   const PORTRAIT_HEIGHT = 1600
   
-  // Canvas settings - size based on orientation
-  const [canvasSize, setCanvasSize] = useState({ 
-    width: LANDSCAPE_WIDTH, 
-    height: LANDSCAPE_HEIGHT 
-  }) 
-  const [scale, setScale] = useState(0.8) // 80% initial zoom for fixed workspace viewing 
+  // Mobile responsive workspace dimensions
+  const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight })
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 640)
+  
+  // Get responsive canvas dimensions based on screen size
+  const getResponsiveCanvasDimensions = () => {
+    const isMobile = window.innerWidth < 640
+    const isTablet = window.innerWidth < 1024
+    
+    if (orientation === 'portrait') {
+      if (isMobile) {
+        return { width: 320, height: 640 } // Mobile portrait - fit screen
+      } else if (isTablet) {
+        return { width: 400, height: 800 } // Tablet portrait
+      }
+      return { width: PORTRAIT_WIDTH, height: PORTRAIT_HEIGHT } // Desktop
+    } else {
+      if (isMobile) {
+        return { width: 320, height: 160 } // Mobile landscape - very compact
+      } else if (isTablet) {
+        return { width: 600, height: 300 } // Tablet landscape
+      }
+      return { width: LANDSCAPE_WIDTH, height: LANDSCAPE_HEIGHT } // Desktop
+    }
+  }
+  
+  // Canvas settings - size based on orientation and screen size
+  const [canvasSize, setCanvasSize] = useState(() => getResponsiveCanvasDimensions()) 
+  const [scale, setScale] = useState(1) // Start with 100% scale, let responsive sizing handle fit
+  
+ 
   const [selectedId, setSelectedId] = useState(null)
   const [elements, setElements] = useState([])
   const [history, setHistory] = useState([])
@@ -2247,16 +2272,40 @@ const BannerEditor = () => {
 
   // Update canvas size when orientation changes (different templates)
   useEffect(() => {
-    const workspaceDims = getWorkspaceDimensions()
-    
-    // Update canvas size for new orientation template
-    if (canvasSize.width !== workspaceDims.width || canvasSize.height !== workspaceDims.height) {
-      setCanvasSize({
-        width: workspaceDims.width,
-        height: workspaceDims.height
-      })
+    const updateCanvasForScreenSize = () => {
+      const newDimensions = getResponsiveCanvasDimensions()
+      setCanvasSize(newDimensions)
+      setIsMobileView(window.innerWidth < 640)
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight })
+      
+
     }
+    
+    // Update immediately for orientation change
+    updateCanvasForScreenSize()
+    
+    // Add resize listener for screen size changes
+    const handleResize = () => {
+      updateCanvasForScreenSize()
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [orientation]) // Update when orientation changes
+  
+  // Auto-scale for mobile when canvas size or viewport changes
+  useEffect(() => {
+    if (isMobileView && canvasSize.width && viewportSize.width) {
+      const availableWidth = viewportSize.width - 40
+      const availableHeight = viewportSize.height - 300
+      
+      const scaleX = availableWidth / canvasSize.width
+      const scaleY = availableHeight / canvasSize.height
+      
+      const optimalScale = Math.min(scaleX, scaleY, 1)
+      setScale(optimalScale)
+    }
+  }, [isMobileView, canvasSize, viewportSize])
 
   // Save user preferences when banner type/size changes
   const saveUserPreferences = async () => {
@@ -3144,12 +3193,9 @@ const BannerEditor = () => {
     }
   }
 
-  // Get workspace dimensions based on orientation
+  // Get workspace dimensions based on orientation and screen size
   const getWorkspaceDimensions = () => {
-    if (orientation === 'portrait') {
-      return { width: PORTRAIT_WIDTH, height: PORTRAIT_HEIGHT }
-    }
-    return { width: LANDSCAPE_WIDTH, height: LANDSCAPE_HEIGHT }
+    return getResponsiveCanvasDimensions()
   }
   
   // Calculate scale factor from workspace to actual banner for export
@@ -3543,6 +3589,21 @@ const BannerEditor = () => {
                   onClick={resetZoom}
                   className="hidden sm:block px-2 py-1 rounded text-xs text-gray-600 hover:bg-white transition-colors"
                   title="Reset Zoom"
+                >
+                  Fit
+                </button>
+                <button 
+                  onClick={() => {
+                    // Mobile fit-to-screen
+                    const availableWidth = viewportSize.width - 40
+                    const availableHeight = viewportSize.height - 300
+                    const scaleX = availableWidth / canvasSize.width
+                    const scaleY = availableHeight / canvasSize.height
+                    const optimalScale = Math.min(scaleX, scaleY, 1)
+                    setScale(optimalScale)
+                  }}
+                  className="sm:hidden p-1 rounded text-xs text-gray-600 hover:bg-white transition-colors"
+                  title="Fit to Screen"
                 >
                   Fit
                 </button>
@@ -4560,11 +4621,11 @@ const BannerEditor = () => {
                 </div>
               </div>
               
-              {/* Canvas Area - Simple template approach - Responsive padding */}
-              <div className="neumorphic-container p-2 sm:p-8 rounded-2xl bg-white flex items-center justify-center">
-                <div className="neumorphic-inset rounded-xl overflow-hidden" style={{
-                  width: canvasSize.width * scale,
-                  height: canvasSize.height * scale
+              {/* Canvas Area - Fully Responsive */}
+              <div className="neumorphic-container p-2 sm:p-8 rounded-2xl bg-white flex items-center justify-center w-full max-w-full">
+                <div className="neumorphic-inset rounded-xl overflow-hidden max-w-full max-h-full" style={{
+                  width: Math.min(canvasSize.width * scale, viewportSize.width - (isMobileView ? 40 : 200)),
+                  height: Math.min(canvasSize.height * scale, viewportSize.height - (isMobileView ? 300 : 400))
                 }}>
                 <Stage
                   ref={stageRef}
