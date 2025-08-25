@@ -127,6 +127,7 @@ const BannerEditor = () => {
   const [uploadQuality, setUploadQuality] = useState(null)
   const [copiedElement, setCopiedElement] = useState(null)
   const [activeTab, setActiveTab] = useState('tools')
+  const [isMobileToolsOpen, setIsMobileToolsOpen] = useState(false)
   const [selectedBannerType, setSelectedBannerType] = useState('vinyl-13oz')
   const [selectedBannerSize, setSelectedBannerSize] = useState('2ft x 4ft')
   
@@ -3489,15 +3490,16 @@ const BannerEditor = () => {
       {/* Clean Modern Toolbar */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         {/* Main Header Row */}
-        <div className="px-6 py-4">
+        <div className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Buy Printz Banner Studio
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="hidden sm:inline">Buy Printz Banner Studio</span>
+              <span className="sm:hidden">Banner Studio</span>
             </h1>
             
             {/* Action Buttons */}
-            <div className="flex items-center space-x-3">
-              {/* History Controls */}
+            <div className="flex items-center space-x-1 sm:space-x-3">
+              {/* History Controls - Hide labels on mobile */}
               <div className="flex items-center space-x-1 bg-gray-50 rounded-lg p-1">
                 <button 
                   onClick={undo} 
@@ -3517,28 +3519,29 @@ const BannerEditor = () => {
                 </button>
               </div>
 
-              {/* Zoom Controls */}
-              <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-2">
+              {/* Zoom Controls - Compact on mobile */}
+              <div className="flex items-center space-x-1 sm:space-x-2 bg-gray-50 rounded-lg p-1 sm:p-2">
                 <button 
                   onClick={zoomOut}
                   className="p-1 rounded hover:bg-white transition-colors"
                   title="Zoom Out"
                 >
-                  <ZoomOut className="w-4 h-4 text-gray-600" />
+                  <ZoomOut className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
                 </button>
-                <span className="text-sm font-medium text-gray-700 min-w-[3rem] text-center">
-                  {Math.round(scale * 100)}%
+                <span className="text-xs sm:text-sm font-medium text-gray-700 min-w-[2rem] sm:min-w-[3rem] text-center">
+                  <span className="hidden sm:inline">{Math.round(scale * 100)}%</span>
+                  <span className="sm:hidden">{Math.round(scale * 100)}</span>
                 </span>
                 <button 
                   onClick={zoomIn}
                   className="p-1 rounded hover:bg-white transition-colors"
                   title="Zoom In"
                 >
-                  <ZoomIn className="w-4 h-4 text-gray-600" />
+                  <ZoomIn className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
                 </button>
                 <button 
                   onClick={resetZoom}
-                  className="px-2 py-1 rounded text-xs text-gray-600 hover:bg-white transition-colors"
+                  className="hidden sm:block px-2 py-1 rounded text-xs text-gray-600 hover:bg-white transition-colors"
                   title="Reset Zoom"
                 >
                   Fit
@@ -3558,9 +3561,18 @@ const BannerEditor = () => {
                 <Grid className="w-4 h-4" />
               </button>
 
-              {/* Element Controls - only show when element is selected */}
+              {/* Mobile Tools Toggle */}
+              <button 
+                onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
+                className="sm:hidden p-2 rounded-lg border bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 transition-colors"
+                title="Toggle Tools Panel"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+
+              {/* Element Controls - only show when element is selected, hide on mobile */}
               {selectedId && (
-                <div className="flex items-center space-x-1 pl-3 border-l border-gray-300">
+                <div className="hidden sm:flex items-center space-x-1 pl-3 border-l border-gray-300">
                   <button 
                     onClick={copySelected}
                     className="p-2 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-blue-600"
@@ -3593,28 +3605,28 @@ const BannerEditor = () => {
                 </div>
               )}
 
-              {/* Save & Export */}
-              <div className="flex items-center space-x-2 pl-3 border-l border-gray-300">
+              {/* Save & Export - Compact on mobile */}
+              <div className="flex items-center space-x-1 sm:space-x-2 pl-2 sm:pl-3 border-l border-gray-300">
                 <button 
                   onClick={saveDesign} 
-                  className="px-4 py-2 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors flex items-center space-x-2"
+                  className="px-2 sm:px-4 py-2 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors flex items-center space-x-1 sm:space-x-2"
                 >
-                  <Save className="w-4 h-4" />
-                  <span className="text-sm font-medium">Save</span>
+                  <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline text-sm font-medium">Save</span>
                 </button>
                 <button 
                   onClick={saveAsTemplate} 
-                  className="px-4 py-2 bg-purple-50 text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors flex items-center space-x-2"
+                  className="hidden sm:flex px-4 py-2 bg-purple-50 text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors items-center space-x-2"
                 >
                   <FileText className="w-4 h-4" />
                   <span className="text-sm font-medium">Template</span>
                 </button>
                 <button 
                   onClick={exportCanvas} 
-                  className="px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg hover:bg-green-100 transition-colors flex items-center space-x-2"
+                  className="px-2 sm:px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg hover:bg-green-100 transition-colors flex items-center space-x-1 sm:space-x-2"
                 >
-                  <Download className="w-4 h-4" />
-                  <span className="text-sm font-medium">Export</span>
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline text-sm font-medium">Export</span>
                 </button>
               </div>
               
@@ -3622,18 +3634,18 @@ const BannerEditor = () => {
               <button
                 onClick={proceedToCheckout}
                 disabled={elements.length === 0}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all flex items-center space-x-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 sm:px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all flex items-center space-x-1 sm:space-x-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ShoppingCart className="w-4 h-4" />
-                <span>Create Order</span>
+                <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm">Order</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Settings Row */}
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-          <div className="flex items-center space-x-6">
+        {/* Settings Row - Scrollable on mobile */}
+        <div className="px-2 sm:px-6 py-2 sm:py-3 bg-gray-50 border-t border-gray-200">
+          <div className="flex items-center space-x-2 sm:space-x-6 overflow-x-auto pb-2 sm:pb-0">
             {/* Banner Type */}
             <div className="flex items-center space-x-2">
               <label className="text-sm font-medium text-gray-700 min-w-0">Type:</label>
@@ -3772,13 +3784,13 @@ const BannerEditor = () => {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar - Professional Tools Panel */}
-        <div className="w-96 bg-gray-100 border-r shadow-neumorphic-inset overflow-y-auto">
-          <div className="p-6">
+        {/* Left Sidebar - Professional Tools Panel - Collapsible on mobile */}
+        <div className={`w-full sm:w-80 lg:w-96 bg-gray-100 border-r shadow-neumorphic-inset overflow-y-auto ${isMobileToolsOpen ? 'block' : 'hidden sm:block'}`}>
+          <div className="p-3 sm:p-6">
             
-            {/* Tab Navigation */}
-            <div className="neumorphic-container p-3 rounded-xl mb-6">
-              <div className="grid grid-cols-4 gap-2">
+            {/* Tab Navigation - Mobile responsive */}
+            <div className="neumorphic-container p-2 sm:p-3 rounded-xl mb-4 sm:mb-6">
+              <div className="grid grid-cols-4 gap-1 sm:gap-2">
                 {[
                   { key: 'tools', label: 'Tools', icon: Settings },
                   { key: 'shapes', label: 'Shapes', icon: Square },
@@ -3788,14 +3800,14 @@ const BannerEditor = () => {
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`p-3 rounded-lg text-xs font-medium transition-all flex flex-col items-center space-y-1 ${
+                    className={`p-2 sm:p-3 rounded-lg text-xs font-medium transition-all flex flex-col items-center space-y-1 ${
                       activeTab === tab.key 
                         ? 'neumorphic-active text-blue-600 bg-blue-50' 
                         : 'neumorphic-button text-gray-600 hover:text-gray-800'
                     }`}
                   >
-                    <tab.icon className="w-4 h-4" />
-                    <span>{tab.label}</span>
+                    <tab.icon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-xs">{tab.label}</span>
                   </button>
                 ))}
               </div>
@@ -4533,21 +4545,23 @@ const BannerEditor = () => {
           </div>
         </div>
 
-        {/* Main Canvas Area - Fixed Workspace */}
-        <div className="flex-1 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-          <div id="canvas-container" className="w-full h-full p-4 flex flex-col items-center justify-center">
-              {/* Banner Details - Always at top, never rotated */}
-              <div className="mb-4 text-center">
-                <div className="text-lg font-bold text-gray-800 mb-1">
-                  {getCurrentBannerType()?.name || 'Custom Banner'}
+        {/* Main Canvas Area - Fixed Workspace - Mobile Responsive */}
+        <div className={`flex-1 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden ${isMobileToolsOpen ? 'hidden sm:block' : 'block'}`}>
+          <div id="canvas-container" className="w-full h-full p-2 sm:p-4 flex flex-col items-center justify-center">
+              {/* Banner Details - Always at top, never rotated - Compact on mobile */}
+              <div className="mb-2 sm:mb-4 text-center">
+                <div className="text-sm sm:text-lg font-bold text-gray-800 mb-1">
+                  <span className="hidden sm:inline">{getCurrentBannerType()?.name || 'Custom Banner'}</span>
+                  <span className="sm:hidden">{getCurrentBannerType()?.name?.split(' ')[0] || 'Banner'}</span>
                 </div>
-                <div className="text-sm text-gray-600">
-                  {Math.round(scale * 100)}% scale • Print: {getCurrentDimensions().width}ft x {getCurrentDimensions().height}ft ({orientation}) • PDF Ready
+                <div className="text-xs sm:text-sm text-gray-600">
+                  <span className="hidden sm:inline">{Math.round(scale * 100)}% scale • Print: {getCurrentDimensions().width}ft x {getCurrentDimensions().height}ft ({orientation}) • PDF Ready</span>
+                  <span className="sm:hidden">{getCurrentDimensions().width}x{getCurrentDimensions().height}ft • {Math.round(scale * 100)}%</span>
                 </div>
               </div>
               
-              {/* Canvas Area - Simple template approach */}
-              <div className="neumorphic-container p-8 rounded-2xl bg-white flex items-center justify-center">
+              {/* Canvas Area - Simple template approach - Responsive padding */}
+              <div className="neumorphic-container p-2 sm:p-8 rounded-2xl bg-white flex items-center justify-center">
                 <div className="neumorphic-inset rounded-xl overflow-hidden" style={{
                   width: canvasSize.width * scale,
                   height: canvasSize.height * scale
