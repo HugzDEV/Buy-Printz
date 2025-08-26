@@ -72,14 +72,14 @@ const LandingPage = () => {
             <Link 
               to="/editor" 
               onClick={() => sessionStorage.setItem('newDesign', 'true')}
-              className="neumorphic-button-hero bg-white text-buyprint-brand hover:bg-gray-50 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
+              className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
             >
               Create Banner
               <ArrowRight className="w-6 h-6" />
             </Link>
             <Link 
               to="/products"
-              className="neumorphic-button-hero-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-buyprint-brand text-xl px-12 py-6 rounded-2xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-3 min-w-[240px]"
+              className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-xl px-12 py-6 rounded-2xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-3 min-w-[240px]"
             >
               View Products
               <Star className="w-6 h-6" />
@@ -210,7 +210,7 @@ const LandingPage = () => {
                   <Link 
                     to="/editor" 
                     onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="bg-white/95 hover:bg-white border border-white/50 hover:border-white w-full text-center py-3 px-6 text-buyprint-brand font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
+                    className="bg-buyprint-brand hover:bg-buyprint-600 border border-buyprint-brand hover:border-buyprint-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
                   >
                     Design Now
                     <ArrowRight className="w-4 h-4" />
@@ -238,14 +238,14 @@ const LandingPage = () => {
               <Link 
                 to="/editor" 
                 onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                className="neumorphic-button-hero bg-white text-buyprint-brand hover:bg-gray-50 text-2xl px-14 py-7 inline-flex items-center justify-center gap-4 rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[280px] hover:scale-105"
+                className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-2xl px-14 py-7 inline-flex items-center justify-center gap-4 rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[280px] hover:scale-105"
               >
                 Start Designing Now
                 <ArrowRight className="w-7 h-7" />
               </Link>
               <Link 
                 to="/products" 
-                className="neumorphic-button-hero-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-buyprint-brand text-2xl px-14 py-7 rounded-3xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-4 min-w-[280px] hover:scale-105"
+                className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-2xl px-14 py-7 rounded-3xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-4 min-w-[280px] hover:scale-105"
               >
                 Browse Products
                 <Palette className="w-7 h-7" />
