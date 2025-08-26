@@ -2185,6 +2185,7 @@ const BannerEditor = () => {
     
     const loadCanvasState = async () => {
       try {
+        console.log('🔄 loadCanvasState: Starting auto-restore check')
         // Check if returning from checkout with preserved canvas state
         const checkoutCanvasState = await canvasStateService.loadCheckoutCanvasState()
         
@@ -2298,6 +2299,8 @@ const BannerEditor = () => {
     }
     
     const initializeCanvas = async () => {
+      console.log('🚀 initializeCanvas starting')
+      console.log('🔍 Initial elements count:', elements.length)
       loadUserPreferences()
       
       // Check if this is a fresh "new design" request FIRST
@@ -2305,8 +2308,17 @@ const BannerEditor = () => {
       const loadDesignData = localStorage.getItem('loadDesign')
       const designToOrderData = localStorage.getItem('designToOrder')
       
+      console.log('🔍 Flags check - isNewDesign:', isNewDesign, 'loadDesignData:', !!loadDesignData, 'designToOrderData:', !!designToOrderData)
+      
       if (isNewDesign && !loadDesignData && !designToOrderData) {
-        console.log('Starting fresh canvas for new design')
+        console.log('🆕 Starting fresh canvas for new design')
+        console.log('🔍 Current elements state:', elements.length)
+        console.log('🔍 sessionStorage newDesign:', sessionStorage.getItem('newDesign'))
+        console.log('🔍 localStorage loadDesign:', localStorage.getItem('loadDesign'))
+        console.log('🔍 localStorage designToOrder:', localStorage.getItem('designToOrder'))
+        
+        // Explicitly clear elements to ensure fresh canvas
+        setElements([])
         sessionStorage.removeItem('newDesign')
         return // Exit early for new designs - no loading needed
       }
@@ -2373,6 +2385,7 @@ const BannerEditor = () => {
       }
       
       // No specific design to load and not a new design, proceed with auto-restore logic
+      console.log('🔄 Running auto-restore logic')
       await loadCanvasState()
     }
     
@@ -2454,6 +2467,7 @@ const BannerEditor = () => {
   // Auto-save canvas state when elements change
   useEffect(() => {
     if (elements.length > 0) {
+      console.log('💾 Auto-save triggered, elements count:', elements.length)
       const canvasData = {
         elements,
         canvasSize,
@@ -2471,6 +2485,8 @@ const BannerEditor = () => {
       
       // Auto-save with debouncing
       canvasStateService.autoSaveCanvasState(canvasData, bannerSettings, 3000) // 3 second delay
+    } else {
+      console.log('🧹 Elements is empty, no auto-save needed')
     }
     
     return () => {
