@@ -2185,17 +2185,6 @@ const BannerEditor = () => {
     
     const loadCanvasState = async () => {
       try {
-        // Check if this is a fresh "new design" request
-        const isNewDesign = sessionStorage.getItem('newDesign') === 'true'
-        const hasLoadDesign = localStorage.getItem('loadDesign')
-        const hasDesignToOrder = localStorage.getItem('designToOrder')
-        
-        if (isNewDesign && !hasLoadDesign && !hasDesignToOrder) {
-          console.log('Starting fresh canvas for new design')
-          sessionStorage.removeItem('newDesign')
-          return // Exit early for new designs
-        }
-        
         // Check if returning from checkout with preserved canvas state
         const checkoutCanvasState = await canvasStateService.loadCheckoutCanvasState()
         
@@ -2308,72 +2297,86 @@ const BannerEditor = () => {
       }
     }
     
-    loadUserPreferences()
-    loadCanvasState()
-    
-    // Handle specific design loading requests
-    const handleLoadDesign = () => {
+    const initializeCanvas = async () => {
+      loadUserPreferences()
+      
+      // Check if this is a fresh "new design" request FIRST
+      const isNewDesign = sessionStorage.getItem('newDesign') === 'true'
       const loadDesignData = localStorage.getItem('loadDesign')
       const designToOrderData = localStorage.getItem('designToOrder')
       
-      if (loadDesignData) {
-        try {
-          const design = JSON.parse(loadDesignData)
-          console.log('Loading specific design:', design)
-          
-          // Load the design data (this would need to be implemented based on the design structure)
-          if (design.canvas_data) {
-            const canvasData = typeof design.canvas_data === 'string' 
-              ? JSON.parse(design.canvas_data) 
-              : design.canvas_data
-            
-            if (canvasData.elements) {
-              setElements(canvasData.elements)
-              setBackgroundColor(canvasData.backgroundColor || backgroundColor)
-              
-              if (canvasData.canvasSize) {
-                setCanvasSize(canvasData.canvasSize)
-              }
-            }
-          }
-          
-          localStorage.removeItem('loadDesign')
-        } catch (error) {
-          console.error('Error loading design:', error)
-          localStorage.removeItem('loadDesign')
-        }
+      if (isNewDesign && !loadDesignData && !designToOrderData) {
+        console.log('Starting fresh canvas for new design')
+        sessionStorage.removeItem('newDesign')
+        return // Exit early for new designs - no loading needed
       }
       
-      if (designToOrderData) {
-        try {
-          const design = JSON.parse(designToOrderData)
-          console.log('Loading design for new order:', design)
-          
-          // Similar logic as loadDesign
-          if (design.canvas_data) {
-            const canvasData = typeof design.canvas_data === 'string' 
-              ? JSON.parse(design.canvas_data) 
-              : design.canvas_data
+      // Check for specific design loading requests
+      if (loadDesignData || designToOrderData) {
+        console.log('Specific design loading detected, skipping auto-restore')
+        
+        if (loadDesignData) {
+          try {
+            const design = JSON.parse(loadDesignData)
+            console.log('Loading specific design:', design)
             
-            if (canvasData.elements) {
-              setElements(canvasData.elements)
-              setBackgroundColor(canvasData.backgroundColor || backgroundColor)
+            if (design.canvas_data) {
+              const canvasData = typeof design.canvas_data === 'string' 
+                ? JSON.parse(design.canvas_data) 
+                : design.canvas_data
               
-              if (canvasData.canvasSize) {
-                setCanvasSize(canvasData.canvasSize)
+              if (canvasData.elements) {
+                setElements(canvasData.elements)
+                setBackgroundColor(canvasData.backgroundColor || backgroundColor)
+                
+                if (canvasData.canvasSize) {
+                  setCanvasSize(canvasData.canvasSize)
+                }
               }
             }
+            
+            localStorage.removeItem('loadDesign')
+          } catch (error) {
+            console.error('Error loading design:', error)
+            localStorage.removeItem('loadDesign')
           }
-          
-          localStorage.removeItem('designToOrder')
-        } catch (error) {
-          console.error('Error loading design for order:', error)
-          localStorage.removeItem('designToOrder')
         }
+        
+        if (designToOrderData) {
+          try {
+            const design = JSON.parse(designToOrderData)
+            console.log('Loading design for new order:', design)
+            
+            if (design.canvas_data) {
+              const canvasData = typeof design.canvas_data === 'string' 
+                ? JSON.parse(design.canvas_data) 
+                : design.canvas_data
+              
+              if (canvasData.elements) {
+                setElements(canvasData.elements)
+                setBackgroundColor(canvasData.backgroundColor || backgroundColor)
+                
+                if (canvasData.canvasSize) {
+                  setCanvasSize(canvasData.canvasSize)
+                }
+              }
+            }
+            
+            localStorage.removeItem('designToOrder')
+          } catch (error) {
+            console.error('Error loading design for order:', error)
+            localStorage.removeItem('designToOrder')
+          }
+        }
+        
+        return // Exit early, don't run auto-restore
       }
+      
+      // No specific design to load and not a new design, proceed with auto-restore logic
+      await loadCanvasState()
     }
     
-    handleLoadDesign()
+    initializeCanvas()
   }, [])
 
   // Update canvas size when orientation changes (different templates)
