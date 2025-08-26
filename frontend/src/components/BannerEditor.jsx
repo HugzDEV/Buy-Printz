@@ -3363,13 +3363,20 @@ const BannerEditor = () => {
       })
       
       if (response.ok) {
-
+        const data = await response.json()
+        if (data.success) {
+          alert('Design saved successfully!')
+          // Navigate back to My Designs tab after successful save
+          navigate('/dashboard?tab=designs')
+        } else {
+          throw new Error('Failed to save design')
+        }
       } else {
         throw new Error('Failed to save design')
       }
     } catch (error) {
       console.error('Error saving design:', error)
-
+      alert('Failed to save design. Please try again.')
     }
   }
 
@@ -3948,10 +3955,21 @@ const BannerEditor = () => {
         {/* Main Header Row */}
         <div className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              <span className="hidden sm:inline">Buy Printz Banner Studio</span>
-              <span className="sm:hidden">Banner Studio</span>
-            </h1>
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => navigate('/dashboard?tab=designs')}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center text-gray-600 hover:text-gray-800"
+                title="Back to My Designs"
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline text-sm">My Designs</span>
+              </button>
+              <div className="w-px h-6 bg-gray-300"></div>
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="hidden sm:inline">Buy Printz Banner Studio</span>
+                <span className="sm:hidden">Banner Studio</span>
+              </h1>
+            </div>
             
             {/* Action Buttons */}
             <div className="flex items-center space-x-1 sm:space-x-3">

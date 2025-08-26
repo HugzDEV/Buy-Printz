@@ -803,6 +803,24 @@ async def get_user_stats(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/orders/pending")
+async def get_pending_orders(current_user: dict = Depends(get_current_user)):
+    """Get user's pending/incomplete orders"""
+    try:
+        pending_orders = await db_manager.get_pending_orders(current_user["user_id"])
+        return {"success": True, "orders": pending_orders}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/designs/completed")
+async def get_completed_designs(current_user: dict = Depends(get_current_user)):
+    """Get user's completed banner designs from successful orders"""
+    try:
+        completed_designs = await db_manager.get_completed_designs(current_user["user_id"])
+        return {"success": True, "designs": completed_designs}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Design history endpoints
 @app.get("/api/designs/{design_id}/history")
 async def get_design_history(design_id: str, current_user: dict = Depends(get_current_user)):

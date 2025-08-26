@@ -393,8 +393,8 @@ class DatabaseManager:
     async def get_user_stats(self, user_id: str) -> Dict[str, Any]:
         """Get user statistics and usage data"""
         try:
-            # Get order counts by status
-            orders_response = self.supabase.table("orders").select("status").eq("user_id", user_id).execute()
+            # Get all orders with status and total_amount
+            orders_response = self.supabase.table("orders").select("status, total_amount").eq("user_id", user_id).execute()
             orders = orders_response.data or []
             
             # Get design count
@@ -407,13 +407,24 @@ class DatabaseManager:
             
             # Calculate order statistics
             order_stats = {}
+            completed_orders = []
+            total_spent = 0
+            
             for order in orders:
                 status = order["status"]
                 order_stats[status] = order_stats.get(status, 0) + 1
+                
+                # Only count completed/paid orders for totals and spending
+                if status in ['completed', 'paid', 'approved', 'shipped', 'delivered']:
+                    completed_orders.append(order)
+                    if order.get("total_amount"):
+                        total_spent += order["total_amount"]
             
             return {
-                "total_orders": len(orders),
-                "order_stats": order_stats,
+                "total_orders": len(completed_orders),  # Only completed orders
+                "total_spent": total_spent,  # Only from completed orders
+                "order_stats": order_stats,  # All order statuses for breakdown
+                "pending_orders": order_stats.get('pending', 0),  # Pending orders count
                 "total_designs": designs_count,
                 "total_templates": templates_count,
                 "success": True
@@ -421,6 +432,54 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error getting user stats: {e}")
             return {"success": False, "error": str(e)}
+
+    async def get_pending_orders(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get user's pending/incomplete orders"""
+        try:
+            response = self.supabase.table("orders").select("*").eq("user_id", user_id).eq("status", "pending").order("created_at", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting pending orders: {e}")
+            return []
+
+    async def get_completed_designs(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get user's completed banner designs from successful orders"""
+        try:
+            # Get completed orders with their design data, ensure no duplicates
+            response = self.supabase.table("orders").select("id, status, total_amount, created_at, order_details").eq("user_id", user_id).in_("status", ["completed", "paid", "approved", "shipped", "delivered"]).order("created_at", desc=True).execute()
+            
+            completed_designs = []
+            processed_designs = set()  # Track processed designs to avoid duplicates
+            
+            print(f"Found {len(response.data or [])} completed orders for user {user_id}")
+            
+            for order in response.data or []:
+                order_details = order.get("order_details")
+                if order_details and order_details.get("canvas_image"):
+                    # Create a unique key to avoid duplicates
+                    design_key = f"{order['id']}_{order_details.get('canvas_image', '')[:50]}"
+                    
+                    if design_key not in processed_designs:
+                        design_data = {
+                            "id": f"design_{order['id']}",  # Make unique ID
+                            "order_id": order["id"], 
+                            "banner_size": order_details.get("banner_size", "Unknown"),
+                            "total_amount": order.get("total_amount", 0),
+                            "status": order["status"],
+                            "created_at": order["created_at"],
+                            "canvas_image": order_details.get("canvas_image"),
+                            "design_preview": order_details.get("canvas_image"),
+                            "title": f"Banner Design - {order_details.get('banner_size', 'Unknown Size')}"
+                        }
+                        completed_designs.append(design_data)
+                        processed_designs.add(design_key)
+                        print(f"Added design for order {order['id']}")
+            
+            print(f"Returning {len(completed_designs)} unique completed designs")
+            return completed_designs
+        except Exception as e:
+            print(f"Error getting completed designs: {e}")
+            return []
 
     # Canvas State Management
     async def save_canvas_state(self, canvas_state_data: Dict[str, Any]) -> bool:
