@@ -72,6 +72,7 @@ frontend_url = os.getenv("FRONTEND_URL", "")
 allowed_origins = [
     "http://localhost:3000", 
     "http://localhost:5173",
+    "https://buyprintz.com",
     "https://www.buyprintz.com"
 ]
 
