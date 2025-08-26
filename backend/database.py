@@ -95,12 +95,27 @@ class DatabaseManager:
     async def create_order(self, user_id: str, order_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new order"""
         try:
+            # Create order_details that includes canvas_image
+            order_details = {
+                "canvas_image": order_data.get("canvas_image"),
+                "banner_size": order_data.get("banner_size"),
+                "banner_type": order_data.get("banner_type"),
+                "banner_material": order_data.get("banner_material"),
+                "banner_finish": order_data.get("banner_finish"),
+                "banner_category": order_data.get("banner_category"),
+                "background_color": order_data.get("background_color"),
+                "print_options": order_data.get("print_options", {}),
+                "dimensions": order_data["dimensions"],
+                "canvas_data": order_data["canvas_data"]
+            }
+            
             order_record = {
                 "user_id": user_id,
                 "product_type": order_data["product_type"],
                 "quantity": order_data["quantity"],
                 "dimensions": json.dumps(order_data["dimensions"]),
                 "canvas_data": json.dumps(order_data["canvas_data"]),
+                "order_details": json.dumps(order_details),  # Store comprehensive order details
                 "total_amount": order_data["total_amount"],
                 "status": "pending",
                 "banner_type": order_data.get("banner_type"),
@@ -455,25 +470,24 @@ class DatabaseManager:
             
             for order in response.data or []:
                 order_details = order.get("order_details")
-                if order_details and order_details.get("canvas_image"):
-                    # Create a unique key to avoid duplicates
-                    design_key = f"{order['id']}_{order_details.get('canvas_image', '')[:50]}"
-                    
-                    if design_key not in processed_designs:
-                        design_data = {
-                            "id": f"design_{order['id']}",  # Make unique ID
-                            "order_id": order["id"], 
-                            "banner_size": order_details.get("banner_size", "Unknown"),
-                            "total_amount": order.get("total_amount", 0),
-                            "status": order["status"],
-                            "created_at": order["created_at"],
-                            "canvas_image": order_details.get("canvas_image"),
-                            "design_preview": order_details.get("canvas_image"),
-                            "title": f"Banner Design - {order_details.get('banner_size', 'Unknown Size')}"
-                        }
-                        completed_designs.append(design_data)
-                        processed_designs.add(design_key)
-                        print(f"Added design for order {order['id']}")
+                # Each order is unique, so use order_id as the unique key
+                order_id = order['id']
+                
+                if order_id not in processed_designs:
+                    design_data = {
+                        "id": f"design_{order_id}",  # Make unique ID based on order
+                        "order_id": order_id, 
+                        "banner_size": order_details.get("banner_size", "Unknown") if order_details else "Unknown",
+                        "total_amount": order.get("total_amount", 0),
+                        "status": order["status"],
+                        "created_at": order["created_at"],
+                        "canvas_image": order_details.get("canvas_image") if order_details else None,
+                        "design_preview": order_details.get("canvas_image") if order_details else None,
+                        "title": f"Banner Design - {order_details.get('banner_size', 'Unknown Size') if order_details else 'Unknown Size'}"
+                    }
+                    completed_designs.append(design_data)
+                    processed_designs.add(order_id)
+                    print(f"Added design for order {order_id} with canvas_image: {'Yes' if order_details and order_details.get('canvas_image') else 'No'}")
             
             print(f"Returning {len(completed_designs)} unique completed designs")
             return completed_designs

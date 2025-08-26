@@ -139,6 +139,7 @@ class CanvasData(BaseModel):
 
 class OrderRequest(BaseModel):
     canvas_data: Dict[str, Any]
+    canvas_image: Optional[str] = None  # Add canvas_image field
     product_type: str
     quantity: int
     dimensions: Dict[str, Any]
@@ -479,6 +480,7 @@ async def create_order(
             "quantity": order_data.quantity,
             "dimensions": order_data.dimensions,
             "canvas_data": order_data.canvas_data,
+            "canvas_image": order_data.canvas_image,  # Include canvas_image
             "banner_type": order_data.banner_type,
             "banner_material": order_data.banner_material,
             "banner_finish": order_data.banner_finish,
