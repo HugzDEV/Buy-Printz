@@ -7,7 +7,7 @@ import {
   Star, Edit, Trash2, RefreshCw, Archive,
   Filter, Search, Clock, CheckCircle, XCircle,
   AlertCircle, Truck, Crown, Layers, Layout,
-  PaintBucket, Ruler, Tag, MapPin
+  PaintBucket, Ruler, Tag, MapPin, ShoppingCart
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import authService from '../services/auth'
@@ -84,6 +84,7 @@ const Dashboard = () => {
       // Load user designs
       const designsData = await designsResponse.json()
       if (designsData.success) {
+        console.log('Regular Designs Data:', designsData.designs)
         setDesigns(designsData.designs)
       }
 
@@ -114,6 +115,7 @@ const Dashboard = () => {
       // Load pending orders
       const pendingOrdersData = await pendingOrdersResponse.json()
       if (pendingOrdersData.success) {
+        console.log('Pending Orders Data:', pendingOrdersData.orders)
         setPendingOrders(pendingOrdersData.orders)
       }
 
@@ -264,6 +266,17 @@ const Dashboard = () => {
     localStorage.setItem('reorderData', JSON.stringify(order))
     navigate('/editor')
     toast.success('Order data loaded for reordering')
+  }
+
+  const reorderDesign = (design) => {
+    // Store design data for reordering  
+    localStorage.setItem('reorderData', JSON.stringify(design))
+    navigate('/editor')
+    toast.success('Design loaded for reordering')
+  }
+
+  const getStatusClass = (status) => {
+    return getStatusColor(status) // Use the same function as getStatusColor
   }
 
   // Profile Management Functions
@@ -515,7 +528,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2">Total Designs</p>
-                    <p className="text-3xl font-bold text-gray-900">{userStats?.total_designs || designs.length}</p>
+                                         <p className="text-3xl font-bold text-gray-900">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
                     <p className="text-xs text-green-600 flex items-center mt-1">
                       <TrendingUp className="w-3 h-3 mr-1" />
                       Active creations
@@ -766,8 +779,9 @@ const Dashboard = () => {
               </Link>
             </div>
 
-            {completedDesigns.length > 0 ? (
+            {(completedDesigns.length > 0 || designs.length > 0) ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Show completed designs from orders */}
                 {completedDesigns.map((design) => (
                   <div key={design.id} className="neumorphic-container bg-white rounded-xl overflow-hidden">
                     <div className="p-6">
@@ -846,12 +860,72 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ))}
+                
+                {/* Show saved designs from editor */}
+                {designs.map((design) => (
+                  <div key={`saved-${design.id}`} className="neumorphic-container bg-white rounded-xl overflow-hidden">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-900 text-lg mb-1">{design.name || 'Untitled Design'}</h3>
+                          <p className="text-sm text-gray-600 mb-2">
+                            Saved Design
+                          </p>
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            <span className="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
+                              Draft
+                            </span>
+                            {design.banner_size && (
+                              <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
+                                {design.banner_size}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="neumorphic-button p-2 rounded-lg">
+                          <Palette className="w-4 h-4 text-blue-600" />
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                        <span>Saved {formatDate(design.created_at)}</span>
+                        <span className="flex items-center">
+                          <Ruler className="w-3 h-3 mr-1" />
+                          {design.product_type || 'Banner'}
+                        </span>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            localStorage.setItem('loadDesign', JSON.stringify(design))
+                            navigate('/editor')
+                          }}
+                          className="neumorphic-button flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center justify-center"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => {
+                            // Create an order from this design
+                            localStorage.setItem('designToOrder', JSON.stringify(design))
+                            navigate('/editor')
+                          }}
+                          className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="text-center py-12">
                 <Palette className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No completed designs yet</h3>
-                <p className="text-gray-600 mb-6">Complete your first order to see your designs here!</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No designs yet</h3>
+                <p className="text-gray-600 mb-6">Create your first design to see it here!</p>
                 <Link to="/editor" className="btn-primary">
                   Create Design
                 </Link>
@@ -870,11 +944,11 @@ const Dashboard = () => {
               </span>
             </div>
 
-            {pendingOrders.length === 0 ? (
-              <div className="neumorphic-container p-12 rounded-xl bg-white text-center">
-                <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No pending orders</h3>
-                <p className="text-gray-600 mb-6">All your orders are complete!</p>
+                         {pendingOrders.length === 0 ? (
+               <div className="neumorphic-container p-12 rounded-xl bg-white text-center">
+                 <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                 <h3 className="text-lg font-medium text-gray-900 mb-2">No pending orders</h3>
+                 <p className="text-gray-600 mb-6">All your orders are complete! Pending orders appear here when you create a design but haven't completed payment.</p>
                 <Link 
                   to="/editor" 
                   className="neumorphic-button px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center"
@@ -1180,8 +1254,8 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="neumorphic-inset p-4 rounded-lg text-center">
                   <Palette className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{designs.length}</p>
-                  <p className="text-xs text-gray-600">Designs Created</p>
+                                     <p className="text-2xl font-bold text-gray-900">{completedDesigns.length + designs.length}</p>
+                   <p className="text-xs text-gray-600">Total Designs</p>
                 </div>
                 <div className="neumorphic-inset p-4 rounded-lg text-center">
                   <Layout className="w-6 h-6 text-purple-600 mx-auto mb-2" />
