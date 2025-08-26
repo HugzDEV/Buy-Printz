@@ -192,24 +192,43 @@ const PrintPreviewModal = ({
       const tempCanvas = document.createElement('canvas')
       const ctx = tempCanvas.getContext('2d')
       
-      // Create a reasonable preview size (not massive 150" canvas!)
-      const originalWidth = parseFloat(dimensions.width) || 14400
-      const originalHeight = parseFloat(dimensions.height) || 7200
+      // The canvas elements are positioned relative to the workspace size, not print size!
+      // BannerEditor uses fixed workspace dimensions (1600x800 landscape, 800x1600 portrait)
+      let workspaceWidth, workspaceHeight
       
-      // Create a more reasonable preview canvas (max 800px wide)
+      // Determine workspace dimensions from canvas data or use defaults
+      if (canvasData && canvasData.canvasSize) {
+        workspaceWidth = canvasData.canvasSize.width
+        workspaceHeight = canvasData.canvasSize.height
+      } else {
+        // Default workspace dimensions based on aspect ratio
+        const printWidth = parseFloat(dimensions.width) || 2
+        const printHeight = parseFloat(dimensions.height) || 4
+        const aspectRatio = printHeight / printWidth
+        
+        if (aspectRatio > 1) {
+          // Portrait orientation
+          workspaceWidth = 800
+          workspaceHeight = 1600
+        } else {
+          // Landscape orientation  
+          workspaceWidth = 1600
+          workspaceHeight = 800
+        }
+      }
+      
+      // Create preview canvas with proper aspect ratio
       const maxPreviewWidth = 800
-      const aspectRatio = originalHeight / originalWidth
-      const previewWidth = Math.min(maxPreviewWidth, originalWidth)
+      const aspectRatio = workspaceHeight / workspaceWidth
+      const previewWidth = Math.min(maxPreviewWidth, workspaceWidth)
       const previewHeight = previewWidth * aspectRatio
-      
-      // Preview canvas configured
       
       tempCanvas.width = previewWidth
       tempCanvas.height = previewHeight
       
-      // Calculate scaling from original canvas to preview canvas
-      const scaleX = previewWidth / originalWidth
-      const scaleY = previewHeight / originalHeight
+      // Calculate scaling from workspace to preview canvas (NOT print size!)
+      const scaleX = previewWidth / workspaceWidth
+      const scaleY = previewHeight / workspaceHeight
       
       // Scaling factors calculated for element positioning
       
@@ -235,10 +254,12 @@ const PrintPreviewModal = ({
       const canvasImage = tempCanvas.toDataURL('image/jpeg', 1.0)
       setPreviewImage(canvasImage) // Set the preview image for direct display
       
-      // Create PDF with proper banner dimensions (use the real banner size)
-      // Convert pixels to inches for printing (assuming the design was made at 96 DPI)
-      const pdfWidthInches = originalWidth / 96
-      const pdfHeightInches = originalHeight / 96
+      // Create PDF with proper banner dimensions (use the actual print size)
+      // Convert feet to inches for printing
+      const printWidthFeet = parseFloat(dimensions.width) || 2
+      const printHeightFeet = parseFloat(dimensions.height) || 4
+      const pdfWidthInches = printWidthFeet * 12  // Convert feet to inches
+      const pdfHeightInches = printHeightFeet * 12
       
       // PDF dimensions calculated for print specifications
       
@@ -258,7 +279,7 @@ const PrintPreviewModal = ({
       
       pdf.setFontSize(12)
       const specs = [
-        `Dimensions: ${dimensions.width}" x ${dimensions.height}"`,
+        `Dimensions: ${printWidthFeet}' x ${printHeightFeet}' (${pdfWidthInches}" x ${pdfHeightInches}")`,
         `Material: ${orderDetails.banner_material || 'Standard Vinyl'}`,
         `Finish: ${orderDetails.banner_finish || 'Matte'}`,
         `Type: ${orderDetails.banner_type || 'Indoor/Outdoor'}`,
