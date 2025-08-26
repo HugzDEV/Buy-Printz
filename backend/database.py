@@ -192,8 +192,21 @@ class DatabaseManager:
 
     # Canvas Data Management
     async def save_canvas_design(self, user_id: str, design_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Save canvas design for later use"""
+        """Save canvas design for later use - database enforced limit"""
         try:
+            # Get current design count using database function
+            count_response = self.supabase.rpc("get_user_design_count", {"user_uuid": user_id}).execute()
+            
+            if count_response.data:
+                count_info = count_response.data
+                if count_info["at_limit"]:
+                    return {
+                        "success": False, 
+                        "error": f"Design limit reached. You can save up to {count_info['design_limit']} designs. Please delete some existing designs first.",
+                        "design_count": count_info["design_count"],
+                        "design_limit": count_info["design_limit"]
+                    }
+            
             design_record = {
                 "user_id": user_id,
                 "name": design_data.get("name", "Untitled Design"),
@@ -211,16 +224,32 @@ class DatabaseManager:
                 "updated_at": datetime.utcnow().isoformat()
             }
             
+            # The database trigger will automatically enforce the 10-design limit
             response = self.supabase.table("canvas_designs").insert(design_record).execute()
             
             if response.data:
+                # Get updated design count after insert
+                updated_count_response = self.supabase.rpc("get_user_design_count", {"user_uuid": user_id}).execute()
+                count_info = updated_count_response.data if updated_count_response.data else {"design_count": 1, "design_limit": 10}
+                
                 return {
                     "design_id": response.data[0]["id"],
+                    "design_count": count_info["design_count"],
+                    "design_limit": count_info["design_limit"],
                     "success": True
                 }
             return {"success": False, "error": "Failed to save design"}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            error_msg = str(e)
+            # Handle database-enforced limit error
+            if "Design limit reached" in error_msg:
+                return {
+                    "success": False,
+                    "error": "Design limit reached. You can save up to 10 designs. Please delete some existing designs first.",
+                    "design_count": 10,
+                    "design_limit": 10
+                }
+            return {"success": False, "error": error_msg}
 
     async def get_user_designs(self, user_id: str) -> List[Dict[str, Any]]:
         """Get all saved designs for a user"""
@@ -230,6 +259,53 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error getting user designs: {e}")
             return []
+
+    async def get_design_count_info(self, user_id: str) -> Dict[str, Any]:
+        """Get design count and limit information using database function"""
+        try:
+            response = self.supabase.rpc("get_user_design_count", {"user_uuid": user_id}).execute()
+            if response.data:
+                return {
+                    "success": True,
+                    **response.data
+                }
+            return {
+                "success": False,
+                "design_count": 0,
+                "design_limit": 10,
+                "designs_remaining": 10,
+                "at_limit": False,
+                "near_limit": False
+            }
+        except Exception as e:
+            print(f"Error getting design count info: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "design_count": 0,
+                "design_limit": 10
+            }
+
+    async def delete_design(self, design_id: str, user_id: str) -> bool:
+        """Delete a saved design using database function for validation"""
+        try:
+            # Use database function for safe deletion with ownership validation
+            response = self.supabase.rpc("delete_user_design", {
+                "design_uuid": design_id,
+                "user_uuid": user_id
+            }).execute()
+            
+            if response.data and response.data.get("success"):
+                print(f"Successfully deleted design {design_id} for user {user_id}")
+                return True
+            else:
+                error_msg = response.data.get("error", "Unknown error") if response.data else "Database function failed"
+                print(f"Failed to delete design {design_id}: {error_msg}")
+                return False
+                
+        except Exception as e:
+            print(f"Error deleting design: {e}")
+            return False
 
     async def get_design(self, design_id: str) -> Optional[Dict[str, Any]]:
         """Get specific design by ID"""

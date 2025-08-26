@@ -3440,14 +3440,24 @@ const BannerEditor = () => {
       if (response.ok) {
         const data = await response.json()
         if (data.success) {
-          alert('Design saved successfully!')
+          alert(`Design saved successfully! (${data.design_count}/${data.design_limit} designs used)`)
           // Navigate back to My Designs tab after successful save
           navigate('/dashboard?tab=designs')
         } else {
-          throw new Error('Failed to save design')
+          // Handle design limit error
+          if (data.design_count >= data.design_limit) {
+            alert(`Design limit reached! You can save up to ${data.design_limit} designs. Please delete some existing designs from your dashboard first.`)
+          } else {
+            alert(data.error || 'Failed to save design')
+          }
         }
       } else {
-        throw new Error('Failed to save design')
+        const errorData = await response.json()
+        if (errorData.design_count >= errorData.design_limit) {
+          alert(`Design limit reached! You can save up to ${errorData.design_limit} designs. Please delete some existing designs from your dashboard first.`)
+        } else {
+          alert(errorData.error || 'Failed to save design')
+        }
       }
     } catch (error) {
       console.error('Error saving design:', error)

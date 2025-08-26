@@ -408,6 +408,15 @@ async def get_user_designs(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/designs/count-info")
+async def get_design_count_info(current_user: dict = Depends(get_current_user)):
+    """Get design count and limit information"""
+    try:
+        count_info = await db_manager.get_design_count_info(current_user["user_id"])
+        return count_info
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/designs/{design_id}")
 async def get_design(design_id: str, current_user: dict = Depends(get_current_user)):
     """Get specific design"""
@@ -417,6 +426,18 @@ async def get_design(design_id: str, current_user: dict = Depends(get_current_us
             return {"success": True, "design": design}
         else:
             raise HTTPException(status_code=404, detail="Design not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/designs/{design_id}")
+async def delete_design(design_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a saved design"""
+    try:
+        success = await db_manager.delete_design(design_id, current_user["user_id"])
+        if success:
+            return {"success": True, "message": "Design deleted successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="Design not found or not authorized")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

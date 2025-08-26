@@ -275,6 +275,32 @@ const Dashboard = () => {
     toast.success('Design loaded for reordering')
   }
 
+  const deleteDesign = async (designId) => {
+    if (!confirm('Are you sure you want to delete this design? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await authService.authenticatedRequest(`/api/designs/${designId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        toast.success('Design deleted successfully')
+        // Remove from local state
+        setDesigns(designs.filter(d => d.id !== designId))
+        // Reload dashboard data to update counts
+        loadDashboardData()
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to delete design')
+      }
+    } catch (error) {
+      console.error('Error deleting design:', error)
+      toast.error(`Failed to delete design: ${error.message}`)
+    }
+  }
+
   const getStatusClass = (status) => {
     return getStatusColor(status) // Use the same function as getStatusColor
   }
@@ -772,11 +798,22 @@ const Dashboard = () => {
         {activeTab === 'designs' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">My Designs</h2>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">My Designs</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {designs.length} of 10 saved designs
+                  {designs.length >= 8 && (
+                    <span className="text-orange-600 ml-2 font-medium">
+                      {designs.length >= 10 ? 'Storage limit reached!' : 'Nearly full!'}
+                    </span>
+                  )}
+                </p>
+              </div>
               <Link
                 to="/editor"
                 onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                className="btn-primary flex items-center"
+                className={`btn-primary flex items-center ${designs.length >= 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={designs.length >= 10 ? 'Delete some designs first to create new ones' : 'Create new design'}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 New Design
@@ -919,6 +956,13 @@ const Dashboard = () => {
                           className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50"
                         >
                           <ShoppingCart className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => deleteDesign(design.id)}
+                          className="neumorphic-button p-3 rounded-lg text-red-600 hover:bg-red-50"
+                          title="Delete design"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
