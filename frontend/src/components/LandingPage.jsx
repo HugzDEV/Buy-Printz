@@ -1,28 +1,28 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle, Star, Truck, Shield, Palette } from 'lucide-react'
+import { ArrowRight, CheckCircle, Star, Truck, Shield, Palette, Zap, Award, Users, Sparkles } from 'lucide-react'
 
 const LandingPage = () => {
   const features = [
     {
-      icon: <Palette className="w-6 h-6" />,
+      icon: <Sparkles className="w-7 h-7" />,
       title: "Professional Design Tools",
       description: "Advanced canvas editor with text, shapes, and color manipulation"
     },
     {
-      icon: <Truck className="w-6 h-6" />,
-      title: "Fast Production",
-      description: "High-quality printing and quick turnaround times"
+      icon: <Zap className="w-7 h-7" />,
+      title: "Lightning Fast Delivery",
+      description: "Order by 12pm → 2 business days. Order by 4pm → 3 business days including shipping"
     },
     {
-      icon: <Shield className="w-6 h-6" />,
+      icon: <Award className="w-7 h-7" />,
       title: "Quality Guarantee",
-      description: "Premium materials and professional finishing"
+      description: "Premium materials with 100% satisfaction guarantee"
     },
     {
-      icon: <Star className="w-6 h-6" />,
+      icon: <Users className="w-7 h-7" />,
       title: "Expert Support",
-      description: "Dedicated customer service and design assistance"
+      description: "Dedicated customer service and professional design assistance"
     }
   ]
 
@@ -32,7 +32,7 @@ const LandingPage = () => {
       name: "13oz Vinyl Banner",
       price: "From $25",
       description: "Our most popular banner - perfect for outdoor use with weather resistance",
-      image: "/images/13oz-vinyl-banner.jpg",
+      image: "/assets/images/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included"],
       badge: "Best Seller"
     },
@@ -40,24 +40,24 @@ const LandingPage = () => {
       name: "Mesh Banner",
       price: "From $30",
       description: "Best seller for windy conditions with 70% air flow",
-      image: "/images/mesh-banner.jpg",
+      image: "/assets/images/Mesh Banner - BuyPrintz.jpg",
       features: ["Wind resistant", "70% air flow", "Fade resistant"],
       badge: "Popular"
     },
     {
       name: "18oz Blocked Banner", 
       price: "From $35",
-      description: "Our most durable banner - built to last with maximum durability",
-      image: "/images/18oz-blocked-banner.jpg",
-      features: ["Maximum durability", "Block-out backing", "Professional finish"],
+      description: "18 oz matte blockout banner - Full color UV printed, indoor and outdoor ready",
+      image: "/assets/images/blockout Banner -BuyPrintz.jpg",
+      features: ["Single or double sided printing", "Free hemming and grommets", "Additional finishing available"],
       badge: "Premium"
     }
   ]
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
+      <section className="text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             Professional Banner Printing for Business
@@ -65,47 +65,48 @@ const LandingPage = () => {
           <p className="text-xl md:text-2xl mb-8 text-primary-100">
             Create custom vinyl banners, trade show displays, and outdoor signage with professional design tools
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 
               to="/editor" 
               onClick={() => sessionStorage.setItem('newDesign', 'true')}
-              className="btn-primary bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-4 inline-flex items-center gap-2"
+              className="neumorphic-button-hero bg-white text-buyprint-brand hover:bg-gray-50 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
             >
               Create Banner
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-6 h-6" />
             </Link>
             <Link 
               to="/products"
-              className="btn-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600 text-lg px-8 py-4"
+              className="neumorphic-button-hero-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-buyprint-brand text-xl px-12 py-6 rounded-2xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-3 min-w-[240px]"
             >
               View Products
+              <Star className="w-6 h-6" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Our Platform?
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Why Choose BuyPrintz?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Professional-grade design tools combined with high-quality printing and fast delivery
+            <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
+              Professional-grade design tools combined with premium printing materials and lightning-fast delivery
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {features.map((feature, index) => (
-              <div key={index} className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl text-center p-8 rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[280px]">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-white mb-3 leading-tight">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-white/80 leading-relaxed text-base flex-grow">
                   {feature.description}
                 </p>
               </div>
@@ -114,60 +115,89 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="py-20 bg-gray-50">
+      {/* Delivery Promise Section */}
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl p-12 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+                ⚡ Lightning Fast Delivery Promise
+              </h2>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-8">
+                  <div className="text-6xl mb-4">🚀</div>
+                  <h3 className="text-2xl font-bold text-white mb-3">Super Rush</h3>
+                  <p className="text-white/90 text-lg mb-2">Order by <span className="font-bold text-buyprint-brand">12:00 PM</span></p>
+                  <p className="text-white font-bold text-xl">2 business days</p>
+                  <p className="text-white/80 text-sm mt-1">(Mon-Fri delivery)</p>
+                </div>
+                <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-8">
+                  <div className="text-6xl mb-4">📦</div>
+                  <h3 className="text-2xl font-bold text-white mb-3">Standard Rush</h3>
+                  <p className="text-white/90 text-lg mb-2">Order by <span className="font-bold text-buyprint-brand">4:00 PM</span></p>
+                  <p className="text-white font-bold text-xl">3 business days</p>
+                  <p className="text-white/80 text-sm mt-1">(Printed, shipped & delivered)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Most Popular Banners
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our top 3 banner types - covering 90% of customer needs
+            <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
+              Our top 3 banner types - covering 90% of customer needs with premium quality and fast delivery
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {featuredProducts.map((product, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                <div className="relative">
+              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[600px]">
+                <div className="relative overflow-hidden rounded-t-3xl">
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${index}`
                     }}
                   />
-                  <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    <div className="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                    <div className="backdrop-blur-md bg-white/95 border border-white/50 text-buyprint-brand px-3 py-1.5 text-sm font-bold rounded-full shadow-lg">
                       {product.price}
                     </div>
-                    <div className={`text-white px-3 py-1 rounded-full text-xs font-semibold ${
-                      product.badge === 'Best Seller' ? 'bg-green-500' :
-                      product.badge === 'Popular' ? 'bg-orange-500' : 'bg-purple-500'
+                    <div className={`backdrop-blur-md border text-white px-3 py-1 text-xs font-semibold rounded-full shadow-lg ${
+                      product.badge === 'Best Seller' ? 'bg-buyprint-600/90 border-buyprint-500/50' :
+                      product.badge === 'Popular' ? 'bg-orange-500/90 border-orange-400/50' : 'bg-purple-500/90 border-purple-400/50'
                     }`}>
                       {product.badge}
                     </div>
                   </div>
                 </div>
                 
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <div className="p-6 flex-grow flex flex-col">
+                  <h3 className="text-xl font-bold text-white mb-3 leading-tight">
                     {product.name}
                   </h3>
-                  <p className="text-gray-600 mb-4 text-sm">
+                  <p className="text-white/80 mb-4 leading-relaxed text-base">
                     {product.description}
                   </p>
                   
                   {/* Features */}
-                  <div className="mb-4">
-                    <div className="flex flex-wrap gap-1">
+                  <div className="mb-6 flex-grow">
+                    <div className="flex flex-wrap gap-2">
                       {product.features.map((feature, featureIndex) => (
                         <span 
                           key={featureIndex}
-                          className="inline-flex items-center bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
+                          className="backdrop-blur-sm bg-white/20 border border-white/30 inline-flex items-center text-white text-xs px-3 py-1.5 rounded-full"
                         >
-                          <CheckCircle className="w-3 h-3 mr-1" />
+                          <CheckCircle className="w-3 h-3 mr-1 text-buyprint-brand" />
                           {feature}
                         </span>
                       ))}
@@ -177,53 +207,48 @@ const LandingPage = () => {
                   <Link 
                     to="/editor" 
                     onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 text-center block"
+                    className="bg-white/95 hover:bg-white border border-white/50 hover:border-white w-full text-center py-3 px-6 text-buyprint-brand font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
                   >
                     Design Now
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* View All Products CTA */}
-          <div className="text-center">
-            <div className="bg-white rounded-xl p-8 shadow-md">
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Need Something Different?
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Explore our complete catalog of 9+ banner types including fabric, backlit, and specialty options
-              </p>
-              <Link 
-                to="/products" 
-                className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-              >
-                View All Products
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </div>
-          </div>
+
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary-600 text-white">
+      <section className="py-24 text-white relative overflow-hidden">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">
-            Ready to Create Your Perfect Sign?
-          </h2>
-          <p className="text-xl mb-8 text-primary-100">
-            Start designing with our professional tools and get your order in minutes
-          </p>
-          <Link 
-            to="/editor" 
-            onClick={() => sessionStorage.setItem('newDesign', 'true')}
-            className="btn-primary bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-4 inline-flex items-center gap-2"
-          >
-            Start Designing Now
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-5xl md:text-6xl font-bold mb-8">
+              Ready to Create Your Perfect Sign?
+            </h2>
+            <p className="text-2xl mb-12 text-white/90 leading-relaxed">
+              Start designing with our professional tools and get your order in minutes
+            </p>
+            <div className="flex flex-col sm:flex-row gap-8 justify-center">
+              <Link 
+                to="/editor" 
+                onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                className="neumorphic-button-hero bg-white text-buyprint-brand hover:bg-gray-50 text-2xl px-14 py-7 inline-flex items-center justify-center gap-4 rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[280px] hover:scale-105"
+              >
+                Start Designing Now
+                <ArrowRight className="w-7 h-7" />
+              </Link>
+              <Link 
+                to="/products" 
+                className="neumorphic-button-hero-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-buyprint-brand text-2xl px-14 py-7 rounded-3xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-4 min-w-[280px] hover:scale-105"
+              >
+                Browse Products
+                <Palette className="w-7 h-7" />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>

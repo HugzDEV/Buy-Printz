@@ -20,7 +20,7 @@ const Products = () => {
       name: "13oz Vinyl Banner",
       price: "From $25",
       description: "Our most popular banner - perfect for outdoor use with weather resistance and vibrant colors",
-      image: "/images/13oz-vinyl-banner.jpg",
+      image: "/assets/images/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included", "UV resistant"],
       bestseller: true,
       specs: {
@@ -35,15 +35,15 @@ const Products = () => {
       category: 'vinyl',
       name: "18oz Blocked Banner", 
       price: "From $35",
-      description: "Our most durable banner - built to last with block-out backing for maximum opacity",
-      image: "/images/18oz-blocked-banner.jpg",
-      features: ["Maximum durability", "Block-out backing", "Professional finish", "Wind resistant"],
+      description: "18 oz matte blockout banner - Full color UV printed, indoor and outdoor ready",
+      image: "/assets/images/blockout Banner -BuyPrintz.jpg",
+      features: ["Single or double sided printing", "Free hemming and grommets", "Additional finishing available", "Welded oversized banners available"],
       premium: true,
       specs: {
-        material: "18oz Block-out Vinyl",
-        finish: "Matte",
-        durability: "5-7 years outdoor",
-        applications: ["Permanent signage", "Highway advertising", "Construction sites"]
+        material: "18oz Matte Blockout Vinyl",
+        finish: "Full color UV printed",
+        durability: "Indoor and outdoor ready",
+        applications: ["Double sided front and back", "Permanent signage", "Highway advertising", "Construction sites"]
       }
     },
     {
@@ -52,7 +52,7 @@ const Products = () => {
       name: "Mesh Banner",
       price: "From $30",
       description: "Best seller for windy conditions with 70% air flow for reduced wind load",
-      image: "/images/mesh-banner.jpg",
+      image: "/assets/images/Mesh Banner - BuyPrintz.jpg",
       features: ["Wind resistant", "70% air flow", "Fade resistant", "Lightweight"],
       popular: true,
       specs: {

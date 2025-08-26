@@ -48,17 +48,17 @@ const Header = () => {
   const currentNavigation = user ? authenticatedNavigation : navigation
 
   return (
-    <header className="shadow-sm border-b" style={{backgroundColor: '#0E1B4D'}}>
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-20">
+    <header className="shadow-sm" style={{backgroundColor: '#0E1B4D'}}>
+      <div className="container mx-auto px-6 lg:px-8">
+        <div className="flex justify-between items-center h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-3">
             <img 
               src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
               alt="Buy Printz" 
-              className="w-24 h-24 object-contain"
+              className="w-28 h-28 object-contain"
             />
-            <span className="text-xl font-bold text-white">Buy Printz</span>
+            <span className="text-2xl font-bold text-white">Buy Printz</span>
           </Link>
 
           {/* Desktop Navigation */}
