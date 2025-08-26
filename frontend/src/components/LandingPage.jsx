@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Star, Truck, Shield, Palette, Zap, Award, Users, Sparkles } from 'lucide-react'
+import SEOHead, { seoConfigs } from './SEOHead'
 
 const LandingPage = () => {
   const features = [
@@ -55,7 +56,9 @@ const LandingPage = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900">
+    <>
+      <SEOHead {...seoConfigs.home} />
+      <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900">
       {/* Hero Section */}
       <section className="text-white py-20">
         <div className="container mx-auto px-4 text-center">
@@ -251,7 +254,8 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }
 

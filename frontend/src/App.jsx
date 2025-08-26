@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import LandingPage from './components/LandingPage'
 import Products from './components/Products'
 import Login from './components/Login'
@@ -80,7 +81,8 @@ const PublicRoute = ({ children }) => {
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <HelmetProvider>
+      <div className="min-h-screen bg-gray-50">
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={
@@ -155,7 +157,8 @@ function App() {
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </div>
+      </div>
+    </HelmetProvider>
   )
 }
 

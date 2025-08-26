@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Filter, Search, Star, Truck, Award, Clock } from 'lucide-react'
+import SEOHead, { seoConfigs } from './SEOHead'
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -167,7 +168,9 @@ const Products = () => {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <SEOHead {...seoConfigs.products} />
+      <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
       <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16">
         <div className="container mx-auto px-4">
@@ -374,7 +377,8 @@ const Products = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }
 

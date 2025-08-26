@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Important pages
+Sitemap: https://buyprintz.com/sitemap.xml
+
+# Allow all crawlers to access main content
+Allow: /products
+Allow: /editor
+Allow: /login
+Allow: /register
+
+# Prevent crawling of user-specific content
+Disallow: /dashboard
+Disallow: /checkout
+Disallow: /api/
+
+# Prevent crawling of admin areas
+Disallow: /admin/
+
+# Crawl delay (be respectful)
+Crawl-delay: 1
