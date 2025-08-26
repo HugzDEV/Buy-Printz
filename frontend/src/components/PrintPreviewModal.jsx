@@ -177,7 +177,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-6xl h-[95vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Printer className="h-6 w-6 text-blue-600" />
@@ -188,8 +188,8 @@ const PrintPreviewModal = ({
           </p>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 p-6">
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
             {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
             <div className="xl:col-span-2 space-y-6">
               {/* Banner Preview Card */}
@@ -212,12 +212,12 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-4">
                       {/* Main Banner Preview */}
-                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 flex items-center justify-center min-h-[300px]">
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 flex items-center justify-center min-h-[250px]">
                         <div className="relative group">
                           <img
                             src={previewImage}
                             alt="Banner Design Preview"
-                            className="max-w-full max-h-[400px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                            className="max-w-full max-h-[300px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                             style={{
                               maxWidth: '100%',
                               height: 'auto'
@@ -412,12 +412,12 @@ const PrintPreviewModal = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-shrink-0 border-t pt-4 bg-gray-50">
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:ml-auto">
+        <DialogFooter className="flex-shrink-0 border-t pt-4 bg-gray-50 mt-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full justify-end">
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex items-center gap-2 order-2 sm:order-1"
+              className="flex items-center justify-center gap-2 order-2 sm:order-1 min-h-[44px]"
             >
               <X className="h-4 w-4" />
               Cancel Order
@@ -426,7 +426,7 @@ const PrintPreviewModal = ({
             <Button
               onClick={handleApprove}
               disabled={!pdfBlob || isGenerating}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 order-1 sm:order-2 shadow-lg"
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 order-1 sm:order-2 shadow-lg min-h-[44px]"
             >
               <Check className="h-4 w-4" />
               Approve & Continue to Payment
