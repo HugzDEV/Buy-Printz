@@ -67,6 +67,11 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={() => {
+                  if (item.href === '/editor') {
+                    sessionStorage.setItem('newDesign', 'true')
+                  }
+                }}
                 className={`text-sm font-medium transition-colors ${
                   location.pathname === item.href
                     ? 'text-white font-semibold'
@@ -130,7 +135,12 @@ const Header = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    if (item.href === '/editor') {
+                      sessionStorage.setItem('newDesign', 'true')
+                    }
+                    setMobileMenuOpen(false)
+                  }}
                   className={`text-sm font-medium transition-colors ${
                     location.pathname === item.href
                       ? 'text-white font-semibold'

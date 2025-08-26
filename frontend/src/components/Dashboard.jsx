@@ -507,6 +507,7 @@ const Dashboard = () => {
                 <div className="flex space-x-3">
                   <Link
                     to="/editor"
+                    onClick={() => sessionStorage.setItem('newDesign', 'true')}
                     className="neumorphic-button-primary px-6 py-3 rounded-xl text-white font-medium flex items-center"
                   >
                     <Plus className="w-5 h-5 mr-2" />
@@ -621,6 +622,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Link
                     to="/editor"
+                    onClick={() => sessionStorage.setItem('newDesign', 'true')}
                     className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors"
                   >
                     <Plus className="w-6 h-6 text-primary-600 mr-3" />
@@ -755,6 +757,7 @@ const Dashboard = () => {
                 <p className="text-gray-600 mb-6">Create your first custom template to reuse designs</p>
                 <Link 
                   to="/editor" 
+                  onClick={() => sessionStorage.setItem('newDesign', 'true')}
                   className="neumorphic-button-primary px-6 py-3 rounded-xl text-white font-medium inline-flex items-center"
                 >
                   <Plus className="w-5 h-5 mr-2" />
@@ -772,6 +775,7 @@ const Dashboard = () => {
               <h2 className="text-2xl font-bold text-gray-900">My Designs</h2>
               <Link
                 to="/editor"
+                onClick={() => sessionStorage.setItem('newDesign', 'true')}
                 className="btn-primary flex items-center"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -926,7 +930,10 @@ const Dashboard = () => {
                 <Palette className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No designs yet</h3>
                 <p className="text-gray-600 mb-6">Create your first design to see it here!</p>
-                <Link to="/editor" className="btn-primary">
+                <Link 
+                  to="/editor" 
+                  onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                  className="btn-primary">
                   Create Design
                 </Link>
               </div>
@@ -951,6 +958,7 @@ const Dashboard = () => {
                  <p className="text-gray-600 mb-6">All your orders are complete! Pending orders appear here when you create a design but haven't completed payment.</p>
                 <Link 
                   to="/editor" 
+                  onClick={() => sessionStorage.setItem('newDesign', 'true')}
                   className="neumorphic-button px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center"
                 >
                   <Plus className="w-4 h-4 mr-2" />
