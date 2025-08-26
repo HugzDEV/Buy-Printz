@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './components/LandingPage'
+import Products from './components/Products'
 import Login from './components/Login'
 import Register from './components/Register'
 import Dashboard from './components/Dashboard'
@@ -86,6 +87,14 @@ function App() {
           <>
             <Header />
             <LandingPage />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/products" element={
+          <>
+            <Header />
+            <Products />
             <Footer />
           </>
         } />

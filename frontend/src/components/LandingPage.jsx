@@ -26,69 +26,31 @@ const LandingPage = () => {
     }
   ]
 
-  const products = [
+  // Showcase only the 3 most common banners
+  const featuredProducts = [
     {
       name: "13oz Vinyl Banner",
       price: "From $25",
-      description: "Our most popular banner - perfect for outdoor use",
+      description: "Our most popular banner - perfect for outdoor use with weather resistance",
       image: "/images/13oz-vinyl-banner.jpg",
-      features: ["Weather resistant", "Full color printing", "Grommets included"]
-    },
-    {
-      name: "18oz Blocked Banner", 
-      price: "From $35",
-      description: "Our most durable banner - built to last",
-      image: "/images/18oz-blocked-banner.jpg",
-      features: ["Maximum durability", "Block-out backing", "Professional finish"]
+      features: ["Weather resistant", "Full color printing", "Grommets included"],
+      badge: "Best Seller"
     },
     {
       name: "Mesh Banner",
       price: "From $30",
-      description: "Best seller for windy conditions",
+      description: "Best seller for windy conditions with 70% air flow",
       image: "/images/mesh-banner.jpg",
-      features: ["Wind resistant", "70% air flow", "Fade resistant"]
+      features: ["Wind resistant", "70% air flow", "Fade resistant"],
+      badge: "Popular"
     },
     {
-      name: "Indoor Banner", 
-      price: "From $20",
-      description: "Full and smooth surface vinyl - great for displays",
-      image: "/images/indoor-banner.jpg",
-      features: ["Smooth surface", "Vivid colors", "Easy to install"]
-    },
-    {
-      name: "Pole Banner",
-      price: "From $45", 
-      description: "Durable fit banners ready to install with hardware kit",
-      image: "/images/pole-banner.jpg",
-      features: ["Hardware included", "Easy installation", "Professional look"]
-    },
-    {
-      name: "Step Fabric Banner",
-      price: "From $40",
-      description: "Wrinkle resistant and washable dye sublimation print",
-      image: "/images/step-fabric-banner.jpg", 
-      features: ["Wrinkle resistant", "Washable", "Premium fabric"]
-    },
-    {
-      name: "Backlight Fabric Banner",
-      price: "From $50",
-      description: "Wrinkle resistant, washable, and blocks back lighting", 
-      image: "/images/backlight-fabric-banner.jpg",
-      features: ["Backlight ready", "Washable", "Color blocking"]
-    },
-    {
-      name: "Tension Fabric",
-      price: "From $60",
-      description: "3-way stretch material perfect for kiosks and displays",
-      image: "/images/tension-fabric.jpg",
-      features: ["3-way stretch", "Kiosk ready", "Professional display"]
-    },
-    {
-      name: "Backlit Banner", 
-      price: "From $45",
-      description: "18oz translucent vinyl for illuminated signage",
-      image: "/images/backlit-banner.jpg", 
-      features: ["Translucent material", "LED compatible", "Even light distribution"]
+      name: "18oz Blocked Banner", 
+      price: "From $35",
+      description: "Our most durable banner - built to last with maximum durability",
+      image: "/images/18oz-blocked-banner.jpg",
+      features: ["Maximum durability", "Block-out backing", "Professional finish"],
+      badge: "Premium"
     }
   ]
 
@@ -106,14 +68,18 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/editor" 
+              onClick={() => sessionStorage.setItem('newDesign', 'true')}
               className="btn-primary bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-4 inline-flex items-center gap-2"
             >
               Create Banner
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <button className="btn-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600 text-lg px-8 py-4">
-              View Samples
-            </button>
+            <Link 
+              to="/products"
+              className="btn-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600 text-lg px-8 py-4"
+            >
+              View Products
+            </Link>
           </div>
         </div>
       </section>
@@ -148,20 +114,20 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Products Section */}
+      {/* Featured Products Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Our Products
+              Most Popular Banners
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Professional signage solutions for every need
+              Our top 3 banner types - covering 90% of customer needs
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product, index) => (
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {featuredProducts.map((product, index) => (
               <div key={index} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                 <div className="relative">
                   <img 
@@ -172,8 +138,16 @@ const LandingPage = () => {
                       e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${index}`
                     }}
                   />
-                  <div className="absolute top-4 right-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {product.price}
+                  <div className="absolute top-4 right-4 flex flex-col gap-2">
+                    <div className="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      {product.price}
+                    </div>
+                    <div className={`text-white px-3 py-1 rounded-full text-xs font-semibold ${
+                      product.badge === 'Best Seller' ? 'bg-green-500' :
+                      product.badge === 'Popular' ? 'bg-orange-500' : 'bg-purple-500'
+                    }`}>
+                      {product.badge}
+                    </div>
                   </div>
                 </div>
                 
@@ -191,8 +165,9 @@ const LandingPage = () => {
                       {product.features.map((feature, featureIndex) => (
                         <span 
                           key={featureIndex}
-                          className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
+                          className="inline-flex items-center bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
                         >
+                          <CheckCircle className="w-3 h-3 mr-1" />
                           {feature}
                         </span>
                       ))}
@@ -201,6 +176,7 @@ const LandingPage = () => {
                   
                   <Link 
                     to="/editor" 
+                    onClick={() => sessionStorage.setItem('newDesign', 'true')}
                     className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 text-center block"
                   >
                     Design Now
@@ -208,6 +184,25 @@ const LandingPage = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* View All Products CTA */}
+          <div className="text-center">
+            <div className="bg-white rounded-xl p-8 shadow-md">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Need Something Different?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Explore our complete catalog of 9+ banner types including fabric, backlit, and specialty options
+              </p>
+              <Link 
+                to="/products" 
+                className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+              >
+                View All Products
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -223,6 +218,7 @@ const LandingPage = () => {
           </p>
           <Link 
             to="/editor" 
+            onClick={() => sessionStorage.setItem('newDesign', 'true')}
             className="btn-primary bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-4 inline-flex items-center gap-2"
           >
             Start Designing Now
