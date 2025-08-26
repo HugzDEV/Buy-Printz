@@ -148,10 +148,16 @@ const BannerEditor = () => {
   
  
   const [selectedId, setSelectedId] = useState(null)
+  const [selectedIds, setSelectedIds] = useState([]) // Multi-select support
+  const [selectionRect, setSelectionRect] = useState(null) // Selection rectangle
+  const [isSelecting, setIsSelecting] = useState(false) // Mouse drag state
   const [elements, setElements] = useState([])
   const [history, setHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [showGrid, setShowGrid] = useState(true)
+  const [showCenterLines, setShowCenterLines] = useState(true)
+  const [activeGuides, setActiveGuides] = useState([])
+  const [isDragging, setIsDragging] = useState(false)
   const [uploadQuality, setUploadQuality] = useState(null)
   const [copiedElement, setCopiedElement] = useState(null)
   const [activeTab, setActiveTab] = useState('tools')
@@ -2106,6 +2112,29 @@ const BannerEditor = () => {
         deleteSelectedElement()
       }
 
+      // Clear all (Ctrl+Shift+Delete)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Delete') {
+        e.preventDefault()
+        clearWorkspace()
+      }
+
+      // Select all (Ctrl+A)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !e.shiftKey && !e.altKey) {
+        e.preventDefault()
+        if (elements.length > 0) {
+          setSelectedIds(elements.map(el => el.id))
+          setSelectedId(null)
+        }
+      }
+
+      // Escape to clear selection
+      if (e.key === 'Escape') {
+        setSelectedId(null)
+        setSelectedIds([])
+        setSelectionRect(null)
+        setIsSelecting(false)
+      }
+
       // Duplicate (Ctrl+D / Cmd+D)
       if ((e.ctrlKey || e.metaKey) && e.key === 'd' && !e.shiftKey && !e.altKey) {
         e.preventDefault()
@@ -2115,7 +2144,7 @@ const BannerEditor = () => {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedId, elements, copiedElement])
+  }, [selectedId, selectedIds, elements, copiedElement])
 
   // No auto-scaling - users control zoom manually via controls
 
@@ -2711,13 +2740,285 @@ const BannerEditor = () => {
     }
   }
 
-  // Delete selected element (Del key)
+  // Delete selected element(s) (Del key)
   const deleteSelectedElement = () => {
-    if (selectedId) {
+    if (selectedIds.length > 0) {
+      // Delete multiple selected elements
+      setElements(elements.filter(el => !selectedIds.includes(el.id)))
+      setSelectedIds([])
+      setSelectedId(null)
+      saveToHistory()
+    } else if (selectedId) {
+      // Delete single selected element
       setElements(elements.filter(el => el.id !== selectedId))
       setSelectedId(null)
       saveToHistory()
     }
+  }
+
+  // Clear entire workspace
+  const clearWorkspace = () => {
+    if (window.confirm('Are you sure you want to clear the entire workspace? This action cannot be undone.')) {
+      setElements([])
+      setSelectedId(null)
+      setSelectedIds([])
+      saveToHistory()
+    }
+  }
+
+  // Selection rectangle functions
+  const startSelection = (pos) => {
+    console.log('Starting selection at:', pos)
+    setIsSelecting(true)
+    setSelectionRect({
+      x: pos.x,
+      y: pos.y,
+      width: 0,
+      height: 0
+    })
+  }
+
+  const updateSelection = (pos) => {
+    if (!isSelecting || !selectionRect) return
+
+    const startX = selectionRect.x
+    const startY = selectionRect.y
+    const newRect = {
+      x: Math.min(startX, pos.x),
+      y: Math.min(startY, pos.y),
+      width: Math.abs(pos.x - startX),
+      height: Math.abs(pos.y - startY)
+    }
+    console.log('Updating selection:', newRect)
+    setSelectionRect(newRect)
+  }
+
+  const finishSelection = () => {
+    if (!isSelecting || !selectionRect) return
+
+    // Find elements within selection rectangle
+    const selectedElements = elements.filter(element => {
+      const elemX = element.x || 0
+      const elemY = element.y || 0
+      const elemWidth = element.width || 50
+      const elemHeight = element.height || 50
+
+      // Check if element intersects with selection rectangle
+      return elemX < selectionRect.x + selectionRect.width &&
+             elemX + elemWidth > selectionRect.x &&
+             elemY < selectionRect.y + selectionRect.height &&
+             elemY + elemHeight > selectionRect.y
+    })
+
+    if (selectedElements.length > 1) {
+      setSelectedIds(selectedElements.map(el => el.id))
+      setSelectedId(null) // Clear single selection
+    } else if (selectedElements.length === 1) {
+      setSelectedId(selectedElements[0].id)
+      setSelectedIds([])
+    } else {
+      setSelectedId(null)
+      setSelectedIds([])
+    }
+
+    setIsSelecting(false)
+    setSelectionRect(null)
+  }
+
+  // Center selected element
+  const centerSelectedElement = () => {
+    if (!selectedId) return
+    
+    setElements(prev => prev.map(el => {
+      if (el.id === selectedId) {
+        const bounds = getElementBounds(el)
+        const centerX = (canvasSize.width - bounds.width) / 2
+        const centerY = (canvasSize.height - bounds.height) / 2
+        return {
+          ...el,
+          x: centerX,
+          y: centerY
+        }
+      }
+      return el
+    }))
+    saveToHistory()
+  }
+
+  // Center element horizontally
+  const centerHorizontally = () => {
+    if (!selectedId) return
+    
+    setElements(prev => prev.map(el => {
+      if (el.id === selectedId) {
+        const bounds = getElementBounds(el)
+        const centerX = (canvasSize.width - bounds.width) / 2
+        return {
+          ...el,
+          x: centerX
+        }
+      }
+      return el
+    }))
+    saveToHistory()
+  }
+
+  // Center element vertically  
+  const centerVertically = () => {
+    if (!selectedId) return
+    
+    setElements(prev => prev.map(el => {
+      if (el.id === selectedId) {
+        const bounds = getElementBounds(el)
+        const centerY = (canvasSize.height - bounds.height) / 2
+        return {
+          ...el,
+          y: centerY
+        }
+      }
+      return el
+    }))
+    saveToHistory()
+  }
+
+  // Helper function to get element dimensions (handles text vs shapes)
+  const getElementBounds = (element) => {
+    if (element.type === 'text') {
+      // For text elements - try to get actual rendered dimensions from the stage
+      const fontSize = element.fontSize || 20
+      const textLength = (element.text || 'Text').length
+      
+      let textWidth, textHeight
+      
+      // Try to find the actual Konva text node on the stage to get real dimensions
+      const stage = stageRef.current
+      if (stage) {
+        const textNode = stage.findOne(`#${element.id}`)
+        if (textNode && textNode.getTextWidth && textNode.getTextHeight) {
+          // Use actual rendered dimensions from Konva
+          textWidth = textNode.getTextWidth()
+          textHeight = textNode.getTextHeight()
+          console.log(`FOUND ACTUAL TEXT DIMENSIONS - width: ${textWidth}, height: ${textHeight}`)
+        }
+      }
+      
+      // Fallback to estimation if we couldn't get real dimensions
+      if (!textWidth || textWidth === 0) {
+        if (element.width && element.height) {
+          textWidth = element.width
+          textHeight = element.height
+        } else {
+          // More generous estimation for better highlighting coverage
+          textWidth = Math.max(textLength * fontSize * 0.8, fontSize * 2)
+          textHeight = fontSize * 1.5 // More generous height estimation
+        }
+        console.log(`ESTIMATED TEXT DIMENSIONS - width: ${textWidth}, height: ${textHeight}`)
+      }
+      
+      // Calculate center based on text positioning
+      // In Konva, text x,y is the top-left corner
+      const centerX = element.x + textWidth / 2
+      const centerY = element.y + textHeight / 2
+      
+      // Debug logging for text positioning (simplified)
+      console.log(`Text "${element.text}" bounds: ${textWidth}x${textHeight} at (${element.x}, ${element.y})`)
+      
+      return {
+        x: element.x,
+        y: element.y,
+        width: textWidth,
+        height: textHeight,
+        centerX: centerX,
+        centerY: centerY
+      }
+    } else if (element.type === 'circle') {
+      // For circles - x,y is the center, radius defines size
+      const radius = element.radius || 50
+      const diameter = radius * 2
+      
+      return {
+        x: element.x - radius, // Convert center to top-left for highlighting
+        y: element.y - radius,
+        width: diameter,
+        height: diameter,
+        centerX: element.x, // x,y is already the center for circles
+        centerY: element.y
+      }
+    } else {
+      // For rectangles and other shapes - x,y is top-left
+      const width = element.width || 100
+      const height = element.height || 100
+      
+      const centerX = element.x + width / 2
+      const centerY = element.y + height / 2
+      
+      return {
+        x: element.x,
+        y: element.y,
+        width: width,
+        height: height,
+        centerX: centerX,
+        centerY: centerY
+      }
+    }
+  }
+
+  // Clean Smart Alignment Guides (focused on key alignments)
+  const calculateAlignmentGuides = (draggedElement) => {
+    if (!draggedElement) return []
+    
+    const guides = []
+    // Larger snap distance for text elements to make alignment easier
+    const snapDistance = draggedElement.type === 'text' ? 25 : 15
+    
+    // Get proper bounds for the dragged element
+    const draggedRect = getElementBounds(draggedElement)
+
+    // Canvas center guides (primary alignment)
+    const canvasCenterX = canvasSize.width / 2
+    const canvasCenterY = canvasSize.height / 2
+
+    console.log('=== ALIGNMENT DEBUG ===')
+    console.log('Element type:', draggedElement.type)
+    console.log('Snap distance:', snapDistance)
+    console.log('Canvas center:', canvasCenterX, canvasCenterY)
+    console.log('Element center:', draggedRect.centerX, draggedRect.centerY)
+    console.log('Vertical distance:', Math.abs(draggedRect.centerX - canvasCenterX))
+    console.log('Horizontal distance:', Math.abs(draggedRect.centerY - canvasCenterY))
+
+    // Canvas center vertical guide
+    const verticalDistance = Math.abs(draggedRect.centerX - canvasCenterX)
+    if (verticalDistance < snapDistance) {
+      guides.push({
+        type: 'vertical',
+        position: canvasCenterX,
+        color: '#ef4444', // Bright red for canvas center
+        dash: [],
+        strokeWidth: 3
+      })
+      console.log('✅ VERTICAL GUIDE ADDED at:', canvasCenterX, 'distance:', verticalDistance)
+    } else {
+      console.log('❌ Vertical guide NOT added, distance too far:', verticalDistance)
+    }
+
+    // Canvas center horizontal guide
+    const horizontalDistance = Math.abs(draggedRect.centerY - canvasCenterY)
+    if (horizontalDistance < snapDistance) {
+      guides.push({
+        type: 'horizontal',
+        position: canvasCenterY,
+        color: '#ef4444', // Bright red for canvas center
+        dash: [],
+        strokeWidth: 3
+      })
+      console.log('✅ HORIZONTAL GUIDE ADDED at:', canvasCenterY, 'distance:', horizontalDistance)
+    } else {
+      console.log('❌ Horizontal guide NOT added, distance too far:', horizontalDistance)
+    }
+
+    console.log('Total guides generated:', guides.length)
+    console.log('======================')
+    return guides
   }
 
   // Universal alignment functions - work the same in both orientations
@@ -3072,12 +3373,30 @@ const BannerEditor = () => {
     }
   }
 
+  // Export canvas as high-quality image
+  const exportCanvasImage = () => {
+    const stage = stageRef.current
+    if (!stage) return null
+    
+    // Export the canvas at high resolution for perfect preview
+    const dataURL = stage.toDataURL({
+      mimeType: 'image/png',
+      quality: 1.0,
+      pixelRatio: 2 // Higher resolution for better quality
+    })
+    
+    return dataURL
+  }
+
   // Proceed to checkout
   const proceedToCheckout = async () => {
     if (elements.length === 0) {
 
       return
     }
+
+    // Export the canvas image for perfect preview
+    const canvasImage = exportCanvasImage()
 
     const currentType = getCurrentBannerType()
     const currentDimensions = getCurrentDimensions()
@@ -3100,6 +3419,7 @@ const BannerEditor = () => {
       quantity: 1,
       dimensions: canvasSize,
       canvas_data: { elements, canvasSize, backgroundColor },
+      canvas_image: canvasImage, // Perfect preview image!
       background_color: backgroundColor,
       print_options: printOptions,
       total_amount: 0 // Price will be calculated at checkout
@@ -3334,38 +3654,111 @@ const BannerEditor = () => {
   const selectedElement = elements.find(el => el.id === selectedId)
   const currentDimensionsInfo = getCurrentDimensions()
 
-  // Grid component
+  // Clean Grid System
   const GridLines = () => {
     if (!showGrid) return null
     
-    const gridSize = 100
+    const gridSize = 50 // Smaller grid for better precision
     const lines = []
+    const centerX = canvasSize.width / 2
+    const centerY = canvasSize.height / 2
     
+    // Background grid lines (very subtle)
     for (let i = 0; i <= canvasSize.width; i += gridSize) {
-      lines.push(
-        <KonvaLine
-          key={`v-${i}`}
-          points={[i, 0, i, canvasSize.height]}
-          stroke="#e5e7eb"
-          strokeWidth={1}
-          listening={false}
-        />
-      )
+      if (Math.abs(i - centerX) > 5) { // Skip lines too close to center
+        lines.push(
+          <KonvaLine
+            key={`v-${i}`}
+            points={[i, 0, i, canvasSize.height]}
+            stroke="#f1f5f9"
+            strokeWidth={0.5}
+            listening={false}
+            opacity={0.6}
+          />
+        )
+      }
     }
     
     for (let i = 0; i <= canvasSize.height; i += gridSize) {
+      if (Math.abs(i - centerY) > 5) { // Skip lines too close to center
+        lines.push(
+          <KonvaLine
+            key={`h-${i}`}
+            points={[0, i, canvasSize.width, i]}
+            stroke="#f1f5f9"
+            strokeWidth={0.5}
+            listening={false}
+            opacity={0.6}
+          />
+        )
+      }
+    }
+    
+    // Center lines (more prominent) - only when not dragging
+    if (showCenterLines && !isDragging) {
       lines.push(
         <KonvaLine
-          key={`h-${i}`}
-          points={[0, i, canvasSize.width, i]}
-          stroke="#e5e7eb"
+          key="center-v"
+          points={[centerX, 0, centerX, canvasSize.height]}
+          stroke="#3b82f6"
           strokeWidth={1}
           listening={false}
+          opacity={0.6}
+        />,
+        <KonvaLine
+          key="center-h"
+          points={[0, centerY, canvasSize.width, centerY]}
+          stroke="#3b82f6"
+          strokeWidth={1}
+          listening={false}
+          opacity={0.6}
         />
       )
     }
     
     return lines
+  }
+
+
+
+  // Smart Alignment Guides (only when dragging)
+  const SmartAlignmentGuides = () => {
+    if (!isDragging || activeGuides.length === 0) return null
+    
+    console.log('Rendering smart guides:', activeGuides)
+    
+    return activeGuides.map((guide, index) => {
+      console.log(`Rendering guide ${index}:`, guide)
+      
+      if (guide.type === 'vertical') {
+        return (
+          <KonvaLine
+            key={`smart-v-${index}-${guide.position}`}
+            points={[guide.position, 0, guide.position, canvasSize.height]}
+            stroke={guide.color}
+            strokeWidth={guide.strokeWidth}
+            dash={guide.dash}
+            listening={false}
+            opacity={1}
+            perfectDrawEnabled={false}
+          />
+        )
+      } else if (guide.type === 'horizontal') {
+        return (
+          <KonvaLine
+            key={`smart-h-${index}-${guide.position}`}
+            points={[0, guide.position, canvasSize.width, guide.position]}
+            stroke={guide.color}
+            strokeWidth={guide.strokeWidth}
+            dash={guide.dash}
+            listening={false}
+            opacity={1}
+            perfectDrawEnabled={false}
+          />
+        )
+      }
+      return null
+    })
   }
 
   // Render elements
@@ -3441,7 +3834,22 @@ const BannerEditor = () => {
           })
         }
       } : undefined,
+      onDragStart: (e) => {
+        setIsDragging(true)
+        setSelectedId(element.id)
+      },
+      onDragMove: (e) => {
+        const draggedElement = {
+          ...element,
+          x: e.target.x(),
+          y: e.target.y()
+        }
+        const guides = calculateAlignmentGuides(draggedElement)
+        setActiveGuides(guides)
+      },
       onDragEnd: (e) => {
+        setIsDragging(false)
+        setActiveGuides([])
         handleElementChange(element.id, {
           x: e.target.x(),
           y: e.target.y()
@@ -3624,6 +4032,18 @@ const BannerEditor = () => {
                 <Grid className="w-4 h-4" />
               </button>
 
+              <button 
+                onClick={() => setShowCenterLines(!showCenterLines)} 
+                className={`p-2 rounded-lg border transition-colors ${
+                  showCenterLines 
+                    ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                }`}
+                title="Toggle Smart Alignment Guides"
+              >
+                <Plus className="w-4 h-4 rotate-45" />
+              </button>
+
               {/* Mobile Tools Toggle */}
               <button 
                 onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
@@ -3659,11 +4079,18 @@ const BannerEditor = () => {
                     <Copy className="w-4 h-4 text-gray-600" />
                   </button>
                   <button 
-                    onClick={deleteSelected}
+                    onClick={deleteSelectedElement}
                     className="p-2 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-red-600"
-                    title="Delete (Del)"
+                    title="Delete Selected (Del)"
                   >
                     <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={clearWorkspace}
+                    className="p-2 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-red-600"
+                    title="Clear Workspace"
+                  >
+                    <Trash2 className="w-4 h-4 opacity-60" />
                   </button>
                 </div>
               )}
@@ -4328,12 +4755,21 @@ const BannerEditor = () => {
                         <span className="text-sm font-medium">Duplicate</span>
                       </button>
                       <button
-                        onClick={deleteSelected}
+                        onClick={deleteSelectedElement}
                         className="neumorphic-button group p-3 rounded-lg text-red-600 hover:text-red-700 transition-colors flex items-center justify-center"
-                        title="Delete (Del)"
+                        title="Delete Selected (Del)"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
                         <span className="text-sm font-medium">Delete</span>
+                      </button>
+                      
+                      <button
+                        onClick={clearWorkspace}
+                        className="neumorphic-button group p-3 rounded-lg text-red-600 hover:text-red-700 transition-colors flex items-center justify-center"
+                        title="Clear All"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2 opacity-60" />
+                        <span className="text-sm font-medium">Clear All</span>
                       </button>
                     </div>
                   </div>
@@ -4362,6 +4798,18 @@ const BannerEditor = () => {
                       >
                         <AlignRight className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
                         <span className="text-xs text-gray-600 mt-1">Right</span>
+                      </button>
+                    </div>
+                    
+                    {/* Center Both Button */}
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <button 
+                        onClick={centerSelectedElement}
+                        className="neumorphic-button-primary w-full p-3 rounded-lg text-white font-medium flex items-center justify-center"
+                        title="Center element both horizontally and vertically"
+                      >
+                        <Plus className="w-4 h-4 mr-2 rotate-45" />
+                        Center Both
                       </button>
                     </div>
                   </div>
@@ -4635,8 +5083,39 @@ const BannerEditor = () => {
                   height={canvasSize.height}
                   scale={{ x: scale, y: scale }}
                   onMouseDown={(e) => {
-                    if (e.target === e.target.getStage()) {
+                    const stage = e.target.getStage()
+                    console.log('Mouse down on:', e.target, 'stage:', stage, 'target === stage:', e.target === stage)
+                    if (e.target === stage) {
+                      // Clear selections when clicking on empty canvas
                       setSelectedId(null)
+                      setSelectedIds([])
+                      
+                      // Start selection rectangle
+                      const pos = stage.getPointerPosition()
+                      console.log('Pointer position:', pos, 'scale:', scale)
+                      if (pos) {
+                        startSelection({
+                          x: pos.x / scale,
+                          y: pos.y / scale
+                        })
+                      }
+                    }
+                  }}
+                  onMouseMove={(e) => {
+                    if (isSelecting) {
+                      const stage = e.target.getStage()
+                      const pos = stage.getPointerPosition()
+                      if (pos) {
+                        updateSelection({
+                          x: pos.x / scale,
+                          y: pos.y / scale
+                        })
+                      }
+                    }
+                  }}
+                  onMouseUp={() => {
+                    if (isSelecting) {
+                      finishSelection()
                     }
                   }}
                 >
@@ -4646,13 +5125,88 @@ const BannerEditor = () => {
                       width={canvasSize.width}
                       height={canvasSize.height}
                       fill={backgroundColor}
+                      onMouseDown={(e) => {
+                        console.log('Background rect clicked')
+                        // Clear selections when clicking on background
+                        setSelectedId(null)
+                        setSelectedIds([])
+                        
+                        // Start selection rectangle
+                        const stage = e.target.getStage()
+                        const pos = stage.getPointerPosition()
+                        console.log('Background click - Pointer position:', pos, 'scale:', scale)
+                        if (pos) {
+                          startSelection({
+                            x: pos.x / scale,
+                            y: pos.y / scale
+                          })
+                        }
+                      }}
+                      onMouseMove={(e) => {
+                        if (isSelecting) {
+                          const stage = e.target.getStage()
+                          const pos = stage.getPointerPosition()
+                          if (pos) {
+                            updateSelection({
+                              x: pos.x / scale,
+                              y: pos.y / scale
+                            })
+                          }
+                        }
+                      }}
+                      onMouseUp={(e) => {
+                        if (isSelecting) {
+                          finishSelection()
+                        }
+                      }}
                     />
                     
-                    {/* Grid */}
+                    {/* Clean Grid System with Center Lines */}
                     <GridLines />
                     
                     {/* Elements */}
                     {elements.map((element) => renderElement(element))}
+                    
+                    {/* Multi-select highlighting */}
+                    {selectedIds.map(id => {
+                      const element = elements.find(el => el.id === id)
+                      if (!element) return null
+                      
+                      // Use getElementBounds for accurate dimensions
+                      const bounds = getElementBounds(element)
+                      
+                      return (
+                        <Rect
+                          key={`highlight-${id}`}
+                          x={bounds.x - 2}
+                          y={bounds.y - 2}
+                          width={bounds.width + 4}
+                          height={bounds.height + 4}
+                          stroke="#007bff"
+                          strokeWidth={2}
+                          fill="rgba(0, 123, 255, 0.1)"
+                          listening={false}
+                        />
+                      )
+                    })}
+                    
+                    {/* Selection rectangle */}
+                    {selectionRect && (
+                      <Rect
+                        x={selectionRect.x}
+                        y={selectionRect.y}
+                        width={selectionRect.width}
+                        height={selectionRect.height}
+                        fill="rgba(0, 123, 255, 0.2)"
+                        stroke="#007bff"
+                        strokeWidth={2}
+                        dash={[5, 5]}
+                        listening={false}
+                      />
+                    )}
+                    
+                    {/* Debug: Show selection state */}
+                    {selectedIds.length > 0 && console.log('Selected elements:', selectedIds.length)}
                     
                     {/* Transformer for selected element */}
                     <Transformer
@@ -4673,6 +5227,9 @@ const BannerEditor = () => {
                       borderStrokeWidth={2}
                       visible={!!selectedId}
                     />
+                    
+                    {/* Smart Alignment Guides - rendered on top */}
+                    <SmartAlignmentGuides />
                   </Layer>
                 </Stage>
                 </div>
