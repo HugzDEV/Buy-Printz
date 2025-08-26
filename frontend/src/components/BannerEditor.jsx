@@ -154,6 +154,18 @@ const BannerEditor = () => {
   const [elements, setElements] = useState([])
   const [history, setHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
+  const [isNewDesignSession, setIsNewDesignSession] = useState(false) // Prevent auto-restore interference
+  
+  /**
+   * Canvas Loading Protection System
+   * 
+   * Issue: Multiple async auto-restore operations can interfere with intentional canvas loading
+   * Solution: Temporary protection flags prevent auto-restore during:
+   * - New design creation (fresh canvas)
+   * - Specific design loading (from saved designs)
+   * 
+   * Protection is automatically lifted after 1 second to allow normal operation
+   */
   const [showGrid, setShowGrid] = useState(true)
   const [showCenterLines, setShowCenterLines] = useState(true)
   const [activeGuides, setActiveGuides] = useState([])
@@ -174,6 +186,7 @@ const BannerEditor = () => {
   const isResizingRef = useRef(false)
   const isRotatingRef = useRef(false)
   const isInitialLoadRef = useRef(true)
+  const justClearedCanvasRef = useRef(false) // Track if we just cleared for new design
 
   // Preset banner sizes (dimensions only)
   const presetSizes = [
@@ -2185,6 +2198,11 @@ const BannerEditor = () => {
     
     const loadCanvasState = async () => {
       try {
+        // Skip auto-restore if protected session is active
+        if (isNewDesignSession || justClearedCanvasRef.current) {
+          return
+        }
+        
         // Check if returning from checkout with preserved canvas state
         const checkoutCanvasState = await canvasStateService.loadCheckoutCanvasState()
         
@@ -2306,15 +2324,26 @@ const BannerEditor = () => {
       const designToOrderData = localStorage.getItem('designToOrder')
       
       if (isNewDesign && !loadDesignData && !designToOrderData) {
-        console.log('Starting fresh canvas for new design')
-        // Explicitly clear elements to ensure fresh canvas
+        // Fresh canvas for new design - prevent auto-restore interference
+        justClearedCanvasRef.current = true
+        setIsNewDesignSession(true)
         setElements([])
         sessionStorage.removeItem('newDesign')
-        return // Exit early for new designs - no loading needed
+        
+        // Reset protection after initialization completes
+        setTimeout(() => {
+          justClearedCanvasRef.current = false
+          setIsNewDesignSession(false)
+        }, 1000) // 1 second protection window
+        
+        return // Exit early for new designs
       }
       
       // Check for specific design loading requests
       if (loadDesignData || designToOrderData) {
+        // Protect specific design loads from auto-restore interference
+        justClearedCanvasRef.current = true
+        setIsNewDesignSession(true)
         
         if (loadDesignData) {
           try {
@@ -2368,6 +2397,12 @@ const BannerEditor = () => {
             localStorage.removeItem('designToOrder')
           }
         }
+        
+        // Reset protection after specific design load completes
+        setTimeout(() => {
+          justClearedCanvasRef.current = false
+          setIsNewDesignSession(false)
+        }, 1000) // 1 second protection window
         
         return // Exit early, don't run auto-restore
       }
@@ -2454,6 +2489,7 @@ const BannerEditor = () => {
   // Auto-save canvas state when elements change
   useEffect(() => {
     if (elements.length > 0) {
+      
       const canvasData = {
         elements,
         canvasSize,
