@@ -11,6 +11,8 @@ import Checkout from './components/Checkout'
 import OrderConfirmation from './components/OrderConfirmation'
 import TermsOfService from './components/TermsOfService'
 import PrivacyPolicy from './components/PrivacyPolicy'
+import EmailConfirmed from './components/EmailConfirmed'
+import CheckEmail from './components/CheckEmail'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import authService from './services/auth'
@@ -116,6 +118,10 @@ function App() {
         {/* Legal Pages */}
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        
+        {/* Email Confirmation */}
+        <Route path="/email-confirmed" element={<EmailConfirmed />} />
+        <Route path="/check-email" element={<CheckEmail />} />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={

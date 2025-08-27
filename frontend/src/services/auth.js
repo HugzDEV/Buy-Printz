@@ -52,7 +52,8 @@ class AuthService {
         options: {
           data: {
             full_name: fullName
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/email-confirmed`
         }
       })
 
@@ -68,6 +69,32 @@ class AuthService {
         email: data.user.email,
         access_token: data.session?.access_token
       }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // Resend confirmation email
+  async resendConfirmation(email) {
+    if (!this.supabase) {
+      throw new Error('Supabase not initialized. Please check your environment variables.')
+    }
+
+    try {
+      const { error } = await this.supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/email-confirmed`
+        }
+      })
+
+      if (error) {
+        console.error('Resend confirmation error:', error)
+        throw new Error(error.message)
+      }
+
+      return { success: true }
     } catch (error) {
       throw error
     }

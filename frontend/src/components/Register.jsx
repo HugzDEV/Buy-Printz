@@ -48,8 +48,12 @@ const Register = () => {
 
     try {
       await authService.register(formData.email, formData.password, formData.fullName)
-      toast.success('Registration successful! Welcome to Buy Printz!')
-      navigate('/dashboard')
+      
+      // Store email for the check-email page
+      sessionStorage.setItem('registrationEmail', formData.email)
+      
+      toast.success('Registration successful! Please check your email to confirm your account.')
+      navigate('/check-email')
     } catch (error) {
       toast.error(error.message || 'Registration failed')
     } finally {
