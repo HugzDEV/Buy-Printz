@@ -13,6 +13,7 @@ import TermsOfService from './components/TermsOfService'
 import PrivacyPolicy from './components/PrivacyPolicy'
 import EmailConfirmed from './components/EmailConfirmed'
 import CheckEmail from './components/CheckEmail'
+import ResetPassword from './components/ResetPassword'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import authService from './services/auth'
@@ -122,6 +123,7 @@ function App() {
         {/* Email Confirmation */}
         <Route path="/email-confirmed" element={<EmailConfirmed />} />
         <Route path="/check-email" element={<CheckEmail />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={

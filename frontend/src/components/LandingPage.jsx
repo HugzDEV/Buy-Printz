@@ -66,7 +66,7 @@ const LandingPage = () => {
             Professional Banner Printing for Business
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-primary-100">
-            Create custom vinyl banners, trade show displays, and outdoor signage with professional design tools
+            Create custom banners, trade show displays, and outdoor signage with professional design tools
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 

@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import authService from '../services/auth'
 import toast from 'react-hot-toast'
+import PasswordResetModal from './PasswordResetModal'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -148,14 +150,24 @@ const Login = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Forgot your password?{' '}
-                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+                <button 
+                  type="button"
+                  onClick={() => setShowResetModal(true)}
+                  className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
+                >
                   Reset it here
-                </a>
+                </button>
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Password Reset Modal */}
+      <PasswordResetModal 
+        isOpen={showResetModal} 
+        onClose={() => setShowResetModal(false)} 
+      />
     </div>
   )
 }

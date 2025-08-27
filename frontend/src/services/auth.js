@@ -100,6 +100,50 @@ class AuthService {
     }
   }
 
+  // Reset password
+  async resetPassword(email) {
+    if (!this.supabase) {
+      throw new Error('Supabase not initialized. Please check your environment variables.')
+    }
+
+    try {
+      const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
+
+      if (error) {
+        console.error('Password reset error:', error)
+        throw new Error(error.message)
+      }
+
+      return { success: true }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // Update password (called after reset link is clicked)
+  async updatePassword(newPassword) {
+    if (!this.supabase) {
+      throw new Error('Supabase not initialized. Please check your environment variables.')
+    }
+
+    try {
+      const { error } = await this.supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (error) {
+        console.error('Password update error:', error)
+        throw new Error(error.message)
+      }
+
+      return { success: true }
+    } catch (error) {
+      throw error
+    }
+  }
+
   // Login user using Supabase Auth
   async login(email, password) {
     if (!this.supabase) {
