@@ -61,7 +61,7 @@ const EmailConfirmed = () => {
               onClick={() => navigate('/dashboard')}
               className="bg-buyprint-brand hover:bg-buyprint-600 text-white font-bold py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 w-full hover:scale-105 hover:shadow-2xl"
             >
-              Go to Dashboard
+              Go to Login
               <ArrowRight className="w-5 h-5" />
             </button>
             

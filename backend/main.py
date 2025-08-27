@@ -829,10 +829,58 @@ async def get_user_stats(current_user: dict = Depends(get_current_user)):
 
 @app.get("/api/orders/pending")
 async def get_pending_orders(current_user: dict = Depends(get_current_user)):
-    """Get user's pending/incomplete orders"""
+    """Get user's pending/incomplete orders from the pending_orders table"""
     try:
         pending_orders = await db_manager.get_pending_orders(current_user["user_id"])
         return {"success": True, "orders": pending_orders}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/orders/pending")
+async def create_pending_order(order_data: dict, current_user: dict = Depends(get_current_user)):
+    """Create a new pending order that hasn't been paid yet"""
+    try:
+        result = await db_manager.create_pending_order(current_user["user_id"], order_data)
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/orders/pending/{pending_order_id}/complete")
+async def complete_pending_order(pending_order_id: str, current_user: dict = Depends(get_current_user)):
+    """Move a pending order to the main orders table when payment is completed"""
+    try:
+        result = await db_manager.move_pending_to_orders(pending_order_id)
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/orders/pending/{pending_order_id}")
+async def update_pending_order(pending_order_id: str, update_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update a pending order (e.g., payment status, customer info)"""
+    try:
+        result = await db_manager.update_pending_order(pending_order_id, update_data)
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result["error"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/orders/pending/{pending_order_id}")
+async def delete_pending_order(pending_order_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a pending order (e.g., when cancelled or expired)"""
+    try:
+        result = await db_manager.delete_pending_order(pending_order_id)
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result["error"])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

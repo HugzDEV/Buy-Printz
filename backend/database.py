@@ -525,13 +525,70 @@ class DatabaseManager:
             return {"success": False, "error": str(e)}
 
     async def get_pending_orders(self, user_id: str) -> List[Dict[str, Any]]:
-        """Get user's pending/incomplete orders"""
+        """Get user's pending/incomplete orders from the pending_orders table"""
         try:
-            response = self.supabase.table("orders").select("*").eq("user_id", user_id).eq("status", "pending").order("created_at", desc=True).execute()
+            # Get from the dedicated pending_orders table
+            response = self.supabase.table("pending_orders").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
             return response.data or []
         except Exception as e:
             print(f"Error getting pending orders: {e}")
-            return []
+            # Fallback to old logic if pending_orders table doesn't exist yet
+            try:
+                response = self.supabase.table("orders").select("*").eq("user_id", user_id).in_("status", ["pending", "payment_failed", "incomplete"]).order("created_at", desc=True).execute()
+                return response.data or []
+            except Exception as fallback_error:
+                print(f"Fallback error getting pending orders: {fallback_error}")
+                return []
+
+    async def create_pending_order(self, user_id: str, order_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new pending order that hasn't been paid yet"""
+        try:
+            # Add user_id and set initial status
+            order_data["user_id"] = user_id
+            order_data["status"] = "pending"
+            
+            response = self.supabase.table("pending_orders").insert(order_data).execute()
+            if response.data:
+                return {"success": True, "order": response.data[0]}
+            else:
+                return {"success": False, "error": "Failed to create pending order"}
+        except Exception as e:
+            print(f"Error creating pending order: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def move_pending_to_orders(self, pending_order_id: str) -> Dict[str, Any]:
+        """Move a pending order to the main orders table when payment is completed"""
+        try:
+            # Call the PostgreSQL function to move the order
+            response = self.supabase.rpc("move_pending_to_orders", {"pending_order_id": pending_order_id}).execute()
+            if response.data:
+                return {"success": True, "order_id": response.data}
+            else:
+                return {"success": False, "error": "Failed to move pending order"}
+        except Exception as e:
+            print(f"Error moving pending order to orders: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def update_pending_order(self, pending_order_id: str, update_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Update a pending order (e.g., payment status, customer info)"""
+        try:
+            response = self.supabase.table("pending_orders").update(update_data).eq("id", pending_order_id).execute()
+            if response.data:
+                return {"success": True, "order": response.data[0]}
+            else:
+                return {"success": False, "error": "Failed to update pending order"}
+        except Exception as e:
+            print(f"Error updating pending order: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def delete_pending_order(self, pending_order_id: str) -> Dict[str, Any]:
+        """Delete a pending order (e.g., when cancelled or expired)"""
+        try:
+            response = self.supabase.table("pending_orders").delete().eq("id", pending_order_id).execute()
+            return {"success": True}
+        except Exception as e:
+            print(f"Error deleting pending order: {e}")
+            return {"success": False, "error": str(e)}
 
     async def get_completed_designs(self, user_id: str) -> List[Dict[str, Any]]:
         """Get user's completed banner designs from successful orders"""

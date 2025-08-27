@@ -1060,14 +1060,18 @@ const Dashboard = () => {
         {/* Pending Orders Tab */}
         {activeTab === 'pending' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">Pending Orders</h2>
-              <span className="neumorphic-container px-4 py-2 rounded-lg bg-yellow-50 text-yellow-800 font-medium">
-                {pendingOrders.length} Pending
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Pending Orders</h2>
+                <p className="text-gray-600 text-sm mt-1">Orders that require payment to complete</p>
+              </div>
+              <span className="neumorphic-container px-4 py-2 rounded-lg bg-yellow-50 text-yellow-800 font-medium w-fit">
+                {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').length} Pending
               </span>
             </div>
 
-                         {pendingOrders.length === 0 ? (
+            {/* Show actual pending orders count and filter client-side for safety */}
+            {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').length === 0 ? (
                <div className="neumorphic-container p-12 rounded-xl bg-white text-center">
                  <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                  <h3 className="text-lg font-medium text-gray-900 mb-2">No pending orders</h3>
@@ -1083,7 +1087,7 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {pendingOrders.map((order) => (
+                {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').map((order) => (
                   <div key={order.id} className="neumorphic-container p-6 rounded-xl bg-white">
                     <div className="flex items-center justify-between mb-4">
                       <div>
@@ -1093,8 +1097,13 @@ const Dashboard = () => {
                         </p>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className="neumorphic-container px-3 py-1 rounded-lg bg-yellow-50 text-yellow-800 text-sm font-medium">
-                          Pending Payment
+                        <span className={`neumorphic-container px-3 py-1 rounded-lg text-sm font-medium ${
+                          order.status === 'payment_failed' 
+                            ? 'bg-red-50 text-red-800' 
+                            : 'bg-yellow-50 text-yellow-800'
+                        }`}>
+                          {order.status === 'payment_failed' ? 'Payment Failed' : 
+                           order.status === 'incomplete' ? 'Incomplete' : 'Pending Payment'}
                         </span>
                         <span className="text-lg font-bold text-gray-900">
                           {formatCurrency(order.total_amount)}
