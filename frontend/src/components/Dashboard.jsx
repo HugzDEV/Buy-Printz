@@ -24,6 +24,15 @@ const Dashboard = () => {
   const [pendingOrders, setPendingOrders] = useState([])
   const [completedDesigns, setCompletedDesigns] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingStates, setLoadingStates] = useState({
+    designs: true,
+    orders: true,
+    templates: true,
+    pendingOrders: true,
+    completedDesigns: true,
+    stats: true,
+    preferences: true
+  })
   const [activeTab, setActiveTab] = useState('overview')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -54,7 +63,16 @@ const Dashboard = () => {
 
   const loadDashboardData = async () => {
     try {
-      const currentUser = await authService.getCurrentUser()
+      // Add timeout for user authentication
+      const authTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Authentication timeout')), 5000)
+      )
+      
+      const currentUser = await Promise.race([
+        authService.getCurrentUser(),
+        authTimeout
+      ])
+      
       if (!currentUser) {
         navigate('/login')
         return
@@ -62,76 +80,124 @@ const Dashboard = () => {
 
       setUser(currentUser)
 
-      // Load all data in parallel for better performance
-      const [
-        designsResponse,
-        ordersResponse,
-        templatesResponse,
-        statsResponse,
-        preferencesResponse,
-        pendingOrdersResponse,
-        completedDesignsResponse
-      ] = await Promise.all([
-        authService.authenticatedRequest('/api/designs'),
-        authService.authenticatedRequest('/api/orders'),
-        authService.authenticatedRequest('/api/templates/user'),
-        authService.authenticatedRequest('/api/user/stats'),
-        authService.authenticatedRequest('/api/user/preferences'),
-        authService.authenticatedRequest('/api/orders/pending'),
-        authService.authenticatedRequest('/api/designs/completed')
-      ])
+      // Load essential data first to show basic dashboard
+      setLoading(false)
 
-      // Load user designs
-      const designsData = await designsResponse.json()
-      if (designsData.success) {
-        console.log('Regular Designs Data:', designsData.designs)
-        setDesigns(designsData.designs)
-      }
-
-      // Load user orders
-      const ordersData = await ordersResponse.json()
-      if (ordersData.success) {
-        setOrders(ordersData.orders)
-      }
-
-      // Load user templates
-      const templatesData = await templatesResponse.json()
-      if (templatesData.success) {
-        setTemplates(templatesData.templates)
-      }
-
-      // Load user statistics
-      const statsData = await statsResponse.json()
-      if (statsData.success) {
-        setUserStats(statsData)
-      }
-
-      // Load user preferences
-      const preferencesData = await preferencesResponse.json()
-      if (preferencesData.success) {
-        setPreferences(preferencesData.preferences)
-      }
-
-      // Load pending orders
-      const pendingOrdersData = await pendingOrdersResponse.json()
-      if (pendingOrdersData.success) {
-        console.log('Pending Orders Data:', pendingOrdersData.orders)
-        setPendingOrders(pendingOrdersData.orders)
-      }
-
-      // Load completed designs
-      const completedDesignsData = await completedDesignsResponse.json()
-      if (completedDesignsData.success) {
-        console.log('Completed Designs Data:', completedDesignsData.designs)
-        setCompletedDesigns(completedDesignsData.designs)
-      }
+      // Load data progressively to avoid overwhelming mobile connections
+      await loadDataProgressively()
 
     } catch (error) {
       console.error('Error loading dashboard data:', error)
-      toast.error('Failed to load dashboard data')
-    } finally {
+      
+      if (error.message.includes('timeout')) {
+        toast.error('Connection timeout. Please check your internet connection.')
+      } else {
+        toast.error('Failed to load dashboard data')
+      }
+      
       setLoading(false)
+      
+      // Set all loading states to false to show empty states
+      setLoadingStates({
+        designs: false,
+        orders: false,
+        templates: false,
+        pendingOrders: false,
+        completedDesigns: false,
+        stats: false,
+        preferences: false
+      })
     }
+  }
+
+  const loadDataProgressively = async () => {
+    const loadDataSafely = async (apiCall, setter, fallback, loadingKey) => {
+      try {
+        // Add timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        )
+        
+        const response = await Promise.race([apiCall(), timeoutPromise])
+        const data = await response.json()
+        if (data.success) {
+          setter(data.designs || data.orders || data.templates || data.preferences || data)
+        } else {
+          console.warn(`API returned error for ${loadingKey}:`, data)
+          setter(fallback)
+        }
+      } catch (error) {
+        console.warn(`API call failed for ${loadingKey}, using fallback:`, error)
+        setter(fallback)
+        
+        // Only show error toast for critical data
+        if (['designs', 'orders'].includes(loadingKey)) {
+          toast.error(`Failed to load ${loadingKey}. Using offline mode.`)
+        }
+      } finally {
+        setLoadingStates(prev => ({ ...prev, [loadingKey]: false }))
+      }
+    }
+
+    // Load core data first (designs and orders)
+    await Promise.all([
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/designs'),
+        (data) => setDesigns(data.designs || []),
+        [],
+        'designs'
+      ),
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/orders'),
+        (data) => setOrders(data.orders || []),
+        [],
+        'orders'
+      )
+    ])
+
+    // Small delay to prevent overwhelming mobile connections
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // Load secondary data
+    await Promise.all([
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/templates/user'),
+        (data) => setTemplates(data.templates || []),
+        [],
+        'templates'
+      ),
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/orders/pending'),
+        (data) => setPendingOrders(data.orders || []),
+        [],
+        'pendingOrders'
+      )
+    ])
+
+    // Another small delay
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // Load tertiary data
+    await Promise.all([
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/designs/completed'),
+        (data) => setCompletedDesigns(data.designs || []),
+        [],
+        'completedDesigns'
+      ),
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/user/stats'),
+        (data) => setUserStats(data),
+        null,
+        'stats'
+      ),
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/user/preferences'),
+        (data) => setPreferences(data.preferences || null),
+        null,
+        'preferences'
+      )
+    ])
   }
 
   const handleLogout = async () => {
@@ -460,28 +526,30 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Mobile-Optimized Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-8">
+          <div className="flex justify-between items-center py-4 sm:py-8">
             <div className="flex items-center">
               <Link to="/" className="flex items-center">
                 <img 
                   src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
                   alt="Buy Printz" 
-                  className="w-32 h-32 object-contain hover:opacity-80 transition-opacity cursor-pointer"
+                  className="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain hover:opacity-80 transition-opacity cursor-pointer"
                 />
               </Link>
-              <h1 className="ml-3 text-2xl font-bold text-gray-900">Dashboard</h1>
+              <h1 className="ml-2 sm:ml-3 text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Welcome, {user?.email}</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <span className="hidden sm:block text-gray-600 text-sm lg:text-base">
+                Welcome, {user?.email?.split('@')[0]}
+              </span>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-gray-600 hover:text-gray-900"
+                className="flex items-center text-gray-600 hover:text-gray-900 text-sm lg:text-base"
               >
                 <LogOut className="w-4 h-4 mr-1" />
-                Logout
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
@@ -489,28 +557,29 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
+        {/* Mobile-Optimized Navigation Tabs */}
         <div className="border-b border-gray-200 mb-8">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto">
             {[
-              { id: 'overview', name: 'Overview', icon: BarChart3 },
-              { id: 'designs', name: 'My Designs', icon: Palette },
-              { id: 'templates', name: 'Templates', icon: Layout },
-              { id: 'orders', name: 'Orders', icon: ShoppingBag },
-              { id: 'pending', name: 'Pending Orders', icon: Clock },
-              { id: 'profile', name: 'Profile', icon: Settings }
+              { id: 'overview', name: 'Overview', shortName: 'Home', icon: BarChart3 },
+              { id: 'designs', name: 'My Designs', shortName: 'Designs', icon: Palette },
+              { id: 'templates', name: 'Templates', shortName: 'Templates', icon: Layout },
+              { id: 'orders', name: 'Orders', shortName: 'Orders', icon: ShoppingBag },
+              { id: 'pending', name: 'Pending Orders', shortName: 'Pending', icon: Clock },
+              { id: 'profile', name: 'Profile', shortName: 'Profile', icon: Settings }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <tab.icon className="w-4 h-4 mr-2" />
-                {tab.name}
+                <tab.icon className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="sm:hidden">{tab.shortName}</span>
+                <span className="hidden sm:inline">{tab.name}</span>
               </button>
             ))}
           </nav>
@@ -555,11 +624,20 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2">Total Designs</p>
-                                         <p className="text-3xl font-bold text-gray-900">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
-                    <p className="text-xs text-green-600 flex items-center mt-1">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      Active creations
-                    </p>
+                    {loadingStates.designs || loadingStates.completedDesigns ? (
+                      <div className="animate-pulse">
+                        <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-24"></div>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-3xl font-bold text-gray-900">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
+                        <p className="text-xs text-green-600 flex items-center mt-1">
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          Active creations
+                        </p>
+                      </>
+                    )}
                   </div>
                   <div className="neumorphic-button p-4 rounded-xl bg-blue-50">
                     <Palette className="w-8 h-8 text-blue-600" />
