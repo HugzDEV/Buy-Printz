@@ -49,13 +49,7 @@ const Dashboard = () => {
   })
 
   useEffect(() => {
-    // Add mobile-specific initialization delay
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent)
-    const delay = isMobile ? 300 : 0
-    
-    setTimeout(() => {
-      loadDashboardData()
-    }, delay)
+    loadDashboardData()
   }, [])
 
   // Check for URL parameters to set active tab
@@ -69,17 +63,12 @@ const Dashboard = () => {
 
   const loadDashboardData = async () => {
     try {
-      // Add timeout for user authentication
-      const authTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Authentication timeout')), 5000)
-      )
-      
-      const currentUser = await Promise.race([
-        authService.getCurrentUser(),
-        authTimeout
-      ])
+      // Since we're already protected by ProtectedRoute, just get user info
+      const currentUser = await authService.getCurrentUser()
       
       if (!currentUser) {
+        // This should rarely happen since ProtectedRoute handles auth
+        console.warn('No user found in dashboard, redirecting to login')
         navigate('/login')
         return
       }
@@ -94,13 +83,7 @@ const Dashboard = () => {
 
     } catch (error) {
       console.error('Error loading dashboard data:', error)
-      
-      if (error.message.includes('timeout')) {
-        toast.error('Connection timeout. Please check your internet connection.')
-      } else {
-        toast.error('Failed to load dashboard data')
-      }
-      
+      toast.error('Failed to load dashboard data')
       setLoading(false)
       
       // Set all loading states to false to show empty states

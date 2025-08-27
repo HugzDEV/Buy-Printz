@@ -231,7 +231,7 @@ class AuthService {
     }
   }
 
-  // Check if user is authenticated with mobile-specific handling
+  // Check if user is authenticated with simplified mobile handling
   async isAuthenticated() {
     if (!this.supabase) {
       console.warn('Supabase not initialized')
@@ -239,47 +239,22 @@ class AuthService {
     }
 
     try {
-      // For mobile, add retry logic for session checks
-      const getSessionWithRetry = async (retries = 2) => {
-        for (let i = 0; i <= retries; i++) {
-          try {
-            const { data: { session }, error } = await this.supabase.auth.getSession()
-            
-            if (error) {
-              console.warn(`Session check attempt ${i + 1} failed:`, error)
-              if (i < retries) {
-                await new Promise(resolve => setTimeout(resolve, 500))
-                continue
-              }
-              throw error
-            }
-            
-            return session
-          } catch (err) {
-            if (i === retries) throw err
-            await new Promise(resolve => setTimeout(resolve, 500))
-          }
-        }
-      }
-
-      const session = await getSessionWithRetry()
+      const { data: { session }, error } = await this.supabase.auth.getSession()
       
-      // Additional validation for mobile
+      if (error) {
+        console.warn('Session check failed:', error)
+        return false
+      }
+      
+      // Simple validation - just check if session exists and has user
       if (session && session.user) {
-        // Check if session is still valid (not expired)
+        // Basic expiration check
         const now = Math.floor(Date.now() / 1000)
         const expiresAt = session.expires_at || session.exp
         
         if (expiresAt && now >= expiresAt) {
-          console.warn('Session expired, attempting refresh')
-          try {
-            await this.refreshToken()
-            const { data: { session: newSession } } = await this.supabase.auth.getSession()
-            return !!newSession
-          } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError)
-            return false
-          }
+          console.warn('Session expired')
+          return false
         }
         
         return true

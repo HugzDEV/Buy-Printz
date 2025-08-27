@@ -18,68 +18,39 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import authService from './services/auth'
 
-// Protected Route Component with Mobile-Specific Handling
+// Protected Route Component with Simplified Mobile Handling
 const ProtectedRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     let mounted = true
     
     const checkAuth = async () => {
       try {
-        // Add timeout for mobile connections
-        const authTimeout = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Auth timeout')), 8000)
-        )
-        
-        const auth = await Promise.race([
-          authService.isAuthenticated(),
-          authTimeout
-        ])
+        const auth = await authService.isAuthenticated()
         
         if (mounted) {
           setIsAuthenticated(auth)
+          setLoading(false)
         }
       } catch (error) {
         console.warn('Auth check failed:', error)
         
         if (mounted) {
-          // Retry once on mobile if initial check fails
-          if (retryCount < 1 && /Mobi|Android/i.test(navigator.userAgent)) {
-            setRetryCount(prev => prev + 1)
-            setTimeout(() => {
-              if (mounted) {
-                checkAuth()
-              }
-            }, 1000)
-            return
-          }
-          
           setIsAuthenticated(false)
-        }
-      } finally {
-        if (mounted) {
           setLoading(false)
         }
       }
     }
     
-    // Initial delay on mobile to ensure proper initialization
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent)
-    const delay = isMobile ? 500 : 0
-    
-    setTimeout(() => {
-      if (mounted) {
-        checkAuth()
-      }
-    }, delay)
+    // Start auth check immediately
+    checkAuth()
 
     return () => {
       mounted = false
     }
-  }, [retryCount])
+  }, [])
 
   if (loading) {
     return (
@@ -99,7 +70,7 @@ const ProtectedRoute = ({ children }) => {
   return children
 }
 
-// Public Route Component with Mobile-Specific Handling
+// Public Route Component with Simplified Handling
 const PublicRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -109,41 +80,24 @@ const PublicRoute = ({ children }) => {
     
     const checkAuth = async () => {
       try {
-        // Add timeout for mobile connections
-        const authTimeout = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Auth timeout')), 5000)
-        )
-        
-        const auth = await Promise.race([
-          authService.isAuthenticated(),
-          authTimeout
-        ])
+        const auth = await authService.isAuthenticated()
         
         if (mounted) {
           setIsAuthenticated(auth)
+          setLoading(false)
         }
       } catch (error) {
         console.warn('Public route auth check failed:', error)
         if (mounted) {
           // On error, assume not authenticated for public routes
           setIsAuthenticated(false)
-        }
-      } finally {
-        if (mounted) {
           setLoading(false)
         }
       }
     }
     
-    // Shorter delay for public routes on mobile
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent)
-    const delay = isMobile ? 200 : 0
-    
-    setTimeout(() => {
-      if (mounted) {
-        checkAuth()
-      }
-    }, delay)
+    // Start auth check immediately
+    checkAuth()
 
     return () => {
       mounted = false
