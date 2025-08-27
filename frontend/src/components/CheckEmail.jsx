@@ -163,7 +163,7 @@ const CheckEmail = () => {
                 href="mailto:order@buyprintz.com" 
                 className="text-buyprint-brand hover:text-buyprint-400 transition-colors"
               >
-                support@buyprintz.com
+                order@buyprintz.com
               </a>
             </p>
           </div>

@@ -231,15 +231,61 @@ class AuthService {
     }
   }
 
-  // Check if user is authenticated
+  // Check if user is authenticated with mobile-specific handling
   async isAuthenticated() {
     if (!this.supabase) {
+      console.warn('Supabase not initialized')
       return false
     }
 
     try {
-      const { data: { session } } = await this.supabase.auth.getSession()
-      return !!session
+      // For mobile, add retry logic for session checks
+      const getSessionWithRetry = async (retries = 2) => {
+        for (let i = 0; i <= retries; i++) {
+          try {
+            const { data: { session }, error } = await this.supabase.auth.getSession()
+            
+            if (error) {
+              console.warn(`Session check attempt ${i + 1} failed:`, error)
+              if (i < retries) {
+                await new Promise(resolve => setTimeout(resolve, 500))
+                continue
+              }
+              throw error
+            }
+            
+            return session
+          } catch (err) {
+            if (i === retries) throw err
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+        }
+      }
+
+      const session = await getSessionWithRetry()
+      
+      // Additional validation for mobile
+      if (session && session.user) {
+        // Check if session is still valid (not expired)
+        const now = Math.floor(Date.now() / 1000)
+        const expiresAt = session.expires_at || session.exp
+        
+        if (expiresAt && now >= expiresAt) {
+          console.warn('Session expired, attempting refresh')
+          try {
+            await this.refreshToken()
+            const { data: { session: newSession } } = await this.supabase.auth.getSession()
+            return !!newSession
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError)
+            return false
+          }
+        }
+        
+        return true
+      }
+      
+      return false
     } catch (error) {
       console.error('Error checking authentication:', error)
       return false

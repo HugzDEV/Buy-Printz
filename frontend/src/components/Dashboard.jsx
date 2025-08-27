@@ -49,7 +49,13 @@ const Dashboard = () => {
   })
 
   useEffect(() => {
-    loadDashboardData()
+    // Add mobile-specific initialization delay
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent)
+    const delay = isMobile ? 300 : 0
+    
+    setTimeout(() => {
+      loadDashboardData()
+    }, delay)
   }, [])
 
   // Check for URL parameters to set active tab
@@ -519,7 +525,11 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm sm:text-base">Loading dashboard...</p>
+          <p className="text-gray-400 text-xs mt-2">This may take a moment on mobile</p>
+        </div>
       </div>
     )
   }
