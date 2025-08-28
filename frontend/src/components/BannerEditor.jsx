@@ -1370,13 +1370,17 @@ const BannerEditorNew = () => {
         const stageElement = document.querySelector('.konvajs-content canvas')
         if (stageElement) {
           // Use a higher quality export
-          return stageElement.toDataURL('image/png', 1.0)
+          const imageData = stageElement.toDataURL('image/png', 1.0)
+          console.log('Canvas image generated successfully, length:', imageData.length)
+          return imageData
         }
         
         // Fallback to any canvas element
         const canvasElement = document.querySelector('canvas')
         if (canvasElement) {
-          return canvasElement.toDataURL('image/png', 1.0)
+          const imageData = canvasElement.toDataURL('image/png', 1.0)
+          console.log('Canvas image generated from fallback, length:', imageData.length)
+          return imageData
         }
         
         console.warn('No canvas element found for image generation')
@@ -1396,6 +1400,10 @@ const BannerEditorNew = () => {
       canvas_image: generateCanvasImage(),
       timestamp: new Date().toISOString()
     }
+    
+    console.log('Creating order with elements count:', elements.length)
+    console.log('Canvas size:', canvasSize)
+    console.log('Banner specs:', bannerSpecs)
     
     // Store in sessionStorage for checkout
     sessionStorage.setItem('orderData', JSON.stringify(orderData))

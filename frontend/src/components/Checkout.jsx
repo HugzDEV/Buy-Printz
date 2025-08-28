@@ -126,12 +126,59 @@ const Checkout = () => {
     try {
       console.log('Creating order with data:', orderData)
       
+      // Clean up order data to remove complex objects that can't be serialized
+      const cleanOrderData = {
+        product_type: orderData.bannerSpecs?.id || 'vinyl-13oz',
+        banner_size: `${orderData.canvasSize?.width || 800}x${orderData.canvasSize?.height || 400}`,
+        quantity: 1,
+        canvas_image: orderData.canvas_image,
+        canvas_data: {
+          width: orderData.canvasSize?.width || 800,
+          height: orderData.canvasSize?.height || 400,
+          backgroundColor: orderData.backgroundColor || '#ffffff',
+          elements: orderData.elements?.map(el => ({
+            id: el.id,
+            type: el.type,
+            x: el.x,
+            y: el.y,
+            width: el.width,
+            height: el.height,
+            text: el.text,
+            fontSize: el.fontSize,
+            fontFamily: el.fontFamily,
+            fill: el.fill,
+            stroke: el.stroke,
+            strokeWidth: el.strokeWidth,
+            rotation: el.rotation,
+            radius: el.radius,
+            numPoints: el.numPoints,
+            innerRadius: el.innerRadius,
+            outerRadius: el.outerRadius,
+            sides: el.sides,
+            points: el.points,
+            closed: el.closed,
+            scaleX: el.scaleX,
+            scaleY: el.scaleY,
+            align: el.align,
+            verticalAlign: el.verticalAlign,
+            lineHeight: el.lineHeight,
+            letterSpacing: el.letterSpacing,
+            padding: el.padding,
+            assetName: el.assetName,
+            uploadedFile: el.uploadedFile
+          })) || []
+        },
+        timestamp: orderData.timestamp || new Date().toISOString()
+      }
+      
       // Update order data with banner options
       const updatedOrderData = {
-        ...orderData,
+        ...cleanOrderData,
         print_options: bannerOptions,
         shipping_option: shippingOption
       }
+      
+      console.log('Sending cleaned order data:', updatedOrderData)
       
       const response = await authService.authenticatedRequest('/api/orders/create', {
         method: 'POST',
