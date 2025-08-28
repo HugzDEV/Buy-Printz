@@ -161,7 +161,24 @@ const Checkout = () => {
           
           // Handle different error response formats
           if (errorData.detail) {
-            errorMessage = errorData.detail
+            if (Array.isArray(errorData.detail)) {
+              // Handle array of validation errors
+              console.log('Validation errors array:', errorData.detail)
+              errorMessage = errorData.detail.map(error => {
+                console.log('Processing error:', error)
+                if (typeof error === 'string') {
+                  return error
+                } else if (error.msg) {
+                  return `${error.loc?.join('.') || 'Field'}: ${error.msg}`
+                } else if (error.message) {
+                  return error.message
+                } else {
+                  return JSON.stringify(error)
+                }
+              }).join(', ')
+            } else {
+              errorMessage = errorData.detail
+            }
           } else if (errorData.message) {
             errorMessage = errorData.message
           } else if (errorData.error) {
