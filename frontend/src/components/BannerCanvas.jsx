@@ -688,6 +688,69 @@ const BannerCanvas = ({
     }
   }
 
+  // DPI calculation function
+  const calculateDPI = (element) => {
+    if (element.type !== 'image' || !element.image) {
+      return null
+    }
+    
+    try {
+      // Get the original image dimensions
+      const originalWidth = element.image.naturalWidth || element.image.width
+      const originalHeight = element.image.naturalHeight || element.image.height
+      
+      // Get the display dimensions on canvas
+      const displayWidth = element.width
+      const displayHeight = element.height
+      
+      // Calculate banner dimensions in inches
+      // Canvas size is in pixels, we need to convert to actual banner size
+      // For banners, we typically use 150 DPI for printing
+      const bannerWidthInches = canvasSize.width / 150
+      const bannerHeightInches = canvasSize.height / 150
+      
+      // Calculate what portion of the banner this image covers
+      const imageWidthInches = (displayWidth / canvasSize.width) * bannerWidthInches
+      const imageHeightInches = (displayHeight / canvasSize.height) * bannerHeightInches
+      
+      // Calculate DPI for width and height
+      const dpiWidth = Math.round(originalWidth / imageWidthInches)
+      const dpiHeight = Math.round(originalHeight / imageHeightInches)
+      
+      // Return the lower DPI (worst case scenario)
+      const dpi = Math.min(dpiWidth, dpiHeight)
+      
+      return {
+        dpi,
+        originalWidth,
+        originalHeight,
+        displayWidth,
+        displayHeight,
+        imageWidthInches: Math.round(imageWidthInches * 100) / 100,
+        imageHeightInches: Math.round(imageHeightInches * 100) / 100,
+        quality: dpi >= 300 ? 'Excellent' : dpi >= 150 ? 'Good' : dpi >= 72 ? 'Fair' : 'Poor',
+        recommendation: dpi >= 300 ? 'Perfect for printing' : 
+                       dpi >= 150 ? 'Good for most banners' : 
+                       dpi >= 72 ? 'Acceptable for large banners' : 
+                       'Consider using a higher resolution image'
+      }
+    } catch (error) {
+      console.error('Error calculating DPI:', error)
+      return null
+    }
+  }
+
+  // Get DPI info for selected element
+  const getSelectedElementDPI = () => {
+    if (selectedId) {
+      const element = elements.find(el => el.id === selectedId)
+      if (element && element.type === 'image') {
+        return calculateDPI(element)
+      }
+    }
+    return null
+  }
+
   return (
     <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 relative">
       
@@ -1217,6 +1280,48 @@ const BannerCanvas = ({
         ${selectedId || selectedIds.length > 0 ? 'translate-y-0' : 'translate-y-full'}
       `}>
         <GlassPanel className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+          
+          {/* DPI Information for Selected Image */}
+          {selectedId && getSelectedElementDPI() && (
+            <div className="flex items-center gap-2 p-2 bg-white/20 rounded-lg border border-white/30">
+              <div className="text-xs sm:text-sm">
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">DPI:</span>
+                  <span className={`font-bold ${
+                    getSelectedElementDPI().dpi >= 300 ? 'text-green-600' :
+                    getSelectedElementDPI().dpi >= 150 ? 'text-yellow-600' :
+                    getSelectedElementDPI().dpi >= 72 ? 'text-orange-600' : 'text-red-600'
+                  }`}>
+                    {getSelectedElementDPI().dpi}
+                  </span>
+                  <span className={`px-1 py-0.5 rounded text-xs font-medium ${
+                    getSelectedElementDPI().quality === 'Excellent' ? 'bg-green-100 text-green-700' :
+                    getSelectedElementDPI().quality === 'Good' ? 'bg-yellow-100 text-yellow-700' :
+                    getSelectedElementDPI().quality === 'Fair' ? 'bg-orange-100 text-orange-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {getSelectedElementDPI().quality}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {getSelectedElementDPI().originalWidth}×{getSelectedElementDPI().originalHeight}px
+                  {' → '}
+                  {getSelectedElementDPI().imageWidthInches}"×{getSelectedElementDPI().imageHeightInches}"
+                </div>
+                {getSelectedElementDPI().dpi < 150 && (
+                  <div className="text-xs text-red-600 font-medium">
+                    ⚠️ {getSelectedElementDPI().recommendation}
+                  </div>
+                )}
+                {getSelectedElementDPI().dpi >= 150 && getSelectedElementDPI().dpi < 300 && (
+                  <div className="text-xs text-yellow-600 font-medium">
+                    ℹ️ {getSelectedElementDPI().recommendation}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           {selectedIds.length > 0 && (
             <div className="text-xs sm:text-sm text-gray-600 font-medium">
               {selectedIds.length} elements selected
