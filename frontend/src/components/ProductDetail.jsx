@@ -526,8 +526,7 @@ const ProductDetail = () => {
                 </p>
                 <div className="flex gap-4">
                   <Link 
-                    to="/editor" 
-                    onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                    to={`/editor?product=${productId}`}
                     className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105 font-semibold"
                   >
                     Design This Product

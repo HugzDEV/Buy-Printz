@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import jsPDF from 'jspdf'
 import { 
   ChevronLeft, 
@@ -14,6 +14,7 @@ import authService from '../services/auth'
 
 const BannerEditorNew = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   
   // Core state
   const [elements, setElements] = useState([])
@@ -75,7 +76,7 @@ const BannerEditorNew = () => {
       uses: ['Heavy-duty Outdoor', 'Construction Sites', 'Long-term Use']
     },
     {
-      id: 'mesh',
+      id: 'mesh-banner',
       name: 'Mesh Banner',
       category: 'Mesh Banners',
       material: 'Mesh Vinyl',
@@ -85,7 +86,7 @@ const BannerEditorNew = () => {
       uses: ['Windy Locations', 'Fencing', 'Construction Barriers']
     },
     {
-      id: 'indoor',
+      id: 'indoor-banner',
       name: 'Indoor Banner',
       category: 'Indoor Banners',
       material: 'Indoor Vinyl',
@@ -95,7 +96,7 @@ const BannerEditorNew = () => {
       uses: ['Indoor Displays', 'Trade Shows', 'Retail']
     },
     {
-      id: 'pole',
+      id: 'pole-banner',
       name: 'Pole Banner',
       category: 'Pole Banners',
       material: '13oz Vinyl',
@@ -125,7 +126,7 @@ const BannerEditorNew = () => {
       uses: ['Double-sided Displays', 'Premium Indoor Signage']
     },
     {
-      id: 'fabric-tension',
+      id: 'tension-fabric',
       name: 'Tension Fabric Banner',
       category: 'Fabric Banners',
       material: 'Tension Fabric',
@@ -135,7 +136,7 @@ const BannerEditorNew = () => {
       uses: ['Trade Show Displays', 'Premium Presentations']
     },
     {
-      id: 'backlit',
+      id: 'backlit-banner',
       name: 'Backlit Banner',
       category: 'Specialty Banners',
       material: 'Translucent Vinyl',
@@ -147,7 +148,18 @@ const BannerEditorNew = () => {
   ]
 
   // Banner specifications - Updated to match actual product specifications
-  const [bannerSpecs, setBannerSpecs] = useState(bannerTypes[0]) // Default to first banner type
+  const [bannerSpecs, setBannerSpecs] = useState(() => {
+    // Get product type from URL parameter
+    const productType = searchParams.get('product')
+    console.log('URL product parameter:', productType)
+    
+    // Find the matching banner type
+    const selectedBannerType = bannerTypes.find(banner => banner.id === productType)
+    console.log('Selected banner type:', selectedBannerType)
+    
+    // Return the selected banner type or default to first one
+    return selectedBannerType || bannerTypes[0]
+  })
 
   // Utility functions
   const generateId = (type) => `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`

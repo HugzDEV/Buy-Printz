@@ -347,8 +347,7 @@ const Products = () => {
                         View Details
                       </Link>
                       <Link 
-                        to="/editor" 
-                        onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                        to={`/editor?product=${product.id}`}
                         className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                       >
                         Design Now
@@ -392,7 +391,6 @@ const Products = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/editor" 
-              onClick={() => sessionStorage.setItem('newDesign', 'true')}
               className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105"
             >
               Start Designing
