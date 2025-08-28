@@ -96,19 +96,13 @@ const Checkout = () => {
   useEffect(() => {
     const savedOrderData = sessionStorage.getItem('orderData')
     if (!savedOrderData) {
-      console.log('No order data found in sessionStorage')
       navigate('/editor')
       return
     }
 
     try {
       const parsedOrderData = JSON.parse(savedOrderData)
-      console.log('Loaded order data:', parsedOrderData)
-      console.log('Canvas image available:', !!parsedOrderData.canvas_image)
-      console.log('Elements count:', parsedOrderData.elements?.length || 0)
-      console.log('Canvas size:', parsedOrderData.canvasSize)
-      console.log('Banner specs:', parsedOrderData.bannerSpecs)
-      
+      console.log('Loading order data from sessionStorage:', parsedOrderData)
       setOrderData(parsedOrderData)
     } catch (error) {
       console.error('Failed to parse order data:', error)
@@ -126,27 +120,12 @@ const Checkout = () => {
     try {
       console.log('Creating order with data:', orderData)
       
-      // Simplified order data structure
-      const cleanOrderData = {
-        product_type: orderData.bannerSpecs?.id || 'vinyl-13oz',
-        banner_size: `${orderData.canvasSize?.width || 800}x${orderData.canvasSize?.height || 400}`,
-        quantity: 1,
-        canvas_image: orderData.canvas_image,
-        canvas_width: orderData.canvasSize?.width || 800,
-        canvas_height: orderData.canvasSize?.height || 400,
-        background_color: orderData.backgroundColor || '#ffffff',
-        elements_count: orderData.elements?.length || 0,
-        timestamp: orderData.timestamp || new Date().toISOString()
-      }
-      
       // Update order data with banner options
       const updatedOrderData = {
-        ...cleanOrderData,
+        ...orderData,
         print_options: bannerOptions,
         shipping_option: shippingOption
       }
-      
-      console.log('Sending cleaned order data:', updatedOrderData)
       
       const response = await authService.authenticatedRequest('/api/orders/create', {
         method: 'POST',
@@ -154,46 +133,9 @@ const Checkout = () => {
       })
       
       if (!response.ok) {
-        let errorMessage = 'Failed to create order'
-        try {
-          const errorData = await response.json()
-          console.error('Order creation failed - full error data:', errorData)
-          
-          // Handle different error response formats
-          if (errorData.detail) {
-            if (Array.isArray(errorData.detail)) {
-              // Handle array of validation errors
-              console.log('Validation errors array:', errorData.detail)
-              errorMessage = errorData.detail.map(error => {
-                console.log('Processing error:', error)
-                if (typeof error === 'string') {
-                  return error
-                } else if (error.msg) {
-                  return `${error.loc?.join('.') || 'Field'}: ${error.msg}`
-                } else if (error.message) {
-                  return error.message
-                } else {
-                  return JSON.stringify(error)
-                }
-              }).join(', ')
-            } else {
-              errorMessage = errorData.detail
-            }
-          } else if (errorData.message) {
-            errorMessage = errorData.message
-          } else if (errorData.error) {
-            errorMessage = errorData.error
-          } else if (typeof errorData === 'string') {
-            errorMessage = errorData
-          } else {
-            errorMessage = JSON.stringify(errorData)
-          }
-        } catch (parseError) {
-          console.error('Failed to parse error response:', parseError)
-          errorMessage = `Server error: ${response.status} ${response.statusText}`
-        }
-        
-        throw new Error(errorMessage)
+        const errorData = await response.json()
+        console.error('Order creation failed:', errorData)
+        throw new Error(errorData.detail || 'Failed to create order')
       }
       
       const data = await response.json()
@@ -341,7 +283,7 @@ const Checkout = () => {
 
       // Payment successful - order status will be updated via webhook
       setCheckoutStep('completed')
-      localStorage.setItem('orderConfirmation', JSON.stringify({
+      sessionStorage.setItem('orderConfirmation', JSON.stringify({
         orderId: orderId,
         amount: paymentIntent.amount,
         customerInfo,

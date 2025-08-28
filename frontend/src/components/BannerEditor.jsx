@@ -1370,7 +1370,7 @@ const BannerEditorNew = () => {
         const stageElement = document.querySelector('.konvajs-content canvas')
         if (stageElement) {
           // Use a higher quality export but limit size
-          const imageData = stageElement.toDataURL('image/png', 0.8) // Reduced quality to limit size
+          const imageData = stageElement.toDataURL('image/png', 0.8)
           console.log('Canvas image generated successfully, length:', imageData.length)
           
           // Check if image is too large (limit to 5MB)
@@ -1407,12 +1407,28 @@ const BannerEditorNew = () => {
 
     // Navigate to checkout with design data
     const orderData = {
+      // Design data
       elements,
       canvasSize,
       backgroundColor,
       bannerSpecs,
       canvas_image: generateCanvasImage(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      
+      // Order metadata
+      product_type: 'banner',
+      quantity: 1,
+      banner_type: bannerSpecs?.id || 'vinyl-13oz',
+      banner_material: bannerSpecs?.material || '13oz Vinyl',
+      banner_finish: bannerSpecs?.finish || 'Matte',
+      banner_size: `${canvasSize.width}x${canvasSize.height}px (${canvasOrientation})`,
+      banner_category: bannerSpecs?.category || 'Vinyl Banners',
+      banner_description: bannerSpecs?.description || 'Professional banner',
+      
+      // Canvas dimensions for pricing
+      width: canvasSize.width,
+      height: canvasSize.height,
+      orientation: canvasOrientation
     }
     
     console.log('Creating order with elements count:', elements.length)
