@@ -1407,28 +1407,31 @@ const BannerEditorNew = () => {
 
     // Navigate to checkout with design data
     const orderData = {
-      // Design data
-      elements,
-      canvasSize,
-      backgroundColor,
-      bannerSpecs,
+      // Canvas data (required by backend)
+      canvas_data: {
+        elements,
+        canvasSize,
+        backgroundColor,
+        bannerSpecs,
+        timestamp: new Date().toISOString()
+      },
       canvas_image: generateCanvasImage(),
-      timestamp: new Date().toISOString(),
       
-      // Order metadata
+      // Order metadata (required by backend)
       product_type: 'banner',
       quantity: 1,
+      dimensions: {
+        width: canvasSize.width,
+        height: canvasSize.height,
+        orientation: canvasOrientation
+      },
       banner_type: bannerSpecs?.id || 'vinyl-13oz',
       banner_material: bannerSpecs?.material || '13oz Vinyl',
       banner_finish: bannerSpecs?.finish || 'Matte',
       banner_size: `${canvasSize.width}x${canvasSize.height}px (${canvasOrientation})`,
       banner_category: bannerSpecs?.category || 'Vinyl Banners',
-      banner_description: bannerSpecs?.description || 'Professional banner',
-      
-      // Canvas dimensions for pricing
-      width: canvasSize.width,
-      height: canvasSize.height,
-      orientation: canvasOrientation
+      background_color: backgroundColor,
+      print_options: {} // Will be populated by checkout component
     }
     
     console.log('Creating order with elements count:', elements.length)
