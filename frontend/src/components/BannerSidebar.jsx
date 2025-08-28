@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { 
   Type, 
@@ -45,8 +45,8 @@ const BannerSidebar = ({
   selectedElement = null
 }) => {
   const [expandedSections, setExpandedSections] = useState({
-    specifications: true,
-    tools: true,
+    specifications: false,
+    tools: false,
     shapes: false,
     templates: false,
     assets: false,
@@ -58,6 +58,33 @@ const BannerSidebar = ({
   const [sizeCategory, setSizeCategory] = useState('landscape')
   const [customWidth, setCustomWidth] = useState('800')
   const [customHeight, setCustomHeight] = useState('400')
+  const [uploadedImages, setUploadedImages] = useState([])
+
+  // Cleanup object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      uploadedImages.forEach(image => {
+        if (image.url && image.url.startsWith('blob:')) {
+          URL.revokeObjectURL(image.url)
+        }
+      })
+    }
+  }, [])
+
+  // Function to remove uploaded image
+  const removeUploadedImage = (index) => {
+    setUploadedImages(prev => {
+      const newImages = [...prev]
+      const removedImage = newImages.splice(index, 1)[0]
+      
+      // Clean up the object URL
+      if (removedImage.url && removedImage.url.startsWith('blob:')) {
+        URL.revokeObjectURL(removedImage.url)
+      }
+      
+      return newImages
+    })
+  }
 
   // Use bannerTemplates prop instead of local definition
 
@@ -307,6 +334,17 @@ const BannerSidebar = ({
   // Image upload handling
   const onDrop = async (acceptedFiles) => {
     for (const file of acceptedFiles) {
+      // Create a URL for the uploaded image
+      const imageUrl = URL.createObjectURL(file)
+      
+      // Add to uploaded images state
+      setUploadedImages(prev => [...prev, {
+        url: imageUrl,
+        name: file.name,
+        file: file
+      }])
+      
+      // Call the parent callback
       onImageUpload(file)
     }
   }
@@ -374,9 +412,9 @@ const BannerSidebar = ({
         {/* Header */}
         <div className="text-center py-4">
           <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-            Design Studio
+            Design Tools
           </h2>
-          <p className="text-sm text-gray-600 mt-1">Professional banner editor</p>
+          <p className="text-sm text-gray-600 mt-1">Tools & options</p>
         </div>
 
         {/* Banner Specifications */}
@@ -630,21 +668,29 @@ const BannerSidebar = ({
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Uploaded Images</h4>
                   <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
                     {uploadedImages.map((image, index) => (
-                      <button
-                        key={index}
-                        onClick={() => onAddAsset(image.url, image.name)}
-                        className="aspect-square relative group overflow-hidden rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-200 border border-white/30"
-                      >
-                        <img
-                          src={image.url}
-                          alt={image.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                        <div className="absolute bottom-1 left-1 right-1 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate">
-                          {image.name}
-                        </div>
-                      </button>
+                      <div key={index} className="relative group">
+                        <button
+                          onClick={() => onAddAsset(image.url, image.name)}
+                          className="aspect-square relative group overflow-hidden rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-200 border border-white/30 w-full"
+                        >
+                          <img
+                            src={image.url}
+                            alt={image.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                          <div className="absolute bottom-1 left-1 right-1 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate">
+                            {image.name}
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => removeUploadedImage(index)}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                          title="Remove image"
+                        >
+                          ×
+                        </button>
+                      </div>
                     ))}
                   </div>
                 </div>

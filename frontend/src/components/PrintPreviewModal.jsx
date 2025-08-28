@@ -177,7 +177,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl h-[95vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-6xl max-h-[90vh] h-auto overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Printer className="h-6 w-6 text-blue-600" />
@@ -188,7 +188,7 @@ const PrintPreviewModal = ({
           </p>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="flex-1 overflow-y-auto min-h-0 pb-4">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
             {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
             <div className="xl:col-span-2 space-y-6">
@@ -412,7 +412,7 @@ const PrintPreviewModal = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-shrink-0 border-t pt-4 bg-gray-50 mt-auto">
+        <DialogFooter className="flex-shrink-0 border-t pt-4 bg-gray-50">
           <div className="flex flex-col sm:flex-row gap-3 w-full justify-end">
             <Button
               variant="outline"

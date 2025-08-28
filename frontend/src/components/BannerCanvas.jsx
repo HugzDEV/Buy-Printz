@@ -30,21 +30,21 @@ const BannerCanvas = ({
 }) => {
   const stageRef = useRef()
   const transformerRef = useRef()
-  const [scale, setScale] = useState(0.8)
+  const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
   
-  // Auto-adjust scale when canvas size changes
-  useEffect(() => {
-    const containerWidth = 800 // Approximate container width
-    const containerHeight = 600 // Approximate container height
-    
-    const scaleX = (containerWidth - 100) / canvasSize.width
-    const scaleY = (containerHeight - 100) / canvasSize.height
-    
-    // Use the smaller scale to ensure canvas fits
-    const newScale = Math.min(scaleX, scaleY, 1) // Don't scale up beyond 1
-    setScale(Math.max(0.3, newScale)) // Minimum scale of 0.3
-  }, [canvasSize])
+  // Auto-adjust scale when canvas size changes - DISABLED for user control
+  // useEffect(() => {
+  //   const containerWidth = 800 // Approximate container width
+  //   const containerHeight = 600 // Approximate container height
+  //   
+  //   const scaleX = (containerWidth - 100) / canvasSize.width
+  //   const scaleY = (containerHeight - 100) / canvasSize.height
+  //   
+  //   // Use the smaller scale to ensure canvas fits
+  //   const newScale = Math.min(scaleX, scaleY, 1) // Don't scale up beyond 1
+  //   setScale(Math.max(0.3, newScale)) // Minimum scale of 0.3
+  // }, [canvasSize])
   const [history, setHistory] = useState([])
   const [historyStep, setHistoryStep] = useState(0)
   const [showGrid, setShowGrid] = useState(true)
@@ -921,59 +921,55 @@ const BannerCanvas = ({
                   anchorStrokeWidth={1}
                   anchorSize={8}
                   visible={true}
+                  // Show single bounding box for multiple selections
                   boundBoxFunc={(oldBox, newBox) => {
+                    // For multiple selections, ensure we get a single bounding box
+                    if (selectedIds.length > 1) {
+                      // Calculate the bounding box of all selected elements
+                      const selectedElements = elements.filter(el => selectedIds.includes(el.id))
+                      if (selectedElements.length > 1) {
+                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+                        
+                        selectedElements.forEach(element => {
+                          const elemX = element.x || 0
+                          const elemY = element.y || 0
+                          let elemWidth = element.width || 50
+                          let elemHeight = element.height || 50
+                          
+                          // Handle different element types for proper bounds
+                          if (element.type === 'circle') {
+                            const radius = element.radius || 50
+                            elemWidth = radius * 2
+                            elemHeight = radius * 2
+                          } else if (element.type === 'star') {
+                            const outerRadius = element.outerRadius || 50
+                            elemWidth = outerRadius * 2
+                            elemHeight = outerRadius * 2
+                          }
+                          
+                          minX = Math.min(minX, elemX)
+                          minY = Math.min(minY, elemY)
+                          maxX = Math.max(maxX, elemX + elemWidth)
+                          maxY = Math.max(maxY, elemY + elemHeight)
+                        })
+                        
+                        // Return the calculated bounding box
+                        return {
+                          x: minX,
+                          y: minY,
+                          width: maxX - minX,
+                          height: maxY - minY
+                        }
+                      }
+                    }
+                    
+                    // For single selection or no selection, use default behavior
                     if (newBox.width < 5 || newBox.height < 5) {
                       return oldBox
                     }
                     return newBox
                   }}
                 />
-                
-                {/* Debug: Show selection state */}
-                <Text
-                  x={10}
-                  y={10}
-                  text={`Selected: ${selectedId || 'none'} | Multi: ${selectedIds.length} | Selecting: ${isSelecting}`}
-                  fontSize={12}
-                  fill="red"
-                  listening={false}
-                />
-                
-                {/* Multi-select highlighting */}
-                {selectedIds.map(id => {
-                  const element = elements.find(el => el.id === id)
-                  if (!element) return null
-                  
-                  const elemX = element.x || 0
-                  const elemY = element.y || 0
-                  let elemWidth = element.width || 50
-                  let elemHeight = element.height || 50
-                  
-                  // Handle different element types for proper bounds
-                  if (element.type === 'circle') {
-                    const radius = element.radius || 50
-                    elemWidth = radius * 2
-                    elemHeight = radius * 2
-                  } else if (element.type === 'star') {
-                    const outerRadius = element.outerRadius || 50
-                    elemWidth = outerRadius * 2
-                    elemHeight = outerRadius * 2
-                  }
-                  
-                  return (
-                    <Rect
-                      key={`highlight-${id}`}
-                      x={elemX - 2}
-                      y={elemY - 2}
-                      width={elemWidth + 4}
-                      height={elemHeight + 4}
-                      stroke="#007bff"
-                      strokeWidth={2}
-                      fill="rgba(0, 123, 255, 0.1)"
-                      listening={false}
-                    />
-                  )
-                })}
                 
                 {/* Selection rectangle */}
                 {selectionRect && (

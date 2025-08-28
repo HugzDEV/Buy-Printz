@@ -1405,7 +1405,7 @@ const BannerEditorNew = () => {
           
           <div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              Banner Studio
+              Buy Printz Banner Editor
             </h1>
             <p className="text-sm text-gray-600">Professional Design Editor</p>
           </div>
