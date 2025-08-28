@@ -197,7 +197,57 @@ const BannerSidebar = ({
     { name: 'Pencil', icon: FileText, symbol: '✏️', category: 'education' },
     { name: 'School', icon: FileText, symbol: '🏫', category: 'education' },
     { name: 'Microscope', icon: FileText, symbol: '🔬', category: 'education' },
-    { name: 'Lightbulb', icon: FileText, symbol: '💡', category: 'education' }
+    { name: 'Lightbulb', icon: FileText, symbol: '💡', category: 'education' },
+    
+    // Social Media
+    { name: 'X (Twitter)', icon: FileText, symbol: '𝕏', category: 'social', imagePath: '/assets/images/social icons/X.png' },
+    { name: 'Twitter', icon: FileText, symbol: '🐦', category: 'social', imagePath: '/assets/images/social icons/Twitter.png' },
+    { name: 'Meta (Facebook)', icon: FileText, symbol: '📘', category: 'social', imagePath: '/assets/images/social icons/Facebook.png' },
+    { name: 'LinkedIn', icon: FileText, symbol: '💼', category: 'social', imagePath: '/assets/images/social icons/LinkedIn.png' },
+    { name: 'Reddit', icon: FileText, symbol: '🤖', category: 'social', imagePath: '/assets/images/social icons/Reddit.png' },
+    { name: 'GitHub', icon: FileText, symbol: '🐙', category: 'social' },
+    { name: 'Pinterest', icon: FileText, symbol: '📌', category: 'social', imagePath: '/assets/images/social icons/Pinterest.png' },
+    { name: 'Instagram', icon: FileText, symbol: '📷', category: 'social', imagePath: '/assets/images/social icons/Instagram.png' },
+    { name: 'Snapchat', icon: FileText, symbol: '👻', category: 'social', imagePath: '/assets/images/social icons/Snapchat.png' },
+    { name: 'Telegram', icon: FileText, symbol: '✈️', category: 'social', imagePath: '/assets/images/social icons/Telegram.png' },
+    { name: 'WhatsApp', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Whatsapp.png' },
+    { name: 'Yelp', icon: FileText, symbol: '⭐', category: 'social' },
+    { name: 'Twitch', icon: FileText, symbol: '🎮', category: 'social', imagePath: '/assets/images/social icons/Twitch.png' },
+    { name: 'YouTube', icon: FileText, symbol: '📺', category: 'social', imagePath: '/assets/images/social icons/Youtube.png' },
+    { name: 'TikTok', icon: FileText, symbol: '🎵', category: 'social', imagePath: '/assets/images/social icons/Tiktok.png' },
+    { name: 'Discord', icon: FileText, symbol: '🎭', category: 'social', imagePath: '/assets/images/social icons/Discord.png' },
+    { name: 'Slack', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Slack.png' },
+    { name: 'Skype', icon: FileText, symbol: '📞', category: 'social', imagePath: '/assets/images/social icons/Skype.png' },
+    { name: 'Zoom', icon: FileText, symbol: '🎥', category: 'social', imagePath: '/assets/images/social icons/Zoom.png' },
+    { name: 'Spotify', icon: FileText, symbol: '🎵', category: 'social', imagePath: '/assets/images/social icons/Spotify.png' },
+    { name: 'Netflix', icon: FileText, symbol: '🎬', category: 'social' },
+    { name: 'Amazon', icon: FileText, symbol: '📦', category: 'social' },
+    { name: 'eBay', icon: FileText, symbol: '🛒', category: 'social' },
+    { name: 'Etsy', icon: FileText, symbol: '🛍️', category: 'social' },
+    { name: 'PayPal', icon: FileText, symbol: '💳', category: 'social', imagePath: '/assets/images/social icons/Paypal.png' },
+    { name: 'Uber', icon: FileText, symbol: '🚗', category: 'social' },
+    { name: 'Airbnb', icon: FileText, symbol: '🏠', category: 'social' },
+    { name: 'Google Maps', icon: FileText, symbol: '🗺️', category: 'social' },
+    { name: 'Dropbox', icon: FileText, symbol: '📁', category: 'social', imagePath: '/assets/images/social icons/Dropbox.png' },
+    { name: 'Canva', icon: FileText, symbol: '🎨', category: 'social' },
+    { name: 'Notion', icon: FileText, symbol: '📝', category: 'social' },
+    { name: 'Trello', icon: FileText, symbol: '📋', category: 'social' },
+    { name: 'Messenger', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Messenger.png' },
+    { name: 'Vimeo', icon: FileText, symbol: '🎬', category: 'social', imagePath: '/assets/images/social icons/Vimeo.png' },
+    { name: 'Dribbble', icon: FileText, symbol: '🏀', category: 'social', imagePath: '/assets/images/social icons/Dribbble.png' },
+    { name: 'Soundcloud', icon: FileText, symbol: '🎵', category: 'social', imagePath: '/assets/images/social icons/Soundcloud.png' },
+    { name: 'Tumblr', icon: FileText, symbol: '📝', category: 'social', imagePath: '/assets/images/social icons/Tumblr.png' },
+    { name: 'Viber', icon: FileText, symbol: '📱', category: 'social', imagePath: '/assets/images/social icons/Viber.png' },
+    { name: 'Line', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Line.png' },
+    { name: 'WeChat', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/WeChat.png' },
+    { name: 'VK', icon: FileText, symbol: '🇷🇺', category: 'social', imagePath: '/assets/images/social icons/VK.png' },
+    { name: 'Behance', icon: FileText, symbol: '🎨', category: 'social', imagePath: '/assets/images/social icons/Behance.png' },
+    { name: 'Google Drive', icon: FileText, symbol: '☁️', category: 'social', imagePath: '/assets/images/social icons/Drive.png' },
+    { name: 'Microsoft Word', icon: FileText, symbol: '📄', category: 'social', imagePath: '/assets/images/social icons/Word.png' },
+    { name: 'Microsoft Excel', icon: FileText, symbol: '📊', category: 'social', imagePath: '/assets/images/social icons/Excel.png' },
+    { name: 'Microsoft PowerPoint', icon: FileText, symbol: '📊', category: 'social', imagePath: '/assets/images/social icons/PowerPoint.png' },
+    { name: 'Microsoft Outlook', icon: FileText, symbol: '📧', category: 'social', imagePath: '/assets/images/social icons/Outlook.png' },
+    { name: 'Microsoft OneNote', icon: FileText, symbol: '📝', category: 'social', imagePath: '/assets/images/social icons/OneNote.png' }
   ]
 
   // Asset categories with modern organization
@@ -704,7 +754,6 @@ const BannerSidebar = ({
                   {isDragActive ? 'Drop images here...' : 'Drag & drop images here'}
                 </p>
                 <p className="text-xs text-gray-500">or click to browse</p>
-                <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF, SVG, WEBP up to 10MB</p>
                 <p className="text-xs text-blue-500 mt-1 font-medium">Click to upload</p>
               </div>
 
@@ -1273,6 +1322,32 @@ const BannerSidebar = ({
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
+                    </NeumorphicButton>
+                  ))}
+                </div>
+              </div>
+
+              {/* Social Media Icons */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Social Media</h4>
+                <div className="grid grid-cols-4 gap-2">
+                  {iconLibrary.filter(icon => icon.category === 'social').map((icon) => (
+                    <NeumorphicButton
+                      key={icon.name}
+                      onClick={() => onAddIcon(icon.name, icon.symbol)}
+                      variant="glass"
+                      className="p-2 flex flex-col items-center gap-1"
+                    >
+                      {icon.imagePath ? (
+                        <img 
+                          src={icon.imagePath} 
+                          alt={icon.name}
+                          className="w-6 h-6 object-contain"
+                        />
+                      ) : (
+                        <span className="text-lg">{icon.symbol}</span>
+                      )}
+                      <span className="text-xs font-medium text-center leading-tight">{icon.name}</span>
                     </NeumorphicButton>
                   ))}
                 </div>
