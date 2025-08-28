@@ -507,42 +507,49 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-sm sm:text-base">Loading dashboard...</p>
-          <p className="text-gray-400 text-xs mt-2">This may take a moment on mobile</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center backdrop-blur-xl bg-white/20 rounded-2xl p-8 border border-white/30">
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 text-sm sm:text-base font-medium">Loading dashboard...</p>
+          <p className="text-gray-500 text-xs mt-2">This may take a moment on mobile</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-Optimized Header */}
-      <div className="bg-white shadow">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
+      {/* GlassUI Header */}
+      <div className="backdrop-blur-xl bg-white/10 border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4 sm:py-8">
+          <div className="flex justify-between items-center py-4 sm:py-6">
             <div className="flex items-center">
               <Link to="/" className="flex items-center">
                 <img 
                   src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
                   alt="Buy Printz" 
-                  className="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain hover:opacity-80 transition-opacity cursor-pointer"
+                  className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain hover:opacity-80 transition-opacity cursor-pointer"
                 />
               </Link>
-              <h1 className="ml-2 sm:ml-3 text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
+              <div className="ml-3 sm:ml-4">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Dashboard
+                </h1>
+                <p className="text-sm text-gray-600">Professional Design Studio</p>
+              </div>
             </div>
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <span className="hidden sm:block text-gray-600 text-sm lg:text-base">
-                Welcome, {user?.email?.split('@')[0]}
-              </span>
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="hidden sm:block backdrop-blur-sm bg-white/20 rounded-xl px-4 py-2 border border-white/30">
+                <span className="text-gray-700 text-sm font-medium">
+                  Welcome, {user?.email?.split('@')[0]}
+                </span>
+              </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-gray-600 hover:text-gray-900 text-sm lg:text-base"
+                className="flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 text-gray-700 hover:text-gray-900"
               >
-                <LogOut className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Logout</span>
+                <LogOut className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline text-sm font-medium">Logout</span>
               </button>
             </div>
           </div>
@@ -550,9 +557,9 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Mobile-Optimized Navigation Tabs */}
-        <div className="border-b border-gray-200 mb-8">
-          <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto">
+        {/* GlassUI Navigation Tabs */}
+        <div className="backdrop-blur-sm bg-white/30 rounded-2xl p-2 mb-8 border border-white/30">
+          <nav className="flex space-x-1 overflow-x-auto">
             {[
               { id: 'overview', name: 'Overview', shortName: 'Home', icon: BarChart3 },
               { id: 'designs', name: 'My Designs', shortName: 'Designs', icon: Palette },
@@ -564,13 +571,13 @@ const Dashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                className={`flex items-center py-3 px-4 rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white/50 text-blue-700 shadow-lg border border-white/40'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-white/20'
                 }`}
               >
-                <tab.icon className="w-4 h-4 mr-1 sm:mr-2" />
+                <tab.icon className="w-4 h-4 mr-2" />
                 <span className="sm:hidden">{tab.shortName}</span>
                 <span className="hidden sm:inline">{tab.name}</span>
               </button>
@@ -580,30 +587,30 @@ const Dashboard = () => {
 
         {/* Overview Tab */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen p-6 -m-6">
+          <div className="space-y-8">
             {/* Welcome Section */}
-            <div className="neumorphic-container p-8 rounded-2xl bg-white">
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-8 border border-white/30 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
                     Welcome back, {user?.email?.split('@')[0]}! 👋
                   </h2>
                   <p className="text-gray-600">
-                    Your banner design studio dashboard
+                    Your professional banner design studio
                   </p>
                 </div>
                 <div className="flex space-x-3">
                   <Link
                     to="/editor"
                     onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="neumorphic-button-primary px-6 py-3 rounded-xl text-white font-medium flex items-center"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     New Banner
                   </Link>
                   <button
                     onClick={loadDashboardData}
-                    className="neumorphic-button p-3 rounded-xl text-gray-600"
+                    className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl text-gray-600 transition-all duration-200"
                   >
                     <RefreshCw className="w-5 h-5" />
                   </button>
@@ -613,7 +620,7 @@ const Dashboard = () => {
 
             {/* Enhanced Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="neumorphic-container p-6 rounded-xl bg-white">
+              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2">Total Designs</p>
@@ -624,7 +631,7 @@ const Dashboard = () => {
                       </div>
                     ) : (
                       <>
-                        <p className="text-3xl font-bold text-gray-900">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
+                        <p className="text-3xl font-bold text-gray-800">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
                         <p className="text-xs text-green-600 flex items-center mt-1">
                           <TrendingUp className="w-3 h-3 mr-1" />
                           Active creations
@@ -632,49 +639,49 @@ const Dashboard = () => {
                       </>
                     )}
                   </div>
-                  <div className="neumorphic-button p-4 rounded-xl bg-blue-50">
+                  <div className="p-4 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-xl border border-blue-200/30">
                     <Palette className="w-8 h-8 text-blue-600" />
                   </div>
                 </div>
               </div>
 
-              <div className="neumorphic-container p-6 rounded-xl bg-white">
+              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2">Templates</p>
-                    <p className="text-3xl font-bold text-gray-900">{userStats?.total_templates || templates.length}</p>
+                    <p className="text-3xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
                     <p className="text-xs text-purple-600 flex items-center mt-1">
                       <Star className="w-3 h-3 mr-1" />
                       Custom saved
                     </p>
                   </div>
-                  <div className="neumorphic-button p-4 rounded-xl bg-purple-50">
+                  <div className="p-4 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-xl border border-purple-200/30">
                     <Layout className="w-8 h-8 text-purple-600" />
                   </div>
                 </div>
               </div>
 
-              <div className="neumorphic-container p-6 rounded-xl bg-white">
+              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2">Total Orders</p>
-                    <p className="text-3xl font-bold text-gray-900">{userStats?.total_orders || 0}</p>
+                    <p className="text-3xl font-bold text-gray-800">{userStats?.total_orders || 0}</p>
                     <p className="text-xs text-green-600 flex items-center mt-1">
                       <CheckCircle className="w-3 h-3 mr-1" />
                       {userStats?.order_stats?.paid || userStats?.order_stats?.completed || 0} completed
                     </p>
                   </div>
-                  <div className="neumorphic-button p-4 rounded-xl bg-green-50">
+                  <div className="p-4 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-xl border border-green-200/30">
                     <ShoppingBag className="w-8 h-8 text-green-600" />
                   </div>
                 </div>
               </div>
 
-              <div className="neumorphic-container p-6 rounded-xl bg-white">
+              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2">Total Spent</p>
-                    <p className="text-3xl font-bold text-gray-900">
+                    <p className="text-3xl font-bold text-gray-800">
                       {formatCurrency(userStats?.total_spent || 0)}
                     </p>
                     <p className="text-xs text-blue-600 flex items-center mt-1">
@@ -682,7 +689,7 @@ const Dashboard = () => {
                       This year
                     </p>
                   </div>
-                  <div className="neumorphic-button p-4 rounded-xl bg-yellow-50">
+                  <div className="p-4 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-xl border border-yellow-200/30">
                     <Crown className="w-8 h-8 text-yellow-600" />
                   </div>
                 </div>
@@ -691,18 +698,18 @@ const Dashboard = () => {
 
             {/* Order Status Breakdown */}
             {userStats?.order_stats && (
-              <div className="neumorphic-container p-6 rounded-xl bg-white">
+              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                   <Activity className="w-5 h-5 mr-2 text-blue-600" />
                   Order Status Overview
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {Object.entries(userStats.order_stats).map(([status, count]) => (
-                    <div key={status} className="neumorphic-inset p-4 rounded-lg text-center">
+                    <div key={status} className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30 hover:bg-white/40 transition-all duration-200">
                       <div className="flex items-center justify-center mb-2">
                         {getStatusIcon(status)}
                       </div>
-                      <p className="text-2xl font-bold text-gray-900">{count}</p>
+                      <p className="text-2xl font-bold text-gray-800">{count}</p>
                       <p className="text-xs text-gray-600 capitalize">{status.replace('_', ' ')}</p>
                     </div>
                   ))}
@@ -711,31 +718,31 @@ const Dashboard = () => {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl border border-white/30 shadow-xl">
+              <div className="px-6 py-4 border-b border-white/30">
+                <h3 className="text-lg font-bold text-gray-800">Quick Actions</h3>
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Link
                     to="/editor"
                     onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors"
+                    className="flex items-center p-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/30 hover:bg-white/40 transition-all duration-200"
                   >
-                    <Plus className="w-6 h-6 text-primary-600 mr-3" />
+                    <Plus className="w-6 h-6 text-blue-600 mr-3" />
                     <div>
-                      <h4 className="font-medium text-gray-900">Create New Design</h4>
-                      <p className="text-sm text-gray-600">Start designing a new sign</p>
+                      <h4 className="font-medium text-gray-800">Create New Design</h4>
+                      <p className="text-sm text-gray-600">Start designing a new banner</p>
                     </div>
                   </Link>
 
                   <button
                     onClick={() => setActiveTab('designs')}
-                    className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors w-full text-left"
+                    className="flex items-center p-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/30 hover:bg-white/40 transition-all duration-200 w-full text-left"
                   >
-                    <Eye className="w-6 h-6 text-primary-600 mr-3" />
+                    <Eye className="w-6 h-6 text-blue-600 mr-3" />
                     <div>
-                      <h4 className="font-medium text-gray-900">View My Designs</h4>
+                      <h4 className="font-medium text-gray-800">View My Designs</h4>
                       <p className="text-sm text-gray-600">Browse your saved designs</p>
                     </div>
                   </button>
@@ -744,19 +751,19 @@ const Dashboard = () => {
             </div>
 
             {/* Recent Orders */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Recent Orders</h3>
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl border border-white/30 shadow-xl">
+              <div className="px-6 py-4 border-b border-white/30">
+                <h3 className="text-lg font-bold text-gray-800">Recent Orders</h3>
               </div>
               <div className="p-6">
                 {orders.slice(0, 5).length > 0 ? (
                   <div className="space-y-4">
                     {orders.slice(0, 5).map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div key={order.id} className="flex items-center justify-between p-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/30 hover:bg-white/40 transition-all duration-200">
                         <div className="flex items-center">
-                          <Package className="w-5 h-5 text-gray-400 mr-3" />
+                          <Package className="w-5 h-5 text-gray-500 mr-3" />
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-gray-800">
                               {order.product_type} - Qty: {order.quantity}
                             </p>
                             <p className="text-sm text-gray-600">
@@ -764,14 +771,14 @@ const Dashboard = () => {
                             </p>
                           </div>
                         </div>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
                           {order.status}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600 text-center py-4">No orders yet. Create your first design!</p>
+                  <p className="text-gray-600 text-center py-8">No orders yet. Create your first design!</p>
                 )}
               </div>
             </div>
@@ -783,13 +790,13 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">My Templates</h2>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">My Templates</h2>
                 <p className="text-gray-600">Custom banner templates you've created</p>
               </div>
               <Link
                 to="/editor"
                 onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                className="neumorphic-button-primary flex items-center px-4 py-2 rounded-xl text-white font-medium"
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Template
@@ -799,11 +806,11 @@ const Dashboard = () => {
             {templates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {templates.map((template) => (
-                  <div key={template.id} className="neumorphic-container bg-white rounded-xl overflow-hidden">
+                  <div key={template.id} className="backdrop-blur-xl bg-white/20 rounded-2xl overflow-hidden border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 text-lg mb-1">{template.name}</h3>
+                          <h3 className="font-bold text-gray-800 text-lg mb-1">{template.name}</h3>
                           <p className="text-sm text-gray-600 mb-2">{template.description}</p>
                           <div className="flex items-center space-x-2">
                             <span className="inline-block bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full font-medium">
@@ -818,7 +825,7 @@ const Dashboard = () => {
                         </div>
                         <button
                           onClick={() => deleteTemplate(template.id)}
-                          className="neumorphic-button p-2 rounded-lg text-red-600 hover:bg-red-50"
+                          className="p-2 bg-white/20 hover:bg-red-50/50 rounded-lg text-red-600 transition-all duration-200"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -835,12 +842,12 @@ const Dashboard = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={() => loadDesignInEditor(template)}
-                          className="neumorphic-button flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center justify-center"
+                          className="flex-1 p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-sm font-medium text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200"
                         >
                           <Edit className="w-4 h-4 mr-1" />
                           Use Template
                         </button>
-                        <button className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <button className="p-3 bg-white/20 hover:bg-white/30 rounded-lg text-gray-600 transition-all duration-200">
                           <Eye className="w-4 h-4" />
                         </button>
                       </div>
@@ -849,14 +856,14 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="neumorphic-container bg-white rounded-xl p-12 text-center">
+              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-12 text-center border border-white/30 shadow-xl">
                 <Layout className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No templates yet</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">No templates yet</h3>
                 <p className="text-gray-600 mb-6">Create your first custom template to reuse designs</p>
                 <Link 
                   to="/editor" 
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="neumorphic-button-primary px-6 py-3 rounded-xl text-white font-medium inline-flex items-center"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium inline-flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Create First Template
@@ -871,7 +878,7 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">My Designs</h2>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">My Designs</h2>
                 <p className="text-sm text-gray-600 mt-1">
                   {designs.length} of 10 saved designs
                   {designs.length >= 8 && (
@@ -884,7 +891,7 @@ const Dashboard = () => {
               <Link
                 to="/editor"
                 onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                className={`btn-primary flex items-center ${designs.length >= 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium flex items-center shadow-lg hover:shadow-xl transition-all duration-200 ${designs.length >= 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
                 title={designs.length >= 10 ? 'Delete some designs first to create new ones' : 'Create new design'}
               >
                 <Plus className="w-4 h-4 mr-2" />
