@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import BannerSidebar from './BannerSidebar'
 import BannerCanvas from './BannerCanvas'
+import authService from '../services/auth'
 
 const BannerEditorNew = () => {
   const navigate = useNavigate()
@@ -1346,20 +1347,55 @@ const BannerEditorNew = () => {
     pdf.save('banner-design.pdf')
   }, [canvasSize])
 
-  // Save design
-  const saveDesign = useCallback(() => {
-    const designData = {
-      elements,
-      canvasSize,
-      backgroundColor,
-      bannerSpecs,
-      timestamp: new Date().toISOString()
+  // Save design to Supabase
+  const saveDesign = useCallback(async () => {
+    try {
+      const designData = {
+        name: `Banner Design ${new Date().toLocaleDateString()}`,
+        canvas_data: {
+          elements,
+          canvasSize,
+          backgroundColor,
+          bannerSpecs,
+          timestamp: new Date().toISOString()
+        },
+        product_type: 'banner',
+        dimensions: {
+          width: canvasSize.width,
+          height: canvasSize.height,
+          orientation: canvasOrientation
+        },
+        banner_type: bannerSpecs?.id || 'vinyl-13oz',
+        banner_material: bannerSpecs?.material || '13oz Vinyl',
+        banner_finish: bannerSpecs?.finish || 'Matte',
+        banner_size: `${canvasSize.width}x${canvasSize.height}px (${canvasOrientation})`,
+        banner_category: bannerSpecs?.category || 'Vinyl Banners',
+        background_color: backgroundColor,
+        print_options: {}
+      }
+      
+      const response = await authService.authenticatedRequest('/api/canvas/save', {
+        method: 'POST',
+        body: JSON.stringify(designData)
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to save design')
+      }
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        alert(`Design saved successfully! (${result.design_count}/${result.design_limit} designs)`)
+      } else {
+        throw new Error(result.error || 'Failed to save design')
+      }
+    } catch (error) {
+      console.error('Failed to save design:', error)
+      alert(`Failed to save design: ${error.message}`)
     }
-    
-    // Save to localStorage for now
-    localStorage.setItem('banner-design', JSON.stringify(designData))
-    alert('Design saved successfully!')
-  }, [elements, canvasSize, backgroundColor, bannerSpecs])
+  }, [elements, canvasSize, backgroundColor, bannerSpecs, canvasOrientation])
 
   // Create order
   const createOrder = useCallback(() => {
@@ -1438,25 +1474,33 @@ const BannerEditorNew = () => {
     console.log('Canvas size:', canvasSize)
     console.log('Banner specs:', bannerSpecs)
     
-    // Store in sessionStorage for checkout
+    // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
     sessionStorage.setItem('orderData', JSON.stringify(orderData))
     navigate('/checkout')
   }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate])
 
-  // Load saved design on mount
+  // Load saved design on mount - removed localStorage loading
+  // Designs should be loaded from Supabase via the dashboard
   useEffect(() => {
-    const savedDesign = localStorage.getItem('banner-design')
-    if (savedDesign) {
+    // Check if we're returning from checkout with a cancelled order
+    const cancelledOrder = sessionStorage.getItem('cancelledOrder')
+    if (cancelledOrder) {
       try {
-        const designData = JSON.parse(savedDesign)
-        if (designData.elements) {
-          setElements(designData.elements)
+        const orderData = JSON.parse(cancelledOrder)
+        if (orderData.canvas_data) {
+          setElements(orderData.canvas_data.elements || [])
+          setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
+          if (orderData.canvas_data.bannerSpecs) {
+            setBannerSpecs(orderData.canvas_data.bannerSpecs)
+          }
+          if (orderData.canvas_data.canvasSize) {
+            setCanvasSize(orderData.canvas_data.canvasSize)
+            setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+          }
         }
-        if (designData.backgroundColor) {
-          setBackgroundColor(designData.backgroundColor)
-        }
+        sessionStorage.removeItem('cancelledOrder')
       } catch (error) {
-        console.error('Failed to load saved design:', error)
+        console.error('Failed to restore cancelled order:', error)
       }
     }
   }, [])

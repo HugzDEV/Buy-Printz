@@ -356,7 +356,14 @@ const Checkout = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() => navigate('/editor')}
+              onClick={() => {
+                // Save current order data to sessionStorage before going back
+                if (orderData) {
+                  sessionStorage.setItem('cancelledOrder', JSON.stringify(orderData))
+                  console.log('Saved cancelled order data for restoration')
+                }
+                navigate('/editor')
+              }}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors backdrop-blur-sm bg-white/20 rounded-xl px-4 py-2 border border-white/30"
             >
               <ChevronLeft className="w-5 h-5" />
