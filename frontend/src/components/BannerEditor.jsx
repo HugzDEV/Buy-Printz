@@ -1676,7 +1676,7 @@ const BannerEditorNew = () => {
             <img 
               src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
               alt="BuyPrintz" 
-              className="h-8 w-auto"
+              className="h-16 w-auto"
             />
           </button>
         </div>
