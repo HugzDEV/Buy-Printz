@@ -172,15 +172,11 @@ function App() {
           </ProtectedRoute>
         } />
         
-                            <Route path="/editor" element={
-                      <ProtectedRoute>
-                        <>
-                          <Header />
-                          <BannerEditor />
-                          <Footer />
-                        </>
-                      </ProtectedRoute>
-                    } />
+        <Route path="/editor" element={
+          <ProtectedRoute>
+            <BannerEditor />
+          </ProtectedRoute>
+        } />
         
         <Route path="/checkout" element={
           <ProtectedRoute>
