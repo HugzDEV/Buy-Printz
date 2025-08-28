@@ -94,18 +94,25 @@ const Checkout = () => {
   ]
 
   useEffect(() => {
-    const savedOrderData = localStorage.getItem('orderData')
+    const savedOrderData = sessionStorage.getItem('orderData')
     if (!savedOrderData) {
+      console.log('No order data found in sessionStorage')
       navigate('/editor')
       return
     }
-    
-    const parsedOrderData = JSON.parse(savedOrderData)
-    setOrderData(parsedOrderData)
-    
-    // Load banner options if they exist in order data
-    if (parsedOrderData.print_options) {
-      setBannerOptions(parsedOrderData.print_options)
+
+    try {
+      const parsedOrderData = JSON.parse(savedOrderData)
+      console.log('Loaded order data:', parsedOrderData)
+      console.log('Canvas image available:', !!parsedOrderData.canvas_image)
+      console.log('Elements count:', parsedOrderData.elements?.length || 0)
+      console.log('Canvas size:', parsedOrderData.canvasSize)
+      console.log('Banner specs:', parsedOrderData.bannerSpecs)
+      
+      setOrderData(parsedOrderData)
+    } catch (error) {
+      console.error('Failed to parse order data:', error)
+      navigate('/editor')
     }
   }, [navigate])
 
@@ -290,8 +297,8 @@ const Checkout = () => {
         shippingOption
       }))
       
-      // Clear order data from localStorage
-      localStorage.removeItem('orderData')
+      // Clear order data from sessionStorage
+      sessionStorage.removeItem('orderData')
       
       navigate('/confirmation')
       toast.success('Payment successful!')

@@ -1363,12 +1363,38 @@ const BannerEditorNew = () => {
 
   // Create order
   const createOrder = useCallback(() => {
+    // Generate canvas image data for preview
+    const generateCanvasImage = () => {
+      try {
+        // Get the Konva Stage element
+        const stageElement = document.querySelector('.konvajs-content canvas')
+        if (stageElement) {
+          // Use a higher quality export
+          return stageElement.toDataURL('image/png', 1.0)
+        }
+        
+        // Fallback to any canvas element
+        const canvasElement = document.querySelector('canvas')
+        if (canvasElement) {
+          return canvasElement.toDataURL('image/png', 1.0)
+        }
+        
+        console.warn('No canvas element found for image generation')
+        return null
+      } catch (error) {
+        console.error('Failed to generate canvas image:', error)
+        return null
+      }
+    }
+
     // Navigate to checkout with design data
     const orderData = {
       elements,
       canvasSize,
       backgroundColor,
-      bannerSpecs
+      bannerSpecs,
+      canvas_image: generateCanvasImage(),
+      timestamp: new Date().toISOString()
     }
     
     // Store in sessionStorage for checkout
