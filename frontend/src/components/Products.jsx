@@ -171,15 +171,20 @@ const Products = () => {
   return (
     <>
       <SEOHead {...seoConfigs.products} />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16">
-        <div className="container mx-auto px-4">
+      <section className="relative py-16 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-primary-800/90 backdrop-blur-sm">
+          <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-white/10 to-transparent"></div>
+        </div>
+        
+        <div className="relative container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">
               Professional Banner Products
             </h1>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
+            <p className="text-xl text-primary-100 max-w-3xl mx-auto drop-shadow-md">
               Premium quality banners and signage solutions for every application - from outdoor advertising to trade show displays
             </p>
           </div>
@@ -188,22 +193,28 @@ const Products = () => {
           <div className="grid md:grid-cols-3 gap-8 mt-12">
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
-                <Award className="w-6 h-6 mr-2" />
-                <span className="text-2xl font-bold">Premium Quality</span>
+                <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
+                  <Award className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-2xl font-bold text-white">Premium Quality</span>
               </div>
               <p className="text-primary-100">Professional-grade materials</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
-                <Clock className="w-6 h-6 mr-2" />
-                <span className="text-2xl font-bold">Fast Turnaround</span>
+                <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-2xl font-bold text-white">Fast Turnaround</span>
               </div>
               <p className="text-primary-100">3-5 business days production</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
-                <Truck className="w-6 h-6 mr-2" />
-                <span className="text-2xl font-bold">Free Shipping</span>
+                <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
+                  <Truck className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-2xl font-bold text-white">Free Shipping</span>
               </div>
               <p className="text-primary-100">On orders over $100</p>
             </div>
@@ -212,36 +223,38 @@ const Products = () => {
       </section>
 
       {/* Filters and Search */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 relative">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row gap-6 items-center">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-            
-            {/* Category Filters */}
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    selectedCategory === category.id
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  {category.name} ({category.count})
-                </button>
-              ))}
+          <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-6">
+            <div className="flex flex-col lg:flex-row gap-6 items-center">
+              {/* Search */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-inner"
+                />
+              </div>
+              
+              {/* Category Filters */}
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                      selectedCategory === category.id
+                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/30'
+                        : 'bg-white/80 backdrop-blur-sm border border-gray-200/50 text-gray-700 hover:bg-white hover:shadow-md'
+                    }`}
+                  >
+                    {category.name} ({category.count})
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -251,88 +264,90 @@ const Products = () => {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="mb-6 flex justify-between items-center">
-            <p className="text-gray-600">
+            <p className="text-gray-600 font-medium">
               Showing {filteredProducts.length} of {allProducts.length} products
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                {/* Product Image */}
-                <div className="relative">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${product.id}`
-                    }}
-                  />
-                  
-                  {/* Badges */}
-                  <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    <div className="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {product.price}
-                    </div>
-                    {product.bestseller && (
-                      <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Best Seller
+              <div key={product.id} className="group">
+                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:bg-white/80 h-full flex flex-col">
+                  {/* Product Image */}
+                  <div className="relative h-48">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${product.id}`
+                      }}
+                    />
+                    
+                    {/* Badges */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      <div className="bg-primary-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                        {product.price}
                       </div>
-                    )}
-                    {product.premium && (
-                      <div className="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Premium
-                      </div>
-                    )}
-                    {product.popular && (
-                      <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Popular
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600 mb-4 text-sm">
-                    {product.description}
-                  </p>
-                  
-                  {/* Key Features */}
-                  <div className="mb-4">
-                    <div className="flex flex-wrap gap-1">
-                      {product.features.slice(0, 3).map((feature, featureIndex) => (
-                        <span 
-                          key={featureIndex}
-                          className="inline-flex items-center bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
-                        >
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          {feature}
-                        </span>
-                      ))}
+                      {product.bestseller && (
+                        <div className="bg-green-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Best Seller
+                        </div>
+                      )}
+                      {product.premium && (
+                        <div className="bg-purple-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Premium
+                        </div>
+                      )}
+                      {product.popular && (
+                        <div className="bg-orange-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Popular
+                        </div>
+                      )}
                     </div>
                   </div>
                   
-                  {/* Quick Specs */}
-                  <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                    <h4 className="text-sm font-semibold text-gray-800 mb-2">Specifications</h4>
-                    <div className="text-xs text-gray-600 space-y-1">
-                      <div><strong>Material:</strong> {product.specs.material}</div>
-                      <div><strong>Durability:</strong> {product.specs.durability}</div>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600 mb-4 text-sm flex-grow">
+                      {product.description}
+                    </p>
+                    
+                    {/* Key Features */}
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {product.features.slice(0, 3).map((feature, featureIndex) => (
+                          <span 
+                            key={featureIndex}
+                            className="inline-flex items-center bg-primary-50/80 backdrop-blur-sm text-primary-700 text-xs px-2 py-1 rounded-full border border-primary-200/50"
+                          >
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
                     </div>
+                    
+                    {/* Quick Specs */}
+                    <div className="mb-6 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Specifications</h4>
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <div><strong>Material:</strong> {product.specs.material}</div>
+                        <div><strong>Durability:</strong> {product.specs.durability}</div>
+                      </div>
+                    </div>
+                    
+                    <Link 
+                      to="/editor" 
+                      onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                      className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-auto"
+                    >
+                      Design This Product
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </div>
-                  
-                  <Link 
-                    to="/editor" 
-                    onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 text-center flex items-center justify-center gap-2"
-                  >
-                    Design This Product
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
                 </div>
               </div>
             ))}
@@ -341,37 +356,43 @@ const Products = () => {
           {/* No Results */}
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
-                <Filter className="w-16 h-16 mx-auto" />
+              <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8 max-w-md mx-auto">
+                <div className="text-gray-400 mb-4">
+                  <Filter className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+                <p className="text-gray-600">Try adjusting your search or filter criteria</p>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-              <p className="text-gray-600">Try adjusting your search or filter criteria</p>
             </div>
           )}
         </div>
       </section>
 
       {/* Bottom CTA */}
-      <section className="py-16 bg-primary-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+      <section className="py-16 relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-primary-800/90 backdrop-blur-sm">
+          <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-white/10 to-transparent"></div>
+        </div>
+        
+        <div className="relative container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-white drop-shadow-lg">
             Need Help Choosing the Right Product?
           </h2>
-          <p className="text-xl mb-8 text-primary-100">
+          <p className="text-xl mb-8 text-primary-100 drop-shadow-md">
             Our experts are here to help you find the perfect banner solution for your needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/editor" 
               onClick={() => sessionStorage.setItem('newDesign', 'true')}
-              className="btn-primary bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-4 inline-flex items-center gap-2"
+              className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105"
             >
               Start Designing
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a 
               href="#contact" 
-              className="btn-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600 text-lg px-8 py-4"
+              className="bg-transparent border-2 border-white/80 backdrop-blur-sm text-white hover:bg-white/20 text-lg px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
             >
               Contact Expert
             </a>
