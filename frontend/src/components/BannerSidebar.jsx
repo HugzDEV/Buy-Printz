@@ -1334,7 +1334,7 @@ const BannerSidebar = ({
                   {iconLibrary.filter(icon => icon.category === 'social').map((icon) => (
                     <NeumorphicButton
                       key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
+                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1"
                     >

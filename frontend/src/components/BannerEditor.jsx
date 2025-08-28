@@ -375,22 +375,62 @@ const BannerEditorNew = () => {
     setSelectedId(shape.id)
   }, [canvasSize])
 
-  // Add icon as text element
-  const addIcon = useCallback((iconName, symbol) => {
-    const newIcon = {
-      id: generateId('text'),
-      type: 'text',
-      x: canvasSize.width / 2 - 50,
-      y: canvasSize.height / 2 - 50,
-      text: symbol,
-      fontSize: 100,
-      fontFamily: 'Arial',
-      fill: '#3B82F6',
-      align: 'center',
-      verticalAlign: 'middle'
+  // Add icon as text element or image element
+  const addIcon = useCallback((iconName, symbol, imagePath = null) => {
+    if (imagePath) {
+      // Create image element for icons with actual images
+      const img = new window.Image()
+      img.onload = () => {
+        const newIcon = {
+          id: generateId('image'),
+          type: 'image',
+          x: canvasSize.width / 2 - 50,
+          y: canvasSize.height / 2 - 50,
+          width: 100,
+          height: 100,
+          image: img,
+          rotation: 0,
+          assetName: iconName
+        }
+        setElements(prev => [...prev, newIcon])
+        setSelectedId(newIcon.id)
+      }
+      img.onerror = () => {
+        console.error('Failed to load icon image:', imagePath)
+        // Fallback to text element with emoji
+        const newIcon = {
+          id: generateId('text'),
+          type: 'text',
+          x: canvasSize.width / 2 - 50,
+          y: canvasSize.height / 2 - 50,
+          text: symbol,
+          fontSize: 100,
+          fontFamily: 'Arial',
+          fill: '#3B82F6',
+          align: 'center',
+          verticalAlign: 'middle'
+        }
+        setElements(prev => [...prev, newIcon])
+        setSelectedId(newIcon.id)
+      }
+      img.src = imagePath
+    } else {
+      // Create text element for emoji-based icons
+      const newIcon = {
+        id: generateId('text'),
+        type: 'text',
+        x: canvasSize.width / 2 - 50,
+        y: canvasSize.height / 2 - 50,
+        text: symbol,
+        fontSize: 100,
+        fontFamily: 'Arial',
+        fill: '#3B82F6',
+        align: 'center',
+        verticalAlign: 'middle'
+      }
+      setElements(prev => [...prev, newIcon])
+      setSelectedId(newIcon.id)
     }
-    setElements(prev => [...prev, newIcon])
-    setSelectedId(newIcon.id)
   }, [canvasSize])
 
   // Text property change handler
