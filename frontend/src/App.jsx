@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import LandingPage from './components/LandingPage'
 import Products from './components/Products'
+import ProductDetail from './components/ProductDetail'
 import Login from './components/Login'
 import Register from './components/Register'
 import Dashboard from './components/Dashboard'
@@ -140,6 +141,14 @@ function App() {
           <>
             <Header />
             <Products />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/product/:productId" element={
+          <>
+            <Header />
+            <ProductDetail />
             <Footer />
           </>
         } />

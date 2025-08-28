@@ -339,14 +339,22 @@ const Products = () => {
                       </div>
                     </div>
                     
-                    <Link 
-                      to="/editor" 
-                      onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                      className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-auto"
-                    >
-                      Design This Product
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    <div className="flex gap-2 mt-auto">
+                      <Link 
+                        to={`/product/${product.id}`}
+                        className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                      >
+                        View Details
+                      </Link>
+                      <Link 
+                        to="/editor" 
+                        onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                        className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                      >
+                        Design Now
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
