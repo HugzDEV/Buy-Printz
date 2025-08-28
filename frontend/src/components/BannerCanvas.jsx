@@ -45,6 +45,33 @@ const BannerCanvas = ({
   //   const newScale = Math.min(scaleX, scaleY, 1) // Don't scale up beyond 1
   //   setScale(Math.max(0.3, newScale)) // Minimum scale of 0.3
   // }, [canvasSize])
+
+  // Mobile-responsive canvas scaling
+  useEffect(() => {
+    const updateCanvasScale = () => {
+      const isMobile = window.innerWidth < 768
+      
+      if (isMobile) {
+        // Mobile scaling - ensure canvas fits within viewport
+        const viewportWidth = window.innerWidth - 32 // Account for padding
+        const viewportHeight = window.innerHeight - 200 // Account for header, toolbar, and bottom actions
+        
+        const scaleX = viewportWidth / canvasSize.width
+        const scaleY = viewportHeight / canvasSize.height
+        
+        // Use the smaller scale to ensure canvas fits completely
+        const newScale = Math.min(scaleX, scaleY, 1)
+        setScale(Math.max(0.2, newScale)) // Minimum scale of 0.2 for mobile
+      } else {
+        // Desktop scaling - maintain current behavior
+        setScale(1.0)
+      }
+    }
+
+    updateCanvasScale()
+    window.addEventListener('resize', updateCanvasScale)
+    return () => window.removeEventListener('resize', updateCanvasScale)
+  }, [canvasSize, window.innerWidth, window.innerHeight])
   const [history, setHistory] = useState([])
   const [historyStep, setHistoryStep] = useState(0)
   const [showGrid, setShowGrid] = useState(true)
@@ -530,6 +557,13 @@ const BannerCanvas = ({
           handleSelect(element.id)
         }
       },
+      onTouchStart: (e) => {
+        // Handle touch start for mobile
+        if (!isSelecting) {
+          console.log('Element touch start:', element.id)
+          handleSelect(element.id)
+        }
+      },
       onDragEnd: (e) => handleDragEnd(e, element.id),
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
     }
@@ -739,8 +773,8 @@ const BannerCanvas = ({
           <div 
             className="relative rounded-xl overflow-hidden"
             style={{
-              width: Math.min(canvasSize.width * scale, window.innerWidth - 32),
-              height: Math.min(canvasSize.height * scale, window.innerHeight - 200),
+              width: canvasSize.width * scale,
+              height: canvasSize.height * scale,
               maxWidth: '100%',
               maxHeight: '100%'
             }}
@@ -751,16 +785,22 @@ const BannerCanvas = ({
               height={canvasSize.height}
               scale={{ x: scale, y: scale }}
               draggable={true}
-              onTouchStart={(e) => {
-                // Handle touch events for mobile
+              onTouchMove={(e) => {
+                // Handle touch move for mobile dragging
                 const stage = e.target.getStage()
-                const touch = e.evt.touches[0]
                 const pos = stage.getPointerPosition()
                 
-                if (pos) {
-                  // Clear selections on touch
-                  setSelectedId(null)
-                  setSelectedIds([])
+                if (pos && isSelecting) {
+                  updateSelection({
+                    x: pos.x / scale,
+                    y: pos.y / scale
+                  })
+                }
+              }}
+              onTouchEnd={(e) => {
+                // Handle touch end for mobile
+                if (isSelecting) {
+                  finishSelection()
                 }
               }}
               onMouseDown={(e) => {
@@ -866,6 +906,28 @@ const BannerCanvas = ({
                       })
                     }
                   }}
+                  onTouchStart={(e) => {
+                    console.log('Background rect touched')
+                    
+                    // Prevent event from bubbling to elements
+                    e.evt.preventDefault()
+                    e.evt.stopPropagation()
+                    
+                    // Clear selections when touching background
+                    setSelectedId(null)
+                    setSelectedIds([])
+                    
+                    // Start selection rectangle
+                    const stage = e.target.getStage()
+                    const pos = stage.getPointerPosition()
+                    console.log('Background touch - Pointer position:', pos, 'scale:', scale)
+                    if (pos) {
+                      startSelection({
+                        x: pos.x / scale,
+                        y: pos.y / scale
+                      })
+                    }
+                  }}
                   onMouseMove={(e) => {
                     if (isSelecting) {
                       const stage = e.target.getStage()
@@ -878,7 +940,24 @@ const BannerCanvas = ({
                       }
                     }
                   }}
+                  onTouchMove={(e) => {
+                    if (isSelecting) {
+                      const stage = e.target.getStage()
+                      const pos = stage.getPointerPosition()
+                      if (pos) {
+                        updateSelection({
+                          x: pos.x / scale,
+                          y: pos.y / scale
+                        })
+                      }
+                    }
+                  }}
                   onMouseUp={(e) => {
+                    if (isSelecting) {
+                      finishSelection()
+                    }
+                  }}
+                  onTouchEnd={(e) => {
                     if (isSelecting) {
                       finishSelection()
                     }

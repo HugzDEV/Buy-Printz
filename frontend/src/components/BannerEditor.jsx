@@ -1454,13 +1454,13 @@ const BannerEditorNew = () => {
   )
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 overflow-hidden">
       
       {/* Header */}
       <GlassHeader />
       
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         
         {/* Sidebar */}
         <BannerSidebar
@@ -1501,7 +1501,7 @@ const BannerEditorNew = () => {
       </div>
 
       {/* Mobile Bottom Actions */}
-      <div className="sm:hidden border-t border-white/20 p-4">
+      <div className="sm:hidden border-t border-white/20 p-4 bg-white/10 backdrop-blur-sm">
         <div className="flex gap-3">
           <button
             onClick={saveDesign}
