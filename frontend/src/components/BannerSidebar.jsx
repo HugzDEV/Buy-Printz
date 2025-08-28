@@ -1213,11 +1213,25 @@ const BannerSidebar = ({
                     >
                       <div className="flex items-center justify-between mb-1">
                         <div className="font-medium text-gray-800 text-sm">{template.name}</div>
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                          {template.category}
-                        </span>
+                        <div className="flex gap-1">
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            template.orientation === 'landscape' 
+                              ? 'bg-green-100 text-green-700' 
+                              : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            {template.orientation === 'landscape' ? 'Landscape' : 'Portrait'}
+                          </span>
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                            {template.category}
+                          </span>
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-600">{template.description}</div>
+                      <div className="text-xs text-gray-600 mb-2">{template.description}</div>
+                      {template.recommendedSizes && (
+                        <div className="text-xs text-gray-500">
+                          Best for: {template.recommendedSizes.join(', ')} ft
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>

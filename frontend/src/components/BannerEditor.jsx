@@ -483,6 +483,8 @@ const BannerEditorNew = () => {
       category: 'Business Events',
       description: 'Eye-catching design with starburst background',
       tags: ['grand opening', 'business', 'celebration'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
           id: generateId('rect'),
@@ -536,6 +538,8 @@ const BannerEditorNew = () => {
       category: 'Retail Sales',
       description: 'High-impact red design for maximum attention',
       tags: ['sale', 'discount', 'retail', 'urgent'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
           id: generateId('rect'),
@@ -606,6 +610,8 @@ const BannerEditorNew = () => {
       category: 'Real Estate',
       description: 'Professional design for property listings',
       tags: ['real estate', 'for sale', 'professional', 'contact'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
           id: generateId('rect'),
@@ -660,6 +666,8 @@ const BannerEditorNew = () => {
       category: 'Food & Dining',
       description: 'Appetizing design for restaurant promotions',
       tags: ['restaurant', 'food', 'special', 'dining'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
           id: generateId('rect'),
@@ -724,6 +732,8 @@ const BannerEditorNew = () => {
       category: 'Construction',
       description: 'Bold design for construction companies',
       tags: ['construction', 'contractor', 'professional', 'services'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
           id: generateId('rect'),
@@ -793,6 +803,8 @@ const BannerEditorNew = () => {
       category: 'Automotive',
       description: 'Dynamic design for car sales events',
       tags: ['auto', 'cars', 'dealership', 'sale'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
           id: generateId('rect'),
@@ -867,6 +879,8 @@ const BannerEditorNew = () => {
       category: 'Healthcare',
       description: 'Clean, professional healthcare design',
       tags: ['medical', 'healthcare', 'clinic', 'professional'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
           id: generateId('rect'),
@@ -942,8 +956,230 @@ const BannerEditorNew = () => {
           align: 'center'
         }
       ]
+    },
+
+    // Portrait Templates for variety
+    // Real Estate Portrait
+    {
+      id: 'real-estate-portrait',
+      name: 'Real Estate - Portrait',
+      category: 'Real Estate',
+      description: 'Tall design perfect for property listings',
+      tags: ['real estate', 'portrait', 'property', 'vertical'],
+      orientation: 'portrait',
+      recommendedSizes: ['3x2', '4x2', '5x2', '6x2'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 400, height: 800,
+          fill: '#1e40af'
+        },
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 25, y: 25,
+          width: 350, height: 750,
+          fill: '#ffffff'
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 80,
+          text: 'FOR SALE',
+          fontSize: 28,
+          fontFamily: 'Arial Black',
+          fill: '#1e40af',
+          align: 'center'
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 200,
+          text: '🏠',
+          fontSize: 60,
+          align: 'center'
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 350,
+          text: 'BEAUTIFUL HOME\n3 BED • 2 BATH\n1,500 SQ FT',
+          fontSize: 18,
+          fontFamily: 'Arial Black',
+          fill: '#1e40af',
+          align: 'center',
+          lineHeight: 1.3
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 500,
+          text: 'CALL TODAY\n(555) 123-4567',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#1e40af',
+          align: 'center',
+          lineHeight: 1.2
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 650,
+          text: 'OPEN HOUSE\nSUNDAY 2-4PM',
+          fontSize: 14,
+          fontFamily: 'Arial Black',
+          fill: '#dc2626',
+          align: 'center',
+          lineHeight: 1.2
+        }
+      ]
+    },
+
+    // Restaurant Portrait
+    {
+      id: 'restaurant-portrait',
+      name: 'Restaurant - Portrait',
+      category: 'Food & Dining',
+      description: 'Tall design for restaurant promotions',
+      tags: ['restaurant', 'portrait', 'food', 'vertical'],
+      orientation: 'portrait',
+      recommendedSizes: ['3x2', '4x2', '5x2', '6x2'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 400, height: 800,
+          fill: '#7c2d12'
+        },
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 400, height: 100,
+          fill: '#fbbf24'
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 50,
+          text: 'DAILY SPECIAL',
+          fontSize: 24,
+          fontFamily: 'Impact',
+          fill: '#7c2d12',
+          align: 'center'
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 180,
+          text: '🍕',
+          fontSize: 80,
+          align: 'center'
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 320,
+          text: 'WOOD FIRED PIZZA\n$12.99',
+          fontSize: 20,
+          fontFamily: 'Arial Black',
+          fill: '#ffffff',
+          align: 'center',
+          lineHeight: 1.3
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 450,
+          text: 'Available 11AM - 9PM\nDaily Specials',
+          fontSize: 14,
+          fontFamily: 'Arial',
+          fill: '#fbbf24',
+          align: 'center',
+          lineHeight: 1.3
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 200, y: 600,
+          text: '📞 (555) PIZZA-NOW\n📍 123 Main Street',
+          fontSize: 12,
+          fontFamily: 'Arial',
+          fill: '#ffffff',
+          align: 'center',
+          lineHeight: 1.2
+        }
+      ]
     }
   ]
+
+  // Scale template elements to fit current canvas size
+  const scaleTemplateElements = useCallback((templateElements, targetWidth, targetHeight) => {
+    // Original template dimensions (hardcoded in templates)
+    const originalWidth = 800
+    const originalHeight = 400
+    
+    // Calculate scaling factors
+    const scaleX = targetWidth / originalWidth
+    const scaleY = targetHeight / originalHeight
+    
+    return templateElements.map(element => {
+      const scaledElement = { ...element }
+      
+      // Scale position
+      if (scaledElement.x !== undefined) {
+        scaledElement.x = scaledElement.x * scaleX
+      }
+      if (scaledElement.y !== undefined) {
+        scaledElement.y = scaledElement.y * scaleY
+      }
+      
+      // Scale dimensions
+      if (scaledElement.width !== undefined) {
+        scaledElement.width = scaledElement.width * scaleX
+      }
+      if (scaledElement.height !== undefined) {
+        scaledElement.height = scaledElement.height * scaleY
+      }
+      
+      // Scale font size
+      if (scaledElement.fontSize !== undefined) {
+        scaledElement.fontSize = Math.max(12, scaledElement.fontSize * Math.min(scaleX, scaleY))
+      }
+      
+      // Scale stroke width
+      if (scaledElement.strokeWidth !== undefined) {
+        scaledElement.strokeWidth = scaledElement.strokeWidth * Math.min(scaleX, scaleY)
+      }
+      
+      // Scale shape properties
+      if (scaledElement.radius !== undefined) {
+        scaledElement.radius = scaledElement.radius * Math.min(scaleX, scaleY)
+      }
+      if (scaledElement.innerRadius !== undefined) {
+        scaledElement.innerRadius = scaledElement.innerRadius * Math.min(scaleX, scaleY)
+      }
+      if (scaledElement.outerRadius !== undefined) {
+        scaledElement.outerRadius = scaledElement.outerRadius * Math.min(scaleX, scaleY)
+      }
+      
+      // Scale line points
+      if (scaledElement.points !== undefined) {
+        scaledElement.points = scaledElement.points.map((point, index) => {
+          if (index % 2 === 0) {
+            return point * scaleX // x coordinates
+          } else {
+            return point * scaleY // y coordinates
+          }
+        })
+      }
+      
+      return scaledElement
+    })
+  }, [])
 
   // Load template functionality
   const loadTemplate = useCallback((template) => {
@@ -954,20 +1190,24 @@ const BannerEditorNew = () => {
       // Clear existing elements
       setElements([])
       
-      // Load template elements with new IDs
-      const templateElements = selectedTemplate.elements.map(element => ({
+      // Scale template elements to fit current canvas size
+      const scaledElements = scaleTemplateElements(
+        selectedTemplate.elements, 
+        canvasSize.width, 
+        canvasSize.height
+      ).map(element => ({
         ...element,
         id: generateId(element.type)
       }))
       
-      setElements(templateElements)
+      setElements(scaledElements)
       
       // Clear selection
       setSelectedId(null)
     } else {
       alert('Template not found. Please try again.')
     }
-  }, [])
+  }, [bannerTemplates, scaleTemplateElements, canvasSize.width, canvasSize.height])
 
   // Add asset from library
   const addAsset = useCallback((imagePath, assetName) => {
