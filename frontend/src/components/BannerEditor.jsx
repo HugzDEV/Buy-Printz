@@ -1668,12 +1668,17 @@ const BannerEditorNew = () => {
           
           <div className="hidden sm:block w-px h-6 bg-white/30" />
           
-          <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              Buy Printz Banner Editor
-            </h1>
-            <p className="text-sm text-gray-600">Professional Design Editor</p>
-          </div>
+          {/* BuyPrintz Logo - Clickable to Homepage */}
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center hover:opacity-80 transition-opacity duration-200"
+          >
+            <img 
+              src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+              alt="BuyPrintz" 
+              className="h-8 w-auto"
+            />
+          </button>
         </div>
 
         {/* Mobile Menu Toggle */}
