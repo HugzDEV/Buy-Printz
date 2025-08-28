@@ -923,13 +923,13 @@ const Dashboard = () => {
                             </span>
                           </div>
                         </div>
-                        <div className="neumorphic-button p-2 rounded-lg">
+                        <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30">
                           <Palette className="w-4 h-4 text-blue-600" />
                         </div>
                       </div>
                       
                       {design.canvas_image && (
-                        <div className="mb-4 neumorphic-inset rounded-lg overflow-hidden">
+                        <div className="mb-4 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
                           <img 
                             src={design.canvas_image} 
                             alt="Design Preview" 
@@ -952,14 +952,14 @@ const Dashboard = () => {
                             setSelectedOrder(design)
                             setShowOrderModal(true)
                           }}
-                          className="neumorphic-button flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center justify-center"
+                          className="flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200 flex items-center justify-center"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View
                         </button>
                         <button 
                           onClick={() => reorderDesign(design)}
-                          className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50"
+                          className="p-3 rounded-lg text-gray-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200"
                         >
                           <RefreshCw className="w-4 h-4" />
                         </button>
@@ -972,7 +972,7 @@ const Dashboard = () => {
                               link.click()
                             }
                           }}
-                          className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50"
+                          className="p-3 rounded-lg text-gray-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200"
                         >
                           <Download className="w-4 h-4" />
                         </button>
@@ -1002,7 +1002,7 @@ const Dashboard = () => {
                             )}
                           </div>
                         </div>
-                        <div className="neumorphic-button p-2 rounded-lg">
+                        <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30">
                           <Palette className="w-4 h-4 text-blue-600" />
                         </div>
                       </div>
@@ -1021,7 +1021,7 @@ const Dashboard = () => {
                             localStorage.setItem('loadDesign', JSON.stringify(design))
                             navigate('/editor')
                           }}
-                          className="neumorphic-button flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center justify-center"
+                          className="flex-1 p-3 rounded-lg text-sm font-medium text-blue-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200 flex items-center justify-center"
                         >
                           <Edit className="w-4 h-4 mr-1" />
                           Edit
@@ -1032,13 +1032,13 @@ const Dashboard = () => {
                             localStorage.setItem('designToOrder', JSON.stringify(design))
                             navigate('/editor')
                           }}
-                          className="neumorphic-button p-3 rounded-lg text-gray-600 hover:bg-gray-50"
+                          className="p-3 rounded-lg text-gray-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200"
                         >
                           <ShoppingCart className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => deleteDesign(design.id)}
-                          className="neumorphic-button p-3 rounded-lg text-red-600 hover:bg-red-50"
+                          className="p-3 rounded-lg text-red-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200"
                           title="Delete design"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1170,7 +1170,7 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Order History</h2>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Order History</h2>
                 <p className="text-gray-600">{userStats?.total_orders || 0} completed orders</p>
               </div>
               
@@ -1183,7 +1183,7 @@ const Dashboard = () => {
                     placeholder="Search orders..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="neumorphic-input-container pl-10 pr-4 py-2 rounded-lg border-none bg-white text-sm focus:outline-none w-full sm:w-64"
+                    className="pl-10 pr-4 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 w-full sm:w-64"
                   />
                 </div>
                 <div className="relative">
@@ -1191,7 +1191,7 @@ const Dashboard = () => {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="neumorphic-input-container pl-10 pr-8 py-2 rounded-lg border-none bg-white text-sm focus:outline-none appearance-none"
+                    className="pl-10 pr-8 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 appearance-none"
                   >
                     <option value="all">All Status</option>
                     <option value="pending">Pending</option>
@@ -1208,7 +1208,7 @@ const Dashboard = () => {
             {filteredOrders.length > 0 ? (
               <div className="space-y-4">
                 {filteredOrders.map((order) => (
-                  <div key={order.id} className="neumorphic-container bg-white rounded-xl p-6">
+                  <div key={order.id} className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
@@ -1224,7 +1224,7 @@ const Dashboard = () => {
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                          <div className="neumorphic-inset p-3 rounded-lg">
+                          <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
                             <div className="flex items-center text-xs text-gray-600 mb-1">
                               <Tag className="w-3 h-3 mr-1" />
                               Banner Type
@@ -1237,7 +1237,7 @@ const Dashboard = () => {
                             )}
                           </div>
                           
-                          <div className="neumorphic-inset p-3 rounded-lg">
+                          <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
                             <div className="flex items-center text-xs text-gray-600 mb-1">
                               <Ruler className="w-3 h-3 mr-1" />
                               Size & Quantity
@@ -1248,7 +1248,7 @@ const Dashboard = () => {
                             <p className="text-xs text-gray-600">Qty: {order.quantity}</p>
                           </div>
                           
-                          <div className="neumorphic-inset p-3 rounded-lg">
+                          <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
                             <div className="flex items-center text-xs text-gray-600 mb-1">
                               <DollarSign className="w-3 h-3 mr-1" />
                               Order Total
@@ -1277,7 +1277,7 @@ const Dashboard = () => {
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button 
                           onClick={() => viewOrderDetails(order)}
-                          className="neumorphic-button px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center"
+                          className="px-4 py-2 rounded-lg text-sm font-medium text-blue-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200 flex items-center"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View Details
@@ -1285,7 +1285,7 @@ const Dashboard = () => {
                         {order.status === 'delivered' && (
                           <button 
                             onClick={() => reorderItem(order)}
-                            className="neumorphic-button px-4 py-2 rounded-lg text-sm font-medium text-green-600 hover:bg-green-50 flex items-center"
+                            className="px-4 py-2 rounded-lg text-sm font-medium text-green-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200 flex items-center"
                           >
                             <RefreshCw className="w-4 h-4 mr-1" />
                             Reorder
@@ -1297,14 +1297,14 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
+              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-12 text-center border border-white/30 shadow-xl">
                 <ShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
                 <p className="text-gray-600 mb-6">Create your first design and place an order</p>
                 <Link 
                   to="/editor" 
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="btn-primary"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   Start Designing
                 </Link>
