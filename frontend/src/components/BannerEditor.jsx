@@ -1314,7 +1314,15 @@ const BannerEditorNew = () => {
           setElements(prev => [...prev, newImage])
           setSelectedId(newImage.id)
         }
+        img.onerror = (error) => {
+          console.error('Failed to load image:', error)
+          alert('Failed to load image. Please try again.')
+        }
         img.src = e.target.result
+      }
+      reader.onerror = (error) => {
+        console.error('FileReader error:', error)
+        alert('Failed to read file. Please try again.')
       }
       reader.readAsDataURL(file)
     } catch (error) {

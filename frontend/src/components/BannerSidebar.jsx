@@ -333,27 +333,48 @@ const BannerSidebar = ({
   // Image upload handling
   const onDrop = async (acceptedFiles) => {
     for (const file of acceptedFiles) {
-      // Create a URL for the uploaded image
-      const imageUrl = URL.createObjectURL(file)
-      
-      // Add to uploaded images state
-      setUploadedImages(prev => [...prev, {
-        url: imageUrl,
-        name: file.name,
-        file: file
-      }])
-      
-      // Call the parent callback
-      onImageUpload(file)
+      try {
+        // Create a URL for the uploaded image
+        const imageUrl = URL.createObjectURL(file)
+        
+        // Add to uploaded images state
+        setUploadedImages(prev => [...prev, {
+          url: imageUrl,
+          name: file.name,
+          file: file
+        }])
+        
+        // Call the parent callback
+        if (onImageUpload) {
+          onImageUpload(file)
+        }
+      } catch (error) {
+        console.error('Error processing uploaded file:', error)
+        alert('Failed to process uploaded file. Please try again.')
+      }
     }
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.svg']
+      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp']
     },
-    multiple: false
+    multiple: true,
+    maxSize: 10 * 1024 * 1024, // 10MB
+    onDropRejected: (rejectedFiles) => {
+      console.log('Files rejected:', rejectedFiles)
+      alert('Some files were rejected. Please check file type and size.')
+    },
+    onDragEnter: () => {
+      console.log('Drag enter')
+    },
+    onDragLeave: () => {
+      console.log('Drag leave')
+    },
+    onDragOver: () => {
+      console.log('Drag over')
+    }
   })
 
   const GlassCard = ({ children, className = "" }) => (
@@ -662,21 +683,60 @@ const BannerSidebar = ({
           {expandedSections.upload && (
             <div className="px-4 pb-4 space-y-4">
               {/* Dropzone */}
-              <div {...getRootProps()} className={`
-                border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200
-                ${isDragActive 
-                  ? 'border-orange-400 bg-orange-50/50' 
-                  : 'border-white/30 hover:border-white/50 bg-white/10 hover:bg-white/20'
-                }
-              `}>
+              <div 
+                {...getRootProps()} 
+                onClick={(e) => {
+                  console.log('Dropzone clicked')
+                  // Ensure the click event triggers the file input
+                  e.stopPropagation()
+                }}
+                className={`
+                  border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200
+                  ${isDragActive 
+                    ? 'border-orange-400 bg-orange-50/50' 
+                    : 'border-white/30 hover:border-white/50 bg-white/10 hover:bg-white/20'
+                  }
+                `}
+              >
                 <input {...getInputProps()} />
-                <Upload className="w-8 h-8 mx-auto mb-3 text-gray-400" />
+                <Upload className={`w-8 h-8 mx-auto mb-3 ${isDragActive ? 'text-orange-400' : 'text-gray-400'}`} />
                 <p className="text-sm text-gray-600 mb-1">
                   {isDragActive ? 'Drop images here...' : 'Drag & drop images here'}
                 </p>
                 <p className="text-xs text-gray-500">or click to browse</p>
-                <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF up to 10MB</p>
+                <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF, SVG, WEBP up to 10MB</p>
+                <p className="text-xs text-blue-500 mt-1 font-medium">Click to upload</p>
               </div>
+
+              {/* Browse Files Button */}
+              <button
+                onClick={() => {
+                  const input = document.createElement('input')
+                  input.type = 'file'
+                  input.accept = 'image/*'
+                  input.multiple = true
+                  input.style.display = 'none'
+                  
+                  input.onchange = (e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      const filesArray = Array.from(e.target.files)
+                      onDrop(filesArray)
+                    }
+                  }
+                  
+                  document.body.appendChild(input)
+                  input.click()
+                  
+                  setTimeout(() => {
+                    if (document.body.contains(input)) {
+                      document.body.removeChild(input)
+                    }
+                  }, 1000)
+                }}
+                className="w-full p-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-sm font-medium"
+              >
+                Browse Files
+              </button>
 
               {/* Uploaded Images */}
               {uploadedImages.length > 0 && (
