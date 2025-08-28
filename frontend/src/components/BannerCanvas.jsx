@@ -14,7 +14,11 @@ import {
   Grid,
   Trash2,
   Copy,
-  Clipboard
+  Clipboard,
+  MoveUp,
+  MoveDown,
+  Layers,
+  SendToBack
 } from 'lucide-react'
 
 const BannerCanvas = ({
@@ -503,6 +507,8 @@ const BannerCanvas = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedId])
 
+
+
   // Update transformer
   useEffect(() => {
     const updateTransformer = () => {
@@ -750,6 +756,79 @@ const BannerCanvas = ({
     }
     return null
   }
+
+  // Layer control functions
+  const bringForward = useCallback(() => {
+    if (!selectedId) return
+    
+    setElements(prev => {
+      const newElements = [...prev]
+      const currentIndex = newElements.findIndex(el => el.id === selectedId)
+      
+      if (currentIndex < newElements.length - 1) {
+        // Swap with the element above
+        [newElements[currentIndex], newElements[currentIndex + 1]] = 
+        [newElements[currentIndex + 1], newElements[currentIndex]]
+      }
+      
+      return newElements
+    })
+  }, [selectedId])
+
+  const sendBack = useCallback(() => {
+    if (!selectedId) return
+    
+    setElements(prev => {
+      const newElements = [...prev]
+      const currentIndex = newElements.findIndex(el => el.id === selectedId)
+      
+      if (currentIndex > 0) {
+        // Swap with the element below
+        [newElements[currentIndex], newElements[currentIndex - 1]] = 
+        [newElements[currentIndex - 1], newElements[currentIndex]]
+      }
+      
+      return newElements
+    })
+  }, [selectedId])
+
+  const bringToFront = useCallback(() => {
+    if (!selectedId) return
+    
+    setElements(prev => {
+      const newElements = [...prev]
+      const currentIndex = newElements.findIndex(el => el.id === selectedId)
+      
+      if (currentIndex !== -1 && currentIndex < newElements.length - 1) {
+        // Move to the end (top layer)
+        const element = newElements.splice(currentIndex, 1)[0]
+        newElements.push(element)
+      }
+      
+      return newElements
+    })
+  }, [selectedId])
+
+  const sendToBack = useCallback(() => {
+    if (!selectedId) return
+    
+    setElements(prev => {
+      const newElements = [...prev]
+      const currentIndex = newElements.findIndex(el => el.id === selectedId)
+      
+      if (currentIndex > 0) {
+        // Move to the beginning (bottom layer)
+        const element = newElements.splice(currentIndex, 1)[0]
+        newElements.unshift(element)
+      }
+      
+      return newElements
+    })
+  }, [selectedId])
+
+  // Check if layer controls should be enabled
+  const canBringForward = selectedId && elements.findIndex(el => el.id === selectedId) < elements.length - 1
+  const canSendBack = selectedId && elements.findIndex(el => el.id === selectedId) > 0
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 relative">
@@ -1329,6 +1408,49 @@ const BannerCanvas = ({
           )}
           
           <div className="flex gap-2 sm:gap-4 w-full sm:w-auto justify-center">
+            {/* Layer Controls */}
+            <div className="flex gap-1 sm:gap-2">
+              <GlassButton 
+                onClick={sendToBack} 
+                disabled={!canSendBack}
+                className="p-2 sm:p-3"
+                title="Send to Back"
+              >
+                <SendToBack className="w-4 h-4 sm:w-5 sm:h-5" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={sendBack} 
+                disabled={!canSendBack}
+                className="p-2 sm:p-3"
+                title="Send Back"
+              >
+                <MoveDown className="w-4 h-4 sm:w-5 sm:h-5" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={bringForward} 
+                disabled={!canBringForward}
+                className="p-2 sm:p-3"
+                title="Bring Forward"
+              >
+                <MoveUp className="w-4 h-4 sm:w-5 sm:h-5" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={bringToFront} 
+                disabled={!canBringForward}
+                className="p-2 sm:p-3"
+                title="Bring to Front"
+              >
+                <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
+              </GlassButton>
+            </div>
+            
+            {/* Divider */}
+            <div className="w-px h-8 bg-gray-300 mx-1 sm:mx-2"></div>
+            
+            {/* Duplicate and Delete */}
             <GlassButton onClick={duplicateSelected} className="flex-1 sm:flex-none p-2 sm:p-3">
               <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-xs sm:text-sm ml-1 sm:ml-2">Duplicate</span>
