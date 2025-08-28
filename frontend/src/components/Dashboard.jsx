@@ -903,7 +903,7 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Show completed designs from orders */}
                 {completedDesigns.map((design) => (
-                  <div key={design.id} className="neumorphic-container bg-white rounded-xl overflow-hidden">
+                  <div key={design.id} className="backdrop-blur-xl bg-white/20 rounded-2xl overflow-hidden border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
@@ -983,7 +983,7 @@ const Dashboard = () => {
                 
                 {/* Show saved designs from editor */}
                 {designs.map((design) => (
-                  <div key={`saved-${design.id}`} className="neumorphic-container bg-white rounded-xl overflow-hidden">
+                  <div key={`saved-${design.id}`} className="backdrop-blur-xl bg-white/20 rounded-2xl overflow-hidden border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
@@ -1051,12 +1051,12 @@ const Dashboard = () => {
             ) : (
               <div className="text-center py-12">
                 <Palette className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No designs yet</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">No designs yet</h3>
                 <p className="text-gray-600 mb-6">Create your first design to see it here!</p>
                 <Link 
                   to="/editor" 
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="btn-primary">
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200">
                   Create Design
                 </Link>
               </div>
@@ -1069,24 +1069,24 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Pending Orders</h2>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Pending Orders</h2>
                 <p className="text-gray-600 text-sm mt-1">Orders that require payment to complete</p>
               </div>
-              <span className="neumorphic-container px-4 py-2 rounded-lg bg-yellow-50 text-yellow-800 font-medium w-fit">
+              <span className="backdrop-blur-sm bg-yellow-400/20 px-4 py-2 rounded-xl border border-yellow-200/30 text-yellow-800 font-medium w-fit">
                 {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').length} Pending
               </span>
             </div>
 
             {/* Show actual pending orders count and filter client-side for safety */}
             {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').length === 0 ? (
-               <div className="neumorphic-container p-12 rounded-xl bg-white text-center">
+               <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-12 text-center border border-white/30 shadow-xl">
                  <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                 <h3 className="text-lg font-medium text-gray-900 mb-2">No pending orders</h3>
+                 <h3 className="text-lg font-bold text-gray-800 mb-2">No pending orders</h3>
                  <p className="text-gray-600 mb-6">All your orders are complete! Pending orders appear here when you create a design but haven't completed payment.</p>
                 <Link 
                   to="/editor" 
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="neumorphic-button px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium inline-flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create New Order
@@ -1095,45 +1095,45 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-4">
                 {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').map((order) => (
-                  <div key={order.id} className="neumorphic-container p-6 rounded-xl bg-white">
+                  <div key={order.id} className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="font-bold text-gray-900 text-lg">Order #{order.id.slice(-8)}</h3>
+                        <h3 className="font-bold text-gray-800 text-lg">Order #{order.id.slice(-8)}</h3>
                         <p className="text-sm text-gray-600">
                           Created {formatDate(order.created_at)}
                         </p>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className={`neumorphic-container px-3 py-1 rounded-lg text-sm font-medium ${
+                        <span className={`backdrop-blur-sm px-3 py-1 rounded-lg text-sm font-medium ${
                           order.status === 'payment_failed' 
-                            ? 'bg-red-50 text-red-800' 
-                            : 'bg-yellow-50 text-yellow-800'
+                            ? 'bg-red-400/20 text-red-800 border border-red-200/30' 
+                            : 'bg-yellow-400/20 text-yellow-800 border border-yellow-200/30'
                         }`}>
                           {order.status === 'payment_failed' ? 'Payment Failed' : 
                            order.status === 'incomplete' ? 'Incomplete' : 'Pending Payment'}
                         </span>
-                        <span className="text-lg font-bold text-gray-900">
+                        <span className="text-lg font-bold text-gray-800">
                           {formatCurrency(order.total_amount)}
                         </span>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="neumorphic-inset p-3 rounded-lg">
+                      <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
                         <div className="text-xs text-gray-600 mb-1">Banner Size</div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-800">
                           {order.order_details?.banner_size || 'Not specified'}
                         </div>
                       </div>
-                      <div className="neumorphic-inset p-3 rounded-lg">
+                      <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
                         <div className="text-xs text-gray-600 mb-1">Material</div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-800">
                           {order.order_details?.banner_material || 'Standard Vinyl'}
                         </div>
                       </div>
-                      <div className="neumorphic-inset p-3 rounded-lg">
+                      <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
                         <div className="text-xs text-gray-600 mb-1">Finish</div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-800">
                           {order.order_details?.banner_finish || 'Standard'}
                         </div>
                       </div>
@@ -1142,7 +1142,7 @@ const Dashboard = () => {
                     <div className="flex space-x-3">
                       <button
                         onClick={() => reorderDesign(order)}
-                        className="neumorphic-button flex-1 px-4 py-3 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
+                        className="flex-1 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
                       >
                         <Edit className="w-4 h-4 mr-2" />
                         Resume & Complete Order
@@ -1152,7 +1152,7 @@ const Dashboard = () => {
                           setSelectedOrder(order)
                           setShowOrderModal(true)
                         }}
-                        className="neumorphic-button px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
+                        className="px-4 py-3 text-sm font-medium text-gray-700 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 flex items-center justify-center"
                       >
                         <Eye className="w-4 h-4 mr-2" />
                         View Details
@@ -1317,35 +1317,35 @@ const Dashboard = () => {
         {activeTab === 'profile' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
-              <div className="flex items-center space-x-2">
-                <User className="w-6 h-6 text-gray-400" />
-                <span className="text-sm text-gray-600">Manage your account</span>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Profile Settings</h2>
+              <div className="flex items-center space-x-2 backdrop-blur-sm bg-white/20 rounded-xl px-4 py-2 border border-white/30">
+                <User className="w-6 h-6 text-gray-500" />
+                <span className="text-sm text-gray-700 font-medium">Manage your account</span>
               </div>
             </div>
             
             {/* Profile Information Card */}
-            <div className="neumorphic-container bg-white rounded-xl p-6">
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
               <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                 <User className="w-5 h-5 mr-2 text-blue-600" />
                 Account Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="neumorphic-inset p-4 rounded-lg">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl border border-white/30">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <p className="text-gray-900 font-medium">{user?.full_name || 'Not set'}</p>
+                  <p className="text-gray-800 font-medium">{user?.full_name || 'Not set'}</p>
                 </div>
-                <div className="neumorphic-inset p-4 rounded-lg">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl border border-white/30">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                  <p className="text-gray-900 font-medium">{user?.email}</p>
+                  <p className="text-gray-800 font-medium">{user?.email}</p>
                 </div>
-                <div className="neumorphic-inset p-4 rounded-lg">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl border border-white/30">
                   <label className="block text-sm font-medium text-gray-700 mb-2">User ID</label>
                   <p className="text-gray-600 text-xs font-mono">{user?.user_id}</p>
                 </div>
-                <div className="neumorphic-inset p-4 rounded-lg">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl border border-white/30">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Account Status</label>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-400/20 text-green-800 border border-green-200/30">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Active
                   </span>
@@ -1354,7 +1354,7 @@ const Dashboard = () => {
             </div>
 
             {/* Account Actions Card */}
-            <div className="neumorphic-container bg-white rounded-xl p-6">
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
               <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                 <Settings className="w-5 h-5 mr-2 text-blue-600" />
                 Account Actions
@@ -1362,58 +1362,58 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button 
                   onClick={() => openProfileModal('update')}
-                  className="neumorphic-button p-6 rounded-xl text-center hover:bg-blue-50 transition-colors group"
+                  className="p-6 backdrop-blur-sm bg-white/30 rounded-xl text-center hover:bg-white/40 transition-all duration-200 group border border-white/30"
                 >
                   <Edit className="w-8 h-8 text-blue-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                  <h4 className="font-medium text-gray-900 mb-1">Update Profile</h4>
+                  <h4 className="font-medium text-gray-800 mb-1">Update Profile</h4>
                   <p className="text-sm text-gray-600">Edit your name and email</p>
                 </button>
 
                 <button 
                   onClick={() => openProfileModal('password')}
-                  className="neumorphic-button p-6 rounded-xl text-center hover:bg-yellow-50 transition-colors group"
+                  className="p-6 backdrop-blur-sm bg-white/30 rounded-xl text-center hover:bg-white/40 transition-all duration-200 group border border-white/30"
                 >
                   <Settings className="w-8 h-8 text-yellow-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                  <h4 className="font-medium text-gray-900 mb-1">Change Password</h4>
+                  <h4 className="font-medium text-gray-800 mb-1">Change Password</h4>
                   <p className="text-sm text-gray-600">Update your password</p>
                 </button>
 
                 <button 
                   onClick={() => openProfileModal('delete')}
-                  className="neumorphic-button p-6 rounded-xl text-center hover:bg-red-50 transition-colors group"
+                  className="p-6 backdrop-blur-sm bg-white/30 rounded-xl text-center hover:bg-white/40 transition-all duration-200 group border border-white/30"
                 >
                   <Trash2 className="w-8 h-8 text-red-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                  <h4 className="font-medium text-gray-900 mb-1">Delete Account</h4>
+                  <h4 className="font-medium text-gray-800 mb-1">Delete Account</h4>
                   <p className="text-sm text-gray-600">Permanently delete account</p>
                 </button>
               </div>
             </div>
 
             {/* Account Statistics */}
-            <div className="neumorphic-container bg-white rounded-xl p-6">
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
               <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                 <BarChart3 className="w-5 h-5 mr-2 text-blue-600" />
                 Account Statistics
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <Palette className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                                     <p className="text-2xl font-bold text-gray-900">{completedDesigns.length + designs.length}</p>
-                   <p className="text-xs text-gray-600">Total Designs</p>
+                  <p className="text-2xl font-bold text-gray-800">{completedDesigns.length + designs.length}</p>
+                  <p className="text-xs text-gray-600">Total Designs</p>
                 </div>
-                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <Layout className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{templates.length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{templates.length}</p>
                   <p className="text-xs text-gray-600">Templates Saved</p>
                 </div>
-                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <ShoppingBag className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{orders.length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{orders.length}</p>
                   <p className="text-xs text-gray-600">Orders Placed</p>
                 </div>
-                <div className="neumorphic-inset p-4 rounded-lg text-center">
+                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <DollarSign className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-800">
                     {formatCurrency(userStats?.total_spent || 0)}
                   </p>
                   <p className="text-xs text-gray-600">Total Spent</p>
