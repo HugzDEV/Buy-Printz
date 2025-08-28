@@ -1309,7 +1309,8 @@ const BannerEditorNew = () => {
             height: finalHeight,
             image: img,
             rotation: 0,
-            uploadedFile: file.name
+            uploadedFile: file.name,
+            imageDataUrl: e.target.result // Store data URL for restoration
           }
           
           setElements(prev => [...prev, newImage])
@@ -1445,7 +1446,16 @@ const BannerEditorNew = () => {
     const orderData = {
       // Canvas data (required by backend)
       canvas_data: {
-        elements,
+        elements: elements.map(element => {
+          // For image elements, ensure we store the data URL for restoration
+          if (element.type === 'image' && element.image) {
+            return {
+              ...element,
+              imageDataUrl: element.imageDataUrl || (element.image.src ? element.image.src : null)
+            }
+          }
+          return element
+        }),
         canvasSize,
         backgroundColor,
         bannerSpecs,
@@ -1479,6 +1489,63 @@ const BannerEditorNew = () => {
     navigate('/checkout')
   }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate])
 
+  // Function to restore image elements from serialized data
+  const restoreImageElements = useCallback(async (elements) => {
+    const restoredElements = []
+    
+    for (const element of elements) {
+      if (element.type === 'image' && element.image) {
+        // If the image is a serialized object, we need to recreate the HTML Image
+        if (typeof element.image === 'object' && !element.image.naturalWidth) {
+          try {
+            // Check if we have a data URL or need to recreate the image
+            let imageSrc = null
+            
+            // If it's an uploaded file, check if we have a data URL stored
+            if (element.uploadedFile && element.imageDataUrl) {
+              // Use the stored data URL for uploaded images
+              imageSrc = element.imageDataUrl
+            } else if (element.assetName) {
+              // For asset library images, we can restore them
+              imageSrc = `/assets/images/${element.assetName}`
+            }
+            
+            if (imageSrc) {
+              // Create a new HTML Image element
+              const img = new window.Image()
+              await new Promise((resolve, reject) => {
+                img.onload = resolve
+                img.onerror = reject
+                img.src = imageSrc
+              })
+              
+              // Create the restored element
+              const restoredElement = {
+                ...element,
+                image: img
+              }
+              restoredElements.push(restoredElement)
+            } else {
+              // Skip elements we can't restore
+              console.warn('Cannot restore image element:', element)
+            }
+          } catch (error) {
+            console.error('Failed to restore image element:', error)
+            // Skip this element if restoration fails
+          }
+        } else {
+          // Element is already properly formatted
+          restoredElements.push(element)
+        }
+      } else {
+        // Non-image elements can be restored as-is
+        restoredElements.push(element)
+      }
+    }
+    
+    return restoredElements
+  }, [])
+
   // Load saved design on mount - removed localStorage loading
   // Designs should be loaded from Supabase via the dashboard
   useEffect(() => {
@@ -1488,22 +1555,37 @@ const BannerEditorNew = () => {
       try {
         const orderData = JSON.parse(cancelledOrder)
         if (orderData.canvas_data) {
-          setElements(orderData.canvas_data.elements || [])
-          setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
-          if (orderData.canvas_data.bannerSpecs) {
-            setBannerSpecs(orderData.canvas_data.bannerSpecs)
-          }
-          if (orderData.canvas_data.canvasSize) {
-            setCanvasSize(orderData.canvas_data.canvasSize)
-            setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
-          }
+          // Restore image elements properly
+          restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
+            setElements(restoredElements)
+            setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
+            if (orderData.canvas_data.bannerSpecs) {
+              setBannerSpecs(orderData.canvas_data.bannerSpecs)
+            }
+            if (orderData.canvas_data.canvasSize) {
+              setCanvasSize(orderData.canvas_data.canvasSize)
+              setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+            }
+          }).catch(error => {
+            console.error('Failed to restore image elements:', error)
+            // Fallback to loading without images
+            setElements(orderData.canvas_data.elements || [])
+            setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
+            if (orderData.canvas_data.bannerSpecs) {
+              setBannerSpecs(orderData.canvas_data.bannerSpecs)
+            }
+            if (orderData.canvas_data.canvasSize) {
+              setCanvasSize(orderData.canvas_data.canvasSize)
+              setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+            }
+          })
         }
         sessionStorage.removeItem('cancelledOrder')
       } catch (error) {
         console.error('Failed to restore cancelled order:', error)
       }
     }
-  }, [])
+  }, [restoreImageElements])
 
   // Handle mobile sidebar close event
   useEffect(() => {
