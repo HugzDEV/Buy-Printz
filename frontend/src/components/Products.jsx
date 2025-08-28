@@ -69,7 +69,7 @@ const Products = () => {
       name: "Indoor Banner", 
       price: "From $20",
       description: "Full and smooth surface vinyl - great for indoor displays and presentations",
-      image: "/images/indoor-banner.jpg",
+      image: "/assets/images/Indoor Banner - BuyPrintz.jpg",
       features: ["Smooth surface", "Vivid colors", "Easy to install", "Lightweight"],
       specs: {
         material: "Smooth Vinyl",
@@ -84,7 +84,7 @@ const Products = () => {
       name: "Pole Banner",
       price: "From $45", 
       description: "Durable fit banners ready to install with complete hardware kit included",
-      image: "/images/pole-banner.jpg",
+      image: "/assets/images/Pole Banner - BuyPrintz.jpg",
       features: ["Hardware included", "Easy installation", "Professional look", "Weather resistant"],
       specs: {
         material: "18oz Vinyl",
@@ -94,33 +94,34 @@ const Products = () => {
       }
     },
     {
-      id: 'step-fabric',
+      id: 'fabric-9oz',
       category: 'fabric',
-      name: "Step Fabric Banner",
-      price: "From $40",
-      description: "Wrinkle resistant and washable dye sublimation print for premium presentations",
-      image: "/images/step-fabric-banner.jpg",
-      features: ["Wrinkle resistant", "Washable", "Premium fabric", "Vibrant colors"],
+      name: "9oz Fabric Banner",
+      price: "From $35",
+      description: "Lightweight fabric banner with vibrant dye sublimation printing for premium presentations",
+      image: "/assets/images/9oz Fabric Banner - BuyPrintz.jpg",
+      features: ["Lightweight fabric", "Vibrant colors", "Wrinkle resistant", "Professional finish"],
       specs: {
-        material: "Polyester Fabric",
+        material: "9oz Polyester Fabric",
         finish: "Dye sublimation",
         durability: "Indoor/light outdoor",
         applications: ["Trade shows", "Retail displays", "Corporate events"]
       }
     },
     {
-      id: 'backlight-fabric',
+      id: 'fabric-blockout',
       category: 'fabric',
-      name: "Backlight Fabric Banner",
-      price: "From $50",
-      description: "Wrinkle resistant, washable, and blocks back lighting for illuminated displays", 
-      image: "/images/backlight-fabric-banner.jpg",
-      features: ["Backlight ready", "Washable", "Color blocking", "Premium fabric"],
+      name: "Fabric Banner (9.5oz Blockout)",
+      price: "From $45",
+      description: "Premium blockout fabric with superior color blocking and professional finish",
+      image: "/assets/images/Fabric Banner (9.5oz. Blockout) - BuyPrintz.jpg",
+      features: ["Color blocking", "Premium fabric", "Professional finish", "Wrinkle resistant"],
+      premium: true,
       specs: {
-        material: "Blockout Fabric",
+        material: "9.5oz Blockout Fabric",
         finish: "Dye sublimation",
-        durability: "Indoor use",
-        applications: ["Light boxes", "Illuminated displays", "Photography backdrops"]
+        durability: "Indoor/light outdoor",
+        applications: ["Trade shows", "Retail displays", "Corporate events"]
       }
     },
     {
@@ -129,7 +130,7 @@ const Products = () => {
       name: "Tension Fabric",
       price: "From $60",
       description: "3-way stretch material perfect for kiosks, displays, and modern installations",
-      image: "/images/tension-fabric.jpg",
+      image: "/assets/images/Tension Fabric - Buy Printz.jpg",
       features: ["3-way stretch", "Kiosk ready", "Professional display", "Seamless fit"],
       premium: true,
       specs: {
@@ -145,7 +146,7 @@ const Products = () => {
       name: "Backlit Banner", 
       price: "From $45",
       description: "18oz translucent vinyl for illuminated signage with even light distribution",
-      image: "/images/backlit-banner.jpg", 
+      image: "/assets/images/Backlit Banner -BuyPrintz.jpg", 
       features: ["Translucent material", "LED compatible", "Even light distribution", "Durable"],
       specs: {
         material: "Translucent Vinyl",
