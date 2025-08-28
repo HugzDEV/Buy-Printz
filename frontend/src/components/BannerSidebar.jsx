@@ -14,7 +14,6 @@ import {
   ChevronDown,
   ChevronUp,
   Upload,
-  Keyboard,
   Sparkles,
   Palette,
   Settings,
@@ -50,8 +49,7 @@ const BannerSidebar = ({
     shapes: false,
     templates: false,
     assets: false,
-    upload: false,
-    shortcuts: false
+    upload: false
   })
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -1340,47 +1338,6 @@ const BannerSidebar = ({
                   </button>
                 ))}
               </div>
-            </div>
-          )}
-        </GlassCard>
-
-        {/* Keyboard Shortcuts */}
-        <GlassCard>
-          <button
-            onClick={() => toggleSection('shortcuts')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-gray-400 to-gray-500">
-                <Keyboard className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-800">Shortcuts</h3>
-                <p className="text-xs text-gray-500">Quick actions</p>
-              </div>
-            </div>
-            {expandedSections.shortcuts ? 
-              <ChevronUp className="w-4 h-4 text-gray-500" /> : 
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            }
-          </button>
-
-          {expandedSections.shortcuts && (
-            <div className="px-4 pb-4 space-y-2">
-              {[
-                ['Copy', 'Ctrl+C'],
-                ['Paste', 'Ctrl+V'],
-                ['Delete', 'Del'],
-                ['Undo', 'Ctrl+Z'],
-                ['Redo', 'Ctrl+Y']
-              ].map(([action, shortcut]) => (
-                <div key={action} className="flex justify-between items-center py-2 px-3 bg-white/20 rounded-lg text-sm">
-                  <span className="text-gray-700">{action}</span>
-                  <span className="font-mono text-xs bg-white/30 px-2 py-1 rounded font-medium text-gray-800">
-                    {shortcut}
-                  </span>
-                </div>
-              ))}
             </div>
           )}
         </GlassCard>
