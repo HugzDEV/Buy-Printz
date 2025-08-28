@@ -1386,6 +1386,18 @@ const BannerEditorNew = () => {
     }
   }, [])
 
+  // Handle mobile sidebar close event
+  useEffect(() => {
+    const handleCloseMobileSidebar = () => {
+      setIsMobileSidebarOpen(false)
+    }
+
+    window.addEventListener('closeMobileSidebar', handleCloseMobileSidebar)
+    return () => {
+      window.removeEventListener('closeMobileSidebar', handleCloseMobileSidebar)
+    }
+  }, [])
+
   // Glass UI Header Component
   const GlassHeader = () => (
     <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 p-4">
@@ -1450,28 +1462,28 @@ const BannerEditorNew = () => {
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         
-                 {/* Sidebar */}
-         <BannerSidebar
-           isMobileOpen={isMobileSidebarOpen}
-           bannerSpecs={bannerSpecs}
-           bannerTypes={bannerTypes}
-           bannerSizes={bannerSizes}
-           canvasSize={canvasSize}
-           canvasOrientation={canvasOrientation}
-           onAddText={addText}
-           onAddShape={addShape}
-           onAddAsset={addAsset}
-           onAddIcon={addIcon}
-           onLoadTemplate={loadTemplate}
-           onImageUpload={handleImageUpload}
-           onTextPropertyChange={handleTextPropertyChange}
-           onChangeBannerType={changeBannerType}
-           onChangeCanvasSize={changeCanvasSize}
-           onToggleCanvasOrientation={toggleCanvasOrientation}
-           bannerTemplates={bannerTemplates}
-           userTemplates={[]}
-           selectedElement={elements.find(el => el.id === selectedId)}
-         />
+        {/* Sidebar */}
+        <BannerSidebar
+          isMobileOpen={isMobileSidebarOpen}
+          bannerSpecs={bannerSpecs}
+          bannerTypes={bannerTypes}
+          bannerSizes={bannerSizes}
+          canvasSize={canvasSize}
+          canvasOrientation={canvasOrientation}
+          onAddText={addText}
+          onAddShape={addShape}
+          onAddAsset={addAsset}
+          onAddIcon={addIcon}
+          onLoadTemplate={loadTemplate}
+          onImageUpload={handleImageUpload}
+          onTextPropertyChange={handleTextPropertyChange}
+          onChangeBannerType={changeBannerType}
+          onChangeCanvasSize={changeCanvasSize}
+          onToggleCanvasOrientation={toggleCanvasOrientation}
+          bannerTemplates={bannerTemplates}
+          userTemplates={[]}
+          selectedElement={elements.find(el => el.id === selectedId)}
+        />
         
         {/* Canvas */}
         <BannerCanvas
@@ -1507,14 +1519,6 @@ const BannerEditorNew = () => {
           </button>
         </div>
       </div>
-
-      {/* Mobile Sidebar Overlay */}
-      {isMobileSidebarOpen && (
-        <div 
-          className="sm:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-          onClick={() => setIsMobileSidebarOpen(false)}
-        />
-      )}
       
     </div>
   )

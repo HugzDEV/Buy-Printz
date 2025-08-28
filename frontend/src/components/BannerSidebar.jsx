@@ -19,7 +19,8 @@ import {
   Settings,
   Copy,
   CornerDownRight,
-  FileText
+  FileText,
+  X
 } from 'lucide-react'
 
 const BannerSidebar = ({ 
@@ -359,9 +360,9 @@ const BannerSidebar = ({
     <div className={`
       backdrop-blur-xl bg-white/10 
       border border-white/20 
-      rounded-2xl 
-      shadow-[0_8px_32px_rgba(0,0,0,0.1)]
-      hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]
+      rounded-xl sm:rounded-2xl 
+      shadow-[0_4px_16px_rgba(0,0,0,0.1)] sm:shadow-[0_8px_32px_rgba(0,0,0,0.1)]
+      hover:shadow-[0_6px_24px_rgba(0,0,0,0.15)] sm:hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]
       transition-all duration-300
       ${className}
     `}>
@@ -398,17 +399,34 @@ const BannerSidebar = ({
 
   return (
     <div className={`
+      ${isMobileOpen ? 'fixed inset-0 z-50' : 'hidden sm:block'}
+      sm:relative sm:inset-auto sm:z-auto
       w-full sm:w-80 lg:w-96 
       h-full 
       backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
       border-r border-white/20
       overflow-y-auto
-      ${isMobileOpen ? 'block' : 'hidden sm:block'}
     `}>
       <div className="p-4 space-y-4">
         
-        {/* Header */}
-        <div className="text-center py-4">
+        {/* Mobile Header with Close Button */}
+        <div className="flex items-center justify-between sm:hidden">
+          <div className="text-left">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              Design Tools
+            </h2>
+            <p className="text-sm text-gray-600">Tools & options</p>
+          </div>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('closeMobileSidebar'))}
+            className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden sm:block text-center py-4">
           <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
             Design Tools
           </h2>
@@ -419,20 +437,20 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('specifications')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+            className="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
           >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500">
-                <Info className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500">
+                <Info className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-gray-800">Specifications</h3>
+                <h3 className="font-semibold text-gray-800 text-sm sm:text-base">Specifications</h3>
                 <p className="text-xs text-gray-500">Banner details</p>
               </div>
             </div>
             {expandedSections.specifications ? 
-              <ChevronUp className="w-4 h-4 text-gray-500" /> : 
-              <ChevronDown className="w-4 h-4 text-gray-500" />
+              <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" /> : 
+              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
             }
           </button>
 
