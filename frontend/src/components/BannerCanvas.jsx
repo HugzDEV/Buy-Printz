@@ -118,9 +118,7 @@ const BannerCanvas = ({
   const [lastClickId, setLastClickId] = useState(null)
   
   // Text editing modal state
-  const [isTextModalOpen, setIsTextModalOpen] = useState(false)
-  const [editingTextId, setEditingTextId] = useState(null)
-  const [editingTextValue, setEditingTextValue] = useState('')
+
 
   // Glass UI Components
   const GlassButton = ({ children, onClick, className = "", variant = "default", disabled = false }) => {
@@ -401,34 +399,95 @@ const BannerCanvas = ({
     }
   }
 
-  // Text editing modal functions
-  const openTextModal = (elementId, currentText) => {
-    setEditingTextId(elementId)
-    const cleanText = currentText || ''
-    setEditingTextValue(cleanText)
-    setIsTextModalOpen(true)
-  }
-
-  const closeTextModal = () => {
-    setIsTextModalOpen(false)
-    setEditingTextId(null)
-    setEditingTextValue('')
-  }
-
-  const saveTextEdit = () => {
-    if (editingTextId && editingTextValue !== undefined) {
-      handleElementChange(editingTextId, { text: editingTextValue })
-    }
-    closeTextModal()
-  }
-
-  const cancelTextEdit = () => {
-    closeTextModal()
-  }
-
-  // Text editing trigger function
+  // Text editing functions - Konva recommended approach
   const handleTextEdit = (elementId, currentText) => {
-    openTextModal(elementId, currentText)
+    const textNode = stageRef.current?.findOne(`#${elementId}`)
+    if (!textNode) return
+
+    const stage = textNode.getStage()
+    const textPosition = textNode.absolutePosition()
+    const stageBox = stage.container().getBoundingClientRect()
+    
+    const areaPosition = {
+      x: stageBox.left + textPosition.x,
+      y: stageBox.top + textPosition.y,
+    }
+
+    const textarea = document.createElement('textarea')
+    document.body.appendChild(textarea)
+    textarea.value = textNode.text()
+    textarea.style.position = 'absolute'
+    textarea.style.top = areaPosition.y + 'px'
+    textarea.style.left = areaPosition.x + 'px'
+    textarea.style.width = textNode.width() - textNode.padding() * 2 + 'px'
+    textarea.style.height = textNode.height() - textNode.padding() * 2 + 5 + 'px'
+    textarea.style.fontSize = textNode.fontSize() + 'px'
+    textarea.style.border = 'none'
+    textarea.style.padding = '0px'
+    textarea.style.margin = '0px'
+    textarea.style.overflow = 'hidden'
+    textarea.style.background = 'none'
+    textarea.style.outline = 'none'
+    textarea.style.resize = 'none'
+    textarea.style.lineHeight = textNode.lineHeight()
+    textarea.style.fontFamily = textNode.fontFamily()
+    textarea.style.transformOrigin = 'left top'
+    textarea.style.textAlign = textNode.align()
+    textarea.style.color = textNode.fill()
+    textarea.style.zIndex = '1000'
+    
+    const rotation = textNode.rotation()
+    let transform = ''
+    if (rotation) {
+      transform += 'rotateZ(' + rotation + 'deg)'
+    }
+    textarea.style.transform = transform
+    textarea.style.height = 'auto'
+    textarea.style.height = textarea.scrollHeight + 3 + 'px'
+    
+    textarea.focus()
+
+    function removeTextarea() {
+      textarea.parentNode.removeChild(textarea)
+      window.removeEventListener('click', handleOutsideClick)
+      window.removeEventListener('touchstart', handleOutsideClick)
+    }
+
+    function setTextareaWidth(newWidth) {
+      if (!newWidth) {
+        newWidth = textNode.placeholder?.length * textNode.fontSize()
+      }
+      textarea.style.width = newWidth + 'px'
+    }
+
+    textarea.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        handleElementChange(elementId, { text: textarea.value })
+        removeTextarea()
+      }
+      if (e.key === 'Escape') {
+        removeTextarea()
+      }
+    })
+
+    textarea.addEventListener('input', function () {
+      const scale = textNode.getAbsoluteScale().x
+      setTextareaWidth(textNode.width() * scale)
+      textarea.style.height = 'auto'
+      textarea.style.height = textarea.scrollHeight + textNode.fontSize() + 'px'
+    })
+
+    function handleOutsideClick(e) {
+      if (e.target !== textarea) {
+        handleElementChange(elementId, { text: textarea.value })
+        removeTextarea()
+      }
+    }
+
+    setTimeout(() => {
+      window.addEventListener('click', handleOutsideClick)
+      window.addEventListener('touchstart', handleOutsideClick)
+    })
   }
 
 
@@ -696,6 +755,9 @@ const BannerCanvas = ({
             onDragEnd={(e) => handleDragEnd(e, element.id)}
             onTransformEnd={(e) => handleTransformEnd(e, element.id)}
             onDblClick={(e) => {
+              handleTextEdit(element.id, element.text)
+            }}
+            onDblTap={(e) => {
               handleTextEdit(element.id, element.text)
             }}
           />
@@ -1373,90 +1435,7 @@ const BannerCanvas = ({
               </Layer>
                         </Stage>
 
-            {/* Text Editing Modal */}
-            {isTextModalOpen && (
-              <div 
-                className="fixed inset-0 flex items-center justify-center z-50"
-                style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                  backdropFilter: 'blur(4px)'
-                }}
-                onClick={(e) => {
-                  // Close modal when clicking backdrop
-                  if (e.target === e.currentTarget) {
-                    cancelTextEdit()
-                  }
-                }}
-              >
-                <div 
-                  className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 border border-gray-200"
-                  style={{ direction: 'ltr', textAlign: 'left' }}
-                  onClick={(e) => {
-                    // Prevent closing when clicking inside the modal
-                    e.stopPropagation()
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800">Edit Text</h3>
-                    <button
-                      onClick={cancelTextEdit}
-                      className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  <input
-                    type="text"
-                    value={editingTextValue}
-                    onChange={(e) => setEditingTextValue(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your text here..."
-                    autoFocus
-                    dir="ltr"
-                    style={{ 
-                      direction: 'ltr', 
-                      textAlign: 'left',
-                      unicodeBidi: 'normal',
-                      textDirection: 'ltr',
-                      writingMode: 'horizontal-tb',
-                      textOrientation: 'mixed'
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        saveTextEdit()
-                      }
-                      if (e.key === 'Escape') {
-                        e.preventDefault()
-                        cancelTextEdit()
-                      }
-                    }}
-                  />
-                  
-                  <div className="flex gap-3 mt-4">
-                    <button
-                      onClick={saveTextEdit}
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={cancelTextEdit}
-                      className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 mt-2 text-center">
-                    Press Enter to save, Esc to cancel
-                  </div>
-                </div>
-              </div>
-            )}
+
  
           </div>
           
