@@ -1538,7 +1538,7 @@ const BannerCanvas = ({
              ['heart', 'diamond', 'arrow', 'arrow-right', 'arrow-left', 'arrow-up', 'arrow-down', 'double-arrow', 'cross', 'crown', 'badge', 'certificate', 'document', 'checkmark', 'target'].includes(selectedElement?.type)
             )
           ) && (
-            <div className="flex items-center justify-center gap-4 p-3 bg-white/20 rounded-lg border border-white/30">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 p-3 bg-white/20 rounded-lg border border-white/30 overflow-x-auto">
               {/* Fill Color Picker */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Fill:</span>
@@ -1555,7 +1555,7 @@ const BannerCanvas = ({
               </div>
               
               {/* Divider */}
-              <div className="w-px h-6 bg-gray-300"></div>
+              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
               
               {/* Stroke Color Picker */}
               <div className="flex items-center gap-2">
@@ -1573,7 +1573,7 @@ const BannerCanvas = ({
               </div>
               
               {/* Divider */}
-              <div className="w-px h-6 bg-gray-300"></div>
+              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
               
               {/* Stroke Width */}
               <div className="flex items-center gap-2">
@@ -1600,7 +1600,7 @@ const BannerCanvas = ({
           )}
           
           {/* Bottom Row - Action Buttons */}
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 w-full overflow-x-auto">
             {/* Layer Controls */}
             <div className="flex gap-1">
               <GlassButton 
@@ -1641,7 +1641,7 @@ const BannerCanvas = ({
             </div>
             
             {/* Divider */}
-            <div className="w-px h-6 bg-gray-300"></div>
+            <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
             
             {/* Duplicate and Delete */}
             <div className="flex gap-2">
@@ -1659,7 +1659,7 @@ const BannerCanvas = ({
             {/* Debug Text Edit Button - Only show for text elements */}
             {selectedId && selectedElement?.type === 'text' && (
               <>
-                <div className="w-px h-6 bg-gray-300"></div>
+                <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
                 <GlassButton 
                   onClick={() => handleTextEdit(selectedId, selectedElement.text)} 
                   className="px-3 py-2 flex items-center justify-center"
