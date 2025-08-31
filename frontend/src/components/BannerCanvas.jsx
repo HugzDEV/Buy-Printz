@@ -716,8 +716,6 @@ const BannerCanvas = ({
             onDragEnd={(e) => handleDragEnd(e, element.id)}
             onTransformEnd={(e) => handleTransformEnd(e, element.id)}
             onDblClick={(e) => {
-              e.evt.preventDefault()
-              e.evt.stopPropagation()
               handleTextEdit(element.id, element.text)
             }}
           />
