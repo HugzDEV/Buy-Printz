@@ -376,8 +376,8 @@ const Checkout = () => {
         </div>
 
         {/* Progress Indicator */}
-        <div className="mb-8 backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
-          <div className="flex items-center justify-between">
+        <div className="mb-8 backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl overflow-x-auto">
+          <div className="flex items-center justify-between min-w-[600px] lg:min-w-0">
             <div className="flex items-center gap-2">
               {getStepIcon('creating', checkoutStep)}
               <span className={getStepStatus('creating', checkoutStep)}>Creating Order</span>
@@ -429,9 +429,9 @@ const Checkout = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8 max-h-[calc(100vh-200px)] overflow-y-auto">
           {/* Order Summary */}
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
               <Package className="w-5 h-5 mr-2 text-blue-600" />
               Order Summary
@@ -554,7 +554,7 @@ const Checkout = () => {
           </div>
 
           {/* Banner Options & Shipping */}
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
               <Settings className="w-5 h-5 mr-2 text-purple-600" />
               Banner Options
@@ -668,7 +668,7 @@ const Checkout = () => {
           </div>
 
           {/* Checkout Form */}
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
               <User className="w-5 h-5 mr-2 text-green-600" />
               Customer Information

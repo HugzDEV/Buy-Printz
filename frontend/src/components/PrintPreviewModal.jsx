@@ -189,9 +189,9 @@ const PrintPreviewModal = ({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto min-h-0 pb-4">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4 max-h-full">
             {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
-            <div className="xl:col-span-2 space-y-6">
+            <div className="xl:col-span-2 space-y-6 overflow-y-auto max-h-full">
               {/* Banner Preview Card */}
               <Card className="shadow-lg">
                 <CardHeader className="pb-4">
@@ -314,7 +314,7 @@ const PrintPreviewModal = ({
             </div>
 
             {/* Right Column - Specifications (Takes 1/3 width on xl screens) */}
-            <div className="space-y-6">
+            <div className="space-y-6 overflow-y-auto max-h-full">
               {/* Print Specifications */}
               <Card className="shadow-lg">
                 <CardHeader className="pb-4">
