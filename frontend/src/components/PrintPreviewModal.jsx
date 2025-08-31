@@ -96,8 +96,26 @@ const PrintPreviewModal = ({
       console.log('Creating PDF from image data URL:', imageDataURL.substring(0, 50) + '...')
       
       // Get actual banner dimensions from orderDetails
-      const printWidthFeet = parseFloat(orderDetails.banner_size?.split('x')[0]) || parseFloat(dimensions.width) || 2
-      const printHeightFeet = parseFloat(orderDetails.banner_size?.split('x')[1]?.split('ft')[0]?.trim()) || parseFloat(dimensions.height) || 4
+      console.log('Banner size from orderDetails:', orderDetails.banner_size)
+      console.log('Dimensions from props:', dimensions)
+      
+      // Parse banner size correctly - handle formats like "8x4ft", "8 x 4 ft", "8ft x 4ft"
+      let printWidthFeet, printHeightFeet
+      
+      if (orderDetails.banner_size) {
+        const sizeStr = orderDetails.banner_size.toLowerCase().replace(/\s+/g, '')
+        const match = sizeStr.match(/(\d+(?:\.\d+)?)(?:ft)?x(\d+(?:\.\d+)?)(?:ft)?/)
+        if (match) {
+          printWidthFeet = parseFloat(match[1])
+          printHeightFeet = parseFloat(match[2])
+        } else {
+          printWidthFeet = parseFloat(dimensions.width) || 8
+          printHeightFeet = parseFloat(dimensions.height) || 4
+        }
+      } else {
+        printWidthFeet = parseFloat(dimensions.width) || 8
+        printHeightFeet = parseFloat(dimensions.height) || 4
+      }
       const pdfWidthInches = printWidthFeet * 12
       const pdfHeightInches = printHeightFeet * 12
 
@@ -131,7 +149,7 @@ const PrintPreviewModal = ({
 
       console.log(`Creating PDF with dimensions: ${cappedWidthInches}" x ${cappedHeightInches}"`)
 
-      // Add the canvas image to PDF
+      // Add the canvas image to PDF with higher quality
       pdf.addImage(imageDataURL, 'PNG', 0, 0, cappedWidthInches, cappedHeightInches, '', 'FAST')
 
       // Add full canvas watermark to PDF (protects design from theft)
@@ -232,7 +250,7 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl h-[500px] w-full">
+                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl h-[600px] w-full">
                          <div className="relative w-full h-full">
                            {!imageLoaded && !imageError && (
                              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
@@ -270,14 +288,16 @@ const PrintPreviewModal = ({
                            <img
                              src={previewImage}
                              alt="Banner Design Preview"
-                             className="w-full h-full object-contain rounded-lg shadow-xl"
+                             className="object-contain rounded-lg shadow-xl"
                              style={{
                                position: 'absolute',
                                top: '50%',
                                left: '50%',
                                transform: 'translate(-50%, -50%)',
-                               maxWidth: '100%',
-                               maxHeight: '100%',
+                               maxWidth: '98%',
+                               maxHeight: '98%',
+                               minWidth: '80%',
+                               minHeight: '80%',
                                zIndex: 2,
                                border: '2px solid red'
                              }}
@@ -286,6 +306,8 @@ const PrintPreviewModal = ({
                                console.log('Natural image dimensions:', e.target.naturalWidth, 'x', e.target.naturalHeight)
                                console.log('Displayed image dimensions:', e.target.offsetWidth, 'x', e.target.offsetHeight)
                                console.log('Container dimensions:', e.target.parentElement.offsetWidth, 'x', e.target.parentElement.offsetHeight)
+                               console.log('Image aspect ratio:', e.target.naturalWidth / e.target.naturalHeight)
+                               console.log('Container aspect ratio:', e.target.parentElement.offsetWidth / e.target.parentElement.offsetHeight)
                                setImageLoaded(true)
                              }}
                              onError={(e) => {
