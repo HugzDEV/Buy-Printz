@@ -26,7 +26,8 @@ import {
   MoveUp,
   MoveDown,
   Layers,
-  SendToBack
+  SendToBack,
+  Settings
 } from 'lucide-react'
 
 const BannerCanvas = ({
@@ -47,6 +48,54 @@ const BannerCanvas = ({
   
   // Get the currently selected element
   const selectedElement = elements.find(el => el.id === selectedId)
+  
+  // Show status bar when element is selected
+  useEffect(() => {
+    if (selectedId || selectedIds.length > 0) {
+      setIsStatusBarHidden(false)
+    }
+  }, [selectedId, selectedIds])
+  
+  // Handle touch/click outside canvas to hide status bar - using Konva's container
+  useEffect(() => {
+    const handleOutsideInteraction = (e) => {
+      // Only handle if we have a stage reference
+      if (!stageRef.current) return
+      
+      const stage = stageRef.current
+      const container = stage.container()
+      const rect = container.getBoundingClientRect()
+      
+      let clientX, clientY
+      
+      // Handle both touch and mouse events
+      if (e.touches && e.touches[0]) {
+        // Touch event
+        clientX = e.touches[0].clientX
+        clientY = e.touches[0].clientY
+      } else if (e.clientX !== undefined) {
+        // Mouse event
+        clientX = e.clientX
+        clientY = e.clientY
+      } else {
+        return
+      }
+      
+      // Check if interaction is outside the canvas container
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+        setIsStatusBarHidden(true)
+      }
+    }
+    
+    // Add event listeners for both touch and click outside detection
+    document.addEventListener('touchstart', handleOutsideInteraction, { passive: true })
+    document.addEventListener('mousedown', handleOutsideInteraction, { passive: true })
+    
+    return () => {
+      document.removeEventListener('touchstart', handleOutsideInteraction)
+      document.removeEventListener('mousedown', handleOutsideInteraction)
+    }
+  }, [])
   
   // Auto-adjust scale when canvas size changes - DISABLED for user control
   // useEffect(() => {
@@ -117,6 +166,7 @@ const BannerCanvas = ({
   const [selectionRect, setSelectionRect] = useState(null)
   const [selectionStart, setSelectionStart] = useState(null)
   const [selectedIds, setSelectedIds] = useState([])
+  const [isStatusBarHidden, setIsStatusBarHidden] = useState(false)
 
   
   // Text editing modal state
@@ -1469,18 +1519,39 @@ const BannerCanvas = ({
         </GlassPanel>
       </div>
 
+      {/* Status Bar Toggle Button - Shows when status bar is hidden but elements are selected */}
+      {(selectedId || selectedIds.length > 0) && isStatusBarHidden && (
+        <div className="absolute bottom-4 right-4 z-50">
+          <GlassButton
+            onClick={() => setIsStatusBarHidden(false)}
+            className="p-3 rounded-full shadow-lg"
+            title="Show element properties"
+          >
+            <Settings className="w-5 h-5" />
+          </GlassButton>
+        </div>
+      )}
+
       {/* Bottom Actions - Mobile Optimized */}
       <div className={`
         absolute bottom-0 left-0 right-0 p-2 sm:p-4 border-t border-white/20 
         bg-gradient-to-br from-gray-50 to-gray-100
         transform transition-transform duration-300 ease-in-out
         max-h-[40vh] overflow-y-auto
-        ${selectedId || selectedIds.length > 0 ? 'translate-y-0' : 'translate-y-full'}
+        ${(selectedId || selectedIds.length > 0) && !isStatusBarHidden ? 'translate-y-0' : 'translate-y-full'}
       `}>
         <GlassPanel className="flex flex-col gap-3 sm:gap-4 max-h-full">
           
-          {/* Top Row - DPI Info and Selection Count */}
+          {/* Top Row - DPI Info, Selection Count, and Close Button */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+            {/* Close Button */}
+            <GlassButton
+              onClick={() => setIsStatusBarHidden(true)}
+              className="p-2 rounded-full self-start sm:self-center"
+              title="Hide element properties"
+            >
+              <EyeOff className="w-4 h-4" />
+            </GlassButton>
             {/* DPI Information for Selected Image */}
             {selectedId && getSelectedElementDPI() && (
               <div className="flex items-center gap-2 p-2 bg-white/20 rounded-lg border border-white/30">
