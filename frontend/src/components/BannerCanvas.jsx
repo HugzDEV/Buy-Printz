@@ -5,6 +5,9 @@ import Konva from 'konva'
 // Enable all events on Konva, even when dragging a node
 // This is required for proper touch handling on mobile devices
 Konva.hitOnDragEnabled = true
+
+// Enable touch event capture for better mobile support
+Konva.captureTouchEventsEnabled = true
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -714,6 +717,13 @@ const BannerCanvas = ({
         console.log('Element tapped:', element.id)
         handleSelect(element.id)
       },
+      onTouchStart: (e) => {
+        console.log('Element touch start:', element.id)
+        handleSelect(element.id)
+      },
+      onTouchEnd: (e) => {
+        console.log('Element touch end:', element.id)
+      },
 
       onDragEnd: (e) => handleDragEnd(e, element.id),
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
@@ -750,6 +760,13 @@ const BannerCanvas = ({
             onTap={(e) => {
               console.log('Text element tapped:', element.id)
               handleSelect(element.id)
+            }}
+            onTouchStart={(e) => {
+              console.log('Text element touch start:', element.id)
+              handleSelect(element.id)
+            }}
+            onTouchEnd={(e) => {
+              console.log('Text element touch end:', element.id)
             }}
 
             onDragEnd={(e) => handleDragEnd(e, element.id)}
@@ -1113,6 +1130,30 @@ const BannerCanvas = ({
                 }
                 // Don't interfere with element dragging - let elements handle their own events
               }}
+              onTouchStart={(e) => {
+                const stage = e.target.getStage()
+                console.log('Stage touch start on:', e.target, 'target === stage:', e.target === stage)
+                
+                // Only handle if touching directly on the stage background (not on elements)
+                if (e.target === stage) {
+                  console.log('Touched on stage background - starting selection')
+                  
+                  // Clear selections when touching empty canvas
+                  setSelectedId(null)
+                  setSelectedIds([])
+                  
+                  // Start selection rectangle
+                  const pos = stage.getPointerPosition()
+                  console.log('Stage touch position:', pos, 'scale:', scale)
+                  if (pos) {
+                    startSelection({
+                      x: pos.x / scale,
+                      y: pos.y / scale
+                    })
+                  }
+                }
+                // Don't interfere with element dragging - let elements handle their own events
+              }}
               onMouseMove={(e) => {
                 if (isSelecting) {
                   const stage = e.target.getStage()
@@ -1125,7 +1166,24 @@ const BannerCanvas = ({
                   }
                 }
               }}
+              onTouchMove={(e) => {
+                if (isSelecting) {
+                  const stage = e.target.getStage()
+                  const pos = stage.getPointerPosition()
+                  if (pos) {
+                    updateSelection({
+                      x: pos.x / scale,
+                      y: pos.y / scale
+                    })
+                  }
+                }
+              }}
               onMouseUp={() => {
+                if (isSelecting) {
+                  finishSelection()
+                }
+              }}
+              onTouchEnd={() => {
                 if (isSelecting) {
                   finishSelection()
                 }
