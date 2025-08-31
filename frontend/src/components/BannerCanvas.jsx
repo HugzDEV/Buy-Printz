@@ -30,7 +30,7 @@ import {
   Settings
 } from 'lucide-react'
 
-const BannerCanvas = React.forwardRef(({
+const BannerCanvas = ({
   elements,
   setElements,
   selectedId,
@@ -40,22 +40,8 @@ const BannerCanvas = React.forwardRef(({
   onExport,
   onSave,
   onCreateOrder
-}, ref) => {
+}) => {
   const stageRef = useRef()
-  
-  // Expose methods via ref
-  React.useImperativeHandle(ref, () => ({
-    generateCanvasImage: () => {
-      if (stageRef.current) {
-        return stageRef.current.toDataURL({
-          mimeType: 'image/png',
-          quality: 1.0,
-          pixelRatio: 2
-        })
-      }
-      return null
-    }
-  }))
   const transformerRef = useRef()
   const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
@@ -1174,7 +1160,6 @@ const BannerCanvas = React.forwardRef(({
               height={canvasSize.height}
               scale={{ x: scale, y: scale }}
               draggable={false}
-              data-konva-stage="true"
 
               onMouseDown={(e) => {
                 const stage = e.target.getStage()
@@ -1764,4 +1749,6 @@ const BannerCanvas = React.forwardRef(({
 
     </div>
   )
-})
+}
+
+export default BannerCanvas

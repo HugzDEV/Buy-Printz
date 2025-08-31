@@ -201,6 +201,7 @@ function App() {
             <>
               <Header />
               <Checkout />
+              <Footer />
             </>
           </ProtectedRoute>
         } />

@@ -64,14 +64,6 @@ const Checkout = () => {
   const [checkoutStep, setCheckoutStep] = useState('creating') // creating, preview, ready, processing, completed, error
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [approvedPDF, setApprovedPDF] = useState(null)
-  
-  // Collapsible sections state
-  const [expandedSections, setExpandedSections] = useState({
-    orderSummary: true,
-    bannerOptions: false,
-    preview: false,
-    customerInfo: false
-  })
 
   // Banner Options Configuration
   const grommetOptions = [
@@ -107,18 +99,13 @@ const Checkout = () => {
       navigate('/editor')
       return
     }
-    
+
     try {
-      const parsedData = JSON.parse(savedOrderData)
-      console.log('OrderData from sessionStorage:', parsedData)
-      console.log('Canvas image exists:', !!parsedData.canvas_image)
-      if (parsedData.canvas_image) {
-        console.log('Canvas image type:', typeof parsedData.canvas_image)
-        console.log('Canvas image starts with:', parsedData.canvas_image.substring(0, 100))
-      }
-      setOrderData(parsedData)
+      const parsedOrderData = JSON.parse(savedOrderData)
+      console.log('Loading order data from sessionStorage:', parsedOrderData)
+      setOrderData(parsedOrderData)
     } catch (error) {
-      console.error('Error parsing orderData from sessionStorage:', error)
+      console.error('Failed to parse order data:', error)
       navigate('/editor')
     }
   }, [navigate])
@@ -203,13 +190,6 @@ const Checkout = () => {
     setBannerOptions(prev => ({
       ...prev,
       [option]: value
-    }))
-  }
-
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
     }))
   }
 
@@ -371,9 +351,9 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="text-center mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 py-4 lg:py-8">
+      <div className="container mx-auto px-2 sm:px-4 max-w-6xl overflow-hidden">
+        <div className="text-center mb-4 lg:mb-8">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => {
@@ -449,28 +429,17 @@ const Checkout = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8 max-h-[calc(100vh-200px)] overflow-y-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8 max-w-full overflow-hidden">
           {/* Order Summary */}
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
-            <button
-              onClick={() => toggleSection('orderSummary')}
-              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
-            >
-              <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                <Package className="w-5 h-5 mr-2 text-blue-600" />
-                Order Summary
-              </h2>
-              <ChevronRight 
-                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
-                  expandedSections.orderSummary ? 'rotate-90' : ''
-                }`} 
-              />
-            </button>
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+              <Package className="w-5 h-5 mr-2 text-blue-600" />
+              Order Summary
+            </h2>
             
-            {expandedSections.orderSummary && (
-              <div className="space-y-4">
-                {/* Product Details */}
-                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
+            <div className="space-y-4">
+              {/* Product Details */}
+              <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
                 <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
                   <Tag className="w-4 h-4 mr-2 text-blue-600" />
                   Product Details
@@ -582,30 +551,18 @@ const Checkout = () => {
                 </p>
               </div>
             </div>
-            )}
           </div>
 
           {/* Banner Options & Shipping */}
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
-            <button
-              onClick={() => toggleSection('bannerOptions')}
-              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
-            >
-              <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                <Settings className="w-5 h-5 mr-2 text-purple-600" />
-                Banner Options & Shipping
-              </h2>
-              <ChevronRight 
-                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
-                  expandedSections.bannerOptions ? 'rotate-90' : ''
-                }`} 
-              />
-            </button>
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+              <Settings className="w-5 h-5 mr-2 text-purple-600" />
+              Banner Options
+            </h2>
             
-            {expandedSections.bannerOptions && (
-              <div className="space-y-6">
-                {/* Grommets */}
-                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
+            <div className="space-y-6">
+              {/* Grommets */}
+              <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
                 <label className="block text-sm font-bold text-gray-800 mb-3 flex items-center">
                   <Anchor className="w-4 h-4 mr-2 text-blue-600" />
                   Grommets (Eyelets)
@@ -708,84 +665,18 @@ const Checkout = () => {
                 </div>
               </div>
             </div>
-            )}
-          </div>
-
-          {/* Design Preview */}
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
-            <button
-              onClick={() => toggleSection('preview')}
-              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
-            >
-              <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                <Eye className="w-5 h-5 mr-2 text-blue-600" />
-                Design Preview & Approval
-              </h2>
-              <ChevronRight 
-                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
-                  expandedSections.preview ? 'rotate-90' : ''
-                }`} 
-              />
-            </button>
-            
-            {expandedSections.preview && (
-              <div className="space-y-4">
-                {checkoutStep === 'preview' && (
-                  <div className="backdrop-blur-sm bg-blue-400/20 rounded-xl p-4 border border-blue-200/30">
-                    <h3 className="flex items-center gap-2 text-lg font-medium text-blue-800 mb-2">
-                      <Eye className="w-5 h-5" />
-                      Final Design Approval Required
-                    </h3>
-                    <p className="text-blue-700 text-sm mb-4">
-                      Please review your banner design before payment. This shows exactly how your banner will look when printed by Buy Printz.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleShowPreview}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Review Final Design
-                    </button>
-                  </div>
-                )}
-
-                {checkoutStep === 'ready' && approvedPDF && (
-                  <div className="backdrop-blur-sm bg-green-400/20 rounded-xl p-4 border border-green-200/30">
-                    <div className="flex items-center gap-2 text-green-800 mb-2">
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="font-medium">Design Approved</span>
-                    </div>
-                    <p className="text-green-700 text-sm">
-                      Your print design has been verified and approved. Ready for payment!
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Checkout Form */}
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
-            <button
-              onClick={() => toggleSection('customerInfo')}
-              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
-            >
-              <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                <User className="w-5 h-5 mr-2 text-green-600" />
-                Customer Information
-              </h2>
-              <ChevronRight 
-                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
-                  expandedSections.customerInfo ? 'rotate-90' : ''
-                }`} 
-              />
-            </button>
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+              <User className="w-5 h-5 mr-2 text-green-600" />
+              Customer Information
+            </h2>
             
-            {expandedSections.customerInfo && (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Customer Details */}
-                <div className="grid md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Customer Details */}
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">Full Name</label>
                   <div className="relative">
@@ -885,7 +776,28 @@ const Checkout = () => {
                 </div>
               </div>
 
-
+              {/* Preview Step */}
+              {checkoutStep === 'preview' && (
+                <div className="mt-6 space-y-4">
+                  <div className="backdrop-blur-sm bg-blue-400/20 rounded-xl p-4 border border-blue-200/30">
+                    <h3 className="flex items-center gap-2 text-lg font-medium text-blue-800 mb-2">
+                      <Eye className="w-5 h-5" />
+                      Final Design Approval Required
+                    </h3>
+                    <p className="text-blue-700 text-sm mb-4">
+                      Please review your banner design before payment. This shows exactly how your banner will look when printed by Buy Printz.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleShowPreview}
+                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Review Final Design
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Payment Section */}
               {checkoutStep === 'ready' && (
@@ -916,7 +828,17 @@ const Checkout = () => {
                     </div>
                   </div>
 
-
+                  {approvedPDF && (
+                    <div className="mt-4 backdrop-blur-sm bg-green-400/20 rounded-xl p-4 border border-green-200/30">
+                      <div className="flex items-center gap-2 text-green-800 mb-2">
+                        <CheckCircle className="w-4 h-4" />
+                        <span className="font-medium">Design Approved</span>
+                      </div>
+                      <p className="text-green-700 text-sm">
+                        Your print design has been verified and approved. Ready for payment!
+                      </p>
+                    </div>
+                  )}
 
                   <button
                     type="submit"
@@ -935,7 +857,6 @@ const Checkout = () => {
                 </>
               )}
             </form>
-            )}
           </div>
         </div>
       </div>

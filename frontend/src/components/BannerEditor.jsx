@@ -20,10 +20,9 @@ const BannerEditorNew = () => {
   const [elements, setElements] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const canvasRef = useRef()
   
   // Canvas configuration
-  const [canvasSize, setCanvasSize] = useState({ width: 1200, height: 600 }) // Default to 2x4 ft banner size
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 })
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState('landscape') // 'landscape' or 'portrait'
   
@@ -51,7 +50,7 @@ const BannerEditorNew = () => {
     { name: '8x4 ft (Portrait)', width: 1200, height: 2400, orientation: 'portrait', category: 'portrait' },
     
     // Custom option
-    { name: 'Custom Size', width: 1200, height: 600, orientation: 'landscape', category: 'custom' }
+    { name: 'Custom Size', width: 800, height: 400, orientation: 'landscape', category: 'custom' }
   ]
   
   // All available banner types from products
@@ -1478,57 +1477,37 @@ const BannerEditorNew = () => {
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs, canvasOrientation])
 
-  // Convert pixel dimensions to feet (approximately 300 pixels per foot)
-  const pixelsToFeet = (pixels) => {
-    return Math.round((pixels / 300) * 10) / 10 // Round to 1 decimal place
-  }
-
   // Create order
   const createOrder = useCallback(() => {
     // Generate canvas image data for preview
     const generateCanvasImage = () => {
       try {
-        // Use the canvas ref to generate the image
-        if (canvasRef.current && canvasRef.current.generateCanvasImage) {
-          const imageData = canvasRef.current.generateCanvasImage()
-          console.log('Canvas image generated successfully via ref, length:', imageData?.length)
+        // Get the Konva Stage element
+        const stageElement = document.querySelector('.konvajs-content canvas')
+        if (stageElement) {
+          // Use a higher quality export but limit size
+          const imageData = stageElement.toDataURL('image/png', 0.8)
+          console.log('Canvas image generated successfully, length:', imageData.length)
+          
+          // Check if image is too large (limit to 5MB)
+          if (imageData.length > 5 * 1024 * 1024) {
+            console.warn('Canvas image too large, reducing quality')
+            return stageElement.toDataURL('image/png', 0.5)
+          }
+          
           return imageData
         }
         
-        // Fallback to DOM query if ref is not available
-        const konvaStage = document.querySelector('[data-konva-stage]') || 
-                          document.querySelector('.konvajs-content') ||
-                          document.querySelector('canvas')
-        
-        if (konvaStage) {
-          console.log('Found canvas element via DOM query:', konvaStage)
+        // Fallback to any canvas element
+        const canvasElement = document.querySelector('canvas')
+        if (canvasElement) {
+          const imageData = canvasElement.toDataURL('image/png', 0.8)
+          console.log('Canvas image generated from fallback, length:', imageData.length)
           
-          // Get the actual Konva Stage object if this is a canvas element
-          let stage = konvaStage
-          if (konvaStage.tagName === 'CANVAS') {
-            // Try to find the parent Konva Stage
-            const stageContainer = konvaStage.closest('[data-konva-stage]')
-            if (stageContainer && stageContainer._konvaStage) {
-              stage = stageContainer._konvaStage
-            }
-          }
-          
-          // Use high quality export with pixelRatio for better resolution
-          const imageData = stage.toDataURL({
-            mimeType: 'image/png',
-            quality: 1.0,
-            pixelRatio: 2
-          })
-          console.log('Canvas image generated successfully via DOM, length:', imageData.length)
-          
-          // Check if image is too large (limit to 10MB for high quality)
-          if (imageData.length > 10 * 1024 * 1024) {
-            console.warn('Canvas image too large, reducing pixelRatio')
-            return stage.toDataURL({
-              mimeType: 'image/png',
-              quality: 1.0,
-              pixelRatio: 1
-            })
+          // Check if image is too large
+          if (imageData.length > 5 * 1024 * 1024) {
+            console.warn('Canvas image too large, reducing quality')
+            return canvasElement.toDataURL('image/png', 0.5)
           }
           
           return imageData
@@ -1574,7 +1553,7 @@ const BannerEditorNew = () => {
       banner_type: bannerSpecs?.id || 'vinyl-13oz',
       banner_material: bannerSpecs?.material || '13oz Vinyl',
       banner_finish: bannerSpecs?.finish || 'Matte',
-      banner_size: `${pixelsToFeet(canvasSize.width)}x${pixelsToFeet(canvasSize.height)}ft`,
+      banner_size: `${canvasSize.width}x${canvasSize.height}px (${canvasOrientation})`,
       banner_category: bannerSpecs?.category || 'Vinyl Banners',
       background_color: backgroundColor,
       print_options: {} // Will be populated by checkout component
@@ -1804,7 +1783,6 @@ const BannerEditorNew = () => {
           z-10 sm:z-auto
         `}>
           <BannerCanvas
-            ref={canvasRef}
             elements={elements}
             setElements={setElements}
             selectedId={selectedId}

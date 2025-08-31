@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -31,26 +31,28 @@ const PrintPreviewModal = ({
   const [previewUrl, setPreviewUrl] = useState(null)
   const [previewImage, setPreviewImage] = useState(null)
   const [qualityAnalysis, setQualityAnalysis] = useState(null)
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
-  const [debugLogs, setDebugLogs] = useState([])
-  const [blobCreated, setBlobCreated] = useState(false)
 
-  const generatePDF = useCallback(async () => {
+  // Generate PDF when modal opens
+  useEffect(() => {
+    if (isOpen && (canvasData || orderDetails?.canvas_image)) {
+      generatePDF()
+    }
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [isOpen, canvasData, orderDetails])
+
+  const generatePDF = async () => {
     try {
       setIsGenerating(true)
-      setImageError(false)
-      setImageLoaded(false)
       
       // Check if we have a perfect canvas image from the editor
       if (orderDetails?.canvas_image) {
-        // Validate the image data
-        if (!orderDetails.canvas_image.startsWith('data:image/')) {
-          setImageError(true)
-          return
-        }
+        console.log('Using perfect canvas image for preview!')
         
-        // Use the original base64 image directly for better compatibility
+        // Use the exported canvas image directly
         setPreviewImage(orderDetails.canvas_image)
         
         // Create PDF with the canvas image
@@ -61,66 +63,12 @@ const PrintPreviewModal = ({
       // No canvas image available - this shouldn't happen with the new system
       console.warn('No canvas image available for preview!')
       setPreviewImage(null)
-      setImageError(true)
       return
     } catch (error) {
       console.error('Error generating PDF:', error)
-      setImageError(true)
     } finally {
       setIsGenerating(false)
     }
-  }, [orderDetails?.canvas_image])
-
-
-
-  // Generate PDF when modal opens
-  useEffect(() => {
-    if (isOpen && (canvasData || orderDetails?.canvas_image)) {
-      setBlobCreated(false) // Reset blob flag when modal opens
-      generatePDF()
-    }
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-      // Clean up blob URL if it exists
-      if (previewImage && previewImage.startsWith('blob:')) {
-        URL.revokeObjectURL(previewImage)
-      }
-    }
-  }, [isOpen, canvasData, orderDetails?.canvas_image])
-
-  // Parse banner dimensions from orderDetails
-  const parseBannerDimensions = () => {
-    console.log('Banner size from orderDetails:', orderDetails.banner_size)
-    console.log('Dimensions from props:', dimensions)
-    
-    // Parse banner size correctly - handle formats like "2.7x1.3ft", "8x4ft", "8 x 4 ft", "8ft x 4ft"
-    let printWidthFeet, printHeightFeet
-    
-    if (orderDetails.banner_size) {
-      const sizeStr = orderDetails.banner_size.toLowerCase().replace(/\s+/g, '')
-      const match = sizeStr.match(/(\d+(?:\.\d+)?)(?:ft)?x(\d+(?:\.\d+)?)(?:ft)?/)
-      if (match) {
-        printWidthFeet = parseFloat(match[1])
-        printHeightFeet = parseFloat(match[2])
-        console.log('Parsed dimensions from banner_size:', printWidthFeet, 'x', printHeightFeet)
-      } else {
-        // Fallback: convert pixel dimensions to feet (300 pixels per foot)
-        const pixelsToFeet = (pixels) => Math.round((pixels / 300) * 10) / 10
-        printWidthFeet = pixelsToFeet(dimensions.width) || 2.7
-        printHeightFeet = pixelsToFeet(dimensions.height) || 1.3
-        console.log('Converted pixel dimensions to feet:', printWidthFeet, 'x', printHeightFeet)
-      }
-    } else {
-      // Fallback: convert pixel dimensions to feet (300 pixels per foot)
-      const pixelsToFeet = (pixels) => Math.round((pixels / 300) * 10) / 10
-      printWidthFeet = pixelsToFeet(dimensions.width) || 2.7
-      printHeightFeet = pixelsToFeet(dimensions.height) || 1.3
-      console.log('No banner_size, converted pixel dimensions to feet:', printWidthFeet, 'x', printHeightFeet)
-    }
-    
-    return { printWidthFeet, printHeightFeet }
   }
 
   // Create PDF directly from canvas image (perfect method)
@@ -129,7 +77,8 @@ const PrintPreviewModal = ({
       console.log('Creating PDF from image data URL:', imageDataURL.substring(0, 50) + '...')
       
       // Get actual banner dimensions from orderDetails
-      const { printWidthFeet, printHeightFeet } = parseBannerDimensions()
+      const printWidthFeet = parseFloat(orderDetails.banner_size?.split('x')[0]) || parseFloat(dimensions.width) || 2
+      const printHeightFeet = parseFloat(orderDetails.banner_size?.split('x')[1]?.split('ft')[0]?.trim()) || parseFloat(dimensions.height) || 4
       const pdfWidthInches = printWidthFeet * 12
       const pdfHeightInches = printHeightFeet * 12
 
@@ -163,7 +112,7 @@ const PrintPreviewModal = ({
 
       console.log(`Creating PDF with dimensions: ${cappedWidthInches}" x ${cappedHeightInches}"`)
 
-      // Add the canvas image to PDF with higher quality
+      // Add the canvas image to PDF
       pdf.addImage(imageDataURL, 'PNG', 0, 0, cappedWidthInches, cappedHeightInches, '', 'FAST')
 
       // Add full canvas watermark to PDF (protects design from theft)
@@ -227,32 +176,31 @@ const PrintPreviewModal = ({
   }
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-             <DialogContent className="max-w-[98vw] sm:max-w-7xl max-h-[98vh] sm:max-h-[95vh] h-auto overflow-hidden flex flex-col">
-                 <DialogHeader className="flex-shrink-0 pb-2 sm:pb-4 border-b">
-                     <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
-             <Printer className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
-             Print Preview & Approval
-           </DialogTitle>
-           <p className="text-gray-600 text-xs sm:text-sm mt-2">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl max-h-[90vh] h-auto overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0 pb-4 border-b">
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Printer className="h-6 w-6 text-blue-600" />
+            Print Preview & Approval
+          </DialogTitle>
+          <p className="text-gray-600 text-sm mt-2">
             Review your banner design before production. This preview shows exactly how your banner will look when printed.
           </p>
         </DialogHeader>
 
-                 <div className="flex-1 overflow-y-auto min-h-0 pb-4">
-           <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 sm:gap-4 p-2 sm:p-4 max-h-full">
-            {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
-                         <div className="xl:col-span-2 space-y-3 sm:space-y-6 overflow-y-auto max-h-full">
-              {/* Banner Preview Card */}
-              <Card className="shadow-lg">
+        <div className="flex-1 overflow-y-auto min-h-0 pb-4">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6 p-4 max-h-[80vh] overflow-y-auto">
+                          {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
+              <div className="xl:col-span-2 space-y-4 lg:space-y-6 overflow-hidden">
+                              {/* Banner Preview Card */}
+                <Card className="shadow-lg max-h-[60vh] overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Eye className="h-5 w-5 text-blue-600" />
                     Your Banner Design
                   </CardTitle>
                 </CardHeader>
-                                 <CardContent className="space-y-3 sm:space-y-4">
+                <CardContent className="space-y-4">
                   {isGenerating ? (
                     <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
                       <div className="text-center space-y-3">
@@ -262,100 +210,50 @@ const PrintPreviewModal = ({
                       </div>
                     </div>
                   ) : previewImage ? (
-                    <div className="space-y-3 sm:space-y-4">
-                                             {/* Main Banner Preview */}
-                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl w-full" style={{ 
-                                                                         height: 'min(85vh, 700px)',
-                                                                         maxHeight: '700px',
-                                                                         minHeight: '500px',
-                                                                         display: 'flex',
-                                                                         alignItems: 'center',
-                                                                         justifyContent: 'center'
-                                                                       }}>
-                         <div className="relative w-full h-full flex items-center justify-center">
-                           {!imageLoaded && !imageError && (
-                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-                               <div className="text-center space-y-2">
-                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                                 <p className="text-sm text-gray-600">Loading preview...</p>
-                                 <p className="text-xs text-red-600">Debug: Image should load here</p>
-                               </div>
-                             </div>
-                           )}
-                           {imageError && (
-                             <div className="absolute inset-0 flex items-center justify-center bg-red-50 rounded-lg border-2 border-red-200">
-                               <div className="text-center space-y-2">
-                                 <AlertTriangle className="h-8 w-8 text-red-500 mx-auto" />
-                                 <p className="text-sm text-red-600">Failed to load preview</p>
-                                 <p className="text-xs text-red-600">Debug: Image failed to load</p>
-                               </div>
-                             </div>
-                           )}
-                           {/* Full Canvas Watermark - Bottom Layer */}
-                           <div className="absolute inset-0 pointer-events-none">
-                             <img
-                               src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                               alt="BuyPrintz Watermark"
-                               className="w-full h-full object-cover opacity-40"
-                               style={{
-                                 position: 'absolute',
-                                 top: 0,
-                                 left: 0,
-                                 zIndex: 0
-                               }}
-                             />
-                           </div>
-                           
-                           <img
-                             src={previewImage}
-                             alt="Banner Design Preview"
-                             className="rounded-lg shadow-xl"
-                             style={{
-                               maxWidth: '98%',
-                               maxHeight: '98%',
-                               width: 'auto',
-                               height: 'auto',
-                               objectFit: 'contain',
-                               zIndex: 2,
-                               border: '2px solid red'
-                             }}
-                             onLoad={(e) => {
-                               console.log('Image loaded successfully!')
-                               console.log('Natural image dimensions:', e.target.naturalWidth, 'x', e.target.naturalHeight)
-                               console.log('Displayed image dimensions:', e.target.offsetWidth, 'x', e.target.offsetHeight)
-                               console.log('Container dimensions:', e.target.parentElement.offsetWidth, 'x', e.target.parentElement.offsetHeight)
-                               console.log('Image aspect ratio:', e.target.naturalWidth / e.target.naturalHeight)
-                               console.log('Container aspect ratio:', e.target.parentElement.offsetWidth / e.target.parentElement.offsetHeight)
-                               setImageLoaded(true)
-                             }}
-                             onError={(e) => {
-                               console.error('Image failed to load:', e.type)
-                               setImageError(true)
-                             }}
-                           />
-                           {/* Debug: Show if image is loading */}
-                           <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
-                             {imageLoaded ? 'LOADED' : 'LOADING'}
-                           </div>
+                    <div className="space-y-4">
+                      {/* Main Banner Preview */}
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 flex items-center justify-center min-h-[250px]">
+                        <div className="relative group">
+                          <img
+                            src={previewImage}
+                            alt="Banner Design Preview"
+                            className="max-w-full max-h-[300px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                            style={{
+                              maxWidth: '100%',
+                              height: 'auto'
+                            }}
+                          />
+                          
+                          {/* Full Canvas Watermark - Bottom Layer */}
+                          <div className="absolute inset-0 pointer-events-none">
+                            <img
+                              src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
+                              alt="BuyPrintz Watermark"
+                              className="w-full h-full object-cover opacity-40"
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                zIndex: 1
+                              }}
+                            />
+                          </div>
                           
                           {/* Preview Badge */}
-                          <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium" style={{ zIndex: 3 }}>
+                          <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium">
                             PREVIEW
                           </div>
                           
                           <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
                             <Badge variant="secondary" className="bg-blue-100 text-blue-800 font-medium px-3 py-1">
-                              {(() => {
-                                const { printWidthFeet, printHeightFeet } = parseBannerDimensions()
-                                return `${printWidthFeet}ft × ${printHeightFeet}ft`
-                              })()}
+                              {dimensions.width}ft × {dimensions.height}ft
                             </Badge>
                           </div>
                         </div>
                       </div>
 
-                                             {/* Action Buttons */}
-                       <div className="flex justify-center pt-3 sm:pt-6">
+                      {/* Action Buttons */}
+                      <div className="flex justify-center pt-6">
                         {previewUrl ? (
                           <Button
                             onClick={() => {
@@ -370,7 +268,7 @@ const PrintPreviewModal = ({
                                 URL.revokeObjectURL(url)
                               }
                             }}
-                                                         className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-lg font-medium shadow-lg"
+                            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-6 py-3 text-lg font-medium shadow-lg"
                           >
                             <Download className="h-5 w-5" />
                             Download Print File
@@ -378,7 +276,7 @@ const PrintPreviewModal = ({
                         ) : (
                           <Button
                             disabled
-                                                         className="bg-gray-400 text-white flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-lg font-medium"
+                            className="bg-gray-400 text-white flex items-center gap-2 px-6 py-3 text-lg font-medium"
                           >
                             <Download className="h-5 w-5" />
                             Generating Print File...
@@ -416,9 +314,9 @@ const PrintPreviewModal = ({
             </div>
 
             {/* Right Column - Specifications (Takes 1/3 width on xl screens) */}
-                         <div className="space-y-4 sm:space-y-6 overflow-y-auto max-h-full">
-              {/* Print Specifications */}
-              <Card className="shadow-lg">
+            <div className="space-y-4 lg:space-y-6 overflow-hidden">
+                              {/* Print Specifications */}
+                <Card className="shadow-lg max-h-[40vh] overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <FileText className="h-5 w-5 text-blue-600" />
@@ -431,10 +329,7 @@ const PrintPreviewModal = ({
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <span className="text-sm font-medium text-gray-600">Dimensions</span>
                         <Badge variant="outline" className="bg-white">
-                          {(() => {
-                            const { printWidthFeet, printHeightFeet } = parseBannerDimensions()
-                            return `${printWidthFeet}ft × ${printHeightFeet}ft`
-                          })()}
+                          {dimensions.width}ft × {dimensions.height}ft
                         </Badge>
                       </div>
                       
@@ -478,7 +373,7 @@ const PrintPreviewModal = ({
               </Card>
 
               {/* Final Approval Checklist */}
-              <Card className="shadow-lg border-amber-200">
+              <Card className="shadow-lg border-amber-200 max-h-[40vh] overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg text-amber-800">
                     <Check className="h-5 w-5" />
@@ -510,37 +405,36 @@ const PrintPreviewModal = ({
                         Once approved and payment is processed, changes cannot be made.
                       </p>
                     </div>
-                                     </div>
-                 </CardContent>
-               </Card>
-
-               {/* Action Buttons */}
-               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-                 <Button
-                   variant="outline"
-                   onClick={onClose}
-                   className="flex items-center justify-center gap-2 order-2 sm:order-1 min-h-[44px]"
-                 >
-                   <X className="h-4 w-4" />
-                   Cancel Order
-                 </Button>
-                 
-                 <Button
-                   onClick={handleApprove}
-                   disabled={!pdfBlob || isGenerating}
-                   className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 order-1 sm:order-2 shadow-lg min-h-[44px]"
-                 >
-                   <Check className="h-4 w-4" />
-                   Approve & Continue to Payment
-                 </Button>
-               </div>
-             </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-                 </div>
+        </div>
+
+        <DialogFooter className="flex-shrink-0 border-t pt-4 bg-gray-50">
+          <div className="flex flex-col sm:flex-row gap-3 w-full justify-end">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 order-2 sm:order-1 min-h-[44px]"
+            >
+              <X className="h-4 w-4" />
+              Cancel Order
+            </Button>
+            
+            <Button
+              onClick={handleApprove}
+              disabled={!pdfBlob || isGenerating}
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 order-1 sm:order-2 shadow-lg min-h-[44px]"
+            >
+              <Check className="h-4 w-4" />
+              Approve & Continue to Payment
+            </Button>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
-
-  </>
   )
 }
 
