@@ -49,54 +49,6 @@ const BannerCanvas = ({
   // Get the currently selected element
   const selectedElement = elements.find(el => el.id === selectedId)
   
-  // Show status bar when element is selected
-  useEffect(() => {
-    if (selectedId || selectedIds.length > 0) {
-      setIsStatusBarHidden(false)
-    }
-  }, [selectedId, selectedIds])
-  
-  // Handle touch/click outside canvas to hide status bar - using Konva's container
-  useEffect(() => {
-    const handleOutsideInteraction = (e) => {
-      // Only handle if we have a stage reference
-      if (!stageRef.current) return
-      
-      const stage = stageRef.current
-      const container = stage.container()
-      const rect = container.getBoundingClientRect()
-      
-      let clientX, clientY
-      
-      // Handle both touch and mouse events
-      if (e.touches && e.touches[0]) {
-        // Touch event
-        clientX = e.touches[0].clientX
-        clientY = e.touches[0].clientY
-      } else if (e.clientX !== undefined) {
-        // Mouse event
-        clientX = e.clientX
-        clientY = e.clientY
-      } else {
-        return
-      }
-      
-      // Check if interaction is outside the canvas container
-      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-        setIsStatusBarHidden(true)
-      }
-    }
-    
-    // Add event listeners for both touch and click outside detection
-    document.addEventListener('touchstart', handleOutsideInteraction, { passive: true })
-    document.addEventListener('mousedown', handleOutsideInteraction, { passive: true })
-    
-    return () => {
-      document.removeEventListener('touchstart', handleOutsideInteraction)
-      document.removeEventListener('mousedown', handleOutsideInteraction)
-    }
-  }, [])
-  
   // Auto-adjust scale when canvas size changes - DISABLED for user control
   // useEffect(() => {
   //   const containerWidth = 800 // Approximate container width
@@ -167,6 +119,54 @@ const BannerCanvas = ({
   const [selectionStart, setSelectionStart] = useState(null)
   const [selectedIds, setSelectedIds] = useState([])
   const [isStatusBarHidden, setIsStatusBarHidden] = useState(false)
+  
+  // Show status bar when element is selected
+  useEffect(() => {
+    if (selectedId || selectedIds.length > 0) {
+      setIsStatusBarHidden(false)
+    }
+  }, [selectedId, selectedIds])
+  
+  // Handle touch/click outside canvas to hide status bar - using Konva's container
+  useEffect(() => {
+    const handleOutsideInteraction = (e) => {
+      // Only handle if we have a stage reference
+      if (!stageRef.current) return
+      
+      const stage = stageRef.current
+      const container = stage.container()
+      const rect = container.getBoundingClientRect()
+      
+      let clientX, clientY
+      
+      // Handle both touch and mouse events
+      if (e.touches && e.touches[0]) {
+        // Touch event
+        clientX = e.touches[0].clientX
+        clientY = e.touches[0].clientY
+      } else if (e.clientX !== undefined) {
+        // Mouse event
+        clientX = e.clientX
+        clientY = e.clientY
+      } else {
+        return
+      }
+      
+      // Check if interaction is outside the canvas container
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+        setIsStatusBarHidden(true)
+      }
+    }
+    
+    // Add event listeners for both touch and click outside detection
+    document.addEventListener('touchstart', handleOutsideInteraction, { passive: true })
+    document.addEventListener('mousedown', handleOutsideInteraction, { passive: true })
+    
+    return () => {
+      document.removeEventListener('touchstart', handleOutsideInteraction)
+      document.removeEventListener('mousedown', handleOutsideInteraction)
+    }
+  }, [])
 
   
   // Text editing modal state
