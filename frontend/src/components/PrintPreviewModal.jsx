@@ -212,17 +212,12 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center min-h-[300px] sm:min-h-[250px]">
+                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center h-[350px] sm:h-[300px]">
                         <div className="relative group">
                           <img
                             src={previewImage}
                             alt="Banner Design Preview"
-                            className="max-w-full max-h-[280px] sm:max-h-[300px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
-                            style={{
-                              maxWidth: '100%',
-                              height: 'auto',
-                              width: 'auto'
-                            }}
+                            className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                           />
                           
                           {/* Full Canvas Watermark - Bottom Layer */}
@@ -406,34 +401,33 @@ const PrintPreviewModal = ({
                         Once approved and payment is processed, changes cannot be made.
                       </p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
+                                     </div>
+                 </CardContent>
+               </Card>
 
-                 <DialogFooter className="flex-shrink-0 border-t pt-2 sm:pt-4 bg-gray-50">
-           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full justify-end">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="flex items-center justify-center gap-2 order-2 sm:order-1 min-h-[44px]"
-            >
-              <X className="h-4 w-4" />
-              Cancel Order
-            </Button>
-            
-            <Button
-              onClick={handleApprove}
-              disabled={!pdfBlob || isGenerating}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 order-1 sm:order-2 shadow-lg min-h-[44px]"
-            >
-              <Check className="h-4 w-4" />
-              Approve & Continue to Payment
-            </Button>
+               {/* Action Buttons */}
+               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+                 <Button
+                   variant="outline"
+                   onClick={onClose}
+                   className="flex items-center justify-center gap-2 order-2 sm:order-1 min-h-[44px]"
+                 >
+                   <X className="h-4 w-4" />
+                   Cancel Order
+                 </Button>
+                 
+                 <Button
+                   onClick={handleApprove}
+                   disabled={!pdfBlob || isGenerating}
+                   className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 order-1 sm:order-2 shadow-lg min-h-[44px]"
+                 >
+                   <Check className="h-4 w-4" />
+                   Approve & Continue to Payment
+                 </Button>
+               </div>
+             </div>
           </div>
-        </DialogFooter>
+                 </div>
       </DialogContent>
     </Dialog>
   )

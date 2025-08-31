@@ -64,6 +64,13 @@ const Checkout = () => {
   const [checkoutStep, setCheckoutStep] = useState('creating') // creating, preview, ready, processing, completed, error
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [approvedPDF, setApprovedPDF] = useState(null)
+  
+  // Collapsible sections state
+  const [expandedSections, setExpandedSections] = useState({
+    orderSummary: true,
+    bannerOptions: false,
+    customerInfo: false
+  })
 
   // Banner Options Configuration
   const grommetOptions = [
@@ -190,6 +197,13 @@ const Checkout = () => {
     setBannerOptions(prev => ({
       ...prev,
       [option]: value
+    }))
+  }
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
     }))
   }
 
@@ -432,14 +446,25 @@ const Checkout = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8 max-h-[calc(100vh-200px)] overflow-y-auto">
           {/* Order Summary */}
           <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
-            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-              <Package className="w-5 h-5 mr-2 text-blue-600" />
-              Order Summary
-            </h2>
+            <button
+              onClick={() => toggleSection('orderSummary')}
+              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
+            >
+              <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                <Package className="w-5 h-5 mr-2 text-blue-600" />
+                Order Summary
+              </h2>
+              <ChevronRight 
+                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
+                  expandedSections.orderSummary ? 'rotate-90' : ''
+                }`} 
+              />
+            </button>
             
-            <div className="space-y-4">
-              {/* Product Details */}
-              <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
+            {expandedSections.orderSummary && (
+              <div className="space-y-4">
+                {/* Product Details */}
+                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
                 <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
                   <Tag className="w-4 h-4 mr-2 text-blue-600" />
                   Product Details
@@ -551,18 +576,30 @@ const Checkout = () => {
                 </p>
               </div>
             </div>
+            )}
           </div>
 
           {/* Banner Options & Shipping */}
           <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
-            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-              <Settings className="w-5 h-5 mr-2 text-purple-600" />
-              Banner Options
-            </h2>
+            <button
+              onClick={() => toggleSection('bannerOptions')}
+              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
+            >
+              <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                <Settings className="w-5 h-5 mr-2 text-purple-600" />
+                Banner Options & Shipping
+              </h2>
+              <ChevronRight 
+                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
+                  expandedSections.bannerOptions ? 'rotate-90' : ''
+                }`} 
+              />
+            </button>
             
-            <div className="space-y-6">
-              {/* Grommets */}
-              <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
+            {expandedSections.bannerOptions && (
+              <div className="space-y-6">
+                {/* Grommets */}
+                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/30">
                 <label className="block text-sm font-bold text-gray-800 mb-3 flex items-center">
                   <Anchor className="w-4 h-4 mr-2 text-blue-600" />
                   Grommets (Eyelets)
@@ -665,18 +702,30 @@ const Checkout = () => {
                 </div>
               </div>
             </div>
+            )}
           </div>
 
           {/* Checkout Form */}
           <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
-            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-              <User className="w-5 h-5 mr-2 text-green-600" />
-              Customer Information
-            </h2>
+            <button
+              onClick={() => toggleSection('customerInfo')}
+              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
+            >
+              <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                <User className="w-5 h-5 mr-2 text-green-600" />
+                Customer Information
+              </h2>
+              <ChevronRight 
+                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
+                  expandedSections.customerInfo ? 'rotate-90' : ''
+                }`} 
+              />
+            </button>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Customer Details */}
-              <div className="grid md:grid-cols-2 gap-4">
+            {expandedSections.customerInfo && (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Customer Details */}
+                <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">Full Name</label>
                   <div className="relative">
@@ -857,6 +906,7 @@ const Checkout = () => {
                 </>
               )}
             </form>
+            )}
           </div>
         </div>
       </div>
