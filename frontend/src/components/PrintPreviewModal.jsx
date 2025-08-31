@@ -277,8 +277,11 @@ const PrintPreviewModal = ({
                              alt="Banner Design Preview"
                              className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                              style={{
-                               position: 'relative',
-                               zIndex: 2
+                               position: 'absolute',
+                               top: 0,
+                               left: 0,
+                               zIndex: 2,
+                               backgroundColor: 'rgba(255, 0, 0, 0.1)'
                              }}
                              onLoad={() => {
                                const log = 'Image loaded successfully!'
@@ -296,6 +299,10 @@ const PrintPreviewModal = ({
                            {/* Debug: Show image source info */}
                            <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
                              Debug: {previewImage ? 'Has Image' : 'No Image'}
+                           </div>
+                           {/* Debug: Show image dimensions */}
+                           <div className="absolute top-12 right-2 bg-red-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
+                             Canvas: {dimensions.width}×{dimensions.height}
                            </div>
                           
                           {/* Preview Badge */}
