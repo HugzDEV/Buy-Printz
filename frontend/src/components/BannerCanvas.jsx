@@ -1052,7 +1052,7 @@ const BannerCanvas = ({
               width={canvasSize.width}
               height={canvasSize.height}
               scale={{ x: scale, y: scale }}
-              draggable={true}
+              draggable={false}
               // Enhanced touch handling for mobile
               onTouchStart={(e) => {
                 console.log('Stage touch start:', e.target === e.target.getStage() ? 'background' : 'element')
