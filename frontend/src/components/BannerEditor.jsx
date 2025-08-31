@@ -20,6 +20,7 @@ const BannerEditorNew = () => {
   const [elements, setElements] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const canvasRef = useRef()
   
   // Canvas configuration
   const [canvasSize, setCanvasSize] = useState({ width: 1200, height: 600 }) // Default to 2x4 ft banner size
@@ -1487,44 +1488,43 @@ const BannerEditorNew = () => {
     // Generate canvas image data for preview
     const generateCanvasImage = () => {
       try {
-        // Get the Konva Stage element
-        const stageElement = document.querySelector('.konvajs-content canvas')
-        if (stageElement) {
-                  // Use high quality export with pixelRatio for better resolution
-        const imageData = stageElement.toDataURL({
-          mimeType: 'image/png',
-          quality: 1.0,
-          pixelRatio: 2
-        })
-        console.log('Canvas image generated successfully, length:', imageData.length)
-        
-        // Check if image is too large (limit to 10MB for high quality)
-        if (imageData.length > 10 * 1024 * 1024) {
-          console.warn('Canvas image too large, reducing pixelRatio')
-          return stageElement.toDataURL({
-            mimeType: 'image/png',
-            quality: 1.0,
-            pixelRatio: 1
-          })
-        }
-          
+        // Use the canvas ref to generate the image
+        if (canvasRef.current && canvasRef.current.generateCanvasImage) {
+          const imageData = canvasRef.current.generateCanvasImage()
+          console.log('Canvas image generated successfully via ref, length:', imageData?.length)
           return imageData
         }
         
-        // Fallback to any canvas element
-        const canvasElement = document.querySelector('canvas')
-        if (canvasElement) {
-          const imageData = canvasElement.toDataURL({
+        // Fallback to DOM query if ref is not available
+        const konvaStage = document.querySelector('[data-konva-stage]') || 
+                          document.querySelector('.konvajs-content') ||
+                          document.querySelector('canvas')
+        
+        if (konvaStage) {
+          console.log('Found canvas element via DOM query:', konvaStage)
+          
+          // Get the actual Konva Stage object if this is a canvas element
+          let stage = konvaStage
+          if (konvaStage.tagName === 'CANVAS') {
+            // Try to find the parent Konva Stage
+            const stageContainer = konvaStage.closest('[data-konva-stage]')
+            if (stageContainer && stageContainer._konvaStage) {
+              stage = stageContainer._konvaStage
+            }
+          }
+          
+          // Use high quality export with pixelRatio for better resolution
+          const imageData = stage.toDataURL({
             mimeType: 'image/png',
             quality: 1.0,
             pixelRatio: 2
           })
-          console.log('Canvas image generated from fallback, length:', imageData.length)
+          console.log('Canvas image generated successfully via DOM, length:', imageData.length)
           
-          // Check if image is too large
+          // Check if image is too large (limit to 10MB for high quality)
           if (imageData.length > 10 * 1024 * 1024) {
             console.warn('Canvas image too large, reducing pixelRatio')
-            return canvasElement.toDataURL({
+            return stage.toDataURL({
               mimeType: 'image/png',
               quality: 1.0,
               pixelRatio: 1
@@ -1804,6 +1804,7 @@ const BannerEditorNew = () => {
           z-10 sm:z-auto
         `}>
           <BannerCanvas
+            ref={canvasRef}
             elements={elements}
             setElements={setElements}
             selectedId={selectedId}
