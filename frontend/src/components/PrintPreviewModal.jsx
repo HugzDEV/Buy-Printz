@@ -212,21 +212,24 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                                               <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center h-[350px] sm:h-[300px]">
-                         <div className="relative group w-full h-full flex items-center justify-center">
+                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center h-[350px] sm:h-[300px]">
+                         <div className="relative group">
                            <img
                              src={previewImage}
                              alt="Banner Design Preview"
-                             className="max-w-full max-h-full object-contain rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                             className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                            />
-                          
-                                                     {/* Full Canvas Watermark - Bottom Layer */}
-                           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                           
+                           {/* Full Canvas Watermark - Bottom Layer */}
+                           <div className="absolute inset-0 pointer-events-none">
                              <img
                                src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
                                alt="BuyPrintz Watermark"
-                               className="max-w-full max-h-full object-contain opacity-40"
+                               className="w-full h-full object-cover opacity-40"
                                style={{
+                                 position: 'absolute',
+                                 top: 0,
+                                 left: 0,
                                  zIndex: 1
                                }}
                              />
