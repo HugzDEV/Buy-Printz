@@ -238,7 +238,7 @@ const PrintPreviewModal = ({
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
                                                                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center h-[350px] sm:h-[300px]">
-                         <div className="relative group">
+                         <div className="relative group" style={{ width: '100%', height: '100%', minHeight: '200px' }}>
                            {!imageLoaded && !imageError && (
                              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
                                <div className="text-center space-y-2">
@@ -280,8 +280,11 @@ const PrintPreviewModal = ({
                                position: 'absolute',
                                top: 0,
                                left: 0,
+                               width: '100%',
+                               height: '100%',
                                zIndex: 2,
-                               backgroundColor: 'rgba(255, 0, 0, 0.1)'
+                               backgroundColor: 'rgba(255, 0, 0, 0.3)',
+                               border: '2px solid red'
                              }}
                              onLoad={() => {
                                const log = 'Image loaded successfully!'
@@ -303,6 +306,10 @@ const PrintPreviewModal = ({
                            {/* Debug: Show image dimensions */}
                            <div className="absolute top-12 right-2 bg-red-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
                              Canvas: {dimensions.width}×{dimensions.height}
+                           </div>
+                           {/* Debug: Show image element status */}
+                           <div className="absolute top-20 right-2 bg-green-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
+                             {imageLoaded ? 'IMG LOADED' : 'IMG LOADING'}
                            </div>
                           
                           {/* Preview Badge */}
