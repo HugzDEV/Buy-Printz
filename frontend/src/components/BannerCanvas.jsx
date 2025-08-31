@@ -252,6 +252,16 @@ const BannerCanvas = ({
       width: 0,
       height: 0
     })
+    
+    // Auto-clear selection mode after 5 seconds to prevent getting stuck
+    setTimeout(() => {
+      if (isSelecting) {
+        console.log('Auto-clearing selection mode due to timeout')
+        setIsSelecting(false)
+        setSelectionRect(null)
+        setSelectionStart(null)
+      }
+    }, 5000)
   }
 
   const updateSelection = (pos) => {
@@ -649,9 +659,11 @@ const BannerCanvas = ({
       onTouchStart: (e) => {
         // Handle touch start for mobile
         console.log('Element touch start:', element.id, element.type)
-        if (!isSelecting) {
-          handleSelect(element.id)
+        // Clear any existing selection mode
+        if (isSelecting) {
+          finishSelection()
         }
+        handleSelect(element.id)
       },
       onDragEnd: (e) => handleDragEnd(e, element.id),
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
@@ -699,9 +711,11 @@ const BannerCanvas = ({
             onTouchStart={(e) => {
               // Handle touch start for mobile
               console.log('Text element touch start:', element.id)
-              if (!isSelecting) {
-                handleSelect(element.id)
+              // Clear any existing selection mode
+              if (isSelecting) {
+                finishSelection()
               }
+              handleSelect(element.id)
             }}
             onDragEnd={(e) => handleDragEnd(e, element.id)}
             onTransformEnd={(e) => handleTransformEnd(e, element.id)}
@@ -1048,11 +1062,6 @@ const BannerCanvas = ({
                 }
               }}
               onTouchMove={(e) => {
-                // Only prevent default on stage background
-                if (e.target === e.target.getStage()) {
-                  e.evt.preventDefault()
-                }
-                
                 const stage = e.target.getStage()
                 const pos = stage.getPointerPosition()
                 
@@ -1064,11 +1073,7 @@ const BannerCanvas = ({
                 }
               }}
               onTouchEnd={(e) => {
-                // Only prevent default on stage background
-                if (e.target === e.target.getStage()) {
-                  e.evt.preventDefault()
-                }
-                
+                console.log('Stage touch end')
                 if (isSelecting) {
                   finishSelection()
                 }
@@ -1089,10 +1094,6 @@ const BannerCanvas = ({
                 console.log('Clicked on empty:', clickedOnEmpty, 'target fill:', e.target.attrs.fill)
                 
                 if (clickedOnEmpty) {
-                  // Prevent event from bubbling to elements
-                  e.evt.preventDefault()
-                  e.evt.stopPropagation()
-                  
                   // Clear selections when clicking on empty canvas
                   setSelectedId(null)
                   setSelectedIds([])
@@ -1157,10 +1158,6 @@ const BannerCanvas = ({
                   onMouseDown={(e) => {
                     console.log('Background rect clicked')
                     
-                    // Prevent event from bubbling to elements
-                    e.evt.preventDefault()
-                    e.evt.stopPropagation()
-                    
                     // Clear selections when clicking on background
                     setSelectedId(null)
                     setSelectedIds([])
@@ -1178,10 +1175,6 @@ const BannerCanvas = ({
                   }}
                   onTouchStart={(e) => {
                     console.log('Background rect touched')
-                    
-                    // Prevent event from bubbling to elements
-                    e.evt.preventDefault()
-                    e.evt.stopPropagation()
                     
                     // Clear selections when touching background
                     setSelectedId(null)
