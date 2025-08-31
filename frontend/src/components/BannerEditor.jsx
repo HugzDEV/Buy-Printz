@@ -1441,8 +1441,8 @@ const BannerEditorNew = () => {
         },
         product_type: 'banner',
         dimensions: {
-          width: canvasSize.width,
-          height: canvasSize.height,
+          width: 2, // Default 2ft width
+          height: 4, // Default 4ft height
           orientation: canvasOrientation
         },
         banner_type: bannerSpecs?.id || 'vinyl-13oz',
@@ -1545,11 +1545,11 @@ const BannerEditorNew = () => {
       // Order metadata (required by backend)
       product_type: 'banner',
       quantity: 1,
-      dimensions: {
-        width: canvasSize.width,
-        height: canvasSize.height,
-        orientation: canvasOrientation
-      },
+              dimensions: {
+          width: 2, // Default 2ft width
+          height: 4, // Default 4ft height
+          orientation: canvasOrientation
+        },
       banner_type: bannerSpecs?.id || 'vinyl-13oz',
       banner_material: bannerSpecs?.material || '13oz Vinyl',
       banner_finish: bannerSpecs?.finish || 'Matte',

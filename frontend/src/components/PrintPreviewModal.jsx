@@ -31,6 +31,37 @@ const PrintPreviewModal = ({
   const [previewUrl, setPreviewUrl] = useState(null)
   const [previewImage, setPreviewImage] = useState(null)
   const [qualityAnalysis, setQualityAnalysis] = useState(null)
+  
+  // Function to get correct banner dimensions
+  const getBannerDimensions = () => {
+    console.log('getBannerDimensions called with:', { dimensions, orderDetails })
+    let width, height
+    
+    if (dimensions && dimensions.width && dimensions.height) {
+      width = parseFloat(dimensions.width)
+      height = parseFloat(dimensions.height)
+    } else if (orderDetails.banner_size) {
+      const sizeMatch = orderDetails.banner_size.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/)
+      if (sizeMatch) {
+        width = parseFloat(sizeMatch[1])
+        height = parseFloat(sizeMatch[2])
+      } else {
+        width = 2
+        height = 4
+      }
+    } else {
+      width = 2
+      height = 4
+    }
+    
+    // Cap dimensions to reasonable production limits
+    const maxFeet = 50
+    if (width > maxFeet) width = maxFeet
+    if (height > maxFeet) height = maxFeet
+    
+    console.log('getBannerDimensions returning:', { width, height })
+    return { width, height }
+  }
 
   // Generate PDF when modal opens
   useEffect(() => {
@@ -76,13 +107,13 @@ const PrintPreviewModal = ({
     try {
       console.log('Creating PDF from image data URL:', imageDataURL.substring(0, 50) + '...')
       
-      // Get actual banner dimensions from orderDetails
-      const printWidthFeet = parseFloat(orderDetails.banner_size?.split('x')[0]) || parseFloat(dimensions.width) || 2
-      const printHeightFeet = parseFloat(orderDetails.banner_size?.split('x')[1]?.split('ft')[0]?.trim()) || parseFloat(dimensions.height) || 4
+      // Get actual banner dimensions using the same logic as UI
+      const { width: printWidthFeet, height: printHeightFeet } = getBannerDimensions()
+      
       const pdfWidthInches = printWidthFeet * 12
       const pdfHeightInches = printHeightFeet * 12
 
-      console.log(`Actual banner dimensions: ${printWidthFeet}ft x ${printHeightFeet}ft`)
+      console.log(`Final banner dimensions: ${printWidthFeet}ft x ${printHeightFeet}ft`)
       console.log(`PDF dimensions: ${pdfWidthInches}" x ${pdfHeightInches}"`)
 
       // Cap PDF dimensions while maintaining aspect ratio
@@ -246,7 +277,7 @@ const PrintPreviewModal = ({
                           
                           <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
                             <Badge variant="secondary" className="bg-blue-100 text-blue-800 font-medium px-3 py-1">
-                              {dimensions.width}ft × {dimensions.height}ft
+                              {getBannerDimensions().width}ft × {getBannerDimensions().height}ft
                             </Badge>
                           </div>
                         </div>
@@ -329,7 +360,7 @@ const PrintPreviewModal = ({
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <span className="text-sm font-medium text-gray-600">Dimensions</span>
                         <Badge variant="outline" className="bg-white">
-                          {dimensions.width}ft × {dimensions.height}ft
+                          {getBannerDimensions().width}ft × {getBannerDimensions().height}ft
                         </Badge>
                       </div>
                       
