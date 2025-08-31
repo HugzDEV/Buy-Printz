@@ -95,7 +95,7 @@ const PrintPreviewModal = ({
     console.log('Banner size from orderDetails:', orderDetails.banner_size)
     console.log('Dimensions from props:', dimensions)
     
-    // Parse banner size correctly - handle formats like "8x4ft", "8 x 4 ft", "8ft x 4ft"
+    // Parse banner size correctly - handle formats like "2.7x1.3ft", "8x4ft", "8 x 4 ft", "8ft x 4ft"
     let printWidthFeet, printHeightFeet
     
     if (orderDetails.banner_size) {
@@ -104,13 +104,20 @@ const PrintPreviewModal = ({
       if (match) {
         printWidthFeet = parseFloat(match[1])
         printHeightFeet = parseFloat(match[2])
+        console.log('Parsed dimensions from banner_size:', printWidthFeet, 'x', printHeightFeet)
       } else {
-        printWidthFeet = parseFloat(dimensions.width) || 8
-        printHeightFeet = parseFloat(dimensions.height) || 4
+        // Fallback: convert pixel dimensions to feet (300 pixels per foot)
+        const pixelsToFeet = (pixels) => Math.round((pixels / 300) * 10) / 10
+        printWidthFeet = pixelsToFeet(dimensions.width) || 2.7
+        printHeightFeet = pixelsToFeet(dimensions.height) || 1.3
+        console.log('Converted pixel dimensions to feet:', printWidthFeet, 'x', printHeightFeet)
       }
     } else {
-      printWidthFeet = parseFloat(dimensions.width) || 8
-      printHeightFeet = parseFloat(dimensions.height) || 4
+      // Fallback: convert pixel dimensions to feet (300 pixels per foot)
+      const pixelsToFeet = (pixels) => Math.round((pixels / 300) * 10) / 10
+      printWidthFeet = pixelsToFeet(dimensions.width) || 2.7
+      printHeightFeet = pixelsToFeet(dimensions.height) || 1.3
+      console.log('No banner_size, converted pixel dimensions to feet:', printWidthFeet, 'x', printHeightFeet)
     }
     
     return { printWidthFeet, printHeightFeet }

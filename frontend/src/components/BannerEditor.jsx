@@ -1477,6 +1477,11 @@ const BannerEditorNew = () => {
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs, canvasOrientation])
 
+  // Convert pixel dimensions to feet (approximately 300 pixels per foot)
+  const pixelsToFeet = (pixels) => {
+    return Math.round((pixels / 300) * 10) / 10 // Round to 1 decimal place
+  }
+
   // Create order
   const createOrder = useCallback(() => {
     // Generate canvas image data for preview
@@ -1569,7 +1574,7 @@ const BannerEditorNew = () => {
       banner_type: bannerSpecs?.id || 'vinyl-13oz',
       banner_material: bannerSpecs?.material || '13oz Vinyl',
       banner_finish: bannerSpecs?.finish || 'Matte',
-      banner_size: `${canvasSize.width}x${canvasSize.height}ft`,
+      banner_size: `${pixelsToFeet(canvasSize.width)}x${pixelsToFeet(canvasSize.height)}ft`,
       banner_category: bannerSpecs?.category || 'Vinyl Banners',
       background_color: backgroundColor,
       print_options: {} // Will be populated by checkout component
