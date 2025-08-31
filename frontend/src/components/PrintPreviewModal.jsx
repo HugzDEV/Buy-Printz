@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -31,22 +31,14 @@ const PrintPreviewModal = ({
   const [previewUrl, setPreviewUrl] = useState(null)
   const [previewImage, setPreviewImage] = useState(null)
   const [qualityAnalysis, setQualityAnalysis] = useState(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
-  // Generate PDF when modal opens
-  useEffect(() => {
-    if (isOpen && (canvasData || orderDetails?.canvas_image)) {
-      generatePDF()
-    }
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-    }
-  }, [isOpen, canvasData, orderDetails])
-
-  const generatePDF = async () => {
+  const generatePDF = useCallback(async () => {
     try {
       setIsGenerating(true)
+      setImageError(false)
+      setImageLoaded(false)
       
       // Check if we have a perfect canvas image from the editor
       if (orderDetails?.canvas_image) {
@@ -63,13 +55,27 @@ const PrintPreviewModal = ({
       // No canvas image available - this shouldn't happen with the new system
       console.warn('No canvas image available for preview!')
       setPreviewImage(null)
+      setImageError(true)
       return
     } catch (error) {
       console.error('Error generating PDF:', error)
+      setImageError(true)
     } finally {
       setIsGenerating(false)
     }
-  }
+  }, [orderDetails?.canvas_image])
+
+  // Generate PDF when modal opens
+  useEffect(() => {
+    if (isOpen && (canvasData || orderDetails?.canvas_image)) {
+      generatePDF()
+    }
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [isOpen, canvasData, orderDetails?.canvas_image, generatePDF])
 
   // Create PDF directly from canvas image (perfect method)
   const createPDFFromImage = async (imageDataURL) => {
@@ -214,10 +220,28 @@ const PrintPreviewModal = ({
                                              {/* Main Banner Preview */}
                                                                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center h-[350px] sm:h-[300px]">
                          <div className="relative group">
+                           {!imageLoaded && !imageError && (
+                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+                               <div className="text-center space-y-2">
+                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                                 <p className="text-sm text-gray-600">Loading preview...</p>
+                               </div>
+                             </div>
+                           )}
+                           {imageError && (
+                             <div className="absolute inset-0 flex items-center justify-center bg-red-50 rounded-lg border-2 border-red-200">
+                               <div className="text-center space-y-2">
+                                 <AlertTriangle className="h-8 w-8 text-red-500 mx-auto" />
+                                 <p className="text-sm text-red-600">Failed to load preview</p>
+                               </div>
+                             </div>
+                           )}
                            <img
                              src={previewImage}
                              alt="Banner Design Preview"
                              className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                             onLoad={() => setImageLoaded(true)}
+                             onError={() => setImageError(true)}
                            />
                            
                            {/* Full Canvas Watermark - Bottom Layer */}
