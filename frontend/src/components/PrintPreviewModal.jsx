@@ -69,7 +69,13 @@ const PrintPreviewModal = ({
           
           // Convert base64 to blob
           const base64Data = orderDetails.canvas_image.split(',')[1]
+          console.log('Base64 data length:', base64Data.length)
+          setDebugLogs(prev => [...prev, `Base64 data length: ${base64Data.length}`])
+          
           const byteCharacters = atob(base64Data)
+          console.log('Byte characters length:', byteCharacters.length)
+          setDebugLogs(prev => [...prev, `Byte characters length: ${byteCharacters.length}`])
+          
           const byteNumbers = new Array(byteCharacters.length)
           for (let i = 0; i < byteCharacters.length; i++) {
             byteNumbers[i] = byteCharacters.charCodeAt(i)
@@ -77,12 +83,28 @@ const PrintPreviewModal = ({
           const byteArray = new Uint8Array(byteNumbers)
           const blob = new Blob([byteArray], { type: 'image/png' })
           
+          console.log('Blob size:', blob.size)
+          setDebugLogs(prev => [...prev, `Blob size: ${blob.size} bytes`])
+          
           // Create blob URL
           const blobUrl = URL.createObjectURL(blob)
           console.log('Created blob URL:', blobUrl)
           setDebugLogs(prev => [...prev, `Created blob URL: ${blobUrl}`])
           
-          setPreviewImage(blobUrl)
+          // Test if blob URL is valid by creating a test image
+          const testImg = new Image()
+          testImg.onload = () => {
+            console.log('Test image loaded successfully, dimensions:', testImg.width, 'x', testImg.height)
+            setDebugLogs(prev => [...prev, `Test image loaded: ${testImg.width}x${testImg.height}`])
+            setPreviewImage(blobUrl)
+          }
+          testImg.onerror = (error) => {
+            console.error('Test image failed to load:', error)
+            setDebugLogs(prev => [...prev, `Test image failed: ${error.type}`])
+            // Fallback to original base64
+            setPreviewImage(orderDetails.canvas_image)
+          }
+          testImg.src = blobUrl
         } catch (error) {
           console.error('Error converting base64 to blob:', error)
           setDebugLogs(prev => [...prev, `Error converting base64: ${error.message}`])
