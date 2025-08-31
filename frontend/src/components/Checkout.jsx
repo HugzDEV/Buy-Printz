@@ -69,6 +69,7 @@ const Checkout = () => {
   const [expandedSections, setExpandedSections] = useState({
     orderSummary: true,
     bannerOptions: false,
+    preview: false,
     customerInfo: false
   })
 
@@ -705,6 +706,60 @@ const Checkout = () => {
             )}
           </div>
 
+          {/* Design Preview */}
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
+            <button
+              onClick={() => toggleSection('preview')}
+              className="w-full text-left mb-6 flex items-center justify-between hover:bg-white/10 rounded-lg p-2 transition-colors"
+            >
+              <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                Design Preview & Approval
+              </h2>
+              <ChevronRight 
+                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
+                  expandedSections.preview ? 'rotate-90' : ''
+                }`} 
+              />
+            </button>
+            
+            {expandedSections.preview && (
+              <div className="space-y-4">
+                {checkoutStep === 'preview' && (
+                  <div className="backdrop-blur-sm bg-blue-400/20 rounded-xl p-4 border border-blue-200/30">
+                    <h3 className="flex items-center gap-2 text-lg font-medium text-blue-800 mb-2">
+                      <Eye className="w-5 h-5" />
+                      Final Design Approval Required
+                    </h3>
+                    <p className="text-blue-700 text-sm mb-4">
+                      Please review your banner design before payment. This shows exactly how your banner will look when printed by Buy Printz.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleShowPreview}
+                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Review Final Design
+                    </button>
+                  </div>
+                )}
+
+                {checkoutStep === 'ready' && approvedPDF && (
+                  <div className="backdrop-blur-sm bg-green-400/20 rounded-xl p-4 border border-green-200/30">
+                    <div className="flex items-center gap-2 text-green-800 mb-2">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="font-medium">Design Approved</span>
+                    </div>
+                    <p className="text-green-700 text-sm">
+                      Your print design has been verified and approved. Ready for payment!
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Checkout Form */}
           <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl max-h-[calc(100vh-250px)] overflow-y-auto">
             <button
@@ -825,28 +880,7 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Preview Step */}
-              {checkoutStep === 'preview' && (
-                <div className="mt-6 space-y-4">
-                  <div className="backdrop-blur-sm bg-blue-400/20 rounded-xl p-4 border border-blue-200/30">
-                    <h3 className="flex items-center gap-2 text-lg font-medium text-blue-800 mb-2">
-                      <Eye className="w-5 h-5" />
-                      Final Design Approval Required
-                    </h3>
-                    <p className="text-blue-700 text-sm mb-4">
-                      Please review your banner design before payment. This shows exactly how your banner will look when printed by Buy Printz.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleShowPreview}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Review Final Design
-                    </button>
-                  </div>
-                </div>
-              )}
+
 
               {/* Payment Section */}
               {checkoutStep === 'ready' && (
@@ -877,17 +911,7 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  {approvedPDF && (
-                    <div className="mt-4 backdrop-blur-sm bg-green-400/20 rounded-xl p-4 border border-green-200/30">
-                      <div className="flex items-center gap-2 text-green-800 mb-2">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="font-medium">Design Approved</span>
-                      </div>
-                      <p className="text-green-700 text-sm">
-                        Your print design has been verified and approved. Ready for payment!
-                      </p>
-                    </div>
-                  )}
+
 
                   <button
                     type="submit"

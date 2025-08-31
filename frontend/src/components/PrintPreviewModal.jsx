@@ -217,7 +217,7 @@ const PrintPreviewModal = ({
                           <img
                             src={previewImage}
                             alt="Banner Design Preview"
-                            className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                            className="w-full h-full object-contain rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                           />
                           
                           {/* Full Canvas Watermark - Bottom Layer */}
