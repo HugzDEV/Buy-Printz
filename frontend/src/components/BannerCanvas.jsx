@@ -648,7 +648,7 @@ const BannerCanvas = ({
       },
       onTouchStart: (e) => {
         // Handle touch start for mobile
-        e.evt.preventDefault()
+        console.log('Element touch start:', element.id, element.type)
         if (!isSelecting) {
           handleSelect(element.id)
         }
@@ -698,7 +698,7 @@ const BannerCanvas = ({
             }}
             onTouchStart={(e) => {
               // Handle touch start for mobile
-              e.evt.preventDefault()
+              console.log('Text element touch start:', element.id)
               if (!isSelecting) {
                 handleSelect(element.id)
               }
@@ -1028,7 +1028,9 @@ const BannerCanvas = ({
               width: canvasSize.width * scale,
               height: canvasSize.height * scale,
               maxWidth: '100%',
-              maxHeight: '100%'
+              maxHeight: '100%',
+              touchAction: 'none', // Prevent browser touch gestures
+              userSelect: 'none' // Prevent text selection
             }}
           >
             <Stage
@@ -1039,12 +1041,18 @@ const BannerCanvas = ({
               draggable={true}
               // Enhanced touch handling for mobile
               onTouchStart={(e) => {
-                // Prevent default touch behavior to avoid zooming
-                e.evt.preventDefault()
+                console.log('Stage touch start:', e.target === e.target.getStage() ? 'background' : 'element')
+                // Only prevent default on stage background to avoid zooming
+                if (e.target === e.target.getStage()) {
+                  e.evt.preventDefault()
+                }
               }}
               onTouchMove={(e) => {
-                // Handle touch move for mobile dragging
-                e.evt.preventDefault()
+                // Only prevent default on stage background
+                if (e.target === e.target.getStage()) {
+                  e.evt.preventDefault()
+                }
+                
                 const stage = e.target.getStage()
                 const pos = stage.getPointerPosition()
                 
@@ -1056,8 +1064,11 @@ const BannerCanvas = ({
                 }
               }}
               onTouchEnd={(e) => {
-                // Handle touch end for mobile
-                e.evt.preventDefault()
+                // Only prevent default on stage background
+                if (e.target === e.target.getStage()) {
+                  e.evt.preventDefault()
+                }
+                
                 if (isSelecting) {
                   finishSelection()
                 }
