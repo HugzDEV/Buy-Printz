@@ -192,8 +192,8 @@ const BannerEditorNew = () => {
       type: shapeType,
       x: canvasSize.width / 2 - 50,
       y: canvasSize.height / 2 - 50,
-      fill: '#3B82F6',
-      stroke: '#1E40AF',
+      fill: '#6B7280', // Neutral gray instead of blue
+      stroke: '#374151', // Darker gray for stroke
       strokeWidth: 2,
       rotation: 0
     }
@@ -415,7 +415,7 @@ const BannerEditorNew = () => {
           text: symbol,
           fontSize: 100,
           fontFamily: 'Arial',
-          fill: '#3B82F6',
+          fill: '#6B7280', // Neutral gray instead of blue
           align: 'center',
           verticalAlign: 'middle'
         }
@@ -433,7 +433,7 @@ const BannerEditorNew = () => {
         text: symbol,
         fontSize: 100,
         fontFamily: 'Arial',
-        fill: '#3B82F6',
+        fill: '#6B7280', // Neutral gray instead of blue
         align: 'center',
         verticalAlign: 'middle'
       }
@@ -449,7 +449,17 @@ const BannerEditorNew = () => {
     if (!selectedId) return
     
     setElements(prev => prev.map(el => {
-      if (el.id === selectedId && (el.type === 'rect' || el.type === 'circle' || el.type === 'star' || el.type === 'triangle' || el.type === 'hexagon' || el.type === 'line')) {
+      if (el.id === selectedId && (
+        el.type === 'rect' || 
+        el.type === 'circle' || 
+        el.type === 'star' || 
+        el.type === 'triangle' || 
+        el.type === 'hexagon' || 
+        el.type === 'octagon' ||
+        el.type === 'line' ||
+        // Include all shape types that can have color properties
+        ['heart', 'diamond', 'arrow', 'arrow-right', 'arrow-left', 'arrow-up', 'arrow-down', 'double-arrow', 'cross', 'crown', 'badge', 'certificate', 'document', 'checkmark', 'target'].includes(el.type)
+      )) {
         if (typeof value === 'function') {
           return { ...el, [property]: value(el[property]) }
         }
@@ -1701,9 +1711,9 @@ const BannerEditorNew = () => {
         {/* Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          className="sm:hidden p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
+          className="sm:hidden p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center"
         >
-          {isMobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
 
         {/* Right Section */}
@@ -1734,50 +1744,66 @@ const BannerEditorNew = () => {
       {/* Header */}
       <GlassHeader />
       
-      {/* Main Content */}
+      {/* Main Content - Mobile Optimized */}
       <div className="flex flex-1 overflow-hidden relative">
         
-        {/* Sidebar */}
-        <BannerSidebar
-          isMobileOpen={isMobileSidebarOpen}
-          bannerSpecs={bannerSpecs}
-          bannerTypes={bannerTypes}
-          bannerSizes={bannerSizes}
-          canvasSize={canvasSize}
-          canvasOrientation={canvasOrientation}
-          onAddText={addText}
-          onAddShape={addShape}
-          onAddAsset={addAsset}
-          onAddIcon={addIcon}
-          onLoadTemplate={loadTemplate}
-          onImageUpload={handleImageUpload}
-          onTextPropertyChange={handleTextPropertyChange}
-          onShapePropertyChange={handleShapePropertyChange}
-          onChangeBannerType={changeBannerType}
-          onChangeCanvasSize={changeCanvasSize}
-          onToggleCanvasOrientation={toggleCanvasOrientation}
-          bannerTemplates={bannerTemplates}
-          userTemplates={[]}
-          selectedElement={elements.find(el => el.id === selectedId)}
-        />
+        {/* Sidebar - Mobile with proper z-index */}
+        <div className={`
+          ${isMobileSidebarOpen ? 'fixed inset-0 z-50' : 'hidden sm:block'}
+          sm:relative sm:inset-auto sm:z-auto
+        `}>
+          <BannerSidebar
+            isMobileOpen={isMobileSidebarOpen}
+            bannerSpecs={bannerSpecs}
+            bannerTypes={bannerTypes}
+            bannerSizes={bannerSizes}
+            canvasSize={canvasSize}
+            canvasOrientation={canvasOrientation}
+            onAddText={addText}
+            onAddShape={addShape}
+            onAddAsset={addAsset}
+            onAddIcon={addIcon}
+            onLoadTemplate={loadTemplate}
+            onImageUpload={handleImageUpload}
+            onTextPropertyChange={handleTextPropertyChange}
+            onShapePropertyChange={handleShapePropertyChange}
+            onChangeBannerType={changeBannerType}
+            onChangeCanvasSize={changeCanvasSize}
+            onToggleCanvasOrientation={toggleCanvasOrientation}
+            bannerTemplates={bannerTemplates}
+            userTemplates={[]}
+            selectedElement={elements.find(el => el.id === selectedId)}
+          />
+        </div>
         
-        {/* Canvas */}
-        <BannerCanvas
-          elements={elements}
-          setElements={setElements}
-          selectedId={selectedId}
-          setSelectedId={setSelectedId}
-          canvasSize={canvasSize}
-          backgroundColor={backgroundColor}
-          onExport={exportToPDF}
-          onSave={saveDesign}
-          onCreateOrder={createOrder}
-        />
+        {/* Canvas - Mobile with proper z-index */}
+        <div className={`
+          flex-1 relative
+          ${isMobileSidebarOpen ? 'hidden sm:block' : 'block'}
+          z-10 sm:z-auto
+        `}>
+          <BannerCanvas
+            elements={elements}
+            setElements={setElements}
+            selectedId={selectedId}
+            setSelectedId={setSelectedId}
+            canvasSize={canvasSize}
+            backgroundColor={backgroundColor}
+            onExport={exportToPDF}
+            onSave={saveDesign}
+            onCreateOrder={createOrder}
+          />
+          
+          {/* Mobile Overlay when sidebar is open */}
+          {isMobileSidebarOpen && (
+            <div className="sm:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
+          )}
+        </div>
         
       </div>
 
       {/* Mobile Bottom Actions */}
-      <div className="sm:hidden border-t border-white/20 p-4 bg-white/10 backdrop-blur-sm">
+      <div className="sm:hidden border-t border-white/20 p-4 bg-white/10 backdrop-blur-sm z-40 relative">
         <div className="flex gap-3">
           <button
             onClick={saveDesign}
@@ -1788,13 +1814,23 @@ const BannerEditorNew = () => {
           
           <button
             onClick={createOrder}
-            className="flex-1 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium text-center flex items-center justify-center gap-2"
           >
             <ShoppingCart className="w-4 h-4" />
             Order
           </button>
         </div>
       </div>
+      
+      {/* Floating Mobile Menu Button - Always visible when sidebar closed */}
+      {!isMobileSidebarOpen && (
+        <button
+          onClick={() => setIsMobileSidebarOpen(true)}
+          className="sm:hidden fixed top-20 left-4 z-50 p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center shadow-lg"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      )}
       
     </div>
   )

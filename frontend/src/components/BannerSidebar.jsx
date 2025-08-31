@@ -474,8 +474,6 @@ const BannerSidebar = ({
 
   return (
     <div className={`
-      ${isMobileOpen ? 'fixed inset-0 z-50' : 'hidden sm:block'}
-      sm:relative sm:inset-auto sm:z-auto
       w-full sm:w-80 lg:w-96 
       h-full 
       backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
@@ -976,6 +974,8 @@ const BannerSidebar = ({
                   </div>
                 </div>
               )}
+
+
             </div>
           )}
         </GlassCard>

@@ -37,6 +37,9 @@ const BannerCanvas = ({
   const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
   
+  // Get the currently selected element
+  const selectedElement = elements.find(el => el.id === selectedId)
+  
   // Auto-adjust scale when canvas size changes - DISABLED for user control
   // useEffect(() => {
   //   const containerWidth = 800 // Approximate container width
@@ -58,15 +61,15 @@ const BannerCanvas = ({
       
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
-        const viewportWidth = window.innerWidth - 24 // Account for padding
-        const viewportHeight = window.innerHeight - 280 // Account for header, toolbar, bottom actions, and safe area
+        const viewportWidth = window.innerWidth - 48 // Account for padding and floating menu
+        const viewportHeight = window.innerHeight - 320 // Account for header, toolbar, bottom actions, and safe area
         
-        const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
-        const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
+        const scaleX = (viewportWidth * 0.85) / canvasSize.width // Use 85% of available width
+        const scaleY = (viewportHeight * 0.85) / canvasSize.height // Use 85% of available height
         
         // Use the smaller scale to ensure canvas fits completely
         const newScale = Math.min(scaleX, scaleY, 1)
-        setScale(Math.max(0.15, newScale)) // Minimum scale of 0.15 for mobile
+        setScale(Math.max(0.12, newScale)) // Minimum scale of 0.12 for mobile
       } else if (isTablet) {
         // Tablet scaling - slightly more generous
         const viewportWidth = window.innerWidth - 48
@@ -1013,8 +1016,8 @@ const BannerCanvas = ({
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden pb-16 sm:pb-20">
-        <GlassPanel className="relative max-w-full max-h-full">
+      <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden pb-20 sm:pb-20 relative">
+        <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
 
@@ -1604,6 +1607,83 @@ const BannerCanvas = ({
           {selectedIds.length > 0 && (
             <div className="text-xs sm:text-sm text-gray-600 font-medium">
               {selectedIds.length} elements selected
+            </div>
+          )}
+          
+          {/* Shape Properties - Only show for shapes and icons */}
+          {selectedId && (
+            (selectedElement?.type === 'rect' || 
+             selectedElement?.type === 'circle' || 
+             selectedElement?.type === 'star' || 
+             selectedElement?.type === 'triangle' || 
+             selectedElement?.type === 'hexagon' || 
+             selectedElement?.type === 'octagon' ||
+             selectedElement?.type === 'line' ||
+             ['heart', 'diamond', 'arrow', 'arrow-right', 'arrow-left', 'arrow-up', 'arrow-down', 'double-arrow', 'cross', 'crown', 'badge', 'certificate', 'document', 'checkmark', 'target'].includes(selectedElement?.type)
+            )
+          ) && (
+            <div className="flex items-center gap-3 p-2 bg-white/20 rounded-lg border border-white/30">
+              {/* Fill Color */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700">Fill:</span>
+                <div className="flex gap-1">
+                  {['#6B7280', '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080', '#008000'].map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => handleElementChange(selectedId, { fill: color })}
+                      className={`w-6 h-6 rounded border-2 transition-colors ${
+                        (selectedElement?.fill || '#6B7280') === color 
+                          ? 'border-blue-500 border-4' 
+                          : 'border-white/30 hover:border-white/50'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Stroke Color */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700">Stroke:</span>
+                <div className="flex gap-1">
+                  {['#374151', '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080', '#008000'].map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => handleElementChange(selectedId, { stroke: color })}
+                      className={`w-6 h-6 rounded border-2 transition-colors ${
+                        (selectedElement?.stroke || '#374151') === color 
+                          ? 'border-blue-500 border-4' 
+                          : 'border-white/30 hover:border-white/50'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Stroke Width */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700">Width:</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleElementChange(selectedId, { strokeWidth: Math.max(0, (selectedElement?.strokeWidth || 2) - 1) })}
+                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                  >
+                    -
+                  </button>
+                  <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] text-center">
+                    {selectedElement?.strokeWidth || 2}
+                  </span>
+                  <button
+                    onClick={() => handleElementChange(selectedId, { strokeWidth: (selectedElement?.strokeWidth || 2) + 1 })}
+                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
             </div>
           )}
           
