@@ -665,7 +665,13 @@ const BannerCanvas = ({
         }
         handleSelect(element.id)
       },
-      onDragEnd: (e) => handleDragEnd(e, element.id),
+      onDragStart: (e) => {
+        console.log('Element drag start:', element.id, element.type)
+      },
+      onDragEnd: (e) => {
+        console.log('Element drag end:', element.id, element.type)
+        handleDragEnd(e, element.id)
+      },
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
     }
 
@@ -717,7 +723,13 @@ const BannerCanvas = ({
               }
               handleSelect(element.id)
             }}
-            onDragEnd={(e) => handleDragEnd(e, element.id)}
+            onDragStart={(e) => {
+              console.log('Text element drag start:', element.id)
+            }}
+            onDragEnd={(e) => {
+              console.log('Text element drag end:', element.id)
+              handleDragEnd(e, element.id)
+            }}
             onTransformEnd={(e) => handleTransformEnd(e, element.id)}
             onDblClick={(e) => {
               e.evt.preventDefault()
@@ -1082,18 +1094,10 @@ const BannerCanvas = ({
                 const stage = e.target.getStage()
                 console.log('Stage mouse down on:', e.target, 'target === stage:', e.target === stage)
                 
-                // Check if clicking on stage background, grid, or safe zone
-                const isElement = elements.some(el => el.id === e.target.attrs.id)
-                const clickedOnEmpty = !isElement && (
-                  e.target === stage || 
-                  e.target.attrs.fill === backgroundColor ||
-                  e.target.attrs.fill === 'rgba(0,0,0,0.1)' ||
-                  e.target.attrs.stroke === '#dc2626' // Safe zone border
-                )
-                
-                console.log('Clicked on empty:', clickedOnEmpty, 'target fill:', e.target.attrs.fill)
-                
-                if (clickedOnEmpty) {
+                // Only handle if clicking directly on the stage background (not on elements)
+                if (e.target === stage) {
+                  console.log('Clicked on stage background - starting selection')
+                  
                   // Clear selections when clicking on empty canvas
                   setSelectedId(null)
                   setSelectedIds([])
@@ -1108,6 +1112,7 @@ const BannerCanvas = ({
                     })
                   }
                 }
+                // Don't interfere with element dragging - let elements handle their own events
               }}
               onMouseMove={(e) => {
                 if (isSelecting) {
