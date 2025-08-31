@@ -177,7 +177,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-             <DialogContent className="max-w-[95vw] sm:max-w-6xl max-h-[95vh] sm:max-h-[90vh] h-auto overflow-hidden flex flex-col">
+             <DialogContent className="max-w-[98vw] sm:max-w-6xl max-h-[98vh] sm:max-h-[90vh] h-auto overflow-hidden flex flex-col">
                  <DialogHeader className="flex-shrink-0 pb-2 sm:pb-4 border-b">
                      <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
              <Printer className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
@@ -189,9 +189,9 @@ const PrintPreviewModal = ({
         </DialogHeader>
 
                  <div className="flex-1 overflow-y-auto min-h-0 pb-4">
-           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-2 sm:p-4 max-h-full">
+           <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 sm:gap-4 p-2 sm:p-4 max-h-full">
             {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
-                         <div className="xl:col-span-2 space-y-4 sm:space-y-6 overflow-y-auto max-h-full">
+                         <div className="xl:col-span-2 space-y-3 sm:space-y-6 overflow-y-auto max-h-full">
               {/* Banner Preview Card */}
               <Card className="shadow-lg">
                 <CardHeader className="pb-4">
@@ -200,7 +200,7 @@ const PrintPreviewModal = ({
                     Your Banner Design
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                                 <CardContent className="space-y-3 sm:space-y-4">
                   {isGenerating ? (
                     <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
                       <div className="text-center space-y-3">
@@ -210,14 +210,14 @@ const PrintPreviewModal = ({
                       </div>
                     </div>
                   ) : previewImage ? (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center min-h-[200px] sm:min-h-[250px]">
+                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center min-h-[300px] sm:min-h-[250px]">
                         <div className="relative group">
                           <img
                             src={previewImage}
                             alt="Banner Design Preview"
-                            className="max-w-full max-h-[200px] sm:max-h-[300px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                            className="max-w-full max-h-[280px] sm:max-h-[300px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                             style={{
                               maxWidth: '100%',
                               height: 'auto',
@@ -254,7 +254,7 @@ const PrintPreviewModal = ({
                       </div>
 
                                              {/* Action Buttons */}
-                       <div className="flex justify-center pt-4 sm:pt-6">
+                       <div className="flex justify-center pt-3 sm:pt-6">
                         {previewUrl ? (
                           <Button
                             onClick={() => {
