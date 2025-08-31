@@ -305,22 +305,22 @@ const PrintPreviewModal = ({
                            <img
                              src={previewImage}
                              alt="Banner Design Preview"
-                             className="w-full h-full object-cover rounded-lg shadow-xl"
+                             className="w-full h-full object-contain rounded-lg shadow-xl"
                              style={{
                                position: 'absolute',
-                               top: 0,
-                               left: 0,
-                               width: '100%',
-                               height: '100%',
-                               minWidth: '100%',
-                               minHeight: '100%',
+                               top: '50%',
+                               left: '50%',
+                               transform: 'translate(-50%, -50%)',
+                               maxWidth: '100%',
+                               maxHeight: '100%',
                                zIndex: 2,
                                border: '2px solid red'
                              }}
                              onLoad={(e) => {
                                console.log('Image loaded successfully!')
-                               console.log('Image dimensions:', e.target.naturalWidth, 'x', e.target.naturalHeight)
-                               console.log('Container dimensions:', e.target.offsetWidth, 'x', e.target.offsetHeight)
+                               console.log('Natural image dimensions:', e.target.naturalWidth, 'x', e.target.naturalHeight)
+                               console.log('Displayed image dimensions:', e.target.offsetWidth, 'x', e.target.offsetHeight)
+                               console.log('Container dimensions:', e.target.parentElement.offsetWidth, 'x', e.target.parentElement.offsetHeight)
                                setImageLoaded(true)
                              }}
                              onError={(e) => {
