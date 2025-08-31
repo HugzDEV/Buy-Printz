@@ -267,8 +267,8 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center h-[400px]">
-                         <div className="relative group w-full h-full">
+                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 h-[400px] w-full">
+                         <div className="relative w-full h-full">
                            {!imageLoaded && !imageError && (
                              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
                                <div className="text-center space-y-2">
@@ -312,11 +312,15 @@ const PrintPreviewModal = ({
                                left: 0,
                                width: '100%',
                                height: '100%',
+                               minWidth: '100%',
+                               minHeight: '100%',
                                zIndex: 2,
                                border: '2px solid red'
                              }}
-                             onLoad={() => {
+                             onLoad={(e) => {
                                console.log('Image loaded successfully!')
+                               console.log('Image dimensions:', e.target.naturalWidth, 'x', e.target.naturalHeight)
+                               console.log('Container dimensions:', e.target.offsetWidth, 'x', e.target.offsetHeight)
                                setImageLoaded(true)
                              }}
                              onError={(e) => {
