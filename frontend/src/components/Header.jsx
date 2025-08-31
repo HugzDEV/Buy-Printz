@@ -52,13 +52,12 @@ const Header = () => {
       <div className="container mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center">
             <img 
               src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
               alt="Buy Printz" 
               className="w-28 h-28 object-contain"
             />
-            <span className="text-2xl font-bold text-white">Buy Printz</span>
           </Link>
 
           {/* Desktop Navigation */}

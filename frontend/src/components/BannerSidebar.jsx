@@ -463,6 +463,7 @@ const BannerSidebar = ({
           active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]
           transition-all duration-200
           font-medium
+          min-h-[44px]
           ${className}
         `}
       >
@@ -493,9 +494,9 @@ const BannerSidebar = ({
           </div>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('closeMobileSidebar'))}
-            className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
+            className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
@@ -511,7 +512,7 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('specifications')}
-            className="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+            className="w-full p-4 sm:p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors min-h-[56px]"
           >
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500">

@@ -50,32 +50,54 @@ const BannerCanvas = ({
   //   setScale(Math.max(0.3, newScale)) // Minimum scale of 0.3
   // }, [canvasSize])
 
-  // Mobile-responsive canvas scaling
+  // Mobile-responsive canvas scaling with better viewport detection
   useEffect(() => {
     const updateCanvasScale = () => {
       const isMobile = window.innerWidth < 768
+      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
       
       if (isMobile) {
-        // Mobile scaling - ensure canvas fits within viewport
-        const viewportWidth = window.innerWidth - 32 // Account for padding
-        const viewportHeight = window.innerHeight - 200 // Account for header, toolbar, and bottom actions
+        // Mobile scaling - ensure canvas fits within viewport with proper margins
+        const viewportWidth = window.innerWidth - 24 // Account for padding
+        const viewportHeight = window.innerHeight - 280 // Account for header, toolbar, bottom actions, and safe area
+        
+        const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
+        const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
+        
+        // Use the smaller scale to ensure canvas fits completely
+        const newScale = Math.min(scaleX, scaleY, 1)
+        setScale(Math.max(0.15, newScale)) // Minimum scale of 0.15 for mobile
+      } else if (isTablet) {
+        // Tablet scaling - slightly more generous
+        const viewportWidth = window.innerWidth - 48
+        const viewportHeight = window.innerHeight - 320
+        
+        const scaleX = (viewportWidth * 0.85) / canvasSize.width
+        const scaleY = (viewportHeight * 0.85) / canvasSize.height
+        
+        const newScale = Math.min(scaleX, scaleY, 1)
+        setScale(Math.max(0.25, newScale))
+      } else {
+        // Desktop scaling - maintain current behavior but with better fit
+        const viewportWidth = window.innerWidth - 100
+        const viewportHeight = window.innerHeight - 200
         
         const scaleX = viewportWidth / canvasSize.width
         const scaleY = viewportHeight / canvasSize.height
         
-        // Use the smaller scale to ensure canvas fits completely
         const newScale = Math.min(scaleX, scaleY, 1)
-        setScale(Math.max(0.2, newScale)) // Minimum scale of 0.2 for mobile
-      } else {
-        // Desktop scaling - maintain current behavior
-        setScale(1.0)
+        setScale(Math.max(0.3, newScale))
       }
     }
 
     updateCanvasScale()
     window.addEventListener('resize', updateCanvasScale)
-    return () => window.removeEventListener('resize', updateCanvasScale)
-  }, [canvasSize, window.innerWidth, window.innerHeight])
+    window.addEventListener('orientationchange', updateCanvasScale)
+    return () => {
+      window.removeEventListener('resize', updateCanvasScale)
+      window.removeEventListener('orientationchange', updateCanvasScale)
+    }
+  }, [canvasSize])
   const [history, setHistory] = useState([])
   const [historyStep, setHistoryStep] = useState(0)
   const [showGrid, setShowGrid] = useState(true)
@@ -623,8 +645,8 @@ const BannerCanvas = ({
       },
       onTouchStart: (e) => {
         // Handle touch start for mobile
+        e.evt.preventDefault()
         if (!isSelecting) {
-          console.log('Element touch start:', element.id)
           handleSelect(element.id)
         }
       },
@@ -673,8 +695,8 @@ const BannerCanvas = ({
             }}
             onTouchStart={(e) => {
               // Handle touch start for mobile
+              e.evt.preventDefault()
               if (!isSelecting) {
-                console.log('Text element touch start:', element.id)
                 handleSelect(element.id)
               }
             }}
@@ -922,33 +944,32 @@ const BannerCanvas = ({
         <GlassPanel className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
           
           {/* Left Controls - Mobile Stacked */}
-          <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-center sm:justify-start">
-            <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1 sm:p-2">
-              <Undo className="w-3 h-3 sm:w-4 sm:h-4" />
+          <div className="flex items-center gap-2 sm:gap-2 w-full sm:w-auto justify-center sm:justify-start">
+            <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <Undo className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
-            <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1 sm:p-2">
-              <Redo className="w-3 h-3 sm:w-4 sm:h-4" />
+            <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <Redo className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
-            <div className="w-px h-4 sm:h-6 bg-white/20 mx-1 sm:mx-2" />
+            <div className="w-px h-6 sm:h-6 bg-white/20 mx-1 sm:mx-2" />
             
-            <GlassButton onClick={zoomOut} className="p-1 sm:p-2">
-              <ZoomOut className="w-3 h-3 sm:w-4 sm:h-4" />
+            <GlassButton onClick={zoomOut} className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <ZoomOut className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
-            <GlassButton onClick={resetZoom} className="px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm">
+            <GlassButton onClick={resetZoom} className="px-3 sm:px-3 py-2 sm:py-2 text-sm sm:text-sm min-w-[60px] min-h-[44px] flex items-center justify-center">
               {Math.round(scale * 100)}%
             </GlassButton>
             
-            <GlassButton onClick={zoomIn} className="p-1 sm:p-2">
-              <ZoomIn className="w-3 h-3 sm:w-4 sm:h-4" />
+            <GlassButton onClick={zoomIn} className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <ZoomIn className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
           </div>
 
           {/* Center Info - Mobile Hidden */}
           <div className="hidden sm:block text-center">
-            <h3 className="font-semibold text-gray-800">Banner Editor</h3>
             <p className="text-sm text-gray-600">
               {canvasSize.width} × {canvasSize.height}px
               <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
@@ -958,33 +979,33 @@ const BannerCanvas = ({
           </div>
 
           {/* Right Controls - Mobile Stacked */}
-          <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-center sm:justify-end">
+          <div className="flex items-center gap-2 sm:gap-2 w-full sm:w-auto justify-center sm:justify-end">
             <GlassButton 
               onClick={() => setShowGrid(!showGrid)} 
               variant={showGrid ? "primary" : "default"}
-              className="p-1 sm:p-2"
+              className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
               title={showGrid ? "Hide Grid" : "Show Grid"}
             >
-              <Grid className="w-3 h-3 sm:w-4 sm:h-4" />
+              <Grid className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
             <GlassButton 
               onClick={() => setShowGuides(!showGuides)} 
               variant={showGuides ? "primary" : "default"}
-              className="p-1 sm:p-2"
+              className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
               title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
             >
-              {showGuides ? <Eye className="w-3 h-3 sm:w-4 sm:h-4" /> : <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {showGuides ? <Eye className="w-4 h-4 sm:w-4 sm:h-4" /> : <EyeOff className="w-4 h-4 sm:w-4 sm:h-4" />}
             </GlassButton>
             
-            <div className="w-px h-4 sm:h-6 bg-white/20 mx-1 sm:mx-2" />
+            <div className="w-px h-6 sm:h-6 bg-white/20 mx-1 sm:mx-2" />
             
-            <GlassButton onClick={onSave} variant="success" className="p-1 sm:p-2">
-              <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+            <GlassButton onClick={onSave} variant="success" className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <Save className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
-            <GlassButton onClick={onExport} variant="primary" className="p-1 sm:p-2">
-              <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+            <GlassButton onClick={onExport} variant="primary" className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <Download className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
           </div>
           
@@ -1013,8 +1034,14 @@ const BannerCanvas = ({
               height={canvasSize.height}
               scale={{ x: scale, y: scale }}
               draggable={true}
+              // Enhanced touch handling for mobile
+              onTouchStart={(e) => {
+                // Prevent default touch behavior to avoid zooming
+                e.evt.preventDefault()
+              }}
               onTouchMove={(e) => {
                 // Handle touch move for mobile dragging
+                e.evt.preventDefault()
                 const stage = e.target.getStage()
                 const pos = stage.getPointerPosition()
                 
@@ -1027,6 +1054,7 @@ const BannerCanvas = ({
               }}
               onTouchEnd={(e) => {
                 // Handle touch end for mobile
+                e.evt.preventDefault()
                 if (isSelecting) {
                   finishSelection()
                 }
@@ -1525,12 +1553,12 @@ const BannerCanvas = ({
 
       {/* Bottom Actions - Mobile Optimized */}
       <div className={`
-        absolute bottom-0 left-0 right-0 p-2 sm:p-4 border-t border-white/20 
+        absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-white/20 
         bg-gradient-to-br from-gray-50 to-gray-100
         transform transition-transform duration-300 ease-in-out
         ${selectedId || selectedIds.length > 0 ? 'translate-y-0' : 'translate-y-full'}
       `}>
-        <GlassPanel className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+        <GlassPanel className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           
           {/* DPI Information for Selected Image */}
           {selectedId && getSelectedElementDPI() && (
@@ -1581,41 +1609,41 @@ const BannerCanvas = ({
           
           <div className="flex gap-2 sm:gap-4 w-full sm:w-auto justify-center">
             {/* Layer Controls */}
-            <div className="flex gap-1 sm:gap-2">
+            <div className="flex gap-2 sm:gap-2">
               <GlassButton 
                 onClick={sendToBack} 
                 disabled={!canSendBack}
-                className="p-2 sm:p-3"
+                className="p-3 sm:p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
                 title="Send to Back"
               >
-                <SendToBack className="w-4 h-4 sm:w-5 sm:h-5" />
+                <SendToBack className="w-5 h-5 sm:w-5 sm:h-5" />
               </GlassButton>
               
               <GlassButton 
                 onClick={sendBack} 
                 disabled={!canSendBack}
-                className="p-2 sm:p-3"
+                className="p-3 sm:p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
                 title="Send Back"
               >
-                <MoveDown className="w-4 h-4 sm:w-5 sm:h-5" />
+                <MoveDown className="w-5 h-5 sm:w-5 sm:h-5" />
               </GlassButton>
               
               <GlassButton 
                 onClick={bringForward} 
                 disabled={!canBringForward}
-                className="p-2 sm:p-3"
+                className="p-3 sm:p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
                 title="Bring Forward"
               >
-                <MoveUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                <MoveUp className="w-5 h-5 sm:w-5 sm:h-5" />
               </GlassButton>
               
               <GlassButton 
                 onClick={bringToFront} 
                 disabled={!canBringForward}
-                className="p-2 sm:p-3"
+                className="p-3 sm:p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
                 title="Bring to Front"
               >
-                <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Layers className="w-5 h-5 sm:w-5 sm:h-5" />
               </GlassButton>
             </div>
             
@@ -1623,14 +1651,14 @@ const BannerCanvas = ({
             <div className="w-px h-8 bg-gray-300 mx-1 sm:mx-2"></div>
             
             {/* Duplicate and Delete */}
-            <GlassButton onClick={duplicateSelected} className="flex-1 sm:flex-none p-2 sm:p-3">
-              <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-xs sm:text-sm ml-1 sm:ml-2">Duplicate</span>
+            <GlassButton onClick={duplicateSelected} className="flex-1 sm:flex-none p-3 sm:p-3 min-h-[48px] flex items-center justify-center">
+              <Copy className="w-5 h-5 sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-sm ml-2 sm:ml-2">Duplicate</span>
             </GlassButton>
             
-            <GlassButton onClick={deleteSelected} variant="danger" className="flex-1 sm:flex-none p-2 sm:p-3">
-              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-xs sm:text-sm ml-1 sm:ml-2">Delete</span>
+            <GlassButton onClick={deleteSelected} variant="danger" className="flex-1 sm:flex-none p-3 sm:p-3 min-h-[48px] flex items-center justify-center">
+              <Trash2 className="w-5 h-5 sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-sm ml-2 sm:ml-2">Delete</span>
             </GlassButton>
           </div>
         </GlassPanel>
