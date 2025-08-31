@@ -273,7 +273,7 @@ const PrintPreviewModal = ({
                            </div>
                            
                            <img
-                             src={previewImage}
+                             src={previewImage || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmYwMDAwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5URVNUIElNQUdFPC90ZXh0Pjwvc3ZnPg=='}
                              alt="Banner Design Preview"
                              className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                              style={{
@@ -298,6 +298,11 @@ const PrintPreviewModal = ({
                                setDebugLogs(prev => [...prev, log])
                                setImageError(true)
                              }}
+                             onLoadStart={() => {
+                               const log = 'Image load started!'
+                               console.log(log)
+                               setDebugLogs(prev => [...prev, log])
+                             }}
                            />
                            {/* Debug: Show image source info */}
                            <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
@@ -310,6 +315,10 @@ const PrintPreviewModal = ({
                            {/* Debug: Show image element status */}
                            <div className="absolute top-20 right-2 bg-green-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
                              {imageLoaded ? 'IMG LOADED' : 'IMG LOADING'}
+                           </div>
+                           {/* Debug: Show image source details */}
+                           <div className="absolute top-28 right-2 bg-blue-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
+                             SRC: {previewImage ? `${previewImage.substring(0, 20)}...` : 'NO SRC'}
                            </div>
                           
                           {/* Preview Badge */}
