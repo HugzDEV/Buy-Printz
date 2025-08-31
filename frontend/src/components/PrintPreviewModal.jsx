@@ -62,10 +62,33 @@ const PrintPreviewModal = ({
           return
         }
         
-        // Use the exported canvas image directly
-        console.log('Setting previewImage to:', orderDetails.canvas_image.substring(0, 50) + '...')
-        setDebugLogs(prev => [...prev, `Setting previewImage: ${orderDetails.canvas_image.substring(0, 30)}...`])
-        setPreviewImage(orderDetails.canvas_image)
+        // Convert base64 to blob URL for better browser compatibility
+        try {
+          console.log('Converting base64 to blob URL...')
+          setDebugLogs(prev => [...prev, 'Converting base64 to blob URL...'])
+          
+          // Convert base64 to blob
+          const base64Data = orderDetails.canvas_image.split(',')[1]
+          const byteCharacters = atob(base64Data)
+          const byteNumbers = new Array(byteCharacters.length)
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i)
+          }
+          const byteArray = new Uint8Array(byteNumbers)
+          const blob = new Blob([byteArray], { type: 'image/png' })
+          
+          // Create blob URL
+          const blobUrl = URL.createObjectURL(blob)
+          console.log('Created blob URL:', blobUrl)
+          setDebugLogs(prev => [...prev, `Created blob URL: ${blobUrl}`])
+          
+          setPreviewImage(blobUrl)
+        } catch (error) {
+          console.error('Error converting base64 to blob:', error)
+          setDebugLogs(prev => [...prev, `Error converting base64: ${error.message}`])
+          // Fallback to original base64
+          setPreviewImage(orderDetails.canvas_image)
+        }
         
         // Create PDF with the canvas image
         await createPDFFromImage(orderDetails.canvas_image)
@@ -107,8 +130,12 @@ const PrintPreviewModal = ({
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl)
       }
+      // Clean up blob URL if it exists
+      if (previewImage && previewImage.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImage)
+      }
     }
-  }, [isOpen, canvasData, orderDetails?.canvas_image, generatePDF])
+  }, [isOpen, canvasData, orderDetails?.canvas_image, generatePDF, previewImage])
 
   // Create PDF directly from canvas image (perfect method)
   const createPDFFromImage = async (imageDataURL) => {
@@ -333,7 +360,7 @@ const PrintPreviewModal = ({
                            </div>
                            {/* Debug: Show image source details */}
                            <div className="absolute top-28 right-2 bg-blue-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
-                             SRC: {previewImage ? `${previewImage.substring(0, 20)}...` : 'NO SRC'}
+                             SRC: {previewImage ? (previewImage.startsWith('blob:') ? 'BLOB URL' : `${previewImage.substring(0, 20)}...`) : 'NO SRC'}
                            </div>
                            {/* Debug: Show previewImage state */}
                            <div className="absolute top-36 right-2 bg-purple-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
