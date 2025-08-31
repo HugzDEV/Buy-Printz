@@ -1482,8 +1482,23 @@ const BannerEditorNew = () => {
     // Generate canvas image data for preview
     const generateCanvasImage = () => {
       try {
-        // Get the Konva Stage element
-        const stageElement = document.querySelector('.konvajs-content canvas')
+        // Try multiple selectors to find the Konva canvas
+        const selectors = [
+          '.konvajs-content canvas',
+          'canvas[data-konva-stage]',
+          'canvas',
+          '[data-konva-stage] canvas'
+        ]
+        
+        let stageElement = null
+        for (const selector of selectors) {
+          stageElement = document.querySelector(selector)
+          if (stageElement) {
+            console.log('Found canvas with selector:', selector)
+            break
+          }
+        }
+        
         if (stageElement) {
           // Use a higher quality export but limit size
           const imageData = stageElement.toDataURL('image/png', 0.8)
@@ -1493,21 +1508,6 @@ const BannerEditorNew = () => {
           if (imageData.length > 5 * 1024 * 1024) {
             console.warn('Canvas image too large, reducing quality')
             return stageElement.toDataURL('image/png', 0.5)
-          }
-          
-          return imageData
-        }
-        
-        // Fallback to any canvas element
-        const canvasElement = document.querySelector('canvas')
-        if (canvasElement) {
-          const imageData = canvasElement.toDataURL('image/png', 0.8)
-          console.log('Canvas image generated from fallback, length:', imageData.length)
-          
-          // Check if image is too large
-          if (imageData.length > 5 * 1024 * 1024) {
-            console.warn('Canvas image too large, reducing quality')
-            return canvasElement.toDataURL('image/png', 0.5)
           }
           
           return imageData

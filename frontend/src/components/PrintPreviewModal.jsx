@@ -82,6 +82,15 @@ const PrintPreviewModal = ({
       // Check if we have a perfect canvas image from the editor
       if (orderDetails?.canvas_image) {
         console.log('Using perfect canvas image for preview!')
+        console.log('Canvas image length:', orderDetails.canvas_image.length)
+        console.log('Canvas image preview:', orderDetails.canvas_image.substring(0, 100) + '...')
+        
+        // Validate the image data
+        if (orderDetails.canvas_image.length < 100) {
+          console.error('Canvas image data is too short, likely corrupted')
+          setPreviewImage(null)
+          return
+        }
         
         // Use the exported canvas image directly
         setPreviewImage(orderDetails.canvas_image)
@@ -242,6 +251,7 @@ const PrintPreviewModal = ({
                     </div>
                   ) : previewImage ? (
                     <div className="space-y-4">
+                      {console.log('Rendering preview image:', previewImage ? 'Image available' : 'No image')}
                       {/* Main Banner Preview */}
                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 flex items-center justify-center min-h-[250px]">
                         <div className="relative group">
@@ -253,6 +263,8 @@ const PrintPreviewModal = ({
                               maxWidth: '100%',
                               height: 'auto'
                             }}
+                            onLoad={() => console.log('Banner image loaded successfully')}
+                            onError={(e) => console.error('Banner image failed to load:', e)}
                           />
                           
                           {/* Full Canvas Watermark - Bottom Layer */}
