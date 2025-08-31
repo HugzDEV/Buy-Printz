@@ -402,10 +402,16 @@ const BannerCanvas = ({
     }
   }
 
-  // Text editing functions - Konva recommended approach
+  // Text editing functions - Konva recommended approach for mobile
   const handleTextEdit = (elementId, currentText) => {
     const textNode = stageRef.current?.findOne(`#${elementId}`)
     if (!textNode) return
+
+    // Hide the text node and transformer during editing
+    textNode.hide()
+    if (transformerRef.current) {
+      transformerRef.current.hide()
+    }
 
     const stage = textNode.getStage()
     const textPosition = textNode.absolutePosition()
@@ -438,6 +444,11 @@ const BannerCanvas = ({
     textarea.style.textAlign = textNode.align()
     textarea.style.color = textNode.fill()
     textarea.style.zIndex = '1000'
+    textarea.style.direction = 'ltr'
+    textarea.style.textDirection = 'ltr'
+    textarea.style.unicodeBidi = 'normal'
+    textarea.style.writingMode = 'horizontal-tb'
+    textarea.style.textOrientation = 'mixed'
     
     const rotation = textNode.rotation()
     let transform = ''
@@ -451,9 +462,19 @@ const BannerCanvas = ({
     textarea.focus()
 
     function removeTextarea() {
-      textarea.parentNode.removeChild(textarea)
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea)
+      }
       window.removeEventListener('click', handleOutsideClick)
       window.removeEventListener('touchstart', handleOutsideClick)
+      window.removeEventListener('touchend', handleOutsideClick)
+      
+      // Show the text node and transformer again
+      textNode.show()
+      if (transformerRef.current) {
+        transformerRef.current.show()
+        transformerRef.current.forceUpdate()
+      }
     }
 
     function setTextareaWidth(newWidth) {
@@ -465,6 +486,7 @@ const BannerCanvas = ({
 
     textarea.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
         handleElementChange(elementId, { text: textarea.value })
         removeTextarea()
       }
@@ -490,6 +512,7 @@ const BannerCanvas = ({
     setTimeout(() => {
       window.addEventListener('click', handleOutsideClick)
       window.addEventListener('touchstart', handleOutsideClick)
+      window.addEventListener('touchend', handleOutsideClick)
     })
   }
 
@@ -710,21 +733,11 @@ const BannerCanvas = ({
       y: element.y,
       draggable: true,
       onClick: (e) => {
-        console.log('Element clicked:', element.id)
         handleSelect(element.id)
       },
       onTap: (e) => {
-        console.log('Element tapped:', element.id)
         handleSelect(element.id)
       },
-      onTouchStart: (e) => {
-        console.log('Element touch start:', element.id)
-        handleSelect(element.id)
-      },
-      onTouchEnd: (e) => {
-        console.log('Element touch end:', element.id)
-      },
-
       onDragEnd: (e) => handleDragEnd(e, element.id),
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
     }
@@ -758,15 +771,7 @@ const BannerCanvas = ({
               handleTextClick(element.id, element.text)
             }}
             onTap={(e) => {
-              console.log('Text element tapped:', element.id)
               handleSelect(element.id)
-            }}
-            onTouchStart={(e) => {
-              console.log('Text element touch start:', element.id)
-              handleSelect(element.id)
-            }}
-            onTouchEnd={(e) => {
-              console.log('Text element touch end:', element.id)
             }}
 
             onDragEnd={(e) => handleDragEnd(e, element.id)}
@@ -1130,30 +1135,7 @@ const BannerCanvas = ({
                 }
                 // Don't interfere with element dragging - let elements handle their own events
               }}
-              onTouchStart={(e) => {
-                const stage = e.target.getStage()
-                console.log('Stage touch start on:', e.target, 'target === stage:', e.target === stage)
-                
-                // Only handle if touching directly on the stage background (not on elements)
-                if (e.target === stage) {
-                  console.log('Touched on stage background - starting selection')
-                  
-                  // Clear selections when touching empty canvas
-                  setSelectedId(null)
-                  setSelectedIds([])
-                  
-                  // Start selection rectangle
-                  const pos = stage.getPointerPosition()
-                  console.log('Stage touch position:', pos, 'scale:', scale)
-                  if (pos) {
-                    startSelection({
-                      x: pos.x / scale,
-                      y: pos.y / scale
-                    })
-                  }
-                }
-                // Don't interfere with element dragging - let elements handle their own events
-              }}
+
               onMouseMove={(e) => {
                 if (isSelecting) {
                   const stage = e.target.getStage()
@@ -1166,28 +1148,13 @@ const BannerCanvas = ({
                   }
                 }
               }}
-              onTouchMove={(e) => {
-                if (isSelecting) {
-                  const stage = e.target.getStage()
-                  const pos = stage.getPointerPosition()
-                  if (pos) {
-                    updateSelection({
-                      x: pos.x / scale,
-                      y: pos.y / scale
-                    })
-                  }
-                }
-              }}
+
               onMouseUp={() => {
                 if (isSelecting) {
                   finishSelection()
                 }
               }}
-              onTouchEnd={() => {
-                if (isSelecting) {
-                  finishSelection()
-                }
-              }}
+
                               onClick={(e) => {
                   // Only deselect if clicking on the stage background, grid, or safe zone
                   const clickedOnEmpty = e.target === e.target.getStage() || 
