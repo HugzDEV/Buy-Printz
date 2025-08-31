@@ -257,10 +257,29 @@ const PrintPreviewModal = ({
                                </div>
                              </div>
                            )}
+                           {/* Full Canvas Watermark - Bottom Layer */}
+                           <div className="absolute inset-0 pointer-events-none">
+                             <img
+                               src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
+                               alt="BuyPrintz Watermark"
+                               className="w-full h-full object-cover opacity-40"
+                               style={{
+                                 position: 'absolute',
+                                 top: 0,
+                                 left: 0,
+                                 zIndex: 0
+                               }}
+                             />
+                           </div>
+                           
                            <img
                              src={previewImage}
                              alt="Banner Design Preview"
                              className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                             style={{
+                               position: 'relative',
+                               zIndex: 2
+                             }}
                              onLoad={() => {
                                const log = 'Image loaded successfully!'
                                console.log(log)
@@ -275,27 +294,12 @@ const PrintPreviewModal = ({
                              }}
                            />
                            {/* Debug: Show image source info */}
-                           <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+                           <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
                              Debug: {previewImage ? 'Has Image' : 'No Image'}
-                           </div>
-                           
-                           {/* Full Canvas Watermark - Bottom Layer */}
-                           <div className="absolute inset-0 pointer-events-none">
-                             <img
-                               src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                               alt="BuyPrintz Watermark"
-                               className="w-full h-full object-cover opacity-40"
-                               style={{
-                                 position: 'absolute',
-                                 top: 0,
-                                 left: 0,
-                                 zIndex: 1
-                               }}
-                             />
                            </div>
                           
                           {/* Preview Badge */}
-                          <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium">
+                          <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium" style={{ zIndex: 3 }}>
                             PREVIEW
                           </div>
                           
