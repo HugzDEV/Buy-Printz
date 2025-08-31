@@ -417,9 +417,10 @@ const BannerCanvas = ({
     const textPosition = textNode.absolutePosition()
     const stageBox = stage.container().getBoundingClientRect()
     
+    // Calculate position considering stage scale and position
     const areaPosition = {
-      x: stageBox.left + textPosition.x,
-      y: stageBox.top + textPosition.y,
+      x: stageBox.left + textPosition.x * scale + stagePos.x * scale,
+      y: stageBox.top + textPosition.y * scale + stagePos.y * scale,
     }
 
     const textarea = document.createElement('textarea')
@@ -428,9 +429,9 @@ const BannerCanvas = ({
     textarea.style.position = 'absolute'
     textarea.style.top = areaPosition.y + 'px'
     textarea.style.left = areaPosition.x + 'px'
-    textarea.style.width = textNode.width() - textNode.padding() * 2 + 'px'
-    textarea.style.height = textNode.height() - textNode.padding() * 2 + 5 + 'px'
-    textarea.style.fontSize = textNode.fontSize() + 'px'
+    textarea.style.width = (textNode.width() - textNode.padding() * 2) * scale + 'px'
+    textarea.style.height = (textNode.height() - textNode.padding() * 2 + 5) * scale + 'px'
+    textarea.style.fontSize = textNode.fontSize() * scale + 'px'
     textarea.style.border = 'none'
     textarea.style.padding = '0px'
     textarea.style.margin = '0px'
@@ -449,6 +450,10 @@ const BannerCanvas = ({
     textarea.style.unicodeBidi = 'normal'
     textarea.style.writingMode = 'horizontal-tb'
     textarea.style.textOrientation = 'mixed'
+    textarea.style.userSelect = 'text'
+    textarea.style.webkitUserSelect = 'text'
+    textarea.style.mozUserSelect = 'text'
+    textarea.style.msUserSelect = 'text'
     
     const rotation = textNode.rotation()
     let transform = ''
@@ -459,7 +464,11 @@ const BannerCanvas = ({
     textarea.style.height = 'auto'
     textarea.style.height = textarea.scrollHeight + 3 + 'px'
     
-    textarea.focus()
+    // Focus with a slight delay to ensure proper positioning
+    setTimeout(() => {
+      textarea.focus()
+      textarea.select()
+    }, 10)
 
     function removeTextarea() {
       if (textarea.parentNode) {
@@ -481,7 +490,7 @@ const BannerCanvas = ({
       if (!newWidth) {
         newWidth = textNode.placeholder?.length * textNode.fontSize()
       }
-      textarea.style.width = newWidth + 'px'
+      textarea.style.width = newWidth * scale + 'px'
     }
 
     textarea.addEventListener('keydown', function (e) {
@@ -496,10 +505,10 @@ const BannerCanvas = ({
     })
 
     textarea.addEventListener('input', function () {
-      const scale = textNode.getAbsoluteScale().x
-      setTextareaWidth(textNode.width() * scale)
+      const nodeScale = textNode.getAbsoluteScale().x
+      setTextareaWidth(textNode.width() * nodeScale)
       textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + textNode.fontSize() + 'px'
+      textarea.style.height = textarea.scrollHeight + textNode.fontSize() * scale + 'px'
     })
 
     function handleOutsideClick(e) {
@@ -1657,6 +1666,20 @@ const BannerCanvas = ({
                 <span className="text-xs">Delete</span>
               </GlassButton>
             </div>
+            
+            {/* Debug Text Edit Button - Only show for text elements */}
+            {selectedId && selectedElement?.type === 'text' && (
+              <>
+                <div className="w-px h-6 bg-gray-300"></div>
+                <GlassButton 
+                  onClick={() => handleTextEdit(selectedId, selectedElement.text)} 
+                  className="px-3 py-2 flex items-center justify-center"
+                  title="Debug: Edit Text"
+                >
+                  <span className="text-xs">Edit Text</span>
+                </GlassButton>
+              </>
+            )}
           </div>
         </GlassPanel>
       </div>
