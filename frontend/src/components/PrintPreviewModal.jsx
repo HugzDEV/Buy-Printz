@@ -63,6 +63,8 @@ const PrintPreviewModal = ({
         }
         
         // Use the exported canvas image directly
+        console.log('Setting previewImage to:', orderDetails.canvas_image.substring(0, 50) + '...')
+        setDebugLogs(prev => [...prev, `Setting previewImage: ${orderDetails.canvas_image.substring(0, 30)}...`])
         setPreviewImage(orderDetails.canvas_image)
         
         // Create PDF with the canvas image
@@ -82,6 +84,19 @@ const PrintPreviewModal = ({
       setIsGenerating(false)
     }
   }, [orderDetails?.canvas_image])
+
+  // Track previewImage state changes
+  useEffect(() => {
+    if (previewImage) {
+      const log = `previewImage state updated: ${previewImage.substring(0, 30)}...`
+      console.log(log)
+      setDebugLogs(prev => [...prev, log])
+    } else {
+      const log = 'previewImage state is null/empty'
+      console.log(log)
+      setDebugLogs(prev => [...prev, log])
+    }
+  }, [previewImage])
 
   // Generate PDF when modal opens
   useEffect(() => {
@@ -319,6 +334,10 @@ const PrintPreviewModal = ({
                            {/* Debug: Show image source details */}
                            <div className="absolute top-28 right-2 bg-blue-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
                              SRC: {previewImage ? `${previewImage.substring(0, 20)}...` : 'NO SRC'}
+                           </div>
+                           {/* Debug: Show previewImage state */}
+                           <div className="absolute top-36 right-2 bg-purple-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
+                             STATE: {previewImage ? 'SET' : 'NULL'}
                            </div>
                           
                           {/* Preview Badge */}
