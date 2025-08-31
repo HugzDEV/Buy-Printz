@@ -34,6 +34,7 @@ const PrintPreviewModal = ({
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [debugLogs, setDebugLogs] = useState([])
+  const [blobCreated, setBlobCreated] = useState(false)
 
   const generatePDF = useCallback(async () => {
     try {
@@ -63,9 +64,16 @@ const PrintPreviewModal = ({
         }
         
         // Convert base64 to blob URL for better browser compatibility
+        if (blobCreated) {
+          console.log('Blob already created, skipping...')
+          setDebugLogs(prev => [...prev, 'Blob already created, skipping...'])
+          return
+        }
+        
         try {
           console.log('Converting base64 to blob URL...')
           setDebugLogs(prev => [...prev, 'Converting base64 to blob URL...'])
+          setBlobCreated(true)
           
           // Convert base64 to blob
           const base64Data = orderDetails.canvas_image.split(',')[1]
@@ -132,8 +140,12 @@ const PrintPreviewModal = ({
 
   // Track previewImage state changes
   useEffect(() => {
-    if (previewImage) {
+    if (previewImage && !previewImage.startsWith('blob:')) {
       const log = `previewImage state updated: ${previewImage.substring(0, 30)}...`
+      console.log(log)
+      setDebugLogs(prev => [...prev, log])
+    } else if (previewImage && previewImage.startsWith('blob:')) {
+      const log = 'previewImage state updated: BLOB URL'
       console.log(log)
       setDebugLogs(prev => [...prev, log])
     } else {
@@ -146,6 +158,7 @@ const PrintPreviewModal = ({
   // Generate PDF when modal opens
   useEffect(() => {
     if (isOpen && (canvasData || orderDetails?.canvas_image)) {
+      setBlobCreated(false) // Reset blob flag when modal opens
       generatePDF()
     }
     return () => {
