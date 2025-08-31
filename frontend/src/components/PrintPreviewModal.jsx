@@ -90,32 +90,39 @@ const PrintPreviewModal = ({
     }
   }, [isOpen, canvasData, orderDetails?.canvas_image])
 
+  // Parse banner dimensions from orderDetails
+  const parseBannerDimensions = () => {
+    console.log('Banner size from orderDetails:', orderDetails.banner_size)
+    console.log('Dimensions from props:', dimensions)
+    
+    // Parse banner size correctly - handle formats like "8x4ft", "8 x 4 ft", "8ft x 4ft"
+    let printWidthFeet, printHeightFeet
+    
+    if (orderDetails.banner_size) {
+      const sizeStr = orderDetails.banner_size.toLowerCase().replace(/\s+/g, '')
+      const match = sizeStr.match(/(\d+(?:\.\d+)?)(?:ft)?x(\d+(?:\.\d+)?)(?:ft)?/)
+      if (match) {
+        printWidthFeet = parseFloat(match[1])
+        printHeightFeet = parseFloat(match[2])
+      } else {
+        printWidthFeet = parseFloat(dimensions.width) || 8
+        printHeightFeet = parseFloat(dimensions.height) || 4
+      }
+    } else {
+      printWidthFeet = parseFloat(dimensions.width) || 8
+      printHeightFeet = parseFloat(dimensions.height) || 4
+    }
+    
+    return { printWidthFeet, printHeightFeet }
+  }
+
   // Create PDF directly from canvas image (perfect method)
   const createPDFFromImage = async (imageDataURL) => {
     try {
       console.log('Creating PDF from image data URL:', imageDataURL.substring(0, 50) + '...')
       
       // Get actual banner dimensions from orderDetails
-      console.log('Banner size from orderDetails:', orderDetails.banner_size)
-      console.log('Dimensions from props:', dimensions)
-      
-      // Parse banner size correctly - handle formats like "8x4ft", "8 x 4 ft", "8ft x 4ft"
-      let printWidthFeet, printHeightFeet
-      
-      if (orderDetails.banner_size) {
-        const sizeStr = orderDetails.banner_size.toLowerCase().replace(/\s+/g, '')
-        const match = sizeStr.match(/(\d+(?:\.\d+)?)(?:ft)?x(\d+(?:\.\d+)?)(?:ft)?/)
-        if (match) {
-          printWidthFeet = parseFloat(match[1])
-          printHeightFeet = parseFloat(match[2])
-        } else {
-          printWidthFeet = parseFloat(dimensions.width) || 8
-          printHeightFeet = parseFloat(dimensions.height) || 4
-        }
-      } else {
-        printWidthFeet = parseFloat(dimensions.width) || 8
-        printHeightFeet = parseFloat(dimensions.height) || 4
-      }
+      const { printWidthFeet, printHeightFeet } = parseBannerDimensions()
       const pdfWidthInches = printWidthFeet * 12
       const pdfHeightInches = printHeightFeet * 12
 
@@ -327,7 +334,10 @@ const PrintPreviewModal = ({
                           
                           <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
                             <Badge variant="secondary" className="bg-blue-100 text-blue-800 font-medium px-3 py-1">
-                              {dimensions.width}ft × {dimensions.height}ft
+                              {(() => {
+                                const { printWidthFeet, printHeightFeet } = parseBannerDimensions()
+                                return `${printWidthFeet}ft × ${printHeightFeet}ft`
+                              })()}
                             </Badge>
                           </div>
                         </div>
@@ -410,7 +420,10 @@ const PrintPreviewModal = ({
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <span className="text-sm font-medium text-gray-600">Dimensions</span>
                         <Badge variant="outline" className="bg-white">
-                          {dimensions.width}ft × {dimensions.height}ft
+                          {(() => {
+                            const { printWidthFeet, printHeightFeet } = parseBannerDimensions()
+                            return `${printWidthFeet}ft × ${printHeightFeet}ft`
+                          })()}
                         </Badge>
                       </div>
                       

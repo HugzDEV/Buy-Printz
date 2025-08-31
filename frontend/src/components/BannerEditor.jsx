@@ -1569,7 +1569,7 @@ const BannerEditorNew = () => {
       banner_type: bannerSpecs?.id || 'vinyl-13oz',
       banner_material: bannerSpecs?.material || '13oz Vinyl',
       banner_finish: bannerSpecs?.finish || 'Matte',
-      banner_size: `${canvasSize.width}x${canvasSize.height}px (${canvasOrientation})`,
+      banner_size: `${canvasSize.width}x${canvasSize.height}ft`,
       banner_category: bannerSpecs?.category || 'Vinyl Banners',
       background_color: backgroundColor,
       print_options: {} // Will be populated by checkout component
