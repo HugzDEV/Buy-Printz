@@ -229,7 +229,7 @@ const PrintPreviewModal = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-             <DialogContent className="max-w-[98vw] sm:max-w-6xl max-h-[98vh] sm:max-h-[90vh] h-auto overflow-hidden flex flex-col">
+             <DialogContent className="max-w-[98vw] sm:max-w-7xl max-h-[98vh] sm:max-h-[95vh] h-auto overflow-hidden flex flex-col">
                  <DialogHeader className="flex-shrink-0 pb-2 sm:pb-4 border-b">
                      <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
              <Printer className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
@@ -264,8 +264,15 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl h-[600px] w-full">
-                         <div className="relative w-full h-full">
+                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl w-full" style={{ 
+                                                                         height: 'min(85vh, 700px)',
+                                                                         maxHeight: '700px',
+                                                                         minHeight: '500px',
+                                                                         display: 'flex',
+                                                                         alignItems: 'center',
+                                                                         justifyContent: 'center'
+                                                                       }}>
+                         <div className="relative w-full h-full flex items-center justify-center">
                            {!imageLoaded && !imageError && (
                              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
                                <div className="text-center space-y-2">
@@ -302,14 +309,13 @@ const PrintPreviewModal = ({
                            <img
                              src={previewImage}
                              alt="Banner Design Preview"
-                             className="object-contain rounded-lg shadow-xl"
+                             className="rounded-lg shadow-xl"
                              style={{
-                               position: 'absolute',
-                               top: '50%',
-                               left: '50%',
-                               transform: 'translate(-50%, -50%)',
-                               width: '100%',
-                               height: '100%',
+                               maxWidth: '98%',
+                               maxHeight: '98%',
+                               width: 'auto',
+                               height: 'auto',
+                               objectFit: 'contain',
                                zIndex: 2,
                                border: '2px solid red'
                              }}
