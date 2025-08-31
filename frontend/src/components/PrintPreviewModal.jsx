@@ -267,7 +267,7 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 h-[400px] w-full">
+                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 h-[500px] w-full">
                          <div className="relative w-full h-full">
                            {!imageLoaded && !imageError && (
                              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
@@ -311,8 +311,8 @@ const PrintPreviewModal = ({
                                top: '50%',
                                left: '50%',
                                transform: 'translate(-50%, -50%)',
-                               maxWidth: '100%',
-                               maxHeight: '100%',
+                               width: '95%',
+                               height: '95%',
                                zIndex: 2,
                                border: '2px solid red'
                              }}
