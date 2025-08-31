@@ -270,14 +270,13 @@ const PrintPreviewModal = ({
                            <img
                              src={previewImage}
                              alt="Banner Design Preview"
-                             className="w-full h-full object-contain rounded-lg shadow-xl"
+                             className="w-full h-full object-cover rounded-lg shadow-xl"
                              style={{
                                position: 'absolute',
-                               top: '50%',
-                               left: '50%',
-                               transform: 'translate(-50%, -50%)',
-                               width: '95%',
-                               height: '95%',
+                               top: 0,
+                               left: 0,
+                               width: '100%',
+                               height: '100%',
                                zIndex: 2,
                                border: '2px solid red'
                              }}
