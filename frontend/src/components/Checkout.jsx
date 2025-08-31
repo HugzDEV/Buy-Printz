@@ -107,13 +107,18 @@ const Checkout = () => {
       navigate('/editor')
       return
     }
-
+    
     try {
-      const parsedOrderData = JSON.parse(savedOrderData)
-      console.log('Loading order data from sessionStorage:', parsedOrderData)
-      setOrderData(parsedOrderData)
+      const parsedData = JSON.parse(savedOrderData)
+      console.log('OrderData from sessionStorage:', parsedData)
+      console.log('Canvas image exists:', !!parsedData.canvas_image)
+      if (parsedData.canvas_image) {
+        console.log('Canvas image type:', typeof parsedData.canvas_image)
+        console.log('Canvas image starts with:', parsedData.canvas_image.substring(0, 100))
+      }
+      setOrderData(parsedData)
     } catch (error) {
-      console.error('Failed to parse order data:', error)
+      console.error('Error parsing orderData from sessionStorage:', error)
       navigate('/editor')
     }
   }, [navigate])

@@ -33,6 +33,7 @@ const PrintPreviewModal = ({
   const [qualityAnalysis, setQualityAnalysis] = useState(null)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [debugLogs, setDebugLogs] = useState([])
 
   const generatePDF = useCallback(async () => {
     try {
@@ -42,7 +43,24 @@ const PrintPreviewModal = ({
       
       // Check if we have a perfect canvas image from the editor
       if (orderDetails?.canvas_image) {
-        console.log('Using perfect canvas image for preview!')
+        const log1 = 'Using perfect canvas image for preview!'
+        const log2 = `Canvas image data type: ${typeof orderDetails.canvas_image}`
+        const log3 = `Canvas image starts with: ${orderDetails.canvas_image.substring(0, 100)}`
+        
+        console.log(log1)
+        console.log(log2)
+        console.log(log3)
+        
+        setDebugLogs(prev => [...prev, log1, log2, log3])
+        
+        // Validate the image data
+        if (!orderDetails.canvas_image.startsWith('data:image/')) {
+          const errorLog = `Invalid image data format: ${orderDetails.canvas_image.substring(0, 50)}`
+          console.error(errorLog)
+          setDebugLogs(prev => [...prev, errorLog])
+          setImageError(true)
+          return
+        }
         
         // Use the exported canvas image directly
         setPreviewImage(orderDetails.canvas_image)
@@ -182,7 +200,8 @@ const PrintPreviewModal = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
              <DialogContent className="max-w-[98vw] sm:max-w-6xl max-h-[98vh] sm:max-h-[90vh] h-auto overflow-hidden flex flex-col">
                  <DialogHeader className="flex-shrink-0 pb-2 sm:pb-4 border-b">
                      <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
@@ -225,6 +244,7 @@ const PrintPreviewModal = ({
                                <div className="text-center space-y-2">
                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                                  <p className="text-sm text-gray-600">Loading preview...</p>
+                                 <p className="text-xs text-red-600">Debug: Image should load here</p>
                                </div>
                              </div>
                            )}
@@ -233,6 +253,7 @@ const PrintPreviewModal = ({
                                <div className="text-center space-y-2">
                                  <AlertTriangle className="h-8 w-8 text-red-500 mx-auto" />
                                  <p className="text-sm text-red-600">Failed to load preview</p>
+                                 <p className="text-xs text-red-600">Debug: Image failed to load</p>
                                </div>
                              </div>
                            )}
@@ -240,9 +261,23 @@ const PrintPreviewModal = ({
                              src={previewImage}
                              alt="Banner Design Preview"
                              className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
-                             onLoad={() => setImageLoaded(true)}
-                             onError={() => setImageError(true)}
+                             onLoad={() => {
+                               const log = 'Image loaded successfully!'
+                               console.log(log)
+                               setDebugLogs(prev => [...prev, log])
+                               setImageLoaded(true)
+                             }}
+                             onError={(e) => {
+                               const log = `Image failed to load: ${e.type}`
+                               console.error(log)
+                               setDebugLogs(prev => [...prev, log])
+                               setImageError(true)
+                             }}
                            />
+                           {/* Debug: Show image source info */}
+                           <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+                             Debug: {previewImage ? 'Has Image' : 'No Image'}
+                           </div>
                            
                            {/* Full Canvas Watermark - Bottom Layer */}
                            <div className="absolute inset-0 pointer-events-none">
@@ -454,6 +489,19 @@ const PrintPreviewModal = ({
                  </div>
       </DialogContent>
     </Dialog>
+
+    {/* Debug Panel - Only show in development */}
+    {process.env.NODE_ENV === 'development' && debugLogs.length > 0 && (
+      <div className="fixed bottom-4 left-4 right-4 bg-black bg-opacity-90 text-white p-4 rounded-lg max-h-40 overflow-y-auto z-50">
+        <div className="text-sm font-mono">
+          <div className="font-bold mb-2">Debug Logs:</div>
+          {debugLogs.map((log, index) => (
+            <div key={index} className="text-xs mb-1">{log}</div>
+          ))}
+        </div>
+      </div>
+    )}
+  </>
   )
 }
 
