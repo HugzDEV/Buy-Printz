@@ -308,7 +308,8 @@ const PrintPreviewModal = ({
                              className="w-full h-auto max-h-full object-contain rounded-lg shadow-xl"
                              style={{
                                position: 'relative',
-                               zIndex: 2
+                               zIndex: 2,
+                               border: '2px solid red'
                              }}
                              onLoad={() => {
                                console.log('Image loaded successfully!')
@@ -319,6 +320,10 @@ const PrintPreviewModal = ({
                                setImageError(true)
                              }}
                            />
+                           {/* Debug: Show if image is loading */}
+                           <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
+                             {imageLoaded ? 'LOADED' : 'LOADING'}
+                           </div>
                           
                           {/* Preview Badge */}
                           <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium" style={{ zIndex: 3 }}>
