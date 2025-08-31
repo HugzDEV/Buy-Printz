@@ -123,7 +123,7 @@ const PrintPreviewModal = ({
         URL.revokeObjectURL(previewImage)
       }
     }
-  }, [isOpen, canvasData, orderDetails?.canvas_image, generatePDF, previewImage])
+  }, [isOpen, canvasData, orderDetails?.canvas_image])
 
   // Create PDF directly from canvas image (perfect method)
   const createPDFFromImage = async (imageDataURL) => {
