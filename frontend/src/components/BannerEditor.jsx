@@ -1822,15 +1822,7 @@ const BannerEditorNew = () => {
         </div>
       </div>
       
-      {/* Floating Mobile Menu Button - Always visible when sidebar closed */}
-      {!isMobileSidebarOpen && (
-        <button
-          onClick={() => setIsMobileSidebarOpen(true)}
-          className="sm:hidden fixed top-20 left-4 z-50 p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center shadow-lg"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-      )}
+
       
     </div>
   )

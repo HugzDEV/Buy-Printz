@@ -69,7 +69,7 @@ const BannerCanvas = ({
       
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
-        const viewportWidth = window.innerWidth - 48 // Account for padding and floating menu
+        const viewportWidth = window.innerWidth - 48 // Account for padding
         const viewportHeight = window.innerHeight - 320 // Account for header, toolbar, bottom actions, and safe area
         
         const scaleX = (viewportWidth * 0.85) / canvasSize.width // Use 85% of available width
