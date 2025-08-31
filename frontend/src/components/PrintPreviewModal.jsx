@@ -50,43 +50,8 @@ const PrintPreviewModal = ({
           return
         }
         
-        // Convert base64 to blob URL for better browser compatibility
-        if (blobCreated) {
-          return
-        }
-        
-        try {
-          setBlobCreated(true)
-          
-          // Convert base64 to blob
-          const base64Data = orderDetails.canvas_image.split(',')[1]
-          const byteCharacters = atob(base64Data)
-          const byteNumbers = new Array(byteCharacters.length)
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i)
-          }
-          const byteArray = new Uint8Array(byteNumbers)
-          const blob = new Blob([byteArray], { type: 'image/png' })
-          
-          // Create blob URL
-          const blobUrl = URL.createObjectURL(blob)
-          
-          // Test if blob URL is valid by creating a test image
-          const testImg = new Image()
-          testImg.onload = () => {
-            setPreviewImage(blobUrl)
-          }
-          testImg.onerror = (error) => {
-            // Fallback to original base64
-            setPreviewImage(orderDetails.canvas_image)
-          }
-          testImg.src = blobUrl
-        } catch (error) {
-          console.error('Error converting base64 to blob:', error)
-          setDebugLogs(prev => [...prev, `Error converting base64: ${error.message}`])
-          // Fallback to original base64
-          setPreviewImage(orderDetails.canvas_image)
-        }
+        // Use the original base64 image directly for better compatibility
+        setPreviewImage(orderDetails.canvas_image)
         
         // Create PDF with the canvas image
         await createPDFFromImage(orderDetails.canvas_image)
@@ -267,7 +232,7 @@ const PrintPreviewModal = ({
                   ) : previewImage ? (
                     <div className="space-y-3 sm:space-y-4">
                                              {/* Main Banner Preview */}
-                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 h-[500px] w-full">
+                                                                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl h-[500px] w-full">
                          <div className="relative w-full h-full">
                            {!imageLoaded && !imageError && (
                              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
