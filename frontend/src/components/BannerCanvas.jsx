@@ -117,8 +117,7 @@ const BannerCanvas = ({
   const [selectionRect, setSelectionRect] = useState(null)
   const [selectionStart, setSelectionStart] = useState(null)
   const [selectedIds, setSelectedIds] = useState([])
-  const [lastClickTime, setLastClickTime] = useState(0)
-  const [lastClickId, setLastClickId] = useState(null)
+
   
   // Text editing modal state
 
@@ -386,21 +385,7 @@ const BannerCanvas = ({
     ))
   }
 
-  // Manual double-click detection
-  const handleTextClick = (elementId, elementText) => {
-    const now = Date.now()
-    const timeDiff = now - lastClickTime
-    const isDoubleClick = timeDiff < 300 && lastClickId === elementId // 300ms threshold
-    
-    if (isDoubleClick) {
-      setLastClickTime(0)
-      setLastClickId(null)
-      handleTextEdit(elementId, elementText)
-    } else {
-      setLastClickTime(now)
-      setLastClickId(elementId)
-    }
-  }
+
 
   // Text editing functions - Konva recommended approach for mobile
   const handleTextEdit = (elementId, currentText) => {
@@ -776,8 +761,6 @@ const BannerCanvas = ({
             padding={element.padding || 0}
             onClick={(e) => {
               handleSelect(element.id)
-              // Handle manual double-click detection
-              handleTextClick(element.id, element.text)
             }}
             onTap={(e) => {
               handleSelect(element.id)
@@ -786,9 +769,15 @@ const BannerCanvas = ({
             onDragEnd={(e) => handleDragEnd(e, element.id)}
             onTransformEnd={(e) => handleTransformEnd(e, element.id)}
             onDblClick={(e) => {
+              console.log('Double click detected on text:', element.id)
+              e.evt.preventDefault()
+              e.evt.stopPropagation()
               handleTextEdit(element.id, element.text)
             }}
             onDblTap={(e) => {
+              console.log('Double tap detected on text:', element.id)
+              e.evt.preventDefault()
+              e.evt.stopPropagation()
               handleTextEdit(element.id, element.text)
             }}
           />
