@@ -44,46 +44,23 @@ const PrintPreviewModal = ({
       
       // Check if we have a perfect canvas image from the editor
       if (orderDetails?.canvas_image) {
-        const log1 = 'Using perfect canvas image for preview!'
-        const log2 = `Canvas image data type: ${typeof orderDetails.canvas_image}`
-        const log3 = `Canvas image starts with: ${orderDetails.canvas_image.substring(0, 100)}`
-        
-        console.log(log1)
-        console.log(log2)
-        console.log(log3)
-        
-        setDebugLogs(prev => [...prev, log1, log2, log3])
-        
         // Validate the image data
         if (!orderDetails.canvas_image.startsWith('data:image/')) {
-          const errorLog = `Invalid image data format: ${orderDetails.canvas_image.substring(0, 50)}`
-          console.error(errorLog)
-          setDebugLogs(prev => [...prev, errorLog])
           setImageError(true)
           return
         }
         
         // Convert base64 to blob URL for better browser compatibility
         if (blobCreated) {
-          console.log('Blob already created, skipping...')
-          setDebugLogs(prev => [...prev, 'Blob already created, skipping...'])
           return
         }
         
         try {
-          console.log('Converting base64 to blob URL...')
-          setDebugLogs(prev => [...prev, 'Converting base64 to blob URL...'])
           setBlobCreated(true)
           
           // Convert base64 to blob
           const base64Data = orderDetails.canvas_image.split(',')[1]
-          console.log('Base64 data length:', base64Data.length)
-          setDebugLogs(prev => [...prev, `Base64 data length: ${base64Data.length}`])
-          
           const byteCharacters = atob(base64Data)
-          console.log('Byte characters length:', byteCharacters.length)
-          setDebugLogs(prev => [...prev, `Byte characters length: ${byteCharacters.length}`])
-          
           const byteNumbers = new Array(byteCharacters.length)
           for (let i = 0; i < byteCharacters.length; i++) {
             byteNumbers[i] = byteCharacters.charCodeAt(i)
@@ -91,24 +68,15 @@ const PrintPreviewModal = ({
           const byteArray = new Uint8Array(byteNumbers)
           const blob = new Blob([byteArray], { type: 'image/png' })
           
-          console.log('Blob size:', blob.size)
-          setDebugLogs(prev => [...prev, `Blob size: ${blob.size} bytes`])
-          
           // Create blob URL
           const blobUrl = URL.createObjectURL(blob)
-          console.log('Created blob URL:', blobUrl)
-          setDebugLogs(prev => [...prev, `Created blob URL: ${blobUrl}`])
           
           // Test if blob URL is valid by creating a test image
           const testImg = new Image()
           testImg.onload = () => {
-            console.log('Test image loaded successfully, dimensions:', testImg.width, 'x', testImg.height)
-            setDebugLogs(prev => [...prev, `Test image loaded: ${testImg.width}x${testImg.height}`])
             setPreviewImage(blobUrl)
           }
           testImg.onerror = (error) => {
-            console.error('Test image failed to load:', error)
-            setDebugLogs(prev => [...prev, `Test image failed: ${error.type}`])
             // Fallback to original base64
             setPreviewImage(orderDetails.canvas_image)
           }
@@ -138,22 +106,7 @@ const PrintPreviewModal = ({
     }
   }, [orderDetails?.canvas_image])
 
-  // Track previewImage state changes
-  useEffect(() => {
-    if (previewImage && !previewImage.startsWith('blob:')) {
-      const log = `previewImage state updated: ${previewImage.substring(0, 30)}...`
-      console.log(log)
-      setDebugLogs(prev => [...prev, log])
-    } else if (previewImage && previewImage.startsWith('blob:')) {
-      const log = 'previewImage state updated: BLOB URL'
-      console.log(log)
-      setDebugLogs(prev => [...prev, log])
-    } else {
-      const log = 'previewImage state is null/empty'
-      console.log(log)
-      setDebugLogs(prev => [...prev, log])
-    }
-  }, [previewImage])
+
 
   // Generate PDF when modal opens
   useEffect(() => {
@@ -350,57 +303,26 @@ const PrintPreviewModal = ({
                            </div>
                            
                            <img
-                             src={previewImage || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmYwMDAwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5URVNUIElNQUdFPC90ZXh0Pjwvc3ZnPg=='}
+                             src={previewImage}
                              alt="Banner Design Preview"
-                             className="w-full h-full object-cover rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                             className="w-full h-full object-contain rounded-lg shadow-xl"
                              style={{
                                position: 'absolute',
                                top: 0,
                                left: 0,
                                width: '100%',
                                height: '100%',
-                               zIndex: 2,
-                               backgroundColor: 'rgba(255, 0, 0, 0.3)',
-                               border: '2px solid red'
+                               zIndex: 2
                              }}
                              onLoad={() => {
-                               const log = 'Image loaded successfully!'
-                               console.log(log)
-                               setDebugLogs(prev => [...prev, log])
+                               console.log('Image loaded successfully!')
                                setImageLoaded(true)
                              }}
                              onError={(e) => {
-                               const log = `Image failed to load: ${e.type}`
-                               console.error(log)
-                               setDebugLogs(prev => [...prev, log])
+                               console.error('Image failed to load:', e.type)
                                setImageError(true)
                              }}
-                             onLoadStart={() => {
-                               const log = 'Image load started!'
-                               console.log(log)
-                               setDebugLogs(prev => [...prev, log])
-                             }}
                            />
-                           {/* Debug: Show image source info */}
-                           <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
-                             Debug: {previewImage ? 'Has Image' : 'No Image'}
-                           </div>
-                           {/* Debug: Show image dimensions */}
-                           <div className="absolute top-12 right-2 bg-red-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
-                             Canvas: {dimensions.width}×{dimensions.height}
-                           </div>
-                           {/* Debug: Show image element status */}
-                           <div className="absolute top-20 right-2 bg-green-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
-                             {imageLoaded ? 'IMG LOADED' : 'IMG LOADING'}
-                           </div>
-                           {/* Debug: Show image source details */}
-                           <div className="absolute top-28 right-2 bg-blue-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
-                             SRC: {previewImage ? (previewImage.startsWith('blob:') ? 'BLOB URL' : `${previewImage.substring(0, 20)}...`) : 'NO SRC'}
-                           </div>
-                           {/* Debug: Show previewImage state */}
-                           <div className="absolute top-36 right-2 bg-purple-500 bg-opacity-90 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 3 }}>
-                             STATE: {previewImage ? 'SET' : 'NULL'}
-                           </div>
                           
                           {/* Preview Badge */}
                           <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium" style={{ zIndex: 3 }}>
@@ -598,17 +520,6 @@ const PrintPreviewModal = ({
       </DialogContent>
     </Dialog>
 
-    {/* Debug Panel - Only show in development */}
-    {process.env.NODE_ENV === 'development' && debugLogs.length > 0 && (
-      <div className="fixed bottom-4 left-4 right-4 bg-black bg-opacity-90 text-white p-4 rounded-lg max-h-40 overflow-y-auto z-50">
-        <div className="text-sm font-mono">
-          <div className="font-bold mb-2">Debug Logs:</div>
-          {debugLogs.map((log, index) => (
-            <div key={index} className="text-xs mb-1">{log}</div>
-          ))}
-        </div>
-      </div>
-    )}
   </>
   )
 }
