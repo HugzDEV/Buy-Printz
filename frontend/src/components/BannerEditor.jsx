@@ -164,29 +164,26 @@ const BannerEditorNew = () => {
   // Utility functions
   const generateId = (type) => `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-  // Add text element
+  // Add text element using Konva.js Text
   const addText = useCallback(() => {
     const newText = {
       id: generateId('text'),
       type: 'text',
       x: canvasSize.width / 2 - 100,
       y: canvasSize.height / 2 - 15,
-      width: 200, // Wider default width to accommodate longer words
-      height: 30,
       text: 'Sample Text',
       fontSize: 24,
       fontFamily: 'Arial',
       fill: '#000000',
       rotation: 0,
       align: 'left',
-      verticalAlign: 'top',
-      lineHeight: 1.2,
-      letterSpacing: 0,
-      padding: 0
+      draggable: true
     }
     setElements(prev => [...prev, newText])
     setSelectedId(newText.id)
   }, [canvasSize])
+
+
 
   // Add shape element
   const addShape = useCallback((shapeType) => {
@@ -445,12 +442,14 @@ const BannerEditorNew = () => {
     }
   }, [canvasSize])
 
-  // Text property change handler
-  const handleTextPropertyChange = useCallback((property, value) => {
+
+
+  // Shape property change handler
+  const handleShapePropertyChange = useCallback((property, value) => {
     if (!selectedId) return
     
     setElements(prev => prev.map(el => {
-      if (el.id === selectedId && el.type === 'text') {
+      if (el.id === selectedId && (el.type === 'rect' || el.type === 'circle' || el.type === 'star' || el.type === 'triangle' || el.type === 'hexagon' || el.type === 'line')) {
         if (typeof value === 'function') {
           return { ...el, [property]: value(el[property]) }
         }
@@ -458,6 +457,24 @@ const BannerEditorNew = () => {
       }
       return el
     }))
+  }, [selectedId])
+
+  // Text property change handler for Konva.js Text
+  const handleTextPropertyChange = useCallback((property, value) => {
+    if (!selectedId) return
+    
+    // For text content, use debounced updates to prevent re-renders during typing
+    if (property === 'text') {
+      // Update immediately for visual feedback
+      setElements(prev => prev.map(el => 
+        el.id === selectedId && el.type === 'text' ? { ...el, [property]: value } : el
+      ))
+    } else {
+      // For other properties, update immediately
+      setElements(prev => prev.map(el => 
+        el.id === selectedId && el.type === 'text' ? { ...el, [property]: value } : el
+      ))
+    }
   }, [selectedId])
 
   // Change banner type
@@ -1735,6 +1752,7 @@ const BannerEditorNew = () => {
           onLoadTemplate={loadTemplate}
           onImageUpload={handleImageUpload}
           onTextPropertyChange={handleTextPropertyChange}
+          onShapePropertyChange={handleShapePropertyChange}
           onChangeBannerType={changeBannerType}
           onChangeCanvasSize={changeCanvasSize}
           onToggleCanvasOrientation={toggleCanvasOrientation}

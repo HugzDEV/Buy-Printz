@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { 
-  Type, 
+  Type,
   Image as ImageIcon, 
   Square, 
   Circle as CircleIcon,
@@ -37,6 +37,7 @@ const BannerSidebar = ({
   onLoadTemplate,
   onImageUpload,
   onTextPropertyChange,
+  onShapePropertyChange,
   onChangeBannerType,
   onChangeCanvasSize,
   onToggleCanvasOrientation,
@@ -58,6 +59,8 @@ const BannerSidebar = ({
   const [customWidth, setCustomWidth] = useState('800')
   const [customHeight, setCustomHeight] = useState('400')
   const [uploadedImages, setUploadedImages] = useState([])
+
+
 
   // Cleanup object URLs when component unmounts
   useEffect(() => {
@@ -857,215 +860,121 @@ const BannerSidebar = ({
                 <span className="font-medium">Add Text</span>
               </NeumorphicButton>
 
-              {/* Text Content Editor */}
-              {selectedElement && selectedElement.type === 'text' ? (
+              {/* Text Instructions */}
+              <div className="text-center py-4 text-sm text-gray-500">
+                <Type className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p>Double-click text elements on canvas to edit</p>
+              </div>
+
+              {/* Font Family */}
+              {selectedElement && selectedElement.type === 'text' && (
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <h4 className="text-sm font-medium text-gray-700">Text Content</h4>
-                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
-                      Editing
-                    </span>
-                  </div>
-                  <textarea
-                    value={selectedElement.text || ''}
-                    onChange={(e) => onTextPropertyChange?.('text', e.target.value)}
-                    className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
-                    rows={3}
-                    placeholder="Enter your text here..."
-                  />
-                  <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                    <span>{selectedElement.text?.length || 0} characters</span>
-                    <span>Press Enter for new line</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-4 text-sm text-gray-500">
-                  <Type className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>Select a text element to edit content</p>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Font Family</h4>
+                  <select 
+                    value={selectedElement.fontFamily || 'Arial'}
+                    className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    onChange={(e) => onTextPropertyChange?.('fontFamily', e.target.value)}
+                  >
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Impact">Impact</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Open Sans">Open Sans</option>
+                  </select>
                 </div>
               )}
 
-              {/* Font Family */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Font Family</h4>
-                <select 
-                  className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  onChange={(e) => onTextPropertyChange?.('fontFamily', e.target.value)}
-                >
-                  <option value="Arial">Arial</option>
-                  <option value="Helvetica">Helvetica</option>
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Verdana">Verdana</option>
-                  <option value="Impact">Impact</option>
-                  <option value="Comic Sans MS">Comic Sans MS</option>
-                  <option value="Courier New">Courier New</option>
-                </select>
-              </div>
-
               {/* Font Size */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Font Size</h4>
-                <div className="flex gap-2">
-                  <input 
-                    type="number" 
-                    min="8" 
-                    max="200"
-                    defaultValue="24"
-                    className="flex-1 p-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    onChange={(e) => onTextPropertyChange?.('fontSize', parseInt(e.target.value))}
-                  />
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('fontSize', (current) => (current || 24) + 2)}
-                    variant="glass"
-                    className="px-3 py-2"
-                  >
-                    +
-                  </NeumorphicButton>
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('fontSize', (current) => Math.max(8, (current || 24) - 2))}
-                    variant="glass"
-                    className="px-3 py-2"
-                  >
-                    -
-                  </NeumorphicButton>
+              {selectedElement && selectedElement.type === 'text' && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Font Size</h4>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-sm text-gray-600 min-w-[3rem]">
+                      {selectedElement.fontSize || 24}
+                    </span>
+                    <NeumorphicButton
+                      onClick={() => onTextPropertyChange?.('fontSize', (selectedElement.fontSize || 24) + 2)}
+                      variant="glass"
+                      className="px-3 py-2"
+                    >
+                      +
+                    </NeumorphicButton>
+                    <NeumorphicButton
+                      onClick={() => onTextPropertyChange?.('fontSize', Math.max(8, (selectedElement.fontSize || 24) - 2))}
+                      variant="glass"
+                      className="px-3 py-2"
+                    >
+                      -
+                    </NeumorphicButton>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Text Color */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Text Color</h4>
-                <div className="grid grid-cols-6 gap-2">
-                  {['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080', '#008000', '#ffc0cb'].map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => onTextPropertyChange?.('fill', color)}
-                      className="w-8 h-8 rounded-lg border-2 border-white/30 hover:border-white/50 transition-colors"
-                      style={{ backgroundColor: color }}
-                      title={color}
-                    />
-                  ))}
+              {selectedElement && selectedElement.type === 'text' && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Text Color</h4>
+                  <div className="grid grid-cols-6 gap-2">
+                    {['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080', '#008000', '#ffc0cb'].map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => onTextPropertyChange?.('fill', color)}
+                        className={`w-8 h-8 rounded-lg border-2 transition-colors ${
+                          (selectedElement.fill || '#000000') === color 
+                            ? 'border-blue-500 border-4' 
+                            : 'border-white/30 hover:border-white/50'
+                        }`}
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Text Alignment */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Alignment</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('align', 'left')}
-                    variant="glass"
-                    className="p-2 flex items-center justify-center"
-                    title="Left Align"
-                  >
-                    <div className="w-4 h-4 flex items-center">
-                      <div className="w-3 h-0.5 bg-current"></div>
-                    </div>
-                  </NeumorphicButton>
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('align', 'center')}
-                    variant="glass"
-                    className="p-2 flex items-center justify-center"
-                    title="Center Align"
-                  >
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <div className="w-3 h-0.5 bg-current"></div>
-                    </div>
-                  </NeumorphicButton>
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('align', 'right')}
-                    variant="glass"
-                    className="p-2 flex items-center justify-center"
-                    title="Right Align"
-                  >
-                    <div className="w-4 h-4 flex items-center justify-end">
-                      <div className="w-3 h-0.5 bg-current"></div>
-                    </div>
-                  </NeumorphicButton>
+              {selectedElement && selectedElement.type === 'text' && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Alignment</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    <NeumorphicButton
+                      onClick={() => onTextPropertyChange?.('align', 'left')}
+                      variant={(selectedElement.align || 'left') === 'left' ? 'primary' : 'glass'}
+                      className="p-2 flex items-center justify-center"
+                      title="Left Align"
+                    >
+                      <div className="w-4 h-4 flex items-center">
+                        <div className="w-3 h-0.5 bg-current"></div>
+                      </div>
+                    </NeumorphicButton>
+                    <NeumorphicButton
+                      onClick={() => onTextPropertyChange?.('align', 'center')}
+                      variant={(selectedElement.align || 'left') === 'center' ? 'primary' : 'glass'}
+                      className="p-2 flex items-center justify-center"
+                      title="Center Align"
+                    >
+                      <div className="w-4 h-4 flex items-center justify-center">
+                        <div className="w-3 h-0.5 bg-current"></div>
+                      </div>
+                    </NeumorphicButton>
+                    <NeumorphicButton
+                      onClick={() => onTextPropertyChange?.('align', 'right')}
+                      variant={(selectedElement.align || 'left') === 'right' ? 'primary' : 'glass'}
+                      className="p-2 flex items-center justify-center"
+                      title="Right Align"
+                    >
+                      <div className="w-4 h-4 flex items-center justify-end">
+                        <div className="w-3 h-0.5 bg-current"></div>
+                      </div>
+                    </NeumorphicButton>
+                  </div>
                 </div>
-              </div>
-
-              {/* Text Effects */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Text Effects</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('fontWeight', 'bold')}
-                    variant="glass"
-                    className="p-2 text-sm font-bold"
-                  >
-                    Bold
-                  </NeumorphicButton>
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('fontStyle', 'italic')}
-                    variant="glass"
-                    className="p-2 text-sm italic"
-                  >
-                    Italic
-                  </NeumorphicButton>
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('textDecoration', 'underline')}
-                    variant="glass"
-                    className="p-2 text-sm underline"
-                  >
-                    Underline
-                  </NeumorphicButton>
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('textDecoration', 'line-through')}
-                    variant="glass"
-                    className="p-2 text-sm line-through"
-                  >
-                    Strike
-                  </NeumorphicButton>
-                </div>
-              </div>
-
-              {/* Text Stroke (Outline) */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Text Outline</h4>
-                <div className="flex gap-2 items-center">
-                  <input 
-                    type="number" 
-                    min="0" 
-                    max="10"
-                    defaultValue="0"
-                    className="flex-1 p-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    placeholder="Width"
-                    onChange={(e) => onTextPropertyChange?.('strokeWidth', parseInt(e.target.value) || 0)}
-                  />
-                  <div className="w-8 h-8 rounded-lg border-2 border-white/30 cursor-pointer"
-                       style={{ backgroundColor: '#000000' }}
-                       onClick={() => onTextPropertyChange?.('stroke', '#000000')}
-                       title="Black outline"
-                  />
-                  <div className="w-8 h-8 rounded-lg border-2 border-white/30 cursor-pointer"
-                       style={{ backgroundColor: '#ffffff' }}
-                       onClick={() => onTextPropertyChange?.('stroke', '#ffffff')}
-                       title="White outline"
-                  />
-                </div>
-              </div>
-
-              {/* Text Shadow */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Text Shadow</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('shadowBlur', 5)}
-                    variant="glass"
-                    className="p-2 text-sm"
-                  >
-                    Add Shadow
-                  </NeumorphicButton>
-                  <NeumorphicButton
-                    onClick={() => onTextPropertyChange?.('shadowBlur', 0)}
-                    variant="glass"
-                    className="p-2 text-sm"
-                  >
-                    Remove Shadow
-                  </NeumorphicButton>
-                </div>
-              </div>
+              )}
             </div>
           )}
         </GlassCard>

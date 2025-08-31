@@ -84,6 +84,13 @@ const BannerCanvas = ({
   const [selectionRect, setSelectionRect] = useState(null)
   const [selectionStart, setSelectionStart] = useState(null)
   const [selectedIds, setSelectedIds] = useState([])
+  const [lastClickTime, setLastClickTime] = useState(0)
+  const [lastClickId, setLastClickId] = useState(null)
+  
+  // Text editing modal state
+  const [isTextModalOpen, setIsTextModalOpen] = useState(false)
+  const [editingTextId, setEditingTextId] = useState(null)
+  const [editingTextValue, setEditingTextValue] = useState('')
 
   // Glass UI Components
   const GlassButton = ({ children, onClick, className = "", variant = "default", disabled = false }) => {
@@ -338,6 +345,54 @@ const BannerCanvas = ({
     ))
   }
 
+  // Manual double-click detection
+  const handleTextClick = (elementId, elementText) => {
+    const now = Date.now()
+    const timeDiff = now - lastClickTime
+    const isDoubleClick = timeDiff < 300 && lastClickId === elementId // 300ms threshold
+    
+    if (isDoubleClick) {
+      setLastClickTime(0)
+      setLastClickId(null)
+      handleTextEdit(elementId, elementText)
+    } else {
+      setLastClickTime(now)
+      setLastClickId(elementId)
+    }
+  }
+
+  // Text editing modal functions
+  const openTextModal = (elementId, currentText) => {
+    setEditingTextId(elementId)
+    const cleanText = currentText || ''
+    setEditingTextValue(cleanText)
+    setIsTextModalOpen(true)
+  }
+
+  const closeTextModal = () => {
+    setIsTextModalOpen(false)
+    setEditingTextId(null)
+    setEditingTextValue('')
+  }
+
+  const saveTextEdit = () => {
+    if (editingTextId && editingTextValue !== undefined) {
+      handleElementChange(editingTextId, { text: editingTextValue })
+    }
+    closeTextModal()
+  }
+
+  const cancelTextEdit = () => {
+    closeTextModal()
+  }
+
+  // Text editing trigger function
+  const handleTextEdit = (elementId, currentText) => {
+    openTextModal(elementId, currentText)
+  }
+
+
+
   const handleDragEnd = (e, id) => {
     const node = e.target
     handleElementChange(id, {
@@ -485,6 +540,12 @@ const BannerCanvas = ({
       
       if (e.key === 'Delete' && selectedId) {
         deleteSelected()
+      } else if (e.key === 'Enter' && selectedId) {
+        // Trigger text editing when Enter is pressed on a selected text element
+        const selectedElement = elements.find(el => el.id === selectedId)
+        if (selectedElement && selectedElement.type === 'text') {
+          handleTextEdit(selectedElement.id, selectedElement.text)
+        }
       } else if (e.ctrlKey || e.metaKey) {
         switch (e.key) {
           case 'z':
@@ -509,25 +570,22 @@ const BannerCanvas = ({
 
 
 
-  // Update transformer
+  // Update transformer when selection or elements change
   useEffect(() => {
     const updateTransformer = () => {
       if (selectedIds.length > 0 && stageRef.current && transformerRef.current) {
         const selectedNodes = selectedIds.map(id => stageRef.current.findOne(`#${id}`)).filter(Boolean)
-        console.log('Multi-selection transformer update:', selectedNodes.length, 'nodes')
         if (selectedNodes.length > 0) {
           transformerRef.current.nodes(selectedNodes)
           transformerRef.current.getLayer()?.batchDraw()
         }
       } else if (selectedId && stageRef.current && transformerRef.current) {
         const selectedNode = stageRef.current.findOne(`#${selectedId}`)
-        console.log('Single selection transformer update:', selectedNode ? 'found' : 'not found')
         if (selectedNode) {
           transformerRef.current.nodes([selectedNode])
           transformerRef.current.getLayer()?.batchDraw()
         }
       } else if (transformerRef.current) {
-        console.log('Clearing transformer')
         transformerRef.current.nodes([])
         transformerRef.current.getLayer()?.batchDraw()
       }
@@ -579,7 +637,10 @@ const BannerCanvas = ({
         return (
           <Text
             key={element.id}
-            {...commonProps}
+            id={element.id}
+            x={element.x}
+            y={element.y}
+            draggable={true}
             text={element.text}
             fontSize={element.fontSize}
             fontFamily={element.fontFamily}
@@ -594,12 +655,35 @@ const BannerCanvas = ({
             lineHeight={element.lineHeight || 1.2}
             letterSpacing={element.letterSpacing || 0}
             padding={element.padding || 0}
-            onDblClick={() => {
-              // Enable text editing on double click
-              const newText = prompt('Edit text:', element.text)
-              if (newText !== null && newText !== element.text) {
-                handleElementChange(element.id, { text: newText })
+            onClick={(e) => {
+              // Only handle clicks if not selecting
+              if (!isSelecting) {
+                handleSelect(element.id)
               }
+              
+              // Handle manual double-click detection
+              handleTextClick(element.id, element.text)
+            }}
+            onTap={(e) => {
+              // Only handle taps if not selecting
+              if (!isSelecting) {
+                console.log('Text element tapped:', element.id)
+                handleSelect(element.id)
+              }
+            }}
+            onTouchStart={(e) => {
+              // Handle touch start for mobile
+              if (!isSelecting) {
+                console.log('Text element touch start:', element.id)
+                handleSelect(element.id)
+              }
+            }}
+            onDragEnd={(e) => handleDragEnd(e, element.id)}
+            onTransformEnd={(e) => handleTransformEnd(e, element.id)}
+            onDblClick={(e) => {
+              e.evt.preventDefault()
+              e.evt.stopPropagation()
+              handleTextEdit(element.id, element.text)
             }}
           />
         )
@@ -911,6 +995,8 @@ const BannerCanvas = ({
       <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden pb-16 sm:pb-20">
         <GlassPanel className="relative max-w-full max-h-full">
           
+          
+
           {/* Canvas - Mobile Responsive Scaling */}
           <div 
             className="relative rounded-xl overflow-hidden"
@@ -997,28 +1083,28 @@ const BannerCanvas = ({
                   finishSelection()
                 }
               }}
-              onClick={(e) => {
-                // Only deselect if clicking on the stage background, grid, or safe zone
-                const clickedOnEmpty = e.target === e.target.getStage() || 
-                                     e.target.attrs.fill === backgroundColor ||
-                                     e.target.attrs.fill === 'rgba(0,0,0,0.1)' ||
-                                     e.target.attrs.stroke === '#dc2626' // Safe zone border
-                if (clickedOnEmpty && !isSelecting) {
-                  setSelectedId(null)
-                  setSelectedIds([])
-                }
-              }}
-              onTap={(e) => {
-                // Same logic for touch events
-                const clickedOnEmpty = e.target === e.target.getStage() || 
-                                     e.target.attrs.fill === backgroundColor ||
-                                     e.target.attrs.fill === 'rgba(0,0,0,0.1)' ||
-                                     e.target.attrs.stroke === '#dc2626' // Safe zone border
-                if (clickedOnEmpty && !isSelecting) {
-                  setSelectedId(null)
-                  setSelectedIds([])
-                }
-              }}
+                              onClick={(e) => {
+                  // Only deselect if clicking on the stage background, grid, or safe zone
+                  const clickedOnEmpty = e.target === e.target.getStage() || 
+                                       e.target.attrs.fill === backgroundColor ||
+                                       e.target.attrs.fill === 'rgba(0,0,0,0.1)' ||
+                                       e.target.attrs.stroke === '#dc2626' // Safe zone border
+                  if (clickedOnEmpty && !isSelecting) {
+                    setSelectedId(null)
+                    setSelectedIds([])
+                  }
+                }}
+                              onTap={(e) => {
+                  // Same logic for touch events
+                  const clickedOnEmpty = e.target === e.target.getStage() || 
+                                       e.target.attrs.fill === backgroundColor ||
+                                       e.target.attrs.fill === 'rgba(0,0,0,0.1)' ||
+                                       e.target.attrs.stroke === '#dc2626' // Safe zone border
+                  if (clickedOnEmpty && !isSelecting) {
+                    setSelectedId(null)
+                    setSelectedIds([])
+                  }
+                }}
             >
               <Layer>
                 {/* Background */}
@@ -1343,7 +1429,93 @@ const BannerCanvas = ({
                   </>
                 )}
               </Layer>
-            </Stage>
+                        </Stage>
+
+            {/* Text Editing Modal */}
+            {isTextModalOpen && (
+              <div 
+                className="fixed inset-0 flex items-center justify-center z-50"
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  backdropFilter: 'blur(4px)'
+                }}
+                onClick={(e) => {
+                  // Close modal when clicking backdrop
+                  if (e.target === e.currentTarget) {
+                    cancelTextEdit()
+                  }
+                }}
+              >
+                <div 
+                  className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 border border-gray-200"
+                  style={{ direction: 'ltr', textAlign: 'left' }}
+                  onClick={(e) => {
+                    // Prevent closing when clicking inside the modal
+                    e.stopPropagation()
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800">Edit Text</h3>
+                    <button
+                      onClick={cancelTextEdit}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <input
+                    type="text"
+                    value={editingTextValue}
+                    onChange={(e) => setEditingTextValue(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter your text here..."
+                    autoFocus
+                    dir="ltr"
+                    style={{ 
+                      direction: 'ltr', 
+                      textAlign: 'left',
+                      unicodeBidi: 'normal',
+                      textDirection: 'ltr',
+                      writingMode: 'horizontal-tb',
+                      textOrientation: 'mixed'
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        saveTextEdit()
+                      }
+                      if (e.key === 'Escape') {
+                        e.preventDefault()
+                        cancelTextEdit()
+                      }
+                    }}
+                  />
+                  
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      onClick={saveTextEdit}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={cancelTextEdit}
+                      className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  
+                  <div className="text-xs text-gray-500 mt-2 text-center">
+                    Press Enter to save, Esc to cancel
+                  </div>
+                </div>
+              </div>
+            )}
+ 
           </div>
           
 

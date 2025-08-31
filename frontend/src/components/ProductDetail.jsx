@@ -505,7 +505,7 @@ const ProductDetail = () => {
             <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-white/10 to-transparent"></div>
           </div>
           
-          <div className="relative container mx-auto px-4">
+          <div className="relative container mx-auto px-4 max-w-7xl">
             <div className="flex items-center mb-8">
               <Link 
                 to="/products" 
@@ -516,7 +516,7 @@ const ProductDetail = () => {
               </Link>
             </div>
             
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">
                   {product.name}
@@ -552,10 +552,10 @@ const ProductDetail = () => {
 
         {/* Product Details */}
         <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-3 gap-8">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-8">
               {/* Description */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-1">
                 <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8 mb-8">
                   <div className="flex items-center mb-6">
                     <div className="p-3 rounded-full bg-primary-100/50 mr-4">
