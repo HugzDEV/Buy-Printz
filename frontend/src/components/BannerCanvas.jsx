@@ -657,21 +657,13 @@ const BannerCanvas = ({
         }
       },
       onTouchStart: (e) => {
-        // Handle touch start for mobile
-        console.log('Element touch start:', element.id, element.type)
-        // Clear any existing selection mode
+        // Let Konva handle touch events by default - only handle selection
         if (isSelecting) {
           finishSelection()
         }
         handleSelect(element.id)
       },
-      onDragStart: (e) => {
-        console.log('Element drag start:', element.id, element.type)
-      },
-      onDragEnd: (e) => {
-        console.log('Element drag end:', element.id, element.type)
-        handleDragEnd(e, element.id)
-      },
+      onDragEnd: (e) => handleDragEnd(e, element.id),
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
     }
 
@@ -715,21 +707,13 @@ const BannerCanvas = ({
               }
             }}
             onTouchStart={(e) => {
-              // Handle touch start for mobile
-              console.log('Text element touch start:', element.id)
-              // Clear any existing selection mode
+              // Let Konva handle touch events by default - only handle selection
               if (isSelecting) {
                 finishSelection()
               }
               handleSelect(element.id)
             }}
-            onDragStart={(e) => {
-              console.log('Text element drag start:', element.id)
-            }}
-            onDragEnd={(e) => {
-              console.log('Text element drag end:', element.id)
-              handleDragEnd(e, element.id)
-            }}
+            onDragEnd={(e) => handleDragEnd(e, element.id)}
             onTransformEnd={(e) => handleTransformEnd(e, element.id)}
             onDblClick={(e) => {
               e.evt.preventDefault()
@@ -1055,7 +1039,6 @@ const BannerCanvas = ({
               height: canvasSize.height * scale,
               maxWidth: '100%',
               maxHeight: '100%',
-              touchAction: 'none', // Prevent browser touch gestures
               userSelect: 'none' // Prevent text selection
             }}
           >
@@ -1065,27 +1048,20 @@ const BannerCanvas = ({
               height={canvasSize.height}
               scale={{ x: scale, y: scale }}
               draggable={false}
-              // Enhanced touch handling for mobile
-              onTouchStart={(e) => {
-                console.log('Stage touch start:', e.target === e.target.getStage() ? 'background' : 'element')
-                // Only prevent default on stage background to avoid zooming
-                if (e.target === e.target.getStage()) {
-                  e.evt.preventDefault()
-                }
-              }}
+              // Let Konva handle touch events by default - only handle selection mode
               onTouchMove={(e) => {
-                const stage = e.target.getStage()
-                const pos = stage.getPointerPosition()
-                
-                if (pos && isSelecting) {
-                  updateSelection({
-                    x: pos.x / scale,
-                    y: pos.y / scale
-                  })
+                if (isSelecting) {
+                  const stage = e.target.getStage()
+                  const pos = stage.getPointerPosition()
+                  if (pos) {
+                    updateSelection({
+                      x: pos.x / scale,
+                      y: pos.y / scale
+                    })
+                  }
                 }
               }}
               onTouchEnd={(e) => {
-                console.log('Stage touch end')
                 if (isSelecting) {
                   finishSelection()
                 }
