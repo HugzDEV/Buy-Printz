@@ -308,10 +308,8 @@ const PrintPreviewModal = ({
                                top: '50%',
                                left: '50%',
                                transform: 'translate(-50%, -50%)',
-                               maxWidth: '98%',
-                               maxHeight: '98%',
-                               minWidth: '80%',
-                               minHeight: '80%',
+                               width: '100%',
+                               height: '100%',
                                zIndex: 2,
                                border: '2px solid red'
                              }}

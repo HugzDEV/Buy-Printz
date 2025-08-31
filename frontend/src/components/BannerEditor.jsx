@@ -22,7 +22,7 @@ const BannerEditorNew = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
   // Canvas configuration
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 })
+  const [canvasSize, setCanvasSize] = useState({ width: 1200, height: 600 }) // Default to 2x4 ft banner size
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState('landscape') // 'landscape' or 'portrait'
   
@@ -50,7 +50,7 @@ const BannerEditorNew = () => {
     { name: '8x4 ft (Portrait)', width: 1200, height: 2400, orientation: 'portrait', category: 'portrait' },
     
     // Custom option
-    { name: 'Custom Size', width: 800, height: 400, orientation: 'landscape', category: 'custom' }
+    { name: 'Custom Size', width: 1200, height: 600, orientation: 'landscape', category: 'custom' }
   ]
   
   // All available banner types from products
