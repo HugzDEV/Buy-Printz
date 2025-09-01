@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -31,16 +31,21 @@ const PrintPreviewModal = ({
   const [previewUrl, setPreviewUrl] = useState(null)
   const [previewImage, setPreviewImage] = useState(null)
   const [qualityAnalysis, setQualityAnalysis] = useState(null)
+  const [error, setError] = useState(null)
+  
+  // Refs for cleanup
+  const timeoutRef = useRef(null)
+  const testImageRef = useRef(null)
+  const isMountedRef = useRef(true)
   
   // Function to get correct banner dimensions
-  const getBannerDimensions = () => {
-    console.log('getBannerDimensions called with:', { dimensions, orderDetails })
+  const getBannerDimensions = useCallback(() => {
     let width, height
     
     if (dimensions && dimensions.width && dimensions.height) {
       width = parseFloat(dimensions.width)
       height = parseFloat(dimensions.height)
-    } else if (orderDetails.banner_size) {
+    } else if (orderDetails?.banner_size) {
       const sizeMatch = orderDetails.banner_size.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/)
       if (sizeMatch) {
         width = parseFloat(sizeMatch[1])
@@ -59,65 +64,99 @@ const PrintPreviewModal = ({
     if (width > maxFeet) width = maxFeet
     if (height > maxFeet) height = maxFeet
     
-    console.log('getBannerDimensions returning:', { width, height })
     return { width, height }
-  }
+  }, [dimensions, orderDetails?.banner_size])
 
-  // Generate PDF when modal opens - Fixed race condition
+  // Cleanup function
+  const cleanup = useCallback(() => {
+    // Clear timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+    
+    // Clean up test image
+    if (testImageRef.current) {
+      testImageRef.current.onload = null
+      testImageRef.current.onerror = null
+      testImageRef.current = null
+    }
+    
+    // Revoke object URLs
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+  }, [previewUrl])
+
+  // Generate PDF when modal opens - Fixed race condition and memory leaks
   useEffect(() => {
     if (isOpen && orderDetails?.canvas_image) {
       // Clear previous state to prevent race conditions
       setPreviewImage(null)
       setPdfBlob(null)
-      setPreviewUrl(null)
+      setError(null)
       
       // Small delay to ensure state is cleared
-      setTimeout(() => {
-        generatePDF()
+      timeoutRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          generatePDF()
+        }
       }, 100)
     }
+    
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
+      cleanup()
     }
-  }, [isOpen, orderDetails?.canvas_image])
+  }, [isOpen, orderDetails?.canvas_image, cleanup, generatePDF])
 
-  const generatePDF = async () => {
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false
+      cleanup()
+    }
+  }, [cleanup])
+
+  const generatePDF = useCallback(async () => {
+    if (!isMountedRef.current) return
+    
     try {
       setIsGenerating(true)
+      setError(null)
       
       // Check if we have a perfect canvas image from the editor
       if (orderDetails?.canvas_image) {
-        console.log('Using perfect canvas image for preview!')
-        console.log('Canvas image length:', orderDetails.canvas_image.length)
-        console.log('Canvas image preview:', orderDetails.canvas_image.substring(0, 100) + '...')
-        
         // Validate the image data
         if (orderDetails.canvas_image.length < 100) {
-          console.error('Canvas image data is too short, likely corrupted')
-          setPreviewImage(null)
-          return
+          throw new Error('Canvas image data is too short, likely corrupted')
         }
         
         // Validate base64 image data
         if (!orderDetails.canvas_image.startsWith('data:image/')) {
-          console.error('Invalid image data format')
-          setPreviewImage(null)
-          return
+          throw new Error('Invalid image data format')
         }
         
         // Test image loading before setting state
         const testImage = new Image()
-        testImage.onload = () => {
-          console.log('Image loaded successfully, dimensions:', testImage.width, 'x', testImage.height)
-          setPreviewImage(orderDetails.canvas_image)
-        }
-        testImage.onerror = () => {
-          console.error('Failed to load image data')
-          setPreviewImage(null)
-        }
+        testImageRef.current = testImage
+        
+        const imageLoadPromise = new Promise((resolve, reject) => {
+          testImage.onload = () => {
+            if (isMountedRef.current) {
+              setPreviewImage(orderDetails.canvas_image)
+              resolve()
+            }
+          }
+          testImage.onerror = () => {
+            reject(new Error('Failed to load image data'))
+          }
+        })
+        
         testImage.src = orderDetails.canvas_image
+        
+        // Wait for image to load
+        await imageLoadPromise
         
         // Create PDF with the canvas image
         await createPDFFromImage(orderDetails.canvas_image)
@@ -125,29 +164,30 @@ const PrintPreviewModal = ({
       }
 
       // No canvas image available - this shouldn't happen with the new system
-      console.warn('No canvas image available for preview!')
-      setPreviewImage(null)
-      return
+      throw new Error('No canvas image available for preview')
     } catch (error) {
-      console.error('Error generating PDF:', error)
+      if (isMountedRef.current) {
+        console.error('Error generating PDF:', error)
+        setError(error.message)
+        setPreviewImage(null)
+      }
     } finally {
-      setIsGenerating(false)
+      if (isMountedRef.current) {
+        setIsGenerating(false)
+      }
     }
-  }
+  }, [orderDetails?.canvas_image, createPDFFromImage])
 
   // Create PDF directly from canvas image (perfect method)
-  const createPDFFromImage = async (imageDataURL) => {
+  const createPDFFromImage = useCallback(async (imageDataURL) => {
+    if (!isMountedRef.current) return
+    
     try {
-      console.log('Creating PDF from image data URL:', imageDataURL.substring(0, 50) + '...')
-      
       // Get actual banner dimensions using the same logic as UI
       const { width: printWidthFeet, height: printHeightFeet } = getBannerDimensions()
       
       const pdfWidthInches = printWidthFeet * 12
       const pdfHeightInches = printHeightFeet * 12
-
-      console.log(`Final banner dimensions: ${printWidthFeet}ft x ${printHeightFeet}ft`)
-      console.log(`PDF dimensions: ${pdfWidthInches}" x ${pdfHeightInches}"`)
 
       // Cap PDF dimensions while maintaining aspect ratio
       const maxInches = 200
@@ -174,8 +214,6 @@ const PrintPreviewModal = ({
         format: [cappedWidthInches, cappedHeightInches]
       })
 
-      console.log(`Creating PDF with dimensions: ${cappedWidthInches}" x ${cappedHeightInches}"`)
-
       // Add the canvas image to PDF
       pdf.addImage(imageDataURL, 'PNG', 0, 0, cappedWidthInches, cappedHeightInches, '', 'FAST')
 
@@ -183,7 +221,6 @@ const PrintPreviewModal = ({
       try {
         const watermarkPath = '/assets/images/BuyPrintz_Watermark_1200px_72dpi.png'
         pdf.addImage(watermarkPath, 'PNG', 0, 0, cappedWidthInches, cappedHeightInches, '', 'FAST')
-        console.log(`Added full canvas watermark to PDF`)
       } catch (watermarkError) {
         console.warn('Could not add watermark to PDF:', watermarkError)
       }
@@ -196,10 +233,10 @@ const PrintPreviewModal = ({
       pdf.setFontSize(12)
       const specs = [
         `Banner Dimensions: ${printWidthFeet}ft x ${printHeightFeet}ft (${pdfWidthInches}" x ${pdfHeightInches}")`,
-        `Material: ${orderDetails.banner_material || 'Standard Vinyl'}`,
-        `Finish: ${orderDetails.banner_finish || 'Matte'}`,
-        `Type: ${orderDetails.banner_type || 'Indoor/Outdoor'}`,
-        `Quantity: ${orderDetails.quantity || 1}`,
+        `Material: ${orderDetails?.banner_material || 'Standard Vinyl'}`,
+        `Finish: ${orderDetails?.banner_finish || 'Matte'}`,
+        `Type: ${orderDetails?.banner_type || 'Indoor/Outdoor'}`,
+        `Quantity: ${orderDetails?.quantity || 1}`,
         `Resolution: 300 DPI`,
         `Color Profile: CMYK`,
         `File Format: High-Quality PNG`
@@ -211,23 +248,25 @@ const PrintPreviewModal = ({
 
       // Create blob and URL
       const pdfBlob = pdf.output('blob')
-      setPdfBlob(pdfBlob)
       
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
+      if (isMountedRef.current) {
+        setPdfBlob(pdfBlob)
+        
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl)
+        }
+        const newPreviewUrl = URL.createObjectURL(pdfBlob)
+        setPreviewUrl(newPreviewUrl)
       }
-      const newPreviewUrl = URL.createObjectURL(pdfBlob)
-      setPreviewUrl(newPreviewUrl)
-      
-      console.log('PDF created successfully! Blob size:', pdfBlob.size, 'bytes')
-      console.log('PDF URL created:', newPreviewUrl)
     } catch (error) {
-      console.error('Error creating PDF from image:', error)
-      console.error('Error details:', error.message, error.stack)
+      if (isMountedRef.current) {
+        console.error('Error creating PDF from image:', error)
+        setError('Failed to create PDF preview')
+      }
     }
-  }
+  }, [getBannerDimensions, orderDetails])
 
-  const handleApprove = () => {
+  const handleApprove = useCallback(() => {
     // For final print approval, send the clean canvas image (no watermark)
     // The PDF blob contains watermark for customer protection
     const cleanPrintData = {
@@ -237,7 +276,31 @@ const PrintPreviewModal = ({
       dimensions: dimensions
     }
     onApprove(cleanPrintData)
-  }
+  }, [pdfBlob, orderDetails, dimensions, onApprove])
+
+  const handleDownload = useCallback(() => {
+    if (pdfBlob) {
+      const url = URL.createObjectURL(pdfBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `BuyPrintz-Banner-${orderDetails?.banner_type || 'Design'}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
+  }, [pdfBlob, orderDetails?.banner_type])
+
+  const handleImageLoad = useCallback(() => {
+    // Image loaded successfully - no console.log in production
+  }, [])
+
+  const handleImageError = useCallback((e) => {
+    if (isMountedRef.current) {
+      console.error('Banner image failed to load:', e)
+      setError('Failed to load banner preview')
+    }
+  }, [])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -254,10 +317,10 @@ const PrintPreviewModal = ({
 
         <div className="flex-1 overflow-y-auto min-h-0">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-6 p-2 sm:p-4 h-full">
-                          {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
-              <div className="xl:col-span-2 space-y-4 lg:space-y-6 overflow-hidden">
-                              {/* Banner Preview Card */}
-                <Card className="shadow-lg h-full overflow-y-auto">
+            {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
+            <div className="xl:col-span-2 space-y-4 lg:space-y-6 overflow-hidden">
+              {/* Banner Preview Card */}
+              <Card className="shadow-lg h-full overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Eye className="h-5 w-5 text-blue-600" />
@@ -273,9 +336,16 @@ const PrintPreviewModal = ({
                         <p className="text-sm text-gray-500">This may take a few seconds</p>
                       </div>
                     </div>
+                  ) : error ? (
+                    <div className="flex items-center justify-center h-64 bg-red-50 rounded-lg border-2 border-red-200">
+                      <div className="text-center space-y-2">
+                        <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
+                        <p className="text-red-600 font-medium">Preview Generation Failed</p>
+                        <p className="text-sm text-red-500">{error}</p>
+                      </div>
+                    </div>
                   ) : previewImage ? (
                     <div className="space-y-4">
-                      {console.log('Rendering preview image:', previewImage ? 'Image available' : 'No image')}
                       {/* Main Banner Preview */}
                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
                         <div className="relative group">
@@ -288,8 +358,8 @@ const PrintPreviewModal = ({
                               height: 'auto',
                               objectFit: 'contain'
                             }}
-                            onLoad={() => console.log('Banner image loaded successfully')}
-                            onError={(e) => console.error('Banner image failed to load:', e)}
+                            onLoad={handleImageLoad}
+                            onError={handleImageError}
                           />
                           
                           {/* Full Canvas Watermark - Bottom Layer */}
@@ -324,18 +394,7 @@ const PrintPreviewModal = ({
                       <div className="flex justify-center pt-4 sm:pt-6">
                         {previewUrl ? (
                           <Button
-                            onClick={() => {
-                              if (pdfBlob) {
-                                const url = URL.createObjectURL(pdfBlob)
-                                const a = document.createElement('a')
-                                a.href = url
-                                a.download = `BuyPrintz-Banner-${orderDetails.banner_type || 'Design'}.pdf`
-                                document.body.appendChild(a)
-                                a.click()
-                                document.body.removeChild(a)
-                                URL.revokeObjectURL(url)
-                              }
-                            }}
+                            onClick={handleDownload}
                             className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-base sm:text-lg font-medium shadow-lg"
                           >
                             <Download className="h-5 w-5" />
@@ -353,11 +412,11 @@ const PrintPreviewModal = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-64 bg-red-50 rounded-lg border-2 border-red-200">
+                    <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
                       <div className="text-center space-y-2">
-                        <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
-                        <p className="text-red-600 font-medium">Preview Generation Failed</p>
-                        <p className="text-sm text-red-500">Please try creating your order again</p>
+                        <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto" />
+                        <p className="text-gray-600 font-medium">No Preview Available</p>
+                        <p className="text-sm text-gray-500">Please try again</p>
                       </div>
                     </div>
                   )}
@@ -383,8 +442,8 @@ const PrintPreviewModal = ({
 
             {/* Right Column - Specifications (Takes 1/3 width on xl screens) */}
             <div className="space-y-3 sm:space-y-4 lg:space-y-6 overflow-hidden">
-                              {/* Print Specifications */}
-                <Card className="shadow-lg h-full overflow-y-auto">
+              {/* Print Specifications */}
+              <Card className="shadow-lg h-full overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <FileText className="h-5 w-5 text-blue-600" />
@@ -404,21 +463,21 @@ const PrintPreviewModal = ({
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <span className="text-sm font-medium text-gray-600">Material</span>
                         <Badge variant="outline" className="bg-white">
-                          {orderDetails.banner_material || 'Standard Vinyl'}
+                          {orderDetails?.banner_material || 'Standard Vinyl'}
                         </Badge>
                       </div>
                       
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <span className="text-sm font-medium text-gray-600">Finish</span>
                         <Badge variant="outline" className="bg-white">
-                          {orderDetails.banner_finish || 'Matte'}
+                          {orderDetails?.banner_finish || 'Matte'}
                         </Badge>
                       </div>
                       
                       <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <span className="text-sm font-medium text-gray-600">Quantity</span>
                         <Badge variant="outline" className="bg-white">
-                          {orderDetails.quantity || 1} piece(s)
+                          {orderDetails?.quantity || 1} piece(s)
                         </Badge>
                       </div>
                       
@@ -440,8 +499,8 @@ const PrintPreviewModal = ({
                 </CardContent>
               </Card>
 
-                              {/* Final Approval Checklist */}
-                <Card className="shadow-lg border-amber-200 h-full overflow-y-auto">
+              {/* Final Approval Checklist */}
+              <Card className="shadow-lg border-amber-200 h-full overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg text-amber-800">
                     <Check className="h-5 w-5" />
@@ -493,7 +552,7 @@ const PrintPreviewModal = ({
             
             <Button
               onClick={handleApprove}
-              disabled={!pdfBlob || isGenerating}
+              disabled={!pdfBlob || isGenerating || !!error}
               className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 order-1 sm:order-2 shadow-lg min-h-[44px]"
             >
               <Check className="h-4 w-4" />
