@@ -63,17 +63,25 @@ const PrintPreviewModal = ({
     return { width, height }
   }
 
-  // Generate PDF when modal opens
+  // Generate PDF when modal opens - Fixed race condition
   useEffect(() => {
-    if (isOpen && (canvasData || orderDetails?.canvas_image)) {
-      generatePDF()
+    if (isOpen && orderDetails?.canvas_image) {
+      // Clear previous state to prevent race conditions
+      setPreviewImage(null)
+      setPdfBlob(null)
+      setPreviewUrl(null)
+      
+      // Small delay to ensure state is cleared
+      setTimeout(() => {
+        generatePDF()
+      }, 100)
     }
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl)
       }
     }
-  }, [isOpen, canvasData, orderDetails])
+  }, [isOpen, orderDetails?.canvas_image])
 
   const generatePDF = async () => {
     try {
@@ -92,8 +100,24 @@ const PrintPreviewModal = ({
           return
         }
         
-        // Use the exported canvas image directly
-        setPreviewImage(orderDetails.canvas_image)
+        // Validate base64 image data
+        if (!orderDetails.canvas_image.startsWith('data:image/')) {
+          console.error('Invalid image data format')
+          setPreviewImage(null)
+          return
+        }
+        
+        // Test image loading before setting state
+        const testImage = new Image()
+        testImage.onload = () => {
+          console.log('Image loaded successfully, dimensions:', testImage.width, 'x', testImage.height)
+          setPreviewImage(orderDetails.canvas_image)
+        }
+        testImage.onerror = () => {
+          console.error('Failed to load image data')
+          setPreviewImage(null)
+        }
+        testImage.src = orderDetails.canvas_image
         
         // Create PDF with the canvas image
         await createPDFFromImage(orderDetails.canvas_image)
@@ -217,7 +241,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] h-auto overflow-hidden flex flex-col">
+      <DialogContent className="max-w-7xl w-[98vw] max-h-[95vh] h-auto overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Printer className="h-6 w-6 text-blue-600" />
@@ -228,12 +252,12 @@ const PrintPreviewModal = ({
           </p>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto min-h-0 pb-4">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-6 p-2 sm:p-4 max-h-[80vh] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-6 p-2 sm:p-4 h-full">
                           {/* Left Column - Main Preview (Takes 2/3 width on xl screens) */}
               <div className="xl:col-span-2 space-y-4 lg:space-y-6 overflow-hidden">
                               {/* Banner Preview Card */}
-                <Card className="shadow-lg max-h-[60vh] overflow-y-auto">
+                <Card className="shadow-lg h-full overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Eye className="h-5 w-5 text-blue-600" />
@@ -253,12 +277,12 @@ const PrintPreviewModal = ({
                     <div className="space-y-4">
                       {console.log('Rendering preview image:', previewImage ? 'Image available' : 'No image')}
                       {/* Main Banner Preview */}
-                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center min-h-[200px] sm:min-h-[250px]">
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 sm:p-4 flex items-center justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
                         <div className="relative group">
                           <img
                             src={previewImage}
                             alt="Banner Design Preview"
-                            className="max-w-full max-h-[250px] sm:max-h-[300px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
+                            className="max-w-full max-h-[280px] sm:max-h-[380px] lg:max-h-[480px] rounded-lg border-2 border-white shadow-xl transition-transform group-hover:scale-105"
                             style={{
                               maxWidth: '100%',
                               height: 'auto',
@@ -360,7 +384,7 @@ const PrintPreviewModal = ({
             {/* Right Column - Specifications (Takes 1/3 width on xl screens) */}
             <div className="space-y-3 sm:space-y-4 lg:space-y-6 overflow-hidden">
                               {/* Print Specifications */}
-                <Card className="shadow-lg max-h-[40vh] overflow-y-auto">
+                <Card className="shadow-lg h-full overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <FileText className="h-5 w-5 text-blue-600" />
@@ -416,8 +440,8 @@ const PrintPreviewModal = ({
                 </CardContent>
               </Card>
 
-              {/* Final Approval Checklist */}
-              <Card className="shadow-lg border-amber-200 max-h-[40vh] overflow-y-auto">
+                              {/* Final Approval Checklist */}
+                <Card className="shadow-lg border-amber-200 h-full overflow-y-auto">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg text-amber-800">
                     <Check className="h-5 w-5" />
@@ -456,7 +480,7 @@ const PrintPreviewModal = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-shrink-0 border-t pt-4 bg-gray-50">
+        <DialogFooter className="flex-shrink-0 border-t pt-4 bg-gray-50 mt-4">
           <div className="flex flex-col sm:flex-row gap-3 w-full justify-end">
             <Button
               variant="outline"
