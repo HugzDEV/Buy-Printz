@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Stage, Layer, Rect, Text, Image as KonvaImage, Transformer, Circle, Star, Line, RegularPolygon } from 'react-konva'
 import Konva from 'konva'
 
+// Enable text rendering fix for better text display
+Konva._fixTextRendering = true
+
 // Enable all events on Konva, even when dragging a node
 // This is required for proper touch handling on mobile devices
 Konva.hitOnDragEnabled = true
@@ -27,7 +30,8 @@ import {
   MoveDown,
   Layers,
   SendToBack,
-  Settings
+  Settings,
+  FileText
 } from 'lucide-react'
 
 const BannerCanvas = ({
@@ -169,7 +173,7 @@ const BannerCanvas = ({
   }, [])
 
   
-  // Text editing modal state
+
 
 
   // Glass UI Components
@@ -415,21 +419,46 @@ const BannerCanvas = ({
     setSelectionStart(null)
   }
 
+  // Text editing state
+  const [editingTextId, setEditingTextId] = useState(null)
+  const [editingTextValue, setEditingTextValue] = useState('')
+
   // Element handlers
   // Simple element selection handler
   const handleSelect = (id) => {
-    // Don't select elements if we're in the middle of a selection
-    if (isSelecting) {
-      console.log('Ignoring element selection during selection process:', id)
-      return
-    }
-    
     console.log('Element selected:', id)
+    console.log('Available elements:', elements)
+    console.log('Selected element type:', elements.find(el => el.id === id)?.type)
     setSelectedId(id)
     setSelectedIds([])
   }
 
+  // Text editing handlers
+  const handleTextDblClick = useCallback((id) => {
+    const element = elements.find(el => el.id === id)
+    if (element && element.type === 'text') {
+      setEditingTextId(id)
+      setEditingTextValue(element.text || '')
+    }
+  }, [elements])
+
+  const handleTextEditComplete = useCallback(() => {
+    if (editingTextId) {
+      setElements(prev => prev.map(el => 
+        el.id === editingTextId ? { ...el, text: editingTextValue } : el
+      ))
+      setEditingTextId(null)
+      setEditingTextValue('')
+    }
+  }, [editingTextId, editingTextValue])
+
+  const handleTextEditCancel = useCallback(() => {
+    setEditingTextId(null)
+    setEditingTextValue('')
+  }, [])
+
   const handleElementChange = (id, changes) => {
+    console.log('handleElementChange called:', { id, changes })
     setElements(prev => prev.map(el => 
       el.id === id ? { ...el, ...changes } : el
     ))
@@ -437,128 +466,7 @@ const BannerCanvas = ({
 
 
 
-  // Text editing functions - Konva recommended approach for mobile
-  const handleTextEdit = (elementId, currentText) => {
-    const textNode = stageRef.current?.findOne(`#${elementId}`)
-    if (!textNode) return
 
-    // Hide the text node and transformer during editing
-    textNode.hide()
-    if (transformerRef.current) {
-      transformerRef.current.hide()
-    }
-
-    const stage = textNode.getStage()
-    const textPosition = textNode.absolutePosition()
-    const stageBox = stage.container().getBoundingClientRect()
-    
-    // Calculate position considering stage scale and position
-    const areaPosition = {
-      x: stageBox.left + textPosition.x * scale + stagePos.x * scale,
-      y: stageBox.top + textPosition.y * scale + stagePos.y * scale,
-    }
-
-    const textarea = document.createElement('textarea')
-    document.body.appendChild(textarea)
-    textarea.value = textNode.text()
-    textarea.style.position = 'absolute'
-    textarea.style.top = areaPosition.y + 'px'
-    textarea.style.left = areaPosition.x + 'px'
-    textarea.style.width = (textNode.width() - textNode.padding() * 2) * scale + 'px'
-    textarea.style.height = (textNode.height() - textNode.padding() * 2 + 5) * scale + 'px'
-    textarea.style.fontSize = textNode.fontSize() * scale + 'px'
-    textarea.style.border = 'none'
-    textarea.style.padding = '0px'
-    textarea.style.margin = '0px'
-    textarea.style.overflow = 'hidden'
-    textarea.style.background = 'none'
-    textarea.style.outline = 'none'
-    textarea.style.resize = 'none'
-    textarea.style.lineHeight = textNode.lineHeight()
-    textarea.style.fontFamily = textNode.fontFamily()
-    textarea.style.transformOrigin = 'left top'
-    textarea.style.textAlign = textNode.align()
-    textarea.style.color = textNode.fill()
-    textarea.style.zIndex = '1000'
-    textarea.style.direction = 'ltr'
-    textarea.style.textDirection = 'ltr'
-    textarea.style.unicodeBidi = 'normal'
-    textarea.style.writingMode = 'horizontal-tb'
-    textarea.style.textOrientation = 'mixed'
-    textarea.style.userSelect = 'text'
-    textarea.style.webkitUserSelect = 'text'
-    textarea.style.mozUserSelect = 'text'
-    textarea.style.msUserSelect = 'text'
-    
-    const rotation = textNode.rotation()
-    let transform = ''
-    if (rotation) {
-      transform += 'rotateZ(' + rotation + 'deg)'
-    }
-    textarea.style.transform = transform
-    textarea.style.height = 'auto'
-    textarea.style.height = textarea.scrollHeight + 3 + 'px'
-    
-    // Focus with a slight delay to ensure proper positioning
-    setTimeout(() => {
-      textarea.focus()
-      textarea.select()
-    }, 10)
-
-    function removeTextarea() {
-      if (textarea.parentNode) {
-        textarea.parentNode.removeChild(textarea)
-      }
-      window.removeEventListener('click', handleOutsideClick)
-      window.removeEventListener('touchstart', handleOutsideClick)
-      window.removeEventListener('touchend', handleOutsideClick)
-      
-      // Show the text node and transformer again
-      textNode.show()
-      if (transformerRef.current) {
-        transformerRef.current.show()
-        transformerRef.current.forceUpdate()
-      }
-    }
-
-    function setTextareaWidth(newWidth) {
-      if (!newWidth) {
-        newWidth = textNode.placeholder?.length * textNode.fontSize()
-      }
-      textarea.style.width = newWidth * scale + 'px'
-    }
-
-    textarea.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        handleElementChange(elementId, { text: textarea.value })
-        removeTextarea()
-      }
-      if (e.key === 'Escape') {
-        removeTextarea()
-      }
-    })
-
-    textarea.addEventListener('input', function () {
-      const nodeScale = textNode.getAbsoluteScale().x
-      setTextareaWidth(textNode.width() * nodeScale)
-      textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + textNode.fontSize() * scale + 'px'
-    })
-
-    function handleOutsideClick(e) {
-      if (e.target !== textarea) {
-        handleElementChange(elementId, { text: textarea.value })
-        removeTextarea()
-      }
-    }
-
-    setTimeout(() => {
-      window.addEventListener('click', handleOutsideClick)
-      window.addEventListener('touchstart', handleOutsideClick)
-      window.addEventListener('touchend', handleOutsideClick)
-    })
-  }
 
 
 
@@ -709,12 +617,10 @@ const BannerCanvas = ({
       
       if (e.key === 'Delete' && selectedId) {
         deleteSelected()
-      } else if (e.key === 'Enter' && selectedId) {
-        // Trigger text editing when Enter is pressed on a selected text element
-        const selectedElement = elements.find(el => el.id === selectedId)
-        if (selectedElement && selectedElement.type === 'text') {
-          handleTextEdit(selectedElement.id, selectedElement.text)
-        }
+      } else if (e.key === 'Enter' && selectedId && selectedElement?.type === 'text') {
+        // Enter key to edit text when text element is selected
+        e.preventDefault()
+        handleTextDblClick(selectedId)
       } else if (e.ctrlKey || e.metaKey) {
         switch (e.key) {
           case 'z':
@@ -735,7 +641,7 @@ const BannerCanvas = ({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedId])
+  }, [selectedId, selectedElement, handleTextDblClick])
 
 
 
@@ -788,6 +694,7 @@ const BannerCanvas = ({
 
     switch (element.type) {
       case 'text':
+        console.log('Rendering text element:', element)
         return (
           <Text
             key={element.id}
@@ -795,13 +702,13 @@ const BannerCanvas = ({
             x={element.x}
             y={element.y}
             draggable={true}
-            text={element.text}
-            fontSize={element.fontSize}
-            fontFamily={element.fontFamily}
-            fill={element.fill}
-            width={element.width}
-            height={element.height}
-            rotation={element.rotation}
+            text={element.text || 'Sample Text'}
+            fontSize={element.fontSize || 24}
+            fontFamily={element.fontFamily || 'Arial'}
+            fill={element.fill || '#000000'}
+            width={element.width || 200}
+            height={element.height || 30}
+            rotation={element.rotation || 0}
             wrap="none"
             ellipsis={false}
             align={element.align || 'left'}
@@ -809,27 +716,25 @@ const BannerCanvas = ({
             lineHeight={element.lineHeight || 1.2}
             letterSpacing={element.letterSpacing || 0}
             padding={element.padding || 0}
+            listening={true}
             onClick={(e) => {
+              e.evt.stopPropagation()
               handleSelect(element.id)
             }}
             onTap={(e) => {
+              e.evt.stopPropagation()
               handleSelect(element.id)
             }}
-
-            onDragEnd={(e) => handleDragEnd(e, element.id)}
-            onTransformEnd={(e) => handleTransformEnd(e, element.id)}
             onDblClick={(e) => {
-              console.log('Double click detected on text:', element.id)
-              e.evt.preventDefault()
               e.evt.stopPropagation()
-              handleTextEdit(element.id, element.text)
+              handleTextDblClick(element.id)
             }}
             onDblTap={(e) => {
-              console.log('Double tap detected on text:', element.id)
-              e.evt.preventDefault()
               e.evt.stopPropagation()
-              handleTextEdit(element.id, element.text)
+              handleTextDblClick(element.id)
             }}
+            onDragEnd={(e) => handleDragEnd(e, element.id)}
+            onTransformEnd={(e) => handleTransformEnd(e, element.id)}
           />
         )
       
@@ -1154,16 +1059,46 @@ const BannerCanvas = ({
               userSelect: 'none' // Prevent text selection
             }}
           >
+            {/* Text Editing Overlay */}
+            {editingTextId && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20">
+                <div className="bg-white rounded-lg p-4 shadow-xl max-w-md w-full mx-4">
+                  <h3 className="text-lg font-semibold mb-3 text-gray-800">Edit Text</h3>
+                  <textarea
+                    value={editingTextValue}
+                    onChange={(e) => setEditingTextValue(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows={4}
+                    placeholder="Enter your text..."
+                    autoFocus
+                  />
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={handleTextEditComplete}
+                      className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleTextEditCancel}
+                      className="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-medium transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             <Stage
               ref={stageRef}
               width={canvasSize.width}
               height={canvasSize.height}
               scale={{ x: scale, y: scale }}
               draggable={false}
+              listening={true}
 
               onMouseDown={(e) => {
                 const stage = e.target.getStage()
-                console.log('Stage mouse down on:', e.target, 'target === stage:', e.target === stage)
                 
                 // Only handle if clicking directly on the stage background (not on elements)
                 if (e.target === stage) {
@@ -1175,7 +1110,6 @@ const BannerCanvas = ({
                   
                   // Start selection rectangle
                   const pos = stage.getPointerPosition()
-                  console.log('Stage pointer position:', pos, 'scale:', scale)
                   if (pos) {
                     startSelection({
                       x: pos.x / scale,
@@ -1542,6 +1476,21 @@ const BannerCanvas = ({
       `}>
         <GlassPanel className="flex flex-col gap-3 sm:gap-4 max-h-full">
           
+          {/* Debug Info */}
+          {selectedId && (
+            <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
+              <div>Selected ID: {selectedId}</div>
+              <div>Selected Element Type: {elements.find(el => el.id === selectedId)?.type}</div>
+              <div>Total Elements: {elements.length}</div>
+              <div>Text Elements: {elements.filter(el => el.type === 'text').length}</div>
+              {selectedElement?.type === 'text' && (
+                <div className="mt-1 text-blue-600 font-medium">
+                  💡 Double-click or press Enter to edit text
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* Top Row - DPI Info, Selection Count, and Close Button */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             {/* Close Button */}
@@ -1600,6 +1549,100 @@ const BannerCanvas = ({
             )}
           </div>
           
+          {/* Middle Row - Text Properties */}
+          {selectedId && selectedElement?.type === 'text' && (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 p-3 bg-white/20 rounded-lg border border-white/30 overflow-x-auto">
+              {/* Text Color Picker */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Color:</span>
+                <input
+                  type="color"
+                  value={selectedElement?.fill || '#000000'}
+                  onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
+                  className="w-8 h-8 rounded border-2 border-white/30 cursor-pointer"
+                  title="Choose text color"
+                />
+                <span className="text-xs text-gray-500 font-mono min-w-[4rem]">
+                  {selectedElement?.fill || '#000000'}
+                </span>
+              </div>
+              
+              {/* Divider */}
+              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
+              
+              {/* Font Size */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Size:</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleElementChange(selectedId, { fontSize: Math.max(8, (selectedElement?.fontSize || 24) - 2) })}
+                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                  >
+                    -
+                  </button>
+                  <span className="text-xs font-medium text-gray-700 min-w-[2rem] text-center">
+                    {selectedElement?.fontSize || 24}
+                  </span>
+                  <button
+                    onClick={() => handleElementChange(selectedId, { fontSize: Math.min(200, (selectedElement?.fontSize || 24) + 2) })}
+                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              
+              {/* Divider */}
+              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
+              
+              {/* Font Family */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Font:</span>
+                <select
+                  value={selectedElement?.fontFamily || 'Arial'}
+                  onChange={(e) => handleElementChange(selectedId, { fontFamily: e.target.value })}
+                  className="px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="Arial">Arial</option>
+                  <option value="Helvetica">Helvetica</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Verdana">Verdana</option>
+                  <option value="Impact">Impact</option>
+                  <option value="Comic Sans MS">Comic Sans MS</option>
+                </select>
+              </div>
+              
+              {/* Divider */}
+              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
+              
+              {/* Text Alignment */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Align:</span>
+                <div className="flex gap-1">
+                  {[
+                    { value: 'left', icon: '⫷', label: 'Left' },
+                    { value: 'center', icon: '⫸', label: 'Center' },
+                    { value: 'right', icon: '⫹', label: 'Right' }
+                  ].map((align) => (
+                    <button
+                      key={align.value}
+                      onClick={() => handleElementChange(selectedId, { align: align.value })}
+                      className={`w-6 h-6 rounded text-xs transition-colors duration-200 ${
+                        (selectedElement?.align || 'left') === align.value
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      }`}
+                      title={align.label}
+                    >
+                      {align.icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Middle Row - Shape Properties with Color Picker */}
           {selectedId && (
             (selectedElement?.type === 'rect' || 
@@ -1717,6 +1760,18 @@ const BannerCanvas = ({
             {/* Divider */}
             <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
             
+            {/* Text Edit Button */}
+            {selectedId && selectedElement?.type === 'text' && (
+              <GlassButton 
+                onClick={() => handleTextDblClick(selectedId)} 
+                variant="primary" 
+                className="px-3 py-2 flex items-center justify-center"
+              >
+                <FileText className="w-4 h-4 mr-1" />
+                <span className="text-xs">Edit Text</span>
+              </GlassButton>
+            )}
+            
             {/* Duplicate and Delete */}
             <div className="flex gap-2">
               <GlassButton onClick={duplicateSelected} className="px-3 py-2 flex items-center justify-center">
@@ -1730,19 +1785,7 @@ const BannerCanvas = ({
               </GlassButton>
             </div>
             
-            {/* Debug Text Edit Button - Only show for text elements */}
-            {selectedId && selectedElement?.type === 'text' && (
-              <>
-                <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-                <GlassButton 
-                  onClick={() => handleTextEdit(selectedId, selectedElement.text)} 
-                  className="px-3 py-2 flex items-center justify-center"
-                  title="Debug: Edit Text"
-                >
-                  <span className="text-xs">Edit Text</span>
-                </GlassButton>
-              </>
-            )}
+
           </div>
         </GlassPanel>
       </div>
