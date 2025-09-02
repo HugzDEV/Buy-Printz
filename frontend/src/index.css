@@ -12,53 +12,6 @@
   body {
     @apply bg-gray-50 text-gray-900;
   }
-  
-  /* Mobile viewport fixes */
-  * {
-    box-sizing: border-box;
-  }
-  
-  /* Ensure proper mobile modal positioning */
-  .mobile-modal-fix {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    z-index: 9999 !important;
-    display: flex !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    padding: 0.5rem !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-  
-  /* Mobile-specific modal content */
-  .mobile-modal-content {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0.5rem auto !important;
-    background: white !important;
-    border-radius: 0.5rem !important;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-    overflow: hidden !important;
-    max-height: calc(100vh - 1rem) !important;
-    max-height: calc(100dvh - 1rem) !important;
-  }
-  
-  /* Mobile touch improvements */
-  @media (max-width: 640px) {
-    .mobile-modal-fix {
-      padding: 0.25rem !important;
-    }
-    
-    .mobile-modal-content {
-      margin: 0.25rem auto !important;
-      max-height: calc(100vh - 0.5rem) !important;
-      max-height: calc(100dvh - 0.5rem) !important;
-    }
-  }
 }
 
 @layer components {
@@ -142,5 +95,23 @@
   to { 
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+/* Essential mobile fixes only - minimal and non-intrusive */
+@media (max-width: 768px) {
+  /* Ensure modal content doesn't overflow on mobile */
+  .max-w-5xl {
+    max-width: calc(100vw - 2rem) !important;
+  }
+  
+  /* Mobile image sizing */
+  .max-h-60 {
+    max-height: 15rem !important;
+  }
+  
+  /* Mobile button sizing */
+  .sm\:w-auto {
+    width: 100% !important;
   }
 }
