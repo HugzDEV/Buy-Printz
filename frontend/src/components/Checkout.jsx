@@ -98,18 +98,20 @@ const Checkout = () => {
   
   // Collapsible sections state - Progressive user journey
   const [expandedSections, setExpandedSections] = useState({
-    orderSummary: true,      // Start with order summary open
-    bannerOptions: false,    // Opens after user reviews order
-    customerInfo: false,     // Opens after banner options selected
-    payment: false           // Opens after customer info completed
+    printPreview: true,      // Start with print preview
+    bannerOptions: false,    // Opens after preview approval
+    shipping: false,         // Opens after banner options
+    customerInfo: false,     // Opens after shipping selection
+    reviewPayment: false     // Opens after customer info completion
   })
   
   const [loading, setLoading] = useState(false)
   const [paymentIntent, setPaymentIntent] = useState(null)
   const [orderId, setOrderId] = useState(null)
-  const [checkoutStep, setCheckoutStep] = useState('creating') // creating, preview, ready, processing, completed, error
+  const [checkoutStep, setCheckoutStep] = useState('printPreview') // printPreview, bannerOptions, shipping, customerInfo, reviewPayment, processing, completed, error
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [approvedPDF, setApprovedPDF] = useState(null)
+  const [previewApproved, setPreviewApproved] = useState(false)
 
   // Banner Options Configuration
   const grommetOptions = [
@@ -145,11 +147,20 @@ const Checkout = () => {
       ...prev,
       [section]: !prev[section]
     }))
+    
+    // Update checkout step when manually toggling sections
+    if (expandedSections[section]) {
+      // If closing a section, don't change step
+      return
+    } else {
+      // If opening a section, update step
+      setCheckoutStep(section)
+    }
   }
 
   // Progressive navigation functions
   const continueToNextSection = (currentSection) => {
-    const sectionOrder = ['orderSummary', 'bannerOptions', 'customerInfo', 'payment']
+    const sectionOrder = ['printPreview', 'bannerOptions', 'shipping', 'customerInfo', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const nextSection = sectionOrder[currentIndex + 1]
     
@@ -158,6 +169,9 @@ const Checkout = () => {
         ...prev,
         [nextSection]: true
       }))
+      
+      // Update checkout step
+      setCheckoutStep(nextSection)
       
       // Scroll to next section
       setTimeout(() => {
@@ -170,7 +184,7 @@ const Checkout = () => {
   }
 
   const goToPreviousSection = (currentSection) => {
-    const sectionOrder = ['orderSummary', 'bannerOptions', 'customerInfo', 'payment']
+    const sectionOrder = ['printPreview', 'bannerOptions', 'shipping', 'customerInfo', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const prevSection = sectionOrder[currentIndex - 1]
     
@@ -179,6 +193,9 @@ const Checkout = () => {
         ...prev,
         [prevSection]: true
       }))
+      
+      // Update checkout step
+      setCheckoutStep(prevSection)
       
       // Scroll to previous section
       setTimeout(() => {
@@ -296,9 +313,14 @@ const Checkout = () => {
 
   const handlePreviewApprove = (pdfBlob) => {
     setApprovedPDF(pdfBlob)
+    setPreviewApproved(true)
     setShowPreviewModal(false)
-    setCheckoutStep('ready')
-    toast.success('Design approved! Ready for payment.')
+    setCheckoutStep('bannerOptions')
+    setExpandedSections(prev => ({
+      ...prev,
+      bannerOptions: true
+    }))
+    toast.success('Design approved! Now configure your banner options.')
   }
 
   const handlePreviewCancel = () => {
@@ -426,102 +448,138 @@ const Checkout = () => {
         <div className="mb-8 backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl overflow-x-auto">
           <div className="flex items-center justify-between min-w-[600px] lg:min-w-0">
             <div className="flex items-center gap-2">
-              {getStepIcon('creating', checkoutStep)}
-              <span className={getStepStatus('creating', checkoutStep)}>Creating Order</span>
+              {getStepIcon('printPreview', checkoutStep)}
+              <span className={getStepStatus('printPreview', checkoutStep)}>Print Preview</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2">
               <div className={`h-full transition-all duration-500 ${
-                ['preview', 'ready', 'processing', 'completed'].includes(checkoutStep) 
+                ['bannerOptions', 'shipping', 'customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
                   ? 'bg-blue-500 w-full' 
                   : 'bg-gray-200 w-0'
               }`} />
             </div>
             <div className="flex items-center gap-2">
-              {getStepIcon('preview', checkoutStep)}
-              <span className={getStepStatus('preview', checkoutStep)}>Print Preview</span>
+              {getStepIcon('bannerOptions', checkoutStep)}
+              <span className={getStepStatus('bannerOptions', checkoutStep)}>Banner Options</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2">
               <div className={`h-full transition-all duration-500 ${
-                ['ready', 'processing', 'completed'].includes(checkoutStep) 
+                ['shipping', 'customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
                   ? 'bg-blue-500 w-full' 
                   : 'bg-gray-200 w-0'
               }`} />
             </div>
             <div className="flex items-center gap-2">
-              {getStepIcon('ready', checkoutStep)}
-              <span className={getStepStatus('ready', checkoutStep)}>Payment Ready</span>
+              {getStepIcon('shipping', checkoutStep)}
+              <span className={getStepStatus('shipping', checkoutStep)}>Shipping</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2">
               <div className={`h-full transition-all duration-500 ${
-                ['processing', 'completed'].includes(checkoutStep) 
+                ['customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
                   ? 'bg-blue-500 w-full' 
                   : 'bg-gray-200 w-0'
               }`} />
             </div>
             <div className="flex items-center gap-2">
-              {getStepIcon('processing', checkoutStep)}
-              <span className={getStepStatus('processing', checkoutStep)}>Processing</span>
+              {getStepIcon('customerInfo', checkoutStep)}
+              <span className={getStepStatus('customerInfo', checkoutStep)}>Customer Info</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2">
               <div className={`h-full transition-all duration-500 ${
-                checkoutStep === 'completed' 
-                  ? 'bg-green-500 w-full' 
+                ['reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
+                  ? 'bg-blue-500 w-full' 
                   : 'bg-gray-200 w-0'
               }`} />
             </div>
             <div className="flex items-center gap-2">
-              {getStepIcon('completed', checkoutStep)}
-              <span className={getStepStatus('completed', checkoutStep)}>Complete</span>
+              {getStepIcon('reviewPayment', checkoutStep)}
+              <span className={getStepStatus('reviewPayment', checkoutStep)}>Review & Payment</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Summary Card */}
+        <div className="mb-6 backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Package className="w-8 h-8 text-blue-600" />
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Order Summary</h3>
+                <p className="text-sm text-gray-600">
+                  {orderData?.dimensions?.width || 2}ft × {orderData?.dimensions?.height || 4}ft Banner
+                  {orderData?.quantity > 1 && ` × ${orderData.quantity}`}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-blue-600">
+                ${(orderData?.total_amount || 25) + 
+                   (grommetOptions.find(opt => opt.value === bannerOptions.grommets)?.price || 0) +
+                   (hemOptions.find(opt => opt.value === bannerOptions.hem)?.price || 0) +
+                   (polePocketOptions.find(opt => opt.value === bannerOptions.polePockets)?.price || 0) +
+                   (bannerOptions.windSlits ? 8 : 0) +
+                   (shippingOption === 'express' ? 25 : 
+                    shippingOption === 'overnight' ? 45 : 0)}
+              </p>
+              <p className="text-sm text-gray-600">Total (including options & shipping)</p>
             </div>
           </div>
         </div>
 
         <div className="space-y-6 max-w-4xl mx-auto">
-          {/* Order Summary */}
+          {/* Print Preview - Step 1 */}
           <CollapsibleSection
-            title="Order Summary"
-            icon={ShoppingCart}
-            isExpanded={expandedSections.orderSummary}
-            onToggle={() => toggleSection('orderSummary')}
+            title="Print Preview"
+            icon={Eye}
+            isExpanded={expandedSections.printPreview}
+            onToggle={() => toggleSection('printPreview')}
             defaultExpanded={true}
+            data-section="printPreview"
           >
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-3">
-                  <Package className="w-6 h-6 text-blue-600" />
-                  <div>
-                    <p className="font-semibold text-blue-900">Banner Design</p>
-                    <p className="text-sm text-blue-700">Custom vinyl banner</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-900">${orderData?.total_amount || 25}</p>
-                  <p className="text-sm text-blue-700">Total</p>
-                </div>
+              <div className="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
+                <Eye className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">Review Your Design</h3>
+                <p className="text-blue-700 mb-4">
+                  Before proceeding, please review your banner design to ensure it's exactly what you want printed.
+                </p>
+                <button
+                  onClick={() => setShowPreviewModal(true)}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
+                >
+                  <Eye className="w-5 h-5" />
+                  Preview Design
+                </button>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-600">Dimensions</p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {orderData?.dimensions?.width || 2}ft × {orderData?.dimensions?.height || 4}ft
-                  </p>
+              {previewApproved && (
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
+                    <div>
+                      <p className="font-semibold text-green-900">Design Approved!</p>
+                      <p className="text-sm text-green-700">Your design has been approved and is ready for production.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => continueToNextSection('printPreview')}
+                    className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Continue to Banner Options →
+                  </button>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-600">Quantity</p>
-                  <p className="text-lg font-semibold text-gray-900">{orderData?.quantity || 1}</p>
-                </div>
-              </div>
+              )}
             </div>
           </CollapsibleSection>
 
-          {/* Banner Options */}
+          {/* Banner Options - Step 2 */}
           <CollapsibleSection
-            title="Banner Options & Shipping"
+            title="Banner Options"
             icon={Settings}
             isExpanded={expandedSections.bannerOptions}
             onToggle={() => toggleSection('bannerOptions')}
             defaultExpanded={false}
+            data-section="bannerOptions"
           >
             <div className="space-y-6">
               {/* Grommets */}
@@ -561,13 +619,63 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {hemOptions.map((option) => (
                     <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 cursor-pointer transition-colors">
+                      <div className="mr-3">
+                        <input
+                          type="radio"
+                          name="hem"
+                          value={option.value}
+                          checked={bannerOptions.hem === option.value}
+                          onChange={(e) => setBannerOptions(prev => ({ ...prev, hem: e.target.value }))}
+                          className="text-purple-600"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Wind Slits */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Wind className="w-4 h-4 text-orange-600" />
+                  Wind Slits
+                </h4>
+                <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={bannerOptions.windSlits}
+                    onChange={(e) => setBannerOptions(prev => ({ ...prev, windSlits: e.target.checked }))}
+                    className="mr-3 text-orange-600"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">Add wind slits for outdoor use</p>
+                    <p className="text-sm text-green-600">+$8.00</p>
+                  </div>
+                </label>
+              </div>
+
+              {/* Pole Pockets */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-indigo-600" />
+                  Pole Pockets
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {polePocketOptions.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-indigo-300 cursor-pointer transition-colors">
                       <input
                         type="radio"
-                        name="hem"
+                        name="polePockets"
                         value={option.value}
-                        checked={bannerOptions.hem === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, hem: e.target.value }))}
-                        className="mr-3 text-purple-600"
+                        checked={bannerOptions.polePockets === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, polePockets: e.target.value }))}
+                        className="mr-3 text-indigo-600"
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
@@ -578,6 +686,39 @@ const Checkout = () => {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              {/* Navigation */}
+              <div className="flex justify-between pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => goToPreviousSection('bannerOptions')}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
+                >
+                  ← Back to Preview
+                </button>
+                <button
+                  onClick={() => continueToNextSection('bannerOptions')}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                >
+                  Continue to Shipping →
+                </button>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* Shipping - Step 3 */}
+          <CollapsibleSection
+            title="Shipping Options"
+            icon={Truck}
+            isExpanded={expandedSections.shipping}
+            onToggle={() => toggleSection('shipping')}
+            defaultExpanded={false}
+            data-section="shipping"
+          >
+            <div className="space-y-6">
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                <Truck className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <p className="text-green-700">Choose your preferred shipping method</p>
               </div>
 
               {/* Shipping Options */}
@@ -613,18 +754,40 @@ const Checkout = () => {
                   })}
                 </div>
               </div>
+
+              {/* Navigation */}
+              <div className="flex justify-between pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => goToPreviousSection('shipping')}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
+                >
+                  ← Back to Banner Options
+                </button>
+                <button
+                  onClick={() => continueToNextSection('shipping')}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                >
+                  Continue to Customer Info →
+                </button>
+              </div>
             </div>
           </CollapsibleSection>
 
-          {/* Customer Information */}
+          {/* Customer Information - Step 4 */}
           <CollapsibleSection
             title="Customer Information"
             icon={User}
             isExpanded={expandedSections.customerInfo}
             onToggle={() => toggleSection('customerInfo')}
             defaultExpanded={false}
+            data-section="customerInfo"
           >
             <div className="space-y-4">
+              <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <User className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <p className="text-blue-700">Please provide your contact and shipping information</p>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
@@ -703,25 +866,55 @@ const Checkout = () => {
                   />
                 </div>
               </div>
+
+              {/* Navigation */}
+              <div className="flex justify-between pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => goToPreviousSection('customerInfo')}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
+                >
+                  ← Back to Shipping
+                </button>
+                <button
+                  onClick={() => continueToNextSection('customerInfo')}
+                  disabled={!customerInfo.name || !customerInfo.email}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
+                >
+                  Continue to Review & Payment →
+                </button>
+              </div>
             </div>
           </CollapsibleSection>
 
-          {/* Payment Section */}
+          {/* Review & Payment - Step 5 */}
           <CollapsibleSection
-            title="Payment & Review"
+            title="Review & Payment"
             icon={CreditCardIcon}
-            isExpanded={expandedSections.payment}
-            onToggle={() => toggleSection('payment')}
+            isExpanded={expandedSections.reviewPayment}
+            onToggle={() => toggleSection('reviewPayment')}
             defaultExpanded={false}
+            data-section="reviewPayment"
           >
             <div className="space-y-6">
-              {/* Order Review */}
+              {/* Order Summary */}
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h4 className="font-semibold text-gray-900 mb-3">Order Review</h4>
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  Order Summary
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Banner Design:</span>
                     <span className="font-medium">${orderData?.total_amount || 25}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Banner Options:</span>
+                    <span className="font-medium">
+                      ${(grommetOptions.find(opt => opt.value === bannerOptions.grommets)?.price || 0) +
+                        (hemOptions.find(opt => opt.value === bannerOptions.hem)?.price || 0) +
+                        (polePocketOptions.find(opt => opt.value === bannerOptions.polePockets)?.price || 0) +
+                        (bannerOptions.windSlits ? 8 : 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
@@ -735,6 +928,10 @@ const Checkout = () => {
                       <span>Total:</span>
                       <span className="text-blue-600">
                         ${(orderData?.total_amount || 25) + 
+                           (grommetOptions.find(opt => opt.value === bannerOptions.grommets)?.price || 0) +
+                           (hemOptions.find(opt => opt.value === bannerOptions.hem)?.price || 0) +
+                           (polePocketOptions.find(opt => opt.value === bannerOptions.polePockets)?.price || 0) +
+                           (bannerOptions.windSlits ? 8 : 0) +
                            (shippingOption === 'express' ? 25 : 
                             shippingOption === 'overnight' ? 45 : 0)}
                       </span>
@@ -743,14 +940,41 @@ const Checkout = () => {
                 </div>
               </div>
 
+              {/* Customer Info Review */}
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                  <User className="w-5 h-5 text-blue-600" />
+                  Customer Information
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-700 font-medium">Name:</span>
+                    <p className="text-blue-900">{customerInfo.name || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="text-blue-700 font-medium">Email:</span>
+                    <p className="text-blue-900">{customerInfo.email || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="text-blue-700 font-medium">Phone:</span>
+                    <p className="text-blue-900">{customerInfo.phone || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="text-blue-700 font-medium">Address:</span>
+                    <p className="text-blue-900">
+                      {customerInfo.address ? `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.state} ${customerInfo.zipCode}` : 'Not provided'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={() => setShowPreviewModal(true)}
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                  onClick={() => goToPreviousSection('reviewPayment')}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
-                  <Eye className="w-5 h-5" />
-                  Preview Design
+                  ← Back to Customer Info
                 </button>
                 
                 <button
