@@ -37,6 +37,38 @@ import {
 import authService from '../services/auth'
 import PrintPreviewModal from './PrintPreviewModal'
 
+// Collapsible Section Component - Defined outside to prevent recreation
+const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle, defaultExpanded = false }) => (
+  <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <button
+      onClick={onToggle}
+      className="w-full px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 hover:from-gray-100 hover:to-gray-50 transition-all duration-200 flex items-center justify-between group"
+    >
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+          <Icon className="h-5 w-5 text-blue-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      </div>
+      <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+        {isExpanded ? (
+          <ChevronUp className="h-5 w-5 text-gray-600" />
+        ) : (
+          <ChevronDown className="h-5 w-5 text-gray-600" />
+        )}
+      </div>
+    </button>
+    
+    <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+      isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+    }`}>
+      <div className="p-6 space-y-6">
+        {children}
+      </div>
+    </div>
+  </div>
+)
+
 const Checkout = () => {
   const navigate = useNavigate()
   const stripe = useStripe()
@@ -64,12 +96,12 @@ const Checkout = () => {
   // Shipping Options State
   const [shippingOption, setShippingOption] = useState('standard')
   
-  // Collapsible sections state
+  // Collapsible sections state - Progressive user journey
   const [expandedSections, setExpandedSections] = useState({
-    orderSummary: true,
-    bannerOptions: true,
-    customerInfo: true,
-    payment: false
+    orderSummary: true,      // Start with order summary open
+    bannerOptions: false,    // Opens after user reviews order
+    customerInfo: false,     // Opens after banner options selected
+    payment: false           // Opens after customer info completed
   })
   
   const [loading, setLoading] = useState(false)
@@ -115,37 +147,48 @@ const Checkout = () => {
     }))
   }
 
-  // Collapsible Section Component
-  const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle, defaultExpanded = false }) => (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <button
-        onClick={onToggle}
-        className="w-full px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 hover:from-gray-100 hover:to-gray-50 transition-all duration-200 flex items-center justify-between group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-            <Icon className="h-5 w-5 text-blue-600" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        </div>
-        <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-          {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-gray-600" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-gray-600" />
-          )}
-        </div>
-      </button>
+  // Progressive navigation functions
+  const continueToNextSection = (currentSection) => {
+    const sectionOrder = ['orderSummary', 'bannerOptions', 'customerInfo', 'payment']
+    const currentIndex = sectionOrder.indexOf(currentSection)
+    const nextSection = sectionOrder[currentIndex + 1]
+    
+    if (nextSection) {
+      setExpandedSections(prev => ({
+        ...prev,
+        [nextSection]: true
+      }))
       
-      <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-        isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-      }`}>
-        <div className="p-6 space-y-6">
-          {children}
-        </div>
-      </div>
-    </div>
-  )
+      // Scroll to next section
+      setTimeout(() => {
+        const nextElement = document.querySelector(`[data-section="${nextSection}"]`)
+        if (nextElement) {
+          nextElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 300)
+    }
+  }
+
+  const goToPreviousSection = (currentSection) => {
+    const sectionOrder = ['orderSummary', 'bannerOptions', 'customerInfo', 'payment']
+    const currentIndex = sectionOrder.indexOf(currentSection)
+    const prevSection = sectionOrder[currentIndex - 1]
+    
+    if (prevSection) {
+      setExpandedSections(prev => ({
+        ...prev,
+        [prevSection]: true
+      }))
+      
+      // Scroll to previous section
+      setTimeout(() => {
+        const prevElement = document.querySelector(`[data-section="${prevSection}"]`)
+        if (prevElement) {
+          prevElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 300)
+    }
+  }
 
   useEffect(() => {
     const savedOrderData = sessionStorage.getItem('orderData')
@@ -478,7 +521,7 @@ const Checkout = () => {
             icon={Settings}
             isExpanded={expandedSections.bannerOptions}
             onToggle={() => toggleSection('bannerOptions')}
-            defaultExpanded={true}
+            defaultExpanded={false}
           >
             <div className="space-y-6">
               {/* Grommets */}
@@ -579,7 +622,7 @@ const Checkout = () => {
             icon={User}
             isExpanded={expandedSections.customerInfo}
             onToggle={() => toggleSection('customerInfo')}
-            defaultExpanded={true}
+            defaultExpanded={false}
           >
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -588,7 +631,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     value={customerInfo.name}
-                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Enter your full name"
                   />
@@ -598,7 +641,7 @@ const Checkout = () => {
                   <input
                     type="email"
                     value={customerInfo.email}
-                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Enter your email"
                   />
@@ -611,7 +654,7 @@ const Checkout = () => {
                   <input
                     type="tel"
                     value={customerInfo.phone}
-                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Enter your phone number"
                   />
@@ -621,7 +664,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     value={customerInfo.address}
-                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, address: e.target.value }))}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Enter your street address"
                   />
@@ -634,7 +677,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     value={customerInfo.city}
-                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, city: e.target.value }))}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="City"
                   />
@@ -644,7 +687,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     value={customerInfo.state}
-                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, state: e.target.value }))}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="State"
                   />
@@ -654,7 +697,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     value={customerInfo.zipCode}
-                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, zipCode: e.target.value }))}
+                    onChange={(e) => handleInputChange('zipCode', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="ZIP Code"
                   />
