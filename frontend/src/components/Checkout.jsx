@@ -61,9 +61,9 @@ const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle,
     </button>
     
     <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-      isExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
+      isExpanded ? 'max-h-[8000px] sm:max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
     }`}>
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {children}
       </div>
     </div>
@@ -1045,7 +1045,7 @@ const Checkout = () => {
               </div>
 
               {/* Turnaround Time */}
-              <div className="space-y-3">
+              <div className="space-y-3 mb-6">
                 <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-yellow-600" />
                   Turnaround Time
@@ -1073,7 +1073,7 @@ const Checkout = () => {
               </div>
 
               {/* Navigation */}
-              <div className="flex justify-between pt-4 border-t border-gray-200">
+              <div className="flex justify-between pt-6 pb-2 border-t border-gray-200 mt-6">
                 <button
                   onClick={() => goToPreviousSection('bannerOptions')}
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
