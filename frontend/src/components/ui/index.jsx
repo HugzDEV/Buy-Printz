@@ -6,16 +6,10 @@ export const Dialog = ({ open, onOpenChange, children }) => {
   if (!open) return null
   
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div 
-        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden my-4 mx-auto"
+        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          minHeight: 'min-content',
-          maxHeight: 'calc(100vh - 2rem)',
-          transform: 'translateZ(0)',
-          backfaceVisibility: 'hidden'
-        }}
       >
         {children}
       </div>
@@ -24,7 +18,7 @@ export const Dialog = ({ open, onOpenChange, children }) => {
 }
 
 export const DialogContent = ({ className = '', children }) => (
-  <div className={`overflow-y-auto w-full ${className}`} style={{ minHeight: 'min-content' }}>
+  <div className={`overflow-y-auto ${className}`}>
     {children}
   </div>
 )
