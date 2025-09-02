@@ -28,50 +28,42 @@ const PrintPreviewModal = ({
 }) => {
   const [pdfBlob, setPdfBlob] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState(null)
   const [previewImage, setPreviewImage] = useState(null)
-  const [qualityAnalysis, setQualityAnalysis] = useState(null)
 
-  // Generate PDF when modal opens
+  // Set preview image when modal opens - NO PDF generation for preview
   useEffect(() => {
-    if (isOpen && (canvasData || orderDetails?.canvas_image)) {
-      generatePDF()
+    if (isOpen && orderDetails?.canvas_image) {
+      console.log('Setting high-quality canvas image for preview!')
+      setPreviewImage(orderDetails.canvas_image)
+      setIsGenerating(false)
+    } else if (isOpen && !orderDetails?.canvas_image) {
+      console.warn('No canvas image available for preview!')
+      setPreviewImage(null)
+      setIsGenerating(false)
     }
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-    }
-  }, [isOpen, canvasData, orderDetails])
+  }, [isOpen, orderDetails])
 
-  const generatePDF = async () => {
+  // Generate PDF only when user approves (for production)
+  const generatePDFForProduction = async () => {
     try {
       setIsGenerating(true)
       
-      // Check if we have a perfect canvas image from the editor
       if (orderDetails?.canvas_image) {
-        console.log('Using perfect canvas image for preview!')
-        
-        // Use the exported canvas image directly
-        setPreviewImage(orderDetails.canvas_image)
-        
-        // Create PDF with the canvas image
+        console.log('Generating production PDF from high-quality canvas image...')
         await createPDFFromImage(orderDetails.canvas_image)
-        return
+      } else {
+        console.error('No canvas image available for PDF generation!')
+        throw new Error('No canvas image available')
       }
-
-      // No canvas image available - this shouldn't happen with the new system
-      console.warn('No canvas image available for preview!')
-      setPreviewImage(null)
-      return
     } catch (error) {
-      console.error('Error generating PDF:', error)
+      console.error('Error generating production PDF:', error)
+      throw error
     } finally {
       setIsGenerating(false)
     }
   }
 
-  // Create PDF directly from canvas image (perfect method)
+  // Create PDF directly from canvas image (production quality)
   const createPDFFromImage = async (imageDataURL) => {
     try {
       // Convert feet to inches for printing
@@ -80,34 +72,46 @@ const PrintPreviewModal = ({
       const pdfWidthInches = printWidthFeet * 12
       const pdfHeightInches = printHeightFeet * 12
 
-      // Create PDF with actual print dimensions
+      // Create PDF with actual print dimensions and production quality settings
       const pdf = new jsPDF({
         orientation: pdfWidthInches > pdfHeightInches ? 'landscape' : 'portrait',
         unit: 'in',
-        format: [pdfWidthInches, pdfHeightInches]
+        format: [pdfWidthInches, pdfHeightInches],
+        compress: false, // No compression for maximum quality
+        precision: 16 // Maximum precision for production quality
       })
 
-      // Add the canvas image to PDF
-      pdf.addImage(imageDataURL, 'PNG', 0, 0, pdfWidthInches, pdfHeightInches)
+      // Add the canvas image to PDF with maximum quality settings
+      // Use 'MEDIUM' quality for best balance of quality and file size
+      pdf.addImage(imageDataURL, 'PNG', 0, 0, pdfWidthInches, pdfHeightInches, undefined, 'MEDIUM', 0)
 
-      // Create blob and URL
+      // Create blob for production
       const pdfBlob = pdf.output('blob')
       setPdfBlob(pdfBlob)
       
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-      const newPreviewUrl = URL.createObjectURL(pdfBlob)
-      setPreviewUrl(newPreviewUrl)
-      
-      console.log('PDF created successfully from canvas image!')
+      console.log('Production-quality PDF created successfully!')
     } catch (error) {
-      console.error('Error creating PDF from image:', error)
+      console.error('Error creating production PDF:', error)
+      throw error
     }
   }
 
-  const handleApprove = () => {
-    onApprove(pdfBlob)
+  const handleApprove = async () => {
+    try {
+      // Generate PDF for production only when user approves
+      await generatePDFForProduction()
+      
+      // Now we have the PDF blob, proceed with approval
+      if (pdfBlob) {
+        onApprove(pdfBlob)
+      } else {
+        console.error('PDF generation failed - cannot approve')
+        alert('PDF generation failed. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error in approval process:', error)
+      alert('Error generating production PDF. Please try again.')
+    }
   }
 
   return (
@@ -176,10 +180,13 @@ const PrintPreviewModal = ({
                     </div>
 
                     {/* Print Information */}
-                    <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
+                    <div className="bg-green-50 rounded-lg p-3 sm:p-4">
                       <div className="text-center">
-                        <p className="text-sm font-medium text-blue-900">
-                          {dimensions.width}ft × {dimensions.height}ft - Print Ready
+                        <p className="text-sm font-medium text-green-900">
+                          {dimensions.width}ft × {dimensions.height}ft - Production Ready
+                        </p>
+                        <p className="text-xs text-green-700 mt-1">
+                          This is the exact image that will be printed
                         </p>
                       </div>
                     </div>
@@ -190,14 +197,14 @@ const PrintPreviewModal = ({
                         variant="outline"
                         onClick={() => {
                           const link = document.createElement('a')
-                          link.download = `banner-design-${orderDetails.banner_type || 'custom'}.jpg`
+                          link.download = `banner-design-${orderDetails.banner_type || 'custom'}.png`
                           link.href = previewImage
                           link.click()
                         }}
                         className="flex items-center gap-2"
                       >
                         <Download className="h-4 w-4" />
-                        Download Preview
+                        Download Production Image
                       </Button>
                     </div>
                   </div>
@@ -287,22 +294,9 @@ const PrintPreviewModal = ({
               Cancel
             </Button>
             
-            {previewUrl && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  window.open(previewUrl, '_blank')
-                }}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto"
-              >
-                <FileText className="h-4 w-4" />
-                View PDF
-              </Button>
-            )}
-            
             <Button
               onClick={handleApprove}
-              disabled={!pdfBlob}
+              disabled={!orderDetails?.canvas_image}
               className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <Check className="h-4 w-4" />
@@ -312,7 +306,7 @@ const PrintPreviewModal = ({
           
           {/* Debug indicator for mobile */}
           <div className="text-xs text-gray-500 text-center sm:hidden">
-            Footer visible - {pdfBlob ? 'PDF ready' : 'PDF generating...'}
+            Footer visible - {orderDetails?.canvas_image ? 'Image ready' : 'No image available'}
           </div>
         </DialogFooter>
       </DialogContent>
