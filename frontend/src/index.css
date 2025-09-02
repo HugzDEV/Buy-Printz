@@ -97,25 +97,3 @@
     opacity: 1;
   }
 }
-
-/* Minimal mobile fixes - only for mobile viewports */
-@media (max-width: 768px) {
-  /* Ensure modal is visible on mobile */
-  .fixed.inset-0 {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-  }
-  
-  /* Mobile modal sizing */
-  .bg-white.rounded-lg.shadow-xl {
-    max-width: calc(100vw - 1rem) !important;
-    width: calc(100vw - 1rem) !important;
-    margin: 0.5rem !important;
-  }
-}

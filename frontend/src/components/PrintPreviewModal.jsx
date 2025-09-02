@@ -112,7 +112,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`max-w-5xl max-h-[90vh] overflow-y-auto p-6`}>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-6">
         <DialogHeader className="pb-6">
           <DialogTitle className="flex items-center gap-2">
             <Printer className="h-5 w-5" />
@@ -120,7 +120,7 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 pb-8`}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 pb-8">
           {/* Left Column - Preview */}
           <div className="space-y-4 lg:space-y-6">
             <Card>
