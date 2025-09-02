@@ -60,9 +60,9 @@ const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle,
     </button>
     
     <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-      isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+      isExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
     }`}>
-      <div className="p-6 space-y-6">
+      <div className="p-6">
         {children}
       </div>
     </div>
@@ -174,7 +174,8 @@ const Checkout = () => {
     turnaround: 'next-day',
     jobName: '',
     quantity: 1,
-    material: '13oz-vinyl' // Added material selection
+    material: '13oz-vinyl', // Added material selection
+    showAdvancedOptions: false // Added for advanced options expansion
   })
   
   // Shipping Options State
@@ -670,7 +671,7 @@ const Checkout = () => {
             defaultExpanded={false}
             data-section="bannerOptions"
           >
-            <div className="space-y-6">
+            <div className="space-y-6 pb-6">
               {/* Job Details */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -850,116 +851,136 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Webbing */}
+              {/* Additional Options - Expandable Section */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Package className="w-4 h-4 text-green-600" />
-                  Webbing & Hanging Options
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.webbing.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="webbing"
-                        value={option.value}
-                        checked={bannerOptions.webbing === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, webbing: e.target.value }))}
-                        className="mr-3 text-green-600"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
-                        </p>
+                <button
+                  type="button"
+                  onClick={() => setBannerOptions(prev => ({ ...prev, showAdvancedOptions: !prev.showAdvancedOptions }))}
+                  className="flex items-center justify-between w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-gray-600" />
+                    <span className="font-semibold text-gray-900">Additional Options</span>
+                    <span className="text-sm text-gray-500">(Webbing, Corners, Rope, Wind Slits)</span>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-gray-600 transition-transform ${bannerOptions.showAdvancedOptions ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {bannerOptions.showAdvancedOptions && (
+                  <div className="space-y-6 pl-4 border-l-2 border-gray-200">
+                    {/* Webbing */}
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
+                        <Package className="w-4 h-4 text-green-600" />
+                        Webbing & Hanging Options
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {bannerOptionsConfig.webbing.map((option) => (
+                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 cursor-pointer transition-colors">
+                            <input
+                              type="radio"
+                              name="webbing"
+                              value={option.value}
+                              checked={bannerOptions.webbing === option.value}
+                              onChange={(e) => setBannerOptions(prev => ({ ...prev, webbing: e.target.value }))}
+                              className="mr-3 text-green-600"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{option.label}</p>
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              </p>
+                            </div>
+                          </label>
+                        ))}
                       </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
+                    </div>
 
-              {/* Corner Reinforcement */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Package className="w-4 h-4 text-orange-600" />
-                  Corner Reinforcement
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.corners.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="corners"
-                        value={option.value}
-                        checked={bannerOptions.corners === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, corners: e.target.value }))}
-                        className="mr-3 text-orange-600"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
-                        </p>
+                    {/* Corner Reinforcement */}
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
+                        <Package className="w-4 h-4 text-orange-600" />
+                        Corner Reinforcement
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {bannerOptionsConfig.corners.map((option) => (
+                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer transition-colors">
+                            <input
+                              type="radio"
+                              name="corners"
+                              value={option.value}
+                              checked={bannerOptions.corners === option.value}
+                              onChange={(e) => setBannerOptions(prev => ({ ...prev, corners: e.target.value }))}
+                              className="mr-3 text-orange-600"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{option.label}</p>
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              </p>
+                            </div>
+                          </label>
+                        ))}
                       </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
+                    </div>
 
-              {/* Rope Options */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Package className="w-4 h-4 text-red-600" />
-                  Rope Options
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.rope.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-red-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="rope"
-                        value={option.value}
-                        checked={bannerOptions.rope === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, rope: e.target.value }))}
-                        className="mr-3 text-red-600"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
-                        </p>
+                    {/* Rope Options */}
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
+                        <Package className="w-4 h-4 text-red-600" />
+                        Rope Options
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {bannerOptionsConfig.rope.map((option) => (
+                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-red-300 cursor-pointer transition-colors">
+                            <input
+                              type="radio"
+                              name="rope"
+                              value={option.value}
+                              checked={bannerOptions.rope === option.value}
+                              onChange={(e) => setBannerOptions(prev => ({ ...prev, rope: e.target.value }))}
+                              className="mr-3 text-red-600"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{option.label}</p>
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              </p>
+                            </div>
+                          </label>
+                        ))}
                       </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
+                    </div>
 
-              {/* Wind Slits */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Wind className="w-4 h-4 text-cyan-600" />
-                  Wind Slits
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.windslits.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-cyan-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="windslits"
-                        value={option.value}
-                        checked={bannerOptions.windslits === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, windslits: e.target.value }))}
-                        className="mr-3 text-cyan-600"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
-                        </p>
+                    {/* Wind Slits */}
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
+                        <Wind className="w-4 h-4 text-cyan-600" />
+                        Wind Slits
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {bannerOptionsConfig.windslits.map((option) => (
+                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-cyan-300 cursor-pointer transition-colors">
+                            <input
+                              type="radio"
+                              name="windslits"
+                              value={option.value}
+                              checked={bannerOptions.windslits === option.value}
+                              onChange={(e) => setBannerOptions(prev => ({ ...prev, windslits: e.target.value }))}
+                              className="mr-3 text-cyan-600"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{option.label}</p>
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              </p>
+                            </div>
+                          </label>
+                        ))}
                       </div>
-                    </label>
-                  ))}
-                </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Turnaround Time */}
