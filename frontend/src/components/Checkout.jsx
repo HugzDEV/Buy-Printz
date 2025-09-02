@@ -85,12 +85,95 @@ const Checkout = () => {
     zipCode: ''
   })
   
-  // Banner Options State
+  // Banner Options Configuration - Updated to match Supabase table
+  const bannerOptionsConfig = {
+    // 1. Width x Height (from editor - already handled)
+    // 2. # of sides
+    sides: [
+      { value: 1, label: 'Single Sided', price: 0 },
+      { value: 2, label: 'Double Sided', price: 25 }
+    ],
+    
+    // 3. Material (from editor - already handled)
+    // 4. Pole Pockets
+    polePockets: [
+      { value: 'none', label: 'No Pole Pockets', price: 0 },
+      { value: '2in-top', label: '2" Pocket - Top Only (fits 1" pole)', price: 8 },
+      { value: '3in-top', label: '3" Pocket - Top Only (fits 1.5" pole)', price: 10 },
+      { value: '4in-top', label: '4" Pocket - Top Only (fits 2" pole)', price: 12 },
+      { value: '2in-top-bottom', label: '2" Pockets - Top & Bottom', price: 15 },
+      { value: '3in-top-bottom', label: '3" Pockets - Top & Bottom', price: 18 },
+      { value: '4in-top-bottom', label: '4" Pockets - Top & Bottom', price: 22 }
+    ],
+    
+    // 5. Hem Options
+    hem: [
+      { value: 'no-hem', label: 'No Hem', price: 0 },
+      { value: 'all-sides', label: 'All Sides Hem', price: 12 }
+    ],
+    
+    // 6. Grommet Options
+    grommets: [
+      { value: 'every-2ft-all-sides', label: 'Every 2\' - All Sides', price: 15 },
+      { value: 'every-2ft-top-bottom', label: 'Every 2\' - Top & Bottom', price: 12 },
+      { value: 'every-2ft-left-right', label: 'Every 2\' - Left & Right', price: 10 },
+      { value: '4-corners-only', label: '4 Corners Only', price: 8 },
+      { value: 'no-grommets', label: 'No Grommets', price: 0 }
+    ],
+    
+    // 7. Webbing Options
+    webbing: [
+      { value: 'no-webbing', label: 'No Webbing', price: 0 },
+      { value: '1in-webbing', label: '1" Webbing', price: 18 },
+      { value: '1in-webbing-d-rings', label: '1" Webbing w/ D-rings', price: 25 },
+      { value: '1in-velcro-all-sides', label: '1" Velcro - All Sides', price: 22 }
+    ],
+    
+    // 8. Corner Reinforcement
+    corners: [
+      { value: 'no-reinforcement', label: 'No Reinforced Corners', price: 0 },
+      { value: 'reinforce-top-only', label: 'Reinforce Top Only', price: 8 },
+      { value: 'reinforce-bottom-only', label: 'Reinforce Bottom Only', price: 8 },
+      { value: 'reinforce-all-corners', label: 'Reinforce All Corners', price: 15 }
+    ],
+    
+    // 9. Rope Options
+    rope: [
+      { value: 'no-rope', label: 'No Rope', price: 0 },
+      { value: '3-16-top-only', label: '3/16" Rope - Top Only', price: 12 },
+      { value: '3-16-bottom-only', label: '3/16" Rope - Bottom Only', price: 12 },
+      { value: '3-16-top-bottom', label: '3/16" Rope - Top & Bottom', price: 20 },
+      { value: '5-16-top-only', label: '5/16" Rope - Top Only', price: 15 },
+      { value: '5-16-bottom-only', label: '5/16" Rope - Bottom Only', price: 15 },
+      { value: '5-16-top-bottom', label: '5/16" Rope - Top & Bottom', price: 25 }
+    ],
+    
+    // 10. Wind Slits
+    windslits: [
+      { value: 'no-windslits', label: 'No Wind Slits', price: 0 },
+      { value: 'standard-windslits', label: 'Standard Wind Slits', price: 8 }
+    ],
+    
+    // Turnaround Time
+    turnaround: [
+      { value: 'next-day', label: 'Next Day (4pm PST Cutoff) - Free', price: 0 },
+      { value: 'same-day', label: 'Same Day (12pm PST Cutoff) +$8.00', price: 8 }
+    ]
+  }
+
+  // Banner Options State - Updated to match Supabase structure
   const [bannerOptions, setBannerOptions] = useState({
-    grommets: 'every-2ft',
-    hem: 'standard-hem',
-    windSlits: false,
-    polePockets: 'none'
+    sides: 1,
+    polePockets: 'none',
+    hem: 'no-hem',
+    grommets: 'every-2ft-all-sides',
+    webbing: 'no-webbing',
+    corners: 'no-reinforcement',
+    rope: 'no-rope',
+    windslits: 'no-windslits',
+    turnaround: 'next-day',
+    jobName: '',
+    quantity: 1
   })
   
   // Shipping Options State
@@ -113,28 +196,7 @@ const Checkout = () => {
   const [approvedPDF, setApprovedPDF] = useState(null)
   const [previewApproved, setPreviewApproved] = useState(false)
 
-  // Banner Options Configuration
-  const grommetOptions = [
-    { value: 'every-2ft', label: 'Every 2 feet (Standard)', price: 0 },
-    { value: 'every-18in', label: 'Every 18 inches', price: 5 },
-    { value: 'corners-only', label: 'Corners only', price: -5 },
-    { value: 'no-grommets', label: 'No grommets', price: -10 }
-  ]
-
-  const hemOptions = [
-    { value: 'standard-hem', label: 'Standard 1" hem', price: 0 },
-    { value: 'reinforced-hem', label: 'Reinforced double hem', price: 8 },
-    { value: 'welded-hem', label: 'Heat welded hem', price: 12 },
-    { value: 'rope-hem', label: 'Rope reinforced hem', price: 15 }
-  ]
-
-  const polePocketOptions = [
-    { value: 'none', label: 'No pole pockets', price: 0 },
-    { value: 'top', label: 'Top pole pocket', price: 8 },
-    { value: 'top-bottom', label: 'Top & bottom pole pockets', price: 15 },
-    { value: 'sides', label: 'Side pole pockets', price: 12 }
-  ]
-
+  // Shipping Options Configuration
   const shippingOptions = [
     { value: 'standard', label: 'Standard Shipping (5-7 days)', price: 0, icon: Truck },
     { value: 'express', label: 'Express Shipping (2-3 days)', price: 25, icon: Zap },
@@ -395,14 +457,19 @@ const Checkout = () => {
   const basePrice = basePrices[orderData.product_type] || 50.00
   
   // Calculate banner options costs
-  const grommetCost = grommetOptions.find(opt => opt.value === bannerOptions.grommets)?.price || 0
-  const hemCost = hemOptions.find(opt => opt.value === bannerOptions.hem)?.price || 0
-  const polePocketCost = polePocketOptions.find(opt => opt.value === bannerOptions.polePockets)?.price || 0
-  const windSlitCost = bannerOptions.windSlits ? 8 : 0
+  const sidesCost = bannerOptionsConfig.sides.find(opt => opt.value === bannerOptions.sides)?.price || 0
+  const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
+  const hemCost = bannerOptionsConfig.hem.find(opt => opt.value === bannerOptions.hem)?.price || 0
+  const polePocketCost = bannerOptionsConfig.polePockets.find(opt => opt.value === bannerOptions.polePockets)?.price || 0
+  const webbingCost = bannerOptionsConfig.webbing.find(opt => opt.value === bannerOptions.webbing)?.price || 0
+  const cornersCost = bannerOptionsConfig.corners.find(opt => opt.value === bannerOptions.corners)?.price || 0
+  const ropeCost = bannerOptionsConfig.rope.find(opt => opt.value === bannerOptions.rope)?.price || 0
+  const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
+  const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
   
-  const optionsTotal = grommetCost + hemCost + polePocketCost + windSlitCost
-  const subtotal = basePrice * orderData.quantity + optionsTotal
+  const optionsTotal = sidesCost + grommetCost + hemCost + polePocketCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
+  const subtotal = (orderData?.total_amount || 25) * bannerOptions.quantity + optionsTotal
   const totalAmount = subtotal + shippingCost
 
   const getStepIcon = (step, currentStep) => {
@@ -507,21 +574,21 @@ const Checkout = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Order Summary</h3>
                 <p className="text-sm text-gray-600">
                   {orderData?.dimensions?.width || 2}ft × {orderData?.dimensions?.height || 4}ft Banner
-                  {orderData?.quantity > 1 && ` × ${orderData.quantity}`}
+                  {bannerOptions.quantity > 1 && ` × ${bannerOptions.quantity}`}
+                  {bannerOptions.sides === 2 && ' (Double Sided)'}
                 </p>
               </div>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-blue-600">
-                ${(orderData?.total_amount || 25) + 
-                   (grommetOptions.find(opt => opt.value === bannerOptions.grommets)?.price || 0) +
-                   (hemOptions.find(opt => opt.value === bannerOptions.hem)?.price || 0) +
-                   (polePocketOptions.find(opt => opt.value === bannerOptions.polePockets)?.price || 0) +
-                   (bannerOptions.windSlits ? 8 : 0) +
-                   (shippingOption === 'express' ? 25 : 
-                    shippingOption === 'overnight' ? 45 : 0)}
+                ${totalAmount}
               </p>
-              <p className="text-sm text-gray-600">Total (including options & shipping)</p>
+              <p className="text-sm text-gray-600">Total (including all options & shipping)</p>
+              <div className="text-xs text-gray-500 mt-1">
+                <p>Base: ${(orderData?.total_amount || 25) * bannerOptions.quantity}</p>
+                <p>Options: +${optionsTotal}</p>
+                <p>Shipping: +${shippingCost}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -582,27 +649,85 @@ const Checkout = () => {
             data-section="bannerOptions"
           >
             <div className="space-y-6">
-              {/* Grommets */}
+              {/* Job Details */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Anchor className="w-4 h-4 text-blue-600" />
-                  Grommets
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  Job Details
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Job Name</label>
+                    <input
+                      type="text"
+                      value={bannerOptions.jobName}
+                      onChange={(e) => setBannerOptions(prev => ({ ...prev, jobName: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter job name (optional)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={bannerOptions.quantity}
+                      onChange={(e) => setBannerOptions(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sides */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-purple-600" />
+                  Number of Sides
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {grommetOptions.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors">
+                  {bannerOptionsConfig.sides.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 cursor-pointer transition-colors">
                       <input
                         type="radio"
-                        name="grommets"
+                        name="sides"
                         value={option.value}
-                        checked={bannerOptions.grommets === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, grommets: e.target.value }))}
-                        className="mr-3 text-blue-600"
+                        checked={bannerOptions.sides === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, sides: parseInt(e.target.value) }))}
+                        className="mr-3 text-purple-600"
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.price < 0 ? 'text-red-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : option.price < 0 ? `-$${Math.abs(option.price)}` : 'No additional cost'}
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pole Pockets */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-indigo-600" />
+                  Pole Pockets
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {bannerOptionsConfig.polePockets.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-indigo-300 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="polePockets"
+                        value={option.value}
+                        checked={bannerOptions.polePockets === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, polePockets: e.target.value }))}
+                        className="mr-3 text-indigo-600"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
                         </p>
                       </div>
                     </label>
@@ -617,18 +742,128 @@ const Checkout = () => {
                   Hem Style
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {hemOptions.map((option) => (
+                  {bannerOptionsConfig.hem.map((option) => (
                     <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 cursor-pointer transition-colors">
-                      <div className="mr-3">
-                        <input
-                          type="radio"
-                          name="hem"
-                          value={option.value}
-                          checked={bannerOptions.hem === option.value}
-                          onChange={(e) => setBannerOptions(prev => ({ ...prev, hem: e.target.value }))}
-                          className="text-purple-600"
-                        />
+                      <input
+                        type="radio"
+                        name="hem"
+                        value={option.value}
+                        checked={bannerOptions.hem === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, hem: e.target.value }))}
+                        className="mr-3 text-purple-600"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        </p>
                       </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Grommets */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Anchor className="w-4 h-4 text-blue-600" />
+                  Grommets
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {bannerOptionsConfig.grommets.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="grommets"
+                        value={option.value}
+                        checked={bannerOptions.grommets === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, grommets: e.target.value }))}
+                        className="mr-3 text-blue-600"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Webbing */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-green-600" />
+                  Webbing & Hanging Options
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {bannerOptionsConfig.webbing.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="webbing"
+                        value={option.value}
+                        checked={bannerOptions.webbing === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, webbing: e.target.value }))}
+                        className="mr-3 text-green-600"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Corner Reinforcement */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-orange-600" />
+                  Corner Reinforcement
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {bannerOptionsConfig.corners.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="corners"
+                        value={option.value}
+                        checked={bannerOptions.corners === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, corners: e.target.value }))}
+                        className="mr-3 text-orange-600"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rope Options */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-red-600" />
+                  Rope Options
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {bannerOptionsConfig.rope.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-red-300 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="rope"
+                        value={option.value}
+                        checked={bannerOptions.rope === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, rope: e.target.value }))}
+                        className="mr-3 text-red-600"
+                      />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
                         <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
@@ -643,39 +878,47 @@ const Checkout = () => {
               {/* Wind Slits */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Wind className="w-4 h-4 text-orange-600" />
+                  <Wind className="w-4 h-4 text-cyan-600" />
                   Wind Slits
                 </h4>
-                <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={bannerOptions.windSlits}
-                    onChange={(e) => setBannerOptions(prev => ({ ...prev, windSlits: e.target.checked }))}
-                    className="mr-3 text-orange-600"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">Add wind slits for outdoor use</p>
-                    <p className="text-sm text-green-600">+$8.00</p>
-                  </div>
-                </label>
-              </div>
-
-              {/* Pole Pockets */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Package className="w-4 h-4 text-indigo-600" />
-                  Pole Pockets
-                </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {polePocketOptions.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-indigo-300 cursor-pointer transition-colors">
+                  {bannerOptionsConfig.windslits.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-cyan-300 cursor-pointer transition-colors">
                       <input
                         type="radio"
-                        name="polePockets"
+                        name="windslits"
                         value={option.value}
-                        checked={bannerOptions.polePockets === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, polePockets: e.target.value }))}
-                        className="mr-3 text-indigo-600"
+                        checked={bannerOptions.windslits === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, windslits: e.target.value }))}
+                        className="mr-3 text-cyan-600"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Turnaround Time */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-yellow-600" />
+                  Turnaround Time
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {bannerOptionsConfig.turnaround.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-yellow-300 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="turnaround"
+                        value={option.value}
+                        checked={bannerOptions.turnaround === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, turnaround: e.target.value }))}
+                        className="mr-3 text-yellow-600"
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
@@ -905,15 +1148,60 @@ const Checkout = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Banner Design:</span>
-                    <span className="font-medium">${orderData?.total_amount || 25}</span>
+                    <span className="font-medium">${(orderData?.total_amount || 25) * bannerOptions.quantity}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Banner Options:</span>
+                    <span className="text-gray-600">Sides ({bannerOptions.sides === 2 ? 'Double' : 'Single'}):</span>
                     <span className="font-medium">
-                      ${(grommetOptions.find(opt => opt.value === bannerOptions.grommets)?.price || 0) +
-                        (hemOptions.find(opt => opt.value === bannerOptions.hem)?.price || 0) +
-                        (polePocketOptions.find(opt => opt.value === bannerOptions.polePockets)?.price || 0) +
-                        (bannerOptions.windSlits ? 8 : 0)}
+                      {sidesCost > 0 ? `+$${sidesCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Pole Pockets:</span>
+                    <span className="font-medium">
+                      {polePocketCost > 0 ? `+$${polePocketCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Hem Style:</span>
+                    <span className="font-medium">
+                      {hemCost > 0 ? `+$${hemCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Grommets:</span>
+                    <span className="font-medium">
+                      {grommetCost > 0 ? `+$${grommetCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Webbing:</span>
+                    <span className="font-medium">
+                      {webbingCost > 0 ? `+$${webbingCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Corner Reinforcement:</span>
+                    <span className="font-medium">
+                      {cornersCost > 0 ? `+$${cornersCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Rope:</span>
+                    <span className="font-medium">
+                      {ropeCost > 0 ? `+$${ropeCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Wind Slits:</span>
+                    <span className="font-medium">
+                      {windSlitCost > 0 ? `+$${windSlitCost}` : 'No additional cost'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Turnaround:</span>
+                    <span className="font-medium">
+                      {turnaroundCost > 0 ? `+$${turnaroundCost}` : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -927,13 +1215,7 @@ const Checkout = () => {
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total:</span>
                       <span className="text-blue-600">
-                        ${(orderData?.total_amount || 25) + 
-                           (grommetOptions.find(opt => opt.value === bannerOptions.grommets)?.price || 0) +
-                           (hemOptions.find(opt => opt.value === bannerOptions.hem)?.price || 0) +
-                           (polePocketOptions.find(opt => opt.value === bannerOptions.polePockets)?.price || 0) +
-                           (bannerOptions.windSlits ? 8 : 0) +
-                           (shippingOption === 'express' ? 25 : 
-                            shippingOption === 'overnight' ? 45 : 0)}
+                        ${totalAmount}
                       </span>
                     </div>
                   </div>
