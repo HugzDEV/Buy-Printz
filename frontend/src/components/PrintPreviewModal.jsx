@@ -50,7 +50,8 @@ const PrintPreviewModal = ({
       
       if (orderDetails?.canvas_image) {
         console.log('Generating production PDF from high-quality canvas image...')
-        await createPDFFromImage(orderDetails.canvas_image)
+        const pdfBlob = await createPDFFromImage(orderDetails.canvas_image)
+        return pdfBlob // Return the PDF blob
       } else {
         console.error('No canvas image available for PDF generation!')
         throw new Error('No canvas image available')
@@ -87,9 +88,10 @@ const PrintPreviewModal = ({
 
       // Create blob for production
       const pdfBlob = pdf.output('blob')
-      setPdfBlob(pdfBlob)
+      setPdfBlob(pdfBlob) // Also update state for other uses
       
       console.log('Production-quality PDF created successfully!')
+      return pdfBlob // Return the blob
     } catch (error) {
       console.error('Error creating production PDF:', error)
       throw error
@@ -99,10 +101,11 @@ const PrintPreviewModal = ({
   const handleApprove = async () => {
     try {
       // Generate PDF for production only when user approves
-      await generatePDFForProduction()
+      const pdfBlob = await generatePDFForProduction()
       
       // Now we have the PDF blob, proceed with approval
       if (pdfBlob) {
+        console.log('PDF generated successfully, proceeding with approval')
         onApprove(pdfBlob)
       } else {
         console.error('PDF generation failed - cannot approve')
