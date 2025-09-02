@@ -20,17 +20,32 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import authService from './services/auth'
 
-// Protected Route Component with Simplified Mobile Handling
+// Protected Route Component with Optimized Mobile Handling
 const ProtectedRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
+    let timeoutId = null
     
     const checkAuth = async () => {
       try {
-        const auth = await authService.isAuthenticated()
+        // Add timeout to prevent hanging on mobile
+        const authPromise = authService.isAuthenticated()
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn('Auth check timeout - assuming not authenticated')
+            setIsAuthenticated(false)
+            setLoading(false)
+          }
+        }, 5000) // 5 second timeout
+        
+        const auth = await authPromise
+        
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+        }
         
         if (mounted) {
           setIsAuthenticated(auth)
@@ -38,6 +53,10 @@ const ProtectedRoute = ({ children }) => {
         }
       } catch (error) {
         console.warn('Auth check failed:', error)
+        
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+        }
         
         if (mounted) {
           setIsAuthenticated(false)
@@ -51,6 +70,9 @@ const ProtectedRoute = ({ children }) => {
 
     return () => {
       mounted = false
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
     }
   }, [])
 
@@ -72,55 +94,10 @@ const ProtectedRoute = ({ children }) => {
   return children
 }
 
-// Public Route Component with Simplified Handling
+// Public Route Component - Simplified for better mobile performance
 const PublicRoute = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    let mounted = true
-    
-    const checkAuth = async () => {
-      try {
-        const auth = await authService.isAuthenticated()
-        
-        if (mounted) {
-          setIsAuthenticated(auth)
-          setLoading(false)
-        }
-      } catch (error) {
-        console.warn('Public route auth check failed:', error)
-        if (mounted) {
-          // On error, assume not authenticated for public routes
-          setIsAuthenticated(false)
-          setLoading(false)
-        }
-      }
-    }
-    
-    // Start auth check immediately
-    checkAuth()
-
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />
-  }
-  
+  // For public routes, we don't need to check authentication immediately
+  // This prevents mobile hanging during routing
   return children
 }
 

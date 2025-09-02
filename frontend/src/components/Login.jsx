@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import authService from '../services/auth'
@@ -11,7 +11,17 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
+  const [componentReady, setComponentReady] = useState(false)
   const navigate = useNavigate()
+
+  // Simple component initialization to prevent hanging
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setComponentReady(true)
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -45,6 +55,18 @@ const Login = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Show loading state until component is ready
+  if (!componentReady) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading login page...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
