@@ -516,7 +516,7 @@ const ProductDetail = () => {
               </Link>
             </div>
             
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
+            <div className="space-y-8 items-center">
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">
                   {product.name}
@@ -524,10 +524,10 @@ const ProductDetail = () => {
                 <p className="text-2xl font-semibold text-primary-100 mb-6">
                   {product.price}
                 </p>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <Link 
                     to={`/editor?product=${productId}`}
-                    className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105 font-semibold"
+                    className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105 font-semibold justify-center"
                   >
                     Design This Product
                   </Link>
@@ -552,11 +552,11 @@ const ProductDetail = () => {
 
         {/* Product Details */}
         <section className="py-16">
-          <div className="container mx-auto px-4 max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-8">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="space-y-8">
               {/* Description */}
-              <div className="lg:col-span-1">
-                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8 mb-8">
+              <div>
+                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8">
                   <div className="flex items-center mb-6">
                     <div className="p-3 rounded-full bg-primary-100/50 mr-4">
                       <Info className="w-6 h-6 text-primary-600" />
@@ -574,8 +574,8 @@ const ProductDetail = () => {
               </div>
 
               {/* Spec */}
-              <div className="lg:col-span-1">
-                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8 mb-8">
+              <div>
+                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8">
                   <div className="flex items-center mb-6">
                     <div className="p-3 rounded-full bg-primary-100/50 mr-4">
                       <Settings className="w-6 h-6 text-primary-600" />
@@ -630,56 +630,58 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* File Setup */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8">
-              <div className="flex items-center mb-6">
-                <div className="p-3 rounded-full bg-primary-100/50 mr-4">
-                  <FileText className="w-6 h-6 text-primary-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">File Setup</h2>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Accepted File Formats</h3>
-                  <ul className="space-y-1">
-                    {product.fileSetup.acceptedFormats.map((format, index) => (
-                      <li key={index} className="text-gray-700">• {format}</li>
-                    ))}
-                  </ul>
+              {/* File Setup */}
+              <div>
+                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-8">
+                  <div className="flex items-center mb-6">
+                    <div className="p-3 rounded-full bg-primary-100/50 mr-4">
+                      <FileText className="w-6 h-6 text-primary-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">File Setup</h2>
+                  </div>
                   
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 mt-6">Color Space</h3>
-                  <p className="text-gray-700">{product.fileSetup.colorSpace}</p>
-                  
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 mt-6">Resolution</h3>
-                  <p className="text-gray-700">{product.fileSetup.resolution}</p>
-                  
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 mt-6">Max File Upload Size</h3>
-                  <p className="text-gray-700">{product.fileSetup.maxFileSize}</p>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h3>
-                  <ul className="space-y-2">
-                    {product.fileSetup.requirements.map((requirement, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700">{requirement}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">Additional Tips</h3>
-                  <ul className="space-y-2">
-                    {product.fileSetup.additionalTips.map((tip, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700">{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="space-y-8">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Accepted File Formats</h3>
+                      <ul className="space-y-1">
+                        {product.fileSetup.acceptedFormats.map((format, index) => (
+                          <li key={index} className="text-gray-700">• {format}</li>
+                        ))}
+                      </ul>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 mt-6">Color Space</h3>
+                      <p className="text-gray-700">{product.fileSetup.colorSpace}</p>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 mt-6">Resolution</h3>
+                      <p className="text-gray-700">{product.fileSetup.resolution}</p>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 mt-6">Max File Upload Size</h3>
+                      <p className="text-gray-700">{product.fileSetup.maxFileSize}</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h3>
+                      <ul className="space-y-2">
+                        {product.fileSetup.requirements.map((requirement, index) => (
+                          <li key={index} className="flex items-start">
+                            <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-700">{requirement}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">Additional Tips</h3>
+                      <ul className="space-y-2">
+                        {product.fileSetup.additionalTips.map((tip, index) => (
+                          <li key={index} className="flex items-start">
+                            <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-700">{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
