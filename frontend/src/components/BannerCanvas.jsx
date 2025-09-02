@@ -409,126 +409,42 @@ const BannerCanvas = ({
     setSelectedIds([])
   }
 
-  // Clean text editing implementation
-  const handleTextDblClick = useCallback((id) => {
+  // Clean, simple text editing implementation
+  const [isEditingText, setIsEditingText] = useState(false)
+  const [editingTextId, setEditingTextId] = useState(null)
+  const [editingTextValue, setEditingTextValue] = useState('')
+
+  // Simple text editing - only triggered by Edit Text button
+  const handleTextEdit = useCallback((id) => {
     const element = elements.find(el => el.id === id)
     if (element && element.type === 'text') {
-      // Get the Konva stage and text node
-      const stage = stageRef.current
-      if (!stage) return
-      
-      const textNode = stage.findOne(`#${id}`)
-      if (!textNode) return
-      
-      // Hide the text node and transformer
-      textNode.hide()
-      if (transformerRef.current) {
-        transformerRef.current.hide()
-      }
-      
-      // Get text position
-      const textPosition = textNode.absolutePosition()
-      const stageBox = stage.container().getBoundingClientRect()
-      const areaPosition = {
-        x: stageBox.left + textPosition.x,
-        y: stageBox.top + textPosition.y,
-      }
-      
-      // Create textarea
-      const textarea = document.createElement('textarea')
-      document.body.appendChild(textarea)
-      textarea.value = textNode.text()
-      textarea.style.position = 'absolute'
-      textarea.style.top = areaPosition.y + 'px'
-      textarea.style.left = areaPosition.x + 'px'
-      textarea.style.width = textNode.width() - (textNode.padding() || 0) * 2 + 'px'
-      textarea.style.height = textNode.height() - (textNode.padding() || 0) * 2 + 5 + 'px'
-      textarea.style.fontSize = textNode.fontSize() + 'px'
-      textarea.style.border = 'none'
-      textarea.style.padding = '0px'
-      textarea.style.margin = '0px'
-      textarea.style.overflow = 'hidden'
-      textarea.style.background = 'none'
-      textarea.style.outline = 'none'
-      textarea.style.resize = 'none'
-      textarea.style.lineHeight = textNode.lineHeight() || '1.2'
-      textarea.style.fontFamily = textNode.fontFamily() || 'Arial'
-      textarea.style.transformOrigin = 'left top'
-      textarea.style.textAlign = textNode.align() || 'left'
-      textarea.style.color = textNode.fill() || '#000000'
-      textarea.style.zIndex = '1000'
-      
-      // Handle rotation
-      const rotation = textNode.rotation()
-      let transform = ''
-      if (rotation) {
-        transform += `rotateZ(${rotation}deg)`
-      }
-      transform += `translateY(-2px)`
-      textarea.style.transform = transform
-      
-      // Auto-adjust height
-      textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + 3 + 'px'
-      
-      textarea.focus()
-      
-      // Function to remove textarea and show text node
-      const removeTextarea = () => {
-        if (textarea.parentNode) {
-          textarea.parentNode.removeChild(textarea)
-        }
-        window.removeEventListener('click', handleOutsideClick)
-        window.removeEventListener('touchstart', handleOutsideClick)
-        textNode.show()
-        if (transformerRef.current) {
-          transformerRef.current.show()
-          transformerRef.current.forceUpdate()
-        }
-      }
-      
-      // Function to save text and remove textarea
-      const saveText = () => {
-        setElements(prev => prev.map(el => {
-          if (el.id === id && el.type === 'text') {
-            return { ...el, text: textarea.value }
-          }
-          return el
-        }))
-        removeTextarea()
-      }
-      
-      // Event handlers
-      const handleOutsideClick = (e) => {
-        if (e.target !== textarea) {
-          saveText()
-        }
-      }
-      
-      textarea.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault()
-          saveText()
-        }
-        if (e.key === 'Escape') {
-          removeTextarea()
-        }
-      })
-      
-      textarea.addEventListener('input', function () {
-        const scale = textNode.getAbsoluteScale().x
-        const newWidth = textNode.width() * scale
-        textarea.style.width = newWidth + 'px'
-        textarea.style.height = 'auto'
-        textarea.style.height = textarea.scrollHeight + textNode.fontSize() + 'px'
-      })
-      
-      setTimeout(() => {
-        window.addEventListener('click', handleOutsideClick)
-        window.addEventListener('touchstart', handleOutsideClick)
-      })
+      setEditingTextId(id)
+      setEditingTextValue(element.text || '')
+      setIsEditingText(true)
     }
-  }, [elements, setElements])
+  }, [elements])
+
+  // Save text changes
+  const handleTextSave = useCallback(() => {
+    if (editingTextId) {
+      setElements(prev => prev.map(el => {
+        if (el.id === editingTextId && el.type === 'text') {
+          return { ...el, text: editingTextValue }
+        }
+        return el
+      }))
+    }
+    setIsEditingText(false)
+    setEditingTextId(null)
+    setEditingTextValue('')
+  }, [editingTextId, editingTextValue, setElements])
+
+  // Cancel text editing
+  const handleTextCancel = useCallback(() => {
+    setIsEditingText(false)
+    setEditingTextId(null)
+    setEditingTextValue('')
+  }, [])
 
   // Clean element change handler
   const handleElementChange = (id, changes) => {
@@ -681,10 +597,6 @@ const BannerCanvas = ({
       
       if (e.key === 'Delete' && selectedId) {
         deleteSelected()
-      } else if (e.key === 'Enter' && selectedId && selectedElement?.type === 'text') {
-        // Enter key to edit text when text element is selected
-        e.preventDefault()
-        handleTextDblClick(selectedId)
       } else if (e.ctrlKey || e.metaKey) {
         switch (e.key) {
           case 'z':
@@ -705,7 +617,7 @@ const BannerCanvas = ({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedId, selectedElement, handleTextDblClick])
+  }, [selectedId, selectedElement])
 
 
 
@@ -791,14 +703,7 @@ const BannerCanvas = ({
             letterSpacing={element.letterSpacing || 0}
             padding={element.padding || 0}
             listening={true}
-            onDblClick={(e) => {
-              e.evt.stopPropagation()
-              handleTextDblClick(element.id)
-            }}
-            onDblTap={(e) => {
-              e.evt.stopPropagation()
-              handleTextDblClick(element.id)
-            }}
+
           />
         )
       
@@ -1508,12 +1413,12 @@ const BannerCanvas = ({
       `}>
         <GlassPanel className="flex flex-col gap-3 sm:gap-4 max-h-full">
           
-          {/* Text Editing Hint */}
-          {selectedId && selectedElement?.type === 'text' && (
-            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded text-center">
-              💡 Double-click text or press Enter to edit
-            </div>
-          )}
+                {/* Text Editing Hint */}
+      {selectedId && selectedElement?.type === 'text' && (
+        <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded text-center">
+          💡 Use the Edit Text button below to edit text
+        </div>
+      )}
           
           {/* Top Row - DPI Info, Selection Count, and Close Button */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
@@ -1789,7 +1694,7 @@ const BannerCanvas = ({
             {/* Text Edit Button */}
             {selectedId && selectedElement?.type === 'text' && (
               <GlassButton 
-                onClick={() => handleTextDblClick(selectedId)} 
+                onClick={() => handleTextEdit(selectedId)} 
                 variant="primary" 
                 className="px-3 py-2 flex items-center justify-center"
               >
@@ -1815,6 +1720,45 @@ const BannerCanvas = ({
           </div>
         </GlassPanel>
       </div>
+
+      {/* Clean Text Editing Modal */}
+      {isEditingText && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Edit Text</h3>
+            <textarea
+              value={editingTextValue}
+              onChange={(e) => setEditingTextValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleTextSave()
+                }
+                if (e.key === 'Escape') {
+                  handleTextCancel()
+                }
+              }}
+              className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              placeholder="Enter your text..."
+              autoFocus
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleTextCancel}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleTextSave}
+                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )

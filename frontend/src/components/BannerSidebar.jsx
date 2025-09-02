@@ -1111,19 +1111,33 @@ const BannerSidebar = ({
 
           {expandedSections.text && (
             <div className="px-4 pb-4 space-y-4">
-              {/* Quick Text Templates */}
+              {/* Simple Text Input */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Quick Text</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['HEADLINE', 'Subtitle', 'Body Text', 'Call to Action'].map((text) => (
-                    <button
-                      key={text}
-                      onClick={() => onAddText(text)}
-                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm transition-colors duration-200 text-center"
-                    >
-                      {text}
-                    </button>
-                  ))}
+                <h4 className="text-sm font-medium text-gray-700">Add Text</h4>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter text..."
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.target.value.trim()) {
+                        onAddText(e.target.value.trim())
+                        e.target.value = ''
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      const input = document.querySelector('input[placeholder="Enter text..."]')
+                      if (input && input.value.trim()) {
+                        onAddText(input.value.trim())
+                        input.value = ''
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    Add
+                  </button>
                 </div>
               </div>
               
@@ -1236,28 +1250,6 @@ const BannerSidebar = ({
                   ))}
                 </div>
               </div>
-              
-              {/* Edit Text Button */}
-              {selectedElement?.type === 'text' && (
-                <div className="pt-2 border-t border-gray-200">
-                  <button
-                    onClick={() => {
-                      // This will trigger text editing in the canvas
-                      if (window.dispatchEvent) {
-                        window.dispatchEvent(new CustomEvent('editText', { 
-                          detail: { elementId: selectedElement.id } 
-                        }))
-                      }
-                    }}
-                    className="w-full px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
-                  >
-                    ✏️ Edit Text
-                  </button>
-                  <p className="text-xs text-gray-500 mt-1 text-center">
-                    Double-click text on canvas or press Enter to edit
-                  </p>
-                </div>
-              )}
             </div>
           )}
         </GlassCard>
