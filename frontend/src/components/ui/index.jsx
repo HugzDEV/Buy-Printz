@@ -1,20 +1,44 @@
 // Simple UI components for the print preview modal
 import React from 'react'
 
-// Dialog components
+// Dialog components - Mobile-first approach
 export const Dialog = ({ open, onOpenChange, children }) => {
   if (!open) return null
   
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+    <div 
+      className="mobile-modal-fix bg-black/50"
+      style={{
+        // Fallback positioning for mobile
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 50,
+        // Ensure proper mobile viewport handling
+        minHeight: '100vh',
+        minHeight: '100dvh', // Dynamic viewport height for mobile
+        WebkitOverflowScrolling: 'touch', // Smooth iOS scrolling
+      }}
+    >
       <div 
-        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden my-4 mx-auto"
+        className="mobile-modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{
+          // Mobile-first sizing and positioning
           minHeight: 'min-content',
-          maxHeight: 'calc(100vh - 2rem)',
-          transform: 'translateZ(0)',
-          backfaceVisibility: 'hidden'
+          maxHeight: 'calc(100vh - 1rem)',
+          maxHeight: 'calc(100dvh - 1rem)', // Dynamic viewport height
+          // Remove problematic transforms for mobile
+          transform: 'none',
+          // Better mobile positioning
+          position: 'relative',
+          top: 'auto',
+          left: 'auto',
+          // Ensure proper mobile rendering
+          WebkitTransform: 'none',
+          msTransform: 'none',
         }}
       >
         {children}
@@ -24,7 +48,17 @@ export const Dialog = ({ open, onOpenChange, children }) => {
 }
 
 export const DialogContent = ({ className = '', children }) => (
-  <div className={`overflow-y-auto w-full ${className}`} style={{ minHeight: 'min-content' }}>
+  <div 
+    className={`overflow-y-auto w-full ${className}`} 
+    style={{ 
+      minHeight: 'min-content',
+      // Mobile-specific overflow handling
+      WebkitOverflowScrolling: 'touch',
+      // Ensure proper mobile sizing
+      width: '100%',
+      maxWidth: '100%'
+    }}
+  >
     {children}
   </div>
 )
