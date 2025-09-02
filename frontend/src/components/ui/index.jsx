@@ -8,7 +8,7 @@ export const Dialog = ({ open, onOpenChange, children }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4">
       <div 
-        className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden"
+        className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[98vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -18,13 +18,13 @@ export const Dialog = ({ open, onOpenChange, children }) => {
 }
 
 export const DialogContent = ({ className = '', children }) => (
-  <div className={`overflow-y-auto h-full ${className}`}>
+  <div className={`overflow-y-auto flex-1 ${className}`}>
     {children}
   </div>
 )
 
 export const DialogHeader = ({ children }) => (
-  <div className="p-4 sm:p-6 border-b">
+  <div className="p-4 sm:p-6 border-b flex-shrink-0">
     {children}
   </div>
 )
@@ -36,7 +36,7 @@ export const DialogTitle = ({ children, className = '' }) => (
 )
 
 export const DialogFooter = ({ children, className = '' }) => (
-  <div className={`p-4 sm:p-6 border-t bg-gray-50 flex justify-end gap-2 ${className}`}>
+  <div className={`p-4 sm:p-6 border-t bg-gray-50 flex justify-end gap-2 flex-shrink-0 ${className}`}>
     {children}
   </div>
 )
@@ -110,14 +110,23 @@ export const Separator = ({ className = '' }) => (
   <div className={`border-t border-gray-200 ${className}`} />
 )
 
-export const Alert = ({ children, className = '' }) => (
-  <div className={`border border-blue-200 bg-blue-50 rounded-lg p-4 ${className}`}>
-    {children}
-  </div>
-)
+export const Alert = ({ children, className = '', variant = 'default' }) => {
+  const variants = {
+    default: 'border border-blue-200 bg-blue-50',
+    success: 'border border-green-200 bg-green-50',
+    warning: 'border border-amber-200 bg-amber-50',
+    error: 'border border-red-200 bg-red-50'
+  }
+  
+  return (
+    <div className={`rounded-lg p-3 sm:p-4 ${variants[variant]} ${className}`}>
+      {children}
+    </div>
+  )
+}
 
 export const AlertDescription = ({ children, className = '' }) => (
-  <div className={`text-sm text-blue-800 ${className}`}>
+  <div className={`text-sm text-gray-800 ${className}`}>
     {children}
   </div>
 )

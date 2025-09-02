@@ -266,7 +266,7 @@ const PrintPreviewModal = ({
             </Card>
 
             {/* Print Ready Status */}
-            <Alert className="border-green-200 bg-green-50 p-3 sm:p-4">
+            <Alert variant="success" className="p-3 sm:p-4">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
                 <strong>Ready for Production!</strong><br />
@@ -276,12 +276,12 @@ const PrintPreviewModal = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-3 w-full pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <DialogFooter className="flex-col sm:flex-row gap-3 w-full pt-4 sm:pt-6 border-t mt-4 sm:mt-6 bg-gray-50">
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <X className="h-4 w-4" />
               Cancel
@@ -293,7 +293,7 @@ const PrintPreviewModal = ({
                 onClick={() => {
                   window.open(previewUrl, '_blank')
                 }}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <FileText className="h-4 w-4" />
                 View PDF
@@ -303,11 +303,16 @@ const PrintPreviewModal = ({
             <Button
               onClick={handleApprove}
               disabled={!pdfBlob}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <Check className="h-4 w-4" />
               Approve & Print
             </Button>
+          </div>
+          
+          {/* Debug indicator for mobile */}
+          <div className="text-xs text-gray-500 text-center sm:hidden">
+            Footer visible - {pdfBlob ? 'PDF ready' : 'PDF generating...'}
           </div>
         </DialogFooter>
       </DialogContent>
