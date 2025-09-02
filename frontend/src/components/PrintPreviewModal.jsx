@@ -112,25 +112,25 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-3 lg:p-6">
-        <DialogHeader className="pb-4 lg:pb-6">
-          <DialogTitle className="flex items-center gap-2 text-lg lg:text-xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-6">
+        <DialogHeader className="pb-6">
+          <DialogTitle className="flex items-center gap-2">
             <Printer className="h-5 w-5" />
             Print Preview & Approval
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 pb-4 lg:pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 pb-8">
           {/* Left Column - Preview */}
           <div className="space-y-4 lg:space-y-6">
             <Card>
-              <CardHeader className="pb-3 lg:pb-4">
-                <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
                   Design Preview
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 lg:space-y-6 p-4 lg:p-6">
+              <CardContent className="space-y-4 lg:space-y-6">
                 {isGenerating ? (
                   <div className="flex items-center justify-center p-8 lg:p-12">
                     <div className="text-center space-y-2">
@@ -141,13 +141,14 @@ const PrintPreviewModal = ({
                 ) : previewImage ? (
                   <div className="space-y-4 lg:space-y-6">
                     {/* Main Banner Preview */}
-                    <div className="bg-gray-100 rounded-lg p-3 lg:p-6 flex items-center justify-center">
-                      <div className="relative w-full">
+                    <div className="bg-gray-100 rounded-lg p-4 lg:p-6 flex items-center justify-center">
+                      <div className="relative max-w-full w-full">
                         <img
                           src={previewImage}
                           alt="Banner Design Preview"
-                          className="w-full max-h-60 lg:max-h-80 rounded border shadow-lg"
+                          className="max-w-full max-h-60 lg:max-h-80 rounded border shadow-lg mx-auto"
                           style={{
+                            maxWidth: '100%',
                             height: 'auto',
                             objectFit: 'contain'
                           }}
@@ -184,7 +185,7 @@ const PrintPreviewModal = ({
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="flex gap-2 lg:gap-3 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -193,7 +194,7 @@ const PrintPreviewModal = ({
                           link.href = previewImage
                           link.click()
                         }}
-                        className="flex items-center gap-2 text-sm lg:text-base px-3 lg:px-4 py-2 lg:py-2"
+                        className="flex items-center gap-2"
                       >
                         <Download className="h-4 w-4" />
                         Download Preview
@@ -213,7 +214,7 @@ const PrintPreviewModal = ({
           </div>
 
           {/* Right Column - Specifications */}
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             {/* Print Specifications */}
             <Card>
               <CardHeader className="pb-4">
@@ -223,7 +224,7 @@ const PrintPreviewModal = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 lg:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-600">Dimensions</p>
                     <Badge variant="outline">
@@ -245,7 +246,7 @@ const PrintPreviewModal = ({
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-600">Quantity</p>
                     <Badge variant="outline">
-                      {orderDetails.quantity} piece(s)
+                      {orderDetails.banner_quantity || 1} piece(s)
                     </Badge>
                   </div>
                   <div className="space-y-2">
@@ -267,7 +268,7 @@ const PrintPreviewModal = ({
             {/* Print Ready Status */}
             <Alert className="border-green-200 bg-green-50 p-3 lg:p-4">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800 text-sm lg:text-base">
+              <AlertDescription className="text-green-800">
                 <strong>Ready for Production!</strong><br />
                 Your design meets all print quality requirements and is ready to be sent to our production facility.
               </AlertDescription>
@@ -280,7 +281,7 @@ const PrintPreviewModal = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex items-center gap-2 text-sm lg:text-base px-3 lg:px-4 py-2 lg:py-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <X className="h-4 w-4" />
               Cancel
@@ -292,7 +293,7 @@ const PrintPreviewModal = ({
                 onClick={() => {
                   window.open(previewUrl, '_blank')
                 }}
-                className="flex items-center gap-2 text-sm lg:text-base px-3 lg:px-4 py-2 lg:py-2"
+                className="flex items-center gap-2 w-full sm:w-auto"
               >
                 <FileText className="h-4 w-4" />
                 View PDF
@@ -302,7 +303,7 @@ const PrintPreviewModal = ({
             <Button
               onClick={handleApprove}
               disabled={!pdfBlob}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 text-sm lg:text-base px-3 lg:px-4 py-2 lg:py-2"
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 w-full sm:w-auto"
             >
               <Check className="h-4 w-4" />
               Approve & Print

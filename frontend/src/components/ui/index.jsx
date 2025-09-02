@@ -8,13 +8,14 @@ export const Dialog = ({ open, onOpenChange, children }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
       <div 
-        className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden transform transition-all duration-200 ease-out"
-        style={{
-          margin: 'auto',
-          maxHeight: 'calc(100vh - 2rem)',
-          maxWidth: 'calc(100vw - 2rem)'
-        }}
+        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden my-4 mx-auto"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          minHeight: 'min-content',
+          maxHeight: 'calc(100vh - 2rem)',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
+        }}
       >
         {children}
       </div>
@@ -23,25 +24,25 @@ export const Dialog = ({ open, onOpenChange, children }) => {
 }
 
 export const DialogContent = ({ className = '', children }) => (
-  <div className={`overflow-y-auto ${className}`}>
+  <div className={`overflow-y-auto w-full ${className}`} style={{ minHeight: 'min-content' }}>
     {children}
   </div>
 )
 
 export const DialogHeader = ({ children }) => (
-  <div className="p-4 lg:p-6 border-b">
+  <div className="p-6 border-b">
     {children}
   </div>
 )
 
 export const DialogTitle = ({ children, className = '' }) => (
-  <h2 className={`text-lg lg:text-xl font-semibold ${className}`}>
+  <h2 className={`text-xl font-semibold ${className}`}>
     {children}
   </h2>
 )
 
 export const DialogFooter = ({ children, className = '' }) => (
-  <div className={`p-4 lg:p-6 border-t bg-gray-50 flex justify-end gap-2 ${className}`}>
+  <div className={`p-6 border-t bg-gray-50 flex justify-end gap-2 ${className}`}>
     {children}
   </div>
 )
@@ -54,13 +55,13 @@ export const Card = ({ children, className = '' }) => (
 )
 
 export const CardContent = ({ children, className = '' }) => (
-  <div className={`p-4 lg:p-6 ${className}`}>
+  <div className={`p-6 ${className}`}>
     {children}
   </div>
 )
 
 export const CardHeader = ({ children, className = '' }) => (
-  <div className={`p-4 lg:p-6 pb-2 lg:pb-3 ${className}`}>
+  <div className={`p-6 pb-3 ${className}`}>
     {children}
   </div>
 )
@@ -80,7 +81,7 @@ export const Button = ({
   className = '',
   ...props 
 }) => {
-  const baseClasses = 'px-3 lg:px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base'
+  const baseClasses = 'px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
   const variants = {
     default: 'bg-blue-600 text-white hover:bg-blue-700',
     outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50'
