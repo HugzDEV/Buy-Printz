@@ -138,7 +138,8 @@ CREATE OR REPLACE FUNCTION calculate_banner_price(
     p_corners TEXT,
     p_rope TEXT,
     p_windslits TEXT,
-    p_turnaround TEXT
+    p_turnaround TEXT,
+    p_sides INTEGER
 ) RETURNS TABLE(
     base_price DECIMAL,
     options_total DECIMAL,
@@ -169,62 +170,65 @@ BEGIN
         ELSE v_base_price := 1.60 * v_sqft; -- Default to 13oz vinyl
     END CASE;
     
-    -- Options pricing
-    -- Pole Pockets
-    CASE p_pole_pockets
-        WHEN '2in-top' THEN v_options_total := v_options_total + 8.00;
-        WHEN '3in-top' THEN v_options_total := v_options_total + 10.00;
-        WHEN '4in-top' THEN v_options_total := v_options_total + 12.00;
-        WHEN '2in-top-bottom' THEN v_options_total := v_options_total + 15.00;
-        WHEN '3in-top-bottom' THEN v_options_total := v_options_total + 18.00;
-        WHEN '4in-top-bottom' THEN v_options_total := v_options_total + 22.00;
-    END CASE;
-    
-    -- Hem
-    IF p_hem = 'all-sides' THEN
-        v_options_total := v_options_total + 12.00;
+    -- Double Sided - 100% markup
+    IF p_sides = 2 THEN
+        v_options_total := v_options_total + v_base_price;
     END IF;
     
-    -- Grommets
+    -- Options pricing with percentage-based markup
+    -- Pole Pockets - 10% markup
+    CASE p_pole_pockets
+        WHEN '2in-top' THEN v_options_total := v_options_total + (v_base_price * 0.10);
+        WHEN '3in-top' THEN v_options_total := v_options_total + (v_base_price * 0.10);
+        WHEN '4in-top' THEN v_options_total := v_options_total + (v_base_price * 0.10);
+        WHEN '2in-top-bottom' THEN v_options_total := v_options_total + (v_base_price * 0.10);
+        WHEN '3in-top-bottom' THEN v_options_total := v_options_total + (v_base_price * 0.10);
+        WHEN '4in-top-bottom' THEN v_options_total := v_options_total + (v_base_price * 0.10);
+    END CASE;
+    
+    -- Hem - Free (no additional cost)
+    -- No markup needed for hem options
+    
+    -- Grommets - $3.00 flat rate
     CASE p_grommets
-        WHEN 'every-2ft-all-sides' THEN v_options_total := v_options_total + 15.00;
-        WHEN 'every-2ft-top-bottom' THEN v_options_total := v_options_total + 12.00;
-        WHEN 'every-2ft-left-right' THEN v_options_total := v_options_total + 10.00;
-        WHEN '4-corners-only' THEN v_options_total := v_options_total + 8.00;
+        WHEN 'every-2ft-all-sides' THEN v_options_total := v_options_total + 3.00;
+        WHEN 'every-2ft-top-bottom' THEN v_options_total := v_options_total + 3.00;
+        WHEN 'every-2ft-left-right' THEN v_options_total := v_options_total + 3.00;
+        WHEN '4-corners-only' THEN v_options_total := v_options_total + 3.00;
     END CASE;
     
-    -- Webbing
+    -- Webbing - 27% markup
     CASE p_webbing
-        WHEN '1in-webbing' THEN v_options_total := v_options_total + 18.00;
-        WHEN '1in-webbing-d-rings' THEN v_options_total := v_options_total + 25.00;
-        WHEN '1in-velcro-all-sides' THEN v_options_total := v_options_total + 22.00;
+        WHEN '1in-webbing' THEN v_options_total := v_options_total + (v_base_price * 0.27);
+        WHEN '1in-webbing-d-rings' THEN v_options_total := v_options_total + (v_base_price * 0.27);
+        WHEN '1in-velcro-all-sides' THEN v_options_total := v_options_total + (v_base_price * 0.27);
     END CASE;
     
-    -- Corners
+    -- Corners - 16% markup
     CASE p_corners
-        WHEN 'reinforce-top-only' THEN v_options_total := v_options_total + 8.00;
-        WHEN 'reinforce-bottom-only' THEN v_options_total := v_options_total + 8.00;
-        WHEN 'reinforce-all-corners' THEN v_options_total := v_options_total + 15.00;
+        WHEN 'reinforce-top-only' THEN v_options_total := v_options_total + (v_base_price * 0.16);
+        WHEN 'reinforce-bottom-only' THEN v_options_total := v_options_total + (v_base_price * 0.16);
+        WHEN 'reinforce-all-corners' THEN v_options_total := v_options_total + (v_base_price * 0.16);
     END CASE;
     
-    -- Rope
+    -- Rope - 35-70% markup based on rope size and placement
     CASE p_rope
-        WHEN '3-16-top-only' THEN v_options_total := v_options_total + 12.00;
-        WHEN '3-16-bottom-only' THEN v_options_total := v_options_total + 12.00;
-        WHEN '3-16-top-bottom' THEN v_options_total := v_options_total + 20.00;
-        WHEN '5-16-top-only' THEN v_options_total := v_options_total + 15.00;
-        WHEN '5-16-bottom-only' THEN v_options_total := v_options_total + 15.00;
-        WHEN '5-16-top-bottom' THEN v_options_total := v_options_total + 25.00;
+        WHEN '3-16-top-only' THEN v_options_total := v_options_total + (v_base_price * 0.35);
+        WHEN '3-16-bottom-only' THEN v_options_total := v_options_total + (v_base_price * 0.35);
+        WHEN '3-16-top-bottom' THEN v_options_total := v_options_total + (v_base_price * 0.50);
+        WHEN '5-16-top-only' THEN v_options_total := v_options_total + (v_base_price * 0.50);
+        WHEN '5-16-bottom-only' THEN v_options_total := v_options_total + (v_base_price * 0.50);
+        WHEN '5-16-top-bottom' THEN v_options_total := v_options_total + (v_base_price * 0.70);
     END CASE;
     
-    -- Wind Slits
+    -- Wind Slits - Keep existing flat rate for now
     IF p_windslits = 'standard-windslits' THEN
         v_options_total := v_options_total + 8.00;
     END IF;
     
-    -- Turnaround
+    -- Turnaround - Updated to $15.00 for same day
     IF p_turnaround = 'same-day' THEN
-        v_turnaround_cost := 8.00;
+        v_turnaround_cost := 15.00;
     END IF;
     
     -- Calculate total

@@ -36,6 +36,7 @@ import {
 } from 'lucide-react'
 import authService from '../services/auth'
 import PrintPreviewModal from './PrintPreviewModal'
+import { GlassCard } from './ui'
 
 // Collapsible Section Component - Defined outside to prevent recreation
 const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle, defaultExpanded = false }) => (
@@ -91,73 +92,73 @@ const Checkout = () => {
     // 2. # of sides
     sides: [
       { value: 1, label: 'Single Sided', price: 0 },
-      { value: 2, label: 'Double Sided', price: 25 }
+      { value: 2, label: 'Double Sided', description: 'Additional cost applies' }
     ],
     
     // 3. Material (from editor - already handled)
-    // 4. Pole Pockets
+    // 4. Pole Pockets - 10% markup (internal)
     polePockets: [
       { value: 'none', label: 'No Pole Pockets', price: 0 },
-      { value: '2in-top', label: '2" Pocket - Top Only (fits 1" pole)', price: 8 },
-      { value: '3in-top', label: '3" Pocket - Top Only (fits 1.5" pole)', price: 10 },
-      { value: '4in-top', label: '4" Pocket - Top Only (fits 2" pole)', price: 12 },
-      { value: '2in-top-bottom', label: '2" Pockets - Top & Bottom', price: 15 },
-      { value: '3in-top-bottom', label: '3" Pockets - Top & Bottom', price: 18 },
-      { value: '4in-top-bottom', label: '4" Pockets - Top & Bottom', price: 22 }
+      { value: '2in-top', label: '2" Pocket - Top Only (fits 1" pole)', description: 'Additional cost applies' },
+      { value: '3in-top', label: '3" Pocket - Top Only (fits 1.5" pole)', description: 'Additional cost applies' },
+      { value: '4in-top', label: '4" Pocket - Top Only (fits 2" pole)', description: 'Additional cost applies' },
+      { value: '2in-top-bottom', label: '2" Pockets - Top & Bottom', description: 'Additional cost applies' },
+      { value: '3in-top-bottom', label: '3" Pockets - Top & Bottom', description: 'Additional cost applies' },
+      { value: '4in-top-bottom', label: '4" Pockets - Top & Bottom', description: 'Additional cost applies' }
     ],
     
-    // 5. Hem Options
+    // 5. Hem Options - Free
     hem: [
       { value: 'no-hem', label: 'No Hem', price: 0 },
-      { value: 'all-sides', label: 'All Sides Hem', price: 12 }
+      { value: 'all-sides', label: 'All Sides Hem', price: 0 }
     ],
     
-    // 6. Grommet Options
+    // 6. Grommet Options - $3.00 flat rate
     grommets: [
-      { value: 'every-2ft-all-sides', label: 'Every 2\' - All Sides', price: 15 },
-      { value: 'every-2ft-top-bottom', label: 'Every 2\' - Top & Bottom', price: 12 },
-      { value: 'every-2ft-left-right', label: 'Every 2\' - Left & Right', price: 10 },
-      { value: '4-corners-only', label: '4 Corners Only', price: 8 },
+      { value: 'every-2ft-all-sides', label: 'Every 2\' - All Sides', price: 3.00 },
+      { value: 'every-2ft-top-bottom', label: 'Every 2\' - Top & Bottom', price: 3.00 },
+      { value: 'every-2ft-left-right', label: 'Every 2\' - Left & Right', price: 3.00 },
+      { value: '4-corners-only', label: '4 Corners Only', price: 3.00 },
       { value: 'no-grommets', label: 'No Grommets', price: 0 }
     ],
     
-    // 7. Webbing Options
+    // 7. Webbing Options - 27% markup (internal)
     webbing: [
       { value: 'no-webbing', label: 'No Webbing', price: 0 },
-      { value: '1in-webbing', label: '1" Webbing', price: 18 },
-      { value: '1in-webbing-d-rings', label: '1" Webbing w/ D-rings', price: 25 },
-      { value: '1in-velcro-all-sides', label: '1" Velcro - All Sides', price: 22 }
+      { value: '1in-webbing', label: '1" Webbing', description: 'Additional cost applies' },
+      { value: '1in-webbing-d-rings', label: '1" Webbing w/ D-rings', description: 'Additional cost applies' },
+      { value: '1in-velcro-all-sides', label: '1" Velcro - All Sides', description: 'Additional cost applies' }
     ],
     
-    // 8. Corner Reinforcement
+    // 8. Corner Reinforcement - 16% markup (internal)
     corners: [
       { value: 'no-reinforcement', label: 'No Reinforced Corners', price: 0 },
-      { value: 'reinforce-top-only', label: 'Reinforce Top Only', price: 8 },
-      { value: 'reinforce-bottom-only', label: 'Reinforce Bottom Only', price: 8 },
-      { value: 'reinforce-all-corners', label: 'Reinforce All Corners', price: 15 }
+      { value: 'reinforce-top-only', label: 'Reinforce Top Only', description: 'Additional cost applies' },
+      { value: 'reinforce-bottom-only', label: 'Reinforce Bottom Only', description: 'Additional cost applies' },
+      { value: 'reinforce-all-corners', label: 'Reinforce All Corners', description: 'Additional cost applies' }
     ],
     
-    // 9. Rope Options
+    // 9. Rope Options - 35-70% markup (internal)
     rope: [
       { value: 'no-rope', label: 'No Rope', price: 0 },
-      { value: '3-16-top-only', label: '3/16" Rope - Top Only', price: 12 },
-      { value: '3-16-bottom-only', label: '3/16" Rope - Bottom Only', price: 12 },
-      { value: '3-16-top-bottom', label: '3/16" Rope - Top & Bottom', price: 20 },
-      { value: '5-16-top-only', label: '5/16" Rope - Top Only', price: 15 },
-      { value: '5-16-bottom-only', label: '5/16" Rope - Bottom Only', price: 15 },
-      { value: '5-16-top-bottom', label: '5/16" Rope - Top & Bottom', price: 25 }
+      { value: '3-16-top-only', label: '3/16" Rope - Top Only', description: 'Additional cost applies' },
+      { value: '3-16-bottom-only', label: '3/16" Rope - Bottom Only', description: 'Additional cost applies' },
+      { value: '3-16-top-bottom', label: '3/16" Rope - Top & Bottom', description: 'Additional cost applies' },
+      { value: '5-16-top-only', label: '5/16" Rope - Top Only', description: 'Additional cost applies' },
+      { value: '5-16-bottom-only', label: '5/16" Rope - Bottom Only', description: 'Additional cost applies' },
+      { value: '5-16-top-bottom', label: '5/16" Rope - Top & Bottom', description: 'Additional cost applies' }
     ],
     
-    // 10. Wind Slits
+    // 10. Wind Slits - Keep existing flat rate
     windslits: [
       { value: 'no-windslits', label: 'No Wind Slits', price: 0 },
-      { value: 'standard-windslits', label: 'Standard Wind Slits', price: 8 }
+      { value: 'standard-windslits', label: 'Standard Wind Slits', price: 8.00 }
     ],
     
     // Turnaround Time
     turnaround: [
       { value: 'next-day', label: 'Next Day (4pm PST Cutoff) - Free', price: 0 },
-      { value: 'same-day', label: 'Same Day (12pm PST Cutoff) +$8.00', price: 8 }
+      { value: 'same-day', label: 'Same Day (12pm PST Cutoff) +$15.00', price: 15 }
     ]
   }
 
@@ -462,14 +463,8 @@ const Checkout = () => {
     'backlit': 7.00
   }
 
-  // Calculate banner options costs
-  const sidesCost = bannerOptionsConfig.sides.find(opt => opt.value === bannerOptions.sides)?.price || 0
+  // Calculate banner options costs - Now handled by backend with dynamic markup
   const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
-  const hemCost = bannerOptionsConfig.hem.find(opt => opt.value === bannerOptions.hem)?.price || 0
-  const polePocketCost = bannerOptionsConfig.polePockets.find(opt => opt.value === bannerOptions.polePockets)?.price || 0
-  const webbingCost = bannerOptionsConfig.webbing.find(opt => opt.value === bannerOptions.webbing)?.price || 0
-  const cornersCost = bannerOptionsConfig.corners.find(opt => opt.value === bannerOptions.corners)?.price || 0
-  const ropeCost = bannerOptionsConfig.rope.find(opt => opt.value === bannerOptions.rope)?.price || 0
   const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
@@ -483,7 +478,28 @@ const Checkout = () => {
   }
   
   const basePrice = getBasePrice()
-  const optionsTotal = sidesCost + grommetCost + hemCost + polePocketCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
+  
+  // Calculate percentage-based options for instant pricing updates
+  const sidesCost = bannerOptions.sides === 2 ? basePrice : 0 // 100% markup for double sided
+  const polePocketCost = bannerOptions.polePockets !== 'none' ? basePrice * 0.10 : 0 // 10% markup
+  const webbingCost = bannerOptions.webbing !== 'no-webbing' ? basePrice * 0.27 : 0 // 27% markup
+  const cornersCost = bannerOptions.corners !== 'no-reinforcement' ? basePrice * 0.16 : 0 // 16% markup
+  
+  // Rope pricing based on size and placement
+  const getRopeCost = () => {
+    if (bannerOptions.rope === 'no-rope') return 0
+    if (bannerOptions.rope.includes('3-16')) {
+      return bannerOptions.rope.includes('top-bottom') ? basePrice * 0.50 : basePrice * 0.35
+    }
+    if (bannerOptions.rope.includes('5-16')) {
+      return bannerOptions.rope.includes('top-bottom') ? basePrice * 0.70 : basePrice * 0.50
+    }
+    return 0
+  }
+  const ropeCost = getRopeCost()
+  
+  // Calculate total options cost including all percentage-based options
+  const optionsTotal = sidesCost + polePocketCost + grommetCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
   const subtotal = basePrice * bannerOptions.quantity + optionsTotal
   const totalAmount = subtotal + shippingCost
 
@@ -503,7 +519,7 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 py-4 lg:py-8">
-      <div className="container mx-auto px-2 sm:px-4 max-w-6xl overflow-hidden">
+      <div className="container mx-auto px-2 sm:px-4 max-w-6xl">
         <div className="text-center mb-4 lg:mb-8">
           <div className="flex items-center justify-between mb-4">
             <button
@@ -580,37 +596,49 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* Order Summary Card */}
-        <div className="mb-6 backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Package className="w-8 h-8 text-blue-600" />
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Order Summary</h3>
-                <p className="text-sm text-gray-600">
-                  {orderData?.dimensions?.width || 2}ft × {orderData?.dimensions?.height || 4}ft Banner
-                  {bannerOptions.quantity > 1 && ` × ${bannerOptions.quantity}`}
-                  {bannerOptions.sides === 2 && ' (Double Sided)'}
-                </p>
-                <p className="text-sm text-blue-600 font-medium">
-                  {bannerOptions.material ? 
-                    Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1] ? 
-                    `${Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1]}/sqft` : 
-                    'Material pricing' : 
-                    'Select material'
-                  }
-                </p>
+        {/* Order Summary Card - Sticky Container */}
+        <div className="sticky top-0 z-20 mb-6">
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Package className="w-8 h-8 text-blue-600" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Order Summary</h3>
+                  <p className="text-sm text-gray-600">
+                    {orderData?.dimensions?.width || 2}ft × {orderData?.dimensions?.height || 4}ft Banner
+                    {bannerOptions.quantity > 1 && ` × ${bannerOptions.quantity}`}
+                    {bannerOptions.sides === 2 && ' (Double Sided)'}
+                  </p>
+                  <p className="text-sm text-blue-600 font-medium">
+                    {bannerOptions.material ? 
+                      Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1] ? 
+                      `${Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1]}/sqft` : 
+                      'Material pricing' : 
+                      'Select material'
+                    }
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-blue-600">
-                ${totalAmount}
-              </p>
-              <p className="text-sm text-gray-600">Total (including all options & shipping)</p>
-              <div className="text-xs text-gray-500 mt-1">
-                <p>Base: ${basePrice * bannerOptions.quantity}</p>
-                <p>Options: +${optionsTotal}</p>
-                <p>Shipping: +${shippingCost}</p>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-green-600">
+                  ${totalAmount.toFixed(2)}
+                </p>
+                <p className="text-sm text-gray-600">Total (including all options & shipping)</p>
+                <div className="text-xs text-gray-500 mt-1">
+                  <p>Base: ${(basePrice * bannerOptions.quantity).toFixed(2)}</p>
+                  <p>Options: +${optionsTotal.toFixed(2)}</p>
+                  <p>Shipping: +${shippingCost.toFixed(2)}</p>
+                  <div className="mt-1 text-xs text-gray-400">
+                    <p>• Sides: +${sidesCost.toFixed(2)}</p>
+                    <p>• Pole Pockets: +${polePocketCost.toFixed(2)}</p>
+                    <p>• Grommets: +${grommetCost.toFixed(2)}</p>
+                    <p>• Webbing: +${webbingCost.toFixed(2)}</p>
+                    <p>• Corners: +${cornersCost.toFixed(2)}</p>
+                    <p>• Rope: +${ropeCost.toFixed(2)}</p>
+                    <p>• Wind Slits: +${windSlitCost.toFixed(2)}</p>
+                    <p>• Turnaround: +${turnaroundCost.toFixed(2)}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -672,6 +700,17 @@ const Checkout = () => {
             data-section="bannerOptions"
           >
             <div className="space-y-6 pb-6">
+              {/* Pricing Note */}
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium mb-1">Professional Banner Options</p>
+                    <p>Advanced options are priced based on your banner specifications to ensure fair, scalable pricing. Final costs will be calculated based on your selected size, material, and options.</p>
+                  </div>
+                </div>
+              </div>
+
               {/* Job Details */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -786,8 +825,10 @@ const Checkout = () => {
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : 
+                           option.description ? `${option.description}` : 
+                           'No additional cost'}
                         </p>
                       </div>
                     </label>
@@ -874,6 +915,18 @@ const Checkout = () => {
                         <Package className="w-4 h-4 text-green-600" />
                         Webbing & Hanging Options
                       </h5>
+                      
+                      {/* Webbing Recommendation Note */}
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                          <div className="text-sm text-amber-800">
+                            <p className="font-medium">Professional Recommendation</p>
+                            <p>Banners over 100 square feet should include webbing for proper hanging and stability. This ensures your banner is securely mounted and won't sag or tear.</p>
+                          </div>
+                        </div>
+                      </div>
+                      
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {bannerOptionsConfig.webbing.map((option) => (
                           <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 cursor-pointer transition-colors">
@@ -887,8 +940,10 @@ const Checkout = () => {
                             />
                             <div className="flex-1">
                               <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 
+                                 option.description ? `${option.description}` : 
+                                 'No additional cost'}
                               </p>
                             </div>
                           </label>
@@ -915,8 +970,10 @@ const Checkout = () => {
                             />
                             <div className="flex-1">
                               <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 
+                                 option.description ? `${option.description}` : 
+                                 'No additional cost'}
                               </p>
                             </div>
                           </label>
@@ -943,8 +1000,10 @@ const Checkout = () => {
                             />
                             <div className="flex-1">
                               <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 
+                                 option.description ? `${option.description}` : 
+                                 'No additional cost'}
                               </p>
                             </div>
                           </label>
@@ -971,8 +1030,10 @@ const Checkout = () => {
                             />
                             <div className="flex-1">
                               <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
+                                {option.price > 0 ? `+$${option.price}` : 
+                                 option.description ? `${option.description}` : 
+                                 'No additional cost'}
                               </p>
                             </div>
                           </label>
@@ -1233,55 +1294,56 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Sides ({bannerOptions.sides === 2 ? 'Double' : 'Single'}):</span>
                     <span className="font-medium">
-                      {sidesCost > 0 ? `+$${sidesCost}` : 'No additional cost'}
+                      {sidesCost > 0 ? <span className="text-green-600">+${sidesCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Pole Pockets:</span>
                     <span className="font-medium">
-                      {polePocketCost > 0 ? `+$${polePocketCost}` : 'No additional cost'}
+                      {polePocketCost > 0 ? <span className="text-green-600">+${polePocketCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Hem Style:</span>
                     <span className="font-medium">
-                      {hemCost > 0 ? `+$${hemCost}` : 'No additional cost'}
+                      {/* Hem is free, no additional cost */}
+                      <span className="text-gray-500">No additional cost</span>
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Grommets:</span>
                     <span className="font-medium">
-                      {grommetCost > 0 ? `+$${grommetCost}` : 'No additional cost'}
+                      {grommetCost > 0 ? <span className="text-green-600">+${grommetCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Webbing:</span>
                     <span className="font-medium">
-                      {webbingCost > 0 ? `+$${webbingCost}` : 'No additional cost'}
+                      {webbingCost > 0 ? <span className="text-green-600">+${webbingCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Corner Reinforcement:</span>
                     <span className="font-medium">
-                      {cornersCost > 0 ? `+$${cornersCost}` : 'No additional cost'}
+                      {cornersCost > 0 ? <span className="text-green-600">+${cornersCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Rope:</span>
                     <span className="font-medium">
-                      {ropeCost > 0 ? `+$${ropeCost}` : 'No additional cost'}
+                      {ropeCost > 0 ? <span className="text-green-600">+${ropeCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Wind Slits:</span>
                     <span className="font-medium">
-                      {windSlitCost > 0 ? `+$${windSlitCost}` : 'No additional cost'}
+                      {windSlitCost > 0 ? <span className="text-green-600">+${windSlitCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Turnaround:</span>
                     <span className="font-medium">
-                      {turnaroundCost > 0 ? `+$${turnaroundCost}` : 'No additional cost'}
+                      {turnaroundCost > 0 ? <span className="text-green-600">+${turnaroundCost.toFixed(2)}</span> : 'No additional cost'}
                     </span>
                   </div>
                   <div className="flex justify-between">
