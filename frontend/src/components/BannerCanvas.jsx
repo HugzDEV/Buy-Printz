@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Stage, Layer, Rect, Text, Image as KonvaImage, Transformer, Circle, Star, Line, RegularPolygon } from 'react-konva'
 import Konva from 'konva'
 
+
 // Enable text rendering fix for better text display
 Konva._fixTextRendering = true
 
@@ -302,7 +303,6 @@ const BannerCanvas = ({
 
   // Selection rectangle functions (based on working bannersample.jsx)
   const startSelection = (pos) => {
-    console.log('Starting selection at:', pos)
     setIsSelecting(true)
     setSelectionStart(pos)
     setSelectionRect({
@@ -315,7 +315,6 @@ const BannerCanvas = ({
     // Auto-clear selection mode after 5 seconds to prevent getting stuck
     setTimeout(() => {
       if (isSelecting) {
-        console.log('Auto-clearing selection mode due to timeout')
         setIsSelecting(false)
         setSelectionRect(null)
         setSelectionStart(null)
@@ -334,7 +333,6 @@ const BannerCanvas = ({
       width: Math.abs(pos.x - startX),
       height: Math.abs(pos.y - startY)
     }
-    console.log('Updating selection:', newRect, 'from start:', selectionStart, 'to current:', pos)
     setSelectionRect(newRect)
   }
 
@@ -352,16 +350,11 @@ const BannerCanvas = ({
     // Only process selection if the rectangle is large enough (avoid accidental micro-drags)
     const minSelectionSize = 10
     if (normalizedRect.width < minSelectionSize && normalizedRect.height < minSelectionSize) {
-      console.log('Selection too small, ignoring')
       setIsSelecting(false)
       setSelectionRect(null)
       setSelectionStart(null)
       return
     }
-
-    console.log('Finishing selection with rect:', selectionRect)
-    console.log('Normalized rect:', normalizedRect)
-    console.log('Available elements:', elements.length)
 
     // Find elements within selection rectangle
     const selectedElements = elements.filter(element => {
@@ -387,29 +380,17 @@ const BannerCanvas = ({
              elemY < normalizedRect.y + normalizedRect.height &&
              elemY + elemHeight > normalizedRect.y
       
-      if (intersects) {
-        console.log('Element intersects:', element.id, element.type, { 
-          elemX, elemY, elemWidth, elemHeight,
-          rectX: normalizedRect.x, rectY: normalizedRect.y, rectWidth: normalizedRect.width, rectHeight: normalizedRect.height
-        })
-      }
-      
       return intersects
     })
 
-    console.log('Selected elements:', selectedElements.length)
-
     if (selectedElements.length > 1) {
       const ids = selectedElements.map(el => el.id)
-      console.log('Setting multi-selection:', ids)
       setSelectedIds(ids)
       setSelectedId(null) // Clear single selection
     } else if (selectedElements.length === 1) {
-      console.log('Setting single selection:', selectedElements[0].id)
       setSelectedId(selectedElements[0].id)
       setSelectedIds([])
     } else {
-      console.log('No elements selected')
       setSelectedId(null)
       setSelectedIds([])
     }
@@ -419,46 +400,138 @@ const BannerCanvas = ({
     setSelectionStart(null)
   }
 
-  // Text editing state
-  const [editingTextId, setEditingTextId] = useState(null)
-  const [editingTextValue, setEditingTextValue] = useState('')
+
 
   // Element handlers
   // Simple element selection handler
   const handleSelect = (id) => {
-    console.log('Element selected:', id)
-    console.log('Available elements:', elements)
-    console.log('Selected element type:', elements.find(el => el.id === id)?.type)
     setSelectedId(id)
     setSelectedIds([])
   }
 
-  // Text editing handlers
+  // Clean text editing implementation
   const handleTextDblClick = useCallback((id) => {
     const element = elements.find(el => el.id === id)
     if (element && element.type === 'text') {
-      setEditingTextId(id)
-      setEditingTextValue(element.text || '')
+      // Get the Konva stage and text node
+      const stage = stageRef.current
+      if (!stage) return
+      
+      const textNode = stage.findOne(`#${id}`)
+      if (!textNode) return
+      
+      // Hide the text node and transformer
+      textNode.hide()
+      if (transformerRef.current) {
+        transformerRef.current.hide()
+      }
+      
+      // Get text position
+      const textPosition = textNode.absolutePosition()
+      const stageBox = stage.container().getBoundingClientRect()
+      const areaPosition = {
+        x: stageBox.left + textPosition.x,
+        y: stageBox.top + textPosition.y,
+      }
+      
+      // Create textarea
+      const textarea = document.createElement('textarea')
+      document.body.appendChild(textarea)
+      textarea.value = textNode.text()
+      textarea.style.position = 'absolute'
+      textarea.style.top = areaPosition.y + 'px'
+      textarea.style.left = areaPosition.x + 'px'
+      textarea.style.width = textNode.width() - (textNode.padding() || 0) * 2 + 'px'
+      textarea.style.height = textNode.height() - (textNode.padding() || 0) * 2 + 5 + 'px'
+      textarea.style.fontSize = textNode.fontSize() + 'px'
+      textarea.style.border = 'none'
+      textarea.style.padding = '0px'
+      textarea.style.margin = '0px'
+      textarea.style.overflow = 'hidden'
+      textarea.style.background = 'none'
+      textarea.style.outline = 'none'
+      textarea.style.resize = 'none'
+      textarea.style.lineHeight = textNode.lineHeight() || '1.2'
+      textarea.style.fontFamily = textNode.fontFamily() || 'Arial'
+      textarea.style.transformOrigin = 'left top'
+      textarea.style.textAlign = textNode.align() || 'left'
+      textarea.style.color = textNode.fill() || '#000000'
+      textarea.style.zIndex = '1000'
+      
+      // Handle rotation
+      const rotation = textNode.rotation()
+      let transform = ''
+      if (rotation) {
+        transform += `rotateZ(${rotation}deg)`
+      }
+      transform += `translateY(-2px)`
+      textarea.style.transform = transform
+      
+      // Auto-adjust height
+      textarea.style.height = 'auto'
+      textarea.style.height = textarea.scrollHeight + 3 + 'px'
+      
+      textarea.focus()
+      
+      // Function to remove textarea and show text node
+      const removeTextarea = () => {
+        if (textarea.parentNode) {
+          textarea.parentNode.removeChild(textarea)
+        }
+        window.removeEventListener('click', handleOutsideClick)
+        window.removeEventListener('touchstart', handleOutsideClick)
+        textNode.show()
+        if (transformerRef.current) {
+          transformerRef.current.show()
+          transformerRef.current.forceUpdate()
+        }
+      }
+      
+      // Function to save text and remove textarea
+      const saveText = () => {
+        setElements(prev => prev.map(el => {
+          if (el.id === id && el.type === 'text') {
+            return { ...el, text: textarea.value }
+          }
+          return el
+        }))
+        removeTextarea()
+      }
+      
+      // Event handlers
+      const handleOutsideClick = (e) => {
+        if (e.target !== textarea) {
+          saveText()
+        }
+      }
+      
+      textarea.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault()
+          saveText()
+        }
+        if (e.key === 'Escape') {
+          removeTextarea()
+        }
+      })
+      
+      textarea.addEventListener('input', function () {
+        const scale = textNode.getAbsoluteScale().x
+        const newWidth = textNode.width() * scale
+        textarea.style.width = newWidth + 'px'
+        textarea.style.height = 'auto'
+        textarea.style.height = textarea.scrollHeight + textNode.fontSize() + 'px'
+      })
+      
+      setTimeout(() => {
+        window.addEventListener('click', handleOutsideClick)
+        window.addEventListener('touchstart', handleOutsideClick)
+      })
     }
-  }, [elements])
+  }, [elements, setElements])
 
-  const handleTextEditComplete = useCallback(() => {
-    if (editingTextId) {
-      setElements(prev => prev.map(el => 
-        el.id === editingTextId ? { ...el, text: editingTextValue } : el
-      ))
-      setEditingTextId(null)
-      setEditingTextValue('')
-    }
-  }, [editingTextId, editingTextValue])
-
-  const handleTextEditCancel = useCallback(() => {
-    setEditingTextId(null)
-    setEditingTextValue('')
-  }, [])
-
+  // Clean element change handler
   const handleElementChange = (id, changes) => {
-    console.log('handleElementChange called:', { id, changes })
     setElements(prev => prev.map(el => 
       el.id === id ? { ...el, ...changes } : el
     ))
@@ -507,16 +580,7 @@ const BannerCanvas = ({
 
     // Handle different element types
     switch (element.type) {
-      case 'text':
-        // For text elements, ensure minimum width for long words
-        const newWidth = Math.max(50, node.width() * scaleX)
-        const newHeight = Math.max(20, node.height() * scaleY)
-        handleElementChange(id, {
-          ...baseUpdate,
-          width: newWidth,
-          height: newHeight
-        })
-        break
+
 
       case 'rect':
       case 'image':
@@ -675,6 +739,8 @@ const BannerCanvas = ({
     return () => clearTimeout(timeoutId)
   }, [selectedId, selectedIds, elements])
 
+  // Remove the TextEditor component since we're using vanilla DOM approach
+
   // Render elements
   const renderElement = (element) => {
     const commonProps = {
@@ -688,20 +754,28 @@ const BannerCanvas = ({
       onTap: (e) => {
         handleSelect(element.id)
       },
+      onDblClick: (e) => {
+        if (element.type === 'text') {
+          e.evt.stopPropagation()
+          handleTextDblClick(element.id)
+        }
+      },
+      onDblTap: (e) => {
+        if (element.type === 'text') {
+          e.evt.stopPropagation()
+          handleTextDblClick(element.id)
+        }
+      },
       onDragEnd: (e) => handleDragEnd(e, element.id),
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
     }
 
     switch (element.type) {
       case 'text':
-        console.log('Rendering text element:', element)
         return (
           <Text
             key={element.id}
-            id={element.id}
-            x={element.x}
-            y={element.y}
-            draggable={true}
+            {...commonProps}
             text={element.text || 'Sample Text'}
             fontSize={element.fontSize || 24}
             fontFamily={element.fontFamily || 'Arial'}
@@ -717,14 +791,6 @@ const BannerCanvas = ({
             letterSpacing={element.letterSpacing || 0}
             padding={element.padding || 0}
             listening={true}
-            onClick={(e) => {
-              e.evt.stopPropagation()
-              handleSelect(element.id)
-            }}
-            onTap={(e) => {
-              e.evt.stopPropagation()
-              handleSelect(element.id)
-            }}
             onDblClick={(e) => {
               e.evt.stopPropagation()
               handleTextDblClick(element.id)
@@ -733,8 +799,6 @@ const BannerCanvas = ({
               e.evt.stopPropagation()
               handleTextDblClick(element.id)
             }}
-            onDragEnd={(e) => handleDragEnd(e, element.id)}
-            onTransformEnd={(e) => handleTransformEnd(e, element.id)}
           />
         )
       
@@ -1059,36 +1123,7 @@ const BannerCanvas = ({
               userSelect: 'none' // Prevent text selection
             }}
           >
-            {/* Text Editing Overlay */}
-            {editingTextId && (
-              <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20">
-                <div className="bg-white rounded-lg p-4 shadow-xl max-w-md w-full mx-4">
-                  <h3 className="text-lg font-semibold mb-3 text-gray-800">Edit Text</h3>
-                  <textarea
-                    value={editingTextValue}
-                    onChange={(e) => setEditingTextValue(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    rows={4}
-                    placeholder="Enter your text..."
-                    autoFocus
-                  />
-                  <div className="flex gap-2 mt-4">
-                    <button
-                      onClick={handleTextEditComplete}
-                      className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={handleTextEditCancel}
-                      className="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-medium transition-colors duration-200"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            
             <Stage
               ref={stageRef}
               width={canvasSize.width}
@@ -1102,7 +1137,6 @@ const BannerCanvas = ({
                 
                 // Only handle if clicking directly on the stage background (not on elements)
                 if (e.target === stage) {
-                  console.log('Clicked on stage background - starting selection')
                   
                   // Clear selections when clicking on empty canvas
                   setSelectedId(null)
@@ -1169,7 +1203,6 @@ const BannerCanvas = ({
                   height={canvasSize.height}
                   fill={backgroundColor}
                   onMouseDown={(e) => {
-                    console.log('Background rect clicked')
                     
                     // Clear selections when clicking on background
                     setSelectedId(null)
@@ -1178,7 +1211,6 @@ const BannerCanvas = ({
                     // Start selection rectangle
                     const stage = e.target.getStage()
                     const pos = stage.getPointerPosition()
-                    console.log('Background click - Pointer position:', pos, 'scale:', scale)
                     if (pos) {
                       startSelection({
                         x: pos.x / scale,
@@ -1476,18 +1508,10 @@ const BannerCanvas = ({
       `}>
         <GlassPanel className="flex flex-col gap-3 sm:gap-4 max-h-full">
           
-          {/* Debug Info */}
-          {selectedId && (
-            <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
-              <div>Selected ID: {selectedId}</div>
-              <div>Selected Element Type: {elements.find(el => el.id === selectedId)?.type}</div>
-              <div>Total Elements: {elements.length}</div>
-              <div>Text Elements: {elements.filter(el => el.type === 'text').length}</div>
-              {selectedElement?.type === 'text' && (
-                <div className="mt-1 text-blue-600 font-medium">
-                  💡 Double-click or press Enter to edit text
-                </div>
-              )}
+          {/* Text Editing Hint */}
+          {selectedId && selectedElement?.type === 'text' && (
+            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded text-center">
+              💡 Double-click text or press Enter to edit
             </div>
           )}
           
@@ -1640,6 +1664,8 @@ const BannerCanvas = ({
                   ))}
                 </div>
               </div>
+              
+
             </div>
           )}
 

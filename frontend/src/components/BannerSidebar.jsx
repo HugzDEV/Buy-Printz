@@ -1088,7 +1088,181 @@ const BannerSidebar = ({
           )}
         </GlassCard>
 
-        {/* Text Suite */}
+        {/* Text Editor */}
+        <GlassCard>
+          <button
+            onClick={() => toggleSection('text')}
+            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500">
+                <FileText className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-800">Text</h3>
+                <p className="text-xs text-gray-500">Add & edit text</p>
+              </div>
+            </div>
+            {expandedSections.text ? 
+              <ChevronUp className="w-4 h-4 text-gray-500" /> : 
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            }
+          </button>
+
+          {expandedSections.text && (
+            <div className="px-4 pb-4 space-y-4">
+              {/* Quick Text Templates */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Quick Text</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {['HEADLINE', 'Subtitle', 'Body Text', 'Call to Action'].map((text) => (
+                    <button
+                      key={text}
+                      onClick={() => onAddText(text)}
+                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm transition-colors duration-200 text-center"
+                    >
+                      {text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Font Family */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Font Family</h4>
+                <select
+                  onChange={(e) => onTextPropertyChange('fontFamily', e.target.value)}
+                  value={selectedElement?.fontFamily || 'Arial'}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="Arial">Arial</option>
+                  <option value="Helvetica">Helvetica</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Verdana">Verdana</option>
+                  <option value="Impact">Impact</option>
+                  <option value="Comic Sans MS">Comic Sans MS</option>
+                  <option value="Courier New">Courier New</option>
+                  <option value="Tahoma">Tahoma</option>
+                  <option value="Trebuchet MS">Trebuchet MS</option>
+                </select>
+              </div>
+              
+              {/* Font Size */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Font Size</h4>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onTextPropertyChange('fontSize', Math.max(8, (selectedElement?.fontSize || 24) - 2))}
+                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
+                  >
+                    -
+                  </button>
+                  <span className="flex-1 text-center text-sm font-medium text-gray-700">
+                    {selectedElement?.fontSize || 24}px
+                  </span>
+                  <button
+                    onClick={() => onTextPropertyChange('fontSize', Math.min(200, (selectedElement?.fontSize || 24) + 2))}
+                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              
+              {/* Text Color */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Text Color</h4>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={selectedElement?.fill || '#000000'}
+                    onChange={(e) => onTextPropertyChange('fill', e.target.value)}
+                    className="w-10 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                    title="Choose text color"
+                  />
+                  <span className="text-xs text-gray-500 font-mono">
+                    {selectedElement?.fill || '#000000'}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Text Alignment */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Alignment</h4>
+                <div className="grid grid-cols-3 gap-1">
+                  {[
+                    { value: 'left', icon: '⫷', label: 'Left' },
+                    { value: 'center', icon: '⫸', label: 'Center' },
+                    { value: 'right', icon: '⫹', label: 'Right' }
+                  ].map((align) => (
+                    <button
+                      key={align.value}
+                      onClick={() => onTextPropertyChange('align', align.value)}
+                      className={`p-2 rounded-lg text-sm transition-colors duration-200 ${
+                        (selectedElement?.align || 'left') === align.value
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      }`}
+                      title={align.label}
+                    >
+                      <div className="text-lg">{align.icon}</div>
+                      <div className="text-xs">{align.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Text Style */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Text Style</h4>
+                <div className="flex flex-wrap gap-1">
+                  {[
+                    { value: 'normal', label: 'Normal' },
+                    { value: 'bold', label: 'Bold' },
+                    { value: 'italic', label: 'Italic' }
+                  ].map((style) => (
+                    <button
+                      key={style.value}
+                      onClick={() => onTextPropertyChange('fontStyle', style.value)}
+                      className={`px-2 py-1 rounded text-xs transition-colors duration-200 ${
+                        (selectedElement?.fontStyle || 'normal') === style.value
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {style.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Edit Text Button */}
+              {selectedElement?.type === 'text' && (
+                <div className="pt-2 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      // This will trigger text editing in the canvas
+                      if (window.dispatchEvent) {
+                        window.dispatchEvent(new CustomEvent('editText', { 
+                          detail: { elementId: selectedElement.id } 
+                        }))
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    ✏️ Edit Text
+                  </button>
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    Double-click text on canvas or press Enter to edit
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </GlassCard>
+
+        {/* Shapes & Icons */}
         <GlassCard>
           <button
             onClick={() => toggleSection('shapes')}
@@ -1508,279 +1682,6 @@ const BannerSidebar = ({
                     </div>
                   </button>
                 ))}
-              </div>
-            </div>
-          )}
-        </GlassCard>
-
-        {/* Text Suite */}
-        <GlassCard>
-          <button
-            onClick={() => toggleSection('shapes')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500">
-                <Square className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-800">Text</h3>
-                <p className="text-xs text-gray-500">Text creation tools</p>
-              </div>
-            </div>
-            {expandedSections.shapes ? 
-              <ChevronUp className="w-4 h-4 text-gray-500" /> : 
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            }
-          </button>
-
-          {expandedSections.shapes && (
-            <div className="px-4 pb-4 space-y-6">
-              {/* Quick Text Templates */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Quick Text</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['HEADLINE', 'Subtitle', 'Body Text', 'Call to Action'].map((text) => (
-                    <button
-                      key={text}
-                      onClick={() => onAddText(text)}
-                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm transition-colors duration-200 text-center"
-                    >
-                      {text}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Font Family Selection */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Font Family</h4>
-                <select
-                  onChange={(e) => onTextPropertyChange('fontFamily', e.target.value)}
-                  value={selectedElement?.fontFamily || 'Arial'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="Arial">Arial</option>
-                  <option value="Helvetica">Helvetica</option>
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Verdana">Verdana</option>
-                  <option value="Impact">Impact</option>
-                  <option value="Comic Sans MS">Comic Sans MS</option>
-                  <option value="Courier New">Courier New</option>
-                  <option value="Lucida Console">Lucida Console</option>
-                  <option value="Tahoma">Tahoma</option>
-                  <option value="Trebuchet MS">Trebuchet MS</option>
-                  <option value="Arial Black">Arial Black</option>
-                  <option value="Bookman Old Style">Bookman Old Style</option>
-                  <option value="Garamond">Garamond</option>
-                  <option value="Palatino">Palatino</option>
-                </select>
-              </div>
-              
-              {/* Font Size */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Font Size</h4>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onTextPropertyChange('fontSize', Math.max(8, (selectedElement?.fontSize || 24) - 2))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center text-sm font-medium text-gray-700">
-                    {selectedElement?.fontSize || 24}px
-                  </span>
-                  <button
-                    onClick={() => onTextPropertyChange('fontSize', Math.min(200, (selectedElement?.fontSize || 24) + 2))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              
-              {/* Text Color */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Text Color</h4>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={selectedElement?.fill || '#000000'}
-                    onChange={(e) => onTextPropertyChange('fill', e.target.value)}
-                    className="w-10 h-10 rounded border-2 border-gray-300 cursor-pointer"
-                    title="Choose text color"
-                  />
-                  <span className="text-xs text-gray-500 font-mono">
-                    {selectedElement?.fill || '#000000'}
-                  </span>
-                </div>
-              </div>
-              
-              {/* Text Alignment */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Alignment</h4>
-                <div className="grid grid-cols-3 gap-1">
-                  {[
-                    { value: 'left', icon: '⫷', label: 'Left' },
-                    { value: 'center', icon: '⫸', label: 'Center' },
-                    { value: 'right', icon: '⫹', label: 'Right' }
-                  ].map((align) => (
-                    <button
-                      key={align.value}
-                      onClick={() => onTextPropertyChange('align', align.value)}
-                      className={`p-2 rounded-lg text-sm transition-colors duration-200 ${
-                        (selectedElement?.align || 'left') === align.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
-                      title={align.label}
-                    >
-                      <div className="text-lg">{align.icon}</div>
-                      <div className="text-xs">{align.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Vertical Alignment */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Vertical Alignment</h4>
-                <div className="grid grid-cols-3 gap-1">
-                  {[
-                    { value: 'top', icon: '⊤', label: 'Top' },
-                    { value: 'middle', icon: '⊟', label: 'Middle' },
-                    { value: 'bottom', icon: '⊥', label: 'Bottom' }
-                  ].map((valign) => (
-                    <button
-                      key={valign.value}
-                      onClick={() => onTextPropertyChange('verticalAlign', valign.value)}
-                      className={`p-2 rounded-lg text-sm transition-colors duration-200 ${
-                        (selectedElement?.verticalAlign || 'top') === valign.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
-                      title={valign.label}
-                    >
-                      <div className="text-lg">{valign.icon}</div>
-                      <div className="text-xs">{valign.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Text Style */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Text Style</h4>
-                <div className="flex flex-wrap gap-1">
-                  {[
-                    { value: 'normal', label: 'Normal' },
-                    { value: 'bold', label: 'Bold' },
-                    { value: 'italic', label: 'Italic' }
-                  ].map((style) => (
-                    <button
-                      key={style.value}
-                      onClick={() => onTextPropertyChange('fontStyle', style.value)}
-                      className={`px-2 py-1 rounded text-xs transition-colors duration-200 ${
-                        (selectedElement?.fontStyle || 'normal') === style.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {style.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Text Decoration */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Decoration</h4>
-                <div className="flex flex-wrap gap-1">
-                  {[
-                    { value: 'none', label: 'None' },
-                    { value: 'underline', label: 'Underline' },
-                    { value: 'line-through', label: 'Strike' }
-                  ].map((decoration) => (
-                    <button
-                      key={decoration.value}
-                      onClick={() => onTextPropertyChange('textDecoration', decoration.value)}
-                      className={`px-2 py-1 rounded text-xs transition-colors duration-200 ${
-                        (selectedElement?.textDecoration || 'none') === decoration.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {decoration.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Line Height */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Line Height</h4>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onTextPropertyChange('lineHeight', Math.max(0.5, (selectedElement?.lineHeight || 1.2) - 0.1))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center text-sm font-medium text-gray-700">
-                    {((selectedElement?.lineHeight || 1.2) * 100).toFixed(0)}%
-                  </span>
-                  <button
-                    onClick={() => onTextPropertyChange('lineHeight', Math.min(3, (selectedElement?.lineHeight || 1.2) + 0.1))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              
-              {/* Letter Spacing */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Letter Spacing</h4>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onTextPropertyChange('letterSpacing', Math.max(-5, (selectedElement?.letterSpacing || 0) - 0.5))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center text-sm font-medium text-gray-700">
-                    {selectedElement?.letterSpacing || 0}px
-                  </span>
-                  <button
-                    onClick={() => onTextPropertyChange('letterSpacing', Math.min(20, (selectedElement?.letterSpacing || 0) + 0.5))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              
-              {/* Padding */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Padding</h4>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onTextPropertyChange('padding', Math.max(0, (selectedElement?.padding || 0) - 2))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center text-sm font-medium text-gray-700">
-                    {selectedElement?.padding || 0}px
-                  </span>
-                  <button
-                    onClick={() => onTextPropertyChange('padding', Math.min(50, (selectedElement?.padding || 0) + 2))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
-                  >
-                    +
-                  </button>
-                </div>
               </div>
             </div>
           )}
