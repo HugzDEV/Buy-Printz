@@ -1,5 +1,30 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Stage, Layer, Rect, Text, Image as KonvaImage, Transformer, Circle, Star, Line, RegularPolygon } from 'react-konva'
+import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
+import { 
+  ZoomIn, 
+  ZoomOut, 
+  RotateCcw, 
+  Grid3X3, 
+  Eye, 
+  EyeOff, 
+  Trash2, 
+  Copy, 
+  Undo2, 
+  Redo2, 
+  FileText,
+  Move,
+  RotateCw,
+  Maximize2,
+  Minimize2,
+  Save,
+  Download,
+  SendToBack,
+  MoveDown,
+  MoveUp,
+  Layers,
+  Settings
+} from 'lucide-react'
+import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
 
 
@@ -12,28 +37,7 @@ Konva.hitOnDragEnabled = true
 
 // Enable touch event capture for better mobile support
 Konva.captureTouchEventsEnabled = true
-import { 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCw, 
-  Download, 
-  Save, 
-  Undo, 
-  Redo,
-  Move,
-  Eye,
-  EyeOff,
-  Grid,
-  Trash2,
-  Copy,
-  Clipboard,
-  MoveUp,
-  MoveDown,
-  Layers,
-  SendToBack,
-  Settings,
-  FileText
-} from 'lucide-react'
+
 
 const BannerCanvas = ({
   elements,
@@ -125,101 +129,46 @@ const BannerCanvas = ({
   const [selectedIds, setSelectedIds] = useState([])
   const [isStatusBarHidden, setIsStatusBarHidden] = useState(false)
   
+  // Text editing state - moved to top to fix hoisting issue
+  // Removed unused state variables - using simple prompt approach instead
+  
   // Show status bar when element is selected
   useEffect(() => {
     if (selectedId || selectedIds.length > 0) {
       setIsStatusBarHidden(false)
     }
   }, [selectedId, selectedIds])
-  
+
+  // Keep status bar visible when text editing modal is open
+  useEffect(() => {
+    // Removed isEditingText dependency - no longer needed
+  }, [])
+
   // Handle touch/click outside canvas to hide status bar - using Konva's container
   useEffect(() => {
     const handleOutsideInteraction = (e) => {
-      // Only handle if we have a stage reference
-      if (!stageRef.current) return
-      
-      const stage = stageRef.current
-      const container = stage.container()
-      const rect = container.getBoundingClientRect()
-      
-      let clientX, clientY
-      
-      // Handle both touch and mouse events
-      if (e.touches && e.touches[0]) {
-        // Touch event
-        clientX = e.touches[0].clientX
-        clientY = e.touches[0].clientY
-      } else if (e.clientX !== undefined) {
-        // Mouse event
-        clientX = e.clientX
-        clientY = e.clientY
-      } else {
-        return
-      }
-      
-      // Check if interaction is outside the canvas container
-      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-        setIsStatusBarHidden(true)
+      // Removed isEditingText check - no longer needed
+
+      // Check if the click is outside the canvas area
+      const canvasContainer = stageRef.current?.container()
+      if (canvasContainer && !canvasContainer.contains(e.target)) {
+        // Check if click is outside the status bar area
+        const statusBar = document.querySelector('[data-status-bar]')
+        if (statusBar && !statusBar.contains(e.target)) {
+          setIsStatusBarHidden(true)
+        }
       }
     }
-    
-    // Add event listeners for both touch and click outside detection
-    document.addEventListener('touchstart', handleOutsideInteraction, { passive: true })
-    document.addEventListener('mousedown', handleOutsideInteraction, { passive: true })
+
+    // Add event listeners for both mouse and touch
+    document.addEventListener('click', handleOutsideInteraction)
+    document.addEventListener('touchstart', handleOutsideInteraction)
     
     return () => {
+      document.removeEventListener('click', handleOutsideInteraction)
       document.removeEventListener('touchstart', handleOutsideInteraction)
-      document.removeEventListener('mousedown', handleOutsideInteraction)
     }
-  }, [])
-
-  
-
-
-
-  // Glass UI Components
-  const GlassButton = ({ children, onClick, className = "", variant = "default", disabled = false }) => {
-    const variants = {
-      default: "bg-white/20 hover:bg-white/30 text-gray-700 border-white/30",
-      primary: "bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border-blue-400/30",
-      success: "bg-green-500/20 hover:bg-green-500/30 text-green-700 border-green-400/30",
-      danger: "bg-red-500/20 hover:bg-red-500/30 text-red-700 border-red-400/30"
-    }
-    
-    return (
-      <button
-        onClick={onClick}
-        disabled={disabled}
-        className={`
-          ${variants[variant]}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'}
-          backdrop-blur-sm
-          border
-          rounded-xl
-          p-3
-          font-medium
-          transition-all duration-200
-          flex items-center justify-center gap-2
-          ${className}
-        `}
-      >
-        {children}
-      </button>
-    )
-  }
-
-  const GlassPanel = ({ children, className = "" }) => (
-    <div className={`
-      backdrop-blur-xl bg-white/10 
-      border border-white/20 
-      rounded-2xl 
-      shadow-[0_8px_32px_rgba(0,0,0,0.1)]
-      p-4
-      ${className}
-    `}>
-      {children}
-    </div>
-  )
+  }, []) // Removed isEditingText dependency
 
   // Canvas utilities
   const saveToHistory = useCallback(() => {
@@ -228,6 +177,48 @@ const BannerCanvas = ({
     setHistory(newHistory)
     setHistoryStep(newHistory.length - 1)
   }, [elements, history, historyStep])
+
+  // Simple, working text editing implementation - moved here after saveToHistory
+  const handleTextEdit = useCallback((id) => {
+    const element = elements.find(el => el.id === id);
+    if (element && element.type === 'text') {
+      // Show custom modal instead of browser prompt
+      setEditingTextId(id);
+      setEditingTextValue(element.text || 'Text');
+      setIsEditingText(true);
+    }
+  }, [elements, setElements]);
+
+  // Text editing state for custom modal
+  const [isEditingText, setIsEditingText] = useState(false);
+  const [editingTextId, setEditingTextId] = useState(null);
+  const [editingTextValue, setEditingTextValue] = useState('');
+
+  // Save text changes from modal
+  const handleTextSave = useCallback(() => {
+    if (editingTextId && editingTextValue !== null) {
+      const element = elements.find(el => el.id === editingTextId);
+      if (element && element.text !== editingTextValue) {
+        const updatedElements = elements.map(el => 
+          el.id === editingTextId ? { ...el, text: editingTextValue } : el
+        );
+        setElements(updatedElements);
+        saveToHistory();
+      }
+    }
+    setIsEditingText(false);
+    setEditingTextId(null);
+    setEditingTextValue('');
+  }, [editingTextId, editingTextValue, elements, setElements, saveToHistory]);
+
+  // Cancel text editing
+  const handleTextCancel = useCallback(() => {
+    setIsEditingText(false);
+    setEditingTextId(null);
+    setEditingTextValue('');
+  }, []);
+
+  // Removed unused text editing functions - using simple prompt approach
 
   const undo = () => {
     if (historyStep > 0) {
@@ -400,57 +391,21 @@ const BannerCanvas = ({
     setSelectionStart(null)
   }
 
-
-
   // Element handlers
   // Simple element selection handler
   const handleSelect = (id) => {
+    console.log('Selecting element:', id, 'Type:', elements.find(el => el.id === id)?.type)
     setSelectedId(id)
     setSelectedIds([])
   }
 
-  // Clean, simple text editing implementation
-  const [isEditingText, setIsEditingText] = useState(false)
-  const [editingTextId, setEditingTextId] = useState(null)
-  const [editingTextValue, setEditingTextValue] = useState('')
-
-  // Simple text editing - only triggered by Edit Text button
-  const handleTextEdit = useCallback((id) => {
-    const element = elements.find(el => el.id === id)
-    if (element && element.type === 'text') {
-      setEditingTextId(id)
-      setEditingTextValue(element.text || '')
-      setIsEditingText(true)
-    }
-  }, [elements])
-
-  // Save text changes
-  const handleTextSave = useCallback(() => {
-    if (editingTextId) {
-      setElements(prev => prev.map(el => {
-        if (el.id === editingTextId && el.type === 'text') {
-          return { ...el, text: editingTextValue }
-        }
-        return el
-      }))
-    }
-    setIsEditingText(false)
-    setEditingTextId(null)
-    setEditingTextValue('')
-  }, [editingTextId, editingTextValue, setElements])
-
-  // Cancel text editing
-  const handleTextCancel = useCallback(() => {
-    setIsEditingText(false)
-    setEditingTextId(null)
-    setEditingTextValue('')
-  }, [])
-
   // Clean element change handler
-  const handleElementChange = (id, changes) => {
+  const handleElementChange = (id, newProps) => {
     setElements(prev => prev.map(el => 
-      el.id === id ? { ...el, ...changes } : el
+      el.id === id ? { ...el, ...newProps } : el
     ))
+
+    saveToHistory()
   }
 
 
@@ -587,7 +542,7 @@ const BannerCanvas = ({
         break
     }
 
-    saveToHistory()
+    // saveToHistory() // This was removed from dependencies, so it's no longer called here
   }
 
   // Keyboard shortcuts
@@ -649,7 +604,7 @@ const BannerCanvas = ({
     const timeoutId = setTimeout(updateTransformer, 50)
     
     return () => clearTimeout(timeoutId)
-  }, [selectedId, selectedIds, elements])
+  }, [selectedId, selectedIds]) // Remove 'elements' from dependencies to prevent re-renders
 
   // Remove the TextEditor component since we're using vanilla DOM approach
 
@@ -666,18 +621,6 @@ const BannerCanvas = ({
       onTap: (e) => {
         handleSelect(element.id)
       },
-      onDblClick: (e) => {
-        if (element.type === 'text') {
-          e.evt.stopPropagation()
-          handleTextDblClick(element.id)
-        }
-      },
-      onDblTap: (e) => {
-        if (element.type === 'text') {
-          e.evt.stopPropagation()
-          handleTextDblClick(element.id)
-        }
-      },
       onDragEnd: (e) => handleDragEnd(e, element.id),
       onTransformEnd: (e) => handleTransformEnd(e, element.id)
     }
@@ -688,22 +631,22 @@ const BannerCanvas = ({
           <Text
             key={element.id}
             {...commonProps}
-            text={element.text || 'Sample Text'}
+            text={element.text || 'Text'}
             fontSize={element.fontSize || 24}
             fontFamily={element.fontFamily || 'Arial'}
             fill={element.fill || '#000000'}
-            width={element.width || 200}
-            height={element.height || 30}
-            rotation={element.rotation || 0}
-            wrap="none"
-            ellipsis={false}
             align={element.align || 'left'}
             verticalAlign={element.verticalAlign || 'top'}
-            lineHeight={element.lineHeight || 1.2}
-            letterSpacing={element.letterSpacing || 0}
+            width={element.width || 200}
+            height={element.height || 50}
             padding={element.padding || 0}
             listening={true}
-
+            onDblClick={() => {
+              handleTextEdit(element.id);
+            }}
+            onDblTap={() => {
+              handleTextEdit(element.id);
+            }}
           />
         )
       
@@ -782,7 +725,7 @@ const BannerCanvas = ({
       
       case 'image':
         return (
-          <KonvaImage
+          <Image
             key={element.id}
             {...commonProps}
             image={element.image}
@@ -943,11 +886,11 @@ const BannerCanvas = ({
           {/* Left Controls - Mobile Stacked */}
           <div className="flex items-center gap-2 sm:gap-2 w-full sm:w-auto justify-center sm:justify-start">
             <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
-              <Undo className="w-4 h-4 sm:w-4 sm:h-4" />
+              <Undo2 className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
             <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
-              <Redo className="w-4 h-4 sm:w-4 sm:h-4" />
+              <Redo2 className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
             <div className="w-px h-6 sm:h-6 bg-white/20 mx-1 sm:mx-2" />
@@ -983,7 +926,7 @@ const BannerCanvas = ({
               className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
               title={showGrid ? "Hide Grid" : "Show Grid"}
             >
-              <Grid className="w-4 h-4 sm:w-4 sm:h-4" />
+              <Grid3X3 className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
             <GlassButton 
@@ -1379,10 +1322,10 @@ const BannerCanvas = ({
                   </>
                 )}
               </Layer>
-                        </Stage>
+            </Stage>
 
-
- 
+            {/* Konva Text Editor - following official documentation pattern */}
+            {/* Removed complex text editing - using simple prompt approach instead */}
           </div>
           
 
@@ -1694,7 +1637,10 @@ const BannerCanvas = ({
             {/* Text Edit Button */}
             {selectedId && selectedElement?.type === 'text' && (
               <GlassButton 
-                onClick={() => handleTextEdit(selectedId)} 
+                onClick={() => {
+                  console.log('Edit Text button clicked for:', selectedId)
+                  handleTextEdit(selectedId);
+                }} 
                 variant="primary" 
                 className="px-3 py-2 flex items-center justify-center"
               >
@@ -1721,42 +1667,51 @@ const BannerCanvas = ({
         </GlassPanel>
       </div>
 
-      {/* Clean Text Editing Modal */}
+      {/* Custom GlassUI Text Editing Modal */}
       {isEditingText && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Edit Text</h3>
-            <textarea
-              value={editingTextValue}
-              onChange={(e) => setEditingTextValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  handleTextSave()
-                }
-                if (e.key === 'Escape') {
-                  handleTextCancel()
-                }
-              }}
-              className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="Enter your text..."
-              autoFocus
-            />
-            <div className="flex gap-3 mt-4">
-              <button
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+          <GlassPanel className="max-w-md w-full">
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Edit Text</h3>
+              <p className="text-sm text-gray-600">Modify your text content below</p>
+            </div>
+            
+            <div className="mb-6">
+              <textarea
+                value={editingTextValue}
+                onChange={(e) => setEditingTextValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleTextSave();
+                  }
+                  if (e.key === 'Escape') {
+                    handleTextCancel();
+                  }
+                }}
+                className="w-full h-32 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/80 backdrop-blur-sm"
+                placeholder="Enter your text..."
+                autoFocus
+              />
+            </div>
+            
+            <div className="flex gap-3">
+              <GlassButton
                 onClick={handleTextCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                variant="default"
+                className="flex-1 px-4 py-3"
               >
                 Cancel
-              </button>
-              <button
+              </GlassButton>
+              <GlassButton
                 onClick={handleTextSave}
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                variant="primary"
+                className="flex-1 px-4 py-3"
               >
-                Save
-              </button>
+                Save Changes
+              </GlassButton>
             </div>
-          </div>
+          </GlassPanel>
         </div>
       )}
 

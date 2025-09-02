@@ -130,3 +130,88 @@ export const AlertDescription = ({ children, className = '' }) => (
     {children}
   </div>
 )
+
+// Glass UI Components
+export const GlassButton = ({ children, onClick, className = "", variant = "default", disabled = false }) => {
+  const variants = {
+    default: "bg-white/20 hover:bg-white/30 text-gray-700 border-white/30",
+    primary: "bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border-blue-400/30",
+    success: "bg-green-500/20 hover:bg-green-500/30 text-green-700 border-green-400/30",
+    danger: "bg-red-500/20 hover:bg-red-500/30 text-red-700 border-red-400/30"
+  }
+  
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`
+        ${variants[variant]}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'}
+        backdrop-blur-sm
+        border
+        rounded-xl
+        p-3
+        font-medium
+        transition-all duration-200
+        flex items-center justify-center gap-2
+        ${className}
+      `}
+    >
+      {children}
+    </button>
+  )
+}
+
+export const GlassCard = ({ children, className = "" }) => (
+  <div className={`
+    backdrop-blur-xl bg-white/10 
+    border border-white/20 
+    rounded-2xl 
+    shadow-[0_8px_32px_rgba(0,0,0,0.1)]
+    p-4
+    ${className}
+  `}>
+    {children}
+  </div>
+)
+
+export const GlassPanel = ({ children, className = "" }) => (
+  <div className={`
+    backdrop-blur-xl bg-white/10 
+    border border-white/20 
+    rounded-2xl 
+    shadow-[0_8px_32px_rgba(0,0,0,0.1)]
+    p-4
+    ${className}
+  `}>
+    {children}
+  </div>
+)
+
+export const NeumorphicButton = ({ children, onClick, className = "", variant = "default", disabled = false }) => {
+  const variants = {
+    default: "bg-gray-100 hover:bg-gray-200 text-gray-700 shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)]",
+    primary: "bg-blue-100 hover:bg-blue-200 text-blue-700 shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(59,130,246,0.2)]",
+    success: "bg-green-100 hover:bg-green-200 text-green-700 shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(34,197,94,0.2)]",
+    danger: "bg-red-100 hover:bg-red-200 text-red-700 shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(239,68,68,0.2)]"
+  }
+  
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`
+        ${variants[variant]}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)]'}
+        rounded-xl
+        p-3
+        font-medium
+        transition-all duration-200
+        flex items-center justify-center gap-2
+        ${className}
+      `}
+    >
+      {children}
+    </button>
+  )
+}
