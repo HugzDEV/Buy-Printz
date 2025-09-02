@@ -98,20 +98,24 @@
   }
 }
 
-/* Essential mobile fixes only - minimal and non-intrusive */
+/* Minimal mobile fixes - only for mobile viewports */
 @media (max-width: 768px) {
-  /* Ensure modal content doesn't overflow on mobile */
-  .max-w-5xl {
-    max-width: calc(100vw - 2rem) !important;
+  /* Ensure modal is visible on mobile */
+  .fixed.inset-0 {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
   }
   
-  /* Mobile image sizing */
-  .max-h-60 {
-    max-height: 15rem !important;
-  }
-  
-  /* Mobile button sizing */
-  .sm\:w-auto {
-    width: 100% !important;
+  /* Mobile modal sizing */
+  .bg-white.rounded-lg.shadow-xl {
+    max-width: calc(100vw - 1rem) !important;
+    width: calc(100vw - 1rem) !important;
+    margin: 0.5rem !important;
   }
 }

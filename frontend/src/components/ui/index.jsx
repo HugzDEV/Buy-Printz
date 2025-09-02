@@ -1,19 +1,32 @@
 // Simple UI components for the print preview modal
 import React from 'react'
 
-// Dialog components with minimal mobile fixes
+// Dialog components
 export const Dialog = ({ open, onOpenChange, children }) => {
   if (!open) return null
   
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+    <div 
+      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto"
+      style={{
+        // Minimal mobile viewport fix
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        // Ensure mobile viewport is handled
+        minHeight: '100vh',
+        minHeight: '100dvh' // Dynamic viewport height for mobile
+      }}
+    >
       <div 
         className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden my-4 mx-auto"
         onClick={(e) => e.stopPropagation()}
         style={{
           minHeight: 'min-content',
           maxHeight: 'calc(100vh - 2rem)',
-          // Only essential mobile fixes that don't break desktop
+          maxHeight: 'calc(100dvh - 2rem)', // Dynamic viewport height for mobile
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden'
         }}
