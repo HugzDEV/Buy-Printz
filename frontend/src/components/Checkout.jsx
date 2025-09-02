@@ -173,7 +173,8 @@ const Checkout = () => {
     windslits: 'no-windslits',
     turnaround: 'next-day',
     jobName: '',
-    quantity: 1
+    quantity: 1,
+    material: '13oz-vinyl' // Added material selection
   })
   
   // Shipping Options State
@@ -447,15 +448,19 @@ const Checkout = () => {
     )
   }
 
-  const basePrices = {
-    banner: 25.00,
-    sign: 35.00,
-    sticker: 15.00,
-    custom: 50.00
+  // Material pricing per square foot
+  const materialPricing = {
+    '13oz-vinyl': 1.60,
+    '18oz-blackout': 2.50,
+    'mesh': 1.80,
+    'indoor': 2.50,
+    'pole': 3.00,
+    '9oz-fabric': 2.75,
+    'blockout-fabric': 7.00,
+    'tension-fabric': 5.15,
+    'backlit': 7.00
   }
 
-  const basePrice = basePrices[orderData.product_type] || 50.00
-  
   // Calculate banner options costs
   const sidesCost = bannerOptionsConfig.sides.find(opt => opt.value === bannerOptions.sides)?.price || 0
   const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
@@ -468,8 +473,17 @@ const Checkout = () => {
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
   
+  // Calculate base price from material and dimensions
+  const getBasePrice = () => {
+    const materialPrice = materialPricing[bannerOptions.material] || 1.60
+    const width = orderData?.dimensions?.width || 2
+    const height = orderData?.dimensions?.height || 4
+    return materialPrice * width * height
+  }
+  
+  const basePrice = getBasePrice()
   const optionsTotal = sidesCost + grommetCost + hemCost + polePocketCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
-  const subtotal = (orderData?.total_amount || 25) * bannerOptions.quantity + optionsTotal
+  const subtotal = basePrice * bannerOptions.quantity + optionsTotal
   const totalAmount = subtotal + shippingCost
 
   const getStepIcon = (step, currentStep) => {
@@ -577,6 +591,14 @@ const Checkout = () => {
                   {bannerOptions.quantity > 1 && ` × ${bannerOptions.quantity}`}
                   {bannerOptions.sides === 2 && ' (Double Sided)'}
                 </p>
+                <p className="text-sm text-blue-600 font-medium">
+                  {bannerOptions.material ? 
+                    Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1] ? 
+                    `${Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1]}/sqft` : 
+                    'Material pricing' : 
+                    'Select material'
+                  }
+                </p>
               </div>
             </div>
             <div className="text-right">
@@ -585,7 +607,7 @@ const Checkout = () => {
               </p>
               <p className="text-sm text-gray-600">Total (including all options & shipping)</p>
               <div className="text-xs text-gray-500 mt-1">
-                <p>Base: ${(orderData?.total_amount || 25) * bannerOptions.quantity}</p>
+                <p>Base: ${basePrice * bannerOptions.quantity}</p>
                 <p>Options: +${optionsTotal}</p>
                 <p>Shipping: +${shippingCost}</p>
               </div>
@@ -676,6 +698,43 @@ const Checkout = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Material Selection */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-blue-600" />
+                  Banner Material
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { value: '13oz-vinyl', label: '13oz. Vinyl Banner', price: 1.60, description: 'Standard outdoor vinyl' },
+                    { value: '18oz-blackout', label: '18oz Blackout Banner', price: 2.50, description: 'Heavy-duty blackout material' },
+                    { value: 'mesh', label: 'Mesh Banner', price: 1.80, description: 'Wind-resistant mesh' },
+                    { value: 'indoor', label: 'Indoor Banner', price: 2.50, description: 'Premium indoor material' },
+                    { value: 'pole', label: 'Pole Banner', price: 3.00, description: 'Durable pole banner material' },
+                    { value: '9oz-fabric', label: '9oz Fabric Banner', price: 2.75, description: 'Lightweight fabric' },
+                    { value: 'blockout-fabric', label: 'Blockout Fabric Banner', price: 7.00, description: 'Premium blockout fabric' },
+                    { value: 'tension-fabric', label: 'Tension Fabric', price: 5.15, description: 'Professional tension fabric' },
+                    { value: 'backlit', label: 'Backlit Banner', price: 7.00, description: 'Premium backlit material' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors">
+                      <input
+                        type="radio"
+                        name="material"
+                        value={option.value}
+                        checked={bannerOptions.material === option.value}
+                        onChange={(e) => setBannerOptions(prev => ({ ...prev, material: e.target.value }))}
+                        className="mr-3 text-blue-600"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className="text-sm text-gray-600">{option.description}</p>
+                        <p className="text-sm text-green-600 font-medium">${option.price}/sqft</p>
+                      </div>
+                    </label>
+                  ))}
                 </div>
               </div>
 
@@ -1148,7 +1207,7 @@ const Checkout = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Banner Design:</span>
-                    <span className="font-medium">${(orderData?.total_amount || 25) * bannerOptions.quantity}</span>
+                    <span className="font-medium">${basePrice * bannerOptions.quantity}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Sides ({bannerOptions.sides === 2 ? 'Double' : 'Single'}):</span>

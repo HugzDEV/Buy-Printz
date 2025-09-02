@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS banner_options (
     sides INTEGER DEFAULT 1 CHECK (sides IN (1, 2)),
     
     -- Material (from editor)
-    material TEXT NOT NULL CHECK (material IN ('13oz-vinyl', '9oz-fabric', 'backlit', 'blockout', 'indoor', 'mesh', 'pole', 'tension-fabric')),
+    material TEXT NOT NULL CHECK (material IN ('13oz-vinyl', '18oz-blackout', 'mesh', 'indoor', 'pole', '9oz-fabric', 'blockout-fabric', 'tension-fabric', 'backlit')),
     
     -- Pole Pockets
     pole_pockets TEXT DEFAULT 'none' CHECK (pole_pockets IN ('none', '2in-top', '3in-top', '4in-top', '2in-top-bottom', '3in-top-bottom', '4in-top-bottom')),
@@ -85,6 +85,11 @@ CREATE INDEX IF NOT EXISTS idx_banner_options_turnaround ON banner_options(turna
 -- Enable Row Level Security
 ALTER TABLE banner_options ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist, then recreate them
+DROP POLICY IF EXISTS "Users can view own banner options" ON banner_options;
+DROP POLICY IF EXISTS "Users can insert own banner options" ON banner_options;
+DROP POLICY IF EXISTS "Users can update own banner options" ON banner_options;
+
 -- Create RLS policies for banner_options
 CREATE POLICY "Users can view own banner options" ON banner_options
     FOR SELECT USING (
@@ -112,6 +117,9 @@ CREATE POLICY "Users can update own banner options" ON banner_options
             AND orders.user_id = auth.uid()
         )
     );
+
+-- Drop existing trigger if it exists, then recreate it
+DROP TRIGGER IF EXISTS update_banner_options_updated_at ON banner_options;
 
 -- Create trigger for updated_at
 CREATE TRIGGER update_banner_options_updated_at
@@ -147,17 +155,18 @@ BEGIN
     -- Calculate square footage
     v_sqft := p_width * p_height;
     
-    -- Base price calculation (per square foot)
+    -- Base price calculation (per square foot) - Updated with exact pricing
     CASE p_material
-        WHEN '13oz-vinyl' THEN v_base_price := 2.50 * v_sqft;
-        WHEN '9oz-fabric' THEN v_base_price := 3.00 * v_sqft;
-        WHEN 'backlit' THEN v_base_price := 4.50 * v_sqft;
-        WHEN 'blockout' THEN v_base_price := 3.50 * v_sqft;
-        WHEN 'indoor' THEN v_base_price := 2.00 * v_sqft;
-        WHEN 'mesh' THEN v_base_price := 3.25 * v_sqft;
-        WHEN 'pole' THEN v_base_price := 2.75 * v_sqft;
-        WHEN 'tension-fabric' THEN v_base_price := 5.00 * v_sqft;
-        ELSE v_base_price := 2.50 * v_sqft; -- Default to 13oz vinyl
+        WHEN '13oz-vinyl' THEN v_base_price := 1.60 * v_sqft;
+        WHEN '18oz-blackout' THEN v_base_price := 2.50 * v_sqft;
+        WHEN 'mesh' THEN v_base_price := 1.80 * v_sqft;
+        WHEN 'indoor' THEN v_base_price := 2.50 * v_sqft;
+        WHEN 'pole' THEN v_base_price := 3.00 * v_sqft;
+        WHEN '9oz-fabric' THEN v_base_price := 2.75 * v_sqft;
+        WHEN 'blockout-fabric' THEN v_base_price := 7.00 * v_sqft;
+        WHEN 'tension-fabric' THEN v_base_price := 5.15 * v_sqft;
+        WHEN 'backlit' THEN v_base_price := 7.00 * v_sqft;
+        ELSE v_base_price := 1.60 * v_sqft; -- Default to 13oz vinyl
     END CASE;
     
     -- Options pricing
