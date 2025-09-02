@@ -64,11 +64,15 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-xl font-bold">B</span>
-          </div>
+        {/* BuyPrintz Logo */}
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+            alt="BuyPrintz Logo" 
+            className="h-32 w-auto"
+          />
         </div>
+        
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Create your account
         </h2>
