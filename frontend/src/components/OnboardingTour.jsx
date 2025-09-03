@@ -31,7 +31,9 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
 
   useEffect(() => {
     const checkDevice = () => {
-      setIsMobile(window.innerWidth < 768)
+      const mobile = window.innerWidth < 768
+      console.log('Device check:', { width: window.innerWidth, mobile, current: isMobile })
+      setIsMobile(mobile)
     }
     
     checkDevice()
@@ -249,9 +251,13 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
 
   // Mark tour as ready when steps are available
   useEffect(() => {
+    console.log('Tour steps effect triggered:', { tourSteps: tourSteps?.length, isMobile, tourReady })
+    
     if (tourSteps && tourSteps.length > 0) {
       setTourReady(true)
       console.log('Tour steps initialized:', tourSteps.length, 'steps for', isMobile ? 'mobile' : 'desktop')
+    } else {
+      console.log('Tour steps not ready yet:', { tourSteps, isMobile })
     }
   }, [tourSteps, isMobile])
 
@@ -283,8 +289,20 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
   const handleStartTour = () => {
     setShowWelcomeDialog(false)
     
-    // Wait for tour to be ready
+    // Wait for tour to be ready with timeout
+    let attempts = 0
+    const maxAttempts = 50 // 5 seconds max wait
+    
     const waitForTour = () => {
+      attempts++
+      console.log(`Tour wait attempt ${attempts}/${maxAttempts}:`, { tourReady, isMobile, tourSteps: tourSteps?.length })
+      
+      if (attempts >= maxAttempts) {
+        console.log('Tour timeout reached, forcing start...')
+        setRunTour(true)
+        return
+      }
+      
       if (!tourReady) {
         console.log('Waiting for tour to be ready...')
         setTimeout(waitForTour, 100)
