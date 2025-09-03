@@ -43,6 +43,19 @@ const PrintPreviewModal = ({
     }
   }, [isOpen, orderDetails])
 
+  // Debug image dimensions when it loads
+  const handleImageLoad = (event) => {
+    const img = event.target
+    console.log('Image loaded:', {
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight,
+      clientWidth: img.clientWidth,
+      clientHeight: img.clientHeight,
+      offsetWidth: img.offsetWidth,
+      offsetHeight: img.offsetHeight
+    })
+  }
+
   // Generate PDF only when user approves (for production)
   const generatePDFForProduction = async () => {
     try {
@@ -148,22 +161,24 @@ const PrintPreviewModal = ({
                 ) : previewImage ? (
                   <div className="space-y-3 sm:space-y-6">
                     {/* Main Banner Preview */}
-                    <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center">
-                      <div className="relative w-full">
+                    <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
+                      <div className="relative w-full h-full flex items-center justify-center">
                         <img
                           src={previewImage}
                           alt="Banner Design Preview"
-                          className="w-full h-auto rounded border shadow-lg"
+                          className="max-w-full max-h-full w-auto h-auto rounded border shadow-lg"
                           style={{
-                            width: '100%',
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: 'auto',
                             height: 'auto',
-                            maxHeight: 'none',
-                            minHeight: '200px'
+                            objectFit: 'contain'
                           }}
+                          onLoad={handleImageLoad}
                         />
                         
                         {/* BuyPrintz Watermark Overlay - IP Protection */}
-                        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 10 }}>
                           <img
                             src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
                             alt="BuyPrintz Watermark"
