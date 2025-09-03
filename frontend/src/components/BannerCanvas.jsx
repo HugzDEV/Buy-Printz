@@ -90,7 +90,7 @@ const BannerCanvas = ({
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
         const viewportWidth = window.innerWidth - 16 // Minimal padding for mobile
-        const viewportHeight = window.innerHeight - 200 // Account for top toolbar + bottom status bar
+        const viewportHeight = window.innerHeight - 160 // Use existing space efficiently
         
         const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
         const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
@@ -1316,7 +1316,7 @@ const BannerCanvas = ({
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className={`absolute inset-0 top-12 sm:top-16 flex items-start justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
+      <div className={`absolute inset-0 top-14 sm:top-20 flex items-start justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
