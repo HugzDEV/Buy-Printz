@@ -1786,7 +1786,7 @@ const BannerEditorNew = () => {
           onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           className="md:hidden p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center z-50"
         >
-          <Menu className="w-6 h-6" />
+          {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
 
         {/* Right Section */}
@@ -1826,18 +1826,6 @@ const BannerEditorNew = () => {
           md:block md:relative md:inset-auto md:z-auto
           transition-all duration-300 ease-in-out
         `}>
-          {/* Mobile Close Button - Only show when sidebar is open on mobile */}
-          {isMobileSidebarOpen && (
-            <div className="md:hidden fixed top-6 right-6 z-[60]">
-              <button
-                onClick={() => setIsMobileSidebarOpen(false)}
-                className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center"
-              >
-                <X className="w-6 h-6 text-white" />
-              </button>
-            </div>
-          )}
-          
           <BannerSidebar
             isMobileOpen={isMobileSidebarOpen}
             bannerSpecs={bannerSpecs}
@@ -1887,7 +1875,7 @@ const BannerEditorNew = () => {
           
           {/* Mobile Overlay when sidebar is open */}
           {isMobileSidebarOpen && (
-            <div className="md:hidden fixed inset-0 bg-black/20 z-40" />
+            <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
           )}
         </div>
         
