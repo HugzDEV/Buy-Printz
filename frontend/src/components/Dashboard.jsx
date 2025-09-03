@@ -291,9 +291,8 @@ const Dashboard = () => {
   })
 
   const loadDesignInEditor = (design) => {
-    // Store design data for the editor to load
-    localStorage.setItem('loadDesign', JSON.stringify(design))
-    navigate('/editor')
+    // Navigate to editor with design ID in URL
+    navigate(`/editor?design=${design.id}`)
   }
 
   const deleteTemplate = async (templateId) => {
@@ -327,16 +326,14 @@ const Dashboard = () => {
   }
 
   const reorderItem = (order) => {
-    // Store order data for reordering
-    localStorage.setItem('reorderData', JSON.stringify(order))
-    navigate('/editor')
+    // Navigate to editor with order ID in URL
+    navigate(`/editor?order=${order.id}`)
     toast.success('Order data loaded for reordering')
   }
 
   const reorderDesign = (design) => {
-    // Store design data for reordering  
-    localStorage.setItem('reorderData', JSON.stringify(design))
-    navigate('/editor')
+    // Navigate to editor with design ID in URL
+    navigate(`/editor?design=${design.id}`)
     toast.success('Design loaded for reordering')
   }
 

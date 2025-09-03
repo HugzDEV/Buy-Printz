@@ -436,6 +436,17 @@ class DatabaseManager:
             print(f"Error getting user templates: {e}")
             return []
 
+    async def get_template(self, template_id: str) -> Optional[Dict[str, Any]]:
+        """Get specific template by ID"""
+        try:
+            response = self.supabase.table("banner_templates").select("*").eq("id", template_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting template: {e}")
+            return None
+
     async def get_public_templates(self) -> List[Dict[str, Any]]:
         """Get all public templates"""
         try:

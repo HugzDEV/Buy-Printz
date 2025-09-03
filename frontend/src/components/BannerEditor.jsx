@@ -1550,6 +1550,50 @@ const BannerEditorNew = () => {
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs, canvasOrientation])
 
+  // Save as template
+  const saveAsTemplate = useCallback(async () => {
+    try {
+      const templateName = prompt('Enter template name:')
+      if (!templateName) return
+      
+      const templateData = {
+        name: templateName,
+        description: `Template created on ${new Date().toLocaleDateString()}`,
+        category: 'Custom',
+        canvas_data: {
+          elements,
+          canvasSize,
+          backgroundColor,
+          bannerSpecs,
+          timestamp: new Date().toISOString()
+        },
+        banner_type: bannerSpecs?.id || 'vinyl-13oz',
+        is_public: false
+      }
+      
+      const response = await authService.authenticatedRequest('/api/templates/save', {
+        method: 'POST',
+        body: JSON.stringify(templateData)
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to save template')
+      }
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        alert('Template saved successfully!')
+      } else {
+        throw new Error(result.error || 'Failed to save template')
+      }
+    } catch (error) {
+      console.error('Failed to save template:', error)
+      alert(`Failed to save template: ${error.message}`)
+    }
+  }, [elements, canvasSize, backgroundColor, bannerSpecs])
+
   // Create order
   const createOrder = useCallback(() => {
     // Generate canvas image data for preview
@@ -1698,8 +1742,89 @@ const BannerEditorNew = () => {
     return restoredElements
   }, [])
 
-  // Load saved design on mount - removed localStorage loading
-  // Designs should be loaded from Supabase via the dashboard
+  // Load design from database
+  const loadDesignFromDatabase = useCallback(async (designId) => {
+    try {
+      const response = await authService.authenticatedRequest(`/api/designs/${designId}`)
+      if (response.ok) {
+        const designData = await response.json()
+        if (designData.canvas_data) {
+          const canvasData = JSON.parse(designData.canvas_data)
+          // Restore image elements properly
+          restoreImageElements(canvasData.elements || []).then(restoredElements => {
+            setElements(restoredElements)
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
+          }).catch(error => {
+            console.error('Failed to restore image elements:', error)
+            // Fallback to loading without images
+            setElements(canvasData.elements || [])
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
+          })
+        }
+      } else {
+        console.error('Failed to load design from database')
+      }
+    } catch (error) {
+      console.error('Error loading design from database:', error)
+    }
+  }, [restoreImageElements])
+
+  // Load template from database
+  const loadTemplateFromDatabase = useCallback(async (templateId) => {
+    try {
+      const response = await authService.authenticatedRequest(`/api/templates/${templateId}`)
+      if (response.ok) {
+        const templateData = await response.json()
+        if (templateData.canvas_data) {
+          const canvasData = JSON.parse(templateData.canvas_data)
+          // Restore image elements properly
+          restoreImageElements(canvasData.elements || []).then(restoredElements => {
+            setElements(restoredElements)
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
+          }).catch(error => {
+            console.error('Failed to restore image elements:', error)
+            // Fallback to loading without images
+            setElements(canvasData.elements || [])
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
+          })
+        }
+      } else {
+        console.error('Failed to load template from database')
+      }
+    } catch (error) {
+      console.error('Error loading template from database:', error)
+    }
+  }, [restoreImageElements])
+
+  // Load saved design on mount - check for design/template ID in URL params
   useEffect(() => {
     // Check if we're returning from checkout with a cancelled order
     const cancelledOrder = sessionStorage.getItem('cancelledOrder')
@@ -1736,6 +1861,16 @@ const BannerEditorNew = () => {
       } catch (error) {
         console.error('Failed to restore cancelled order:', error)
       }
+    }
+
+    // Check URL params for design/template ID to load from database
+    const designId = searchParams.get('design')
+    const templateId = searchParams.get('template')
+    
+    if (designId) {
+      loadDesignFromDatabase(designId)
+    } else if (templateId) {
+      loadTemplateFromDatabase(templateId)
     }
   }, [restoreImageElements])
 
@@ -1796,6 +1931,13 @@ const BannerEditorNew = () => {
             className="px-3 md:px-4 py-1.5 md:py-2 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
           >
             Save Design
+          </button>
+          
+          <button
+            onClick={saveAsTemplate}
+            className="px-3 md:px-4 py-1.5 md:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
+          >
+            Save as Template
           </button>
           
           <button

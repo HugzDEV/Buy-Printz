@@ -793,6 +793,22 @@ async def get_public_templates():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/templates/{template_id}")
+async def get_template(template_id: str, current_user: dict = Depends(get_current_user)):
+    """Get specific template by ID"""
+    try:
+        template = await db_manager.get_template(template_id)
+        if template:
+            # Check if user owns the template or if it's public
+            if template["user_id"] == current_user["user_id"] or template.get("is_public", False):
+                return {"success": True, "template": template}
+            else:
+                raise HTTPException(status_code=403, detail="Access denied")
+        else:
+            raise HTTPException(status_code=404, detail="Template not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Enhanced design save with banner specifications
 @app.post("/api/designs/save-enhanced")
 async def save_enhanced_canvas_design(
