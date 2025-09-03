@@ -1828,7 +1828,7 @@ const BannerEditorNew = () => {
         `}>
           {/* Mobile Close Button - Only show when sidebar is open on mobile */}
           {isMobileSidebarOpen && (
-            <div className="md:hidden fixed top-4 right-4 z-[60]">
+            <div className="md:hidden fixed top-6 right-6 z-[60]">
               <button
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center"
