@@ -1639,9 +1639,12 @@ const BannerCanvas = ({
         bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
         transform transition-transform duration-300 ease-in-out
         max-h-[35vh] sm:max-h-[40vh] overflow-y-auto
-        z-[9999] shadow-2xl
+        z-[99999] shadow-2xl
         ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
-      `}>
+        !important
+      `}
+      style={{ zIndex: 99999 }}
+      >
         <div className="flex flex-col gap-2 sm:gap-4 max-h-full p-2 sm:p-4">
           
                 {/* Text Editing Hint */}
