@@ -179,8 +179,11 @@ const PrintPreviewModal = ({
                                          {/* Main Banner Preview */}
                                            <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-visible sm:overflow-hidden">
                         <div className="relative flex items-center justify-center w-full" style={{ 
-                          minHeight: window.innerWidth < 768 ? '300px' : '280px',
-                          maxHeight: window.innerWidth < 768 ? '400px' : '320px'
+                          minHeight: window.innerWidth < 768 ? '200px' : '280px',
+                          maxHeight: window.innerWidth < 768 ? '250px' : '320px',
+                          // Mobile centering adjustments
+                          paddingLeft: window.innerWidth < 768 ? '20px' : '0px',
+                          paddingRight: window.innerWidth < 768 ? '20px' : '0px'
                         }}>
                           <img
                             src={previewImage}
@@ -190,14 +193,16 @@ const PrintPreviewModal = ({
                               width: 'auto',
                               height: 'auto',
                               maxWidth: '100%',
-                              maxHeight: window.innerWidth < 768 ? '350px' : '280px',
-                              minHeight: window.innerWidth < 768 ? '250px' : '250px',
+                              maxHeight: window.innerWidth < 768 ? '200px' : '280px',
+                              minHeight: window.innerWidth < 768 ? '150px' : '250px',
                               objectFit: 'contain',
                               transform: `scale(${imageScale})`,
                               transformOrigin: 'center center',
                               // Ensure mobile positioning is correct
                               display: 'block',
-                              margin: '0 auto'
+                              margin: '0 auto',
+                              // Mobile positioning adjustments
+                              position: 'static'
                             }}
                             onLoad={handleImageLoad}
                           />
