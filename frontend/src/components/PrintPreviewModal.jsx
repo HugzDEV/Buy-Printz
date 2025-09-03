@@ -61,7 +61,7 @@ const PrintPreviewModal = ({
   useEffect(() => {
     const updateScale = () => {
       if (window.innerWidth < 768) {
-        setImageScale(1.0) // No scaling on mobile - let container handle sizing
+        setImageScale(3.0) // Much more aggressive scaling on mobile
       } else {
         setImageScale(1.0) // No scaling on desktop to maintain original behavior
       }
@@ -148,72 +148,71 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl w-full h-full overflow-y-auto p-2 sm:p-6">
-        <DialogHeader className="pb-2 sm:pb-6">
+      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-3 sm:p-4">
+        <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center gap-2">
             <Printer className="h-5 w-5" />
             Print Preview & Approval
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-8 pb-3 sm:pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 pb-4 sm:pb-6">
           {/* Left Column - Preview */}
-          <div className="space-y-2 sm:space-y-6">
-            <Card>
-              <CardHeader className="pb-2 sm:pb-4">
-                <CardTitle className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  Design Preview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-6">
-                {isGenerating ? (
-                  <div className="flex items-center justify-center p-4 sm:p-12">
-                    <div className="text-center space-y-2">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="text-sm text-gray-600">Generating your banner preview...</p>
-                    </div>
-                  </div>
-                ) : previewImage ? (
-                  <div className="space-y-2 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
+                                      <Card>
+               <CardHeader className="pb-3 sm:pb-4">
+                 <CardTitle className="flex items-center gap-2">
+                   <Eye className="h-4 w-4" />
+                   Design Preview
+                 </CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-3 sm:space-y-4">
+                 {isGenerating ? (
+                   <div className="flex items-center justify-center p-4 sm:p-12">
+                     <div className="text-center space-y-2">
+                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                       <p className="text-sm text-gray-600">Generating your banner preview...</p>
+                     </div>
+                   </div>
+                 ) : previewImage ? (
+                   <div className="space-y-3 sm:space-y-4">
                                          {/* Main Banner Preview */}
-                     <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
-                       <div className="relative w-full flex items-center justify-center" 
-                            style={{ 
-                              minHeight: window.innerWidth < 768 ? '250px' : '400px',
-                              maxHeight: window.innerWidth < 768 ? '350px' : '600px'
-                            }}>
-                         <img
-                           src={previewImage}
-                           alt="Banner Design Preview"
-                           className="rounded border shadow-lg"
-                           style={{
-                             width: 'auto',
-                             height: 'auto',
-                             maxWidth: '100%',
-                             maxHeight: window.innerWidth < 768 ? '300px' : '500px',
-                             minHeight: window.innerWidth < 768 ? '200px' : '300px',
-                             objectFit: 'contain',
-                             transform: `scale(${imageScale})`,
-                             transformOrigin: 'center center'
-                           }}
-                           onLoad={handleImageLoad}
-                         />
-                        
-                        {/* BuyPrintz Watermark Overlay - IP Protection */}
-                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 10 }}>
+                                           <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
+                        <div className="relative flex items-center justify-center" style={{ 
+                          minHeight: window.innerWidth < 768 ? '250px' : '280px',
+                          maxHeight: window.innerWidth < 768 ? '350px' : '320px'
+                        }}>
                           <img
-                            src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                            alt="BuyPrintz Watermark"
-                            className="w-full h-full object-cover opacity-30"
+                            src={previewImage}
+                            alt="Banner Design Preview"
+                            className="rounded border shadow-lg"
                             style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              zIndex: 10
+                              width: 'auto',
+                              height: 'auto',
+                              maxWidth: '100%',
+                              maxHeight: window.innerWidth < 768 ? '300px' : '280px',
+                              minHeight: window.innerWidth < 768 ? '200px' : '250px',
+                              objectFit: 'contain',
+                              transform: `scale(${imageScale})`,
+                              transformOrigin: 'center center'
                             }}
+                            onLoad={handleImageLoad}
                           />
-                        </div>
+                         
+                         {/* BuyPrintz Watermark Overlay - IP Protection - Only cover the image, not the entire viewport */}
+                         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+                           <img
+                             src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
+                             alt="BuyPrintz Watermark"
+                             className="w-full h-full object-cover opacity-30"
+                             style={{
+                               position: 'absolute',
+                               top: 0,
+                               left: 0,
+                               zIndex: 10
+                             }}
+                           />
+                         </div>
                         
                         <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 20 }}>
                           Preview
@@ -243,11 +242,10 @@ const PrintPreviewModal = ({
                           link.href = previewImage
                           link.click()
                         }}
-                        className="flex items-center gap-2 text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2"
+                        className="flex items-center gap-2"
                       >
                         <Download className="h-4 w-4" />
-                        <span className="hidden sm:inline">Download Production Image</span>
-                        <span className="sm:hidden">Download Image</span>
+                        Download Production Image
                       </Button>
                     </div>
                   </div>
@@ -264,75 +262,74 @@ const PrintPreviewModal = ({
           </div>
 
           {/* Right Column - Specifications */}
-          <div className="space-y-2 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
             {/* Print Specifications */}
-            <Card>
-              <CardHeader className="pb-2 sm:pb-4">
+                         <Card>
+              <CardHeader className="pb-3 sm:pb-4">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Print Specifications
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-2 sm:p-6">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-6">
-                  <div className="space-y-1 sm:space-y-2">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Dimensions</p>
-                    <Badge variant="outline" className="text-xs">
+                             <CardContent className="p-4 sm:p-6">
+                                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-sm font-medium text-gray-600">Dimensions</p>
+                    <Badge variant="outline">
                       {dimensions.width}ft × {dimensions.height}ft
                     </Badge>
                   </div>
-                  <div className="space-y-1 sm:space-y-2">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Material</p>
-                    <Badge variant="outline" className="text-xs">
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-sm font-medium text-gray-600">Material</p>
+                    <Badge variant="outline">
                       {orderDetails.banner_material || 'Standard Vinyl'}
                     </Badge>
                   </div>
-                  <div className="space-y-1 sm:space-y-2">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Finish</p>
-                    <Badge variant="outline" className="text-xs">
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-sm font-medium text-gray-600">Finish</p>
+                    <Badge variant="outline">
                       {orderDetails.banner_finish || 'Matte'}
                     </Badge>
                   </div>
-                  <div className="space-y-1 sm:space-y-2">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Quantity</p>
-                    <Badge variant="outline" className="text-xs">
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-sm font-medium text-gray-600">Quantity</p>
+                    <Badge variant="outline">
                       {orderDetails.quantity} piece(s)
                     </Badge>
                   </div>
-                  <div className="space-y-1 sm:space-y-2">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Resolution</p>
-                    <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-sm font-medium text-gray-600">Resolution</p>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">
                       300 DPI
                     </Badge>
                   </div>
-                  <div className="space-y-1 sm:space-y-2">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Color Profile</p>
-                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
-                      CMYK
-                    </Badge>
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-sm font-medium text-gray-600">Color Profile</p>
+                                         <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                       CMYK
+                     </Badge>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                                 </div>
+               </CardContent>
+             </Card>
 
             {/* Print Ready Status */}
             <Alert variant="success" className="p-2 sm:p-4">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800 text-xs sm:text-sm">
+              <AlertDescription className="text-green-800">
                 <strong>Ready for Production!</strong><br />
-                <span className="hidden sm:inline">Your design meets all print quality requirements and is ready to be sent to our production facility.</span>
-                <span className="sm:hidden">Your design is ready for production!</span>
+                Your design meets all print quality requirements and is ready to be sent to our production facility.
               </AlertDescription>
             </Alert>
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3 w-full pt-3 sm:pt-6 border-t mt-3 sm:mt-6 bg-gray-50">
+        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3 w-full pt-3 sm:pt-4 border-t mt-3 sm:mt-4 bg-gray-50">
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <X className="h-4 w-4" />
               Cancel
@@ -341,11 +338,10 @@ const PrintPreviewModal = ({
             <Button
               onClick={handleApprove}
               disabled={!orderDetails?.canvas_image}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2"
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <Check className="h-4 w-4" />
-              <span className="hidden sm:inline">Approve & Print</span>
-              <span className="sm:hidden">Approve</span>
+              Approve & Print
             </Button>
           </div>
           
