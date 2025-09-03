@@ -196,6 +196,110 @@ const BannerSidebar = ({
     { name: 'WeChat', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/WeChat.png' },
     { name: 'Word', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Word.png' },
     { name: 'Zoom', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Zoom.png' },
+    
+    // Technology & Business (Real SVG Icons)
+    { name: 'Technology', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Technology.svg' },
+    { name: 'Data Analytics', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Data Analytic.svg' },
+    { name: 'User Experience', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/User Experience.svg' },
+    { name: 'Passive Income', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Passive Income.svg' },
+    { name: 'Valuations', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Valuations.svg' },
+    { name: 'Blue Print', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Blue Print.svg' },
+    { name: 'Anti Virus', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Anti Virus.svg' },
+    { name: 'Manager', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Manager.svg' },
+    { name: 'Digital Agreement', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Digital Agreement.svg' },
+    { name: 'Growth', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Growth.svg' },
+    { name: 'Sync Data', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Sync Data.svg' },
+    { name: 'Project Management', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Project Management.svg' },
+    { name: 'Startup', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Startup.svg' },
+    { name: 'Development', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Development.svg' },
+    { name: 'Digital Marketing', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Digital Marketing.svg' },
+    { name: 'User Security', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/User Security.svg' },
+    { name: 'Affiliate', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Affiliate.svg' },
+    { name: 'Registration', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Registration.svg' },
+    { name: 'Budget', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Budget.svg' },
+    { name: 'Online Shopping', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Online Shoping.svg' },
+    { name: 'Feedback Audience', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Feedback Audience.svg' },
+    { name: 'Warning', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Warning.svg' },
+    { name: 'Unicorn', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Unicorn.svg' },
+    { name: 'Direction', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Direction.svg' },
+    { name: 'Time Management', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Time Management.svg' },
+    { name: 'MRR', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/MRR.svg' },
+    { name: 'User Acquisitions', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/User Acquisitions.svg' },
+    { name: 'Investor', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Investor.svg' },
+    { name: 'Binocular', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Binocular.svg' },
+    { name: 'Product Management', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Product Management.svg' },
+    { name: 'Cloud Computing', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Cloud Computing.svg' },
+    { name: 'Target Audience', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Target Audience.svg' },
+    { name: 'Website', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Website.svg' },
+    { name: 'Networking', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Networking.svg' },
+    { name: 'Mobile Payment', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Mobile Payment.svg' },
+    { name: 'Ecommerce', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Ecommerce.svg' },
+    { name: 'SaaS', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/SaaS.svg' },
+    { name: 'Cloud Data', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Cloud Data.svg' },
+    { name: 'Speed', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Speed.svg' },
+    { name: 'Work Flow', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Work Flow.svg' },
+    { name: 'Database', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Database.svg' },
+    { name: 'Presentation', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Presentation.svg' },
+    { name: 'Software Companies', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Software Companes.svg' },
+    { name: 'Comparison', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Comparison.svg' },
+    { name: 'User Interface', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/User Interface.svg' },
+    { name: 'Target', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Target.svg' },
+    { name: 'Creative Idea', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Creative Idea.svg' },
+    { name: 'SEO', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/SEO.svg' },
+    { name: 'Hockey Stick Growth', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Hockey stick growth.svg' },
+    { name: 'Teamwork', icon: FileText, symbol: null, category: 'technology', imagePath: '/assets/images/icons/Teamwork.svg' },
+    
+    // Food & Dining (Real SVG Icons)
+    { name: 'Lollipop', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Lollipop.svg' },
+    { name: 'Tart', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Tart.svg' },
+    { name: 'Pancake', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Pancake.svg' },
+    { name: 'Ramen', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Ramen.svg' },
+    { name: 'Dimsum', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Dimsum.svg' },
+    { name: 'Cheese', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Cheese.svg' },
+    { name: 'Baguette', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Baguette.svg' },
+    { name: 'Sausage', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Sausage.svg' },
+    { name: 'Muffin', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Muffin.svg' },
+    { name: 'Sushi', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Sushi.svg' },
+    { name: 'Fries', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Fries.svg' },
+    { name: 'Banana', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Banana.svg' },
+    { name: 'Pizza', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Pizza.svg' },
+    { name: 'Boba', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Boba.svg' },
+    { name: 'Ice Cream', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Ice Cream.svg' },
+    { name: 'Banana Split', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Banana Split.svg' },
+    { name: 'Donut', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Donut.svg' },
+    { name: 'Tea', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Tea.svg' },
+    { name: 'Chocolate', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Chocolate.svg' },
+    { name: 'Sandwich', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Sandwich.svg' },
+    { name: 'Juice', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Juice.svg' },
+    { name: 'Salt Pepper', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Salt Pepper.svg' },
+    { name: 'Pie', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Pie.svg' },
+    { name: 'Burger', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Burger.svg' },
+    { name: 'Onigiri', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Onigiri.svg' },
+    { name: 'Mineral Water', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Mineral Water.svg' },
+    { name: 'BBQ', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/BBQ.svg' },
+    { name: 'Spaghetti', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Spaghetti.svg' },
+    { name: 'Softdrink', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Softdrink.svg' },
+    { name: 'Salad', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Salad.svg' },
+    { name: 'Cutlery', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Cutlery.svg' },
+    { name: 'Coffee', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Coffee.svg' },
+    { name: 'Hotdog', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Hotdog.svg' },
+    { name: 'Cocktail', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Cocktail.svg' },
+    { name: 'Breakfast', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Breakfast.svg' },
+    { name: 'Bread', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Bread.svg' },
+    { name: 'Cheesecake', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Cheesecake.svg' },
+    { name: 'Cookies', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Cookies.svg' },
+    { name: 'Salmon Steak', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Salmon Steak.svg' },
+    { name: 'Ice Block', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Ice block.svg' },
+    { name: 'Sauce', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Sauce.svg' },
+    { name: 'Chopsticks', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Chopsticks.svg' },
+    { name: 'Steak', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Steak.svg' },
+    { name: 'Kimbab', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Kimbab.svg' },
+    { name: 'Milk', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Milk.svg' },
+    { name: 'Beer', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Beer.svg' },
+    { name: 'Cola Can', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Cola Can.svg' },
+    { name: 'Burrito', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Burrito.svg' },
+    { name: 'Croissant', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Croissant.svg' },
+    { name: 'Wine', icon: FileText, symbol: null, category: 'food', imagePath: '/assets/images/food/Wine.svg' },
   ]
 
   // Asset categories with modern organization
@@ -683,11 +787,11 @@ const BannerSidebar = ({
     <div 
       ref={sidebarRef}
       className={`
-        w-full sm:w-80 lg:w-96 
-        h-full 
-        backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
-        border-r border-white/20
-        overflow-y-auto
+      w-full sm:w-80 lg:w-96 
+      h-full 
+      backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
+      border-r border-white/20
+      overflow-y-auto
         relative
       `}
       onScroll={() => {
@@ -1332,12 +1436,6 @@ const BannerSidebar = ({
                 </div>
               </div>
 
-
-
-
-
-
-
               {/* Medical Icons */}
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Medical & Healthcare</h4>
@@ -1356,7 +1454,59 @@ const BannerSidebar = ({
                           className="w-6 h-6 object-contain"
                         />
                       ) : (
-                        <span className="text-lg">{icon.symbol}</span>
+                      <span className="text-lg">{icon.symbol}</span>
+                      )}
+                      <span className="text-xs font-medium text-center leading-tight">{icon.name}</span>
+                    </NeumorphicButton>
+                  ))}
+                </div>
+              </div>
+
+              {/* Technology & Business Icons */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Technology & Business</h4>
+                <div className="grid grid-cols-4 gap-2">
+                  {iconLibrary.filter(icon => icon.category === 'technology').map((icon) => (
+                    <NeumorphicButton
+                      key={icon.name}
+                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
+                      variant="glass"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
+                    >
+                      {icon.imagePath ? (
+                        <img 
+                          src={icon.imagePath} 
+                          alt={icon.name}
+                          className="w-6 h-6 object-contain"
+                        />
+                      ) : (
+                      <span className="text-lg">{icon.symbol}</span>
+                      )}
+                      <span className="text-xs font-medium text-center leading-tight">{icon.name}</span>
+                    </NeumorphicButton>
+                  ))}
+                </div>
+              </div>
+
+              {/* Food & Dining Icons */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Food & Dining</h4>
+                <div className="grid grid-cols-4 gap-2">
+                  {iconLibrary.filter(icon => icon.category === 'food').map((icon) => (
+                    <NeumorphicButton
+                      key={icon.name}
+                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
+                      variant="glass"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
+                    >
+                      {icon.imagePath ? (
+                        <img 
+                          src={icon.imagePath} 
+                          alt={icon.name}
+                          className="w-6 h-6 object-contain"
+                        />
+                      ) : (
+                      <span className="text-lg">{icon.symbol}</span>
                       )}
                       <span className="text-xs font-medium text-center leading-tight">{icon.name}</span>
                     </NeumorphicButton>

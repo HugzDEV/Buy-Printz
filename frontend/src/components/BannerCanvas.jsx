@@ -132,49 +132,12 @@ const BannerCanvas = ({
   const [selectionRect, setSelectionRect] = useState(null)
   const [selectionStart, setSelectionStart] = useState(null)
   const [selectedIds, setSelectedIds] = useState([])
-  const [isStatusBarHidden, setIsStatusBarHidden] = useState(false)
   
-  // Text editing state - moved to top to fix hoisting issue
-  // Removed unused state variables - using simple prompt approach instead
+  // Text editing state for custom modal
+  const [isEditingText, setIsEditingText] = useState(false);
+  const [editingTextId, setEditingTextId] = useState(null);
+  const [editingTextValue, setEditingTextValue] = useState('');
   
-  // Show status bar when element is selected
-  useEffect(() => {
-    if (selectedId || selectedIds.length > 0) {
-      setIsStatusBarHidden(false)
-    }
-  }, [selectedId, selectedIds])
-
-  // Keep status bar visible when text editing modal is open
-  useEffect(() => {
-    // Removed isEditingText dependency - no longer needed
-  }, [])
-
-  // Handle touch/click outside canvas to hide status bar - using Konva's container
-  useEffect(() => {
-    const handleOutsideInteraction = (e) => {
-      // Removed isEditingText check - no longer needed
-
-      // Check if the click is outside the canvas area
-      const canvasContainer = stageRef.current?.container()
-      if (canvasContainer && !canvasContainer.contains(e.target)) {
-        // Check if click is outside the status bar area
-        const statusBar = document.querySelector('[data-status-bar]')
-        if (statusBar && !statusBar.contains(e.target)) {
-          setIsStatusBarHidden(true)
-        }
-      }
-    }
-
-    // Add event listeners for both mouse and touch
-    document.addEventListener('click', handleOutsideInteraction)
-    document.addEventListener('touchstart', handleOutsideInteraction)
-    
-    return () => {
-      document.removeEventListener('click', handleOutsideInteraction)
-      document.removeEventListener('touchstart', handleOutsideInteraction)
-    }
-  }, []) // Removed isEditingText dependency
-
   // Canvas utilities
   const saveToHistory = useCallback(() => {
     const newHistory = history.slice(0, historyStep + 1)
@@ -193,11 +156,6 @@ const BannerCanvas = ({
       setIsEditingText(true);
     }
   }, [elements, setElements]);
-
-  // Text editing state for custom modal
-  const [isEditingText, setIsEditingText] = useState(false);
-  const [editingTextId, setEditingTextId] = useState(null);
-  const [editingTextValue, setEditingTextValue] = useState('');
 
   // Save text changes from modal
   const handleTextSave = useCallback(() => {
@@ -1674,110 +1632,16 @@ const BannerCanvas = ({
         </GlassPanel>
       </div>
 
-      {/* Status Bar */}
-      {!isStatusBarHidden && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-3 flex items-center gap-2 z-50">
-          {/* Edit Text Button */}
-          {selectedId && selectedElement?.type === 'text' && (
-            <GlassButton 
-              onClick={() => { handleTextEdit(selectedId); }} 
-              variant="primary" 
-              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg"
-            >
-              <FileText className="w-4 h-4 mr-1" />
-              <span className="text-xs">Edit Text</span>
-            </GlassButton>
-          )}
-          
-          {/* Delete Button */}
-          {selectedId && (
-            <GlassButton 
-              onClick={deleteSelected} 
-              variant="default" 
-              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-red-50 hover:border-red-200 hover:text-red-700"
-            >
-              <Trash2 className="w-4 h-4 mr-1" />
-              <span className="text-xs">Delete</span>
-            </GlassButton>
-          )}
-          
-          {/* Duplicate Button */}
-          {selectedId && (
-            <GlassButton 
-              onClick={duplicateSelected} 
-              variant="default" 
-              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-green-50 hover:border-green-200 hover:text-green-700"
-            >
-              <Copy className="w-4 h-4 mr-1" />
-              <span className="text-xs">Duplicate</span>
-            </GlassButton>
-          )}
-          
-          {/* Bring to Front Button */}
-          {selectedId && (
-            <GlassButton 
-              onClick={bringToFront} 
-              variant="default" 
-              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700"
-            >
-              <ArrowUp className="w-4 h-4 mr-1" />
-              <span className="text-xs">Front</span>
-            </GlassButton>
-          )}
-          
-          {/* Send to Back Button */}
-          {selectedId && (
-            <GlassButton 
-              onClick={sendToBack} 
-              variant="default" 
-              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700"
-            >
-              <ArrowDown className="w-4 h-4 mr-1" />
-              <span className="text-xs">Back</span>
-            </GlassButton>
-          )}
-          
-          {/* Undo Button */}
-          <GlassButton 
-            onClick={undo} 
-            disabled={historyStep <= 0}
-            variant="default" 
-            className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            <Undo className="w-4 h-4 mr-1" />
-            <span className="text-xs">Undo</span>
-          </GlassButton>
-          
-          {/* Redo Button */}
-          <GlassButton 
-            onClick={redo} 
-            disabled={historyStep >= history.length - 1}
-            variant="default" 
-            className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            <Redo className="w-4 h-4 mr-1" />
-            <span className="text-xs">Redo</span>
-          </GlassButton>
-          
-          {/* Hide Status Bar Button */}
-          <GlassButton 
-            onClick={() => setIsStatusBarHidden(true)} 
-            variant="default" 
-            className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-gray-50 hover:border-gray-200"
-          >
-            <X className="w-4 h-4 mr-1" />
-            <span className="text-xs">Hide</span>
-          </GlassButton>
-        </div>
-      )}
+      {/* Status Bar - REMOVED TO ELIMINATE DUPLICATION */}
+      {/* The bottom actions section below provides all the same functionality in a better organized way */}
 
-      {/* Bottom Actions - Mobile Optimized */}
+      {/* Bottom Actions - Consolidated Interface */}
       <div className={`
         absolute bottom-0 left-0 right-0 p-2 sm:p-4 border-t border-white/20 
         bg-gradient-to-br from-gray-50 to-gray-100
         transform transition-transform duration-300 ease-in-out
         max-h-[40vh] overflow-y-auto
-        ${(selectedId || selectedIds.length > 0) && !isStatusBarHidden ? 'translate-y-0' : 'translate-y-full'}
+        ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
       `}>
         <GlassPanel className="flex flex-col gap-3 sm:gap-4 max-h-full">
           
@@ -1792,7 +1656,11 @@ const BannerCanvas = ({
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             {/* Close Button */}
             <GlassButton
-              onClick={() => setIsStatusBarHidden(true)}
+              onClick={() => {
+                // Hide the bottom actions by deselecting all elements
+                setSelectedId(null);
+                setSelectedIds([]);
+              }}
               className="p-2 rounded-full self-start sm:self-center"
               title="Hide element properties"
             >
@@ -2087,7 +1955,29 @@ const BannerCanvas = ({
               </GlassButton>
             </div>
             
-
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
+            
+            {/* Undo/Redo */}
+            <div className="flex gap-1">
+              <GlassButton 
+                onClick={undo} 
+                disabled={historyStep <= 0}
+                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Undo"
+              >
+                <Undo className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={redo} 
+                disabled={historyStep >= history.length - 1}
+                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Redo"
+              >
+                <Redo className="w-4 h-4" />
+              </GlassButton>
+            </div>
           </div>
         </GlassPanel>
       </div>
