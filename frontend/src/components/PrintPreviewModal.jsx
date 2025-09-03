@@ -61,9 +61,9 @@ const PrintPreviewModal = ({
   useEffect(() => {
     const updateScale = () => {
       if (window.innerWidth < 768) {
-        setImageScale(2.5) // More aggressive scaling on mobile
+        setImageScale(3.0) // Much more aggressive scaling on mobile
       } else {
-        setImageScale(1.5) // Normal scaling on desktop
+        setImageScale(1.0) // No scaling on desktop to maintain original behavior
       }
     }
     
@@ -178,16 +178,15 @@ const PrintPreviewModal = ({
                   <div className="space-y-3 sm:space-y-6">
                                          {/* Main Banner Preview */}
                      <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
-                       <div className="relative w-full flex items-center justify-center">
+                       <div className="relative w-full flex items-center justify-center" style={{ minHeight: '400px' }}>
                          <img
                            src={previewImage}
                            alt="Banner Design Preview"
-                           className="w-full h-auto rounded border shadow-lg"
+                           className="rounded border shadow-lg"
                            style={{
-                             width: '100%',
+                             width: 'auto',
                              height: 'auto',
                              minHeight: '300px',
-                             minWidth: '100%',
                              objectFit: 'contain',
                              transform: `scale(${imageScale})`,
                              transformOrigin: 'center center'
