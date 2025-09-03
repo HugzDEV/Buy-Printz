@@ -1753,14 +1753,14 @@ const BannerEditorNew = () => {
 
   // Glass UI Header Component
   const GlassHeader = () => (
-    <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 p-4">
+    <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 p-2 md:p-4">
       <div className="flex items-center justify-between">
         
         {/* Left Section */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
+            className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="hidden md:inline text-sm font-medium">Dashboard</span>
@@ -1776,7 +1776,7 @@ const BannerEditorNew = () => {
             <img 
               src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
               alt="BuyPrintz" 
-              className="h-16 w-auto"
+              className="h-12 md:h-16 w-auto"
             />
           </button>
         </div>
@@ -1790,17 +1790,17 @@ const BannerEditorNew = () => {
         </button>
 
         {/* Right Section */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-2 md:gap-3">
           <button
             onClick={saveDesign}
-            className="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
+            className="px-3 md:px-4 py-1.5 md:py-2 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
           >
             Save Design
           </button>
           
           <button
             onClick={createOrder}
-            className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center gap-2"
+            className="px-3 md:px-4 py-1.5 md:py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center gap-2"
           >
             <ShoppingCart className="w-4 h-4" />
             Create Order
