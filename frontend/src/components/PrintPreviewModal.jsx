@@ -177,12 +177,12 @@ const PrintPreviewModal = ({
                  ) : previewImage ? (
                    <div className="space-y-3 sm:space-y-4">
                                          {/* Main Banner Preview */}
-                                           <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-visible sm:overflow-hidden">
+                                                                                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-visible sm:overflow-hidden">
                         <div className="relative flex items-center justify-center w-full" style={{ 
                           minHeight: window.innerWidth < 768 ? '180px' : '280px',
                           maxHeight: window.innerWidth < 768 ? '220px' : '320px',
-                          // Mobile positioning adjustments for touchdown
-                          transform: window.innerWidth < 768 ? 'translate(60%, 75%)' : 'none'
+                          // Mobile positioning adjustments - 30% larger, up by 15%
+                          transform: window.innerWidth < 768 ? 'translate(60%, 60%) scale(1.3)' : 'none'
                         }}>
                           <img
                             src={previewImage}
@@ -199,9 +199,7 @@ const PrintPreviewModal = ({
                               transformOrigin: 'center center',
                               // Ensure mobile positioning is correct
                               display: 'block',
-                              margin: '0 auto',
-                              // Mobile positioning for touchdown
-                              position: window.innerWidth < 768 ? 'relative' : 'static'
+                              margin: '0 auto'
                             }}
                             onLoad={handleImageLoad}
                           />
