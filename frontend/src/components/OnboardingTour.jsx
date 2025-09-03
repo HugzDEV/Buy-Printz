@@ -25,7 +25,21 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
     }
   }, [isFirstTimeUser])
 
-  const tourSteps = [
+  // Detect device type for responsive tour
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkDevice()
+    window.addEventListener('resize', checkDevice)
+    return () => window.removeEventListener('resize', checkDevice)
+  }, [])
+
+  // Desktop tour steps
+  const desktopTourSteps = [
     {
       target: '.canvas-container',
       content: (
@@ -43,23 +57,6 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       ),
       placement: 'center',
       disableBeacon: true,
-    },
-    {
-      target: '.mobile-hamburger',
-      content: (
-        <div className="text-center space-y-3">
-          <div className="flex justify-center">
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <Menu className="w-8 h-8 text-yellow-600" />
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">Mobile Tools Access</h3>
-          <p className="text-gray-600">
-            Tap this button to open all your design tools and options on mobile!
-          </p>
-        </div>
-      ),
-      placement: 'bottom',
     },
     {
       target: '.sidebar-tools',
@@ -148,8 +145,112 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
     },
   ]
 
+  // Mobile tour steps
+  const mobileTourSteps = [
+    {
+      target: '.canvas-container',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-blue-100 rounded-full">
+              <MousePointer className="w-8 h-8 text-blue-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Your Creative Canvas</h3>
+          <p className="text-gray-600">
+            This is where the magic happens! Your banner design lives here.
+          </p>
+        </div>
+      ),
+      placement: 'center',
+      disableBeacon: true,
+    },
+    {
+      target: '.mobile-hamburger',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-yellow-100 rounded-full">
+              <Menu className="w-8 h-8 text-yellow-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Mobile Tools Access</h3>
+          <p className="text-gray-600">
+            Tap this button to open all your design tools and options on mobile!
+          </p>
+        </div>
+      ),
+      placement: 'bottom',
+    },
+    {
+      target: '.zoom-controls',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-orange-100 rounded-full">
+              <Eye className="w-8 h-8 text-orange-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Zoom & Navigate</h3>
+          <p className="text-gray-600">
+            Zoom in for detail work, zoom out to see the full design.
+          </p>
+        </div>
+      ),
+      placement: 'left',
+    },
+    {
+      target: '.element-selection',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-pink-100 rounded-full">
+              <MousePointer className="w-8 h-8 text-pink-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Element Control</h3>
+          <p className="text-gray-600">
+            Click any element to select, move, resize, or edit it.
+          </p>
+        </div>
+      ),
+      placement: 'center',
+    },
+    {
+      target: '.final-step',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">You're Ready!</h3>
+          <p className="text-gray-600">
+            Start creating your amazing banner design! 🎨
+          </p>
+        </div>
+      ),
+      placement: 'center',
+    },
+  ]
+
+  // Select appropriate tour steps based on device
+  const tourSteps = isMobile ? mobileTourSteps : desktopTourSteps
+
+  // Debug: Log tour steps and device type
+  useEffect(() => {
+    if (runTour) {
+      console.log('Tour started on:', isMobile ? 'Mobile' : 'Desktop')
+      console.log('Tour steps:', tourSteps)
+      console.log('Step targets:', tourSteps.map(step => step.target))
+    }
+  }, [runTour, tourSteps, isMobile])
+
   const handleTourComplete = (data) => {
-    const { status } = data
+    const { status, action, index, step, type } = data
+    console.log('Tour callback:', { status, action, index, step, type })
+    
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       setRunTour(false)
       onTourComplete()
@@ -158,7 +259,10 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
 
   const handleStartTour = () => {
     setShowWelcomeDialog(false)
-    setRunTour(true)
+    // Add a small delay to ensure DOM elements are fully rendered
+    setTimeout(() => {
+      setRunTour(true)
+    }, 100)
   }
 
   const handleSkipTour = () => {
@@ -220,6 +324,8 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       showProgress={true}
       showSkipButton={true}
       callback={handleTourComplete}
+      debug={true}
+      disableOverlayClose={true}
       styles={{
         options: {
           primaryColor: '#3b82f6',
