@@ -1813,25 +1813,7 @@ const BannerEditorNew = () => {
         
       </div>
 
-      {/* Mobile Bottom Actions */}
-      <div className="sm:hidden border-t border-white/20 p-4 bg-white/10 backdrop-blur-sm z-40 relative">
-        <div className="flex gap-3">
-          <button
-            onClick={saveDesign}
-            className="flex-1 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium text-center"
-          >
-            Save
-          </button>
-          
-          <button
-            onClick={createOrder}
-            className="flex-1 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium text-center flex items-center justify-center gap-2"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            Order
-          </button>
-        </div>
-      </div>
+
       
 
       

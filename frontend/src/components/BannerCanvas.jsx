@@ -27,18 +27,13 @@ import {
   Redo,
   ArrowUp,
   ArrowDown,
-  X
+  X,
+  ShoppingCart
 } from 'lucide-react'
 import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
 
-// CSS for maximum z-index priority
-const statusBarStyles = `
-  .status-bar-overlay {
-    z-index: 999999 !important;
-    position: fixed !important;
-  }
-`
+
 
 
 // Enable text rendering fix for better text display
@@ -84,17 +79,7 @@ const BannerCanvas = ({
   //   setScale(Math.max(0.3, newScale)) // Minimum scale of 0.3
   // }, [canvasSize])
 
-  // Inject CSS for maximum z-index priority
-  useEffect(() => {
-    // Create and inject CSS for status bar z-index
-    const styleElement = document.createElement('style')
-    styleElement.textContent = statusBarStyles
-    document.head.appendChild(styleElement)
-    
-    return () => {
-      document.head.removeChild(styleElement)
-    }
-  }, [])
+
 
   // Mobile-responsive canvas scaling with better viewport detection
   useEffect(() => {
@@ -105,7 +90,7 @@ const BannerCanvas = ({
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
         const viewportWidth = window.innerWidth - 32 // Reduced padding for mobile
-        const viewportHeight = window.innerHeight - 280 // Reduced height allocation for bottom actions
+        const viewportHeight = window.innerHeight - 200 // Reduced height allocation since no bottom buttons
         
         const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
         const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
@@ -1304,6 +1289,10 @@ const BannerCanvas = ({
               <Save className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
             
+            <GlassButton onClick={onCreateOrder} variant="primary" className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <ShoppingCart className="w-4 h-4 sm:w-4 sm:h-4" />
+            </GlassButton>
+            
             <GlassButton onClick={onExport} variant="primary" className="p-2 sm:p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
               <Download className="w-4 h-4 sm:w-4 sm:h-4" />
             </GlassButton>
@@ -1656,18 +1645,13 @@ const BannerCanvas = ({
       {/* Bottom Actions - Consolidated Interface */}
       <div 
         className={`
-          status-bar-overlay fixed bottom-0 left-0 right-0 border-t border-white/20 
+          fixed bottom-0 left-0 right-0 border-t border-white/20 
           bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
           transform transition-transform duration-300 ease-in-out
           max-h-[35vh] sm:max-h-[40vh] overflow-y-auto
-          shadow-2xl
+          shadow-2xl z-50
           ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
         `}
-        style={{ 
-          zIndex: 999999,
-          position: 'fixed'
-        }}
-        data-z-index="999999"
       >
         <div className="flex flex-col gap-2 sm:gap-4 max-h-full p-2 sm:p-4">
           
