@@ -247,7 +247,12 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
   ]
 
   // Select appropriate tour steps based on device
-  const tourSteps = isMobile ? mobileTourSteps : desktopTourSteps
+  const [tourSteps, setTourSteps] = useState([])
+  
+  useEffect(() => {
+    const baseSteps = isMobile ? mobileTourSteps : desktopTourSteps
+    setTourSteps(baseSteps)
+  }, [isMobile])
 
   // Mark tour as ready when steps are available
   useEffect(() => {
@@ -272,6 +277,24 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       tourSteps.forEach((step, index) => {
         const element = document.querySelector(step.target)
         console.log(`Step ${index} target "${step.target}":`, element ? 'Found' : 'NOT FOUND', element)
+        
+        if (element) {
+          // Check element visibility and styles
+          const computedStyle = window.getComputedStyle(element)
+          const rect = element.getBoundingClientRect()
+          console.log(`Step ${index} element details:`, {
+            display: computedStyle.display,
+            visibility: computedStyle.visibility,
+            opacity: computedStyle.opacity,
+            position: computedStyle.position,
+            zIndex: computedStyle.zIndex,
+            width: rect.width,
+            height: rect.height,
+            top: rect.top,
+            left: rect.left,
+            isVisible: rect.width > 0 && rect.height > 0
+          })
+        }
       })
     }
   }, [runTour, tourSteps, isMobile])
@@ -291,7 +314,7 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
     
     // Wait for tour to be ready with timeout
     let attempts = 0
-    const maxAttempts = 50 // 5 seconds max wait
+    const maxAttempts = 100 // 10 seconds max wait
     
     const waitForTour = () => {
       attempts++
@@ -320,6 +343,129 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
         
         if (missingTargets.length > 0) {
           console.log('Missing targets:', missingTargets)
+          
+          // Debug: Check DOM structure for missing targets
+          missingTargets.forEach(target => {
+            console.log(`Debugging target "${target}":`)
+            
+            // Check if element exists but with different selector
+            if (target === '.mobile-hamburger') {
+              console.log('=== MOBILE HAMBURGER DEBUG ===')
+              
+              // Method 1: Check by class name
+              const allButtons = document.querySelectorAll('button')
+              console.log('All buttons found:', allButtons.length)
+              allButtons.forEach((btn, i) => {
+                const classes = btn.className
+                const hasMobileHamburger = classes.includes('mobile-hamburger')
+                const rect = btn.getBoundingClientRect()
+                const computedStyle = window.getComputedStyle(btn)
+                console.log(`Button ${i}: classes="${classes}", hasMobileHamburger=${hasMobileHamburger}, visible=${rect.width > 0 && rect.height > 0}, display=${computedStyle.display}, visibility=${computedStyle.visibility}`)
+              })
+              
+              // Method 2: Check for elements with similar classes
+              const similarElements = document.querySelectorAll('[class*="hamburger"], [class*="mobile"]')
+              console.log('Similar elements found:', similarElements.length)
+              similarElements.forEach((el, i) => {
+                const rect = el.getBoundingClientRect()
+                const computedStyle = window.getComputedStyle(el)
+                console.log(`Similar element ${i}:`, el.tagName, el.className, 'visible=', rect.width > 0 && rect.height > 0, 'display=', computedStyle.display)
+              })
+              
+              // Method 3: Check for any button in the header area
+              const header = document.querySelector('header, .backdrop-blur-xl, [class*="header"]')
+              if (header) {
+                console.log('Header found:', header)
+                const headerButtons = header.querySelectorAll('button')
+                console.log('Header buttons:', headerButtons.length)
+                headerButtons.forEach((btn, i) => {
+                  const classes = btn.className
+                  const rect = btn.getBoundingClientRect()
+                  console.log(`Header button ${i}: classes="${classes}", visible=${rect.width > 0 && rect.height > 0}`)
+                })
+              }
+              
+              // Method 4: Check for elements with Menu icon
+              const menuIcons = document.querySelectorAll('[data-lucide="menu"], .lucide-menu, svg[data-lucide="menu"]')
+              console.log('Menu icons found:', menuIcons.length)
+              menuIcons.forEach((icon, i) => {
+                const parent = icon.closest('button')
+                if (parent) {
+                  const classes = parent.className
+                  const rect = parent.getBoundingClientRect()
+                  console.log(`Menu icon ${i} parent button: classes="${classes}", visible=${rect.width > 0 && rect.height > 0}`)
+                }
+              })
+              
+              // Method 5: Check entire DOM for mobile-hamburger class
+              const allElements = document.querySelectorAll('*')
+              const mobileHamburgerElements = Array.from(allElements).filter(el => 
+                el.className && typeof el.className === 'string' && el.className.includes('mobile-hamburger')
+              )
+              console.log('Elements with mobile-hamburger class:', mobileHamburgerElements.length)
+              mobileHamburgerElements.forEach((el, i) => {
+                const rect = el.getBoundingClientRect()
+                const computedStyle = window.getComputedStyle(el)
+                console.log(`Mobile hamburger element ${i}:`, el.tagName, el.className, 'visible=', rect.width > 0 && rect.height > 0, 'display=', computedStyle.display)
+              })
+              
+              console.log('=== END MOBILE HAMBURGER DEBUG ===')
+            }
+          })
+          
+          // Special handling for mobile hamburger if it's the only missing target
+          if (missingTargets.length === 1 && missingTargets[0] === '.mobile-hamburger' && isMobile) {
+            console.log('Mobile hamburger is missing, trying alternative approach...')
+            
+            // Try to find the button by alternative means
+            const alternativeSelectors = [
+              'button[class*="hamburger"]',
+              'button[class*="mobile"]',
+              'button:has(svg[data-lucide="menu"])',
+              'button:has(.lucide-menu)',
+              'button:has([data-lucide="menu"])'
+            ]
+            
+            let foundButton = null
+            for (const selector of alternativeSelectors) {
+              try {
+                const element = document.querySelector(selector)
+                if (element) {
+                  foundButton = element
+                  console.log('Found button with alternative selector:', selector, element)
+                  break
+                }
+              } catch (e) {
+                console.log('Selector failed:', selector, e)
+              }
+            }
+            
+            if (foundButton) {
+              // Add the mobile-hamburger class to the found button
+              foundButton.classList.add('mobile-hamburger')
+              console.log('Added mobile-hamburger class to found button')
+              
+              // Wait a bit for the class to be applied, then retry
+              setTimeout(() => {
+                console.log('Retrying tour with mobile-hamburger class added')
+                checkTargets()
+              }, 100)
+              return
+            }
+          }
+          
+          // Fallback: Create a working tour with available targets
+          const workingSteps = tourSteps.filter(step => document.querySelector(step.target))
+          console.log('Working steps:', workingSteps.length, 'out of', tourSteps.length)
+          
+          if (workingSteps.length > 0) {
+            // Update tourSteps to only include working targets
+            console.log('Starting tour with available targets')
+            setTourSteps(workingSteps)
+            setRunTour(true)
+            return
+          }
+          
           // Wait a bit more and try again
           setTimeout(checkTargets, 200)
         } else {
@@ -328,7 +474,8 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
         }
       }
       
-      checkTargets()
+      // Add a small delay to ensure DOM is fully rendered
+      setTimeout(checkTargets, 100)
     }
     
     waitForTour()
