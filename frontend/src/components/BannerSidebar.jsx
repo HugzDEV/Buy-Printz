@@ -6,16 +6,11 @@ import {
   Circle as CircleIcon,
   Star as StarIcon,
   Triangle,
-  Heart,
-  Award,
-  Shield,
-  Info,
   ChevronDown,
   ChevronUp,
   Upload,
   Sparkles,
   Palette,
-  Settings,
   Copy,
   CornerDownRight,
   FileText,
@@ -99,15 +94,11 @@ const BannerSidebar = ({
     { name: 'Rectangle', icon: Square, type: 'rect', category: 'basic' },
     { name: 'Circle', icon: CircleIcon, type: 'circle', category: 'basic' },
     { name: 'Triangle', icon: Triangle, type: 'triangle', category: 'basic' },
-    { name: 'Hexagon', icon: Settings, type: 'hexagon', category: 'basic' },
-    { name: 'Octagon', icon: Settings, type: 'octagon', category: 'basic' },
+    { name: 'Hexagon', icon: FileText, type: 'hexagon', category: 'basic' },
+    { name: 'Octagon', icon: FileText, type: 'octagon', category: 'basic' },
     
     // Decorative Shapes
     { name: 'Star', icon: StarIcon, type: 'star', category: 'decorative' },
-    { name: 'Heart', icon: Heart, type: 'heart', category: 'decorative' },
-    { name: 'Diamond', icon: Award, type: 'diamond', category: 'decorative' },
-    { name: 'Cross', icon: Award, type: 'cross', category: 'decorative' },
-    { name: 'Crown', icon: Award, type: 'crown', category: 'decorative' },
     
     // Arrows & Directional
     { name: 'Arrow Right', icon: CornerDownRight, type: 'arrow-right', category: 'arrows' },
@@ -117,143 +108,94 @@ const BannerSidebar = ({
     { name: 'Double Arrow', icon: CornerDownRight, type: 'double-arrow', category: 'arrows' },
     
     // Business Shapes
-    { name: 'Badge', icon: Shield, type: 'badge', category: 'business' },
+    { name: 'Badge', icon: FileText, type: 'badge', category: 'business' },
     { name: 'Certificate', icon: FileText, type: 'certificate', category: 'business' },
     { name: 'Document', icon: FileText, type: 'document', category: 'business' },
     { name: 'Checkmark', icon: FileText, type: 'checkmark', category: 'business' },
     { name: 'Target', icon: CircleIcon, type: 'target', category: 'business' }
   ]
 
-  // Enhanced Icon Library
+  // Enhanced Icon Library - Only Icons with Real Assets
   const iconLibrary = [
-    // Business & Professional
-    { name: 'Phone', icon: FileText, symbol: '📞', category: 'business' },
-    { name: 'Mail', icon: FileText, symbol: '✉️', category: 'business' },
-    { name: 'Location', icon: FileText, symbol: '📍', category: 'business' },
-    { name: 'Globe', icon: FileText, symbol: '🌐', category: 'business' },
-    { name: 'Calendar', icon: FileText, symbol: '📅', category: 'business' },
-    { name: 'Clock', icon: FileText, symbol: '🕐', category: 'business' },
-    { name: 'User', icon: FileText, symbol: '👤', category: 'business' },
-    { name: 'Users', icon: FileText, symbol: '👥', category: 'business' },
-    { name: 'Building', icon: FileText, symbol: '🏢', category: 'business' },
-    { name: 'Briefcase', icon: FileText, symbol: '💼', category: 'business' },
-    { name: 'Chart', icon: FileText, symbol: '📊', category: 'business' },
-    { name: 'Calculator', icon: FileText, symbol: '🧮', category: 'business' },
+    // Medical & Healthcare (Real SVG Icons)
+    { name: 'Doctor', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Doctor.svg' },
+    { name: 'Nurse', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Nurse.svg' },
+    { name: 'Hospital Building', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Hospital.svg' },
+    { name: 'Medical Kit', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Medical Kit.svg' },
+    { name: 'Stethoscope', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Phonendoscope.svg' },
+    { name: 'Thermometer', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Thermometer.svg' },
+    { name: 'Syringe', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Syringe.svg' },
+    { name: 'Pills', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Medicine.svg' },
+    { name: 'Capsule', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Capsule.svg' },
+    { name: 'Microscope', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Microscope.svg' },
+    { name: 'DNA', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/DNA.svg' },
+    { name: 'Cardiogram', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Cardiogram.svg' },
+    { name: 'X-Ray', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Xray.svg' },
+    { name: 'MRI', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/MRI.svg' },
+    { name: 'USG', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/USG.svg' },
+    { name: 'Ambulance', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Ambulance.svg' },
+    { name: 'Pharmacy', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Pharmacy.svg' },
+    { name: 'Medical Report', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Medical Report.svg' },
+    { name: 'Prescription', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Prescription.svg' },
+    { name: 'Medical History', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Medical History.svg' },
+    { name: 'Medical Checkup', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Medical Checkup.svg' },
+    { name: 'Surgery Room', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Surgery Room.svg' },
+    { name: 'Emergency Call', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Emergency Call.svg' },
+    { name: 'Blood', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Blood.svg' },
+    { name: 'Blood Transfusion', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Blood Transfusion.svg' },
+    { name: 'Sample Tube', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Sample Tube.svg' },
+    { name: 'Bacteria', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Bacteria.svg' },
+    { name: 'Caduceus', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Caduceus.svg' },
+    { name: 'Wheelchair', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Wheelchair.svg' },
+    { name: 'Crutches', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Crutches.svg' },
+    { name: 'Weight Scale', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Weight Scale.svg' },
+    { name: 'Oxygen', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Oxygen.svg' },
+    { name: 'Infusion', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Infusion.svg' },
+    { name: 'Herbal Medicine', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Herbal.svg' },
+    { name: 'Dental', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Dental.svg' },
+    { name: 'Ophthalmologist', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/ophthalmologists.svg' },
+    { name: 'Blood Pressure', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Sphygmomanometer.svg' },
+    { name: 'Radioactive', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Radio Active.svg' },
+    { name: 'Mobile Apps', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Mobile Apps.svg' },
+    { name: 'Healthy Insurance', icon: FileText, symbol: null, category: 'medical', imagePath: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Healthy Insurance.svg' },
     
-    // Awards & Recognition
-    { name: 'Star', icon: StarIcon, symbol: '★', category: 'awards' },
-    { name: 'Award', icon: Award, symbol: '🏆', category: 'awards' },
-    { name: 'Shield', icon: Shield, symbol: '🛡️', category: 'awards' },
-    { name: 'Trophy', icon: Award, symbol: '🏅', category: 'awards' },
-    { name: 'Medal', icon: Award, symbol: '🥇', category: 'awards' },
-    { name: 'Crown', icon: Award, symbol: '👑', category: 'awards' },
-    
-    // Communication
-    { name: 'Chat', icon: FileText, symbol: '💬', category: 'communication' },
-    { name: 'Message', icon: FileText, symbol: '💌', category: 'communication' },
-    { name: 'Video Call', icon: FileText, symbol: '📹', category: 'communication' },
-    { name: 'Speaker', icon: FileText, symbol: '🔊', category: 'communication' },
-    { name: 'Microphone', icon: FileText, symbol: '🎤', category: 'communication' },
-    { name: 'Camera', icon: FileText, symbol: '📷', category: 'communication' },
-    
-    // Technology
-    { name: 'Computer', icon: FileText, symbol: '💻', category: 'technology' },
-    { name: 'Mobile', icon: FileText, symbol: '📱', category: 'technology' },
-    { name: 'WiFi', icon: FileText, symbol: '📶', category: 'technology' },
-    { name: 'Battery', icon: FileText, symbol: '🔋', category: 'technology' },
-    { name: 'Settings', icon: Settings, symbol: '⚙️', category: 'technology' },
-    { name: 'Lock', icon: Shield, symbol: '🔒', category: 'technology' },
-    { name: 'Key', icon: Shield, symbol: '🔑', category: 'technology' },
-    
-    // Finance & Money
-    { name: 'Dollar', icon: FileText, symbol: '💵', category: 'finance' },
-    { name: 'Credit Card', icon: FileText, symbol: '💳', category: 'finance' },
-    { name: 'Bank', icon: FileText, symbol: '🏦', category: 'finance' },
-    { name: 'Piggy Bank', icon: FileText, symbol: '🐷', category: 'finance' },
-    { name: 'Chart Up', icon: FileText, symbol: '📈', category: 'finance' },
-    { name: 'Chart Down', icon: FileText, symbol: '📉', category: 'finance' },
-    
-    // Health & Wellness
-    { name: 'Heart', icon: Heart, symbol: '♥️', category: 'health' },
-    { name: 'Medical Cross', icon: FileText, symbol: '➕', category: 'health' },
-    { name: 'Pill', icon: FileText, symbol: '💊', category: 'health' },
-    { name: 'Stethoscope', icon: FileText, symbol: '🩺', category: 'health' },
-    { name: 'Hospital', icon: FileText, symbol: '🏥', category: 'health' },
-    { name: 'Ambulance', icon: FileText, symbol: '🚑', category: 'health' },
-    
-    // Food & Dining
-    { name: 'Restaurant', icon: FileText, symbol: '🍽️', category: 'food' },
-    { name: 'Coffee', icon: FileText, symbol: '☕', category: 'food' },
-    { name: 'Pizza', icon: FileText, symbol: '🍕', category: 'food' },
-    { name: 'Burger', icon: FileText, symbol: '🍔', category: 'food' },
-    { name: 'Cake', icon: FileText, symbol: '🎂', category: 'food' },
-    { name: 'Wine', icon: FileText, symbol: '🍷', category: 'food' },
-    
-    // Transportation
-    { name: 'Car', icon: FileText, symbol: '🚗', category: 'transport' },
-    { name: 'Truck', icon: FileText, symbol: '🚛', category: 'transport' },
-    { name: 'Motorcycle', icon: FileText, symbol: '🏍️', category: 'transport' },
-    { name: 'Bicycle', icon: FileText, symbol: '🚲', category: 'transport' },
-    { name: 'Airplane', icon: FileText, symbol: '✈️', category: 'transport' },
-    { name: 'Ship', icon: FileText, symbol: '🚢', category: 'transport' },
-    
-    // Education
-    { name: 'Graduation Cap', icon: FileText, symbol: '🎓', category: 'education' },
-    { name: 'Book', icon: FileText, symbol: '📚', category: 'education' },
-    { name: 'Pencil', icon: FileText, symbol: '✏️', category: 'education' },
-    { name: 'School', icon: FileText, symbol: '🏫', category: 'education' },
-    { name: 'Microscope', icon: FileText, symbol: '🔬', category: 'education' },
-    { name: 'Lightbulb', icon: FileText, symbol: '💡', category: 'education' },
-    
-    // Social Media
-    { name: 'X (Twitter)', icon: FileText, symbol: '𝕏', category: 'social', imagePath: '/assets/images/social icons/X.png' },
-    { name: 'Twitter', icon: FileText, symbol: '🐦', category: 'social', imagePath: '/assets/images/social icons/Twitter.png' },
-    { name: 'Meta (Facebook)', icon: FileText, symbol: '📘', category: 'social', imagePath: '/assets/images/social icons/Facebook.png' },
-    { name: 'LinkedIn', icon: FileText, symbol: '💼', category: 'social', imagePath: '/assets/images/social icons/LinkedIn.png' },
-    { name: 'Reddit', icon: FileText, symbol: '🤖', category: 'social', imagePath: '/assets/images/social icons/Reddit.png' },
-    { name: 'GitHub', icon: FileText, symbol: '🐙', category: 'social' },
-    { name: 'Pinterest', icon: FileText, symbol: '📌', category: 'social', imagePath: '/assets/images/social icons/Pinterest.png' },
-    { name: 'Instagram', icon: FileText, symbol: '📷', category: 'social', imagePath: '/assets/images/social icons/Instagram.png' },
-    { name: 'Snapchat', icon: FileText, symbol: '👻', category: 'social', imagePath: '/assets/images/social icons/Snapchat.png' },
-    { name: 'Telegram', icon: FileText, symbol: '✈️', category: 'social', imagePath: '/assets/images/social icons/Telegram.png' },
-    { name: 'WhatsApp', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Whatsapp.png' },
-    { name: 'Yelp', icon: FileText, symbol: '⭐', category: 'social' },
-    { name: 'Twitch', icon: FileText, symbol: '🎮', category: 'social', imagePath: '/assets/images/social icons/Twitch.png' },
-    { name: 'YouTube', icon: FileText, symbol: '📺', category: 'social', imagePath: '/assets/images/social icons/Youtube.png' },
-    { name: 'TikTok', icon: FileText, symbol: '🎵', category: 'social', imagePath: '/assets/images/social icons/Tiktok.png' },
-    { name: 'Discord', icon: FileText, symbol: '🎭', category: 'social', imagePath: '/assets/images/social icons/Discord.png' },
-    { name: 'Slack', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Slack.png' },
-    { name: 'Skype', icon: FileText, symbol: '📞', category: 'social', imagePath: '/assets/images/social icons/Skype.png' },
-    { name: 'Zoom', icon: FileText, symbol: '🎥', category: 'social', imagePath: '/assets/images/social icons/Zoom.png' },
-    { name: 'Spotify', icon: FileText, symbol: '🎵', category: 'social', imagePath: '/assets/images/social icons/Spotify.png' },
-    { name: 'Netflix', icon: FileText, symbol: '🎬', category: 'social' },
-    { name: 'Amazon', icon: FileText, symbol: '📦', category: 'social' },
-    { name: 'eBay', icon: FileText, symbol: '🛒', category: 'social' },
-    { name: 'Etsy', icon: FileText, symbol: '🛍️', category: 'social' },
-    { name: 'PayPal', icon: FileText, symbol: '💳', category: 'social', imagePath: '/assets/images/social icons/Paypal.png' },
-    { name: 'Uber', icon: FileText, symbol: '🚗', category: 'social' },
-    { name: 'Airbnb', icon: FileText, symbol: '🏠', category: 'social' },
-    { name: 'Google Maps', icon: FileText, symbol: '🗺️', category: 'social' },
-    { name: 'Dropbox', icon: FileText, symbol: '📁', category: 'social', imagePath: '/assets/images/social icons/Dropbox.png' },
-    { name: 'Canva', icon: FileText, symbol: '🎨', category: 'social' },
-    { name: 'Notion', icon: FileText, symbol: '📝', category: 'social' },
-    { name: 'Trello', icon: FileText, symbol: '📋', category: 'social' },
-    { name: 'Messenger', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Messenger.png' },
-    { name: 'Vimeo', icon: FileText, symbol: '🎬', category: 'social', imagePath: '/assets/images/social icons/Vimeo.png' },
-    { name: 'Dribbble', icon: FileText, symbol: '🏀', category: 'social', imagePath: '/assets/images/social icons/Dribbble.png' },
-    { name: 'Soundcloud', icon: FileText, symbol: '🎵', category: 'social', imagePath: '/assets/images/social icons/Soundcloud.png' },
-    { name: 'Tumblr', icon: FileText, symbol: '📝', category: 'social', imagePath: '/assets/images/social icons/Tumblr.png' },
-    { name: 'Viber', icon: FileText, symbol: '📱', category: 'social', imagePath: '/assets/images/social icons/Viber.png' },
-    { name: 'Line', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/Line.png' },
-    { name: 'WeChat', icon: FileText, symbol: '💬', category: 'social', imagePath: '/assets/images/social icons/WeChat.png' },
-    { name: 'VK', icon: FileText, symbol: '🇷🇺', category: 'social', imagePath: '/assets/images/social icons/VK.png' },
-    { name: 'Behance', icon: FileText, symbol: '🎨', category: 'social', imagePath: '/assets/images/social icons/Behance.png' },
-    { name: 'Google Drive', icon: FileText, symbol: '☁️', category: 'social', imagePath: '/assets/images/social icons/Drive.png' },
-    { name: 'Microsoft Word', icon: FileText, symbol: '📄', category: 'social', imagePath: '/assets/images/social icons/Word.png' },
-    { name: 'Microsoft Excel', icon: FileText, symbol: '📊', category: 'social', imagePath: '/assets/images/social icons/Excel.png' },
-    { name: 'Microsoft PowerPoint', icon: FileText, symbol: '📊', category: 'social', imagePath: '/assets/images/social icons/PowerPoint.png' },
-    { name: 'Microsoft Outlook', icon: FileText, symbol: '📧', category: 'social', imagePath: '/assets/images/social icons/Outlook.png' },
-    { name: 'Microsoft OneNote', icon: FileText, symbol: '📝', category: 'social', imagePath: '/assets/images/social icons/OneNote.png' }
+    // Social Media (Real PNG Icons)
+    { name: 'X (Twitter)', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/X.png' },
+    { name: 'Twitter', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Twitter.png' },
+    { name: 'Meta (Facebook)', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Facebook.png' },
+    { name: 'LinkedIn', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/LinkedIn.png' },
+    { name: 'Reddit', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Reddit.png' },
+    { name: 'Pinterest', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Pinterest.png' },
+    { name: 'Instagram', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Instagram.png' },
+    { name: 'Snapchat', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Snapchat.png' },
+    { name: 'Telegram', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Telegram.png' },
+    { name: 'WhatsApp', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Whatsapp.png' },
+    { name: 'Twitch', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Twitch.png' },
+    { name: 'YouTube', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Youtube.png' },
+    { name: 'TikTok', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Tiktok.png' },
+    { name: 'Discord', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Discord.png' },
+    { name: 'Slack', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Slack.png' },
+    { name: 'Skype', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Skype.png' },
+    { name: 'Behance', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Behance.png' },
+    { name: 'Dribbble', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Dribbble.png' },
+    { name: 'Dropbox', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Dropbox.png' },
+    { name: 'Drive', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Drive.png' },
+    { name: 'Excel', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Excel.png' },
+    { name: 'Line', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Line.png' },
+    { name: 'Messenger', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Messenger.png' },
+    { name: 'OneNote', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/OneNote.png' },
+    { name: 'Outlook', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Outlook.png' },
+    { name: 'Paypal', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Paypal.png' },
+    { name: 'PowerPoint', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/PowerPoint.png' },
+    { name: 'Soundcloud', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Soundcloud.png' },
+    { name: 'Spotify', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Spotify.png' },
+    { name: 'Tumblr', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Tumblr.png' },
+    { name: 'Viber', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Viber.png' },
+    { name: 'Vimeo', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Vimeo.png' },
+    { name: 'VK', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/VK.png' },
+    { name: 'WeChat', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/WeChat.png' },
+    { name: 'Word', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Word.png' },
+    { name: 'Zoom', icon: FileText, symbol: null, category: 'social', imagePath: '/assets/images/social icons/Zoom.png' },
   ]
 
   // Asset categories with modern organization
@@ -816,7 +758,7 @@ const BannerSidebar = ({
           >
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500">
-                <Info className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
               <div className="text-left">
                 <h3 className="font-semibold text-gray-800 text-sm sm:text-base">Specifications</h3>
@@ -1390,163 +1332,33 @@ const BannerSidebar = ({
                 </div>
               </div>
 
-              {/* Business Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Business & Professional</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'business').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
 
-              {/* Awards Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Awards & Recognition</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'awards').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
 
-              {/* Communication Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Communication</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'communication').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
 
-              {/* Technology Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Technology</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'technology').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
 
-              {/* Finance Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Finance & Money</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'finance').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
 
-              {/* Health Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Health & Wellness</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'health').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
 
-              {/* Food Icons */}
+              {/* Medical Icons */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Food & Dining</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Medical & Healthcare</h4>
                 <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'food').map((icon) => (
+                  {iconLibrary.filter(icon => icon.category === 'medical').map((icon) => (
                     <NeumorphicButton
                       key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
+                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
-
-              {/* Transport Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Transportation</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'transport').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
-                    </NeumorphicButton>
-                  ))}
-                </div>
-              </div>
-
-              {/* Education Icons */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Education</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconLibrary.filter(icon => icon.category === 'education').map((icon) => (
-                    <NeumorphicButton
-                      key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol)}
-                      variant="glass"
-                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
-                    >
-                      <span className="text-lg">{icon.symbol}</span>
-                      <span className="text-xs font-medium">{icon.name}</span>
+                      {icon.imagePath ? (
+                        <img 
+                          src={icon.imagePath} 
+                          alt={icon.name}
+                          className="w-6 h-6 object-contain"
+                        />
+                      ) : (
+                        <span className="text-lg">{icon.symbol}</span>
+                      )}
+                      <span className="text-xs font-medium text-center leading-tight">{icon.name}</span>
                     </NeumorphicButton>
                   ))}
                 </div>

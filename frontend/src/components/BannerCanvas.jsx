@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer, Group } from 'react-konva'
+import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -399,12 +399,6 @@ const BannerCanvas = ({
   // Element handlers
   // Simple element selection handler
   const handleSelect = (id) => {
-    console.log('Selecting element:', id)
-    const element = elements.find(el => el.id === id)
-    if (element) {
-      console.log('Element type:', element.type, 'Element data:', element)
-    }
-    
     if (selectedIds.includes(id)) {
       // Deselect if already selected
       setSelectedIds(prev => prev.filter(selectedId => selectedId !== id))
@@ -446,11 +440,7 @@ const BannerCanvas = ({
 
     const node = e.target
     
-    // Debug logging for icons
-    if (element.type === 'icon') {
-      console.log('Transforming icon:', element.iconName, 'Current size:', element.width, 'x', element.height)
-      console.log('Node scale:', node.scaleX(), 'x', node.scaleY())
-    }
+
     
     // Update element properties based on transformation
     const updatedElement = { ...element }
@@ -521,19 +511,7 @@ const BannerCanvas = ({
       updatedElement.width = newWidth
       updatedElement.height = newHeight
       
-      // Debug logging for icon transformation
-      console.log('Icon transformed:', element.iconName, 'New size:', newWidth, 'x', newHeight)
-      
-      // Reset scale to 1
-      node.scaleX(1)
-      node.scaleY(1)
-    } else if (element.type === 'group') {
-      // For groups (like icons), update width/height based on scale
-      const newWidth = Math.max(10, (element.width || 100) * node.scaleX())
-      const newHeight = Math.max(10, (element.height || 100) * node.scaleY())
-      
-      updatedElement.width = newWidth
-      updatedElement.height = newHeight
+
       
       // Reset scale to 1
       node.scaleX(1)
@@ -758,46 +736,18 @@ const BannerCanvas = ({
   useEffect(() => {
     const updateTransformer = () => {
       if (selectedIds.length > 0 && stageRef.current && transformerRef.current) {
-        console.log('Updating transformer for multiple selection:', selectedIds)
         const selectedNodes = selectedIds.map(id => {
           const element = elements.find(el => el.id === id)
           if (!element) return null
           
-          console.log('Finding node for element:', element.type, element.id)
-          
           // Find the actual Konva node
           const node = stageRef.current.findOne(`#${id}`)
           if (node) {
-            console.log('Found node:', node.constructor.name, 'Node bounds:', {
-              x: node.x(),
-              y: node.y(),
-              width: node.width(),
-              height: node.height()
-            })
-            
-            // For icons, ensure proper bounds
-            if (element.type === 'icon') {
-              console.log('Processing icon element:', element.iconName)
-              // Force the node to update its bounds
-              node.width(element.width || 60)
-              node.height(element.height || 60)
-              node.x(element.x || 0)
-              node.y(element.y || 0)
-              console.log('Updated icon node bounds:', {
-                x: node.x(),
-                y: node.y(),
-                width: node.width(),
-                height: node.height()
-              })
-            }
+
             return node
-          } else {
-            console.log('No node found for element:', id)
-            return null
           }
+          return null
         }).filter(Boolean)
-        
-        console.log('Selected nodes for transformer:', selectedNodes.length)
         
         if (selectedNodes.length > 0) {
           transformerRef.current.nodes(selectedNodes)
@@ -807,25 +757,13 @@ const BannerCanvas = ({
           setTimeout(() => {
             if (transformerRef.current) {
               transformerRef.current.forceUpdate()
-              console.log('Transformer force updated')
             }
           }, 10)
         }
       } else if (selectedId && stageRef.current && transformerRef.current) {
-        console.log('Updating transformer for single selection:', selectedId)
         const selectedNode = stageRef.current.findOne(`#${selectedId}`)
         if (selectedNode) {
-          console.log('Found single node:', selectedNode.constructor.name)
-          
-          // For icons, ensure proper bounds
-          const element = elements.find(el => el.id === selectedId)
-          if (element && element.type === 'icon') {
-            console.log('Processing single icon element:', element.iconName)
-            selectedNode.width(element.width || 60)
-            selectedNode.height(element.height || 60)
-            selectedNode.x(element.x || 0)
-            selectedNode.y(element.y || 0)
-          }
+
           
           transformerRef.current.nodes([selectedNode])
           transformerRef.current.getLayer()?.batchDraw()
@@ -834,12 +772,10 @@ const BannerCanvas = ({
           setTimeout(() => {
             if (transformerRef.current) {
               transformerRef.current.forceUpdate()
-              console.log('Single transformer force updated')
             }
           }, 10)
         }
       } else if (transformerRef.current) {
-        console.log('Clearing transformer')
         transformerRef.current.nodes([])
         transformerRef.current.getLayer()?.batchDraw()
       }
@@ -952,6 +888,8 @@ const BannerCanvas = ({
       onDragEnd: (e) => handleDragEnd(e, safeElement.id),
       onTransformEnd: (e) => handleTransformEnd(e, safeElement.id)
     }
+
+
 
     switch (safeElement.type) {
       case 'text':
@@ -1074,9 +1012,9 @@ const BannerCanvas = ({
         )
       
       case 'icon':
-        // Check if icon has an image path or symbol
+        // Render icons exactly like shapes - simple and direct
         if (safeElement.imagePath) {
-          // Render as image icon - use Image for proper bounds
+          // Image icons - use Image component like other elements
           return (
             <Image
               key={safeElement.id}
@@ -1085,55 +1023,31 @@ const BannerCanvas = ({
               width={safeElement.width || 60}
               height={safeElement.height || 60}
               rotation={safeElement.rotation || 0}
-              // Ensure proper bounds for transformer
-              listening={true}
-              // Prevent text editing
+            />
+          )
+        } else if (safeElement.symbol) {
+          // Symbol icons - render the actual symbol as text so transformer can bound to it
+          const fontSize = Math.max(12, Math.min(safeElement.width || 60, safeElement.height || 60) * 0.6)
+          return (
+            <Text
+              key={safeElement.id}
+              {...commonProps}
+              text={safeElement.symbol}
+              fontSize={fontSize}
+              fontFamily="Arial"
+              fill="#000000"
+              width={safeElement.width || 60}
+              height={safeElement.height || 60}
+              align="center"
+              verticalAlign="middle"
+              rotation={safeElement.rotation || 0}
+              // Prevent text editing for icons
               onDblClick={(e) => e.evt.preventDefault()}
               onDblTap={(e) => e.evt.preventDefault()}
             />
           )
-        } else if (safeElement.symbol) {
-          // Render as group with background and symbol - prevents text editing
-          const fontSize = Math.max(12, Math.min(safeElement.width || 60, safeElement.height || 60) * 0.6)
-          return (
-            <Group
-              key={safeElement.id}
-              {...commonProps}
-              width={safeElement.width || 60}
-              height={safeElement.height || 60}
-            >
-              {/* Background rectangle for proper bounds */}
-              <Rect
-                x={0}
-                y={0}
-                width={safeElement.width || 60}
-                height={safeElement.height || 60}
-                fill={safeElement.fill || '#666666'}
-                stroke={safeElement.stroke || '#000000'}
-                strokeWidth={safeElement.strokeWidth || 1}
-                cornerRadius={4}
-                shadowColor="black"
-                shadowBlur={2}
-                shadowOffset={{ x: 2, y: 2 }}
-                shadowOpacity={0.3}
-              />
-              {/* Symbol text centered on background */}
-              <Text
-                x={0}
-                y={0}
-                width={safeElement.width || 60}
-                height={safeElement.height || 60}
-                text={safeElement.symbol}
-                fontSize={fontSize}
-                fontFamily="Arial"
-                fill="#000000"
-                align="center"
-                verticalAlign="middle"
-              />
-            </Group>
-          )
         } else {
-          // Fallback to rectangle with icon name - use Rect for proper bounds
+          // Fallback to styled rectangle
           return (
             <Rect
               key={safeElement.id}
@@ -1149,13 +1063,9 @@ const BannerCanvas = ({
               shadowBlur={2}
               shadowOffset={{ x: 2, y: 2 }}
               shadowOpacity={0.3}
-              // Ensure proper bounds for transformer
-              listening={true}
             />
           )
         }
-      
-
       
       default:
         return null
@@ -1593,33 +1503,17 @@ const BannerCanvas = ({
                 {/* Transformer */}
                 <Transformer
                   ref={transformerRef}
-                  boundBoxFunc={(oldBox, newBox) => {
-                    // Ensure minimum size for all elements
+                                    boundBoxFunc={(oldBox, newBox) => {
+                    // Ensure minimum size for all elements (same for all types)
                     const minSize = 10
                     
-                    // For icons, ensure minimum size and proper bounds
-                    if (selectedIds.length === 1) {
-                      const selectedElement = elements.find(el => el.id === selectedIds[0])
-                      if (selectedElement && selectedElement.type === 'icon') {
-                        const minWidth = Math.max(minSize, selectedElement.width || 60)
-                        const minHeight = Math.max(minSize, selectedElement.height || 60)
-                        
-                        return {
-                          ...newBox,
-                          width: Math.max(minWidth, newBox.width),
-                          height: Math.max(minHeight, newBox.height)
-                        }
-                      }
-                    }
-                    
-                    // For other elements, use standard bounds
                     return {
                       ...newBox,
                       width: Math.max(minSize, newBox.width),
                       height: Math.max(minSize, newBox.height)
                     }
                   }}
-                  enabledAnchors={['middle-left', 'middle-right', 'top-middle', 'bottom-middle', 'top-left', 'top-right', 'bottom-left', 'bottom-right']}
+                  enabledAnchors={['middle-left', 'middle-right', 'top-center', 'bottom-center', 'top-left', 'top-right', 'bottom-left', 'bottom-right']}
                   rotateEnabled={true}
                   keepRatio={false}
                   ignoreStroke={false}
@@ -2169,7 +2063,7 @@ const BannerCanvas = ({
             {selectedId && selectedElement?.type === 'text' && (
               <GlassButton 
                 onClick={() => {
-                  console.log('Edit Text button clicked for:', selectedId)
+              
                   handleTextEdit(selectedId);
                 }} 
                 variant="primary" 
