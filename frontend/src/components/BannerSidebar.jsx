@@ -14,7 +14,9 @@ import {
   Copy,
   CornerDownRight,
   FileText,
-  X
+  X,
+  QrCode,
+  Link
 } from 'lucide-react'
 
 const BannerSidebar = ({ 
@@ -29,6 +31,7 @@ const BannerSidebar = ({
   onAddAsset,
   onAddIcon,
   onAddText,
+  onAddQRCode,
   onLoadTemplate,
   onImageUpload,
   onTextPropertyChange,
@@ -44,6 +47,7 @@ const BannerSidebar = ({
     specifications: false,
     shapes: false,
     text: false,
+    qrcode: false,
     templates: false,
     assets: false,
     upload: false
@@ -54,6 +58,11 @@ const BannerSidebar = ({
   const [customWidth, setCustomWidth] = useState('800')
   const [customHeight, setCustomHeight] = useState('400')
   const [uploadedImages, setUploadedImages] = useState([])
+  
+  // QR Code state
+  const [qrUrl, setQrUrl] = useState('https://buyprintz.com')
+  const [qrColor, setQrColor] = useState('#000000')
+  const [qrBackgroundColor, setQrBackgroundColor] = useState('#ffffff')
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [scrollDirection, setScrollDirection] = useState('down')
@@ -1337,6 +1346,117 @@ const BannerSidebar = ({
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+        </GlassCard>
+
+        {/* QR Code Generator */}
+        <GlassCard>
+          <button
+            onClick={() => toggleSection('qrcode')}
+            className="w-full p-4 flex items-center justify-between hover:bg-white/20 active:bg-white/30 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-inset"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-green-400 to-green-500">
+                <QrCode className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-800">QR Code</h3>
+                <p className="text-xs text-gray-500">Generate scannable QR codes</p>
+              </div>
+            </div>
+            {expandedSections.qrcode ? 
+              <ChevronUp className="w-4 h-4 text-gray-500" /> : 
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            }
+          </button>
+
+          {expandedSections.qrcode && (
+            <div className="px-4 pb-4 space-y-4">
+              {/* URL Input */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Website URL</h4>
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="url"
+                    placeholder="https://example.com"
+                    value={qrUrl}
+                    onChange={(e) => setQrUrl(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <button
+                    onClick={() => {
+                      if (qrUrl.trim() && qrUrl.startsWith('http')) {
+                        onAddQRCode(qrUrl.trim(), qrColor, qrBackgroundColor)
+                      } else {
+                        alert('Please enter a valid URL starting with http:// or https://')
+                      }
+                    }}
+                    className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                  >
+                    <QrCode className="w-4 h-4" />
+                    Generate
+                  </button>
+                </div>
+              </div>
+              
+              {/* QR Code Colors */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-gray-700">QR Code Colors</h4>
+                
+                {/* QR Code Color */}
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-600 flex items-center gap-2">
+                    <Palette className="w-3 h-3" />
+                    QR Code Color
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={qrColor}
+                      onChange={(e) => setQrColor(e.target.value)}
+                      className="w-10 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                      title="Choose QR code color"
+                    />
+                    <span className="text-xs text-gray-500 font-mono">
+                      {qrColor}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Background Color */}
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-600 flex items-center gap-2">
+                    <Palette className="w-3 h-3" />
+                    Background Color
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={qrBackgroundColor}
+                      onChange={(e) => setQrBackgroundColor(e.target.value)}
+                      className="w-10 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                      title="Choose background color"
+                    />
+                    <span className="text-xs text-gray-500 font-mono">
+                      {qrBackgroundColor}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Preview */}
+              {qrUrl && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-700">Preview</h4>
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="text-xs text-gray-500 mb-2">URL: {qrUrl}</div>
+                    <div className="text-xs text-gray-500">
+                      Colors: {qrColor} / {qrBackgroundColor}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </GlassCard>

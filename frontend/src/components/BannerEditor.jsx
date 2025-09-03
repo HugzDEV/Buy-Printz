@@ -1,12 +1,17 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import jsPDF from 'jspdf'
+import { QRCodeCanvas } from 'qrcode.react'
+import { createRoot } from 'react-dom/client'
 import { 
   ChevronLeft, 
   Settings, 
   ShoppingCart,
   Menu,
-  X
+  X,
+  QrCode,
+  Link,
+  Palette
 } from 'lucide-react'
 import BannerSidebar from './BannerSidebar'
 import BannerCanvas from './BannerCanvas'
@@ -450,6 +455,65 @@ const BannerEditorNew = () => {
       setElements(prev => [...prev, newIcon])
       setSelectedId(newIcon.id)
     }
+  }, [canvasSize])
+
+  // Add QR code element
+  const addQRCode = useCallback((url, qrColor = '#000000', backgroundColor = '#ffffff') => {
+    // Create a hidden div to render the QR code
+    const qrContainer = document.createElement('div')
+    qrContainer.style.position = 'absolute'
+    qrContainer.style.left = '-9999px'
+    qrContainer.style.top = '-9999px'
+    document.body.appendChild(qrContainer)
+    
+    // Create a temporary React element for the QR code
+    const qrElement = React.createElement(QRCodeCanvas, {
+      value: url,
+      size: 200,
+      fgColor: qrColor,
+      bgColor: backgroundColor,
+      level: 'M', // Medium error correction
+      includeMargin: true
+    })
+    
+    // Render the QR code to the hidden container
+    const root = createRoot(qrContainer)
+    root.render(qrElement)
+    
+    // Wait for the QR code to render, then capture it
+    setTimeout(() => {
+      const canvas = qrContainer.querySelector('canvas')
+      if (canvas) {
+        const qrDataUrl = canvas.toDataURL('image/png')
+        
+        // Create image element from the QR code
+        const img = new window.Image()
+        img.onload = () => {
+          const newQRCode = {
+            id: generateId('qrcode'),
+            type: 'image',
+            x: canvasSize.width / 2 - 100,
+            y: canvasSize.height / 2 - 100,
+            width: 200,
+            height: 200,
+            image: img,
+            rotation: 0,
+            assetName: 'QR Code',
+            qrData: {
+              url: url,
+              color: qrColor,
+              backgroundColor: backgroundColor
+            }
+          }
+          setElements(prev => [...prev, newQRCode])
+          setSelectedId(newQRCode.id)
+        }
+        img.src = qrDataUrl
+        
+        // Clean up the hidden container
+        document.body.removeChild(qrContainer)
+      }
+    }, 100)
   }, [canvasSize])
 
 
@@ -1775,6 +1839,7 @@ const BannerEditorNew = () => {
             onAddIcon={addIcon}
             onLoadTemplate={loadTemplate}
             onImageUpload={handleImageUpload}
+            onAddQRCode={addQRCode}
 
             onTextPropertyChange={handleTextPropertyChange}
             onShapePropertyChange={handleShapePropertyChange}
