@@ -10,7 +10,8 @@ import {
   ShoppingCart,
   X,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  Menu
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 
@@ -42,6 +43,23 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       ),
       placement: 'center',
       disableBeacon: true,
+    },
+    {
+      target: '.mobile-hamburger',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-yellow-100 rounded-full">
+              <Menu className="w-8 h-8 text-yellow-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Mobile Tools Access</h3>
+          <p className="text-gray-600">
+            Tap this button to open all your design tools and options on mobile!
+          </p>
+        </div>
+      ),
+      placement: 'bottom',
     },
     {
       target: '.sidebar-tools',
@@ -150,8 +168,8 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
 
   if (showWelcomeDialog) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <GlassCard className="max-w-md w-full p-6 text-center space-y-6">
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <GlassCard className="max-w-md w-full p-6 text-center space-y-6 bg-white/95 border-2 border-white/50 shadow-2xl">
           <div className="flex justify-center">
             <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
               <Sparkles className="w-12 h-12 text-white" />
@@ -159,14 +177,14 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
           </div>
           
           <div className="space-y-3">
-            <h2 className="text-2xl font-bold text-gray-900">Welcome to BuyPrintz! 🎉</h2>
-            <p className="text-gray-600">
+            <h2 className="text-3xl font-bold text-gray-800">Welcome to BuyPrintz! 🎉</h2>
+            <p className="text-lg text-gray-700 font-medium">
               Create professional banners in minutes with our powerful design tools.
             </p>
           </div>
 
           <div className="space-y-3">
-            <p className="text-sm text-gray-500">
+            <p className="text-base text-gray-600 font-medium">
               Would you like a quick tour to get started?
             </p>
             
