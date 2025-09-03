@@ -29,6 +29,7 @@ const PrintPreviewModal = ({
   const [pdfBlob, setPdfBlob] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [previewImage, setPreviewImage] = useState(null)
+  const [imageScale, setImageScale] = useState(1.5)
 
   // Set preview image when modal opens - NO PDF generation for preview
   useEffect(() => {
@@ -55,6 +56,21 @@ const PrintPreviewModal = ({
       offsetHeight: img.offsetHeight
     })
   }
+
+  // Set image scale based on screen size
+  useEffect(() => {
+    const updateScale = () => {
+      if (window.innerWidth < 768) {
+        setImageScale(2.5) // More aggressive scaling on mobile
+      } else {
+        setImageScale(1.5) // Normal scaling on desktop
+      }
+    }
+    
+    updateScale()
+    window.addEventListener('resize', updateScale)
+    return () => window.removeEventListener('resize', updateScale)
+  }, [])
 
   // Generate PDF only when user approves (for production)
   const generatePDFForProduction = async () => {
@@ -160,22 +176,24 @@ const PrintPreviewModal = ({
                   </div>
                 ) : previewImage ? (
                   <div className="space-y-3 sm:space-y-6">
-                    {/* Main Banner Preview */}
-                    <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        <img
-                          src={previewImage}
-                          alt="Banner Design Preview"
-                          className="max-w-full max-h-full w-auto h-auto rounded border shadow-lg"
-                          style={{
-                            maxWidth: '100%',
-                            maxHeight: '100%',
-                            width: 'auto',
-                            height: 'auto',
-                            objectFit: 'contain'
-                          }}
-                          onLoad={handleImageLoad}
-                        />
+                                         {/* Main Banner Preview */}
+                     <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
+                       <div className="relative w-full flex items-center justify-center">
+                         <img
+                           src={previewImage}
+                           alt="Banner Design Preview"
+                           className="w-full h-auto rounded border shadow-lg"
+                           style={{
+                             width: '100%',
+                             height: 'auto',
+                             minHeight: '300px',
+                             minWidth: '100%',
+                             objectFit: 'contain',
+                             transform: `scale(${imageScale})`,
+                             transformOrigin: 'center center'
+                           }}
+                           onLoad={handleImageLoad}
+                         />
                         
                         {/* BuyPrintz Watermark Overlay - IP Protection */}
                         <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 10 }}>
