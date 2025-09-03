@@ -180,7 +180,9 @@ const PrintPreviewModal = ({
                                            <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-visible sm:overflow-hidden">
                         <div className="relative flex items-center justify-center w-full" style={{ 
                           minHeight: window.innerWidth < 768 ? '180px' : '280px',
-                          maxHeight: window.innerWidth < 768 ? '220px' : '320px'
+                          maxHeight: window.innerWidth < 768 ? '220px' : '320px',
+                          // Mobile positioning adjustments for touchdown
+                          transform: window.innerWidth < 768 ? 'translate(60%, 75%)' : 'none'
                         }}>
                           <img
                             src={previewImage}
@@ -197,7 +199,9 @@ const PrintPreviewModal = ({
                               transformOrigin: 'center center',
                               // Ensure mobile positioning is correct
                               display: 'block',
-                              margin: '0 auto'
+                              margin: '0 auto',
+                              // Mobile positioning for touchdown
+                              position: window.innerWidth < 768 ? 'relative' : 'static'
                             }}
                             onLoad={handleImageLoad}
                           />
