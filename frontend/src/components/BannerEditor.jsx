@@ -1763,10 +1763,10 @@ const BannerEditorNew = () => {
             className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline text-sm font-medium">Dashboard</span>
+            <span className="hidden md:inline text-sm font-medium">Dashboard</span>
           </button>
           
-          <div className="hidden sm:block w-px h-6 bg-white/30" />
+          <div className="hidden md:block w-px h-6 bg-white/30" />
           
           {/* BuyPrintz Logo - Clickable to Homepage */}
           <button
@@ -1781,10 +1781,10 @@ const BannerEditorNew = () => {
           </button>
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Toggle - Show on Mobile Landscape and Portrait */}
         <button
           onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          className="sm:hidden p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center"
+          className="md:hidden p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center"
         >
           {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -1817,13 +1817,14 @@ const BannerEditorNew = () => {
       {/* Header */}
       <GlassHeader />
       
-      {/* Main Content - Mobile Optimized */}
+      {/* Main Content - Mobile Optimized with Landscape Toggle */}
       <div className="flex flex-1 overflow-hidden relative">
         
-        {/* Sidebar - Mobile with proper z-index */}
+        {/* Sidebar - Toggleable on Mobile Landscape, Always Visible on Desktop */}
         <div className={`
-          ${isMobileSidebarOpen ? 'fixed inset-0 z-50' : 'hidden sm:block'}
-          sm:relative sm:inset-auto sm:z-auto
+          ${isMobileSidebarOpen ? 'fixed inset-0 z-50' : 'hidden'}
+          md:block md:relative md:inset-auto md:z-auto
+          transition-all duration-300 ease-in-out
         `}>
           <BannerSidebar
             isMobileOpen={isMobileSidebarOpen}
@@ -1852,11 +1853,13 @@ const BannerEditorNew = () => {
           />
         </div>
         
-        {/* Canvas - Mobile with proper z-index */}
+        {/* Canvas - Centered on Mobile Landscape when Sidebar Closed, Normal on Desktop */}
         <div className={`
           flex-1 relative
-          ${isMobileSidebarOpen ? 'hidden sm:block' : 'block'}
-          z-10 sm:z-auto
+          ${isMobileSidebarOpen ? 'hidden' : 'block'}
+          md:block
+          z-10 md:z-auto
+          transition-all duration-300 ease-in-out
         `}>
           <BannerCanvas
             elements={elements}
@@ -1872,7 +1875,7 @@ const BannerEditorNew = () => {
           
           {/* Mobile Overlay when sidebar is open */}
           {isMobileSidebarOpen && (
-            <div className="sm:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
+            <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
           )}
         </div>
         
