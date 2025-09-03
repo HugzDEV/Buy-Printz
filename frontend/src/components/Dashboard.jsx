@@ -132,13 +132,35 @@ const Dashboard = () => {
     await Promise.all([
       loadDataSafely(
         () => authService.authenticatedRequest('/api/designs'),
-        (data) => setDesigns(data.designs || []),
+        (data) => {
+          const designs = data.designs || []
+          setDesigns(designs)
+          // Filter completed designs from main designs data
+          const completed = designs.filter(design => 
+            design.status === 'completed' || 
+            design.status === 'finished' || 
+            design.status === 'done' ||
+            (design.created_at && !design.updated_at) // Fallback: assume older designs are completed
+          )
+          setCompletedDesigns(completed)
+        },
         [],
         'designs'
       ),
       loadDataSafely(
         () => authService.authenticatedRequest('/api/orders'),
-        (data) => setOrders(data.orders || []),
+        (data) => {
+          const orders = data.orders || []
+          setOrders(orders)
+          // Filter pending orders from main orders data
+          const pending = orders.filter(order => 
+            order.status === 'pending' || 
+            order.status === 'processing' || 
+            order.status === 'new' ||
+            (order.created_at && !order.shipped_at) // Fallback: assume orders without shipping date are pending
+          )
+          setPendingOrders(pending)
+        },
         [],
         'orders'
       )
@@ -154,26 +176,14 @@ const Dashboard = () => {
         (data) => setTemplates(data.templates || []),
         [],
         'templates'
-      ),
-      loadDataSafely(
-        () => authService.authenticatedRequest('/api/orders/pending'),
-        (data) => setPendingOrders(data.orders || []),
-        [],
-        'pendingOrders'
       )
     ])
 
     // Another small delay
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    // Load tertiary data
+    // Load tertiary data - use main endpoints and filter on frontend
     await Promise.all([
-      loadDataSafely(
-        () => authService.authenticatedRequest('/api/designs/completed'),
-        (data) => setCompletedDesigns(data.designs || []),
-        [],
-        'completedDesigns'
-      ),
       loadDataSafely(
         () => authService.authenticatedRequest('/api/user/stats'),
         (data) => setUserStats(data),
