@@ -148,7 +148,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-3 sm:p-4">
+      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-1 sm:p-4">
         <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center gap-2">
             <Printer className="h-5 w-5" />
@@ -156,9 +156,9 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 pb-4 sm:pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
           {/* Left Column - Preview */}
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-2 sm:space-y-4">
                                       <Card>
                <CardHeader className="pb-3 sm:pb-4">
                  <CardTitle className="flex items-center gap-2">
@@ -179,11 +179,8 @@ const PrintPreviewModal = ({
                                          {/* Main Banner Preview */}
                                            <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-visible sm:overflow-hidden">
                         <div className="relative flex items-center justify-center w-full" style={{ 
-                          minHeight: window.innerWidth < 768 ? '200px' : '280px',
-                          maxHeight: window.innerWidth < 768 ? '250px' : '320px',
-                          // Mobile centering adjustments
-                          paddingLeft: window.innerWidth < 768 ? '20px' : '0px',
-                          paddingRight: window.innerWidth < 768 ? '20px' : '0px'
+                          minHeight: window.innerWidth < 768 ? '180px' : '280px',
+                          maxHeight: window.innerWidth < 768 ? '220px' : '320px'
                         }}>
                           <img
                             src={previewImage}
@@ -193,16 +190,14 @@ const PrintPreviewModal = ({
                               width: 'auto',
                               height: 'auto',
                               maxWidth: '100%',
-                              maxHeight: window.innerWidth < 768 ? '200px' : '280px',
-                              minHeight: window.innerWidth < 768 ? '150px' : '250px',
+                              maxHeight: window.innerWidth < 768 ? '180px' : '280px',
+                              minHeight: window.innerWidth < 768 ? '120px' : '250px',
                               objectFit: 'contain',
                               transform: `scale(${imageScale})`,
                               transformOrigin: 'center center',
                               // Ensure mobile positioning is correct
                               display: 'block',
-                              margin: '0 auto',
-                              // Mobile positioning adjustments
-                              position: 'static'
+                              margin: '0 auto'
                             }}
                             onLoad={handleImageLoad}
                           />
@@ -270,7 +265,7 @@ const PrintPreviewModal = ({
           </div>
 
           {/* Right Column - Specifications */}
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-2 sm:space-y-4">
             {/* Print Specifications */}
                          <Card>
               <CardHeader className="pb-3 sm:pb-4">
@@ -332,7 +327,7 @@ const PrintPreviewModal = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3 w-full pt-3 sm:pt-4 border-t mt-3 sm:mt-4 bg-gray-50">
+        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3 w-full pt-2 sm:pt-4 border-t mt-2 sm:mt-4 bg-gray-50">
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
             <Button
               variant="outline"
