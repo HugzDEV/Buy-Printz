@@ -129,7 +129,7 @@ const PrintPreviewModal = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 pb-4 sm:pb-8">
           {/* Left Column - Preview */}
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-6">
             <Card>
               <CardHeader className="pb-3 sm:pb-4">
                 <CardTitle className="flex items-center gap-2">
@@ -137,27 +137,28 @@ const PrintPreviewModal = ({
                   Design Preview
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 sm:space-y-6">
+              <CardContent className="space-y-3 sm:space-y-6">
                 {isGenerating ? (
-                  <div className="flex items-center justify-center p-6 sm:p-12">
+                  <div className="flex items-center justify-center p-4 sm:p-12">
                     <div className="text-center space-y-2">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                       <p className="text-sm text-gray-600">Generating your banner preview...</p>
                     </div>
                   </div>
                 ) : previewImage ? (
-                  <div className="space-y-4 sm:space-y-6">
+                  <div className="space-y-3 sm:space-y-6">
                     {/* Main Banner Preview */}
-                    <div className="bg-gray-100 rounded-lg p-3 sm:p-6 flex items-center justify-center">
+                    <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center">
                       <div className="relative w-full">
                         <img
                           src={previewImage}
                           alt="Banner Design Preview"
-                          className="w-full max-h-60 sm:max-h-80 rounded border shadow-lg"
+                          className="w-full h-auto rounded border shadow-lg"
                           style={{
                             width: '100%',
                             height: 'auto',
-                            objectFit: 'contain'
+                            maxHeight: 'none',
+                            minHeight: '200px'
                           }}
                         />
                         
@@ -183,7 +184,7 @@ const PrintPreviewModal = ({
                     </div>
 
                     {/* Print Information */}
-                    <div className="bg-green-50 rounded-lg p-3 sm:p-4">
+                    <div className="bg-green-50 rounded-lg p-2 sm:p-4">
                       <div className="text-center">
                         <p className="text-sm font-medium text-green-900">
                           {dimensions.width}ft × {dimensions.height}ft - Production Ready
@@ -195,7 +196,7 @@ const PrintPreviewModal = ({
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -224,48 +225,48 @@ const PrintPreviewModal = ({
           </div>
 
           {/* Right Column - Specifications */}
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-6">
             {/* Print Specifications */}
             <Card>
-              <CardHeader className="pb-3 sm:pb-4">
+              <CardHeader className="pb-2 sm:pb-4">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Print Specifications
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-3 sm:p-6">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
-                  <div className="space-y-2">
+              <CardContent className="p-2 sm:p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-6">
+                  <div className="space-y-1 sm:space-y-2">
                     <p className="text-sm font-medium text-gray-600">Dimensions</p>
                     <Badge variant="outline">
                       {dimensions.width}ft × {dimensions.height}ft
                     </Badge>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <p className="text-sm font-medium text-gray-600">Material</p>
                     <Badge variant="outline">
                       {orderDetails.banner_material || 'Standard Vinyl'}
                     </Badge>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <p className="text-sm font-medium text-gray-600">Finish</p>
                     <Badge variant="outline">
                       {orderDetails.banner_finish || 'Matte'}
                     </Badge>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <p className="text-sm font-medium text-gray-600">Quantity</p>
                     <Badge variant="outline">
                       {orderDetails.quantity} piece(s)
                     </Badge>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <p className="text-sm font-medium text-gray-600">Resolution</p>
                     <Badge variant="outline" className="bg-green-50 text-green-700">
                       300 DPI
                     </Badge>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <p className="text-sm font-medium text-gray-600">Color Profile</p>
                     <Badge variant="outline" className="bg-blue-50 text-blue-700">
                       CMYK
@@ -276,7 +277,7 @@ const PrintPreviewModal = ({
             </Card>
 
             {/* Print Ready Status */}
-            <Alert variant="success" className="p-3 sm:p-4">
+            <Alert variant="success" className="p-2 sm:p-4">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
                 <strong>Ready for Production!</strong><br />
@@ -286,8 +287,8 @@ const PrintPreviewModal = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-3 w-full pt-4 sm:pt-6 border-t mt-4 sm:mt-6 bg-gray-50">
-          <div className="flex flex-col sm:flex-row gap-3 w-full">
+        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3 w-full pt-3 sm:pt-6 border-t mt-3 sm:mt-6 bg-gray-50">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
             <Button
               variant="outline"
               onClick={onClose}
@@ -307,10 +308,7 @@ const PrintPreviewModal = ({
             </Button>
           </div>
           
-          {/* Debug indicator for mobile */}
-          <div className="text-xs text-gray-500 text-center sm:hidden">
-            Footer visible - {orderDetails?.canvas_image ? 'Image ready' : 'No image available'}
-          </div>
+
         </DialogFooter>
       </DialogContent>
     </Dialog>
