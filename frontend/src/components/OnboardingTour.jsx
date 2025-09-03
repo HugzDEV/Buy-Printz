@@ -18,6 +18,7 @@ import { GlassCard, GlassButton } from './ui'
 const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
   const [runTour, setRunTour] = useState(false)
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(true)
+  const [tourReady, setTourReady] = useState(false)
 
   useEffect(() => {
     if (isFirstTimeUser) {
@@ -238,6 +239,14 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
   // Select appropriate tour steps based on device
   const tourSteps = isMobile ? mobileTourSteps : desktopTourSteps
 
+  // Mark tour as ready when steps are available
+  useEffect(() => {
+    if (tourSteps && tourSteps.length > 0) {
+      setTourReady(true)
+      console.log('Tour steps initialized:', tourSteps.length, 'steps for', isMobile ? 'mobile' : 'desktop')
+    }
+  }, [tourSteps, isMobile])
+
   // Debug: Log tour steps and device type
   useEffect(() => {
     if (runTour) {
@@ -265,11 +274,22 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
 
   const handleStartTour = () => {
     setShowWelcomeDialog(false)
-    // Add a longer delay to ensure DOM elements are fully rendered
-    setTimeout(() => {
+    
+    // Wait for tour to be ready
+    const waitForTour = () => {
+      if (!tourReady) {
+        console.log('Waiting for tour to be ready...')
+        setTimeout(waitForTour, 100)
+        return
+      }
+      
+      console.log('Tour ready, checking targets...')
+      
       // Check if target elements exist before starting tour
       const checkTargets = () => {
         const targets = tourSteps.map(step => step.target)
+        console.log('Checking targets:', targets)
+        
         const missingTargets = targets.filter(target => !document.querySelector(target))
         
         if (missingTargets.length > 0) {
@@ -283,7 +303,9 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       }
       
       checkTargets()
-    }, 300)
+    }
+    
+    waitForTour()
   }
 
   const handleSkipTour = () => {
