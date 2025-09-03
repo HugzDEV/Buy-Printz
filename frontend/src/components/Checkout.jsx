@@ -597,19 +597,19 @@ const Checkout = () => {
         </div>
 
         {/* Order Summary Card - Sticky Container */}
-        <div className="sticky top-0 z-20 mb-6">
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Package className="w-8 h-8 text-blue-600" />
+        <div className="sticky top-0 z-20 mb-4 sm:mb-6">
+          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-3 sm:p-4 lg:p-6 border border-white/30 shadow-xl">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Package className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Order Summary</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Order Summary</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">
                     {orderData?.dimensions?.width || 2}ft × {orderData?.dimensions?.height || 4}ft Banner
                     {bannerOptions.quantity > 1 && ` × ${bannerOptions.quantity}`}
                     {bannerOptions.sides === 2 && ' (Double Sided)'}
                   </p>
-                  <p className="text-sm text-blue-600 font-medium">
+                  <p className="text-xs sm:text-sm text-blue-600 font-medium">
                     {bannerOptions.material ? 
                       Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1] ? 
                       `${Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1]}/sqft` : 
@@ -620,10 +620,10 @@ const Checkout = () => {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-xl sm:text-2xl font-bold text-green-600">
                   ${totalAmount.toFixed(2)}
                 </p>
-                <p className="text-sm text-gray-600">Total (including all options & shipping)</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total (including all options & shipping)</p>
                 <div className="text-xs text-gray-500 mt-1">
                   <p>Base: ${(basePrice * bannerOptions.quantity).toFixed(2)}</p>
                   <p>Options: +${optionsTotal.toFixed(2)}</p>
