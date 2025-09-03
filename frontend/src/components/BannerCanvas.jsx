@@ -84,15 +84,15 @@ const BannerCanvas = ({
       
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
-        const viewportWidth = window.innerWidth - 48 // Account for padding
-        const viewportHeight = window.innerHeight - 320 // Account for header, toolbar, bottom actions, and safe area
+        const viewportWidth = window.innerWidth - 32 // Reduced padding for mobile
+        const viewportHeight = window.innerHeight - 280 // Reduced height allocation for bottom actions
         
-        const scaleX = (viewportWidth * 0.85) / canvasSize.width // Use 85% of available width
-        const scaleY = (viewportHeight * 0.85) / canvasSize.height // Use 85% of available height
+        const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
+        const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
         
         // Use the smaller scale to ensure canvas fits completely
         const newScale = Math.min(scaleX, scaleY, 1)
-        setScale(Math.max(0.12, newScale)) // Minimum scale of 0.12 for mobile
+        setScale(Math.max(0.15, newScale)) // Slightly higher minimum scale for better interaction
       } else if (isTablet) {
         // Tablet scaling - slightly more generous
         const viewportWidth = window.innerWidth - 48
@@ -1294,7 +1294,7 @@ const BannerCanvas = ({
 
       {/* Canvas Area - Mobile Optimized */}
       <div className={`flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden relative transition-all duration-300 ease-in-out ${
-        selectedId || selectedIds.length > 0 ? 'pb-32 sm:pb-32' : 'pb-20 sm:pb-20'
+        selectedId || selectedIds.length > 0 ? 'pb-20 sm:pb-32' : 'pb-20 sm:pb-20'
       }`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
@@ -1637,23 +1637,24 @@ const BannerCanvas = ({
 
       {/* Bottom Actions - Consolidated Interface */}
       <div className={`
-        absolute bottom-0 left-0 right-0 p-2 sm:p-4 border-t border-white/20 
-        bg-gradient-to-br from-gray-50 to-gray-100
+        absolute bottom-0 left-0 right-0 border-t border-white/20 
+        bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
         transform transition-transform duration-300 ease-in-out
-        max-h-[40vh] overflow-y-auto
+        max-h-[35vh] sm:max-h-[40vh] overflow-y-auto
+        z-[60] shadow-2xl
         ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
       `}>
-        <GlassPanel className="flex flex-col gap-3 sm:gap-4 max-h-full">
+        <div className="flex flex-col gap-2 sm:gap-4 max-h-full p-2 sm:p-4">
           
                 {/* Text Editing Hint */}
       {selectedId && selectedElement?.type === 'text' && (
-        <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded text-center">
+        <div className="text-xs text-blue-600 bg-blue-50 p-1.5 sm:p-2 rounded text-center">
           💡 Use the Edit Text button below to edit text
         </div>
       )}
           
           {/* Top Row - DPI Info, Selection Count, and Close Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-2">
             {/* Close Button */}
             <GlassButton
               onClick={() => {
@@ -1661,14 +1662,14 @@ const BannerCanvas = ({
                 setSelectedId(null);
                 setSelectedIds([]);
               }}
-              className="p-2 rounded-full self-start sm:self-center"
+              className="p-1.5 sm:p-2 rounded-full self-start sm:self-center"
               title="Hide element properties"
             >
-              <EyeOff className="w-4 h-4" />
+              <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
             </GlassButton>
             {/* DPI Information for Selected Image */}
             {selectedId && getSelectedElementDPI() && (
-              <div className="flex items-center gap-2 p-2 bg-white/20 rounded-lg border border-white/30">
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2">
                 <div className="text-xs sm:text-sm">
                   <div className="flex items-center gap-1">
                     <span className="font-medium">DPI:</span>
@@ -1716,7 +1717,7 @@ const BannerCanvas = ({
           
           {/* Middle Row - Text Properties */}
           {selectedId && selectedElement?.type === 'text' && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 p-3 bg-white/20 rounded-lg border border-white/30 overflow-x-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 p-2 sm:p-3 overflow-x-auto">
               {/* Text Color Picker */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Color:</span>
@@ -1822,7 +1823,7 @@ const BannerCanvas = ({
              ['heart', 'diamond', 'arrow', 'arrow-right', 'arrow-left', 'arrow-up', 'arrow-down', 'double-arrow', 'cross', 'crown', 'badge', 'certificate', 'document', 'checkmark', 'target'].includes(selectedElement?.type)
             )
           ) && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 p-3 bg-white/20 rounded-lg border border-white/30 overflow-x-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 p-2 sm:p-3 overflow-x-auto">
               {/* Fill Color Picker */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Fill:</span>
@@ -1884,43 +1885,43 @@ const BannerCanvas = ({
           )}
           
           {/* Bottom Row - Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 w-full overflow-x-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 w-full overflow-x-auto">
             {/* Layer Controls */}
             <div className="flex gap-1">
               <GlassButton 
                 onClick={sendToBack} 
                 disabled={!canSendBack}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Send to Back"
               >
-                <SendToBack className="w-4 h-4" />
+                <SendToBack className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={sendBack} 
                 disabled={!canSendBack}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Send Back"
               >
-                <MoveDown className="w-4 h-4" />
+                <MoveDown className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={bringForward} 
                 disabled={!canBringForward}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Bring Forward"
               >
-                <MoveUp className="w-4 h-4" />
+                <MoveUp className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={bringToFront} 
                 disabled={!canBringForward}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Bring to Front"
               >
-                <Layers className="w-4 h-4" />
+                <Layers className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
             </div>
             
@@ -1943,14 +1944,14 @@ const BannerCanvas = ({
             )}
             
             {/* Duplicate and Delete */}
-            <div className="flex gap-2">
-              <GlassButton onClick={duplicateSelected} className="px-3 py-2 flex items-center justify-center">
-                <Copy className="w-4 h-4 mr-1" />
+            <div className="flex gap-1.5 sm:gap-2">
+              <GlassButton onClick={duplicateSelected} className="px-2 sm:px-3 py-1.5 sm:py-2 flex items-center justify-center">
+                <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 <span className="text-xs">Duplicate</span>
               </GlassButton>
               
-              <GlassButton onClick={deleteSelected} variant="danger" className="px-3 py-2 flex items-center justify-center">
-                <Trash2 className="w-4 h-4 mr-1" />
+              <GlassButton onClick={deleteSelected} variant="danger" className="px-2 sm:px-3 py-1.5 sm:py-2 flex items-center justify-center">
+                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 <span className="text-xs">Delete</span>
               </GlassButton>
             </div>
@@ -1963,23 +1964,23 @@ const BannerCanvas = ({
               <GlassButton 
                 onClick={undo} 
                 disabled={historyStep <= 0}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Undo"
               >
-                <Undo className="w-4 h-4" />
+                <Undo className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={redo} 
                 disabled={historyStep >= history.length - 1}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Redo"
               >
-                <Redo className="w-4 h-4" />
+                <Redo className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
             </div>
           </div>
-        </GlassPanel>
+        </div>
       </div>
 
       {/* Custom GlassUI Text Editing Modal */}

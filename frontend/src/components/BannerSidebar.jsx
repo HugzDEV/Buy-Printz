@@ -1684,17 +1684,7 @@ const BannerSidebar = ({
 
       </div>
       
-      {/* Scroll Position Indicator */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-        <div 
-          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
-          style={{
-            width: sidebarRef.current ? 
-              `${(sidebarRef.current.scrollTop / (sidebarRef.current.scrollHeight - sidebarRef.current.clientHeight)) * 100}%` : 
-              '0%'
-          }}
-        />
-      </div>
+
     </div>
   )
 }
