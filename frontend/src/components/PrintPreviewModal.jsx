@@ -177,12 +177,12 @@ const PrintPreviewModal = ({
                  ) : previewImage ? (
                    <div className="space-y-3 sm:space-y-4">
                                          {/* Main Banner Preview */}
-                                                                                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-visible">
+                                                                                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
                         <div className="relative flex items-center justify-center w-full" style={{ 
-                          minHeight: window.innerWidth < 768 ? '180px' : '280px',
-                          maxHeight: window.innerWidth < 768 ? '220px' : '320px',
-                          // Mobile positioning adjustments - 30% larger, ultimate positioning with safeprint visibility
-                          transform: window.innerWidth < 768 ? 'translate(70%, 70%) scale(1.3)' : 'none'
+                          minHeight: window.innerWidth < 768 ? '200px' : '280px',
+                          maxHeight: window.innerWidth < 768 ? '240px' : '320px',
+                          // Mobile positioning adjustments - 30% larger, ultimate positioning
+                          transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.3)' : 'none'
                         }}>
                           <img
                             src={previewImage}
@@ -215,11 +215,9 @@ const PrintPreviewModal = ({
                                top: 0,
                                left: 0,
                                zIndex: 10,
-                               // Mobile positioning to match canvas transform
-                               transform: window.innerWidth < 768 ? 'translate(70%, 70%) scale(1.3)' : 'none',
-                               // Ensure watermark is visible
                                opacity: 0.3,
-                               pointerEvents: 'none'
+                               // Mobile positioning to match canvas transform
+                               transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.3)' : 'none'
                              }}
                            />
                          </div>
@@ -227,7 +225,7 @@ const PrintPreviewModal = ({
                         <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ 
                           zIndex: 20,
                           // Mobile positioning to match canvas transform
-                          transform: window.innerWidth < 768 ? 'translate(70%, 70%) scale(1.3)' : 'none'
+                          transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.3)' : 'none'
                         }}>
                           Preview
                         </div>
