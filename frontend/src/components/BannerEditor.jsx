@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import BannerSidebar from './BannerSidebar'
 import BannerCanvas from './BannerCanvas'
+import OnboardingTour from './OnboardingTour'
 import authService from '../services/auth'
 
 const BannerEditorNew = () => {
@@ -26,10 +27,22 @@ const BannerEditorNew = () => {
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
+  // Tour state
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false)
+  const [showTour, setShowTour] = useState(false)
+  
   // Canvas configuration
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 })
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState('landscape') // 'landscape' or 'portrait'
+  
+  // Check if user is first time user
+  useEffect(() => {
+    const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
+    if (!tourCompleted) {
+      setIsFirstTimeUser(true)
+    }
+  }, [])
   
   // Banner size presets - Standard banner dimensions (H x W format)
   const bannerSizes = [
@@ -1925,7 +1938,7 @@ const BannerEditorNew = () => {
         </button>
 
         {/* Right Section */}
-        <div className="hidden sm:flex items-center gap-2 md:gap-3">
+        <div className="action-buttons hidden sm:flex items-center gap-2 md:gap-3">
           <button
             onClick={saveDesign}
             className="px-3 md:px-4 py-1.5 md:py-2 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
@@ -1954,7 +1967,7 @@ const BannerEditorNew = () => {
   )
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 overflow-hidden">
+    <div className="final-step h-screen flex flex-col bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 overflow-hidden">
       
       {/* Header */}
       <GlassHeader />
@@ -1964,6 +1977,7 @@ const BannerEditorNew = () => {
         
         {/* Sidebar - Toggleable on Mobile Landscape, Always Visible on Desktop */}
         <div className={`
+          sidebar-tools
           ${isMobileSidebarOpen ? 'fixed inset-0 z-50' : 'hidden'}
           md:block md:relative md:inset-auto md:z-auto
           transition-all duration-300 ease-in-out
@@ -1997,7 +2011,7 @@ const BannerEditorNew = () => {
         
         {/* Canvas - Centered on Mobile Landscape when Sidebar Closed, Normal on Desktop */}
         <div className={`
-          flex-1 relative
+          canvas-container flex-1 relative
           ${isMobileSidebarOpen ? 'hidden' : 'block'}
           md:block
           z-10 md:z-auto
@@ -2015,13 +2029,29 @@ const BannerEditorNew = () => {
             onCreateOrder={createOrder}
           />
           
-          {/* Mobile Overlay when sidebar is open */}
-          {isMobileSidebarOpen && (
-            <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
-          )}
-        </div>
-        
-      </div>
+                {/* Mobile Overlay when sidebar is open */}
+      {isMobileSidebarOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
+      )}
+    </div>
+    
+    {/* Onboarding Tour */}
+    <OnboardingTour
+      isFirstTimeUser={isFirstTimeUser}
+      onTourComplete={() => {
+        setShowTour(false)
+        setIsFirstTimeUser(false)
+        // Store in localStorage that user has seen the tour
+        localStorage.setItem('buyprintz-tour-completed', 'true')
+      }}
+      onSkipTour={() => {
+        setShowTour(false)
+        setIsFirstTimeUser(false)
+        // Store in localStorage that user has seen the tour
+        localStorage.setItem('buyprintz-tour-completed', 'true')
+      }}
+    />
+  </div>
 
 
       

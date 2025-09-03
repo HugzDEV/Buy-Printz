@@ -1229,7 +1229,7 @@ const BannerCanvas = ({
         <GlassPanel className="flex items-center justify-between gap-1">
           
           {/* Left Section - Zoom Controls */}
-          <div className="flex items-center gap-1">
+          <div className="zoom-controls flex items-center gap-1">
             {/* Desktop: Undo/Redo + Zoom */}
             <div className="hidden sm:flex items-center gap-1">
               <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
@@ -1316,7 +1316,7 @@ const BannerCanvas = ({
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className={`absolute top-16 sm:top-20 left-0 right-0 bottom-4 md:bottom-20 flex items-start justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
+      <div className={`element-selection absolute top-16 sm:top-20 left-0 right-0 bottom-4 md:bottom-20 flex items-start justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           

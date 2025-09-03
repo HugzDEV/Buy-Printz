@@ -14,8 +14,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 
 # Import our modules
-from backend.database import db_manager
-from backend.auth import auth_manager, get_current_user
+from database import db_manager
+from auth import auth_manager, get_current_user
 
 # Load environment variables
 load_dotenv()

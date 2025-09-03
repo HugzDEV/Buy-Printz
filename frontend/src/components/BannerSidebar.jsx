@@ -58,7 +58,7 @@ const BannerSidebar = ({
   const [customWidth, setCustomWidth] = useState('800')
   const [customHeight, setCustomHeight] = useState('400')
   const [uploadedImages, setUploadedImages] = useState([])
-  
+
   // QR Code state
   const [qrUrl, setQrUrl] = useState('https://buyprintz.com')
   const [qrColor, setQrColor] = useState('#000000')
