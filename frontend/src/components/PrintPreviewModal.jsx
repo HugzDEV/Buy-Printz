@@ -61,7 +61,7 @@ const PrintPreviewModal = ({
   useEffect(() => {
     const updateScale = () => {
       if (window.innerWidth < 768) {
-        setImageScale(3.0) // Much more aggressive scaling on mobile
+        setImageScale(2.0) // Moderate scaling on mobile for better fit
       } else {
         setImageScale(1.0) // No scaling on desktop to maintain original behavior
       }
@@ -177,10 +177,10 @@ const PrintPreviewModal = ({
                  ) : previewImage ? (
                    <div className="space-y-3 sm:space-y-4">
                                          {/* Main Banner Preview */}
-                                           <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
-                        <div className="relative flex items-center justify-center" style={{ 
-                          minHeight: window.innerWidth < 768 ? '250px' : '280px',
-                          maxHeight: window.innerWidth < 768 ? '350px' : '320px'
+                                           <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-visible sm:overflow-hidden">
+                        <div className="relative flex items-center justify-center w-full" style={{ 
+                          minHeight: window.innerWidth < 768 ? '300px' : '280px',
+                          maxHeight: window.innerWidth < 768 ? '400px' : '320px'
                         }}>
                           <img
                             src={previewImage}
@@ -190,11 +190,14 @@ const PrintPreviewModal = ({
                               width: 'auto',
                               height: 'auto',
                               maxWidth: '100%',
-                              maxHeight: window.innerWidth < 768 ? '300px' : '280px',
-                              minHeight: window.innerWidth < 768 ? '200px' : '250px',
+                              maxHeight: window.innerWidth < 768 ? '350px' : '280px',
+                              minHeight: window.innerWidth < 768 ? '250px' : '250px',
                               objectFit: 'contain',
                               transform: `scale(${imageScale})`,
-                              transformOrigin: 'center center'
+                              transformOrigin: 'center center',
+                              // Ensure mobile positioning is correct
+                              display: 'block',
+                              margin: '0 auto'
                             }}
                             onLoad={handleImageLoad}
                           />
