@@ -90,7 +90,7 @@ const BannerCanvas = ({
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
         const viewportWidth = window.innerWidth - 16 // Minimal padding for mobile
-        const viewportHeight = window.innerHeight - 120 // Reduced height allocation since canvas is closer to toolbar
+        const viewportHeight = window.innerHeight - 100 // Reduced height allocation since canvas is much closer to toolbar
         
         const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
         const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
@@ -1225,7 +1225,7 @@ const BannerCanvas = ({
     <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 relative">
       
       {/* Top Toolbar - Mobile Responsive */}
-      <div className="p-1 sm:p-2 border-b border-white/20">
+      <div className="p-1 border-b border-white/20">
         <GlassPanel className="flex items-center justify-between gap-1">
           
           {/* Left Section - Zoom Controls */}
@@ -1316,7 +1316,7 @@ const BannerCanvas = ({
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className={`absolute inset-0 top-10 sm:top-16 flex items-center justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
+      <div className={`absolute inset-0 top-8 sm:top-12 flex items-center justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
