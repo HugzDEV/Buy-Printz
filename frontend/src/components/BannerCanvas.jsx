@@ -18,6 +18,7 @@ import {
   Minimize2,
   Save,
   Download,
+  ShoppingCart,
   SendToBack,
   MoveDown,
   MoveUp,
@@ -27,8 +28,7 @@ import {
   Redo,
   ArrowUp,
   ArrowDown,
-  X,
-  ShoppingCart
+  X
 } from 'lucide-react'
 import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
@@ -90,7 +90,7 @@ const BannerCanvas = ({
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
         const viewportWidth = window.innerWidth - 32 // Reduced padding for mobile
-        const viewportHeight = window.innerHeight - 200 // Reduced height allocation since no bottom buttons
+        const viewportHeight = window.innerHeight - 240 // Increased height allocation for top spacing
         
         const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
         const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
@@ -1229,28 +1229,47 @@ const BannerCanvas = ({
         <GlassPanel className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
           
           {/* Left Controls - Mobile Stacked */}
-          <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-center sm:justify-start overflow-x-auto">
-            <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              <Undo2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
+          <div className="flex items-center gap-2 sm:gap-2 w-full sm:w-auto justify-center sm:justify-start">
+            {/* Mobile: Only zoom controls + save/order buttons */}
+            {/* Desktop: Full toolbar with undo/redo, grid, guides */}
+            <div className="sm:hidden flex items-center gap-2">
+              <GlassButton onClick={zoomOut} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <ZoomOut className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[60px] min-h-[44px] flex items-center justify-center">
+                {Math.round(scale * 100)}%
+              </GlassButton>
+              
+              <GlassButton onClick={zoomIn} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <ZoomIn className="w-4 h-4" />
+              </GlassButton>
+            </div>
             
-            <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              <Redo2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
-            
-            <div className="w-px h-6 sm:h-6 bg-white/20 mx-1 sm:mx-2 flex-shrink-0" />
-            
-            <GlassButton onClick={zoomOut} className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              <ZoomOut className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
-            
-            <GlassButton onClick={resetZoom} className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm min-w-[50px] sm:min-w-[60px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              {Math.round(scale * 100)}%
-            </GlassButton>
-            
-            <GlassButton onClick={zoomIn} className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              <ZoomIn className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
+            {/* Desktop: Full left controls */}
+            <div className="hidden sm:flex items-center gap-2">
+              <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <Undo2 className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <Redo2 className="w-4 h-4" />
+              </GlassButton>
+              
+              <div className="w-px h-6 bg-white/20 mx-2" />
+              
+              <GlassButton onClick={zoomOut} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <ZoomOut className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[60px] min-h-[44px] flex items-center justify-center">
+                {Math.round(scale * 100)}%
+              </GlassButton>
+              
+              <GlassButton onClick={zoomIn} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <ZoomIn className="w-4 h-4" />
+              </GlassButton>
+            </div>
           </div>
 
           {/* Center Info - Mobile Hidden */}
@@ -1264,45 +1283,55 @@ const BannerCanvas = ({
           </div>
 
           {/* Right Controls - Mobile Stacked */}
-          <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-center sm:justify-end overflow-x-auto">
-            <GlassButton 
-              onClick={() => setShowGrid(!showGrid)} 
-              variant={showGrid ? "primary" : "default"}
-              className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0"
-              title={showGrid ? "Hide Grid" : "Show Grid"}
-            >
-              <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
+          <div className="flex items-center gap-2 sm:gap-2 w-full sm:w-auto justify-center sm:justify-end">
+            {/* Mobile: Save and Order buttons only */}
+            <div className="sm:hidden flex items-center gap-2">
+              <GlassButton onClick={onSave} variant="success" className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" title="Save Design">
+                <Save className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton onClick={onCreateOrder} variant="primary" className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" title="Create Order">
+                <ShoppingCart className="w-4 h-4" />
+              </GlassButton>
+            </div>
             
-            <GlassButton 
-              onClick={() => setShowGuides(!showGuides)} 
-              variant={showGuides ? "primary" : "default"}
-              className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0"
-              title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
-            >
-              {showGuides ? <Eye className="w-3 h-3 sm:w-4 sm:h-4" /> : <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />}
-            </GlassButton>
-            
-            <div className="w-px h-6 sm:h-6 bg-white/20 mx-1 sm:mx-2 flex-shrink-0" />
-            
-            <GlassButton onClick={onSave} variant="success" className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              <Save className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
-            
-            <GlassButton onClick={onCreateOrder} variant="primary" className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
-            
-            <GlassButton onClick={onExport} variant="primary" className="p-1.5 sm:p-2 min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center flex-shrink-0">
-              <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-            </GlassButton>
+            {/* Desktop: Full right controls */}
+            <div className="hidden sm:flex items-center gap-2">
+              <GlassButton 
+                onClick={() => setShowGrid(!showGrid)} 
+                variant={showGrid ? "primary" : "default"}
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                title={showGrid ? "Hide Grid" : "Show Grid"}
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={() => setShowGuides(!showGuides)} 
+                variant={showGuides ? "primary" : "default"}
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                title={showGrid ? "Hide Safe Zone" : "Show Safe Zone"}
+              >
+                {showGuides ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              </GlassButton>
+              
+              <div className="w-px h-6 bg-white/20 mx-2" />
+              
+              <GlassButton onClick={onSave} variant="success" className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <Save className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton onClick={onExport} variant="primary" className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                <Download className="w-4 h-4" />
+              </GlassButton>
+            </div>
           </div>
           
         </GlassPanel>
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className={`absolute inset-0 top-16 sm:top-20 flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-all duration-300 ease-in-out`}>
+      <div className={`absolute inset-0 top-20 sm:top-20 flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-all duration-300 ease-in-out`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
@@ -1648,16 +1677,16 @@ const BannerCanvas = ({
           fixed bottom-0 left-0 right-0 border-t border-white/20 
           bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
           transform transition-transform duration-300 ease-in-out
-          max-h-[30vh] sm:max-h-[35vh] overflow-y-auto
+          max-h-[35vh] sm:max-h-[40vh] overflow-y-auto
           shadow-2xl z-50
           ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
         `}
       >
-        <div className="flex flex-col gap-1 sm:gap-2 max-h-full p-1 sm:p-2">
+        <div className="flex flex-col gap-2 sm:gap-4 max-h-full p-2 sm:p-4">
           
                 {/* Text Editing Hint */}
       {selectedId && selectedElement?.type === 'text' && (
-        <div className="text-xs text-blue-600 bg-blue-50 p-1 sm:p-1.5 rounded text-center">
+        <div className="text-xs text-blue-600 bg-blue-50 p-1.5 sm:p-2 rounded text-center">
           💡 Use the Edit Text button below to edit text
         </div>
       )}
@@ -1671,14 +1700,14 @@ const BannerCanvas = ({
                 setSelectedId(null);
                 setSelectedIds([]);
               }}
-              className="p-1 sm:p-1.5 rounded-full self-start sm:self-center"
+              className="p-1.5 sm:p-2 rounded-full self-start sm:self-center"
               title="Hide element properties"
             >
-              <EyeOff className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+              <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
             </GlassButton>
             {/* DPI Information for Selected Image */}
             {selectedId && getSelectedElementDPI() && (
-              <div className="flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5">
+              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2">
                 <div className="text-xs sm:text-sm">
                   <div className="flex items-center gap-1">
                     <span className="font-medium">DPI:</span>
@@ -1726,7 +1755,7 @@ const BannerCanvas = ({
           
           {/* Middle Row - Text Properties */}
           {selectedId && selectedElement?.type === 'text' && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-3 p-1.5 sm:p-2 overflow-x-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 p-2 sm:p-3 overflow-x-auto">
               {/* Text Color Picker */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Color:</span>
@@ -1832,7 +1861,7 @@ const BannerCanvas = ({
              ['heart', 'diamond', 'arrow', 'arrow-right', 'arrow-left', 'arrow-up', 'arrow-down', 'double-arrow', 'cross', 'crown', 'badge', 'certificate', 'document', 'checkmark', 'target'].includes(selectedElement?.type)
             )
           ) && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-3 p-1.5 sm:p-2 overflow-x-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 p-2 sm:p-3 overflow-x-auto">
               {/* Fill Color Picker */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Fill:</span>
@@ -1894,43 +1923,43 @@ const BannerCanvas = ({
           )}
           
           {/* Bottom Row - Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 w-full overflow-x-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 w-full overflow-x-auto">
             {/* Layer Controls */}
             <div className="flex gap-1">
               <GlassButton 
                 onClick={sendToBack} 
                 disabled={!canSendBack}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Send to Back"
               >
-                <SendToBack className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <SendToBack className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={sendBack} 
                 disabled={!canSendBack}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Send Back"
               >
-                <MoveDown className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <MoveDown className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={bringForward} 
                 disabled={!canBringForward}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Bring Forward"
               >
-                <MoveUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <MoveUp className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={bringToFront} 
                 disabled={!canBringForward}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
                 title="Bring to Front"
               >
-                <Layers className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <Layers className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
             </div>
             
@@ -1953,14 +1982,14 @@ const BannerCanvas = ({
             )}
             
             {/* Duplicate and Delete */}
-            <div className="flex gap-1 sm:gap-1.5">
-              <GlassButton onClick={duplicateSelected} className="px-1.5 sm:px-2 py-1 sm:py-1.5 flex items-center justify-center">
-                <Copy className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
+            <div className="flex gap-1.5 sm:gap-2">
+              <GlassButton onClick={duplicateSelected} className="px-2 sm:px-3 py-1.5 sm:py-2 flex items-center justify-center">
+                <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 <span className="text-xs">Duplicate</span>
               </GlassButton>
               
-              <GlassButton onClick={deleteSelected} variant="danger" className="px-1.5 sm:px-2 py-1 sm:py-1.5 flex items-center justify-center">
-                <Trash2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
+              <GlassButton onClick={deleteSelected} variant="danger" className="px-2 sm:px-3 py-1.5 sm:py-2 flex items-center justify-center">
+                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 <span className="text-xs">Delete</span>
               </GlassButton>
             </div>
@@ -1973,19 +2002,19 @@ const BannerCanvas = ({
               <GlassButton 
                 onClick={undo} 
                 disabled={historyStep <= 0}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Undo"
               >
-                <Undo className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <Undo className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={redo} 
                 disabled={historyStep >= history.length - 1}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-1.5 sm:p-2 min-w-[32px] sm:min-w-[36px] min-h-[32px] sm:min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Redo"
               >
-                <Redo className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <Redo className="w-3 h-3 sm:w-4 sm:h-4" />
               </GlassButton>
             </div>
           </div>
