@@ -177,7 +177,7 @@ const PrintPreviewModal = ({
                  ) : previewImage ? (
                    <div className="space-y-3 sm:space-y-4">
                                          {/* Main Banner Preview */}
-                                                                                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-visible sm:overflow-hidden">
+                                                                                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
                         <div className="relative flex items-center justify-center w-full" style={{ 
                           minHeight: window.innerWidth < 768 ? '180px' : '280px',
                           maxHeight: window.innerWidth < 768 ? '220px' : '320px',
@@ -204,7 +204,7 @@ const PrintPreviewModal = ({
                             onLoad={handleImageLoad}
                           />
                          
-                         {/* BuyPrintz Watermark Overlay - IP Protection - Only cover the image, not the entire viewport */}
+                         {/* BuyPrintz Watermark Overlay - IP Protection - Aligned with canvas */}
                          <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
                            <img
                              src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
@@ -214,12 +214,18 @@ const PrintPreviewModal = ({
                                position: 'absolute',
                                top: 0,
                                left: 0,
-                               zIndex: 10
+                               zIndex: 10,
+                               // Mobile positioning to match canvas transform
+                               transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.3)' : 'none'
                              }}
                            />
                          </div>
                         
-                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ zIndex: 20 }}>
+                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ 
+                          zIndex: 20,
+                          // Mobile positioning to match canvas transform
+                          transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.3)' : 'none'
+                        }}>
                           Preview
                         </div>
                       </div>
