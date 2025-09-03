@@ -181,8 +181,8 @@ const PrintPreviewModal = ({
                         <div className="relative flex items-center justify-center w-full" style={{ 
                           minHeight: window.innerWidth < 768 ? '180px' : '280px',
                           maxHeight: window.innerWidth < 768 ? '220px' : '320px',
-                          // Mobile positioning adjustments - 30% larger, final positioning
-                          transform: window.innerWidth < 768 ? 'translate(70%, 65%) scale(1.3)' : 'none'
+                          // Mobile positioning adjustments - 30% larger, ultimate positioning
+                          transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.3)' : 'none'
                         }}>
                           <img
                             src={previewImage}
