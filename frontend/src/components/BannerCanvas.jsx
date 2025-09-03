@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
+import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer, Group } from 'react-konva'
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -22,7 +22,12 @@ import {
   MoveDown,
   MoveUp,
   Layers,
-  Settings
+  Settings,
+  Undo,
+  Redo,
+  ArrowUp,
+  ArrowDown,
+  X
 } from 'lucide-react'
 import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
@@ -394,9 +399,21 @@ const BannerCanvas = ({
   // Element handlers
   // Simple element selection handler
   const handleSelect = (id) => {
-    console.log('Selecting element:', id, 'Type:', elements.find(el => el.id === id)?.type)
-    setSelectedId(id)
-    setSelectedIds([])
+    console.log('Selecting element:', id)
+    const element = elements.find(el => el.id === id)
+    if (element) {
+      console.log('Element type:', element.type, 'Element data:', element)
+    }
+    
+    if (selectedIds.includes(id)) {
+      // Deselect if already selected
+      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id))
+      setSelectedId(null)
+    } else {
+      // Select new element
+      setSelectedIds([id])
+      setSelectedId(id)
+    }
   }
 
   // Clean element change handler
@@ -422,127 +439,129 @@ const BannerCanvas = ({
     })
   }
 
+  // Handle element transformation end
   const handleTransformEnd = (e, id) => {
-    const node = e.target
-    const scaleX = node.scaleX()
-    const scaleY = node.scaleY()
-    
     const element = elements.find(el => el.id === id)
     if (!element) return
 
-    // Reset scale to 1 to prevent double scaling
-    node.scaleX(1)
-    node.scaleY(1)
+    const node = e.target
     
-    const baseUpdate = {
-      x: node.x(),
-      y: node.y(),
-      rotation: node.rotation()
+    // Debug logging for icons
+    if (element.type === 'icon') {
+      console.log('Transforming icon:', element.iconName, 'Current size:', element.width, 'x', element.height)
+      console.log('Node scale:', node.scaleX(), 'x', node.scaleY())
+    }
+    
+    // Update element properties based on transformation
+    const updatedElement = { ...element }
+    
+    // Update position
+    updatedElement.x = node.x()
+    updatedElement.y = node.y()
+    
+    // Update rotation
+    updatedElement.rotation = node.rotation()
+    
+    // Handle scaling - Konva transformer changes scaleX/scaleY, not width/height
+    if (element.type === 'text') {
+      // For text, we need to handle scaling differently
+      const newWidth = Math.max(50, node.width() * node.scaleX())
+      const newHeight = Math.max(50, node.height() * node.scaleY())
+      
+      updatedElement.width = newWidth
+      updatedElement.height = newHeight
+      
+      // Reset scale to 1 after updating dimensions
+      node.scaleX(1)
+      node.scaleY(1)
+    } else if (element.type === 'circle') {
+      // For circles, update radius based on scale
+      const newRadius = Math.max(10, (element.radius || 50) * Math.max(node.scaleX(), node.scaleY()))
+      updatedElement.radius = newRadius
+      
+      // Reset scale to 1
+      node.scaleX(1)
+      node.scaleY(1)
+    } else if (element.type === 'star') {
+      // For stars, update outer radius based on scale
+      const newOuterRadius = Math.max(10, (element.outerRadius || 50) * Math.max(node.scaleX(), node.scaleY()))
+      updatedElement.outerRadius = newOuterRadius
+      
+      // Reset scale to 1
+      node.scaleX(1)
+      node.scaleY(1)
+    } else if (element.type === 'triangle' || element.type === 'hexagon') {
+      // For regular polygons, update radius based on scale
+      const newRadius = Math.max(10, (element.radius || 50) * Math.max(node.scaleX(), node.scaleY()))
+      updatedElement.radius = newRadius
+      
+      // Reset scale to 1
+      node.scaleX(1)
+      node.scaleY(1)
+    } else if (element.type === 'line') {
+      // For lines, update points based on scale
+      const points = element.points || [0, 0, 100, 100]
+      const newPoints = points.map((point, index) => {
+        if (index % 2 === 0) {
+          return point * node.scaleX()
+        } else {
+          return point * node.scaleY()
+        }
+      })
+      updatedElement.points = newPoints
+      
+      // Reset scale to 1
+      node.scaleX(1)
+      node.scaleY(1)
+    } else if (element.type === 'icon') {
+      // For icons, update width/height based on scale (same as rectangles)
+      const newWidth = Math.max(10, (element.width || 60) * node.scaleX())
+      const newHeight = Math.max(10, (element.height || 60) * node.scaleY())
+      
+      updatedElement.width = newWidth
+      updatedElement.height = newHeight
+      
+      // Debug logging for icon transformation
+      console.log('Icon transformed:', element.iconName, 'New size:', newWidth, 'x', newHeight)
+      
+      // Reset scale to 1
+      node.scaleX(1)
+      node.scaleY(1)
+    } else if (element.type === 'group') {
+      // For groups (like icons), update width/height based on scale
+      const newWidth = Math.max(10, (element.width || 100) * node.scaleX())
+      const newHeight = Math.max(10, (element.height || 100) * node.scaleY())
+      
+      updatedElement.width = newWidth
+      updatedElement.height = newHeight
+      
+      // Reset scale to 1
+      node.scaleX(1)
+      node.scaleY(1)
+    } else {
+      // For rectangles and other shapes, update width/height based on scale
+      const newWidth = Math.max(10, (element.width || 100) * node.scaleX())
+      const newHeight = Math.max(10, (element.height || 100) * node.scaleY())
+      
+      updatedElement.width = newWidth
+      updatedElement.height = newHeight
+      
+      // Reset scale to 1
+      node.scaleX(1)
+      node.scaleY(1)
     }
 
-    // Determine if this was a corner handle (proportional scaling) or center handle (stretching)
-    // Corner handles: top-left, top-right, bottom-left, bottom-right
-    // Center handles: top-center, middle-left, middle-right, bottom-center
-    const isCornerHandle = Math.abs(scaleX - scaleY) < 0.1 // If scales are very similar, it's likely a corner handle
+    // Update elements array
+    const newElements = elements.map(el => el.id === id ? updatedElement : el)
+    setElements(newElements)
     
-    // For corner handles, use uniform scaling (average of X and Y)
-    // For center handles, allow independent X and Y scaling
-    const uniformScale = (scaleX + scaleY) / 2
-
-    // Handle different element types
-    switch (element.type) {
-
-
-      case 'rect':
-      case 'image':
-        // For rectangles and images
-        if (isCornerHandle) {
-          // Corner handles: proportional scaling
-          handleElementChange(id, {
-            ...baseUpdate,
-            width: Math.max(10, (element.width || 100) * uniformScale),
-            height: Math.max(10, (element.height || 100) * uniformScale)
-          })
-        } else {
-          // Center handles: independent scaling (stretching)
-          handleElementChange(id, {
-            ...baseUpdate,
-            width: Math.max(10, (element.width || 100) * scaleX),
-            height: Math.max(10, (element.height || 100) * scaleY)
-          })
-        }
-        break
-
-      case 'circle':
-        // For circles, always use uniform scaling to maintain circular shape
-        handleElementChange(id, {
-          ...baseUpdate,
-          radius: Math.max(5, (element.radius || 50) * uniformScale)
-        })
-        break
-
-      case 'star':
-        // For stars, always use uniform scaling to maintain star shape
-        handleElementChange(id, {
-          ...baseUpdate,
-          innerRadius: Math.max(5, (element.innerRadius || 30) * uniformScale),
-          outerRadius: Math.max(10, (element.outerRadius || 50) * uniformScale)
-        })
-        break
-
-      case 'triangle':
-      case 'hexagon':
-        // For regular polygons, always use uniform scaling to maintain shape
-        handleElementChange(id, {
-          ...baseUpdate,
-          radius: Math.max(5, (element.radius || 50) * uniformScale)
-        })
-        break
-
-      case 'line':
-        // For line-based shapes (heart, diamond, arrow)
-        if (element.points && Array.isArray(element.points)) {
-          if (isCornerHandle) {
-            // Corner handles: proportional scaling
-            const scaledPoints = element.points.map((point, index) => {
-              return index % 2 === 0 ? point * uniformScale : point * uniformScale
-            })
-            handleElementChange(id, {
-              ...baseUpdate,
-              points: scaledPoints
-            })
-          } else {
-            // Center handles: independent scaling
-            const scaledPoints = element.points.map((point, index) => {
-              return index % 2 === 0 ? point * scaleX : point * scaleY
-            })
-            handleElementChange(id, {
-              ...baseUpdate,
-              points: scaledPoints
-            })
-          }
-        }
-        break
-
-      default:
-        // Fallback for other elements
-        if (isCornerHandle) {
-          handleElementChange(id, {
-            ...baseUpdate,
-            width: Math.max(5, (element.width || 100) * uniformScale),
-            height: Math.max(5, (element.height || 100) * uniformScale)
-          })
-        } else {
-          handleElementChange(id, {
-            ...baseUpdate,
-            width: Math.max(5, (element.width || 100) * scaleX),
-            height: Math.max(5, (element.height || 100) * scaleY)
-          })
-        }
-        break
+    // Save to history
+    saveToHistory()
+    
+    // Force transformer update to ensure handles match new element size
+    if (transformerRef.current) {
+      transformerRef.current.forceUpdate()
     }
-
-    // saveToHistory() // This was removed from dependencies, so it's no longer called here
   }
 
   // Keyboard shortcuts
@@ -574,24 +593,253 @@ const BannerCanvas = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedId, selectedElement])
 
+  // Ensure new element has proper initial properties
+  const createElementWithBounds = (type, x, y, additionalProps = {}) => {
+    const baseElement = {
+      id: `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      type,
+      x: x || 100,
+      y: y || 100,
+      rotation: 0,
+      fill: '#000000',
+      stroke: '#000000',
+      strokeWidth: 1,
+      ...additionalProps
+    }
 
+    // Add type-specific properties
+    switch (type) {
+      case 'text':
+        return {
+          ...baseElement,
+          text: 'Text',
+          fontSize: 24,
+          fontFamily: 'Arial',
+          width: 200,
+          height: 50,
+          fill: '#000000',
+          align: 'left',
+          verticalAlign: 'top',
+          padding: 0
+        }
+      case 'rect':
+        return {
+          ...baseElement,
+          width: 100,
+          height: 100,
+          fill: '#ff0000'
+        }
+      case 'circle':
+        return {
+          ...baseElement,
+          radius: 50,
+          fill: '#00ff00'
+        }
+      case 'star':
+        return {
+          ...baseElement,
+          numPoints: 5,
+          innerRadius: 30,
+          outerRadius: 50,
+          fill: '#ffff00'
+        }
+      case 'triangle':
+        return {
+          ...baseElement,
+          radius: 50,
+          fill: '#0000ff'
+        }
+      case 'hexagon':
+        return {
+          ...baseElement,
+          radius: 50,
+          fill: '#800080'
+        }
+      case 'line':
+        return {
+          ...baseElement,
+          points: [0, 0, 100, 100],
+          closed: false,
+          strokeWidth: 2
+        }
+      case 'image':
+        return {
+          ...baseElement,
+          image: imageUrl,
+          width: 200,
+          height: 200
+        }
+      case 'icon':
+        return {
+          ...baseElement,
+          width: 60,
+          height: 60,
+          fill: '#666666',
+          stroke: '#000000',
+          strokeWidth: 1,
+          symbol: null,
+          imagePath: null
+        }
+
+      default:
+        return baseElement
+    }
+  }
+
+  // Calculate proper bounds for an element
+  const getElementBounds = (element) => {
+    const x = element.x || 0
+    const y = element.y || 0
+    
+    switch (element.type) {
+      case 'circle':
+        const radius = element.radius || 50
+        return {
+          x: x - radius,
+          y: y - radius,
+          width: radius * 2,
+          height: radius * 2
+        }
+      case 'star':
+        const outerRadius = element.outerRadius || 50
+        return {
+          x: x - outerRadius,
+          y: y - outerRadius,
+          width: outerRadius * 2,
+          height: outerRadius * 2
+        }
+      case 'triangle':
+      case 'hexagon':
+        const polyRadius = element.radius || 50
+        return {
+          x: x - polyRadius,
+          y: y - polyRadius,
+          width: polyRadius * 2,
+          height: polyRadius * 2
+        }
+      case 'line':
+        const points = element.points || [0, 0, 100, 100]
+        const minX = Math.min(points[0], points[2])
+        const maxX = Math.max(points[0], points[2])
+        const minY = Math.min(points[1], points[3])
+        const maxY = Math.max(points[1], points[3])
+        return {
+          x: x + minX,
+          y: y + minY,
+          width: maxX - minX,
+          height: maxY - minY
+        }
+      case 'image':
+        return {
+          x: x,
+          y: y,
+          width: element.width || 100,
+          height: element.height || 100
+        }
+      case 'icon':
+        return {
+          x: x,
+          y: y,
+          width: element.width || 60,
+          height: element.height || 60
+        }
+
+      default:
+        return {
+          x: x,
+          y: y,
+          width: element.width || 100,
+          height: element.height || 100
+        }
+    }
+  }
 
   // Update transformer when selection or elements change
   useEffect(() => {
     const updateTransformer = () => {
       if (selectedIds.length > 0 && stageRef.current && transformerRef.current) {
-        const selectedNodes = selectedIds.map(id => stageRef.current.findOne(`#${id}`)).filter(Boolean)
+        console.log('Updating transformer for multiple selection:', selectedIds)
+        const selectedNodes = selectedIds.map(id => {
+          const element = elements.find(el => el.id === id)
+          if (!element) return null
+          
+          console.log('Finding node for element:', element.type, element.id)
+          
+          // Find the actual Konva node
+          const node = stageRef.current.findOne(`#${id}`)
+          if (node) {
+            console.log('Found node:', node.constructor.name, 'Node bounds:', {
+              x: node.x(),
+              y: node.y(),
+              width: node.width(),
+              height: node.height()
+            })
+            
+            // For icons, ensure proper bounds
+            if (element.type === 'icon') {
+              console.log('Processing icon element:', element.iconName)
+              // Force the node to update its bounds
+              node.width(element.width || 60)
+              node.height(element.height || 60)
+              node.x(element.x || 0)
+              node.y(element.y || 0)
+              console.log('Updated icon node bounds:', {
+                x: node.x(),
+                y: node.y(),
+                width: node.width(),
+                height: node.height()
+              })
+            }
+            return node
+          } else {
+            console.log('No node found for element:', id)
+            return null
+          }
+        }).filter(Boolean)
+        
+        console.log('Selected nodes for transformer:', selectedNodes.length)
+        
         if (selectedNodes.length > 0) {
           transformerRef.current.nodes(selectedNodes)
           transformerRef.current.getLayer()?.batchDraw()
+          
+          // Force update to ensure proper bounds calculation
+          setTimeout(() => {
+            if (transformerRef.current) {
+              transformerRef.current.forceUpdate()
+              console.log('Transformer force updated')
+            }
+          }, 10)
         }
       } else if (selectedId && stageRef.current && transformerRef.current) {
+        console.log('Updating transformer for single selection:', selectedId)
         const selectedNode = stageRef.current.findOne(`#${selectedId}`)
         if (selectedNode) {
+          console.log('Found single node:', selectedNode.constructor.name)
+          
+          // For icons, ensure proper bounds
+          const element = elements.find(el => el.id === selectedId)
+          if (element && element.type === 'icon') {
+            console.log('Processing single icon element:', element.iconName)
+            selectedNode.width(element.width || 60)
+            selectedNode.height(element.height || 60)
+            selectedNode.x(element.x || 0)
+            selectedNode.y(element.y || 0)
+          }
+          
           transformerRef.current.nodes([selectedNode])
           transformerRef.current.getLayer()?.batchDraw()
+          
+          // Force update to ensure proper bounds calculation
+          setTimeout(() => {
+            if (transformerRef.current) {
+              transformerRef.current.forceUpdate()
+              console.log('Single transformer force updated')
+            }
+          }, 10)
         }
       } else if (transformerRef.current) {
+        console.log('Clearing transformer')
         transformerRef.current.nodes([])
         transformerRef.current.getLayer()?.batchDraw()
       }
@@ -604,48 +852,128 @@ const BannerCanvas = ({
     const timeoutId = setTimeout(updateTransformer, 50)
     
     return () => clearTimeout(timeoutId)
-  }, [selectedId, selectedIds]) // Remove 'elements' from dependencies to prevent re-renders
+  }, [selectedId, selectedIds, elements]) // Include elements for proper updates
+
+  // Additional transformer update when elements array changes
+  useEffect(() => {
+    if (transformerRef.current && (selectedId || selectedIds.length > 0)) {
+      // Force transformer update when elements change
+      setTimeout(() => {
+        if (transformerRef.current) {
+          transformerRef.current.forceUpdate()
+        }
+      }, 100)
+    }
+  }, [elements.length]) // Only trigger on elements array length change
 
   // Remove the TextEditor component since we're using vanilla DOM approach
 
+  // Ensure element has valid properties to prevent disappearing
+  const ensureElementProperties = (element) => {
+    const defaults = {
+      x: 0,
+      y: 0,
+      rotation: 0,
+      fill: '#000000',
+      stroke: '#000000',
+      strokeWidth: 1
+    }
+    
+    // Apply defaults for missing properties
+    Object.keys(defaults).forEach(key => {
+      if (element[key] === undefined || element[key] === null) {
+        element[key] = defaults[key]
+      }
+    })
+    
+    // Type-specific defaults
+    switch (element.type) {
+      case 'text':
+        if (!element.text) element.text = 'Text'
+        if (!element.fontSize) element.fontSize = 24
+        if (!element.fontFamily) element.fontFamily = 'Arial'
+        if (!element.width) element.width = 200
+        if (!element.height) element.height = 50
+        break
+      case 'rect':
+        if (!element.width) element.width = 100
+        if (!element.height) element.height = 100
+        break
+      case 'circle':
+        if (!element.radius) element.radius = 50
+        break
+      case 'star':
+        if (!element.numPoints) element.numPoints = 5
+        if (!element.innerRadius) element.innerRadius = 30
+        if (!element.outerRadius) element.outerRadius = 50
+        break
+      case 'triangle':
+      case 'hexagon':
+        if (!element.radius) element.radius = 50
+        break
+      case 'line':
+        if (!element.points) element.points = [0, 0, 100, 100]
+        break
+      case 'image':
+        if (!element.width) element.width = 100
+        if (!element.height) element.height = 100
+        break
+      case 'icon':
+        if (!element.width) element.width = 60
+        if (!element.height) element.height = 60
+        if (!element.fill) element.fill = '#666666'
+        if (!element.stroke) element.stroke = '#000000'
+        if (!element.strokeWidth) element.strokeWidth = 1
+        if (!element.symbol) element.symbol = null
+        if (!element.imagePath) element.imagePath = null
+        break
+
+    }
+    
+    return element
+  }
+
   // Render elements
   const renderElement = (element) => {
+    // Ensure element has all required properties
+    const safeElement = ensureElementProperties({ ...element })
+    
     const commonProps = {
-      id: element.id,
-      x: element.x,
-      y: element.y,
+      id: safeElement.id,
+      x: safeElement.x || 0,
+      y: safeElement.y || 0,
       draggable: true,
       onClick: (e) => {
-        handleSelect(element.id)
+        handleSelect(safeElement.id)
       },
       onTap: (e) => {
-        handleSelect(element.id)
+        handleSelect(safeElement.id)
       },
-      onDragEnd: (e) => handleDragEnd(e, element.id),
-      onTransformEnd: (e) => handleTransformEnd(e, element.id)
+      onDragEnd: (e) => handleDragEnd(e, safeElement.id),
+      onTransformEnd: (e) => handleTransformEnd(e, safeElement.id)
     }
 
-    switch (element.type) {
+    switch (safeElement.type) {
       case 'text':
         return (
           <Text
-            key={element.id}
+            key={safeElement.id}
             {...commonProps}
-            text={element.text || 'Text'}
-            fontSize={element.fontSize || 24}
-            fontFamily={element.fontFamily || 'Arial'}
-            fill={element.fill || '#000000'}
-            align={element.align || 'left'}
-            verticalAlign={element.verticalAlign || 'top'}
-            width={element.width || 200}
-            height={element.height || 50}
-            padding={element.padding || 0}
+            text={safeElement.text || 'Text'}
+            fontSize={safeElement.fontSize || 24}
+            fontFamily={safeElement.fontFamily || 'Arial'}
+            fill={safeElement.fill || '#000000'}
+            align={safeElement.align || 'left'}
+            verticalAlign={safeElement.verticalAlign || 'top'}
+            width={safeElement.width || 200}
+            height={safeElement.height || 50}
+            padding={safeElement.padding || 0}
             listening={true}
             onDblClick={() => {
-              handleTextEdit(element.id);
+              handleTextEdit(safeElement.id);
             }}
             onDblTap={() => {
-              handleTextEdit(element.id);
+              handleTextEdit(safeElement.id);
             }}
           />
         )
@@ -653,42 +981,48 @@ const BannerCanvas = ({
       case 'rect':
         return (
           <Rect
-            key={element.id}
+            key={safeElement.id}
             {...commonProps}
-            width={element.width}
-            height={element.height}
-            fill={element.fill}
-            stroke={element.stroke}
-            strokeWidth={element.strokeWidth}
-            rotation={element.rotation}
+            width={safeElement.width || 100}
+            height={safeElement.height || 100}
+            fill={safeElement.fill || '#ff0000'}
+            stroke={safeElement.stroke || '#000000'}
+            strokeWidth={safeElement.strokeWidth || 1}
+            rotation={safeElement.rotation || 0}
           />
         )
       
       case 'circle':
         return (
           <Circle
-            key={element.id}
+            key={safeElement.id}
             {...commonProps}
-            radius={element.radius}
-            fill={element.fill}
-            stroke={element.stroke}
-            strokeWidth={element.strokeWidth}
-            rotation={element.rotation}
+            radius={safeElement.radius || 50}
+            fill={safeElement.fill || '#00ff00'}
+            stroke={safeElement.stroke || '#000000'}
+            strokeWidth={safeElement.strokeWidth || 1}
+            rotation={safeElement.rotation || 0}
+            // Ensure proper bounds for transformer
+            width={safeElement.radius * 2 || 100}
+            height={safeElement.radius || 100}
           />
         )
       
       case 'star':
         return (
           <Star
-            key={element.id}
+            key={safeElement.id}
             {...commonProps}
-            numPoints={element.numPoints || 5}
-            innerRadius={element.innerRadius}
-            outerRadius={element.outerRadius}
-            fill={element.fill}
-            stroke={element.stroke}
-            strokeWidth={element.strokeWidth}
-            rotation={element.rotation}
+            numPoints={safeElement.numPoints || 5}
+            innerRadius={safeElement.innerRadius || 30}
+            outerRadius={safeElement.outerRadius || 50}
+            fill={safeElement.fill || '#ffff00'}
+            stroke={safeElement.stroke || '#000000'}
+            strokeWidth={safeElement.strokeWidth || 1}
+            rotation={safeElement.rotation || 0}
+            // Ensure proper bounds for transformer
+            width={safeElement.outerRadius * 2 || 100}
+            height={safeElement.outerRadius * 2 || 100}
           />
         )
       
@@ -696,44 +1030,132 @@ const BannerCanvas = ({
       case 'hexagon':
         return (
           <RegularPolygon
-            key={element.id}
+            key={safeElement.id}
             {...commonProps}
-            sides={element.sides}
-            radius={element.radius}
-            fill={element.fill}
-            stroke={element.stroke}
-            strokeWidth={element.strokeWidth}
-            rotation={element.rotation}
+            sides={safeElement.type === 'triangle' ? 3 : 6}
+            radius={safeElement.radius || 50}
+            fill={safeElement.fill || '#0000ff'}
+            stroke={safeElement.stroke || '#000000'}
+            strokeWidth={safeElement.strokeWidth || 1}
+            rotation={safeElement.rotation || 0}
+            // Ensure proper bounds for transformer
+            width={safeElement.radius * 2 || 100}
+            height={safeElement.radius * 2 || 100}
           />
         )
       
       case 'line':
         return (
           <Line
-            key={element.id}
+            key={safeElement.id}
             {...commonProps}
-            points={element.points}
-            closed={element.closed}
-            fill={element.fill}
-            stroke={element.stroke}
-            strokeWidth={element.strokeWidth}
-            rotation={element.rotation}
-            scaleX={element.scaleX}
-            scaleY={element.scaleY}
+            points={safeElement.points || [0, 0, 100, 100]}
+            closed={safeElement.closed || false}
+            fill={safeElement.fill || '#000000'}
+            stroke={safeElement.stroke || '#000000'}
+            strokeWidth={safeElement.strokeWidth || 2}
+            rotation={safeElement.rotation || 0}
+            // Ensure proper bounds for transformer
+            width={Math.abs(safeElement.points[2] - safeElement.points[0]) || 100}
+            height={Math.abs(safeElement.points[3] - safeElement.points[1]) || 100}
           />
         )
       
       case 'image':
         return (
           <Image
-            key={element.id}
+            key={safeElement.id}
             {...commonProps}
-            image={element.image}
-            width={element.width}
-            height={element.height}
-            rotation={element.rotation}
+            image={safeElement.image}
+            width={safeElement.width || 100}
+            height={safeElement.height || 100}
+            rotation={safeElement.rotation || 0}
           />
         )
+      
+      case 'icon':
+        // Check if icon has an image path or symbol
+        if (safeElement.imagePath) {
+          // Render as image icon - use Image for proper bounds
+          return (
+            <Image
+              key={safeElement.id}
+              {...commonProps}
+              image={safeElement.imagePath}
+              width={safeElement.width || 60}
+              height={safeElement.height || 60}
+              rotation={safeElement.rotation || 0}
+              // Ensure proper bounds for transformer
+              listening={true}
+              // Prevent text editing
+              onDblClick={(e) => e.evt.preventDefault()}
+              onDblTap={(e) => e.evt.preventDefault()}
+            />
+          )
+        } else if (safeElement.symbol) {
+          // Render as group with background and symbol - prevents text editing
+          const fontSize = Math.max(12, Math.min(safeElement.width || 60, safeElement.height || 60) * 0.6)
+          return (
+            <Group
+              key={safeElement.id}
+              {...commonProps}
+              width={safeElement.width || 60}
+              height={safeElement.height || 60}
+            >
+              {/* Background rectangle for proper bounds */}
+              <Rect
+                x={0}
+                y={0}
+                width={safeElement.width || 60}
+                height={safeElement.height || 60}
+                fill={safeElement.fill || '#666666'}
+                stroke={safeElement.stroke || '#000000'}
+                strokeWidth={safeElement.strokeWidth || 1}
+                cornerRadius={4}
+                shadowColor="black"
+                shadowBlur={2}
+                shadowOffset={{ x: 2, y: 2 }}
+                shadowOpacity={0.3}
+              />
+              {/* Symbol text centered on background */}
+              <Text
+                x={0}
+                y={0}
+                width={safeElement.width || 60}
+                height={safeElement.height || 60}
+                text={safeElement.symbol}
+                fontSize={fontSize}
+                fontFamily="Arial"
+                fill="#000000"
+                align="center"
+                verticalAlign="middle"
+              />
+            </Group>
+          )
+        } else {
+          // Fallback to rectangle with icon name - use Rect for proper bounds
+          return (
+            <Rect
+              key={safeElement.id}
+              {...commonProps}
+              width={safeElement.width || 60}
+              height={safeElement.height || 60}
+              fill={safeElement.fill || '#666666'}
+              stroke={safeElement.stroke || '#000000'}
+              strokeWidth={safeElement.strokeWidth || 1}
+              rotation={safeElement.rotation || 0}
+              cornerRadius={4}
+              shadowColor="black"
+              shadowBlur={2}
+              shadowOffset={{ x: 2, y: 2 }}
+              shadowOpacity={0.3}
+              // Ensure proper bounds for transformer
+              listening={true}
+            />
+          )
+        }
+      
+
       
       default:
         return null
@@ -875,6 +1297,56 @@ const BannerCanvas = ({
   // Check if layer controls should be enabled
   const canBringForward = selectedId && elements.findIndex(el => el.id === selectedId) < elements.length - 1
   const canSendBack = selectedId && elements.findIndex(el => el.id === selectedId) > 0
+
+  // Add element functions with proper bounds
+  const addText = (text = 'Text', x = 100, y = 100) => {
+    const newElement = createElementWithBounds('text', x, y, { text })
+    setElements(prev => [...prev, newElement])
+    setSelectedId(newElement.id)
+    saveToHistory()
+  }
+
+  const addShape = (type, x = 100, y = 100) => {
+    const newElement = createElementWithBounds(type, x, y)
+    setElements(prev => [...prev, newElement])
+    setSelectedId(newElement.id)
+    saveToHistory()
+  }
+
+  const addIcon = (iconName, symbol = null, imagePath = null, x = 100, y = 100) => {
+    // For icons, create a proper element that can be resized
+    const newElement = {
+      id: `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      type: 'icon', // Use a special 'icon' type
+      x: x || 100,
+      y: y || 100,
+      width: 60,
+      height: 60,
+      iconName: iconName,
+      symbol: symbol, // Store the symbol (emoji/unicode)
+      imagePath: imagePath, // Store the image path if available
+      fill: '#666666',
+      stroke: '#000000',
+      strokeWidth: 1,
+      rotation: 0
+    }
+    setElements(prev => [...prev, newElement])
+    setSelectedId(newElement.id)
+    saveToHistory()
+  }
+
+  const addImage = (imageUrl, x = 100, y = 100) => {
+    const newElement = createElementWithBounds('image', x, y, {
+      image: imageUrl,
+      width: 200,
+      height: 200
+    })
+    setElements(prev => [...prev, newElement])
+    setSelectedId(newElement.id)
+    saveToHistory()
+  }
+
+
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 relative">
@@ -1121,69 +1593,44 @@ const BannerCanvas = ({
                 {/* Transformer */}
                 <Transformer
                   ref={transformerRef}
-                  keepRatio={false}
-                  enabledAnchors={[
-                    'top-left', 'top-center', 'top-right',
-                    'middle-right', 'middle-left',
-                    'bottom-left', 'bottom-center', 'bottom-right'
-                  ]}
-                  rotateEnabled={true}
-                  borderEnabled={true}
-                  borderStroke="#0066cc"
-                  borderStrokeWidth={2}
-                  anchorFill="#0066cc"
-                  anchorStroke="#004499"
-                  anchorStrokeWidth={1}
-                  anchorSize={8}
-                  visible={true}
-                  // Show single bounding box for multiple selections
                   boundBoxFunc={(oldBox, newBox) => {
-                    // For multiple selections, ensure we get a single bounding box
-                    if (selectedIds.length > 1) {
-                      // Calculate the bounding box of all selected elements
-                      const selectedElements = elements.filter(el => selectedIds.includes(el.id))
-                      if (selectedElements.length > 1) {
-                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+                    // Ensure minimum size for all elements
+                    const minSize = 10
+                    
+                    // For icons, ensure minimum size and proper bounds
+                    if (selectedIds.length === 1) {
+                      const selectedElement = elements.find(el => el.id === selectedIds[0])
+                      if (selectedElement && selectedElement.type === 'icon') {
+                        const minWidth = Math.max(minSize, selectedElement.width || 60)
+                        const minHeight = Math.max(minSize, selectedElement.height || 60)
                         
-                        selectedElements.forEach(element => {
-                          const elemX = element.x || 0
-                          const elemY = element.y || 0
-                          let elemWidth = element.width || 50
-                          let elemHeight = element.height || 50
-                          
-                          // Handle different element types for proper bounds
-                          if (element.type === 'circle') {
-                            const radius = element.radius || 50
-                            elemWidth = radius * 2
-                            elemHeight = radius * 2
-                          } else if (element.type === 'star') {
-                            const outerRadius = element.outerRadius || 50
-                            elemWidth = outerRadius * 2
-                            elemHeight = outerRadius * 2
-                          }
-                          
-                          minX = Math.min(minX, elemX)
-                          minY = Math.min(minY, elemY)
-                          maxX = Math.max(maxX, elemX + elemWidth)
-                          maxY = Math.max(maxY, elemY + elemHeight)
-                        })
-                        
-                        // Return the calculated bounding box
                         return {
-                          x: minX,
-                          y: minY,
-                          width: maxX - minX,
-                          height: maxY - minY
+                          ...newBox,
+                          width: Math.max(minWidth, newBox.width),
+                          height: Math.max(minHeight, newBox.height)
                         }
                       }
                     }
                     
-                    // For single selection or no selection, use default behavior
-                    if (newBox.width < 5 || newBox.height < 5) {
-                      return oldBox
+                    // For other elements, use standard bounds
+                    return {
+                      ...newBox,
+                      width: Math.max(minSize, newBox.width),
+                      height: Math.max(minSize, newBox.height)
                     }
-                    return newBox
                   }}
+                  enabledAnchors={['middle-left', 'middle-right', 'top-middle', 'bottom-middle', 'top-left', 'top-right', 'bottom-left', 'bottom-right']}
+                  rotateEnabled={true}
+                  keepRatio={false}
+                  ignoreStroke={false}
+                  useSingleNodeRotation={true}
+                  shouldOverdrawWholeArea={false}
+                  anchorSize={8}
+                  anchorFill="#00a8ff"
+                  anchorStroke="#0066cc"
+                  anchorStrokeWidth={2}
+                  borderStroke="#00a8ff"
+                  borderStrokeWidth={2}
                 />
                 
                 {/* Selection rectangle */}
@@ -1333,15 +1780,99 @@ const BannerCanvas = ({
         </GlassPanel>
       </div>
 
-      {/* Status Bar Toggle Button - Shows when status bar is hidden but elements are selected */}
-      {(selectedId || selectedIds.length > 0) && isStatusBarHidden && (
-        <div className="absolute bottom-4 right-4 z-50">
-          <GlassButton
-            onClick={() => setIsStatusBarHidden(false)}
-            className="p-3 rounded-full shadow-lg"
-            title="Show element properties"
+      {/* Status Bar */}
+      {!isStatusBarHidden && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-3 flex items-center gap-2 z-50">
+          {/* Edit Text Button */}
+          {selectedId && selectedElement?.type === 'text' && (
+            <GlassButton 
+              onClick={() => { handleTextEdit(selectedId); }} 
+              variant="primary" 
+              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg"
+            >
+              <FileText className="w-4 h-4 mr-1" />
+              <span className="text-xs">Edit Text</span>
+            </GlassButton>
+          )}
+          
+          {/* Delete Button */}
+          {selectedId && (
+            <GlassButton 
+              onClick={deleteSelected} 
+              variant="default" 
+              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-red-50 hover:border-red-200 hover:text-red-700"
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              <span className="text-xs">Delete</span>
+            </GlassButton>
+          )}
+          
+          {/* Duplicate Button */}
+          {selectedId && (
+            <GlassButton 
+              onClick={duplicateSelected} 
+              variant="default" 
+              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-green-50 hover:border-green-200 hover:text-green-700"
+            >
+              <Copy className="w-4 h-4 mr-1" />
+              <span className="text-xs">Duplicate</span>
+            </GlassButton>
+          )}
+          
+          {/* Bring to Front Button */}
+          {selectedId && (
+            <GlassButton 
+              onClick={bringToFront} 
+              variant="default" 
+              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700"
+            >
+              <ArrowUp className="w-4 h-4 mr-1" />
+              <span className="text-xs">Front</span>
+            </GlassButton>
+          )}
+          
+          {/* Send to Back Button */}
+          {selectedId && (
+            <GlassButton 
+              onClick={sendToBack} 
+              variant="default" 
+              className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700"
+            >
+              <ArrowDown className="w-4 h-4 mr-1" />
+              <span className="text-xs">Back</span>
+            </GlassButton>
+          )}
+          
+          {/* Undo Button */}
+          <GlassButton 
+            onClick={undo} 
+            disabled={historyStep <= 0}
+            variant="default" 
+            className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            <Settings className="w-5 h-5" />
+            <Undo className="w-4 h-4 mr-1" />
+            <span className="text-xs">Undo</span>
+          </GlassButton>
+          
+          {/* Redo Button */}
+          <GlassButton 
+            onClick={redo} 
+            disabled={historyStep >= history.length - 1}
+            variant="default" 
+            className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            <Redo className="w-4 h-4 mr-1" />
+            <span className="text-xs">Redo</span>
+          </GlassButton>
+          
+          {/* Hide Status Bar Button */}
+          <GlassButton 
+            onClick={() => setIsStatusBarHidden(true)} 
+            variant="default" 
+            className="px-3 py-2 flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-md hover:shadow-lg hover:bg-gray-50 hover:border-gray-200"
+          >
+            <X className="w-4 h-4 mr-1" />
+            <span className="text-xs">Hide</span>
           </GlassButton>
         </div>
       )}

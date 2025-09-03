@@ -786,19 +786,12 @@ const Checkout = () => {
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {bannerOptionsConfig.sides.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="sides"
-                        value={option.value}
-                        checked={bannerOptions.sides === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, sides: parseInt(e.target.value) }))}
-                        className="mr-3 text-purple-600"
-                      />
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2">
+                      <input type="radio" name="sides" value={option.value} checked={bannerOptions.sides === option.value} onChange={(e) => setBannerOptions(prev => ({ ...prev, sides: parseInt(e.target.value) }))} className="mr-3 text-blue-600 focus:ring-blue-500" />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
+                          {option.price > 0 ? `+$${option.price}` : option.description ? `${option.description}` : 'No additional cost'}
                         </p>
                       </div>
                     </label>
@@ -814,21 +807,12 @@ const Checkout = () => {
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {bannerOptionsConfig.polePockets.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-indigo-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="polePockets"
-                        value={option.value}
-                        checked={bannerOptions.polePockets === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, polePockets: e.target.value }))}
-                        className="mr-3 text-indigo-600"
-                      />
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
+                      <input type="radio" name="polePockets" value={option.value} checked={bannerOptions.polePockets === option.value} onChange={(e) => setBannerOptions(prev => ({ ...prev, polePockets: e.target.value }))} className="mr-3 text-green-600 focus:ring-green-500" />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
                         <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 
-                           option.description ? `${option.description}` : 
-                           'No additional cost'}
+                          {option.price > 0 ? `+$${option.price}` : option.description ? `${option.description}` : 'No additional cost'}
                         </p>
                       </div>
                     </label>
@@ -872,15 +856,8 @@ const Checkout = () => {
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {bannerOptionsConfig.grommets.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="grommets"
-                        value={option.value}
-                        checked={bannerOptions.grommets === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, grommets: e.target.value }))}
-                        className="mr-3 text-blue-600"
-                      />
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 active:bg-orange-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2">
+                      <input type="radio" name="grommets" value={option.value} checked={bannerOptions.grommets === option.value} onChange={(e) => setBannerOptions(prev => ({ ...prev, grommets: e.target.value }))} className="mr-3 text-orange-600 focus:ring-orange-500" />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
                         <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
@@ -1076,13 +1053,13 @@ const Checkout = () => {
               <div className="flex justify-between pt-6 pb-2 border-t border-gray-200 mt-6">
                 <button
                   onClick={() => goToPreviousSection('bannerOptions')}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 active:scale-95 transition-all duration-200 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   ← Back to Preview
                 </button>
                 <button
                   onClick={() => continueToNextSection('bannerOptions')}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 active:scale-95 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
                 >
                   Continue to Shipping →
                 </button>
@@ -1115,14 +1092,14 @@ const Checkout = () => {
                   {shippingOptions.map((option) => {
                     const Icon = option.icon
                     return (
-                      <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 cursor-pointer transition-colors">
+                      <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
                         <input
                           type="radio"
                           name="shipping"
                           value={option.value}
                           checked={shippingOption === option.value}
                           onChange={(e) => setShippingOption(e.target.value)}
-                          className="mr-3 text-green-600"
+                          className="mr-3 text-green-600 focus:ring-green-500"
                         />
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -1179,7 +1156,7 @@ const Checkout = () => {
                     type="text"
                     value={customerInfo.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -1189,7 +1166,7 @@ const Checkout = () => {
                     type="email"
                     value={customerInfo.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -1202,7 +1179,7 @@ const Checkout = () => {
                     type="tel"
                     value={customerInfo.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
                     placeholder="Enter your phone number"
                   />
                 </div>
@@ -1212,7 +1189,7 @@ const Checkout = () => {
                     type="text"
                     value={customerInfo.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
                     placeholder="Enter your street address"
                   />
                 </div>
@@ -1225,7 +1202,7 @@ const Checkout = () => {
                     type="text"
                     value={customerInfo.city}
                     onChange={(e) => handleInputChange('city', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
                     placeholder="City"
                   />
                 </div>
@@ -1235,7 +1212,7 @@ const Checkout = () => {
                     type="text"
                     value={customerInfo.state}
                     onChange={(e) => handleInputChange('state', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
                     placeholder="State"
                   />
                 </div>
@@ -1245,7 +1222,7 @@ const Checkout = () => {
                     type="text"
                     value={customerInfo.zipCode}
                     onChange={(e) => handleInputChange('zipCode', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
                     placeholder="ZIP Code"
                   />
                 </div>
@@ -1396,7 +1373,7 @@ const Checkout = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => goToPreviousSection('reviewPayment')}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100 active:scale-95 font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-sm hover:shadow-md"
                 >
                   ← Back to Customer Info
                 </button>
@@ -1404,7 +1381,7 @@ const Checkout = () => {
                 <button
                   onClick={handleSubmitOrder}
                   disabled={loading || !customerInfo.name || !customerInfo.email}
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 active:scale-95 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {loading ? (
                     <>

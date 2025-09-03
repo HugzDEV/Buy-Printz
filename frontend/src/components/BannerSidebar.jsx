@@ -60,7 +60,10 @@ const BannerSidebar = ({
   const [customHeight, setCustomHeight] = useState('400')
   const [uploadedImages, setUploadedImages] = useState([])
 
+  const [isScrolling, setIsScrolling] = useState(false)
+  const [scrollDirection, setScrollDirection] = useState('down')
 
+  const sidebarRef = useRef(null)
 
   // Cleanup object URLs when component unmounts
   useEffect(() => {
@@ -479,7 +482,7 @@ const BannerSidebar = ({
         <h3 className="text-lg font-semibold text-gray-800">Text</h3>
         <button
           onClick={() => onAddText()}
-          className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+          className="px-3 py-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-md hover:shadow-lg"
         >
           Add Text
         </button>
@@ -493,7 +496,7 @@ const BannerSidebar = ({
             <button
               key={text}
               onClick={() => onAddText(text)}
-              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm transition-colors duration-200 text-center"
+              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 rounded-lg text-sm transition-all duration-200 text-center transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500/50 shadow-sm hover:shadow-md"
             >
               {text}
             </button>
@@ -735,13 +738,50 @@ const BannerSidebar = ({
   )
 
   return (
-    <div className={`
-      w-full sm:w-80 lg:w-96 
-      h-full 
-      backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
-      border-r border-white/20
-      overflow-y-auto
-    `}>
+    <div 
+      ref={sidebarRef}
+      className={`
+        w-full sm:w-80 lg:w-96 
+        h-full 
+        backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
+        border-r border-white/20
+        overflow-y-auto
+        relative
+      `}
+      onScroll={() => {
+        const sidebar = sidebarRef.current
+        if (!sidebar) return
+
+        const scrollTop = sidebar.scrollTop
+        const scrollHeight = sidebar.scrollHeight
+        const clientHeight = sidebar.clientHeight
+        
+        // Determine scroll direction
+        if (scrollTop > (sidebar.lastScrollTop || 0)) {
+          setScrollDirection('down')
+        } else {
+          setScrollDirection('up')
+        }
+        
+        // Show scroll indicator
+        setIsScrolling(true)
+        
+        // Clear timeout and hide indicator
+        clearTimeout(sidebar.scrollTimeout)
+        sidebar.scrollTimeout = setTimeout(() => {
+          setIsScrolling(false)
+        }, 1000)
+        
+        sidebar.lastScrollTop = scrollTop
+      }}
+    >
+      {/* Scroll Direction Indicator */}
+      {isScrolling && (
+        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-10 transition-opacity duration-300 ${
+          scrollDirection === 'down' ? 'animate-pulse' : 'animate-bounce'
+        }`} />
+      )}
+      
       <div className="p-4 space-y-4">
         
         {/* Mobile Header with Close Button */}
@@ -772,7 +812,7 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('specifications')}
-            className="w-full p-4 sm:p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors min-h-[56px]"
+            className="w-full p-4 sm:p-4 flex items-center justify-between hover:bg-white/20 active:bg-white/30 rounded-2xl transition-all duration-200 min-h-[56px] transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-inset"
           >
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500">
@@ -815,30 +855,30 @@ const BannerSidebar = ({
                 <div className="flex gap-1 mb-3">
                   <button
                     onClick={() => setSizeCategory('landscape')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 ${
+                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                       sizeCategory === 'landscape' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30'
+                        ? 'bg-blue-500 text-white shadow-lg' 
+                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
                     }`}
                   >
                     Landscape
                   </button>
                   <button
                     onClick={() => setSizeCategory('portrait')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 ${
+                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                       sizeCategory === 'portrait' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30'
+                        ? 'bg-blue-500 text-white shadow-lg' 
+                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
                     }`}
                   >
                     Portrait
                   </button>
                   <button
                     onClick={() => setSizeCategory('custom')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 ${
+                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                       sizeCategory === 'custom' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30'
+                        ? 'bg-blue-500 text-white shadow-lg' 
+                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
                     }`}
                   >
                     Custom
@@ -853,10 +893,10 @@ const BannerSidebar = ({
                       <button
                         key={size.name}
                         onClick={() => onChangeCanvasSize?.(size.name)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                           canvasSize.width === size.width && canvasSize.height === size.height
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-white/20 text-gray-700 hover:bg-white/30'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
                         }`}
                       >
                         <div className="flex justify-between items-center">
@@ -879,7 +919,7 @@ const BannerSidebar = ({
                           type="number"
                           value={customWidth}
                           onChange={(e) => setCustomWidth(e.target.value)}
-                          className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                          className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 hover:border-white/50 active:border-blue-500/50"
                           placeholder="800"
                         />
                       </div>
@@ -889,7 +929,7 @@ const BannerSidebar = ({
                           type="number"
                           value={customHeight}
                           onChange={(e) => setCustomHeight(e.target.value)}
-                          className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                          className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 hover:border-white/50 active:border-blue-500/50"
                           placeholder="400"
                         />
                       </div>
@@ -900,7 +940,7 @@ const BannerSidebar = ({
                           onChangeCanvasSize?.(`Custom ${customWidth}x${customHeight}`)
                         }
                       }}
-                      className="w-full mt-2 px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 rounded text-xs font-medium transition-all duration-200"
+                      className="w-full mt-2 px-3 py-1 bg-green-500/20 hover:bg-green-500/30 active:bg-green-500/40 text-green-700 border border-green-400/30 rounded text-xs font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-500/50 shadow-sm hover:shadow-md"
                     >
                       Apply Custom Size
                     </button>
@@ -977,7 +1017,7 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('upload')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:bg-white/20 active:bg-white/30 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-inset"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-gradient-to-br from-orange-400 to-orange-500">
@@ -1005,10 +1045,10 @@ const BannerSidebar = ({
                   e.stopPropagation()
                 }}
                 className={`
-                  border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200
+                  border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-orange-500/50
                   ${isDragActive 
-                    ? 'border-orange-400 bg-orange-50/50' 
-                    : 'border-white/30 hover:border-white/50 bg-white/10 hover:bg-white/20'
+                    ? 'border-orange-400 bg-orange-50/50 shadow-lg' 
+                    : 'border-white/30 hover:border-white/50 bg-white/10 hover:bg-white/20 hover:shadow-md'
                   }
                 `}
               >
@@ -1046,7 +1086,7 @@ const BannerSidebar = ({
                     }
                   }, 1000)
                 }}
-                className="w-full p-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-sm font-medium"
+                className="w-full p-2 bg-purple-500/20 hover:bg-purple-500/30 active:bg-purple-500/40 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-sm font-medium transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-sm hover:shadow-md"
               >
                 Browse Files
               </button>
@@ -1092,7 +1132,7 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('text')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:bg-white/20 active:bg-white/30 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-inset"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500">
@@ -1157,6 +1197,7 @@ const BannerSidebar = ({
                   <option value="Impact">Impact</option>
                   <option value="Comic Sans MS">Comic Sans MS</option>
                   <option value="Courier New">Courier New</option>
+                  <option value="Lucida Console">Lucida Console</option>
                   <option value="Tahoma">Tahoma</option>
                   <option value="Trebuchet MS">Trebuchet MS</option>
                 </select>
@@ -1258,7 +1299,7 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('shapes')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:bg-white/20 active:bg-white/30 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-inset"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500">
@@ -1286,7 +1327,7 @@ const BannerSidebar = ({
                       key={shape.type}
                       onClick={() => onAddShape(shape.type)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <shape.icon className="w-4 h-4" />
                       <span className="text-xs font-medium">{shape.name}</span>
@@ -1304,7 +1345,7 @@ const BannerSidebar = ({
                       key={shape.type}
                       onClick={() => onAddShape(shape.type)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <shape.icon className="w-4 h-4" />
                       <span className="text-xs font-medium">{shape.name}</span>
@@ -1322,7 +1363,7 @@ const BannerSidebar = ({
                       key={shape.type}
                       onClick={() => onAddShape(shape.type)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <shape.icon className="w-4 h-4" />
                       <span className="text-xs font-medium">{shape.name}</span>
@@ -1340,7 +1381,7 @@ const BannerSidebar = ({
                       key={shape.type}
                       onClick={() => onAddShape(shape.type)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <shape.icon className="w-4 h-4" />
                       <span className="text-xs font-medium">{shape.name}</span>
@@ -1358,7 +1399,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1376,7 +1417,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1394,7 +1435,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1412,7 +1453,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1430,7 +1471,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1448,7 +1489,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1466,7 +1507,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1484,7 +1525,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1502,7 +1543,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       <span className="text-lg">{icon.symbol}</span>
                       <span className="text-xs font-medium">{icon.name}</span>
@@ -1520,7 +1561,7 @@ const BannerSidebar = ({
                       key={icon.name}
                       onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
                       variant="glass"
-                      className="p-2 flex flex-col items-center gap-1"
+                      className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
                       {icon.imagePath ? (
                         <img 
@@ -1544,7 +1585,7 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('templates')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:bg-white/20 active:bg-white/30 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-inset"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-gradient-to-br from-green-400 to-green-500">
@@ -1590,7 +1631,7 @@ const BannerSidebar = ({
                     <button
                       key={template.id}
                       onClick={() => onLoadTemplate(template)}
-                      className="w-full text-left p-3 bg-white/20 hover:bg-white/30 rounded-lg transition-colors border border-white/30"
+                      className="w-full text-left p-3 bg-white/20 hover:bg-white/30 active:bg-white/40 rounded-lg transition-all duration-200 border border-white/30 hover:border-white/50 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm hover:shadow-md"
                     >
                       <div className="flex items-center justify-between mb-1">
                         <div className="font-medium text-gray-800 text-sm">{template.name}</div>
@@ -1625,7 +1666,7 @@ const BannerSidebar = ({
         <GlassCard>
           <button
             onClick={() => toggleSection('assets')}
-            className="w-full p-4 flex items-center justify-between hover:bg-white/10 rounded-2xl transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:bg-white/20 active:bg-white/30 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-inset"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500">
@@ -1651,7 +1692,7 @@ const BannerSidebar = ({
                   placeholder="Search designs..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50 placeholder-gray-500"
+                  className="w-full px-3 py-2 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 placeholder-gray-500 transition-all duration-200 hover:border-white/50 active:border-purple-400/50 focus:shadow-lg"
                 />
               </div>
 
@@ -1661,7 +1702,7 @@ const BannerSidebar = ({
                   <button
                     key={index}
                     onClick={() => handleAssetClick(asset)}
-                    className="aspect-square relative group overflow-hidden rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-200 border border-white/30 hover:border-purple-300/50"
+                    className="aspect-square relative group overflow-hidden rounded-lg bg-white/20 hover:bg-white/30 active:bg-white/40 transition-all duration-200 border border-white/30 hover:border-purple-300/50 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-sm hover:shadow-md"
                   >
                     <img
                       src={`/assets/images/${asset.file}`}
@@ -1679,6 +1720,18 @@ const BannerSidebar = ({
           )}
         </GlassCard>
 
+      </div>
+      
+      {/* Scroll Position Indicator */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+        <div 
+          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+          style={{
+            width: sidebarRef.current ? 
+              `${(sidebarRef.current.scrollTop / (sidebarRef.current.scrollHeight - sidebarRef.current.clientHeight)) * 100}%` : 
+              '0%'
+          }}
+        />
       </div>
     </div>
   )
