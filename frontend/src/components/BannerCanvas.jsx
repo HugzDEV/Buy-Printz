@@ -1293,9 +1293,7 @@ const BannerCanvas = ({
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className={`flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden relative transition-all duration-300 ease-in-out ${
-        selectedId || selectedIds.length > 0 ? 'pb-20 sm:pb-32' : 'pb-20 sm:pb-20'
-      }`}>
+      <div className={`flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden relative transition-all duration-300 ease-in-out pb-20 sm:pb-20`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
@@ -1637,12 +1635,13 @@ const BannerCanvas = ({
 
       {/* Bottom Actions - Consolidated Interface */}
       <div className={`
-        absolute bottom-0 left-0 right-0 border-t border-white/20 
+        fixed sm:absolute bottom-0 left-0 right-0 border-t border-white/20 
         bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
         transform transition-transform duration-300 ease-in-out
         max-h-[35vh] sm:max-h-[40vh] overflow-y-auto
         z-[60] shadow-2xl
         ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
+        sm:relative sm:z-auto
       `}>
         <div className="flex flex-col gap-2 sm:gap-4 max-h-full p-2 sm:p-4">
           
