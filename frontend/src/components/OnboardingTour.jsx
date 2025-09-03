@@ -32,7 +32,6 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
   useEffect(() => {
     const checkDevice = () => {
       const mobile = window.innerWidth < 768
-      console.log('Device check:', { width: window.innerWidth, mobile, current: isMobile })
       setIsMobile(mobile)
     }
     
@@ -256,52 +255,13 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
 
   // Mark tour as ready when steps are available
   useEffect(() => {
-    console.log('Tour steps effect triggered:', { tourSteps: tourSteps?.length, isMobile, tourReady })
-    
     if (tourSteps && tourSteps.length > 0) {
       setTourReady(true)
-      console.log('Tour steps initialized:', tourSteps.length, 'steps for', isMobile ? 'mobile' : 'desktop')
-    } else {
-      console.log('Tour steps not ready yet:', { tourSteps, isMobile })
     }
   }, [tourSteps, isMobile])
 
-  // Debug: Log tour steps and device type
-  useEffect(() => {
-    if (runTour) {
-      console.log('Tour started on:', isMobile ? 'Mobile' : 'Desktop')
-      console.log('Tour steps:', tourSteps)
-      console.log('Step targets:', tourSteps.map(step => step.target))
-      
-      // Check if all target elements exist
-      tourSteps.forEach((step, index) => {
-        const element = document.querySelector(step.target)
-        console.log(`Step ${index} target "${step.target}":`, element ? 'Found' : 'NOT FOUND', element)
-        
-        if (element) {
-          // Check element visibility and styles
-          const computedStyle = window.getComputedStyle(element)
-          const rect = element.getBoundingClientRect()
-          console.log(`Step ${index} element details:`, {
-            display: computedStyle.display,
-            visibility: computedStyle.visibility,
-            opacity: computedStyle.opacity,
-            position: computedStyle.position,
-            zIndex: computedStyle.zIndex,
-            width: rect.width,
-            height: rect.height,
-            top: rect.top,
-            left: rect.left,
-            isVisible: rect.width > 0 && rect.height > 0
-          })
-        }
-      })
-    }
-  }, [runTour, tourSteps, isMobile])
-
   const handleTourComplete = (data) => {
-    const { status, action, index, step, type } = data
-    console.log('Tour callback:', { status, action, index, step, type })
+    const { status } = data
     
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       setRunTour(false)
@@ -318,105 +278,25 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
     
     const waitForTour = () => {
       attempts++
-      console.log(`Tour wait attempt ${attempts}/${maxAttempts}:`, { tourReady, isMobile, tourSteps: tourSteps?.length })
       
       if (attempts >= maxAttempts) {
-        console.log('Tour timeout reached, forcing start...')
         setRunTour(true)
         return
       }
       
       if (!tourReady) {
-        console.log('Waiting for tour to be ready...')
         setTimeout(waitForTour, 100)
         return
       }
       
-      console.log('Tour ready, checking targets...')
-      
       // Check if target elements exist before starting tour
       const checkTargets = () => {
         const targets = tourSteps.map(step => step.target)
-        console.log('Checking targets:', targets)
-        
         const missingTargets = targets.filter(target => !document.querySelector(target))
         
         if (missingTargets.length > 0) {
-          console.log('Missing targets:', missingTargets)
-          
-          // Debug: Check DOM structure for missing targets
-          missingTargets.forEach(target => {
-            console.log(`Debugging target "${target}":`)
-            
-            // Check if element exists but with different selector
-            if (target === '.mobile-hamburger') {
-              console.log('=== MOBILE HAMBURGER DEBUG ===')
-              
-              // Method 1: Check by class name
-              const allButtons = document.querySelectorAll('button')
-              console.log('All buttons found:', allButtons.length)
-              allButtons.forEach((btn, i) => {
-                const classes = btn.className
-                const hasMobileHamburger = classes.includes('mobile-hamburger')
-                const rect = btn.getBoundingClientRect()
-                const computedStyle = window.getComputedStyle(btn)
-                console.log(`Button ${i}: classes="${classes}", hasMobileHamburger=${hasMobileHamburger}, visible=${rect.width > 0 && rect.height > 0}, display=${computedStyle.display}, visibility=${computedStyle.visibility}`)
-              })
-              
-              // Method 2: Check for elements with similar classes
-              const similarElements = document.querySelectorAll('[class*="hamburger"], [class*="mobile"]')
-              console.log('Similar elements found:', similarElements.length)
-              similarElements.forEach((el, i) => {
-                const rect = el.getBoundingClientRect()
-                const computedStyle = window.getComputedStyle(el)
-                console.log(`Similar element ${i}:`, el.tagName, el.className, 'visible=', rect.width > 0 && rect.height > 0, 'display=', computedStyle.display)
-              })
-              
-              // Method 3: Check for any button in the header area
-              const header = document.querySelector('header, .backdrop-blur-xl, [class*="header"]')
-              if (header) {
-                console.log('Header found:', header)
-                const headerButtons = header.querySelectorAll('button')
-                console.log('Header buttons:', headerButtons.length)
-                headerButtons.forEach((btn, i) => {
-                  const classes = btn.className
-                  const rect = btn.getBoundingClientRect()
-                  console.log(`Header button ${i}: classes="${classes}", visible=${rect.width > 0 && rect.height > 0}`)
-                })
-              }
-              
-              // Method 4: Check for elements with Menu icon
-              const menuIcons = document.querySelectorAll('[data-lucide="menu"], .lucide-menu, svg[data-lucide="menu"]')
-              console.log('Menu icons found:', menuIcons.length)
-              menuIcons.forEach((icon, i) => {
-                const parent = icon.closest('button')
-                if (parent) {
-                  const classes = parent.className
-                  const rect = parent.getBoundingClientRect()
-                  console.log(`Menu icon ${i} parent button: classes="${classes}", visible=${rect.width > 0 && rect.height > 0}`)
-                }
-              })
-              
-              // Method 5: Check entire DOM for mobile-hamburger class
-              const allElements = document.querySelectorAll('*')
-              const mobileHamburgerElements = Array.from(allElements).filter(el => 
-                el.className && typeof el.className === 'string' && el.className.includes('mobile-hamburger')
-              )
-              console.log('Elements with mobile-hamburger class:', mobileHamburgerElements.length)
-              mobileHamburgerElements.forEach((el, i) => {
-                const rect = el.getBoundingClientRect()
-                const computedStyle = window.getComputedStyle(el)
-                console.log(`Mobile hamburger element ${i}:`, el.tagName, el.className, 'visible=', rect.width > 0 && rect.height > 0, 'display=', computedStyle.display)
-              })
-              
-              console.log('=== END MOBILE HAMBURGER DEBUG ===')
-            }
-          })
-          
           // Special handling for mobile hamburger if it's the only missing target
           if (missingTargets.length === 1 && missingTargets[0] === '.mobile-hamburger' && isMobile) {
-            console.log('Mobile hamburger is missing, trying alternative approach...')
-            
             // Try to find the button by alternative means
             const alternativeSelectors = [
               'button[class*="hamburger"]',
@@ -432,22 +312,19 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
                 const element = document.querySelector(selector)
                 if (element) {
                   foundButton = element
-                  console.log('Found button with alternative selector:', selector, element)
                   break
                 }
               } catch (e) {
-                console.log('Selector failed:', selector, e)
+                // Selector failed, continue to next
               }
             }
             
             if (foundButton) {
               // Add the mobile-hamburger class to the found button
               foundButton.classList.add('mobile-hamburger')
-              console.log('Added mobile-hamburger class to found button')
               
               // Wait a bit for the class to be applied, then retry
               setTimeout(() => {
-                console.log('Retrying tour with mobile-hamburger class added')
                 checkTargets()
               }, 100)
               return
@@ -456,11 +333,9 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
           
           // Fallback: Create a working tour with available targets
           const workingSteps = tourSteps.filter(step => document.querySelector(step.target))
-          console.log('Working steps:', workingSteps.length, 'out of', tourSteps.length)
           
           if (workingSteps.length > 0) {
             // Update tourSteps to only include working targets
-            console.log('Starting tour with available targets')
             setTourSteps(workingSteps)
             setRunTour(true)
             return
@@ -469,7 +344,6 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
           // Wait a bit more and try again
           setTimeout(checkTargets, 200)
         } else {
-          console.log('All targets found, starting tour')
           setRunTour(true)
         }
       }
@@ -544,7 +418,7 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       showProgress={true}
       showSkipButton={true}
       callback={handleTourComplete}
-      debug={true}
+      debug={false}
       disableOverlayClose={true}
       styles={{
         options: {
