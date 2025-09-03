@@ -90,7 +90,7 @@ const BannerCanvas = ({
       if (isMobile) {
         // Mobile scaling - ensure canvas fits within viewport with proper margins
         const viewportWidth = window.innerWidth - 32 // Reduced padding for mobile
-        const viewportHeight = window.innerHeight - 240 // Increased height allocation for top spacing
+        const viewportHeight = window.innerHeight - 160 // Reduced height allocation since canvas is closer to toolbar
         
         const scaleX = (viewportWidth * 0.9) / canvasSize.width // Use 90% of available width
         const scaleY = (viewportHeight * 0.9) / canvasSize.height // Use 90% of available height
@@ -1226,27 +1226,11 @@ const BannerCanvas = ({
       
       {/* Top Toolbar - Mobile Responsive */}
       <div className="p-2 sm:p-4 border-b border-white/20">
-        <GlassPanel className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+        <GlassPanel className="flex items-center justify-between gap-2">
           
-          {/* Left Controls - Mobile Stacked */}
-          <div className="flex items-center gap-2 sm:gap-2 w-full sm:w-auto justify-center sm:justify-start">
-            {/* Mobile: Only zoom controls + save/order buttons */}
-            {/* Desktop: Full toolbar with undo/redo, grid, guides */}
-            <div className="sm:hidden flex items-center gap-2">
-              <GlassButton onClick={zoomOut} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
-                <ZoomOut className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[60px] min-h-[44px] flex items-center justify-center">
-                {Math.round(scale * 100)}%
-              </GlassButton>
-              
-              <GlassButton onClick={zoomIn} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
-                <ZoomIn className="w-4 h-4" />
-              </GlassButton>
-            </div>
-            
-            {/* Desktop: Full left controls */}
+          {/* Left Section - Zoom Controls */}
+          <div className="flex items-center gap-2">
+            {/* Desktop: Undo/Redo + Zoom */}
             <div className="hidden sm:flex items-center gap-2">
               <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
                 <Undo2 className="w-4 h-4" />
@@ -1257,22 +1241,23 @@ const BannerCanvas = ({
               </GlassButton>
               
               <div className="w-px h-6 bg-white/20 mx-2" />
-              
-              <GlassButton onClick={zoomOut} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
-                <ZoomOut className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[60px] min-h-[44px] flex items-center justify-center">
-                {Math.round(scale * 100)}%
-              </GlassButton>
-              
-              <GlassButton onClick={zoomIn} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
-                <ZoomIn className="w-4 h-4" />
-              </GlassButton>
             </div>
+            
+            {/* Mobile & Desktop: Zoom Controls */}
+            <GlassButton onClick={zoomOut} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <ZoomOut className="w-4 h-4" />
+            </GlassButton>
+            
+            <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[60px] min-h-[44px] flex items-center justify-center">
+              {Math.round(scale * 100)}%
+            </GlassButton>
+            
+            <GlassButton onClick={zoomIn} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <ZoomIn className="w-4 h-4" />
+            </GlassButton>
           </div>
 
-          {/* Center Info - Mobile Hidden */}
+          {/* Center Section - Canvas Info (Desktop Only) */}
           <div className="hidden sm:block text-center">
             <p className="text-sm text-gray-600">
               {canvasSize.width} × {canvasSize.height}px
@@ -1282,9 +1267,9 @@ const BannerCanvas = ({
             </p>
           </div>
 
-          {/* Right Controls - Mobile Stacked */}
-          <div className="flex items-center gap-2 sm:gap-2 w-full sm:w-auto justify-center sm:justify-end">
-            {/* Mobile: Save and Order buttons only */}
+          {/* Right Section - Action Buttons */}
+          <div className="flex items-center gap-2">
+            {/* Mobile: Save and Order buttons */}
             <div className="sm:hidden flex items-center gap-2">
               <GlassButton onClick={onSave} variant="success" className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" title="Save Design">
                 <Save className="w-4 h-4" />
@@ -1295,7 +1280,7 @@ const BannerCanvas = ({
               </GlassButton>
             </div>
             
-            {/* Desktop: Full right controls */}
+            {/* Desktop: Full controls */}
             <div className="hidden sm:flex items-center gap-2">
               <GlassButton 
                 onClick={() => setShowGrid(!showGrid)} 
@@ -1310,7 +1295,7 @@ const BannerCanvas = ({
                 onClick={() => setShowGuides(!showGuides)} 
                 variant={showGuides ? "primary" : "default"}
                 className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                title={showGrid ? "Hide Safe Zone" : "Show Safe Zone"}
+                title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
               >
                 {showGuides ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </GlassButton>
@@ -1331,7 +1316,7 @@ const BannerCanvas = ({
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className={`absolute inset-0 top-20 sm:top-20 flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-all duration-300 ease-in-out`}>
+      <div className={`absolute inset-0 top-12 sm:top-20 flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-all duration-300 ease-in-out`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
