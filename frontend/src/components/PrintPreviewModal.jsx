@@ -181,8 +181,8 @@ const PrintPreviewModal = ({
                         <div className="relative flex items-center justify-center w-full" style={{ 
                           minHeight: window.innerWidth < 768 ? '200px' : '280px',
                           maxHeight: window.innerWidth < 768 ? '240px' : '320px',
-                          // Mobile positioning adjustments - 25% larger (reduced from 30%), ultimate positioning
-                          transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.25)' : 'none'
+                          // Mobile positioning adjustments - 25% larger, perfect centering
+                          transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
                         }}>
                           <img
                             src={previewImage}
@@ -217,7 +217,7 @@ const PrintPreviewModal = ({
                                zIndex: 10,
                                opacity: 0.3,
                                // Mobile positioning to match canvas transform
-                               transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.25)' : 'none'
+                               transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
                              }}
                            />
                          </div>
@@ -225,7 +225,7 @@ const PrintPreviewModal = ({
                         <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ 
                           zIndex: 20,
                                                      // Mobile positioning to match canvas transform
-                           transform: window.innerWidth < 768 ? 'translate(75%, 70%) scale(1.25)' : 'none'
+                           transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
                         }}>
                           Preview
                         </div>
