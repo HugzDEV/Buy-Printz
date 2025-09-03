@@ -132,8 +132,12 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
-              <Sparkles className="w-8 h-8 text-white" />
+            <div className="p-3 bg-white rounded-full shadow-lg">
+              <img 
+                src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                alt="BuyPrintz Logo" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
           </div>
           <h3 className="text-lg font-semibold text-gray-900">You're Ready!</h3>
@@ -222,8 +226,12 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
-              <Sparkles className="w-8 h-8 text-white" />
+            <div className="p-3 bg-white rounded-full shadow-lg">
+              <img 
+                src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                alt="BuyPrintz Logo" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
           </div>
           <h3 className="text-lg font-semibold text-gray-900">You're Ready!</h3>
@@ -317,11 +325,15 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
     return (
       <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <GlassCard className="max-w-md w-full p-6 text-center space-y-6 bg-white/95 border-2 border-white/50 shadow-2xl">
-          <div className="flex justify-center">
-            <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
-              <Sparkles className="w-12 h-12 text-white" />
-            </div>
-          </div>
+                     <div className="flex justify-center">
+             <div className="p-4 bg-white rounded-full shadow-lg">
+               <img 
+                 src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                 alt="BuyPrintz Logo" 
+                 className="w-16 h-16 object-contain"
+               />
+             </div>
+           </div>
           
           <div className="space-y-3">
             <h2 className="text-3xl font-bold text-gray-800">Welcome to BuyPrintz! 🎉</h2>
