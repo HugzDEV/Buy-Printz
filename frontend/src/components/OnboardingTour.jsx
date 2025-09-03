@@ -244,6 +244,12 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
       console.log('Tour started on:', isMobile ? 'Mobile' : 'Desktop')
       console.log('Tour steps:', tourSteps)
       console.log('Step targets:', tourSteps.map(step => step.target))
+      
+      // Check if all target elements exist
+      tourSteps.forEach((step, index) => {
+        const element = document.querySelector(step.target)
+        console.log(`Step ${index} target "${step.target}":`, element ? 'Found' : 'NOT FOUND', element)
+      })
     }
   }, [runTour, tourSteps, isMobile])
 
@@ -259,10 +265,25 @@ const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
 
   const handleStartTour = () => {
     setShowWelcomeDialog(false)
-    // Add a small delay to ensure DOM elements are fully rendered
+    // Add a longer delay to ensure DOM elements are fully rendered
     setTimeout(() => {
-      setRunTour(true)
-    }, 100)
+      // Check if target elements exist before starting tour
+      const checkTargets = () => {
+        const targets = tourSteps.map(step => step.target)
+        const missingTargets = targets.filter(target => !document.querySelector(target))
+        
+        if (missingTargets.length > 0) {
+          console.log('Missing targets:', missingTargets)
+          // Wait a bit more and try again
+          setTimeout(checkTargets, 200)
+        } else {
+          console.log('All targets found, starting tour')
+          setRunTour(true)
+        }
+      }
+      
+      checkTargets()
+    }, 300)
   }
 
   const handleSkipTour = () => {
