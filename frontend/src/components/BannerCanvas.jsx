@@ -32,6 +32,14 @@ import {
 import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
 
+// CSS for maximum z-index priority
+const statusBarStyles = `
+  .status-bar-overlay {
+    z-index: 999999 !important;
+    position: fixed !important;
+  }
+`
+
 
 // Enable text rendering fix for better text display
 Konva._fixTextRendering = true
@@ -75,6 +83,18 @@ const BannerCanvas = ({
   //   const newScale = Math.min(scaleX, scaleY, 1) // Don't scale up beyond 1
   //   setScale(Math.max(0.3, newScale)) // Minimum scale of 0.3
   // }, [canvasSize])
+
+  // Inject CSS for maximum z-index priority
+  useEffect(() => {
+    // Create and inject CSS for status bar z-index
+    const styleElement = document.createElement('style')
+    styleElement.textContent = statusBarStyles
+    document.head.appendChild(styleElement)
+    
+    return () => {
+      document.head.removeChild(styleElement)
+    }
+  }, [])
 
   // Mobile-responsive canvas scaling with better viewport detection
   useEffect(() => {
@@ -1634,16 +1654,20 @@ const BannerCanvas = ({
       {/* The bottom actions section below provides all the same functionality in a better organized way */}
 
       {/* Bottom Actions - Consolidated Interface */}
-      <div className={`
-        fixed bottom-0 left-0 right-0 border-t border-white/20 
-        bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
-        transform transition-transform duration-300 ease-in-out
-        max-h-[35vh] sm:max-h-[40vh] overflow-y-auto
-        z-[99999] shadow-2xl
-        ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
-        !important
-      `}
-      style={{ zIndex: 99999 }}
+      <div 
+        className={`
+          status-bar-overlay fixed bottom-0 left-0 right-0 border-t border-white/20 
+          bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
+          transform transition-transform duration-300 ease-in-out
+          max-h-[35vh] sm:max-h-[40vh] overflow-y-auto
+          shadow-2xl
+          ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
+        `}
+        style={{ 
+          zIndex: 999999,
+          position: 'fixed'
+        }}
+        data-z-index="999999"
       >
         <div className="flex flex-col gap-2 sm:gap-4 max-h-full p-2 sm:p-4">
           
