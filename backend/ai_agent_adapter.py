@@ -324,6 +324,11 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
     
     async def initialize(self) -> bool:
         """Initialize AI agent adapter with health check"""
+        # If already initialized, return success
+        if self._initialized and self.openai_client:
+            logger.info("AI Agent already initialized, skipping initialization")
+            return True
+            
         try:
             # Check if OpenAI API key is configured
             api_key = os.getenv("OPENAI_API_KEY")
@@ -1138,5 +1143,23 @@ Context about the user:"""
             "available_tools": len(self.available_tools)
         }
 
-# Create global instance
+# Create global instance with proper initialization
 ai_agent_adapter = AIAgentAdapter()
+
+# Initialize OpenAI client at module import time (like Supabase)
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if openai_api_key:
+    try:
+        ai_agent_adapter.openai_client = AsyncOpenAI(
+            api_key=openai_api_key,
+            http_client=httpx.AsyncClient()
+        )
+        ai_agent_adapter._initialized = True
+        logger.info("✅ OpenAI client initialized successfully at startup")
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize OpenAI client at startup: {e}")
+        ai_agent_adapter._initialized = False
+else:
+    logger.warning("⚠️ OPENAI_API_KEY environment variable not set. AI features will be disabled.")
+    logger.warning("Server will start but AI operations will fail gracefully.")
+    ai_agent_adapter._initialized = False
