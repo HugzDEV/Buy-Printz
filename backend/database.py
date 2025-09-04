@@ -318,6 +318,28 @@ class DatabaseManager:
             print(f"Error getting design: {e}")
             return None
 
+    async def update_design(self, design_id: str, update_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Update an existing design"""
+        try:
+            # Convert canvas_data to JSON if it's a dict
+            if "canvas_data" in update_data and isinstance(update_data["canvas_data"], dict):
+                update_data["canvas_data"] = json.dumps(update_data["canvas_data"])
+            
+            # Add updated timestamp
+            update_data["updated_at"] = datetime.utcnow().isoformat()
+            
+            response = self.supabase.table("canvas_designs").update(update_data).eq("id", design_id).execute()
+            
+            if response.data:
+                return {
+                    "success": True,
+                    "design_id": design_id,
+                    "updated_data": response.data[0]
+                }
+            return {"success": False, "error": "Failed to update design"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     # Address Management
     async def save_user_address(self, user_id: str, address_data: Dict[str, Any]) -> bool:
         """Save user shipping address"""
