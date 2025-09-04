@@ -395,12 +395,13 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             
             # Call OpenAI with function calling
             logger.info(f"Calling OpenAI with {len(self.available_tools)} tools available")
+            logger.info(f"User query: '{query}'")
             response = await self.openai_client.chat.completions.create(
                 model="gpt-4o",
                 messages=messages,
                 tools=self.available_tools,
                 tool_choice="auto",
-                max_tokens=1000,
+                max_tokens=1500,
                 temperature=0.7
             )
             
@@ -567,7 +568,11 @@ You have access to tools that let you:
 - Add elements (text, shapes, icons) to designs
 - Generate complete banners from text prompts
 
-IMPORTANT: When users ask you to create banners, modify designs, or add elements, you MUST use the appropriate tools to actually perform these actions. Don't just provide advice - use the tools to create the actual designs.
+CRITICAL INSTRUCTIONS:
+- When users ask to "create a banner", "generate a banner", or "make a banner", you MUST call the generate_banner_from_prompt tool
+- When users ask to "add text", "add elements", or "modify design", you MUST call the appropriate tools
+- NEVER just provide advice - ALWAYS use the tools to perform the actual actions
+- If a user asks for banner creation, you MUST call generate_banner_from_prompt with their request as the prompt
 
 Always be helpful, professional, and provide actionable advice. If you need to use tools to get information or perform actions, do so to provide the most accurate and helpful response.
 
