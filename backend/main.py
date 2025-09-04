@@ -212,6 +212,20 @@ class BannerRecommendationRequest(BaseModel):
     dimensions: Optional[Dict[str, Any]] = None
     budget: Optional[float] = None
 
+# AI Banner Generation Models
+class BannerGenerationRequest(BaseModel):
+    prompt: str
+    style: Optional[str] = None
+    dimensions: Optional[Dict[str, Any]] = None
+
+class DesignModificationRequest(BaseModel):
+    design_id: str
+    modifications: Dict[str, Any]
+
+class ElementAdditionRequest(BaseModel):
+    design_id: str
+    element: Dict[str, Any]
+
 # Authentication endpoints
 @app.post("/api/auth/register")
 async def register_user(user_data: UserRegistration):
@@ -1048,6 +1062,91 @@ async def ai_agent_health():
             "service": "ai_agent_adapter"
         }
 
+# AI Banner Generation Endpoints
+@app.post("/api/ai/generate-banner")
+async def generate_banner_endpoint(request: BannerGenerationRequest, current_user: dict = Depends(get_current_user)):
+    """Generate a complete banner design from a text prompt"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        result = await ai_agent_adapter._generate_banner_from_prompt(
+            current_user["user_id"],
+            request.prompt,
+            request.style,
+            request.dimensions
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Banner generation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ai/modify-design")
+async def modify_design_endpoint(request: DesignModificationRequest, current_user: dict = Depends(get_current_user)):
+    """Modify an existing banner design"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        result = await ai_agent_adapter._modify_banner_design(
+            current_user["user_id"],
+            request.design_id,
+            request.modifications
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Design modification error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ai/add-element")
+async def add_element_endpoint(request: ElementAdditionRequest, current_user: dict = Depends(get_current_user)):
+    """Add a new element to a banner design"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        result = await ai_agent_adapter._add_element_to_design(
+            current_user["user_id"],
+            request.design_id,
+            request.element
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Element addition error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ai/create-design")
+async def create_design_endpoint(design_spec: Dict[str, Any], current_user: dict = Depends(get_current_user)):
+    """Create a new banner design programmatically"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        result = await ai_agent_adapter._create_banner_design(
+            current_user["user_id"],
+            design_spec
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Design creation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/")
 async def root():
     return {"message": "Buy Printz Banner Printing Platform API v2.0 - Enhanced with AI Agent"}
@@ -1119,7 +1218,27 @@ async def api_status():
         },
         "ai_agent": {
             "enabled": bool(os.getenv("OPENAI_API_KEY")),
-            "capabilities": ["design_assistance", "order_help", "banner_recommendations", "general_chat"]
+            "capabilities": [
+                "design_assistance", 
+                "order_help", 
+                "banner_recommendations", 
+                "general_chat",
+                "banner_generation",
+                "design_modification",
+                "element_addition",
+                "programmatic_canvas_control"
+            ],
+            "tools": [
+                "get_user_designs",
+                "create_banner_design", 
+                "modify_banner_design",
+                "add_element_to_design",
+                "generate_banner_from_prompt",
+                "get_user_orders",
+                "get_banner_products",
+                "calculate_banner_pricing",
+                "get_design_recommendations"
+            ]
         }
     }
 
