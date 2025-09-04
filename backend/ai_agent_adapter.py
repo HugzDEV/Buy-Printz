@@ -423,12 +423,26 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             # Process the response
             result = await self._process_ai_response(response, context)
             
-            return {
-                "success": True,
-                "response": result,
-                "mcp_compliant": True,
-                "server_templates_guide_compliant": True
-            }
+            # Handle structured response (with design data) or simple text response
+            if isinstance(result, dict) and "response" in result:
+                # Structured response with design data
+                return {
+                    "success": True,
+                    "response": result["response"],
+                    "design_created": result.get("design_created", False),
+                    "design_modified": result.get("design_modified", False),
+                    "design_data": result.get("design_data"),
+                    "mcp_compliant": True,
+                    "server_templates_guide_compliant": True
+                }
+            else:
+                # Simple text response
+                return {
+                    "success": True,
+                    "response": result,
+                    "mcp_compliant": True,
+                    "server_templates_guide_compliant": True
+                }
             
         except Exception as e:
             logger.error(f"AI Chat error: {e}")
@@ -586,6 +600,9 @@ CRITICAL INSTRUCTIONS:
 - When users ask to "add text", "add elements", or "modify design", you MUST call the appropriate tools
 - NEVER just provide advice - ALWAYS use the tools to perform the actual actions
 - If a user asks for banner creation, you MUST call generate_banner_from_prompt with their request as the prompt
+- After using tools, ALWAYS provide a detailed response explaining what you accomplished
+- Be specific about what was created, modified, or added
+- Include relevant details like design IDs, dimensions, colors, or other specifications
 
 Always be helpful, professional, and provide actionable advice. If you need to use tools to get information or perform actions, do so to provide the most accurate and helpful response.
 
@@ -624,7 +641,7 @@ Context about the user:"""
                 # Get final response with tool results
                 final_messages = [
                     {"role": "system", "content": self._build_system_message(context)},
-                    {"role": "user", "content": "Please provide a helpful response based on the tool results."},
+                    {"role": "user", "content": "Please provide a detailed, helpful response about what you just accomplished with the tools. Be specific about what was created or modified."},
                     message  # Include the original message with tool_calls
                 ]
                 
@@ -643,7 +660,36 @@ Context about the user:"""
                     max_completion_tokens=1000
                 )
                 
-                return final_response.choices[0].message.content
+                final_content = final_response.choices[0].message.content
+                logger.info(f"Final AI response content: {final_content}")
+                
+                # Check if any tool created or modified a design
+                design_created = False
+                design_modified = False
+                design_data = None
+                
+                for tool_result in tool_results:
+                    if tool_result["function_name"] in ["generate_banner_from_prompt", "create_banner_design"]:
+                        if tool_result["result"].get("success"):
+                            design_created = True
+                            design_data = tool_result["result"].get("canvas_data")
+                            break
+                    elif tool_result["function_name"] in ["modify_banner_design", "add_element_to_design"]:
+                        if tool_result["result"].get("success"):
+                            design_modified = True
+                            design_data = tool_result["result"].get("canvas_data")
+                            break
+                
+                # Return structured response with design data if applicable
+                if design_created or design_modified:
+                    return {
+                        "response": final_content,
+                        "design_created": design_created,
+                        "design_modified": design_modified,
+                        "design_data": design_data
+                    }
+                else:
+                    return final_content
             else:
                 logger.info("AI did not call any tools, returning direct response")
                 return message.content
