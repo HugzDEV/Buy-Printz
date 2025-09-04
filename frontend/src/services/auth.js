@@ -310,15 +310,47 @@ class AuthService {
       throw new Error('Supabase not initialized')
     }
 
-    const { data: { session } } = await this.supabase.auth.getSession()
-    
-    if (!session) {
-      throw new Error('No access token available')
-    }
+    try {
+      const { data: { session }, error } = await this.supabase.auth.getSession()
+      
+      if (error) {
+        console.error('Session retrieval error:', error)
+        throw new Error('Failed to retrieve session')
+      }
+      
+      if (!session) {
+        throw new Error('No active session found. Please log in again.')
+      }
 
-    return {
-      'Authorization': `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json'
+      // Check if session is expired
+      const now = Math.floor(Date.now() / 1000)
+      const expiresAt = session.expires_at || session.exp
+      
+      if (expiresAt && now >= expiresAt) {
+        console.warn('Session expired, attempting refresh...')
+        try {
+          await this.refreshToken()
+          // Get fresh session after refresh
+          const { data: { session: newSession } } = await this.supabase.auth.getSession()
+          if (newSession) {
+            return {
+              'Authorization': `Bearer ${newSession.access_token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        } catch (refreshError) {
+          console.error('Token refresh failed:', refreshError)
+          throw new Error('Session expired and refresh failed. Please log in again.')
+        }
+      }
+
+      return {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json'
+      }
+    } catch (error) {
+      console.error('getAuthHeaders error:', error)
+      throw error
     }
   }
 
@@ -343,6 +375,7 @@ class AuthService {
       // If token is expired, try to refresh
       if (response.status === 401) {
         try {
+          console.log('Token expired, attempting refresh...')
           await this.refreshToken()
           const newHeaders = await this.getAuthHeaders()
           const retryResponse = await fetch(fullUrl, {
@@ -354,15 +387,26 @@ class AuthService {
           })
           return retryResponse
         } catch (refreshError) {
+          console.error('Token refresh failed:', refreshError)
           // If refresh fails, redirect to login
           await this.logout()
-          window.location.href = '/login'
-          throw refreshError
+          // Store current URL to redirect back after login
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname)
+            window.location.href = '/login'
+          }
+          throw new Error('Authentication failed. Please log in again.')
         }
       }
 
       return response
     } catch (error) {
+      console.error('Authenticated request failed:', error)
+      // If it's an auth error, don't retry
+      if (error.message.includes('session') || error.message.includes('auth') || error.message.includes('log in')) {
+        throw error
+      }
+      // For other errors, throw as-is
       throw error
     }
   }

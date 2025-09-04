@@ -34,7 +34,15 @@ const Login = () => {
       console.log('Login successful:', result)
       
       toast.success('Login successful!')
-      navigate('/dashboard')
+      
+      // Check if there's a redirect URL stored
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin')
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirectAfterLogin')
+        navigate(redirectUrl)
+      } else {
+        navigate('/dashboard')
+      }
     } catch (error) {
       console.error('Login failed:', error)
       

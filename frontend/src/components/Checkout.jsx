@@ -86,6 +86,10 @@ const Checkout = () => {
     zipCode: ''
   })
   
+  // Add authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
+  
   // Banner Options Configuration - Updated to match Supabase table
   const bannerOptionsConfig = {
     // 1. Width x Height (from editor - already handled)
@@ -289,11 +293,39 @@ const Checkout = () => {
     }
   }, [navigate])
 
+  // Check authentication status
   useEffect(() => {
-    if (orderData) {
+    const checkAuth = async () => {
+      try {
+        setAuthLoading(true)
+        const authenticated = await authService.isAuthenticated()
+        setIsAuthenticated(authenticated)
+        
+        if (!authenticated) {
+          console.log('User not authenticated, redirecting to login')
+          // Save current location to redirect back after login
+          sessionStorage.setItem('redirectAfterLogin', '/checkout')
+          navigate('/login')
+          return
+        }
+      } catch (error) {
+        console.error('Authentication check failed:', error)
+        sessionStorage.setItem('redirectAfterLogin', '/checkout')
+        navigate('/login')
+        return
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    
+    checkAuth()
+  }, [navigate])
+
+  useEffect(() => {
+    if (orderData && isAuthenticated && !authLoading) {
       createOrder()
     }
-  }, [orderData])
+  }, [orderData, isAuthenticated, authLoading])
 
   const createOrder = async () => {
     try {
@@ -438,6 +470,39 @@ const Checkout = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Early return for loading and error states
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <GlassCard className="max-w-md w-full p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Checking Authentication</h2>
+          <p className="text-gray-600">Please wait while we verify your account...</p>
+        </GlassCard>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <GlassCard className="max-w-md w-full p-8 text-center">
+          <div className="p-4 bg-red-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <Lock className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
+          <p className="text-gray-600 mb-4">You need to be logged in to access the checkout.</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            Go to Login
+          </button>
+        </GlassCard>
+      </div>
+    )
   }
 
   if (!orderData || !paymentIntent) {
