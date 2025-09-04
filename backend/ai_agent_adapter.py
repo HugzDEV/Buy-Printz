@@ -610,7 +610,8 @@ Context about the user:"""
                 # Get final response with tool results
                 final_messages = [
                     {"role": "system", "content": self._build_system_message(context)},
-                    {"role": "user", "content": "Please provide a helpful response based on the tool results."}
+                    {"role": "user", "content": "Please provide a helpful response based on the tool results."},
+                    message  # Include the original message with tool_calls
                 ]
                 
                 # Add tool results to messages
