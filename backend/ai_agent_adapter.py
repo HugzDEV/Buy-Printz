@@ -391,6 +391,7 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             ]
             
             # Call OpenAI with function calling
+            logger.info(f"Calling OpenAI with {len(self.available_tools)} tools available")
             response = await self.openai_client.chat.completions.create(
                 model="gpt-4o",
                 messages=messages,
@@ -399,6 +400,8 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
                 max_tokens=1000,
                 temperature=0.7
             )
+            
+            logger.info(f"OpenAI response: {response.choices[0].message}")
             
             # Process the response
             result = await self._process_ai_response(response, context)
@@ -547,14 +550,23 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
 2. Order management and tracking
 3. Product selection and pricing
 4. General questions about banners and printing
+5. Creating new banner designs from text descriptions
+6. Modifying existing banner designs
+7. Adding elements to banners
 
 You have access to tools that let you:
 - Get user's saved designs
 - Check order status and history
 - Get product information and pricing
 - Provide design recommendations
+- Create new banner designs programmatically
+- Modify existing banner designs
+- Add elements (text, shapes, icons) to designs
+- Generate complete banners from text prompts
 
-Always be helpful, professional, and provide actionable advice. If you need to use tools to get information, do so to provide the most accurate and helpful response.
+IMPORTANT: When users ask you to create banners, modify designs, or add elements, you MUST use the appropriate tools to actually perform these actions. Don't just provide advice - use the tools to create the actual designs.
+
+Always be helpful, professional, and provide actionable advice. If you need to use tools to get information or perform actions, do so to provide the most accurate and helpful response.
 
 Context about the user:"""
         
