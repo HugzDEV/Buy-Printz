@@ -910,10 +910,12 @@ CRITICAL INSTRUCTIONS:
 - You have FULL CONTROL of the banner editor - use the tools to perform actual actions
 - When users ask to "create a banner", "generate a banner", or "make a banner", you MUST call generate_banner_from_prompt
 - When users ask to "add text", "add shapes", "add icons", use the specific add_* tools
-            - When users ask to "add QR code", "generate QR code", you MUST call add_qr_code
+            - When users ask to "add QR code", "generate QR code", "create QR code", you MUST call add_qr_code (NOT create_new_design)
+            - The add_qr_code tool will automatically create a new canvas if no design_id is provided
             - For immediate canvas updates, use direct manipulation tools (add_text, add_qr_code, add_rectangle, etc.) which return canvas_data
             - These tools work with or without existing design_id - they create new canvas data if needed
             - The frontend will handle displaying the updated canvas immediately
+            - IMPORTANT: For QR codes, always use add_qr_code, never create_new_design
 - When users ask to "move", "resize", "delete", "duplicate" elements, use the element manipulation tools
 - When users ask to "change colors", "modify text", use the modification tools
 - NEVER just provide advice - ALWAYS use the tools to perform the actual actions
@@ -1025,6 +1027,12 @@ Context about the user:"""
                 
                 # Return structured response with design data if applicable
                 if design_created or design_modified:
+                    # Ensure design_data has the correct structure for frontend
+                    if design_data and not isinstance(design_data, dict):
+                        design_data = {"canvas_data": design_data}
+                    elif design_data and "canvas_data" not in design_data:
+                        design_data = {"canvas_data": design_data}
+                    
                     return {
                         "response": final_content,
                         "design_created": design_created,
@@ -1827,6 +1835,10 @@ async def _create_new_design(self, user_id: str, name: str, width: int = 800, he
             "message": f"Created new design: {name}",
             "design_id": f"temp_{int(time.time())}",  # Temporary ID for immediate use
             "canvas_data": canvas_data,
+            "design_data": {
+                "design_id": f"temp_{int(time.time())}",
+                "canvas_data": canvas_data
+            },
             "direct_manipulation": True
         }
     except Exception as e:
@@ -1940,6 +1952,10 @@ async def _add_text(self, user_id: str, design_id: str, text: str, x: int = None
             "success": True,
             "message": f"Added text: {text}",
             "canvas_data": canvas_data,
+            "design_data": {
+                "design_id": design_id or f"temp_{int(time.time())}",
+                "canvas_data": canvas_data
+            },
             "element": text_element,
             "direct_manipulation": True
         }
@@ -2368,6 +2384,10 @@ async def _add_qr_code(self, user_id: str, design_id: str, url: str, x: int = No
             "success": True,
             "message": f"Added QR code for: {url}",
             "canvas_data": canvas_data,
+            "design_data": {
+                "design_id": design_id or f"temp_{int(time.time())}",
+                "canvas_data": canvas_data
+            },
             "element": qr_element,
             "direct_manipulation": True  # Flag to indicate this is direct canvas manipulation
         }
