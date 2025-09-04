@@ -7,6 +7,7 @@ MANDATORY pattern for AI agent integration with full MCP compliance.
 import os
 import json
 import logging
+import time
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import httpx
@@ -83,19 +84,413 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
         self.add_capability("general_chat", "General AI chat assistance")
         
         # Tool definitions for the AI agent
-        self.available_tools = [
+        # Initialize with comprehensive sidebar tools
+        self.available_tools = self._initialize_sidebar_tools()
+    
+    def _initialize_sidebar_tools(self):
+        """Initialize comprehensive sidebar tools that mirror all user capabilities"""
+        return [
+            # === CANVAS MANAGEMENT TOOLS ===
+            {
+                "type": "function",
+                "function": {
+                    "name": "create_new_design",
+                    "description": "Create a new banner design from scratch",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "name": {"type": "string", "description": "Design name"},
+                            "width": {"type": "number", "description": "Canvas width in pixels"},
+                            "height": {"type": "number", "description": "Canvas height in pixels"},
+                            "background_color": {"type": "string", "description": "Background color (hex)"}
+                        },
+                        "required": ["user_id", "name"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "change_canvas_size",
+                    "description": "Change the canvas dimensions",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "width": {"type": "number", "description": "New width"},
+                            "height": {"type": "number", "description": "New height"}
+                        },
+                        "required": ["user_id", "design_id", "width", "height"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "change_background_color",
+                    "description": "Change the canvas background color",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "color": {"type": "string", "description": "Background color (hex)"}
+                        },
+                        "required": ["user_id", "design_id", "color"]
+                    }
+                }
+            },
+            
+            # === TEXT TOOLS ===
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_text",
+                    "description": "Add text element to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "text": {"type": "string", "description": "Text content"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "font_size": {"type": "number", "description": "Font size"},
+                            "font_family": {"type": "string", "description": "Font family"},
+                            "color": {"type": "string", "description": "Text color (hex)"},
+                            "align": {"type": "string", "enum": ["left", "center", "right"], "description": "Text alignment"}
+                        },
+                        "required": ["user_id", "design_id", "text"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "modify_text",
+                    "description": "Modify existing text element properties",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Text element ID"},
+                            "text": {"type": "string", "description": "New text content"},
+                            "font_size": {"type": "number", "description": "New font size"},
+                            "font_family": {"type": "string", "description": "New font family"},
+                            "color": {"type": "string", "description": "New text color (hex)"},
+                            "align": {"type": "string", "enum": ["left", "center", "right"], "description": "New text alignment"}
+                        },
+                        "required": ["user_id", "design_id", "element_id"]
+                    }
+                }
+            },
+            
+            # === SHAPE TOOLS ===
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_rectangle",
+                    "description": "Add rectangle shape to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "width": {"type": "number", "description": "Width"},
+                            "height": {"type": "number", "description": "Height"},
+                            "fill_color": {"type": "string", "description": "Fill color (hex)"},
+                            "stroke_color": {"type": "string", "description": "Stroke color (hex)"},
+                            "stroke_width": {"type": "number", "description": "Stroke width"}
+                        },
+                        "required": ["user_id", "design_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_circle",
+                    "description": "Add circle shape to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "radius": {"type": "number", "description": "Circle radius"},
+                            "fill_color": {"type": "string", "description": "Fill color (hex)"},
+                            "stroke_color": {"type": "string", "description": "Stroke color (hex)"},
+                            "stroke_width": {"type": "number", "description": "Stroke width"}
+                        },
+                        "required": ["user_id", "design_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_star",
+                    "description": "Add star shape to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "num_points": {"type": "number", "description": "Number of star points"},
+                            "inner_radius": {"type": "number", "description": "Inner radius"},
+                            "outer_radius": {"type": "number", "description": "Outer radius"},
+                            "fill_color": {"type": "string", "description": "Fill color (hex)"},
+                            "stroke_color": {"type": "string", "description": "Stroke color (hex)"},
+                            "stroke_width": {"type": "number", "description": "Stroke width"}
+                        },
+                        "required": ["user_id", "design_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_triangle",
+                    "description": "Add triangle shape to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "radius": {"type": "number", "description": "Triangle radius"},
+                            "fill_color": {"type": "string", "description": "Fill color (hex)"},
+                            "stroke_color": {"type": "string", "description": "Stroke color (hex)"},
+                            "stroke_width": {"type": "number", "description": "Stroke width"}
+                        },
+                        "required": ["user_id", "design_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_hexagon",
+                    "description": "Add hexagon shape to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "radius": {"type": "number", "description": "Hexagon radius"},
+                            "fill_color": {"type": "string", "description": "Fill color (hex)"},
+                            "stroke_color": {"type": "string", "description": "Stroke color (hex)"},
+                            "stroke_width": {"type": "number", "description": "Stroke width"}
+                        },
+                        "required": ["user_id", "design_id"]
+                    }
+                }
+            },
+            
+            # === ICON TOOLS ===
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_icon",
+                    "description": "Add an icon from the icon library to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "icon_name": {"type": "string", "description": "Name of the icon to add"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "width": {"type": "number", "description": "Icon width"},
+                            "height": {"type": "number", "description": "Icon height"}
+                        },
+                        "required": ["user_id", "design_id", "icon_name"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "list_available_icons",
+                    "description": "Get list of available icons by category",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "category": {"type": "string", "description": "Icon category (medical, business, technology, etc.)"}
+                        }
+                    }
+                }
+            },
+            
+            # === QR CODE TOOLS ===
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_qr_code",
+                    "description": "Add QR code element to the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "url": {"type": "string", "description": "URL or text to encode"},
+                            "x": {"type": "number", "description": "X position"},
+                            "y": {"type": "number", "description": "Y position"},
+                            "width": {"type": "number", "description": "QR code width"},
+                            "height": {"type": "number", "description": "QR code height"},
+                            "qr_color": {"type": "string", "description": "QR code color (hex)"},
+                            "background_color": {"type": "string", "description": "Background color (hex)"}
+                        },
+                        "required": ["user_id", "design_id", "url"]
+                    }
+                }
+            },
+            
+            # === ELEMENT MANIPULATION TOOLS ===
+            {
+                "type": "function",
+                "function": {
+                    "name": "move_element",
+                    "description": "Move an element to a new position",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Element ID to move"},
+                            "x": {"type": "number", "description": "New X position"},
+                            "y": {"type": "number", "description": "New Y position"}
+                        },
+                        "required": ["user_id", "design_id", "element_id", "x", "y"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "resize_element",
+                    "description": "Resize an element",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Element ID to resize"},
+                            "width": {"type": "number", "description": "New width"},
+                            "height": {"type": "number", "description": "New height"}
+                        },
+                        "required": ["user_id", "design_id", "element_id", "width", "height"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "change_element_color",
+                    "description": "Change the color of an element",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Element ID"},
+                            "fill_color": {"type": "string", "description": "New fill color (hex)"},
+                            "stroke_color": {"type": "string", "description": "New stroke color (hex)"}
+                        },
+                        "required": ["user_id", "design_id", "element_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "delete_element",
+                    "description": "Delete an element from the design",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Element ID to delete"}
+                        },
+                        "required": ["user_id", "design_id", "element_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "duplicate_element",
+                    "description": "Duplicate an element",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Element ID to duplicate"},
+                            "x_offset": {"type": "number", "description": "X offset for duplicate"},
+                            "y_offset": {"type": "number", "description": "Y offset for duplicate"}
+                        },
+                        "required": ["user_id", "design_id", "element_id"]
+                    }
+                }
+            },
+            
+            # === LAYER MANAGEMENT TOOLS ===
+            {
+                "type": "function",
+                "function": {
+                    "name": "bring_to_front",
+                    "description": "Bring element to front layer",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Element ID"}
+                        },
+                        "required": ["user_id", "design_id", "element_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "send_to_back",
+                    "description": "Send element to back layer",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "element_id": {"type": "string", "description": "Element ID"}
+                        },
+                        "required": ["user_id", "design_id", "element_id"]
+                    }
+                }
+            },
+            
+            # === DESIGN MANAGEMENT TOOLS ===
             {
                 "type": "function",
                 "function": {
                     "name": "get_user_designs",
-                    "description": "Get user's saved banner designs",
+                    "description": "Get user's saved designs and templates",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "user_id": {
-                                "type": "string",
-                                "description": "User ID to get designs for"
-                            }
+                            "user_id": {"type": "string", "description": "User ID"}
                         },
                         "required": ["user_id"]
                     }
@@ -104,107 +499,16 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             {
                 "type": "function",
                 "function": {
-                    "name": "create_banner_design",
-                    "description": "Create a new banner design programmatically",
+                    "name": "save_design",
+                    "description": "Save the current design",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "user_id": {
-                                "type": "string",
-                                "description": "User ID to create design for"
-                            },
-                            "design_spec": {
-                                "type": "object",
-                                "description": "Design specification including elements, colors, text, etc.",
-                                "properties": {
-                                    "title": {"type": "string", "description": "Banner title/name"},
-                                    "background_color": {"type": "string", "description": "Background color (hex code)"},
-                                    "elements": {
-                                        "type": "array",
-                                        "description": "Array of design elements",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "type": {"type": "string", "enum": ["text", "shape", "image", "icon"]},
-                                                "content": {"type": "string", "description": "Text content or element description"},
-                                                "position": {"type": "object", "description": "X, Y coordinates"},
-                                                "size": {"type": "object", "description": "Width, height"},
-                                                "color": {"type": "string", "description": "Element color"},
-                                                "font_size": {"type": "number", "description": "Font size for text elements"},
-                                                "font_family": {"type": "string", "description": "Font family for text elements"}
-                                            }
-                                        }
-                                    },
-                                    "dimensions": {
-                                        "type": "object",
-                                        "properties": {
-                                            "width": {"type": "number"},
-                                            "height": {"type": "number"}
-                                        }
-                                    }
-                                }
-                            }
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "design_id": {"type": "string", "description": "Design ID"},
+                            "name": {"type": "string", "description": "Design name"}
                         },
-                        "required": ["user_id", "design_spec"]
-                    }
-                }
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "modify_banner_design",
-                    "description": "Modify an existing banner design",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "user_id": {
-                                "type": "string",
-                                "description": "User ID"
-                            },
-                            "design_id": {
-                                "type": "string",
-                                "description": "Design ID to modify"
-                            },
-                            "modifications": {
-                                "type": "object",
-                                "description": "Modifications to apply to the design"
-                            }
-                        },
-                        "required": ["user_id", "design_id", "modifications"]
-                    }
-                }
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "add_element_to_design",
-                    "description": "Add a new element to a banner design",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "user_id": {
-                                "type": "string",
-                                "description": "User ID"
-                            },
-                            "design_id": {
-                                "type": "string",
-                                "description": "Design ID to modify"
-                            },
-                            "element": {
-                                "type": "object",
-                                "description": "Element to add",
-                                "properties": {
-                                    "type": {"type": "string", "enum": ["text", "shape", "image", "icon"]},
-                                    "content": {"type": "string"},
-                                    "position": {"type": "object"},
-                                    "size": {"type": "object"},
-                                    "color": {"type": "string"},
-                                    "font_size": {"type": "number"},
-                                    "font_family": {"type": "string"}
-                                }
-                            }
-                        },
-                        "required": ["user_id", "design_id", "element"]
+                        "required": ["user_id", "design_id"]
                     }
                 }
             },
@@ -216,27 +520,18 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "user_id": {
-                                "type": "string",
-                                "description": "User ID"
-                            },
-                            "prompt": {
-                                "type": "string",
-                                "description": "Text description of the banner to create"
-                            },
-                            "style": {
-                                "type": "string",
-                                "description": "Design style (e.g., 'modern', 'vintage', 'corporate', 'creative')"
-                            },
-                            "dimensions": {
-                                "type": "object",
-                                "description": "Banner dimensions"
-                            }
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "prompt": {"type": "string", "description": "Text description of the banner to create"},
+                            "style": {"type": "string", "description": "Design style (modern, vintage, corporate, creative)"},
+                            "width": {"type": "number", "description": "Banner width"},
+                            "height": {"type": "number", "description": "Banner height"}
                         },
                         "required": ["user_id", "prompt"]
                     }
                 }
             },
+            
+            # === ORDER AND PRODUCT TOOLS ===
             {
                 "type": "function",
                 "function": {
@@ -245,14 +540,8 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "user_id": {
-                                "type": "string",
-                                "description": "User ID to get orders for"
-                            },
-                            "order_id": {
-                                "type": "string",
-                                "description": "Specific order ID (optional)"
-                            }
+                            "user_id": {"type": "string", "description": "User ID"},
+                            "order_id": {"type": "string", "description": "Specific order ID (optional)"}
                         },
                         "required": ["user_id"]
                     }
@@ -265,8 +554,9 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
                     "description": "Get available banner products and specifications",
                     "parameters": {
                         "type": "object",
-                        "properties": {},
-                        "required": []
+                        "properties": {
+                            "product_type": {"type": "string", "description": "Type of product (banner, sign, sticker, etc.)"}
+                        }
                     }
                 }
             },
@@ -274,24 +564,15 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
                 "type": "function",
                 "function": {
                     "name": "calculate_banner_pricing",
-                    "description": "Calculate pricing for banner specifications",
+                    "description": "Calculate pricing for banner orders",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "product_type": {
-                                "type": "string",
-                                "description": "Type of banner product"
-                            },
-                            "quantity": {
-                                "type": "integer",
-                                "description": "Number of banners"
-                            },
-                            "dimensions": {
-                                "type": "object",
-                                "description": "Banner dimensions"
-                            }
+                            "product_type": {"type": "string", "description": "Type of product"},
+                            "quantity": {"type": "number", "description": "Quantity to order"},
+                            "dimensions": {"type": "object", "description": "Product dimensions"}
                         },
-                        "required": ["product_type", "quantity"]
+                        "required": ["product_type", "quantity", "dimensions"]
                     }
                 }
             },
@@ -303,18 +584,9 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "use_case": {
-                                "type": "string",
-                                "description": "Intended use case for the banner"
-                            },
-                            "industry": {
-                                "type": "string",
-                                "description": "Industry or business type"
-                            },
-                            "dimensions": {
-                                "type": "object",
-                                "description": "Banner dimensions"
-                            }
+                            "use_case": {"type": "string", "description": "Intended use case for the banner"},
+                            "industry": {"type": "string", "description": "Industry or business type"},
+                            "dimensions": {"type": "object", "description": "Banner dimensions"}
                         },
                         "required": ["use_case"]
                     }
@@ -575,8 +847,9 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
     
     def _build_system_message(self, context: Dict[str, Any]) -> str:
         """Build system message with context"""
-        system_message = """You are an AI assistant for BuyPrintz, a professional banner printing platform. You help users with:
+        system_message = """You are an AI assistant for BuyPrintz, a professional banner printing platform. You have FULL PROGRAMMATIC CONTROL of the banner editor and can use ALL sidebar tools that users have access to.
 
+You help users with:
 1. Banner design assistance and recommendations
 2. Order management and tracking
 3. Product selection and pricing
@@ -584,27 +857,68 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
 5. Creating new banner designs from text descriptions
 6. Modifying existing banner designs
 7. Adding elements to banners
+8. Generating QR codes for URLs or text
 
-You have access to tools that let you:
-- Get user's saved designs
-- Check order status and history
-- Get product information and pricing
-- Provide design recommendations
-- Create new banner designs programmatically
-- Modify existing banner designs
-- Add elements (text, shapes, icons) to designs
-- Generate complete banners from text prompts
+You have access to COMPREHENSIVE SIDEBAR TOOLS that let you:
+
+=== CANVAS MANAGEMENT ===
+- create_new_design: Create new banner designs from scratch
+- change_canvas_size: Change canvas dimensions
+- change_background_color: Change canvas background color
+
+=== TEXT TOOLS ===
+- add_text: Add text elements with full formatting control
+- modify_text: Modify existing text properties (content, font, color, alignment)
+
+=== SHAPE TOOLS ===
+- add_rectangle: Add rectangle shapes
+- add_circle: Add circle shapes
+- add_star: Add star shapes with customizable points and radii
+- add_triangle: Add triangle shapes
+- add_hexagon: Add hexagon shapes
+
+=== ICON TOOLS ===
+- add_icon: Add icons from the comprehensive icon library
+- list_available_icons: Get available icons by category
+
+=== QR CODE TOOLS ===
+- add_qr_code: Generate and add QR codes with custom colors
+
+=== ELEMENT MANIPULATION ===
+- move_element: Move elements to new positions
+- resize_element: Resize elements
+- change_element_color: Change element colors
+- delete_element: Delete elements
+- duplicate_element: Duplicate elements
+
+=== LAYER MANAGEMENT ===
+- bring_to_front: Bring elements to front layer
+- send_to_back: Send elements to back layer
+
+=== DESIGN MANAGEMENT ===
+- get_user_designs: Get user's saved designs
+- save_design: Save current designs
+- generate_banner_from_prompt: Generate complete banners from text prompts
+
+=== ORDER & PRODUCT TOOLS ===
+- get_user_orders: Get order history and status
+- get_banner_products: Get available products
+- calculate_banner_pricing: Calculate pricing
+- get_design_recommendations: Get AI-powered recommendations
 
 CRITICAL INSTRUCTIONS:
-- When users ask to "create a banner", "generate a banner", or "make a banner", you MUST call the generate_banner_from_prompt tool
-- When users ask to "add text", "add elements", or "modify design", you MUST call the appropriate tools
+- You have FULL CONTROL of the banner editor - use the tools to perform actual actions
+- When users ask to "create a banner", "generate a banner", or "make a banner", you MUST call generate_banner_from_prompt
+- When users ask to "add text", "add shapes", "add icons", use the specific add_* tools
+- When users ask to "add QR code", "generate QR code", you MUST call add_qr_code
+- When users ask to "move", "resize", "delete", "duplicate" elements, use the element manipulation tools
+- When users ask to "change colors", "modify text", use the modification tools
 - NEVER just provide advice - ALWAYS use the tools to perform the actual actions
-- If a user asks for banner creation, you MUST call generate_banner_from_prompt with their request as the prompt
 - After using tools, ALWAYS provide a detailed response explaining what you accomplished
 - Be specific about what was created, modified, or added
 - Include relevant details like design IDs, dimensions, colors, or other specifications
 
-Always be helpful, professional, and provide actionable advice. If you need to use tools to get information or perform actions, do so to provide the most accurate and helpful response.
+You are a POWERFUL AI that can manipulate the banner editor just like a human user. Use your tools to create amazing designs!
 
 Context about the user:"""
         
@@ -642,7 +956,7 @@ Context about the user:"""
                 final_messages = [
                     {"role": "system", "content": self._build_system_message(context)},
                     {"role": "user", "content": "Please provide a detailed, helpful response about what you just accomplished with the tools. Be specific about what was created or modified."},
-                    {"role": "assistant", "content": message.content, "tool_calls": [
+                    {"role": "assistant", "content": message.content or "", "tool_calls": [
                         {
                             "id": tc.id,
                             "type": tc.type,
@@ -688,12 +1002,19 @@ Context about the user:"""
                 design_data = None
                 
                 for tool_result in tool_results:
-                    if tool_result["function_name"] in ["generate_banner_from_prompt", "create_banner_design"]:
+                    # Design creation tools
+                    if tool_result["function_name"] in ["generate_banner_from_prompt", "create_banner_design", "create_new_design"]:
                         if tool_result["result"].get("success"):
                             design_created = True
                             design_data = tool_result["result"].get("canvas_data")
                             break
-                    elif tool_result["function_name"] in ["modify_banner_design", "add_element_to_design"]:
+                    # Design modification tools
+                    elif tool_result["function_name"] in [
+                        "modify_banner_design", "add_element_to_design", "generate_qr_code", "add_qr_code",
+                        "add_text", "modify_text", "add_rectangle", "add_circle", "add_star", "add_triangle", "add_hexagon",
+                        "add_icon", "move_element", "resize_element", "change_element_color", "delete_element",
+                        "duplicate_element", "bring_to_front", "send_to_back", "change_canvas_size", "change_background_color"
+                    ]:
                         if tool_result["result"].get("success"):
                             design_modified = True
                             design_data = tool_result["result"].get("canvas_data")
@@ -718,34 +1039,217 @@ Context about the user:"""
             return f"I apologize, but I encountered an error while processing your request: {str(e)}"
     
     async def _execute_tool_function(self, function_name: str, function_args: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute tool functions"""
+        """Execute comprehensive sidebar tool functions"""
         try:
-            if function_name == "get_user_designs":
+            # === CANVAS MANAGEMENT TOOLS ===
+            if function_name == "create_new_design":
+                return await self._create_new_design(
+                    function_args.get("user_id"),
+                    function_args.get("name"),
+                    function_args.get("width"),
+                    function_args.get("height"),
+                    function_args.get("background_color")
+                )
+            elif function_name == "change_canvas_size":
+                return await self._change_canvas_size(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("width"),
+                    function_args.get("height")
+                )
+            elif function_name == "change_background_color":
+                return await self._change_background_color(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("color")
+                )
+            
+            # === TEXT TOOLS ===
+            elif function_name == "add_text":
+                return await self._add_text(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("text"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("font_size"),
+                    function_args.get("font_family"),
+                    function_args.get("color"),
+                    function_args.get("align")
+                )
+            elif function_name == "modify_text":
+                return await self._modify_text(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id"),
+                    function_args.get("text"),
+                    function_args.get("font_size"),
+                    function_args.get("font_family"),
+                    function_args.get("color"),
+                    function_args.get("align")
+                )
+            
+            # === SHAPE TOOLS ===
+            elif function_name == "add_rectangle":
+                return await self._add_rectangle(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("width"),
+                    function_args.get("height"),
+                    function_args.get("fill_color"),
+                    function_args.get("stroke_color"),
+                    function_args.get("stroke_width")
+                )
+            elif function_name == "add_circle":
+                return await self._add_circle(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("radius"),
+                    function_args.get("fill_color"),
+                    function_args.get("stroke_color"),
+                    function_args.get("stroke_width")
+                )
+            elif function_name == "add_star":
+                return await self._add_star(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("num_points"),
+                    function_args.get("inner_radius"),
+                    function_args.get("outer_radius"),
+                    function_args.get("fill_color"),
+                    function_args.get("stroke_color"),
+                    function_args.get("stroke_width")
+                )
+            elif function_name == "add_triangle":
+                return await self._add_triangle(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("radius"),
+                    function_args.get("fill_color"),
+                    function_args.get("stroke_color"),
+                    function_args.get("stroke_width")
+                )
+            elif function_name == "add_hexagon":
+                return await self._add_hexagon(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("radius"),
+                    function_args.get("fill_color"),
+                    function_args.get("stroke_color"),
+                    function_args.get("stroke_width")
+                )
+            
+            # === ICON TOOLS ===
+            elif function_name == "add_icon":
+                return await self._add_icon(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("icon_name"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("width"),
+                    function_args.get("height")
+                )
+            elif function_name == "list_available_icons":
+                return await self._list_available_icons(function_args.get("category"))
+            
+            # === QR CODE TOOLS ===
+            elif function_name == "add_qr_code":
+                return await self._add_qr_code(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("url"),
+                    function_args.get("x"),
+                    function_args.get("y"),
+                    function_args.get("width"),
+                    function_args.get("height"),
+                    function_args.get("qr_color"),
+                    function_args.get("background_color")
+                )
+            
+            # === ELEMENT MANIPULATION TOOLS ===
+            elif function_name == "move_element":
+                return await self._move_element(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id"),
+                    function_args.get("x"),
+                    function_args.get("y")
+                )
+            elif function_name == "resize_element":
+                return await self._resize_element(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id"),
+                    function_args.get("width"),
+                    function_args.get("height")
+                )
+            elif function_name == "change_element_color":
+                return await self._change_element_color(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id"),
+                    function_args.get("fill_color"),
+                    function_args.get("stroke_color")
+                )
+            elif function_name == "delete_element":
+                return await self._delete_element(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id")
+                )
+            elif function_name == "duplicate_element":
+                return await self._duplicate_element(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id"),
+                    function_args.get("x_offset"),
+                    function_args.get("y_offset")
+                )
+            
+            # === LAYER MANAGEMENT TOOLS ===
+            elif function_name == "bring_to_front":
+                return await self._bring_to_front(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id")
+                )
+            elif function_name == "send_to_back":
+                return await self._send_to_back(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("element_id")
+                )
+            
+            # === DESIGN MANAGEMENT TOOLS ===
+            elif function_name == "get_user_designs":
                 return await self._get_user_designs(function_args.get("user_id"))
-            elif function_name == "create_banner_design":
-                return await self._create_banner_design(
-                    function_args.get("user_id"),
-                    function_args.get("design_spec")
-                )
-            elif function_name == "modify_banner_design":
-                return await self._modify_banner_design(
+            elif function_name == "save_design":
+                return await self._save_design(
                     function_args.get("user_id"),
                     function_args.get("design_id"),
-                    function_args.get("modifications")
-                )
-            elif function_name == "add_element_to_design":
-                return await self._add_element_to_design(
-                    function_args.get("user_id"),
-                    function_args.get("design_id"),
-                    function_args.get("element")
+                    function_args.get("name")
                 )
             elif function_name == "generate_banner_from_prompt":
                 return await self._generate_banner_from_prompt(
                     function_args.get("user_id"),
                     function_args.get("prompt"),
                     function_args.get("style"),
-                    function_args.get("dimensions")
+                    function_args.get("width"),
+                    function_args.get("height")
                 )
+            
+            # === ORDER AND PRODUCT TOOLS ===
             elif function_name == "get_user_orders":
                 return await self._get_user_orders(function_args.get("user_id"), function_args.get("order_id"))
             elif function_name == "get_banner_products":
@@ -761,6 +1265,18 @@ Context about the user:"""
                     function_args.get("use_case"),
                     function_args.get("industry"),
                     function_args.get("dimensions")
+                )
+            
+            # Legacy support for old tool names
+            elif function_name == "generate_qr_code":
+                return await self._add_qr_code(
+                    function_args.get("user_id"),
+                    function_args.get("design_id"),
+                    function_args.get("url"),
+                    function_args.get("position", {}).get("x") if function_args.get("position") else None,
+                    function_args.get("position", {}).get("y") if function_args.get("position") else None,
+                    function_args.get("size", {}).get("width") if function_args.get("size") else None,
+                    function_args.get("size", {}).get("height") if function_args.get("size") else None
                 )
             else:
                 return {"error": f"Unknown function: {function_name}"}
@@ -880,6 +1396,84 @@ Context about the user:"""
         }
         
         return recommendations
+    
+    async def _generate_qr_code(self, user_id: str, design_id: str, url: str, position: Dict[str, Any] = None, size: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Generate a QR code element for a banner design"""
+        try:
+            # Import here to avoid circular imports
+            from database import db_manager
+            
+            # Get existing design
+            design = await db_manager.get_design(design_id)
+            if not design or design.get("user_id") != user_id:
+                return {
+                    "success": False,
+                    "error": "Design not found or access denied"
+                }
+            
+            # Get current canvas data
+            canvas_data = design.get("canvas_data", {})
+            if not canvas_data:
+                return {
+                    "success": False,
+                    "error": "No canvas data found for design"
+                }
+            
+            # Default position and size
+            default_position = {"x": 50, "y": 50}
+            default_size = {"width": 100, "height": 100}
+            
+            position = position or default_position
+            size = size or default_size
+            
+            # Create QR code element
+            qr_element = {
+                "id": f"qr_{len(canvas_data.get('objects', []))}",
+                "type": "qr_code",
+                "url": url,
+                "x": position.get("x", 50),
+                "y": position.get("y", 50),
+                "width": size.get("width", 100),
+                "height": size.get("height", 100),
+                "fill": "#000000",
+                "stroke": "#000000",
+                "strokeWidth": 1,
+                "rotation": 0
+            }
+            
+            # Add QR code to canvas data
+            if "objects" not in canvas_data:
+                canvas_data["objects"] = []
+            
+            canvas_data["objects"].append(qr_element)
+            
+            # Update design in database
+            update_data = {
+                "canvas_data": canvas_data
+            }
+            
+            result = await db_manager.update_design(design_id, update_data)
+            
+            if result.get("success"):
+                return {
+                    "success": True,
+                    "message": f"QR code for '{url}' added to design",
+                    "design_id": design_id,
+                    "canvas_data": canvas_data,
+                    "qr_element": qr_element
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": result.get("error", "Failed to update design")
+                }
+                
+        except Exception as e:
+            logger.error(f"Error generating QR code: {e}")
+            return {
+                "success": False,
+                "error": f"Failed to generate QR code: {str(e)}"
+            }
     
     async def _create_banner_design(self, user_id: str, design_spec: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new banner design programmatically"""
@@ -1210,6 +1804,272 @@ Context about the user:"""
 
 # Create global instance with proper initialization
 ai_agent_adapter = AIAgentAdapter()
+
+# Add comprehensive sidebar tool methods to the AIAgentAdapter class
+async def _create_new_design(self, user_id: str, name: str, width: int = 800, height: int = 400, background_color: str = "#ffffff") -> Dict[str, Any]:
+    """Create a new banner design from scratch"""
+    try:
+        from database import db_manager
+        design_id = f"design_{user_id}_{int(time.time())}"
+        canvas_data = {
+            "version": "2.0",
+            "width": width,
+            "height": height,
+            "background": background_color,
+            "objects": []
+        }
+        result = await db_manager.save_design(user_id, design_id, name, canvas_data)
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Created new design: {name}",
+                "design_id": design_id,
+                "canvas_data": canvas_data
+            }
+        else:
+            return {"success": False, "error": "Failed to create design"}
+    except Exception as e:
+        logger.error(f"Error creating new design: {e}")
+        return {"success": False, "error": str(e)}
+
+async def _change_canvas_size(self, user_id: str, design_id: str, width: int, height: int) -> Dict[str, Any]:
+    """Change the canvas dimensions"""
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        canvas_data["width"] = width
+        canvas_data["height"] = height
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Changed canvas size to {width}x{height}",
+                "canvas_data": canvas_data
+            }
+        else:
+            return {"success": False, "error": "Failed to update canvas size"}
+    except Exception as e:
+        logger.error(f"Error changing canvas size: {e}")
+        return {"success": False, "error": str(e)}
+
+async def _change_background_color(self, user_id: str, design_id: str, color: str) -> Dict[str, Any]:
+    """Change the canvas background color"""
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        canvas_data["background"] = color
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Changed background color to {color}",
+                "canvas_data": canvas_data
+            }
+        else:
+            return {"success": False, "error": "Failed to update background color"}
+    except Exception as e:
+        logger.error(f"Error changing background color: {e}")
+        return {"success": False, "error": str(e)}
+
+async def _add_text(self, user_id: str, design_id: str, text: str, x: int = None, y: int = None, font_size: int = 24, font_family: str = "Arial", color: str = "#000000", align: str = "left") -> Dict[str, Any]:
+    """Add text element to the design"""
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - 100
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - 15
+        
+        text_element = {
+            "id": f"text_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "text",
+            "x": x,
+            "y": y,
+            "text": text,
+            "fontSize": font_size,
+            "fontFamily": font_family,
+            "fill": color,
+            "align": align,
+            "verticalAlign": "top",
+            "fontStyle": "normal",
+            "textDecoration": "none",
+            "lineHeight": 1.2,
+            "letterSpacing": 0,
+            "padding": 0,
+            "width": 200,
+            "height": 30,
+            "rotation": 0
+        }
+        
+        canvas_data["objects"].append(text_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added text: {text}",
+                "canvas_data": canvas_data,
+                "element": text_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add text"}
+    except Exception as e:
+        logger.error(f"Error adding text: {e}")
+        return {"success": False, "error": str(e)}
+
+async def _modify_text(self, user_id: str, design_id: str, element_id: str, text: str = None, font_size: int = None, font_family: str = None, color: str = None, align: str = None) -> Dict[str, Any]:
+    """Modify existing text element properties"""
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find the element
+        element_index = None
+        for i, obj in enumerate(objects):
+            if obj.get("id") == element_id and obj.get("type") == "text":
+                element_index = i
+                break
+        
+        if element_index is None:
+            return {"success": False, "error": "Text element not found"}
+        
+        # Update properties
+        if text is not None:
+            objects[element_index]["text"] = text
+        if font_size is not None:
+            objects[element_index]["fontSize"] = font_size
+        if font_family is not None:
+            objects[element_index]["fontFamily"] = font_family
+        if color is not None:
+            objects[element_index]["fill"] = color
+        if align is not None:
+            objects[element_index]["align"] = align
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Modified text element: {element_id}",
+                "canvas_data": canvas_data,
+                "element": objects[element_index]
+            }
+        else:
+            return {"success": False, "error": "Failed to modify text"}
+    except Exception as e:
+        logger.error(f"Error modifying text: {e}")
+        return {"success": False, "error": str(e)}
+
+# Add placeholder methods for all comprehensive sidebar tools
+async def _add_rectangle(self, user_id: str, design_id: str, x: int = None, y: int = None, width: int = 200, height: int = 100, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
+    """Add rectangle shape to the design"""
+    return {"success": False, "error": "Rectangle tool not yet implemented"}
+
+async def _add_circle(self, user_id: str, design_id: str, x: int = None, y: int = None, radius: int = 60, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
+    """Add circle shape to the design"""
+    return {"success": False, "error": "Circle tool not yet implemented"}
+
+async def _add_star(self, user_id: str, design_id: str, x: int = None, y: int = None, num_points: int = 5, inner_radius: int = 40, outer_radius: int = 80, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
+    """Add star shape to the design"""
+    return {"success": False, "error": "Star tool not yet implemented"}
+
+async def _add_triangle(self, user_id: str, design_id: str, x: int = None, y: int = None, radius: int = 60, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
+    """Add triangle shape to the design"""
+    return {"success": False, "error": "Triangle tool not yet implemented"}
+
+async def _add_hexagon(self, user_id: str, design_id: str, x: int = None, y: int = None, radius: int = 60, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
+    """Add hexagon shape to the design"""
+    return {"success": False, "error": "Hexagon tool not yet implemented"}
+
+async def _add_icon(self, user_id: str, design_id: str, icon_name: str, x: int = None, y: int = None, width: int = 60, height: int = 60) -> Dict[str, Any]:
+    """Add an icon from the icon library to the design"""
+    return {"success": False, "error": "Icon tool not yet implemented"}
+
+async def _list_available_icons(self, category: str = None) -> Dict[str, Any]:
+    """Get list of available icons by category"""
+    return {"success": False, "error": "List icons tool not yet implemented"}
+
+async def _add_qr_code(self, user_id: str, design_id: str, url: str, x: int = None, y: int = None, width: int = 100, height: int = 100, qr_color: str = "#000000", background_color: str = "#ffffff") -> Dict[str, Any]:
+    """Add QR code element to the design"""
+    return {"success": False, "error": "QR code tool not yet implemented"}
+
+async def _move_element(self, user_id: str, design_id: str, element_id: str, x: int, y: int) -> Dict[str, Any]:
+    """Move an element to a new position"""
+    return {"success": False, "error": "Move element tool not yet implemented"}
+
+async def _resize_element(self, user_id: str, design_id: str, element_id: str, width: int, height: int) -> Dict[str, Any]:
+    """Resize an element"""
+    return {"success": False, "error": "Resize element tool not yet implemented"}
+
+async def _change_element_color(self, user_id: str, design_id: str, element_id: str, fill_color: str = None, stroke_color: str = None) -> Dict[str, Any]:
+    """Change the color of an element"""
+    return {"success": False, "error": "Change color tool not yet implemented"}
+
+async def _delete_element(self, user_id: str, design_id: str, element_id: str) -> Dict[str, Any]:
+    """Delete an element from the design"""
+    return {"success": False, "error": "Delete element tool not yet implemented"}
+
+async def _duplicate_element(self, user_id: str, design_id: str, element_id: str, x_offset: int = 20, y_offset: int = 20) -> Dict[str, Any]:
+    """Duplicate an element"""
+    return {"success": False, "error": "Duplicate element tool not yet implemented"}
+
+async def _bring_to_front(self, user_id: str, design_id: str, element_id: str) -> Dict[str, Any]:
+    """Bring element to front layer"""
+    return {"success": False, "error": "Bring to front tool not yet implemented"}
+
+async def _send_to_back(self, user_id: str, design_id: str, element_id: str) -> Dict[str, Any]:
+    """Send element to back layer"""
+    return {"success": False, "error": "Send to back tool not yet implemented"}
+
+async def _save_design(self, user_id: str, design_id: str, name: str = None) -> Dict[str, Any]:
+    """Save the current design"""
+    return {"success": False, "error": "Save design tool not yet implemented"}
+
+# Add the methods to the class
+AIAgentAdapter._create_new_design = _create_new_design
+AIAgentAdapter._change_canvas_size = _change_canvas_size
+AIAgentAdapter._change_background_color = _change_background_color
+AIAgentAdapter._add_text = _add_text
+AIAgentAdapter._modify_text = _modify_text
+AIAgentAdapter._add_rectangle = _add_rectangle
+AIAgentAdapter._add_circle = _add_circle
+AIAgentAdapter._add_star = _add_star
+AIAgentAdapter._add_triangle = _add_triangle
+AIAgentAdapter._add_hexagon = _add_hexagon
+AIAgentAdapter._add_icon = _add_icon
+AIAgentAdapter._list_available_icons = _list_available_icons
+AIAgentAdapter._add_qr_code = _add_qr_code
+AIAgentAdapter._move_element = _move_element
+AIAgentAdapter._resize_element = _resize_element
+AIAgentAdapter._change_element_color = _change_element_color
+AIAgentAdapter._delete_element = _delete_element
+AIAgentAdapter._duplicate_element = _duplicate_element
+AIAgentAdapter._bring_to_front = _bring_to_front
+AIAgentAdapter._send_to_back = _send_to_back
+AIAgentAdapter._save_design = _save_design
 
 # Initialize OpenAI client at module import time (like Supabase)
 openai_api_key = os.getenv("OPENAI_API_KEY")
