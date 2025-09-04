@@ -327,8 +327,17 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
         try:
             # Check if OpenAI API key is configured
             api_key = os.getenv("OPENAI_API_KEY")
+            logger.info(f"Environment check - OPENAI_API_KEY exists: {bool(api_key)}")
+            logger.info(f"Environment check - API key length: {len(api_key) if api_key else 0}")
+            logger.info(f"Environment check - API key prefix: {api_key[:10] if api_key else 'None'}...")
+            
+            # Debug: Show all OpenAI-related environment variables
+            openai_vars = {k: v for k, v in os.environ.items() if 'OPENAI' in k.upper()}
+            logger.info(f"All OpenAI environment variables: {list(openai_vars.keys())}")
+            
             if not api_key:
                 self.initialization_error = "OpenAI API key not configured"
+                logger.error("OpenAI API key not found in environment variables")
                 return False
             
             # Initialize OpenAI client
