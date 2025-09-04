@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
+import { QRCodeCanvas } from 'qrcode.react'
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -684,6 +685,13 @@ const BannerCanvas = ({
           width: element.width || 60,
           height: element.height || 60
         }
+      case 'qr':
+        return {
+          x: x,
+          y: y,
+          width: element.width || 200,
+          height: element.height || 200
+        }
 
       default:
         return {
@@ -825,6 +833,13 @@ const BannerCanvas = ({
         if (!element.strokeWidth) element.strokeWidth = 1
         if (!element.symbol) element.symbol = null
         if (!element.imagePath) element.imagePath = null
+        break
+      case 'qr':
+        if (!element.width) element.width = 200
+        if (!element.height) element.height = 200
+        if (!element.url) element.url = 'https://example.com'
+        if (!element.qrColor) element.qrColor = '#000000'
+        if (!element.backgroundColor) element.backgroundColor = '#ffffff'
         break
 
     }
@@ -1029,6 +1044,28 @@ const BannerCanvas = ({
             />
           )
         }
+      
+      case 'qr':
+        // For QR codes, we'll render a placeholder rectangle for now
+        // The actual QR code rendering will be handled by a separate component
+        return (
+          <Rect
+            key={safeElement.id}
+            {...commonProps}
+            width={safeElement.width || 200}
+            height={safeElement.height || 200}
+            fill={safeElement.backgroundColor || '#ffffff'}
+            stroke={safeElement.qrColor || '#000000'}
+            strokeWidth={2}
+            rotation={safeElement.rotation || 0}
+            cornerRadius={8}
+            // Add a label to indicate this is a QR code
+            shadowColor="black"
+            shadowBlur={4}
+            shadowOffset={{ x: 2, y: 2 }}
+            shadowOpacity={0.3}
+          />
+        )
       
       default:
         return null
