@@ -25,6 +25,11 @@ const BannerEditorNew = () => {
   
   // Core state
   const [elements, setElements] = useState([])
+  
+  // Debug elements state changes
+  useEffect(() => {
+    console.log('🎨 Elements state updated:', elements);
+  }, [elements]);
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
@@ -37,16 +42,21 @@ const BannerEditorNew = () => {
   
   // AI Agent handlers
   const handleAIDesignGenerated = useCallback((designData) => {
+    console.log('🎨 handleAIDesignGenerated called with:', designData);
     if (designData && designData.canvas_data) {
       // Load the AI-generated design into the canvas
       const canvasData = designData.canvas_data;
+      console.log('🎨 Canvas data:', canvasData);
       if (canvasData.objects) {
+        console.log('🎨 Setting elements:', canvasData.objects);
         setElements(canvasData.objects);
       }
       if (canvasData.background) {
+        console.log('🎨 Setting background:', canvasData.background);
         setBackgroundColor(canvasData.background);
       }
       if (canvasData.width && canvasData.height) {
+        console.log('🎨 Setting canvas size:', canvasData.width, canvasData.height);
         setCanvasSize({ width: canvasData.width, height: canvasData.height });
       }
       setCurrentDesignId(designData.design_id);
@@ -54,13 +64,18 @@ const BannerEditorNew = () => {
   }, []);
 
   const handleAIDesignModified = useCallback((designData) => {
+    console.log('🎨 handleAIDesignModified called with:', designData);
     if (designData && designData.canvas_data) {
       // Apply AI modifications to the canvas
       const canvasData = designData.canvas_data;
+      console.log('🎨 Canvas data:', canvasData);
       if (canvasData.objects) {
+        console.log('🎨 Setting elements:', canvasData.objects);
         setElements(canvasData.objects);
+        console.log('🎨 Elements state should now be updated with', canvasData.objects.length, 'objects');
       }
       if (canvasData.background) {
+        console.log('🎨 Setting background:', canvasData.background);
         setBackgroundColor(canvasData.background);
       }
     }

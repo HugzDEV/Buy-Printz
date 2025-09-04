@@ -60,37 +60,47 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
         })
       });
 
+      // Parse the response if it's a Response object
+      let responseData;
+      if (response && typeof response.json === 'function') {
+        responseData = await response.json();
+      } else if (response && typeof response === 'object') {
+        responseData = response;
+      } else {
+        throw new Error('Invalid response format');
+      }
+
       // Debug logging
-      console.log('AI Agent Response:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response keys:', Object.keys(response || {}));
+      console.log('AI Agent Response:', responseData);
+      console.log('Response type:', typeof responseData);
+      console.log('Response keys:', Object.keys(responseData || {}));
 
       const aiResponse = {
         id: Date.now() + 1,
         type: 'ai',
-        content: response.response || response.message || 'I understand your request. Let me help you with that.',
+        content: responseData.response || responseData.message || 'I understand your request. Let me help you with that.',
         timestamp: new Date(),
-        actions: response.actions || []
+        actions: responseData.actions || []
       };
 
       setMessages(prev => [...prev, aiResponse]);
 
       // Handle design generation/modification
       console.log('Design flags:', {
-        design_created: response.design_created,
-        design_modified: response.design_modified,
-        has_design_data: !!response.design_data,
+        design_created: responseData.design_created,
+        design_modified: responseData.design_modified,
+        has_design_data: !!responseData.design_data,
         onDesignGenerated: !!onDesignGenerated,
         onDesignModified: !!onDesignModified
       });
       
-      if (response.design_created && onDesignGenerated) {
-        console.log('Calling onDesignGenerated with:', response.design_data);
-        onDesignGenerated(response.design_data);
+      if (responseData.design_created && onDesignGenerated) {
+        console.log('Calling onDesignGenerated with:', responseData.design_data);
+        onDesignGenerated(responseData.design_data);
       }
-      if (response.design_modified && onDesignModified) {
-        console.log('Calling onDesignModified with:', response.design_data);
-        onDesignModified(response.design_data);
+      if (responseData.design_modified && onDesignModified) {
+        console.log('Calling onDesignModified with:', responseData.design_data);
+        onDesignModified(responseData.design_data);
       }
 
     } catch (error) {
