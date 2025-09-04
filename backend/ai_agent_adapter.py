@@ -72,10 +72,9 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             timeout=120.0
         )
         
-        # Initialize OpenAI client
-        self.openai_client = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY")
-        )
+        # Initialize OpenAI client lazily (only when needed)
+        self.openai_client = None
+        self._initialized = False
         
         # Add AI agent capabilities
         self.add_capability("design_assistance", "AI-powered banner design assistance")
@@ -326,10 +325,17 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
     async def initialize(self) -> bool:
         """Initialize AI agent adapter with health check"""
         try:
-            # Test OpenAI connection
-            if not os.getenv("OPENAI_API_KEY"):
+            # Check if OpenAI API key is configured
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
                 self.initialization_error = "OpenAI API key not configured"
                 return False
+            
+            # Initialize OpenAI client
+            self.openai_client = AsyncOpenAI(
+                api_key=api_key,
+                http_client=httpx.AsyncClient()
+            )
             
             # Test OpenAI API
             test_response = await self.openai_client.chat.completions.create(
@@ -339,6 +345,7 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             )
             
             if test_response.choices:
+                self._initialized = True
                 logger.info("✅ AI Agent Adapter initialized successfully")
                 return True
             else:
@@ -362,6 +369,15 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             Dict with AI response and success status
         """
         try:
+            # Ensure OpenAI client is initialized
+            if not self._initialized or not self.openai_client:
+                initialized = await self.initialize()
+                if not initialized:
+                    return {
+                        "response": "AI Agent is not available. Please check configuration.",
+                        "error": self.initialization_error
+                    }
+            
             if not context:
                 context = {}
             
@@ -406,6 +422,15 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
     async def get_design_assistance(self, design_type: str, requirements: Dict[str, Any], user_preferences: Dict[str, Any] = None) -> Dict[str, Any]:
         """Get AI-powered design assistance"""
         try:
+            # Ensure OpenAI client is initialized
+            if not self._initialized or not self.openai_client:
+                initialized = await self.initialize()
+                if not initialized:
+                    return {
+                        "response": "AI Agent is not available. Please check configuration.",
+                        "error": self.initialization_error
+                    }
+            
             if not user_preferences:
                 user_preferences = {}
             
@@ -440,6 +465,15 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
     async def get_order_assistance(self, order_id: str = None, user_id: str = None, query_type: str = "status") -> Dict[str, Any]:
         """Get AI assistance with order management"""
         try:
+            # Ensure OpenAI client is initialized
+            if not self._initialized or not self.openai_client:
+                initialized = await self.initialize()
+                if not initialized:
+                    return {
+                        "response": "AI Agent is not available. Please check configuration.",
+                        "error": self.initialization_error
+                    }
+            
             # Build order assistance query
             if order_id:
                 query = f"Help me with order {order_id}. I want to know about {query_type}."
@@ -466,6 +500,15 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
     async def get_banner_recommendations(self, use_case: str, dimensions: Dict[str, Any] = None, budget: float = None) -> Dict[str, Any]:
         """Get AI-powered banner recommendations"""
         try:
+            # Ensure OpenAI client is initialized
+            if not self._initialized or not self.openai_client:
+                initialized = await self.initialize()
+                if not initialized:
+                    return {
+                        "response": "AI Agent is not available. Please check configuration.",
+                        "error": self.initialization_error
+                    }
+            
             # Build recommendation query
             query = f"""
             I need banner recommendations for: {use_case}
