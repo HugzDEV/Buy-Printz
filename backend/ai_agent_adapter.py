@@ -339,9 +339,9 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             
             # Test OpenAI API
             test_response = await self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-5-mini-2025-08-07",
                 messages=[{"role": "user", "content": "Hello"}],
-                max_tokens=10
+                max_completion_tokens=100
             )
             
             if test_response.choices:
@@ -397,12 +397,11 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
             logger.info(f"Calling OpenAI with {len(self.available_tools)} tools available")
             logger.info(f"User query: '{query}'")
             response = await self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-5-mini-2025-08-07",
                 messages=messages,
                 tools=self.available_tools,
                 tool_choice="auto",
-                max_tokens=1500,
-                temperature=0.7
+                max_completion_tokens=1500
             )
             
             logger.info(f"OpenAI response: {response.choices[0].message}")
@@ -624,10 +623,9 @@ Context about the user:"""
                 
                 # Get final response
                 final_response = await self.openai_client.chat.completions.create(
-                    model="gpt-4o",
+                    model="gpt-5-mini-2025-08-07",
                     messages=final_messages,
-                    max_tokens=1000,
-                    temperature=0.7
+                    max_completion_tokens=1000
                 )
                 
                 return final_response.choices[0].message.content
@@ -1074,13 +1072,12 @@ Context about the user:"""
             
             # Use OpenAI to interpret the prompt
             response = await self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-5-mini-2025-08-07",
                 messages=[
                     {"role": "system", "content": "You are a professional banner designer. Create detailed design specifications in JSON format."},
                     {"role": "user", "content": interpretation_prompt}
                 ],
-                max_tokens=1000,
-                temperature=0.7
+                max_completion_tokens=1000
             )
             
             # Parse the AI response
