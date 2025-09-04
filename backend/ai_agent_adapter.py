@@ -371,12 +371,15 @@ class AIAgentAdapter(MCPCompliantServiceAdapter):
         try:
             # Ensure OpenAI client is initialized
             if not self._initialized or not self.openai_client:
+                logger.info("AI Agent not initialized, attempting initialization...")
                 initialized = await self.initialize()
                 if not initialized:
+                    logger.error(f"AI Agent initialization failed: {self.initialization_error}")
                     return {
                         "response": "AI Agent is not available. Please check configuration.",
                         "error": self.initialization_error
                     }
+                logger.info("AI Agent initialized successfully!")
             
             if not context:
                 context = {}
@@ -579,17 +582,21 @@ Context about the user:"""
         """Process AI response and handle function calls"""
         try:
             message = response.choices[0].message
+            logger.info(f"AI Response message: {message}")
             
             # Check if the AI wants to call a function
             if message.tool_calls:
+                logger.info(f"AI wants to call {len(message.tool_calls)} tools: {[tc.function.name for tc in message.tool_calls]}")
                 # Execute function calls
                 tool_results = []
                 for tool_call in message.tool_calls:
                     function_name = tool_call.function.name
                     function_args = json.loads(tool_call.function.arguments)
+                    logger.info(f"Executing tool: {function_name} with args: {function_args}")
                     
                     # Execute the function
                     result = await self._execute_tool_function(function_name, function_args, context)
+                    logger.info(f"Tool {function_name} result: {result}")
                     tool_results.append({
                         "tool_call_id": tool_call.id,
                         "function_name": function_name,
@@ -620,6 +627,7 @@ Context about the user:"""
                 
                 return final_response.choices[0].message.content
             else:
+                logger.info("AI did not call any tools, returning direct response")
                 return message.content
                 
         except Exception as e:
