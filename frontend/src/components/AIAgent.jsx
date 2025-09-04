@@ -60,12 +60,25 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
         })
       });
 
+      // Debug the raw response first
+      console.log('🔍 Raw response object:', response);
+      console.log('🔍 Response has json method:', typeof response.json);
+      console.log('🔍 Response status:', response.status);
+      console.log('🔍 Response ok:', response.ok);
+
       // Parse the response if it's a Response object
       let responseData;
       if (response && typeof response.json === 'function') {
-        responseData = await response.json();
+        try {
+          responseData = await response.json();
+          console.log('🔍 Successfully parsed JSON response:', responseData);
+        } catch (parseError) {
+          console.error('🔍 Error parsing JSON response:', parseError);
+          throw new Error('Failed to parse response JSON: ' + parseError.message);
+        }
       } else if (response && typeof response === 'object') {
         responseData = response;
+        console.log('🔍 Using response as-is (not a Response object)');
       } else {
         throw new Error('Invalid response format');
       }
