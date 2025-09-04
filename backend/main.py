@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 # Import our modules
 from database import db_manager
 from auth import auth_manager, get_current_user
+from ai_agent_adapter import ai_agent_adapter
 
 # Load environment variables
 load_dotenv()
@@ -189,6 +190,27 @@ class EnhancedCanvasData(BaseModel):
     banner_category: Optional[str] = None
     background_color: Optional[str] = "#ffffff"
     print_options: Optional[dict] = {}
+
+# AI Agent Models
+class AIQuery(BaseModel):
+    query: str
+    context: Optional[Dict[str, Any]] = {}
+    user_id: Optional[str] = None
+
+class DesignAssistanceRequest(BaseModel):
+    design_type: str
+    requirements: Dict[str, Any]
+    user_preferences: Optional[Dict[str, Any]] = {}
+
+class OrderQuery(BaseModel):
+    order_id: Optional[str] = None
+    user_id: Optional[str] = None
+    query_type: str  # "status", "history", "details"
+
+class BannerRecommendationRequest(BaseModel):
+    use_case: str
+    dimensions: Optional[Dict[str, Any]] = None
+    budget: Optional[float] = None
 
 # Authentication endpoints
 @app.post("/api/auth/register")
@@ -919,9 +941,116 @@ async def get_design_history(design_id: str, current_user: dict = Depends(get_cu
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# AI Agent Endpoints
+@app.post("/api/ai/chat")
+async def ai_chat_endpoint(request: AIQuery, current_user: dict = Depends(get_current_user)):
+    """AI Chat endpoint for general assistance"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        # Add user context to the request
+        request.context["user_id"] = current_user["user_id"]
+        request.context["user_email"] = current_user.get("email", "")
+        
+        result = await ai_agent_adapter.chat_with_ai(request.query, request.context)
+        return result
+    except Exception as e:
+        logger.error(f"AI Chat error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ai/design-assistance")
+async def design_assistance_endpoint(request: DesignAssistanceRequest, current_user: dict = Depends(get_current_user)):
+    """Design assistance endpoint"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        # Add user context to preferences
+        if not request.user_preferences:
+            request.user_preferences = {}
+        request.user_preferences["user_id"] = current_user["user_id"]
+        
+        result = await ai_agent_adapter.get_design_assistance(
+            request.design_type,
+            request.requirements,
+            request.user_preferences
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Design assistance error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ai/order-assistance")
+async def order_assistance_endpoint(request: OrderQuery, current_user: dict = Depends(get_current_user)):
+    """Order assistance endpoint"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        # Use current user's ID if not provided
+        if not request.user_id:
+            request.user_id = current_user["user_id"]
+        
+        result = await ai_agent_adapter.get_order_assistance(
+            request.order_id,
+            request.user_id,
+            request.query_type
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Order assistance error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ai/banner-recommendations")
+async def banner_recommendations_endpoint(request: BannerRecommendationRequest, current_user: dict = Depends(get_current_user)):
+    """Banner recommendations endpoint"""
+    try:
+        # Initialize AI agent adapter if not already done
+        if not hasattr(ai_agent_adapter, '_initialized'):
+            initialized = await ai_agent_adapter.initialize()
+            if not initialized:
+                raise HTTPException(status_code=503, detail="AI Agent service unavailable")
+            ai_agent_adapter._initialized = True
+        
+        result = await ai_agent_adapter.get_banner_recommendations(
+            request.use_case,
+            request.dimensions,
+            request.budget
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Banner recommendations error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/ai/health")
+async def ai_agent_health():
+    """AI Agent health check endpoint"""
+    try:
+        health = await ai_agent_adapter.get_health()
+        return health
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "service": "ai_agent_adapter"
+        }
+
 @app.get("/")
 async def root():
-    return {"message": "Buy Printz Banner Printing Platform API v2.0 - Enhanced"}
+    return {"message": "Buy Printz Banner Printing Platform API v2.0 - Enhanced with AI Agent"}
 
 @app.get("/health", tags=["Health"])
 async def health_check():
@@ -933,7 +1062,16 @@ async def health_check():
         # Check environment configuration
         supabase_configured = bool(os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_KEY"))
         stripe_configured = bool(os.getenv("STRIPE_SECRET_KEY"))
+        openai_configured = bool(os.getenv("OPENAI_API_KEY"))
         db_connected = db_manager.is_connected() if hasattr(db_manager, 'is_connected') else False
+        ai_agent_healthy = False
+        
+        # Check AI agent health
+        try:
+            ai_health = await ai_agent_adapter.get_health()
+            ai_agent_healthy = ai_health.get("status") == "healthy"
+        except:
+            ai_agent_healthy = False
         
         # Determine overall status
         status = "healthy" if (supabase_configured and db_connected) else "starting"
@@ -947,6 +1085,8 @@ async def health_check():
             "database": "connected" if db_connected else "disconnected",
             "supabase_configured": supabase_configured,
             "stripe_configured": stripe_configured,
+            "openai_configured": openai_configured,
+            "ai_agent_healthy": ai_agent_healthy,
             "uptime": "active"
         }
     except Exception as e:
@@ -974,7 +1114,12 @@ async def api_status():
         },
         "integrations": {
             "supabase": "configured" if os.getenv("SUPABASE_URL") else "missing",
-            "stripe": "configured" if os.getenv("STRIPE_SECRET_KEY") else "missing"
+            "stripe": "configured" if os.getenv("STRIPE_SECRET_KEY") else "missing",
+            "openai": "configured" if os.getenv("OPENAI_API_KEY") else "missing"
+        },
+        "ai_agent": {
+            "enabled": bool(os.getenv("OPENAI_API_KEY")),
+            "capabilities": ["design_assistance", "order_help", "banner_recommendations", "general_chat"]
         }
     }
 
