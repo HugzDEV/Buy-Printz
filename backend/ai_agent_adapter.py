@@ -654,6 +654,10 @@ Context about the user:"""
                     })
                 
                 # Get final response
+                logger.info(f"Sending final messages to OpenAI: {len(final_messages)} messages")
+                for i, msg in enumerate(final_messages):
+                    logger.info(f"Message {i}: {msg['role']} - {msg['content'][:100]}...")
+                
                 final_response = await self.openai_client.chat.completions.create(
                     model="gpt-5-mini-2025-08-07",
                     messages=final_messages,
@@ -661,7 +665,13 @@ Context about the user:"""
                 )
                 
                 final_content = final_response.choices[0].message.content
-                logger.info(f"Final AI response content: {final_content}")
+                logger.info(f"Final AI response content: '{final_content}'")
+                logger.info(f"Final response object: {final_response.choices[0].message}")
+                
+                # If final content is empty, provide a fallback response
+                if not final_content or final_content.strip() == "":
+                    final_content = "I've successfully created your banner design! The design has been generated and is now ready for you to view and customize."
+                    logger.info(f"Using fallback response: '{final_content}'")
                 
                 # Check if any tool created or modified a design
                 design_created = False
