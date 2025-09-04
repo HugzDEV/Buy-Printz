@@ -642,7 +642,16 @@ Context about the user:"""
                 final_messages = [
                     {"role": "system", "content": self._build_system_message(context)},
                     {"role": "user", "content": "Please provide a detailed, helpful response about what you just accomplished with the tools. Be specific about what was created or modified."},
-                    message  # Include the original message with tool_calls
+                    {"role": "assistant", "content": message.content, "tool_calls": [
+                        {
+                            "id": tc.id,
+                            "type": tc.type,
+                            "function": {
+                                "name": tc.function.name,
+                                "arguments": tc.function.arguments
+                            }
+                        } for tc in message.tool_calls
+                    ]}
                 ]
                 
                 # Add tool results to messages
