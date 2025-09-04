@@ -60,6 +60,11 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
         })
       });
 
+      // Debug logging
+      console.log('AI Agent Response:', response);
+      console.log('Response type:', typeof response);
+      console.log('Response keys:', Object.keys(response || {}));
+
       const aiResponse = {
         id: Date.now() + 1,
         type: 'ai',
@@ -71,10 +76,20 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
       setMessages(prev => [...prev, aiResponse]);
 
       // Handle design generation/modification
+      console.log('Design flags:', {
+        design_created: response.design_created,
+        design_modified: response.design_modified,
+        has_design_data: !!response.design_data,
+        onDesignGenerated: !!onDesignGenerated,
+        onDesignModified: !!onDesignModified
+      });
+      
       if (response.design_created && onDesignGenerated) {
+        console.log('Calling onDesignGenerated with:', response.design_data);
         onDesignGenerated(response.design_data);
       }
       if (response.design_modified && onDesignModified) {
+        console.log('Calling onDesignModified with:', response.design_data);
         onDesignModified(response.design_data);
       }
 
