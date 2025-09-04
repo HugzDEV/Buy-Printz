@@ -16,6 +16,7 @@ import {
 import BannerSidebar from './BannerSidebar'
 import BannerCanvas from './BannerCanvas'
 import OnboardingTour from './OnboardingTour'
+import AIAgent from './AIAgent'
 import authService from '../services/auth'
 
 const BannerEditorNew = () => {
@@ -30,6 +31,40 @@ const BannerEditorNew = () => {
   // Tour state
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false)
   const [showTour, setShowTour] = useState(false)
+  
+  // AI Agent state
+  const [currentDesignId, setCurrentDesignId] = useState(null)
+  
+  // AI Agent handlers
+  const handleAIDesignGenerated = useCallback((designData) => {
+    if (designData && designData.canvas_data) {
+      // Load the AI-generated design into the canvas
+      const canvasData = designData.canvas_data;
+      if (canvasData.objects) {
+        setElements(canvasData.objects);
+      }
+      if (canvasData.background) {
+        setBackgroundColor(canvasData.background);
+      }
+      if (canvasData.width && canvasData.height) {
+        setCanvasSize({ width: canvasData.width, height: canvasData.height });
+      }
+      setCurrentDesignId(designData.design_id);
+    }
+  }, []);
+
+  const handleAIDesignModified = useCallback((designData) => {
+    if (designData && designData.canvas_data) {
+      // Apply AI modifications to the canvas
+      const canvasData = designData.canvas_data;
+      if (canvasData.objects) {
+        setElements(canvasData.objects);
+      }
+      if (canvasData.background) {
+        setBackgroundColor(canvasData.background);
+      }
+    }
+  }, []);
   
   // Canvas configuration
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 })
@@ -2033,6 +2068,7 @@ const BannerEditorNew = () => {
       {isMobileSidebarOpen && (
         <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
       )}
+      </div>
     </div>
     
     {/* Onboarding Tour */}
@@ -2051,12 +2087,13 @@ const BannerEditorNew = () => {
         localStorage.setItem('buyprintz-tour-completed', 'true')
       }}
     />
-  </div>
-
-
-      
-
-      
+    
+    {/* AI Agent */}
+    <AIAgent
+      onDesignGenerated={handleAIDesignGenerated}
+      onDesignModified={handleAIDesignModified}
+      currentDesignId={currentDesignId}
+    />
     </div>
   )
 }
