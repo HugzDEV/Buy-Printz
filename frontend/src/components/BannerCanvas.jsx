@@ -1047,106 +1047,104 @@ const BannerCanvas = ({
         }
       
       case 'qr':
-        // Convert QR type to functional QR code using the existing QR generator
-        const [qrImage, setQrImage] = useState(null)
-        const [qrLoading, setQrLoading] = useState(true)
+        // For now, render a placeholder that looks like a QR code
+        // We'll implement functional QR codes in a separate component later
+        const qrSize = safeElement.width || 200
+        const qrHeight = safeElement.height || 200
+        const cellSize = Math.min(qrSize, qrHeight) / 25 // 25x25 grid
+        const qrColor = safeElement.qrColor || '#000000'
+        const bgColor = safeElement.backgroundColor || '#ffffff'
         
-        useEffect(() => {
-          // Create a functional QR code using the same method as the existing QR generator
-          const generateFunctionalQR = async () => {
-            try {
-              // Create a hidden div to render the QR code
-              const qrContainer = document.createElement('div')
-              qrContainer.style.position = 'absolute'
-              qrContainer.style.left = '-9999px'
-              qrContainer.style.top = '-9999px'
-              document.body.appendChild(qrContainer)
-              
-              // Create a temporary React element for the QR code
-              const qrElement = React.createElement(QRCodeCanvas, {
-                value: safeElement.url || 'https://example.com',
-                size: Math.min(safeElement.width || 200, safeElement.height || 200),
-                fgColor: safeElement.qrColor || '#000000',
-                bgColor: safeElement.backgroundColor || '#ffffff',
-                level: 'M', // Medium error correction
-                includeMargin: true
-              })
-              
-              // Render the QR code to the hidden container
-              const root = createRoot(qrContainer)
-              root.render(qrElement)
-              
-              // Wait for the QR code to render, then capture it
-              setTimeout(() => {
-                const canvas = qrContainer.querySelector('canvas')
-                if (canvas) {
-                  const qrDataUrl = canvas.toDataURL('image/png')
-                  
-                  // Create image element from the QR code
-                  const img = new window.Image()
-                  img.onload = () => {
-                    setQrImage(img)
-                    setQrLoading(false)
-                  }
-                  img.src = qrDataUrl
-                }
-                
-                // Clean up
-                document.body.removeChild(qrContainer)
-              }, 100)
-            } catch (error) {
-              console.error('Error generating functional QR code:', error)
-              setQrLoading(false)
+        // Create a simple QR-like pattern
+        const qrPattern = []
+        for (let i = 0; i < 25; i++) {
+          for (let j = 0; j < 25; j++) {
+            // Create a pattern that looks like a QR code
+            const shouldFill = (i + j) % 3 === 0 || (i * j) % 7 === 0 || (i === 0 || i === 24 || j === 0 || j === 24)
+            if (shouldFill) {
+              qrPattern.push(
+                <Rect
+                  key={`${safeElement.id}-cell-${i}-${j}`}
+                  x={safeElement.x + (j * cellSize)}
+                  y={safeElement.y + (i * cellSize)}
+                  width={cellSize}
+                  height={cellSize}
+                  fill={qrColor}
+                />
+              )
             }
           }
-          
-          generateFunctionalQR()
-        }, [safeElement.url, safeElement.qrColor, safeElement.backgroundColor, safeElement.width, safeElement.height])
+        }
         
-        // Show loading state while generating QR code
-        if (qrLoading) {
-          return (
+        return (
+          <React.Fragment key={safeElement.id}>
+            {/* Background */}
             <Rect
-              key={safeElement.id}
               {...commonProps}
-              width={safeElement.width || 200}
-              height={safeElement.height || 200}
-              fill="#f0f0f0"
-              stroke="#cccccc"
+              width={qrSize}
+              height={qrHeight}
+              fill={bgColor}
+              stroke={qrColor}
               strokeWidth={2}
               rotation={safeElement.rotation || 0}
               cornerRadius={8}
+              shadowColor="black"
+              shadowBlur={4}
+              shadowOffset={{ x: 2, y: 2 }}
+              shadowOpacity={0.3}
             />
-          )
-        }
-        
-        // Render the functional QR code as an image
-        if (qrImage) {
-          return (
-            <Image
-              key={safeElement.id}
-              {...commonProps}
-              image={qrImage}
-              width={safeElement.width || 200}
-              height={safeElement.height || 200}
-              rotation={safeElement.rotation || 0}
+            {/* QR Pattern */}
+            {qrPattern}
+            {/* Corner markers */}
+            <Rect
+              x={safeElement.x + 2}
+              y={safeElement.y + 2}
+              width={cellSize * 7}
+              height={cellSize * 7}
+              fill={bgColor}
+              stroke={qrColor}
+              strokeWidth={2}
             />
-          )
-        }
-        
-        // Fallback to placeholder if QR generation fails
-        return (
-          <Rect
-            key={safeElement.id}
-            {...commonProps}
-            width={safeElement.width || 200}
-            height={safeElement.height || 200}
-            fill={safeElement.backgroundColor || '#ffffff'}
-            stroke={safeElement.qrColor || '#000000'}
-            strokeWidth={2}
-            rotation={safeElement.rotation || 0}
-            cornerRadius={8}
-          />
+            <Rect
+              x={safeElement.x + 4}
+              y={safeElement.y + 4}
+              width={cellSize * 3}
+              height={cellSize * 3}
+              fill={qrColor}
+            />
+            <Rect
+              x={safeElement.x + qrSize - cellSize * 7 - 2}
+              y={safeElement.y + 2}
+              width={cellSize * 7}
+              height={cellSize * 7}
+              fill={bgColor}
+              stroke={qrColor}
+              strokeWidth={2}
+            />
+            <Rect
+              x={safeElement.x + qrSize - cellSize * 3 - 4}
+              y={safeElement.y + 4}
+              width={cellSize * 3}
+              height={cellSize * 3}
+              fill={qrColor}
+            />
+            <Rect
+              x={safeElement.x + 2}
+              y={safeElement.y + qrHeight - cellSize * 7 - 2}
+              width={cellSize * 7}
+              height={cellSize * 7}
+              fill={bgColor}
+              stroke={qrColor}
+              strokeWidth={2}
+            />
+            <Rect
+              x={safeElement.x + 4}
+              y={safeElement.y + qrHeight - cellSize * 3 - 4}
+              width={cellSize * 3}
+              height={cellSize * 3}
+              fill={qrColor}
+            />
+          </React.Fragment>
         )
       
       default:
