@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
-import { QRCodeCanvas } from 'qrcode.react'
-import { createRoot } from 'react-dom/client'
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -1047,104 +1045,23 @@ const BannerCanvas = ({
         }
       
       case 'qr':
-        // For now, render a placeholder that looks like a QR code
-        // We'll implement functional QR codes in a separate component later
-        const qrSize = safeElement.width || 200
-        const qrHeight = safeElement.height || 200
-        const cellSize = Math.min(qrSize, qrHeight) / 25 // 25x25 grid
-        const qrColor = safeElement.qrColor || '#000000'
-        const bgColor = safeElement.backgroundColor || '#ffffff'
-        
-        // Create a simple QR-like pattern
-        const qrPattern = []
-        for (let i = 0; i < 25; i++) {
-          for (let j = 0; j < 25; j++) {
-            // Create a pattern that looks like a QR code
-            const shouldFill = (i + j) % 3 === 0 || (i * j) % 7 === 0 || (i === 0 || i === 24 || j === 0 || j === 24)
-            if (shouldFill) {
-              qrPattern.push(
-                <Rect
-                  key={`${safeElement.id}-cell-${i}-${j}`}
-                  x={safeElement.x + (j * cellSize)}
-                  y={safeElement.y + (i * cellSize)}
-                  width={cellSize}
-                  height={cellSize}
-                  fill={qrColor}
-                />
-              )
-            }
-          }
-        }
-        
+        // Simple QR code placeholder - just a styled rectangle for now
         return (
-          <React.Fragment key={safeElement.id}>
-            {/* Background */}
-            <Rect
-              {...commonProps}
-              width={qrSize}
-              height={qrHeight}
-              fill={bgColor}
-              stroke={qrColor}
-              strokeWidth={2}
-              rotation={safeElement.rotation || 0}
-              cornerRadius={8}
-              shadowColor="black"
-              shadowBlur={4}
-              shadowOffset={{ x: 2, y: 2 }}
-              shadowOpacity={0.3}
-            />
-            {/* QR Pattern */}
-            {qrPattern}
-            {/* Corner markers */}
-            <Rect
-              x={safeElement.x + 2}
-              y={safeElement.y + 2}
-              width={cellSize * 7}
-              height={cellSize * 7}
-              fill={bgColor}
-              stroke={qrColor}
-              strokeWidth={2}
-            />
-            <Rect
-              x={safeElement.x + 4}
-              y={safeElement.y + 4}
-              width={cellSize * 3}
-              height={cellSize * 3}
-              fill={qrColor}
-            />
-            <Rect
-              x={safeElement.x + qrSize - cellSize * 7 - 2}
-              y={safeElement.y + 2}
-              width={cellSize * 7}
-              height={cellSize * 7}
-              fill={bgColor}
-              stroke={qrColor}
-              strokeWidth={2}
-            />
-            <Rect
-              x={safeElement.x + qrSize - cellSize * 3 - 4}
-              y={safeElement.y + 4}
-              width={cellSize * 3}
-              height={cellSize * 3}
-              fill={qrColor}
-            />
-            <Rect
-              x={safeElement.x + 2}
-              y={safeElement.y + qrHeight - cellSize * 7 - 2}
-              width={cellSize * 7}
-              height={cellSize * 7}
-              fill={bgColor}
-              stroke={qrColor}
-              strokeWidth={2}
-            />
-            <Rect
-              x={safeElement.x + 4}
-              y={safeElement.y + qrHeight - cellSize * 3 - 4}
-              width={cellSize * 3}
-              height={cellSize * 3}
-              fill={qrColor}
-            />
-          </React.Fragment>
+          <Rect
+            key={safeElement.id}
+            {...commonProps}
+            width={safeElement.width || 200}
+            height={safeElement.height || 200}
+            fill={safeElement.backgroundColor || '#ffffff'}
+            stroke={safeElement.qrColor || '#000000'}
+            strokeWidth={3}
+            rotation={safeElement.rotation || 0}
+            cornerRadius={8}
+            shadowColor="black"
+            shadowBlur={4}
+            shadowOffset={{ x: 2, y: 2 }}
+            shadowOpacity={0.3}
+          />
         )
       
       default:
