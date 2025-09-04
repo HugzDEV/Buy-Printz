@@ -1986,67 +1986,754 @@ async def _modify_text(self, user_id: str, design_id: str, element_id: str, text
 # Add placeholder methods for all comprehensive sidebar tools
 async def _add_rectangle(self, user_id: str, design_id: str, x: int = None, y: int = None, width: int = 200, height: int = 100, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
     """Add rectangle shape to the design"""
-    return {"success": False, "error": "Rectangle tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - width // 2
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - height // 2
+        
+        rectangle_element = {
+            "id": f"rect_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "rect",
+            "x": x,
+            "y": y,
+            "width": width,
+            "height": height,
+            "fill": fill_color,
+            "stroke": stroke_color,
+            "strokeWidth": stroke_width,
+            "rotation": 0
+        }
+        
+        canvas_data["objects"].append(rectangle_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added rectangle: {width}x{height}",
+                "canvas_data": canvas_data,
+                "element": rectangle_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add rectangle"}
+    except Exception as e:
+        logger.error(f"Error adding rectangle: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _add_circle(self, user_id: str, design_id: str, x: int = None, y: int = None, radius: int = 60, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
     """Add circle shape to the design"""
-    return {"success": False, "error": "Circle tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - radius
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - radius
+        
+        circle_element = {
+            "id": f"circle_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "circle",
+            "x": x,
+            "y": y,
+            "radius": radius,
+            "fill": fill_color,
+            "stroke": stroke_color,
+            "strokeWidth": stroke_width,
+            "rotation": 0
+        }
+        
+        canvas_data["objects"].append(circle_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added circle: radius {radius}",
+                "canvas_data": canvas_data,
+                "element": circle_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add circle"}
+    except Exception as e:
+        logger.error(f"Error adding circle: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _add_star(self, user_id: str, design_id: str, x: int = None, y: int = None, num_points: int = 5, inner_radius: int = 40, outer_radius: int = 80, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
     """Add star shape to the design"""
-    return {"success": False, "error": "Star tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - outer_radius
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - outer_radius
+        
+        star_element = {
+            "id": f"star_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "star",
+            "x": x,
+            "y": y,
+            "numPoints": num_points,
+            "innerRadius": inner_radius,
+            "outerRadius": outer_radius,
+            "fill": fill_color,
+            "stroke": stroke_color,
+            "strokeWidth": stroke_width,
+            "rotation": 0
+        }
+        
+        canvas_data["objects"].append(star_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added star: {num_points} points, inner {inner_radius}, outer {outer_radius}",
+                "canvas_data": canvas_data,
+                "element": star_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add star"}
+    except Exception as e:
+        logger.error(f"Error adding star: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _add_triangle(self, user_id: str, design_id: str, x: int = None, y: int = None, radius: int = 60, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
     """Add triangle shape to the design"""
-    return {"success": False, "error": "Triangle tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - radius
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - radius
+        
+        triangle_element = {
+            "id": f"triangle_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "triangle",
+            "x": x,
+            "y": y,
+            "sides": 3,
+            "radius": radius,
+            "fill": fill_color,
+            "stroke": stroke_color,
+            "strokeWidth": stroke_width,
+            "rotation": 0
+        }
+        
+        canvas_data["objects"].append(triangle_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added triangle: radius {radius}",
+                "canvas_data": canvas_data,
+                "element": triangle_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add triangle"}
+    except Exception as e:
+        logger.error(f"Error adding triangle: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _add_hexagon(self, user_id: str, design_id: str, x: int = None, y: int = None, radius: int = 60, fill_color: str = "#6B7280", stroke_color: str = "#374151", stroke_width: int = 2) -> Dict[str, Any]:
     """Add hexagon shape to the design"""
-    return {"success": False, "error": "Hexagon tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - radius
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - radius
+        
+        hexagon_element = {
+            "id": f"hexagon_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "hexagon",
+            "x": x,
+            "y": y,
+            "sides": 6,
+            "radius": radius,
+            "fill": fill_color,
+            "stroke": stroke_color,
+            "strokeWidth": stroke_width,
+            "rotation": 0
+        }
+        
+        canvas_data["objects"].append(hexagon_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added hexagon: radius {radius}",
+                "canvas_data": canvas_data,
+                "element": hexagon_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add hexagon"}
+    except Exception as e:
+        logger.error(f"Error adding hexagon: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _add_icon(self, user_id: str, design_id: str, icon_name: str, x: int = None, y: int = None, width: int = 60, height: int = 60) -> Dict[str, Any]:
     """Add an icon from the icon library to the design"""
-    return {"success": False, "error": "Icon tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - width // 2
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - height // 2
+        
+        # Find the icon in our library
+        icon_info = self._find_icon_by_name(icon_name)
+        if not icon_info:
+            return {"success": False, "error": f"Icon '{icon_name}' not found in library"}
+        
+        icon_element = {
+            "id": f"icon_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "image",
+            "x": x,
+            "y": y,
+            "width": width,
+            "height": height,
+            "image": icon_info["imagePath"],
+            "rotation": 0,
+            "assetName": icon_name,
+            "iconName": icon_name,
+            "category": icon_info["category"]
+        }
+        
+        canvas_data["objects"].append(icon_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added icon: {icon_name}",
+                "canvas_data": canvas_data,
+                "element": icon_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add icon"}
+    except Exception as e:
+        logger.error(f"Error adding icon: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _list_available_icons(self, category: str = None) -> Dict[str, Any]:
     """Get list of available icons by category"""
-    return {"success": False, "error": "List icons tool not yet implemented"}
+    try:
+        icon_library = self._get_icon_library()
+        
+        if category:
+            filtered_icons = [icon for icon in icon_library if icon["category"] == category]
+            return {
+                "success": True,
+                "message": f"Found {len(filtered_icons)} icons in category '{category}'",
+                "icons": filtered_icons,
+                "category": category,
+                "count": len(filtered_icons)
+            }
+        else:
+            # Group by category
+            categories = {}
+            for icon in icon_library:
+                cat = icon["category"]
+                if cat not in categories:
+                    categories[cat] = []
+                categories[cat].append(icon)
+            
+            return {
+                "success": True,
+                "message": f"Found {len(icon_library)} icons across {len(categories)} categories",
+                "icons": icon_library,
+                "categories": categories,
+                "count": len(icon_library)
+            }
+    except Exception as e:
+        logger.error(f"Error listing icons: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _add_qr_code(self, user_id: str, design_id: str, url: str, x: int = None, y: int = None, width: int = 100, height: int = 100, qr_color: str = "#000000", background_color: str = "#ffffff") -> Dict[str, Any]:
     """Add QR code element to the design"""
-    return {"success": False, "error": "QR code tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        if not canvas_data.get("objects"):
+            canvas_data["objects"] = []
+        
+        # Default position to center if not provided
+        if x is None:
+            x = canvas_data.get("width", 800) // 2 - width // 2
+        if y is None:
+            y = canvas_data.get("height", 400) // 2 - height // 2
+        
+        qr_element = {
+            "id": f"qr_{int(time.time())}_{len(canvas_data['objects'])}",
+            "type": "qr",
+            "x": x,
+            "y": y,
+            "width": width,
+            "height": height,
+            "url": url,
+            "qrColor": qr_color,
+            "backgroundColor": background_color,
+            "rotation": 0
+        }
+        
+        canvas_data["objects"].append(qr_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Added QR code for: {url}",
+                "canvas_data": canvas_data,
+                "element": qr_element
+            }
+        else:
+            return {"success": False, "error": "Failed to add QR code"}
+    except Exception as e:
+        logger.error(f"Error adding QR code: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _move_element(self, user_id: str, design_id: str, element_id: str, x: int, y: int) -> Dict[str, Any]:
     """Move an element to a new position"""
-    return {"success": False, "error": "Move element tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find the element
+        element_index = None
+        for i, obj in enumerate(objects):
+            if obj.get("id") == element_id:
+                element_index = i
+                break
+        
+        if element_index is None:
+            return {"success": False, "error": "Element not found"}
+        
+        # Update position
+        objects[element_index]["x"] = x
+        objects[element_index]["y"] = y
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Moved element to ({x}, {y})",
+                "canvas_data": canvas_data,
+                "element": objects[element_index]
+            }
+        else:
+            return {"success": False, "error": "Failed to move element"}
+    except Exception as e:
+        logger.error(f"Error moving element: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _resize_element(self, user_id: str, design_id: str, element_id: str, width: int, height: int) -> Dict[str, Any]:
     """Resize an element"""
-    return {"success": False, "error": "Resize element tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find the element
+        element_index = None
+        for i, obj in enumerate(objects):
+            if obj.get("id") == element_id:
+                element_index = i
+                break
+        
+        if element_index is None:
+            return {"success": False, "error": "Element not found"}
+        
+        # Update size
+        objects[element_index]["width"] = width
+        objects[element_index]["height"] = height
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Resized element to {width}x{height}",
+                "canvas_data": canvas_data,
+                "element": objects[element_index]
+            }
+        else:
+            return {"success": False, "error": "Failed to resize element"}
+    except Exception as e:
+        logger.error(f"Error resizing element: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _change_element_color(self, user_id: str, design_id: str, element_id: str, fill_color: str = None, stroke_color: str = None) -> Dict[str, Any]:
     """Change the color of an element"""
-    return {"success": False, "error": "Change color tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find the element
+        element_index = None
+        for i, obj in enumerate(objects):
+            if obj.get("id") == element_id:
+                element_index = i
+                break
+        
+        if element_index is None:
+            return {"success": False, "error": "Element not found"}
+        
+        # Update colors
+        if fill_color is not None:
+            objects[element_index]["fill"] = fill_color
+        if stroke_color is not None:
+            objects[element_index]["stroke"] = stroke_color
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Changed element colors",
+                "canvas_data": canvas_data,
+                "element": objects[element_index]
+            }
+        else:
+            return {"success": False, "error": "Failed to change element color"}
+    except Exception as e:
+        logger.error(f"Error changing element color: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _delete_element(self, user_id: str, design_id: str, element_id: str) -> Dict[str, Any]:
     """Delete an element from the design"""
-    return {"success": False, "error": "Delete element tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find and remove the element
+        original_count = len(objects)
+        objects[:] = [obj for obj in objects if obj.get("id") != element_id]
+        
+        if len(objects) == original_count:
+            return {"success": False, "error": "Element not found"}
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Deleted element: {element_id}",
+                "canvas_data": canvas_data
+            }
+        else:
+            return {"success": False, "error": "Failed to delete element"}
+    except Exception as e:
+        logger.error(f"Error deleting element: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _duplicate_element(self, user_id: str, design_id: str, element_id: str, x_offset: int = 20, y_offset: int = 20) -> Dict[str, Any]:
     """Duplicate an element"""
-    return {"success": False, "error": "Duplicate element tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find the element to duplicate
+        original_element = None
+        for obj in objects:
+            if obj.get("id") == element_id:
+                original_element = obj
+                break
+        
+        if not original_element:
+            return {"success": False, "error": "Element not found"}
+        
+        # Create duplicate with new ID and offset position
+        duplicate_element = original_element.copy()
+        duplicate_element["id"] = f"{element_id}_copy_{int(time.time())}"
+        duplicate_element["x"] = original_element.get("x", 0) + x_offset
+        duplicate_element["y"] = original_element.get("y", 0) + y_offset
+        
+        objects.append(duplicate_element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Duplicated element: {element_id}",
+                "canvas_data": canvas_data,
+                "element": duplicate_element
+            }
+        else:
+            return {"success": False, "error": "Failed to duplicate element"}
+    except Exception as e:
+        logger.error(f"Error duplicating element: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _bring_to_front(self, user_id: str, design_id: str, element_id: str) -> Dict[str, Any]:
     """Bring element to front layer"""
-    return {"success": False, "error": "Bring to front tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find the element
+        element_index = None
+        for i, obj in enumerate(objects):
+            if obj.get("id") == element_id:
+                element_index = i
+                break
+        
+        if element_index is None:
+            return {"success": False, "error": "Element not found"}
+        
+        # Move element to the end (front layer)
+        element = objects.pop(element_index)
+        objects.append(element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Brought element to front",
+                "canvas_data": canvas_data,
+                "element": element
+            }
+        else:
+            return {"success": False, "error": "Failed to bring element to front"}
+    except Exception as e:
+        logger.error(f"Error bringing element to front: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _send_to_back(self, user_id: str, design_id: str, element_id: str) -> Dict[str, Any]:
     """Send element to back layer"""
-    return {"success": False, "error": "Send to back tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        canvas_data = design.get("canvas_data", {})
+        objects = canvas_data.get("objects", [])
+        
+        # Find the element
+        element_index = None
+        for i, obj in enumerate(objects):
+            if obj.get("id") == element_id:
+                element_index = i
+                break
+        
+        if element_index is None:
+            return {"success": False, "error": "Element not found"}
+        
+        # Move element to the beginning (back layer)
+        element = objects.pop(element_index)
+        objects.insert(0, element)
+        
+        result = await db_manager.update_design(design_id, {"canvas_data": canvas_data})
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Sent element to back",
+                "canvas_data": canvas_data,
+                "element": element
+            }
+        else:
+            return {"success": False, "error": "Failed to send element to back"}
+    except Exception as e:
+        logger.error(f"Error sending element to back: {e}")
+        return {"success": False, "error": str(e)}
 
 async def _save_design(self, user_id: str, design_id: str, name: str = None) -> Dict[str, Any]:
     """Save the current design"""
-    return {"success": False, "error": "Save design tool not yet implemented"}
+    try:
+        from database import db_manager
+        design = await db_manager.get_design(design_id)
+        if not design:
+            return {"success": False, "error": "Design not found"}
+        
+        # Update the design name if provided
+        update_data = {}
+        if name:
+            update_data["name"] = name
+        
+        # Mark as saved/updated
+        update_data["updated_at"] = datetime.now().isoformat()
+        
+        result = await db_manager.update_design(design_id, update_data)
+        if result.get("success"):
+            return {
+                "success": True,
+                "message": f"Saved design: {name or design.get('name', 'Untitled')}",
+                "design_id": design_id
+            }
+        else:
+            return {"success": False, "error": "Failed to save design"}
+    except Exception as e:
+        logger.error(f"Error saving design: {e}")
+        return {"success": False, "error": str(e)}
+
+# Helper methods for icon library
+def _get_icon_library(self) -> List[Dict[str, Any]]:
+    """Get the complete icon library"""
+    return [
+        # Medical & Healthcare
+        {"name": "Doctor", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Doctor.svg"},
+        {"name": "Nurse", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Nurse.svg"},
+        {"name": "Hospital Building", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Hospital.svg"},
+        {"name": "Medical Kit", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Medical Kit.svg"},
+        {"name": "Stethoscope", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Phonendoscope.svg"},
+        {"name": "Thermometer", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Thermometer.svg"},
+        {"name": "Syringe", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Syringe.svg"},
+        {"name": "Pills", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Medicine.svg"},
+        {"name": "Capsule", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Capsule.svg"},
+        {"name": "Microscope", "category": "medical", "imagePath": "/assets/images/medical assets/DrawKit Vector Medical Health Icons/DrawKit Medical - Color/SVG/Microscope.svg"},
+        
+        # Social Media
+        {"name": "X (Twitter)", "category": "social", "imagePath": "/assets/images/social icons/X.png"},
+        {"name": "Twitter", "category": "social", "imagePath": "/assets/images/social icons/Twitter.png"},
+        {"name": "Meta (Facebook)", "category": "social", "imagePath": "/assets/images/social icons/Facebook.png"},
+        {"name": "LinkedIn", "category": "social", "imagePath": "/assets/images/social icons/LinkedIn.png"},
+        {"name": "Reddit", "category": "social", "imagePath": "/assets/images/social icons/Reddit.png"},
+        {"name": "Pinterest", "category": "social", "imagePath": "/assets/images/social icons/Pinterest.png"},
+        {"name": "Instagram", "category": "social", "imagePath": "/assets/images/social icons/Instagram.png"},
+        {"name": "Snapchat", "category": "social", "imagePath": "/assets/images/social icons/Snapchat.png"},
+        {"name": "Telegram", "category": "social", "imagePath": "/assets/images/social icons/Telegram.png"},
+        {"name": "WhatsApp", "category": "social", "imagePath": "/assets/images/social icons/Whatsapp.png"},
+        {"name": "Twitch", "category": "social", "imagePath": "/assets/images/social icons/Twitch.png"},
+        {"name": "YouTube", "category": "social", "imagePath": "/assets/images/social icons/Youtube.png"},
+        {"name": "TikTok", "category": "social", "imagePath": "/assets/images/social icons/Tiktok.png"},
+        {"name": "Discord", "category": "social", "imagePath": "/assets/images/social icons/Discord.png"},
+        {"name": "Slack", "category": "social", "imagePath": "/assets/images/social icons/Slack.png"},
+        {"name": "Zoom", "category": "social", "imagePath": "/assets/images/social icons/Zoom.png"},
+        
+        # Technology & Business
+        {"name": "Technology", "category": "technology", "imagePath": "/assets/images/icons/Technology.svg"},
+        {"name": "Data Analytics", "category": "technology", "imagePath": "/assets/images/icons/Data Analytic.svg"},
+        {"name": "User Experience", "category": "technology", "imagePath": "/assets/images/icons/User Experience.svg"},
+        {"name": "Passive Income", "category": "technology", "imagePath": "/assets/images/icons/Passive Income.svg"},
+        {"name": "Valuations", "category": "technology", "imagePath": "/assets/images/icons/Valuations.svg"},
+        {"name": "Blue Print", "category": "technology", "imagePath": "/assets/images/icons/Blue Print.svg"},
+        {"name": "Anti Virus", "category": "technology", "imagePath": "/assets/images/icons/Anti Virus.svg"},
+        {"name": "Manager", "category": "technology", "imagePath": "/assets/images/icons/Manager.svg"},
+        {"name": "Digital Agreement", "category": "technology", "imagePath": "/assets/images/icons/Digital Agreement.svg"},
+        {"name": "Growth", "category": "technology", "imagePath": "/assets/images/icons/Growth.svg"},
+        {"name": "Sync Data", "category": "technology", "imagePath": "/assets/images/icons/Sync Data.svg"},
+        {"name": "Project Management", "category": "technology", "imagePath": "/assets/images/icons/Project Management.svg"},
+        {"name": "Startup", "category": "technology", "imagePath": "/assets/images/icons/Startup.svg"},
+        {"name": "Development", "category": "technology", "imagePath": "/assets/images/icons/Development.svg"},
+        {"name": "Digital Marketing", "category": "technology", "imagePath": "/assets/images/icons/Digital Marketing.svg"},
+        {"name": "User Security", "category": "technology", "imagePath": "/assets/images/icons/User Security.svg"},
+        {"name": "Affiliate", "category": "technology", "imagePath": "/assets/images/icons/Affiliate.svg"},
+        {"name": "Registration", "category": "technology", "imagePath": "/assets/images/icons/Registration.svg"},
+        {"name": "Budget", "category": "technology", "imagePath": "/assets/images/icons/Budget.svg"},
+        {"name": "SEO", "category": "technology", "imagePath": "/assets/images/icons/SEO.svg"},
+        {"name": "Teamwork", "category": "technology", "imagePath": "/assets/images/icons/Teamwork.svg"},
+        
+        # Food & Dining
+        {"name": "Lollipop", "category": "food", "imagePath": "/assets/images/food/Lollipop.svg"},
+        {"name": "Tart", "category": "food", "imagePath": "/assets/images/food/Tart.svg"},
+        {"name": "Pancake", "category": "food", "imagePath": "/assets/images/food/Pancake.svg"},
+        {"name": "Ramen", "category": "food", "imagePath": "/assets/images/food/Ramen.svg"},
+        {"name": "Dimsum", "category": "food", "imagePath": "/assets/images/food/Dimsum.svg"},
+        {"name": "Cheese", "category": "food", "imagePath": "/assets/images/food/Cheese.svg"},
+        {"name": "Baguette", "category": "food", "imagePath": "/assets/images/food/Baguette.svg"},
+        {"name": "Sausage", "category": "food", "imagePath": "/assets/images/food/Sausage.svg"},
+        {"name": "Muffin", "category": "food", "imagePath": "/assets/images/food/Muffin.svg"},
+        {"name": "Sushi", "category": "food", "imagePath": "/assets/images/food/Sushi.svg"},
+        {"name": "Fries", "category": "food", "imagePath": "/assets/images/food/Fries.svg"},
+        {"name": "Banana", "category": "food", "imagePath": "/assets/images/food/Banana.svg"},
+        {"name": "Pizza", "category": "food", "imagePath": "/assets/images/food/Pizza.svg"},
+        {"name": "Boba", "category": "food", "imagePath": "/assets/images/food/Boba.svg"}
+    ]
+
+def _find_icon_by_name(self, icon_name: str) -> Dict[str, Any]:
+    """Find an icon by name in the library"""
+    icon_library = self._get_icon_library()
+    for icon in icon_library:
+        if icon["name"].lower() == icon_name.lower():
+            return icon
+    return None
 
 # Add the methods to the class
 AIAgentAdapter._create_new_design = _create_new_design
@@ -2061,6 +2748,8 @@ AIAgentAdapter._add_triangle = _add_triangle
 AIAgentAdapter._add_hexagon = _add_hexagon
 AIAgentAdapter._add_icon = _add_icon
 AIAgentAdapter._list_available_icons = _list_available_icons
+AIAgentAdapter._get_icon_library = _get_icon_library
+AIAgentAdapter._find_icon_by_name = _find_icon_by_name
 AIAgentAdapter._add_qr_code = _add_qr_code
 AIAgentAdapter._move_element = _move_element
 AIAgentAdapter._resize_element = _resize_element
