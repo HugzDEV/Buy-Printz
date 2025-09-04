@@ -964,7 +964,7 @@ Context about the user:"""
                 # Get final response with tool results
                 final_messages = [
                     {"role": "system", "content": self._build_system_message(context)},
-                    {"role": "user", "content": "Please provide a detailed, helpful response about what you just accomplished with the tools. Be specific about what was created or modified."},
+                    {"role": "user", "content": "Please provide a detailed, helpful response about what you just accomplished with the tools. Be specific about what was created or modified. Include details about the design elements, colors, dimensions, and any other specifications."},
                     {"role": "assistant", "content": message.content or "", "tool_calls": [
                         {
                             "id": tc.id,
@@ -1002,7 +1002,19 @@ Context about the user:"""
                 
                 # If final content is empty, provide a fallback response
                 if not final_content or final_content.strip() == "":
-                    final_content = "I've successfully created your banner design! The design has been generated and is now ready for you to view and customize."
+                    # Create a more specific fallback based on what tools were executed
+                    if tool_results:
+                        tool_names = [tr["function_name"] for tr in tool_results]
+                        if "add_qr_code" in tool_names:
+                            final_content = "I've successfully added a QR code to your canvas! The QR code has been generated and is now visible on your design."
+                        elif "add_text" in tool_names:
+                            final_content = "I've successfully added text to your canvas! The text element has been created and is now visible on your design."
+                        elif "generate_banner_from_prompt" in tool_names:
+                            final_content = "I've successfully generated your banner design! The complete banner has been created and is now ready for you to view and customize."
+                        else:
+                            final_content = "I've successfully completed your request! The design has been updated and is now ready for you to view and customize."
+                    else:
+                        final_content = "I've successfully completed your request! The design has been updated and is now ready for you to view and customize."
                     logger.info(f"Using fallback response: '{final_content}'")
                 
                 # Check if any tool created or modified a design
@@ -1026,7 +1038,8 @@ Context about the user:"""
                     ]:
                         if tool_result["result"].get("success"):
                             design_modified = True
-                            design_data = tool_result["result"].get("canvas_data")
+                            # Try to get design_data first, then fallback to canvas_data
+                            design_data = tool_result["result"].get("design_data") or tool_result["result"].get("canvas_data")
                             break
                 
                 # Return structured response with design data if applicable
