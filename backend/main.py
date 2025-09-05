@@ -244,7 +244,15 @@ async def register_user(user_data: UserRegistration):
                 "user_id": result["user_id"]
             }
         else:
-            raise HTTPException(status_code=400, detail=result["error"])
+            # Check if it's a client error (400) or server error (500)
+            error_msg = result["error"]
+            if "400:" in error_msg or "invalid" in error_msg.lower():
+                raise HTTPException(status_code=400, detail=error_msg)
+            else:
+                raise HTTPException(status_code=500, detail=error_msg)
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
