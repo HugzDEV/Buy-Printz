@@ -13,8 +13,22 @@ load_dotenv()
 
 # Initialize Supabase client for auth
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_anon_key = os.getenv("SUPABASE_KEY")
-supabase_auth: Client = create_client(supabase_url, supabase_anon_key)
+supabase_anon_key = os.getenv("SUPABASE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+
+# Check if we have the required environment variables
+if not supabase_url or not supabase_anon_key:
+    print("⚠️ Supabase auth environment variables not found.")
+    print(f"SUPABASE_URL: {'✓' if supabase_url else '✗'}")
+    print(f"SUPABASE_KEY: {'✓' if supabase_anon_key else '✗'}")
+    print("Auth features will be disabled.")
+    supabase_auth = None
+else:
+    try:
+        supabase_auth: Client = create_client(supabase_url, supabase_anon_key)
+        print("✅ Supabase auth client initialized successfully")
+    except Exception as e:
+        print(f"❌ Failed to initialize Supabase auth client: {e}")
+        supabase_auth = None
 
 # JWT Configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
@@ -30,6 +44,10 @@ security = HTTPBearer()
 class AuthManager:
     def __init__(self):
         self.supabase = supabase_auth
+        
+    def is_available(self):
+        """Check if Supabase auth is available"""
+        return self.supabase is not None
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash"""
@@ -61,6 +79,9 @@ class AuthManager:
 
     async def authenticate_user(self, email: str, password: str) -> Optional[dict]:
         """Authenticate user with Supabase"""
+        if not self.is_available():
+            raise HTTPException(status_code=503, detail="Authentication service unavailable")
+        
         try:
             response = self.supabase.auth.sign_in_with_password({
                 "email": email,
@@ -91,13 +112,14 @@ class AuthManager:
                 return {"user_id": user_id, "token_type": "jwt"}
         
         # If JWT fails, try Supabase token
-        try:
-            # Use Supabase client to verify the JWT token directly
-            response = self.supabase.auth.get_user(token)
-            if response and response.user:
-                return {"user_id": response.user.id, "token_type": "supabase"}
-        except Exception as e:
-            print(f"Supabase token verification error: {e}")
+        if self.is_available():
+            try:
+                # Use Supabase client to verify the JWT token directly
+                response = self.supabase.auth.get_user(token)
+                if response and response.user:
+                    return {"user_id": response.user.id, "token_type": "supabase"}
+            except Exception as e:
+                print(f"Supabase token verification error: {e}")
             # Try alternative method - decode JWT manually to get user info
             try:
                 from jose import jwt
@@ -117,6 +139,9 @@ class AuthManager:
 
     async def refresh_token(self, refresh_token: str) -> Optional[dict]:
         """Refresh access token using Supabase"""
+        if not self.is_available():
+            return None
+        
         try:
             response = self.supabase.auth.refresh_session(refresh_token)
             if response.session:
@@ -131,6 +156,9 @@ class AuthManager:
 
     async def sign_out(self, access_token: str) -> bool:
         """Sign out user"""
+        if not self.is_available():
+            return False
+        
         try:
             self.supabase.auth.sign_out()
             return True
