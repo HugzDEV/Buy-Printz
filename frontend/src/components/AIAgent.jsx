@@ -17,7 +17,7 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
       setMessages([{
         id: 1,
         type: 'ai',
-        content: "Hello! I'm your AI design assistant. I can help you create banners, modify designs, and provide design recommendations. What would you like to create today?",
+        content: "Hello! I'm your BuyPrintz AI Agent. I can help you create professional banners, modify designs, and provide design recommendations. What would you like to create today?",
         timestamp: new Date()
       }]);
     }
@@ -167,10 +167,14 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
       <div className="fixed bottom-6 right-6 z-50">
         <GlassButton
           onClick={() => setIsOpen(true)}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 p-4 rounded-full"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 p-3 rounded-full"
         >
-          <Bot className="w-6 h-6" />
-          <span className="ml-2 font-semibold">AI Assistant</span>
+          <img 
+            src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+            alt="BuyPrintz Agent" 
+            className="w-6 h-6 object-contain"
+          />
+          <span className="ml-2 font-semibold text-sm">BuyPrintz Agent</span>
         </GlassButton>
       </div>
     );
@@ -182,11 +186,15 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/20">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <Bot className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center p-1">
+              <img 
+                src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                alt="BuyPrintz Agent" 
+                className="w-6 h-6 object-contain"
+              />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800">AI Design Assistant</h3>
+              <h3 className="font-semibold text-gray-800">BuyPrintz Agent</h3>
               <p className="text-xs text-gray-600">Powered by OpenAI</p>
             </div>
           </div>
