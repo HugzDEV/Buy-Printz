@@ -10,7 +10,17 @@ load_dotenv()
 
 # Initialize Supabase client with error handling for deployment
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
+supabase_service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+supabase_anon_key = os.getenv("SUPABASE_KEY")
+
+# Debug: Print what keys we found
+print(f"🔍 Environment check:")
+print(f"SUPABASE_URL: {'✓' if supabase_url else '✗'}")
+print(f"SUPABASE_SERVICE_ROLE_KEY: {'✓' if supabase_service_key else '✗'}")
+print(f"SUPABASE_KEY: {'✓' if supabase_anon_key else '✗'}")
+
+# Use service role key if available, otherwise fall back to anon key
+supabase_key = supabase_service_key or supabase_anon_key
 
 # Initialize supabase client with proper error handling
 supabase = None
