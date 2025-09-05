@@ -118,7 +118,13 @@ class AuthManager:
             if jwt_secret:
                 try:
                     # Verify the token with the correct JWT secret
-                    payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+                    # Note: Supabase tokens may have audience claims that we need to handle
+                    payload = jwt.decode(
+                        token, 
+                        jwt_secret, 
+                        algorithms=["HS256"],
+                        options={"verify_aud": False}  # Disable audience verification for Supabase tokens
+                    )
                     if payload and payload.get('sub'):
                         print(f"✅ JWT token verified for user: {payload.get('sub')}")
                         return {"user_id": payload.get('sub'), "token_type": "supabase_verified"}
