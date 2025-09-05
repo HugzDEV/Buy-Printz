@@ -2282,7 +2282,7 @@ async def _add_icon(self, user_id: str, design_id: str, icon_name: str, x: int =
             y = canvas_data.get("height", 400) // 2 - height // 2
         
         # Find the icon in our library
-        icon_info = self._find_icon_by_name(icon_name)
+        icon_info = _find_icon_by_name(icon_name)
         if not icon_info:
             return {"success": False, "error": f"Icon '{icon_name}' not found in library"}
         
@@ -2319,7 +2319,7 @@ async def _add_icon(self, user_id: str, design_id: str, icon_name: str, x: int =
 async def _list_available_icons(self, category: str = None) -> Dict[str, Any]:
     """Get list of available icons by category"""
     try:
-        icon_library = self._get_icon_library()
+        icon_library = _get_icon_library()
         
         if category:
             filtered_icons = [icon for icon in icon_library if icon["category"] == category]
@@ -2350,67 +2350,95 @@ async def _list_available_icons(self, category: str = None) -> Dict[str, Any]:
         logger.error(f"Error listing icons: {e}")
         return {"success": False, "error": str(e)}
 
-async def _add_qr_code(self, user_id: str, design_id: str, url: str, x: int = None, y: int = None, width: int = 100, height: int = 100, qr_color: str = "#000000", background_color: str = "#ffffff") -> Dict[str, Any]:
-    """Add QR code element to the design"""
-    try:
-        # If design_id is provided, try to get existing design
-        canvas_data = None
-        if design_id:
-            from database import db_manager
-            design = await db_manager.get_design(design_id)
-            if design:
-                canvas_data = design.get("canvas_data", {})
-        
-        # If no existing design or design_id not provided, create new canvas data
-        if not canvas_data:
-            canvas_data = {
-                "version": "2.0",
-                "width": 800,
-                "height": 400,
-                "background": "#ffffff",
-                "objects": []
+    async def _add_qr_code(self, user_id: str, design_id: str, url: str, x: int = None, y: int = None, width: int = 200, height: int = 200, qr_color: str = "#000000", background_color: str = "#ffffff") -> Dict[str, Any]:
+        """Add QR code element to the design - generates real QR code like sidebar"""
+        try:
+            # If design_id is provided, try to get existing design
+            canvas_data = None
+            if design_id:
+                from database import db_manager
+                design = await db_manager.get_design(design_id)
+                if design:
+                    canvas_data = design.get("canvas_data", {})
+            
+            # If no existing design or design_id not provided, create new canvas data
+            if not canvas_data:
+                canvas_data = {
+                    "version": "2.0",
+                    "width": 800,
+                    "height": 400,
+                    "background": "#ffffff",
+                    "objects": []
+                }
+            
+            if not canvas_data.get("objects"):
+                canvas_data["objects"] = []
+            
+            # Default position to center if not provided
+            if x is None:
+                x = canvas_data.get("width", 800) // 2 - width // 2
+            if y is None:
+                y = canvas_data.get("height", 400) // 2 - height // 2
+            
+            # Generate QR code using qrcode library (Python backend)
+            import qrcode
+            from io import BytesIO
+            import base64
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(url)
+            qr.make(fit=True)
+            
+            # Create QR code image
+            qr_img = qr.make_image(fill_color=qr_color, back_color=background_color)
+            
+            # Convert to base64 data URL
+            buffer = BytesIO()
+            qr_img.save(buffer, format='PNG')
+            qr_data_url = f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            
+            # Create QR code element as image type (same as sidebar implementation)
+            qr_element = {
+                "id": f"qrcode_{int(time.time())}_{len(canvas_data['objects'])}",
+                "type": "image", # Use 'image' type like sidebar
+                "x": x, 
+                "y": y, 
+                "width": width, 
+                "height": height,
+                "rotation": 0,
+                "assetName": "QR Code",
+                "qrData": {
+                    "url": url,
+                    "color": qr_color,
+                    "backgroundColor": background_color
+                },
+                "imageDataUrl": qr_data_url # Store the generated QR code image
             }
-        
-        if not canvas_data.get("objects"):
-            canvas_data["objects"] = []
-        
-        # Default position to center if not provided
-        if x is None:
-            x = canvas_data.get("width", 800) // 2 - width // 2
-        if y is None:
-            y = canvas_data.get("height", 400) // 2 - height // 2
-        
-        qr_element = {
-            "id": f"qr_{int(time.time())}_{len(canvas_data['objects'])}",
-            "type": "qr",
-            "x": x,
-            "y": y,
-            "width": width,
-            "height": height,
-            "url": url,
-            "qrColor": qr_color,
-            "backgroundColor": background_color,
-            "rotation": 0
-        }
-        
-        canvas_data["objects"].append(qr_element)
-        
-        # For direct canvas manipulation, we don't need to save to database immediately
-        # The frontend will handle the canvas update
-        return {
-            "success": True,
-            "message": f"Added QR code for: {url}",
-            "canvas_data": canvas_data,
-            "design_data": {
-                "design_id": design_id or f"temp_{int(time.time())}",
-                "canvas_data": canvas_data
-            },
-            "element": qr_element,
-            "direct_manipulation": True  # Flag to indicate this is direct canvas manipulation
-        }
-    except Exception as e:
-        logger.error(f"Error adding QR code: {e}")
-        return {"success": False, "error": str(e)}
+            
+            canvas_data["objects"].append(qr_element)
+            
+            # For direct canvas manipulation, we don't need to save to database immediately
+            # The frontend will handle the canvas update
+            return {
+                "success": True,
+                "message": f"Generated QR code for: {url}",
+                "canvas_data": canvas_data,
+                "design_data": {
+                    "design_id": design_id or f"temp_{int(time.time())}",
+                    "canvas_data": canvas_data
+                },
+                "element": qr_element,
+                "direct_manipulation": True  # Flag to indicate this is direct canvas manipulation
+            }
+        except Exception as e:
+            logger.error(f"Error generating QR code: {e}")
+            return {"success": False, "error": str(e)}
 
 async def _move_element(self, user_id: str, design_id: str, element_id: str, x: int, y: int) -> Dict[str, Any]:
     """Move an element to a new position"""
@@ -2713,7 +2741,7 @@ async def _save_design(self, user_id: str, design_id: str, name: str = None) -> 
         return {"success": False, "error": str(e)}
 
 # Helper methods for icon library
-def _get_icon_library(self) -> List[Dict[str, Any]]:
+def _get_icon_library() -> List[Dict[str, Any]]:
     """Get the complete icon library"""
     return [
         # Medical & Healthcare
@@ -2786,9 +2814,9 @@ def _get_icon_library(self) -> List[Dict[str, Any]]:
         {"name": "Boba", "category": "food", "imagePath": "/assets/images/food/Boba.svg"}
     ]
 
-def _find_icon_by_name(self, icon_name: str) -> Dict[str, Any]:
+def _find_icon_by_name(icon_name: str) -> Dict[str, Any]:
     """Find an icon by name in the library"""
-    icon_library = self._get_icon_library()
+    icon_library = _get_icon_library()
     for icon in icon_library:
         if icon["name"].lower() == icon_name.lower():
             return icon
@@ -2809,7 +2837,6 @@ AIAgentAdapter._add_icon = _add_icon
 AIAgentAdapter._list_available_icons = _list_available_icons
 AIAgentAdapter._get_icon_library = _get_icon_library
 AIAgentAdapter._find_icon_by_name = _find_icon_by_name
-AIAgentAdapter._add_qr_code = _add_qr_code
 AIAgentAdapter._move_element = _move_element
 AIAgentAdapter._resize_element = _resize_element
 AIAgentAdapter._change_element_color = _change_element_color
