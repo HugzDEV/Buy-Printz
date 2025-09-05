@@ -246,8 +246,12 @@ async def register_user(user_data: UserRegistration):
         else:
             # Check if it's a client error (400) or server error (500)
             error_msg = result["error"]
-            if "400:" in error_msg or "invalid" in error_msg.lower():
+            if ("400:" in error_msg or "invalid" in error_msg.lower() or 
+                "already exists" in error_msg.lower() or "duplicate" in error_msg.lower()):
                 raise HTTPException(status_code=400, detail=error_msg)
+            elif "foreign key constraint" in error_msg.lower():
+                # This is a database schema issue, return 400 for user already exists
+                raise HTTPException(status_code=400, detail="User already exists")
             else:
                 raise HTTPException(status_code=500, detail=error_msg)
     except HTTPException:
