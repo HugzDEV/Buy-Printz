@@ -327,9 +327,16 @@ const Dashboard = () => {
     return matchesSearch && matchesStatus
   })
 
-  const loadDesignInEditor = (design) => {
-    // Navigate to editor with design ID in URL
-    navigate(`/editor?design=${design.id}`)
+  const loadDesignInEditor = (item) => {
+    // Check if it's a template or design
+    if (item.canvas_data) {
+      // It's a template - navigate with template data
+      const templateData = encodeURIComponent(JSON.stringify(item.canvas_data))
+      navigate(`/editor?template=${item.id}&data=${templateData}`)
+    } else {
+      // It's a design - navigate with design ID
+      navigate(`/editor?design=${item.id}`)
+    }
   }
 
   const deleteTemplate = async (templateId) => {
