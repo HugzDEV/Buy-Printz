@@ -33,6 +33,11 @@ DROP POLICY IF EXISTS "Users can update own templates" ON banner_templates;
 DROP POLICY IF EXISTS "Users can delete own templates" ON banner_templates;
 
 -- Create RLS policies for banner_templates
+-- Allow service role to bypass RLS for backend operations
+CREATE POLICY "Service role can manage all templates" ON banner_templates
+    FOR ALL USING (auth.role() = 'service_role');
+
+-- User-facing policies (for direct frontend access)
 CREATE POLICY "Users can view own templates" ON banner_templates
     FOR SELECT USING (auth.uid() = user_id);
 

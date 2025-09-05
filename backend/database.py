@@ -19,6 +19,7 @@ if supabase_url and supabase_key:
     try:
         supabase: Client = create_client(supabase_url, supabase_key)
         print("✅ Supabase client initialized successfully")
+        print(f"Using key type: {'Service Role' if 'service_role' in supabase_key else 'Anon Key'}")
     except Exception as e:
         print(f"❌ Failed to initialize Supabase client: {e}")
         supabase = None
@@ -35,6 +36,24 @@ class DatabaseManager:
     def is_connected(self):
         """Check if database is properly connected"""
         return self.supabase is not None
+    
+    async def test_auth_role(self):
+        """Test what auth role the backend is using"""
+        if not self.is_connected():
+            return {"error": "Database not connected"}
+        
+        try:
+            # Test query to check current auth role
+            response = self.supabase.rpc("auth.role").execute()
+            return {"success": True, "role": response.data}
+        except Exception as e:
+            # If the RPC doesn't exist, try a different approach
+            try:
+                # Try to get current user info
+                response = self.supabase.auth.get_user()
+                return {"success": True, "user": response.user if response.user else None, "error": str(e)}
+            except Exception as e2:
+                return {"error": f"Auth test failed: {e2}"}
 
     # User Management
     async def create_user(self, email: str, password: str, full_name: str) -> Dict[str, Any]:
@@ -237,6 +256,7 @@ class DatabaseManager:
             }
             
             print(f"Saving design record: {design_record['name']}")
+            print(f"Design record data: {design_record}")
             
             # The database trigger will automatically enforce the 10-design limit
             response = self.supabase.table("canvas_designs").insert(design_record).execute()
@@ -485,6 +505,7 @@ class DatabaseManager:
             }
             
             print(f"Saving template record: {template_record['name']}")
+            print(f"Template record data: {template_record}")
             
             response = self.supabase.table("banner_templates").insert(template_record).execute()
             

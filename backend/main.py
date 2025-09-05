@@ -1263,6 +1263,25 @@ async def test_templates_connection():
             "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
         }
 
+@app.get("/api/auth/test")
+async def test_auth_role():
+    """Test what auth role the backend is using"""
+    try:
+        auth_test = await db_manager.test_auth_role()
+        return {
+            "success": True,
+            "auth_test": auth_test,
+            "supabase_url": os.getenv("SUPABASE_URL"),
+            "supabase_key_type": "Service Role" if "service_role" in (os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY") or "") else "Anon Key"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "supabase_url": os.getenv("SUPABASE_URL"),
+            "supabase_key_type": "Service Role" if "service_role" in (os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY") or "") else "Anon Key"
+        }
+
 @app.get("/api/status", tags=["Health"])
 async def api_status():
     """
