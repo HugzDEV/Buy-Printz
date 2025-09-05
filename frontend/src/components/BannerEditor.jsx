@@ -91,6 +91,11 @@ const BannerEditorNew = () => {
     const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
     if (!tourCompleted) {
       setIsFirstTimeUser(true)
+      setShowTour(true)
+    } else {
+      // User has already completed the tour, don't show it again
+      setIsFirstTimeUser(false)
+      setShowTour(false)
     }
   }, [])
   

@@ -17,12 +17,18 @@ import { GlassCard, GlassButton } from './ui'
 
 const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
   const [runTour, setRunTour] = useState(false)
-  const [showWelcomeDialog, setShowWelcomeDialog] = useState(true)
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false)
   const [tourReady, setTourReady] = useState(false)
 
   useEffect(() => {
     if (isFirstTimeUser) {
-      setShowWelcomeDialog(true)
+      // Double-check that tour hasn't been completed
+      const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
+      if (!tourCompleted) {
+        setShowWelcomeDialog(true)
+      }
+    } else {
+      setShowWelcomeDialog(false)
     }
   }, [isFirstTimeUser])
 
