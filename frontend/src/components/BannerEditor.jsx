@@ -1983,7 +1983,9 @@ const BannerEditorNew = () => {
         console.log('🎨 Loading template data from URL:', canvasData)
         
         // Restore image elements properly
+        console.log('🎨 About to restore elements:', canvasData.elements)
         restoreImageElements(canvasData.elements || []).then(restoredElements => {
+          console.log('🎨 Restored elements:', restoredElements)
           setElements(restoredElements)
           setBackgroundColor(canvasData.backgroundColor || '#ffffff')
           if (canvasData.bannerSpecs) {
@@ -1996,6 +1998,7 @@ const BannerEditorNew = () => {
         }).catch(error => {
           console.error('Failed to restore image elements:', error)
           // Fallback to loading without images
+          console.log('🎨 Fallback: Setting elements directly:', canvasData.elements)
           setElements(canvasData.elements || [])
           setBackgroundColor(canvasData.backgroundColor || '#ffffff')
           if (canvasData.bannerSpecs) {
