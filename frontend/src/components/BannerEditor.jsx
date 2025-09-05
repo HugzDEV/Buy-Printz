@@ -1984,6 +1984,7 @@ const BannerEditorNew = () => {
         
         // Restore image elements properly
         console.log('🎨 About to restore elements:', canvasData.elements)
+        console.log('🎨 Canvas data keys:', Object.keys(canvasData))
         restoreImageElements(canvasData.elements || []).then(restoredElements => {
           console.log('🎨 Restored elements:', restoredElements)
           setElements(restoredElements)
