@@ -109,20 +109,33 @@ const Dashboard = () => {
         
         const response = await Promise.race([apiCall(), timeoutPromise])
         const data = await response.json()
+        
+        // Debug: Log the raw data structure
+        console.log(`🔍 Raw API response for ${loadingKey}:`, data)
+        console.log(`🔍 Data type:`, typeof data)
+        console.log(`🔍 Is array:`, Array.isArray(data))
+        console.log(`🔍 Data keys:`, Object.keys(data || {}))
+        
         if (data.success) {
           // Handle different response formats
           if (data.templates) {
+            console.log(`✅ Found data.templates:`, data.templates)
             setter(data.templates)
           } else if (data.designs) {
+            console.log(`✅ Found data.designs:`, data.designs)
             setter(data.designs)
           } else if (data.orders) {
+            console.log(`✅ Found data.orders:`, data.orders)
             setter(data.orders)
           } else if (data.preferences) {
+            console.log(`✅ Found data.preferences:`, data.preferences)
             setter(data.preferences)
           } else if (Array.isArray(data)) {
             // Handle direct array responses
+            console.log(`✅ Found direct array:`, data)
             setter(data)
           } else {
+            console.log(`⚠️ Fallback to full data:`, data)
             setter(data)
           }
         } else {
