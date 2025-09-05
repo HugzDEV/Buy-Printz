@@ -19,6 +19,11 @@ const Dashboard = () => {
   const [designs, setDesigns] = useState([])
   const [orders, setOrders] = useState([])
   const [templates, setTemplates] = useState([])
+  
+  // Debug: Log templates state changes
+  useEffect(() => {
+    console.log('🔄 Templates state updated:', templates.length, 'templates:', templates)
+  }, [templates])
   const [userStats, setUserStats] = useState(null)
   const [preferences, setPreferences] = useState(null)
   const [pendingOrders, setPendingOrders] = useState([])
@@ -203,9 +208,8 @@ const Dashboard = () => {
         () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
           console.log('Dashboard: Received templates data:', data)
-          console.log('Dashboard: Templates array:', data.templates)
-          console.log('Dashboard: Templates length:', data.templates?.length)
-          setTemplates(data.templates || [])
+          console.log('Dashboard: Setting templates state with:', data)
+          setTemplates(data)
         },
         [],
         'templates'
