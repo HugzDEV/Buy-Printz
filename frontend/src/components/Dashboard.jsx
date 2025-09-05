@@ -845,87 +845,133 @@ const Dashboard = () => {
         {/* Templates Tab */}
         {activeTab === 'templates' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">My Templates</h2>
-                <p className="text-gray-600">Custom banner templates you've created</p>
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center space-x-4">
+                <div className="p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl shadow-lg border border-white/30">
+                  <Layout className="w-8 h-8 text-purple-600" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-purple-700 to-blue-600 bg-clip-text text-transparent">
+                    My Templates
+                  </h2>
+                  <p className="text-gray-600 mt-1">Custom banner templates you've created and saved</p>
+                </div>
               </div>
               <Link
                 to="/editor"
                 onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-xl text-white font-semibold flex items-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-5 h-5 mr-2" />
                 Create Template
               </Link>
             </div>
 
             {console.log('Dashboard: Rendering templates, count:', templates.length, 'templates:', templates)}
             {templates.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {templates.map((template) => (
-                  <div key={template.id} className="backdrop-blur-xl bg-white/20 rounded-2xl overflow-hidden border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="font-bold text-gray-800 text-lg mb-1">{template.name}</h3>
-                          <p className="text-sm text-gray-600 mb-2">{template.description}</p>
-                          <div className="flex items-center space-x-2">
-                            <span className="inline-block bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full font-medium">
-                              {template.category}
-                            </span>
-                            {template.banner_type && (
-                              <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${getBannerTypeColor(template.banner_type)}`}>
-                                {template.banner_type}
+                  <div key={template.id} className="group relative">
+                    {/* Main Template Card */}
+                    <div className="backdrop-blur-xl bg-white/10 rounded-3xl overflow-hidden border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02]">
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      <div className="relative p-8">
+                        {/* Header Section */}
+                        <div className="flex items-start justify-between mb-6">
+                          <div className="flex-1">
+                            <h3 className="font-bold text-gray-800 text-xl mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                              {template.name}
+                            </h3>
+                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{template.description}</p>
+                            
+                            {/* Enhanced Tags */}
+                            <div className="flex items-center space-x-3">
+                              <span className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700 text-xs font-semibold rounded-full border border-purple-200/50 shadow-sm">
+                                <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                                {template.category}
                               </span>
-                            )}
+                              {template.banner_type && (
+                                <span className={`inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm ${getBannerTypeColor(template.banner_type)}`}>
+                                  <div className="w-2 h-2 bg-current rounded-full mr-2 opacity-60"></div>
+                                  {template.banner_type}
+                                </span>
+                              )}
+                            </div>
                           </div>
+                          
+                          {/* Enhanced Delete Button */}
+                          <button
+                            onClick={() => deleteTemplate(template.id)}
+                            className="p-3 bg-white/20 hover:bg-red-50/80 rounded-xl text-red-500 hover:text-red-600 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-red-200/50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => deleteTemplate(template.id)}
-                          className="p-2 bg-white/20 hover:bg-red-50/50 rounded-lg text-red-600 transition-all duration-200"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        
+                        {/* Timestamp Section */}
+                        <div className="flex items-center justify-between text-xs text-gray-500 mb-6 px-4 py-3 bg-white/10 rounded-xl border border-white/20">
+                          <span className="flex items-center">
+                            <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                            Created {formatDate(template.created_at)}
+                          </span>
+                          <span className="flex items-center">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {formatDate(template.updated_at)}
+                          </span>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={() => loadDesignInEditor(template)}
+                            className="flex-1 p-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 rounded-xl text-sm font-semibold text-white flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Use Template
+                          </button>
+                          <button className="p-4 bg-white/20 hover:bg-white/40 rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                       
-                      <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                        <span>Created {formatDate(template.created_at)}</span>
-                        <span className="flex items-center">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {formatDate(template.updated_at)}
-                        </span>
-                      </div>
-
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => loadDesignInEditor(template)}
-                          className="flex-1 p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-sm font-medium text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200"
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Use Template
-                        </button>
-                        <button className="p-3 bg-white/20 hover:bg-white/30 rounded-lg text-gray-600 transition-all duration-200">
-                          <Eye className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {/* Subtle Bottom Accent */}
+                      <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-12 text-center border border-white/30 shadow-xl">
-                <Layout className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-800 mb-2">No templates yet</h3>
-                <p className="text-gray-600 mb-6">Create your first custom template to reuse designs</p>
-                <Link 
-                  to="/editor" 
-                  onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium inline-flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create First Template
-                </Link>
+              <div className="backdrop-blur-xl bg-white/10 rounded-3xl p-16 text-center border border-white/20 shadow-2xl">
+                {/* Decorative Background Elements */}
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-50/20 via-transparent to-blue-50/20 rounded-3xl"></div>
+                <div className="absolute top-8 right-8 w-32 h-32 bg-gradient-to-br from-purple-200/20 to-blue-200/20 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-8 left-8 w-24 h-24 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-2xl"></div>
+                
+                <div className="relative">
+                  {/* Enhanced Icon */}
+                  <div className="inline-flex p-6 bg-gradient-to-br from-purple-100 to-blue-100 rounded-3xl shadow-xl border border-white/30 mb-8">
+                    <Layout className="w-16 h-16 text-purple-600" />
+                  </div>
+                  
+                  <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-purple-700 to-blue-600 bg-clip-text text-transparent mb-4">
+                    No templates yet
+                  </h3>
+                  <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto leading-relaxed">
+                    Create your first custom template to save and reuse your favorite banner designs
+                  </p>
+                  
+                  <Link 
+                    to="/editor" 
+                    onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-xl text-white font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
+                  >
+                    <Plus className="w-6 h-6 mr-3" />
+                    Create First Template
+                  </Link>
+                </div>
               </div>
             )}
           </div>
