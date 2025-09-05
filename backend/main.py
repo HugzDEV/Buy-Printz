@@ -280,8 +280,13 @@ async def login_user(user_data: UserLogin):
             }
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials")
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # For any other exceptions, return 401 (invalid credentials) instead of 500
+        print(f"Login error: {e}")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
 @app.post("/api/auth/refresh")
 async def refresh_token(refresh_token: str):
