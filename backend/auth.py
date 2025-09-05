@@ -96,25 +96,16 @@ class AuthManager:
             if user_id:
                 return {"user_id": user_id, "token_type": "jwt"}
         
-        # If JWT fails, try Supabase token
-        if self.is_available():
-            try:
-                # Use Supabase client to verify the JWT token directly
-                response = self.supabase.auth.get_user(token)
-                if response and response.user:
-                    return {"user_id": response.user.id, "token_type": "supabase"}
-            except Exception as e:
-                print(f"Supabase token verification error: {e}")
-            # Try alternative method - decode JWT manually to get user info
-            try:
-                from jose import jwt
-                # Supabase tokens are typically signed with HS256 and the JWT secret
-                # For now, we'll just try to decode without verification to get user ID
-                payload = jwt.get_unverified_claims(token)
-                if payload and payload.get('sub'):
-                    return {"user_id": payload.get('sub'), "token_type": "supabase_unverified"}
-            except Exception as decode_error:
-                print(f"Token decode error: {decode_error}")
+        # Try to decode Supabase JWT token directly
+        try:
+            from jose import jwt
+            # Supabase tokens are typically signed with HS256 and the JWT secret
+            # For now, we'll just try to decode without verification to get user ID
+            payload = jwt.get_unverified_claims(token)
+            if payload and payload.get('sub'):
+                return {"user_id": payload.get('sub'), "token_type": "supabase_unverified"}
+        except Exception as decode_error:
+            print(f"Token decode error: {decode_error}")
         
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
