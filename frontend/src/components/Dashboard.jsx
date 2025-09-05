@@ -110,7 +110,21 @@ const Dashboard = () => {
         const response = await Promise.race([apiCall(), timeoutPromise])
         const data = await response.json()
         if (data.success) {
-          setter(data.designs || data.orders || data.templates || data.preferences || data)
+          // Handle different response formats
+          if (data.templates) {
+            setter(data.templates)
+          } else if (data.designs) {
+            setter(data.designs)
+          } else if (data.orders) {
+            setter(data.orders)
+          } else if (data.preferences) {
+            setter(data.preferences)
+          } else if (Array.isArray(data)) {
+            // Handle direct array responses
+            setter(data)
+          } else {
+            setter(data)
+          }
         } else {
           console.warn(`API returned error for ${loadingKey}:`, data)
           setter(fallback)
