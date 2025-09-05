@@ -5,10 +5,10 @@ import {
   ZoomOut, 
   RotateCcw, 
   Grid3X3, 
-  Eye, 
-  EyeOff, 
-  Trash2, 
-  Copy, 
+  Eye,
+  EyeOff,
+  Trash2,
+  Copy,
   Undo2, 
   Redo2, 
   FileText,
@@ -142,7 +142,7 @@ const BannerCanvas = ({
   const [isEditingText, setIsEditingText] = useState(false);
   const [editingTextId, setEditingTextId] = useState(null);
   const [editingTextValue, setEditingTextValue] = useState('');
-  
+
   // Canvas utilities
   const saveToHistory = useCallback(() => {
     const newHistory = history.slice(0, historyStep + 1)
@@ -369,7 +369,7 @@ const BannerCanvas = ({
     } else {
       // Select new element
       setSelectedIds([id])
-      setSelectedId(id)
+    setSelectedId(id)
     }
   }
 
@@ -457,7 +457,7 @@ const BannerCanvas = ({
       const newPoints = points.map((point, index) => {
         if (index % 2 === 0) {
           return point * node.scaleX()
-        } else {
+          } else {
           return point * node.scaleY()
         }
       })
@@ -488,7 +488,7 @@ const BannerCanvas = ({
       // Reset scale to 1
       node.scaleX(1)
       node.scaleY(1)
-    } else {
+        } else {
       // For rectangles and other shapes, update width/height based on scale
       const newWidth = Math.max(10, (element.width || 100) * node.scaleX())
       const newHeight = Math.max(10, (element.height || 100) * node.scaleY())
@@ -528,7 +528,7 @@ const BannerCanvas = ({
         return
       }
       
-      if (e.key === 'Delete' && selectedId) {
+            if (e.key === 'Delete' && selectedId) {
         deleteSelected()
       } else if (e.ctrlKey || e.metaKey) {
         switch (e.key) {
@@ -1040,10 +1040,10 @@ const BannerCanvas = ({
           // Create image from data URL for AI-generated QR codes
           const img = new window.Image()
           img.src = safeElement.imageDataUrl
-          return (
+        return (
             <Image
               key={safeElement.id}
-              {...commonProps}
+            {...commonProps}
               image={img}
               width={safeElement.width || 200}
               height={safeElement.height || 200}
@@ -1380,12 +1380,12 @@ const BannerCanvas = ({
             <div className="hidden sm:flex items-center gap-1">
               <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <Undo2 className="w-3.5 h-3.5" />
-              </GlassButton>
-              
+            </GlassButton>
+            
               <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <Redo2 className="w-3.5 h-3.5" />
-              </GlassButton>
-              
+            </GlassButton>
+            
               <div className="w-px h-5 bg-white/20 mx-1" />
             </div>
             
@@ -1428,33 +1428,33 @@ const BannerCanvas = ({
             
             {/* Desktop: Full controls */}
             <div className="hidden sm:flex items-center gap-1">
-              <GlassButton 
-                onClick={() => setShowGrid(!showGrid)} 
-                variant={showGrid ? "primary" : "default"}
+            <GlassButton 
+              onClick={() => setShowGrid(!showGrid)} 
+              variant={showGrid ? "primary" : "default"}
                 className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
-                title={showGrid ? "Hide Grid" : "Show Grid"}
-              >
+              title={showGrid ? "Hide Grid" : "Show Grid"}
+            >
                 <Grid3X3 className="w-3.5 h-3.5" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={() => setShowGuides(!showGuides)} 
-                variant={showGuides ? "primary" : "default"}
+            </GlassButton>
+            
+            <GlassButton 
+              onClick={() => setShowGuides(!showGuides)} 
+              variant={showGuides ? "primary" : "default"}
                 className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
-                title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
-              >
+              title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
+            >
                 {showGuides ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-              </GlassButton>
-              
+            </GlassButton>
+            
               <div className="w-px h-5 bg-white/20 mx-1" />
-              
+            
               <GlassButton onClick={onSave} variant="success" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <Save className="w-3.5 h-3.5" />
-              </GlassButton>
-              
+            </GlassButton>
+            
               <GlassButton onClick={onExport} variant="primary" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <Download className="w-3.5 h-3.5" />
-              </GlassButton>
+            </GlassButton>
             </div>
           </div>
           
@@ -1629,11 +1629,11 @@ const BannerCanvas = ({
                 {/* Transformer */}
                 <Transformer
                   ref={transformerRef}
-                                    boundBoxFunc={(oldBox, newBox) => {
+                  boundBoxFunc={(oldBox, newBox) => {
                     // Ensure minimum size for all elements (same for all types)
                     const minSize = 10
                     
-                    return {
+                        return {
                       ...newBox,
                       width: Math.max(minSize, newBox.width),
                       height: Math.max(minSize, newBox.height)
@@ -1789,7 +1789,7 @@ const BannerCanvas = ({
                   </>
                 )}
               </Layer>
-            </Stage>
+                        </Stage>
 
             {/* Konva Text Editor - following official documentation pattern */}
             {/* Removed complex text editing - using simple prompt approach instead */}
@@ -1808,7 +1808,7 @@ const BannerCanvas = ({
         className={`
           fixed bottom-0 left-0 right-0 border-t border-white/20 
           bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
-          transform transition-transform duration-300 ease-in-out
+        transform transition-transform duration-300 ease-in-out
           max-h-[30vh] sm:max-h-[35vh] overflow-y-auto
           shadow-2xl z-50
           ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
@@ -1820,8 +1820,8 @@ const BannerCanvas = ({
       {selectedId && selectedElement?.type === 'text' && (
         <div className="text-xs text-blue-600 bg-blue-50 p-1 sm:p-1.5 rounded text-center">
           💡 Use the Edit Text button below to edit text
-        </div>
-      )}
+            </div>
+          )}
           
           {/* Top Row - DPI Info, Selection Count, and Close Button */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-1">
@@ -2099,20 +2099,20 @@ const BannerCanvas = ({
             <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
             
             {/* Text Edit Button */}
-            {selectedId && selectedElement?.type === 'text' && (
-              <GlassButton 
-                onClick={() => {
+              {selectedId && selectedElement?.type === 'text' && (
+                <GlassButton 
+                  onClick={() => {
               
                   handleTextEdit(selectedId);
-                }} 
-                variant="primary" 
-                className="px-3 py-2 flex items-center justify-center"
-              >
+                  }}
+                  variant="primary"
+                  className="px-3 py-2 flex items-center justify-center"
+                >
                 <FileText className="w-4 h-4 mr-1" />
-                <span className="text-xs">Edit Text</span>
-              </GlassButton>
-            )}
-            
+                  <span className="text-xs">Edit Text</span>
+                </GlassButton>
+              )}
+              
             {/* Duplicate and Delete */}
             <div className="flex gap-1 sm:gap-1.5">
               <GlassButton onClick={duplicateSelected} className="px-1.5 sm:px-2 py-1 sm:py-1.5 flex items-center justify-center">
@@ -2196,9 +2196,9 @@ const BannerCanvas = ({
               >
                 Save Changes
               </GlassButton>
-            </div>
-          </GlassPanel>
-        </div>
+          </div>
+        </GlassPanel>
+      </div>
       )}
 
     </div>
