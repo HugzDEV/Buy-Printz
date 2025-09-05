@@ -377,13 +377,22 @@ class DatabaseManager:
 
     async def get_design(self, design_id: str) -> Optional[Dict[str, Any]]:
         """Get specific design by ID"""
-        try:
-            response = self.supabase.table("canvas_designs").select("*").eq("id", design_id).execute()
-            if response.data:
-                return response.data[0]
+        if not self.is_connected():
+            print(f"❌ Database not connected when getting design {design_id}")
             return None
+            
+        try:
+            print(f"🔍 Getting design {design_id}")
+            response = self.supabase.table("canvas_designs").select("*").eq("id", design_id).execute()
+            print(f"🔍 Design query response: {response}")
+            if response.data:
+                print(f"✅ Found design: {response.data[0].get('name', 'unnamed')}")
+                return response.data[0]
+            else:
+                print(f"❌ No design found with ID: {design_id}")
+                return None
         except Exception as e:
-            print(f"Error getting design: {e}")
+            print(f"❌ Error getting design {design_id}: {e}")
             return None
 
     async def update_design(self, design_id: str, update_data: Dict[str, Any]) -> Dict[str, Any]:

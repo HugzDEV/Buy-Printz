@@ -475,12 +475,23 @@ async def get_design_count_info(current_user: dict = Depends(get_current_user)):
 async def get_design(design_id: str, current_user: dict = Depends(get_current_user)):
     """Get specific design"""
     try:
+        print(f"🔍 API: Getting design {design_id} for user {current_user['user_id']}")
         design = await db_manager.get_design(design_id)
+        print(f"🔍 API: Design result: {design}")
+        
         if design and design["user_id"] == current_user["user_id"]:
+            print(f"✅ API: Design found and authorized")
             return {"success": True, "design": design}
+        elif design:
+            print(f"❌ API: Design found but user mismatch. Design user: {design.get('user_id')}, Request user: {current_user['user_id']}")
+            raise HTTPException(status_code=403, detail="Access denied")
         else:
+            print(f"❌ API: Design not found")
             raise HTTPException(status_code=404, detail="Design not found")
+    except HTTPException:
+        raise
     except Exception as e:
+        print(f"❌ API: Unexpected error getting design {design_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/designs/{design_id}")
