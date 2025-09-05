@@ -174,7 +174,10 @@ const Dashboard = () => {
     await Promise.all([
       loadDataSafely(
         () => authService.authenticatedRequest('/api/templates/user'),
-        (data) => setTemplates(data.templates || []),
+        (data) => {
+          console.log('Dashboard: Received templates data:', data)
+          setTemplates(data.templates || [])
+        },
         [],
         'templates'
       )

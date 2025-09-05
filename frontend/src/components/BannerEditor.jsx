@@ -1659,17 +1659,24 @@ const BannerEditorNew = () => {
         is_public: false
       }
       
+      console.log('Sending template data:', templateData)
+      
       const response = await authService.authenticatedRequest('/api/templates/save', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(templateData)
       })
       
+      console.log('Template save response status:', response.status)
+      
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('Template save error response:', errorData)
         throw new Error(errorData.detail || 'Failed to save template')
       }
       
       const result = await response.json()
+      console.log('Template save result:', result)
       
       if (result.success) {
         alert('Template saved successfully!')
@@ -1678,7 +1685,18 @@ const BannerEditorNew = () => {
       }
     } catch (error) {
       console.error('Failed to save template:', error)
-      alert(`Failed to save template: ${error.message}`)
+      
+      // Provide more specific error messages
+      let errorMessage = error.message
+      if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your connection and try again.'
+      } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        errorMessage = 'Authentication error. Please log in again.'
+      } else if (error.message.includes('Templates table not found')) {
+        errorMessage = 'Templates feature is not available. Please contact support.'
+      }
+      
+      alert(`Failed to save template: ${errorMessage}`)
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs])
 

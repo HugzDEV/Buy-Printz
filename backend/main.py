@@ -1226,6 +1226,43 @@ async def test_database_connection():
             "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
         }
 
+@app.get("/api/templates/test")
+async def test_templates_connection():
+    """Test templates table connection and basic operations"""
+    try:
+        if not db_manager.is_connected():
+            return {
+                "success": False,
+                "error": "Database not connected",
+                "supabase_url": os.getenv("SUPABASE_URL"),
+                "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
+            }
+        
+        # Test basic query to templates table
+        test_response = db_manager.supabase.table("banner_templates").select("id").limit(1).execute()
+        
+        # Test count query
+        count_response = db_manager.supabase.table("banner_templates").select("id", count="exact").execute()
+        
+        return {
+            "success": True,
+            "message": "Templates table connection successful",
+            "test_query_result": test_response.data is not None,
+            "table_exists": True,
+            "total_templates": count_response.count if hasattr(count_response, 'count') else 0,
+            "supabase_url": os.getenv("SUPABASE_URL"),
+            "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
+        }
+    except Exception as e:
+        error_msg = str(e)
+        return {
+            "success": False,
+            "error": error_msg,
+            "table_exists": "relation \"banner_templates\" does not exist" not in error_msg,
+            "supabase_url": os.getenv("SUPABASE_URL"),
+            "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
+        }
+
 @app.get("/api/status", tags=["Health"])
 async def api_status():
     """

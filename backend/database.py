@@ -461,57 +461,129 @@ class DatabaseManager:
     # Banner Templates Management
     async def save_custom_template(self, user_id: str, template_data: Dict[str, Any]) -> Dict[str, Any]:
         """Save a custom banner template"""
+        if not self.is_connected():
+            return {"success": False, "error": "Database not connected. Please check your connection."}
+        
         try:
+            print(f"Attempting to save template for user: {user_id}")
+            
+            # Ensure canvas_data is properly formatted
+            canvas_data = template_data.get("canvas_data", {})
+            if isinstance(canvas_data, str):
+                canvas_data = json.loads(canvas_data)
+            
             template_record = {
                 "user_id": user_id,
                 "name": template_data["name"],
                 "category": template_data.get("category", "Custom"),
                 "description": template_data.get("description", ""),
-                "canvas_data": json.dumps(template_data["canvas_data"]),
+                "canvas_data": json.dumps(canvas_data),
                 "banner_type": template_data.get("banner_type"),
                 "is_public": template_data.get("is_public", False),
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat()
             }
             
+            print(f"Saving template record: {template_record['name']}")
+            
             response = self.supabase.table("banner_templates").insert(template_record).execute()
             
             if response.data:
+                print(f"Template saved successfully with ID: {response.data[0]['id']}")
                 return {
                     "template_id": response.data[0]["id"],
                     "success": True
                 }
-            return {"success": False, "error": "Failed to save template"}
+            else:
+                print("Error: No data returned from template insert operation")
+                return {"success": False, "error": "Failed to save template - no data returned"}
+                
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            error_msg = str(e)
+            print(f"Error saving custom template: {error_msg}")
+            
+            # Handle table doesn't exist error
+            if "relation \"banner_templates\" does not exist" in error_msg:
+                return {
+                    "success": False,
+                    "error": "Templates table not found. Please contact support to set up the templates feature."
+                }
+            
+            return {"success": False, "error": error_msg}
 
     async def get_user_templates(self, user_id: str) -> List[Dict[str, Any]]:
         """Get all custom templates for a user"""
+        if not self.is_connected():
+            print("Database not connected, returning empty templates list")
+            return []
+        
         try:
+            print(f"Fetching templates for user: {user_id}")
             response = self.supabase.table("banner_templates").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
-            return response.data or []
+            
+            if response.data:
+                print(f"Found {len(response.data)} templates for user")
+                return response.data
+            else:
+                print("No templates found for user")
+                return []
+                
         except Exception as e:
             print(f"Error getting user templates: {e}")
+            # If table doesn't exist, return empty list
+            if "relation \"banner_templates\" does not exist" in str(e):
+                print("banner_templates table does not exist. Please run the SQL setup.")
+                return []
             return []
 
     async def get_template(self, template_id: str) -> Optional[Dict[str, Any]]:
         """Get specific template by ID"""
-        try:
-            response = self.supabase.table("banner_templates").select("*").eq("id", template_id).execute()
-            if response.data:
-                return response.data[0]
+        if not self.is_connected():
+            print("Database not connected, returning None for template")
             return None
+        
+        try:
+            print(f"Fetching template with ID: {template_id}")
+            response = self.supabase.table("banner_templates").select("*").eq("id", template_id).execute()
+            
+            if response.data:
+                print(f"Found template: {response.data[0]['name']}")
+                return response.data[0]
+            else:
+                print("Template not found")
+                return None
+                
         except Exception as e:
             print(f"Error getting template: {e}")
+            # If table doesn't exist, return None
+            if "relation \"banner_templates\" does not exist" in str(e):
+                print("banner_templates table does not exist. Please run the SQL setup.")
+                return None
             return None
 
     async def get_public_templates(self) -> List[Dict[str, Any]]:
         """Get all public templates"""
+        if not self.is_connected():
+            print("Database not connected, returning empty public templates list")
+            return []
+        
         try:
+            print("Fetching public templates")
             response = self.supabase.table("banner_templates").select("*").eq("is_public", True).order("created_at", desc=True).execute()
-            return response.data or []
+            
+            if response.data:
+                print(f"Found {len(response.data)} public templates")
+                return response.data
+            else:
+                print("No public templates found")
+                return []
+                
         except Exception as e:
             print(f"Error getting public templates: {e}")
+            # If table doesn't exist, return empty list
+            if "relation \"banner_templates\" does not exist" in str(e):
+                print("banner_templates table does not exist. Please run the SQL setup.")
+                return []
             return []
 
     # Design History Management
