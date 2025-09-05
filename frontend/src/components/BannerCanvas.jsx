@@ -517,7 +517,16 @@ const BannerCanvas = ({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      // Skip keyboard shortcuts if user is typing in input fields
+      if (e.target.tagName === 'INPUT' || 
+          e.target.tagName === 'TEXTAREA' || 
+          e.target.tagName === 'SELECT' ||
+          e.target.isContentEditable ||
+          e.target.closest('input') ||
+          e.target.closest('textarea') ||
+          e.target.closest('[contenteditable]')) {
+        return
+      }
       
       if (e.key === 'Delete' && selectedId) {
         deleteSelected()
