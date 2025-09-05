@@ -10,17 +10,17 @@ load_dotenv()
 
 # Initialize Supabase client with error handling for deployment
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+supabase_service_role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 supabase_anon_key = os.getenv("SUPABASE_KEY")
 
 # Debug: Print what keys we found
 print(f"🔍 Environment check:")
 print(f"SUPABASE_URL: {'✓' if supabase_url else '✗'}")
-print(f"SUPABASE_SERVICE_ROLE_KEY: {'✓' if supabase_service_key else '✗'}")
+print(f"SUPABASE_SERVICE_ROLE_KEY: {'✓' if supabase_service_role_key else '✗'}")
 print(f"SUPABASE_KEY: {'✓' if supabase_anon_key else '✗'}")
 
-# Use service role key if available, otherwise fall back to anon key
-supabase_key = supabase_service_key or supabase_anon_key
+# Use service role key (required for backend operations)
+supabase_key = supabase_service_role_key
 
 # Initialize supabase client with proper error handling
 supabase = None
@@ -29,7 +29,9 @@ if supabase_url and supabase_key:
     try:
         supabase: Client = create_client(supabase_url, supabase_key)
         print("✅ Supabase client initialized successfully")
-        print(f"Using key type: {'Service Role' if 'service_role' in supabase_key else 'Anon Key'}")
+        # More reliable key type detection
+        key_type = "Service Role" if supabase_service_role_key else "Anon Key"
+        print(f"Using key type: {key_type}")
     except Exception as e:
         print(f"❌ Failed to initialize Supabase client: {e}")
         supabase = None
