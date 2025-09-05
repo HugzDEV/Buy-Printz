@@ -11,9 +11,23 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Auth client is not needed - frontend handles authentication directly
-supabase_auth = None
-print("ℹ️ Supabase auth client not initialized (frontend handles auth directly)")
+# Initialize Supabase auth client for user authentication
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_anon_key = os.getenv("SUPABASE_ANON_KEY")  # Use the anon key from Railway
+
+if supabase_url and supabase_anon_key:
+    try:
+        supabase_auth: Client = create_client(supabase_url, supabase_anon_key)
+        print("✅ Supabase auth client initialized successfully")
+    except Exception as e:
+        print(f"❌ Failed to initialize Supabase auth client: {e}")
+        supabase_auth = None
+else:
+    print("⚠️ Supabase auth environment variables not found.")
+    print(f"SUPABASE_URL: {'✓' if supabase_url else '✗'}")
+    print(f"SUPABASE_ANON_KEY: {'✓' if supabase_anon_key else '✗'}")
+    print("Auth features will be disabled.")
+    supabase_auth = None
 
 # JWT Configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
