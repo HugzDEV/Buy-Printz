@@ -176,6 +176,8 @@ const Dashboard = () => {
         () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
           console.log('Dashboard: Received templates data:', data)
+          console.log('Dashboard: Templates array:', data.templates)
+          console.log('Dashboard: Templates length:', data.templates?.length)
           setTemplates(data.templates || [])
         },
         [],
@@ -814,6 +816,7 @@ const Dashboard = () => {
               </Link>
             </div>
 
+            {console.log('Dashboard: Rendering templates, count:', templates.length, 'templates:', templates)}
             {templates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {templates.map((template) => (
