@@ -1800,36 +1800,89 @@ const BannerEditorNew = () => {
         // If the image is a serialized object, we need to recreate the HTML Image
         if (typeof element.image === 'object' && !element.image.naturalWidth) {
           try {
-            // Check if we have a data URL or need to recreate the image
-            let imageSrc = null
-            
-            // If it's an uploaded file, check if we have a data URL stored
-            if (element.uploadedFile && element.imageDataUrl) {
-              // Use the stored data URL for uploaded images
-              imageSrc = element.imageDataUrl
-            } else if (element.assetName) {
-              // For asset library images, we can restore them
-              imageSrc = `/assets/images/${element.assetName}`
-            }
-            
-            if (imageSrc) {
-              // Create a new HTML Image element
-              const img = new window.Image()
-              await new Promise((resolve, reject) => {
-                img.onload = resolve
-                img.onerror = reject
-                img.src = imageSrc
+            // Check if it's a QR code that needs to be regenerated
+            if (element.assetName === 'QR Code' && element.qrData) {
+              console.log('🎨 Restoring QR code:', element.qrData)
+              
+              // Create a hidden div to render the QR code
+              const qrContainer = document.createElement('div')
+              qrContainer.style.position = 'absolute'
+              qrContainer.style.left = '-9999px'
+              qrContainer.style.top = '-9999px'
+              document.body.appendChild(qrContainer)
+              
+              // Create a temporary React element for the QR code
+              const qrElement = React.createElement(QRCodeCanvas, {
+                value: element.qrData.url,
+                size: 200,
+                fgColor: element.qrData.color,
+                bgColor: element.qrData.backgroundColor,
+                level: 'M', // Medium error correction
+                includeMargin: true
               })
               
-              // Create the restored element
-              const restoredElement = {
-                ...element,
-                image: img
-              }
-              restoredElements.push(restoredElement)
+              // Render the QR code to the hidden container
+              const root = createRoot(qrContainer)
+              root.render(qrElement)
+              
+              // Wait for the QR code to render, then capture it
+              await new Promise((resolve) => {
+                setTimeout(() => {
+                  const canvas = qrContainer.querySelector('canvas')
+                  if (canvas) {
+                    const qrDataUrl = canvas.toDataURL('image/png')
+                    
+                    // Create image element from the QR code
+                    const img = new window.Image()
+                    img.onload = () => {
+                      const restoredElement = {
+                        ...element,
+                        image: img
+                      }
+                      restoredElements.push(restoredElement)
+                      resolve()
+                    }
+                    img.src = qrDataUrl
+                  } else {
+                    resolve()
+                  }
+                  
+                  // Clean up the hidden container
+                  document.body.removeChild(qrContainer)
+                }, 100)
+              })
             } else {
-              // Skip elements we can't restore
-              console.warn('Cannot restore image element:', element)
+              // Check if we have a data URL or need to recreate the image
+              let imageSrc = null
+              
+              // If it's an uploaded file, check if we have a data URL stored
+              if (element.uploadedFile && element.imageDataUrl) {
+                // Use the stored data URL for uploaded images
+                imageSrc = element.imageDataUrl
+              } else if (element.assetName) {
+                // For asset library images, we can restore them
+                imageSrc = `/assets/images/${element.assetName}`
+              }
+              
+              if (imageSrc) {
+                // Create a new HTML Image element
+                const img = new window.Image()
+                await new Promise((resolve, reject) => {
+                  img.onload = resolve
+                  img.onerror = reject
+                  img.src = imageSrc
+                })
+                
+                // Create the restored element
+                const restoredElement = {
+                  ...element,
+                  image: img
+                }
+                restoredElements.push(restoredElement)
+              } else {
+                // Skip elements we can't restore
+                console.warn('Cannot restore image element:', element)
+              }
             }
           } catch (error) {
             console.error('Failed to restore image element:', error)
