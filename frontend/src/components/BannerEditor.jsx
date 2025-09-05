@@ -17,6 +17,8 @@ import BannerSidebar from './BannerSidebar'
 import BannerCanvas from './BannerCanvas'
 import OnboardingTour from './OnboardingTour'
 import AIAgent from './AIAgent'
+import SaveModal from './SaveModal'
+import SuccessNotification from './SuccessNotification'
 import authService from '../services/auth'
 
 const BannerEditorNew = () => {
@@ -39,6 +41,16 @@ const BannerEditorNew = () => {
   
   // AI Agent state
   const [currentDesignId, setCurrentDesignId] = useState(null)
+  
+  // Save Modal state
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [saveModalType, setSaveModalType] = useState('design') // 'design' or 'template'
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
+  
+  // Success Notification state
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [successMessage, setSuccessMessage] = useState({ title: '', message: '' })
   
   // AI Agent handlers
   const handleAIDesignGenerated = useCallback((designData) => {
@@ -1569,10 +1581,19 @@ const BannerEditorNew = () => {
   }, [canvasSize])
 
   // Save design to Supabase
-  const saveDesign = useCallback(async () => {
+  const saveDesign = useCallback(() => {
+    setSaveModalType('design')
+    setSaveError(null)
+    setShowSaveModal(true)
+  }, [])
+
+  const handleSaveDesign = useCallback(async (name, description) => {
+    setIsSaving(true)
+    setSaveError(null)
+    
     try {
       const designData = {
-        name: `Banner Design ${new Date().toLocaleDateString()}`,
+        name: name || `Banner Design ${new Date().toLocaleDateString()}`,
         canvas_data: {
           elements,
           canvasSize,
@@ -1615,7 +1636,12 @@ const BannerEditorNew = () => {
       console.log('Save result:', result)
       
       if (result.success) {
-        alert(`Design saved successfully! (${result.design_count}/${result.design_limit} designs)`)
+        setShowSaveModal(false)
+        setSuccessMessage({
+          title: 'Design Saved!',
+          message: `Your design has been saved successfully! (${result.design_count}/${result.design_limit} designs)`
+        })
+        setShowSuccessNotification(true)
         // Update current design ID for future modifications
         setCurrentDesignId(result.design_id)
       } else {
@@ -1634,16 +1660,27 @@ const BannerEditorNew = () => {
         errorMessage = error.message
       }
       
-      alert(`Failed to save design: ${errorMessage}`)
+      setSaveError(errorMessage)
+    } finally {
+      setIsSaving(false)
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs, canvasOrientation])
 
   // Save as template
-  const saveAsTemplate = useCallback(async () => {
-    const saveTemplateWithName = async (templateName) => {
+  const saveAsTemplate = useCallback(() => {
+    setSaveModalType('template')
+    setSaveError(null)
+    setShowSaveModal(true)
+  }, [])
+
+  const handleSaveTemplate = useCallback(async (name, description) => {
+    setIsSaving(true)
+    setSaveError(null)
+    
+    try {
       const templateData = {
-        name: templateName,
-        description: `Template created on ${new Date().toLocaleDateString()}`,
+        name: name,
+        description: description || `Template created on ${new Date().toLocaleDateString()}`,
         category: 'Custom',
         canvas_data: {
           elements,
@@ -1676,34 +1713,15 @@ const BannerEditorNew = () => {
       console.log('Template save result:', result)
       
       if (result.success) {
-        alert('Template saved successfully!')
+        setShowSaveModal(false)
+        setSuccessMessage({
+          title: 'Template Saved!',
+          message: 'Your template has been saved successfully and is now available in your templates collection!'
+        })
+        setShowSuccessNotification(true)
         return true
       } else {
         throw new Error(result.error || 'Failed to save template')
-      }
-    }
-
-    try {
-      let templateName = prompt('Enter template name:')
-      if (!templateName) return
-      
-      // Try to save with the initial name
-      try {
-        await saveTemplateWithName(templateName)
-      } catch (error) {
-        // Check if it's a duplicate name error
-        if (error.message.includes('already exists')) {
-          // Ask user if they want to try a different name
-          const tryAgain = confirm(`${error.message}\n\nWould you like to try a different name?`)
-          if (tryAgain) {
-            const newName = prompt('Enter a different template name:', templateName)
-            if (newName && newName !== templateName) {
-              await saveTemplateWithName(newName)
-            }
-          }
-        } else {
-          throw error // Re-throw if it's not a duplicate name error
-        }
       }
     } catch (error) {
       console.error('Failed to save template:', error)
@@ -1718,7 +1736,9 @@ const BannerEditorNew = () => {
         errorMessage = 'Templates feature is not available. Please contact support.'
       }
       
-      alert(`Failed to save template: ${errorMessage}`)
+      setSaveError(errorMessage)
+    } finally {
+      setIsSaving(false)
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs])
 
@@ -2274,6 +2294,28 @@ const BannerEditorNew = () => {
       onDesignGenerated={handleAIDesignGenerated}
       onDesignModified={handleAIDesignModified}
       currentDesignId={currentDesignId}
+    />
+    
+    {/* Save Modal */}
+    <SaveModal
+      isOpen={showSaveModal}
+      onClose={() => {
+        setShowSaveModal(false)
+        setSaveError(null)
+      }}
+      onSave={saveModalType === 'template' ? handleSaveTemplate : handleSaveDesign}
+      type={saveModalType}
+      isLoading={isSaving}
+      error={saveError}
+    />
+    
+    {/* Success Notification */}
+    <SuccessNotification
+      isVisible={showSuccessNotification}
+      onClose={() => setShowSuccessNotification(false)}
+      title={successMessage.title}
+      message={successMessage.message}
+      type="success"
     />
     </div>
   )
