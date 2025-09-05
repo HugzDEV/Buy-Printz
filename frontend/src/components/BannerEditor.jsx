@@ -1640,10 +1640,7 @@ const BannerEditorNew = () => {
 
   // Save as template
   const saveAsTemplate = useCallback(async () => {
-    try {
-      const templateName = prompt('Enter template name:')
-      if (!templateName) return
-      
+    const saveTemplateWithName = async (templateName) => {
       const templateData = {
         name: templateName,
         description: `Template created on ${new Date().toLocaleDateString()}`,
@@ -1680,8 +1677,33 @@ const BannerEditorNew = () => {
       
       if (result.success) {
         alert('Template saved successfully!')
+        return true
       } else {
         throw new Error(result.error || 'Failed to save template')
+      }
+    }
+
+    try {
+      let templateName = prompt('Enter template name:')
+      if (!templateName) return
+      
+      // Try to save with the initial name
+      try {
+        await saveTemplateWithName(templateName)
+      } catch (error) {
+        // Check if it's a duplicate name error
+        if (error.message.includes('already exists')) {
+          // Ask user if they want to try a different name
+          const tryAgain = confirm(`${error.message}\n\nWould you like to try a different name?`)
+          if (tryAgain) {
+            const newName = prompt('Enter a different template name:', templateName)
+            if (newName && newName !== templateName) {
+              await saveTemplateWithName(newName)
+            }
+          }
+        } else {
+          throw error // Re-throw if it's not a duplicate name error
+        }
       }
     } catch (error) {
       console.error('Failed to save template:', error)

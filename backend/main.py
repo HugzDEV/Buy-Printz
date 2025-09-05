@@ -835,7 +835,14 @@ async def save_custom_template(
                 "message": "Template saved successfully"
             }
         else:
-            raise HTTPException(status_code=500, detail=result["error"])
+            # Check if it's a duplicate name error
+            error_msg = result["error"]
+            if "already exists" in error_msg.lower():
+                raise HTTPException(status_code=400, detail=error_msg)
+            else:
+                raise HTTPException(status_code=500, detail=error_msg)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -508,6 +508,14 @@ class DatabaseManager:
         try:
             print(f"Attempting to save template for user: {user_id}")
             
+            # Check for duplicate template names for this user
+            template_name = template_data["name"]
+            existing_templates = self.supabase.table("banner_templates").select("id,name").eq("user_id", user_id).eq("name", template_name).execute()
+            
+            if existing_templates.data:
+                print(f"Template name '{template_name}' already exists for user {user_id}")
+                return {"success": False, "error": f"Template name '{template_name}' already exists. Please choose a different name."}
+            
             # Ensure canvas_data is properly formatted
             canvas_data = template_data.get("canvas_data", {})
             if isinstance(canvas_data, str):
