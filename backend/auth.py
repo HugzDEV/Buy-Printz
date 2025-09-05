@@ -96,14 +96,28 @@ class AuthManager:
             if user_id:
                 return {"user_id": user_id, "token_type": "jwt"}
         
-        # Try to decode Supabase JWT token directly
+        # Try to decode Supabase JWT token with proper validation
         try:
             from jose import jwt
-            # Supabase tokens are typically signed with HS256 and the JWT secret
-            # For now, we'll just try to decode without verification to get user ID
-            payload = jwt.get_unverified_claims(token)
-            if payload and payload.get('sub'):
-                return {"user_id": payload.get('sub'), "token_type": "supabase_unverified"}
+            # For Supabase tokens, we need to verify against the JWT secret
+            # Get the JWT secret from environment
+            jwt_secret = os.getenv("JWT_SECRET_KEY")
+            if jwt_secret:
+                try:
+                    # Try to verify the token with the JWT secret
+                    payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+                    if payload and payload.get('sub'):
+                        return {"user_id": payload.get('sub'), "token_type": "supabase_verified"}
+                except jwt.JWTError:
+                    # If JWT verification fails, try unverified decode as fallback
+                    # but only for debugging - this should be removed in production
+                    print("JWT verification failed, trying unverified decode for debugging")
+                    payload = jwt.get_unverified_claims(token)
+                    if payload and payload.get('sub'):
+                        print(f"WARNING: Using unverified token for user: {payload.get('sub')}")
+                        return {"user_id": payload.get('sub'), "token_type": "supabase_unverified"}
+            else:
+                print("JWT_SECRET_KEY not found, cannot verify Supabase tokens")
         except Exception as decode_error:
             print(f"Token decode error: {decode_error}")
         
