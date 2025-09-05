@@ -1595,26 +1595,46 @@ const BannerEditorNew = () => {
         print_options: {}
       }
       
-      const response = await authService.authenticatedRequest('/api/canvas/save', {
+      console.log('Sending design data:', designData)
+      
+      const response = await authService.authenticatedRequest('/api/designs/save', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(designData)
       })
       
+      console.log('Save response status:', response.status)
+      
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('Save error response:', errorData)
         throw new Error(errorData.detail || 'Failed to save design')
       }
       
       const result = await response.json()
+      console.log('Save result:', result)
       
       if (result.success) {
         alert(`Design saved successfully! (${result.design_count}/${result.design_limit} designs)`)
+        // Update current design ID for future modifications
+        setCurrentDesignId(result.design_id)
       } else {
         throw new Error(result.error || 'Failed to save design')
       }
     } catch (error) {
       console.error('Failed to save design:', error)
-      alert(`Failed to save design: ${error.message}`)
+      
+      // Provide more specific error messages
+      let errorMessage = error.message
+      if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your connection and try again.'
+      } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        errorMessage = 'Authentication error. Please log in again.'
+      } else if (error.message.includes('Design limit reached')) {
+        errorMessage = error.message
+      }
+      
+      alert(`Failed to save design: ${errorMessage}`)
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs, canvasOrientation])
 

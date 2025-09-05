@@ -1196,6 +1196,36 @@ async def health_check():
             "error": str(e)
         }
 
+@app.get("/api/database/test")
+async def test_database_connection():
+    """Test database connection and basic operations"""
+    try:
+        if not db_manager.is_connected():
+            return {
+                "success": False,
+                "error": "Database not connected",
+                "supabase_url": os.getenv("SUPABASE_URL"),
+                "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
+            }
+        
+        # Test basic query
+        test_response = db_manager.supabase.table("canvas_designs").select("id").limit(1).execute()
+        
+        return {
+            "success": True,
+            "message": "Database connection successful",
+            "test_query_result": test_response.data is not None,
+            "supabase_url": os.getenv("SUPABASE_URL"),
+            "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "supabase_url": os.getenv("SUPABASE_URL"),
+            "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
+        }
+
 @app.get("/api/status", tags=["Health"])
 async def api_status():
     """

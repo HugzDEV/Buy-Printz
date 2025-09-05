@@ -193,7 +193,12 @@ class DatabaseManager:
     # Canvas Data Management
     async def save_canvas_design(self, user_id: str, design_data: Dict[str, Any]) -> Dict[str, Any]:
         """Save canvas design for later use - database enforced limit"""
+        if not self.is_connected():
+            return {"success": False, "error": "Database not connected. Please check your connection."}
+        
         try:
+            print(f"Attempting to save design for user: {user_id}")
+            
             # Get current design count using database function
             count_response = self.supabase.rpc("get_user_design_count", {"user_uuid": user_id}).execute()
             
@@ -206,11 +211,18 @@ class DatabaseManager:
                         "design_count": count_info["design_count"],
                         "design_limit": count_info["design_limit"]
                     }
+            else:
+                print("Warning: Could not get design count, proceeding with save")
+            
+            # Ensure canvas_data is properly formatted
+            canvas_data = design_data.get("canvas_data", {})
+            if isinstance(canvas_data, str):
+                canvas_data = json.loads(canvas_data)
             
             design_record = {
                 "user_id": user_id,
                 "name": design_data.get("name", "Untitled Design"),
-                "canvas_data": json.dumps(design_data["canvas_data"]),
+                "canvas_data": json.dumps(canvas_data),
                 "product_type": design_data.get("product_type", "custom"),
                 "dimensions": json.dumps(design_data.get("dimensions", {})),
                 "banner_type": design_data.get("banner_type"),
@@ -224,13 +236,21 @@ class DatabaseManager:
                 "updated_at": datetime.utcnow().isoformat()
             }
             
+            print(f"Saving design record: {design_record['name']}")
+            
             # The database trigger will automatically enforce the 10-design limit
             response = self.supabase.table("canvas_designs").insert(design_record).execute()
             
             if response.data:
+                print(f"Design saved successfully with ID: {response.data[0]['id']}")
+                
                 # Get updated design count after insert
-                updated_count_response = self.supabase.rpc("get_user_design_count", {"user_uuid": user_id}).execute()
-                count_info = updated_count_response.data if updated_count_response.data else {"design_count": 1, "design_limit": 10}
+                try:
+                    updated_count_response = self.supabase.rpc("get_user_design_count", {"user_uuid": user_id}).execute()
+                    count_info = updated_count_response.data if updated_count_response.data else {"design_count": 1, "design_limit": 10}
+                except Exception as count_error:
+                    print(f"Warning: Could not get updated count: {count_error}")
+                    count_info = {"design_count": 1, "design_limit": 10}
                 
                 return {
                     "design_id": response.data[0]["id"],
@@ -238,9 +258,13 @@ class DatabaseManager:
                     "design_limit": count_info["design_limit"],
                     "success": True
                 }
-            return {"success": False, "error": "Failed to save design"}
+            else:
+                print("Error: No data returned from insert operation")
+                return {"success": False, "error": "Failed to save design - no data returned"}
+                
         except Exception as e:
             error_msg = str(e)
+            print(f"Error saving canvas design: {error_msg}")
             # Handle database-enforced limit error
             if "Design limit reached" in error_msg:
                 return {
@@ -253,9 +277,21 @@ class DatabaseManager:
 
     async def get_user_designs(self, user_id: str) -> List[Dict[str, Any]]:
         """Get all saved designs for a user"""
+        if not self.is_connected():
+            print("Database not connected, returning empty designs list")
+            return []
+        
         try:
+            print(f"Fetching designs for user: {user_id}")
             response = self.supabase.table("canvas_designs").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
-            return response.data or []
+            
+            if response.data:
+                print(f"Found {len(response.data)} designs for user")
+                return response.data
+            else:
+                print("No designs found for user")
+                return []
+                
         except Exception as e:
             print(f"Error getting user designs: {e}")
             return []

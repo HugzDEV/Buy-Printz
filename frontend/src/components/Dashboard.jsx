@@ -133,6 +133,7 @@ const Dashboard = () => {
       loadDataSafely(
         () => authService.authenticatedRequest('/api/designs'),
         (data) => {
+          console.log('Dashboard: Received designs data:', data)
           const designs = data.designs || []
           setDesigns(designs)
           // Filter completed designs from main designs data
