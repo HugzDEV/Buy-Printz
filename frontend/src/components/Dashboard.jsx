@@ -330,13 +330,15 @@ const Dashboard = () => {
   const loadDesignInEditor = (item) => {
     // Check if it's a template or design
     if (item.canvas_data) {
-      // It's a template - navigate with template data
+      // It's a template - store template data in sessionStorage and navigate
       // Parse canvas_data if it's a string, otherwise use as-is
       const parsedCanvasData = typeof item.canvas_data === 'string' 
         ? JSON.parse(item.canvas_data) 
         : item.canvas_data
-      const templateData = encodeURIComponent(JSON.stringify(parsedCanvasData))
-      navigate(`/editor?template=${item.id}&data=${templateData}`)
+      
+      // Store template data in sessionStorage to avoid URL encoding issues
+      sessionStorage.setItem('templateData', JSON.stringify(parsedCanvasData))
+      navigate(`/editor?template=${item.id}`)
     } else {
       // It's a design - navigate with design ID
       navigate(`/editor?design=${item.id}`)

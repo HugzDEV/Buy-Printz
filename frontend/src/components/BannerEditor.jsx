@@ -1972,51 +1972,59 @@ const BannerEditorNew = () => {
     // Check URL params for design/template ID to load from database
     const designId = searchParams.get('design')
     const templateId = searchParams.get('template')
-    const templateData = searchParams.get('data')
     
     if (designId) {
       loadDesignFromDatabase(designId)
-    } else if (templateId && templateData) {
-      // Load template data from URL parameters
-      try {
-        const canvasData = JSON.parse(decodeURIComponent(templateData))
-        console.log('🎨 Loading template data from URL:', canvasData)
-        
-        // Restore image elements properly
-        console.log('🎨 About to restore elements:', canvasData.elements)
-        console.log('🎨 Canvas data keys:', Object.keys(canvasData))
-        restoreImageElements(canvasData.elements || []).then(restoredElements => {
-          console.log('🎨 Restored elements:', restoredElements)
-          setElements(restoredElements)
-          setBackgroundColor(canvasData.backgroundColor || '#ffffff')
-          if (canvasData.bannerSpecs) {
-            setBannerSpecs(canvasData.bannerSpecs)
-          }
-          if (canvasData.canvasSize) {
-            setCanvasSize(canvasData.canvasSize)
-            setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
-          }
-        }).catch(error => {
-          console.error('Failed to restore image elements:', error)
-          // Fallback to loading without images
-          console.log('🎨 Fallback: Setting elements directly:', canvasData.elements)
-          setElements(canvasData.elements || [])
-          setBackgroundColor(canvasData.backgroundColor || '#ffffff')
-          if (canvasData.bannerSpecs) {
-            setBannerSpecs(canvasData.bannerSpecs)
-          }
-          if (canvasData.canvasSize) {
-            setCanvasSize(canvasData.canvasSize)
-            setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
-          }
-        })
-      } catch (error) {
-        console.error('Failed to parse template data from URL:', error)
-        // Fallback to loading from database
+    } else if (templateId) {
+      // Check for template data in sessionStorage first
+      const templateData = sessionStorage.getItem('templateData')
+      if (templateData) {
+        try {
+          const canvasData = JSON.parse(templateData)
+          console.log('🎨 Loading template data from sessionStorage:', canvasData)
+          
+          // Restore image elements properly
+          console.log('🎨 About to restore elements:', canvasData.elements)
+          console.log('🎨 Canvas data keys:', Object.keys(canvasData))
+          restoreImageElements(canvasData.elements || []).then(restoredElements => {
+            console.log('🎨 Restored elements:', restoredElements)
+            setElements(restoredElements)
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
+            // Clear the template data from sessionStorage after loading
+            sessionStorage.removeItem('templateData')
+          }).catch(error => {
+            console.error('Failed to restore image elements:', error)
+            // Fallback to loading without images
+            console.log('🎨 Fallback: Setting elements directly:', canvasData.elements)
+            setElements(canvasData.elements || [])
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
+            // Clear the template data from sessionStorage after loading
+            sessionStorage.removeItem('templateData')
+          })
+        } catch (error) {
+          console.error('Failed to parse template data from sessionStorage:', error)
+          // Clear invalid data and fallback to loading from database
+          sessionStorage.removeItem('templateData')
+          loadTemplateFromDatabase(templateId)
+        }
+      } else {
+        // No template data in sessionStorage, load from database
         loadTemplateFromDatabase(templateId)
       }
-    } else if (templateId) {
-      loadTemplateFromDatabase(templateId)
     }
   }, [restoreImageElements])
 
