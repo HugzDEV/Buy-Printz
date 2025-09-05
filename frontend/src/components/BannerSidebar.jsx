@@ -60,7 +60,6 @@ const BannerSidebar = ({
   const [uploadedImages, setUploadedImages] = useState([])
 
   // QR Code state
-  const [qrUrl, setQrUrl] = useState('https://buyprintz.com')
   const [qrColor, setQrColor] = useState('#000000')
   const [qrBackgroundColor, setQrBackgroundColor] = useState('#ffffff')
 
@@ -1380,18 +1379,30 @@ const BannerSidebar = ({
                   <input
                     type="url"
                     placeholder="https://example.com"
-                    value={qrUrl}
-                    onChange={(e) => setQrUrl(e.target.value)}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    onKeyUp={(e) => e.stopPropagation()}
+                    defaultValue="https://buyprintz.com"
+                    onKeyDown={(e) => {
+                      e.stopPropagation()
+                      if (e.key === 'Enter' && e.target.value.trim()) {
+                        if (e.target.value.trim().startsWith('http')) {
+                          onAddQRCode(e.target.value.trim(), qrColor, qrBackgroundColor)
+                          e.target.value = ''
+                        } else {
+                          alert('Please enter a valid URL starting with http:// or https://')
+                        }
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <button
                     onClick={() => {
-                      if (qrUrl.trim() && qrUrl.startsWith('http')) {
-                        onAddQRCode(qrUrl.trim(), qrColor, qrBackgroundColor)
-                      } else {
-                        alert('Please enter a valid URL starting with http:// or https://')
+                      const input = document.querySelector('input[placeholder="https://example.com"]')
+                      if (input && input.value.trim()) {
+                        if (input.value.trim().startsWith('http')) {
+                          onAddQRCode(input.value.trim(), qrColor, qrBackgroundColor)
+                          input.value = ''
+                        } else {
+                          alert('Please enter a valid URL starting with http:// or https://')
+                        }
                       }
                     }}
                     className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center gap-2"
@@ -1448,17 +1459,15 @@ const BannerSidebar = ({
               </div>
               
               {/* Preview */}
-              {qrUrl && (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-700">Preview</h4>
-                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="text-xs text-gray-500 mb-2">URL: {qrUrl}</div>
-                    <div className="text-xs text-gray-500">
-                      Colors: {qrColor} / {qrBackgroundColor}
-                    </div>
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Preview</h4>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="text-xs text-gray-500 mb-2">Enter URL above to generate QR code</div>
+                  <div className="text-xs text-gray-500">
+                    Colors: {qrColor} / {qrBackgroundColor}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           )}
         </GlassCard>
