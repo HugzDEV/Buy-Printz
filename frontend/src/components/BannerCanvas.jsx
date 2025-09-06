@@ -56,6 +56,7 @@ const BannerCanvas = ({
   backgroundColor,
   onExport,
   onSave,
+
   onCreateOrder,
   onClearCanvas,
   hasElements
@@ -64,6 +65,7 @@ const BannerCanvas = ({
   const transformerRef = useRef()
   const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
+  const [autoScaling, setAutoScaling] = useState(true) // Auto-scaling enabled by default for mobile
   
   // Get the currently selected element
   const selectedElement = elements.find(el => el.id === selectedId)
@@ -419,36 +421,71 @@ const BannerCanvas = ({
     
     // Handle scaling - Konva transformer changes scaleX/scaleY, not width/height
     if (element.type === 'text') {
-      // For text, we need to handle scaling differently
-      const newWidth = Math.max(50, node.width() * node.scaleX())
-      const newHeight = Math.max(50, node.height() * node.scaleY())
-      
-      updatedElement.width = newWidth
-      updatedElement.height = newHeight
+      // For text, handle scaling based on auto-scaling mode
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain aspect ratio
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newWidth = Math.max(50, node.width() * scale)
+        const newHeight = Math.max(50, node.height() * scale)
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      } else {
+        // Free scaling: allow independent width/height scaling
+        const newWidth = Math.max(50, node.width() * node.scaleX())
+        const newHeight = Math.max(50, node.height() * node.scaleY())
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      }
       
       // Reset scale to 1 after updating dimensions
       node.scaleX(1)
       node.scaleY(1)
     } else if (element.type === 'circle') {
       // For circles, update radius based on scale
-      const newRadius = Math.max(10, (element.radius || 50) * Math.max(node.scaleX(), node.scaleY()))
-      updatedElement.radius = newRadius
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain circular shape
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newRadius = Math.max(10, (element.radius || 50) * scale)
+        updatedElement.radius = newRadius
+      } else {
+        // Free scaling: use the larger scale (circles become ellipses)
+        const newRadius = Math.max(10, (element.radius || 50) * Math.max(node.scaleX(), node.scaleY()))
+        updatedElement.radius = newRadius
+      }
       
       // Reset scale to 1
       node.scaleX(1)
       node.scaleY(1)
     } else if (element.type === 'star') {
       // For stars, update outer radius based on scale
-      const newOuterRadius = Math.max(10, (element.outerRadius || 50) * Math.max(node.scaleX(), node.scaleY()))
-      updatedElement.outerRadius = newOuterRadius
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain star shape
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newOuterRadius = Math.max(10, (element.outerRadius || 50) * scale)
+        updatedElement.outerRadius = newOuterRadius
+      } else {
+        // Free scaling: use the larger scale
+        const newOuterRadius = Math.max(10, (element.outerRadius || 50) * Math.max(node.scaleX(), node.scaleY()))
+        updatedElement.outerRadius = newOuterRadius
+      }
       
       // Reset scale to 1
       node.scaleX(1)
       node.scaleY(1)
     } else if (element.type === 'triangle' || element.type === 'hexagon') {
       // For regular polygons, update radius based on scale
-      const newRadius = Math.max(10, (element.radius || 50) * Math.max(node.scaleX(), node.scaleY()))
-      updatedElement.radius = newRadius
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain polygon shape
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newRadius = Math.max(10, (element.radius || 50) * scale)
+        updatedElement.radius = newRadius
+      } else {
+        // Free scaling: use the larger scale
+        const newRadius = Math.max(10, (element.radius || 50) * Math.max(node.scaleX(), node.scaleY()))
+        updatedElement.radius = newRadius
+      }
       
       // Reset scale to 1
       node.scaleX(1)
@@ -456,47 +493,88 @@ const BannerCanvas = ({
     } else if (element.type === 'line') {
       // For lines, update points based on scale
       const points = element.points || [0, 0, 100, 100]
-      const newPoints = points.map((point, index) => {
-        if (index % 2 === 0) {
-          return point * node.scaleX()
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain line proportions
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newPoints = points.map(point => point * scale)
+        updatedElement.points = newPoints
+      } else {
+        // Free scaling: allow independent X/Y scaling
+        const newPoints = points.map((point, index) => {
+          if (index % 2 === 0) {
+            return point * node.scaleX()
           } else {
-          return point * node.scaleY()
-        }
-      })
-      updatedElement.points = newPoints
+            return point * node.scaleY()
+          }
+        })
+        updatedElement.points = newPoints
+      }
       
       // Reset scale to 1
       node.scaleX(1)
       node.scaleY(1)
     } else if (element.type === 'icon') {
-      // For icons, update width/height based on scale (same as rectangles)
-      const newWidth = Math.max(10, (element.width || 60) * node.scaleX())
-      const newHeight = Math.max(10, (element.height || 60) * node.scaleY())
-      
-      updatedElement.width = newWidth
-      updatedElement.height = newHeight
+      // For icons, update width/height based on scale
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain icon proportions
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newWidth = Math.max(10, (element.width || 60) * scale)
+        const newHeight = Math.max(10, (element.height || 60) * scale)
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      } else {
+        // Free scaling: allow independent width/height scaling
+        const newWidth = Math.max(10, (element.width || 60) * node.scaleX())
+        const newHeight = Math.max(10, (element.height || 60) * node.scaleY())
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      }
       
       // Reset scale to 1
       node.scaleX(1)
       node.scaleY(1)
     } else if (element.type === 'image' && element.imageDataUrl) {
       // For AI-generated QR codes (image type with imageDataUrl)
-      const newWidth = Math.max(10, (element.width || 200) * node.scaleX())
-      const newHeight = Math.max(10, (element.height || 200) * node.scaleY())
-      
-      updatedElement.width = newWidth
-      updatedElement.height = newHeight
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain QR code proportions
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newWidth = Math.max(10, (element.width || 200) * scale)
+        const newHeight = Math.max(10, (element.height || 200) * scale)
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      } else {
+        // Free scaling: allow independent width/height scaling
+        const newWidth = Math.max(10, (element.width || 200) * node.scaleX())
+        const newHeight = Math.max(10, (element.height || 200) * node.scaleY())
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      }
       
       // Reset scale to 1
       node.scaleX(1)
       node.scaleY(1)
         } else {
       // For rectangles and other shapes, update width/height based on scale
-      const newWidth = Math.max(10, (element.width || 100) * node.scaleX())
-      const newHeight = Math.max(10, (element.height || 100) * node.scaleY())
-      
-      updatedElement.width = newWidth
-      updatedElement.height = newHeight
+      if (autoScaling) {
+        // Auto-scaling: use the smaller scale to maintain shape proportions
+        const scale = Math.min(node.scaleX(), node.scaleY())
+        const newWidth = Math.max(10, (element.width || 100) * scale)
+        const newHeight = Math.max(10, (element.height || 100) * scale)
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      } else {
+        // Free scaling: allow independent width/height scaling
+        const newWidth = Math.max(10, (element.width || 100) * node.scaleX())
+        const newHeight = Math.max(10, (element.height || 100) * node.scaleY())
+        
+        updatedElement.width = newWidth
+        updatedElement.height = newHeight
+      }
       
       // Reset scale to 1
       node.scaleX(1)
@@ -1417,7 +1495,7 @@ const BannerCanvas = ({
 
           {/* Right Section - Action Buttons */}
           <div className="flex items-center gap-1">
-            {/* Mobile: Clear, Save and Order buttons */}
+            {/* Mobile: Clear, Auto-scaling, Save and Order buttons */}
             <div className="sm:hidden flex items-center gap-1">
               <GlassButton 
                 onClick={onClearCanvas} 
@@ -1427,6 +1505,15 @@ const BannerCanvas = ({
                 title="Clear Canvas"
               >
                 <Trash2 className="w-3.5 h-3.5" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={() => setAutoScaling(!autoScaling)} 
+                variant={autoScaling ? "primary" : "default"}
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
               </GlassButton>
               
               <GlassButton onClick={onSave} variant="success" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Save Design">
@@ -1440,6 +1527,15 @@ const BannerCanvas = ({
             
             {/* Desktop: Full controls */}
             <div className="hidden sm:flex items-center gap-1">
+            <GlassButton 
+              onClick={() => setAutoScaling(!autoScaling)} 
+              variant={autoScaling ? "primary" : "default"}
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+              title={autoScaling ? "Auto-scaling ON (proportional)" : "Auto-scaling OFF (free scaling)"}
+            >
+                <Maximize2 className="w-3.5 h-3.5" />
+            </GlassButton>
+            
             <GlassButton 
               onClick={() => setShowGrid(!showGrid)} 
               variant={showGrid ? "primary" : "default"}
@@ -1655,7 +1751,24 @@ const BannerCanvas = ({
                     // Ensure minimum size for all elements (same for all types)
                     const minSize = 10
                     
+                    // Auto-scaling: maintain aspect ratio
+                    if (autoScaling) {
+                      const aspectRatio = oldBox.width / oldBox.height
+                      const newAspectRatio = newBox.width / newBox.height
+                      
+                      // If aspect ratio changed significantly, adjust to maintain original ratio
+                      if (Math.abs(newAspectRatio - aspectRatio) > 0.1) {
+                        // Use the smaller dimension to maintain aspect ratio
+                        const scale = Math.min(newBox.width / oldBox.width, newBox.height / oldBox.height)
                         return {
+                          ...newBox,
+                          width: Math.max(minSize, oldBox.width * scale),
+                          height: Math.max(minSize, oldBox.height * scale)
+                        }
+                      }
+                    }
+                    
+                    return {
                       ...newBox,
                       width: Math.max(minSize, newBox.width),
                       height: Math.max(minSize, newBox.height)
@@ -1663,7 +1776,7 @@ const BannerCanvas = ({
                   }}
                   enabledAnchors={['middle-left', 'middle-right', 'top-center', 'bottom-center', 'top-left', 'top-right', 'bottom-left', 'bottom-right']}
                   rotateEnabled={true}
-                  keepRatio={false}
+                  keepRatio={autoScaling}
                   ignoreStroke={false}
                   useSingleNodeRotation={true}
                   shouldOverdrawWholeArea={false}
