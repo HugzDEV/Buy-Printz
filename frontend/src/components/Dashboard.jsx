@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import authService from '../services/auth'
+import cacheService from '../services/cache'
+import LoadingSpinner, { SkeletonCard, SkeletonTemplateCard } from './LoadingSpinner'
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -105,60 +107,81 @@ const Dashboard = () => {
   }
 
   const loadDataProgressively = async () => {
-    const loadDataSafely = async (apiCall, setter, fallback, loadingKey) => {
-      try {
-        // Add timeout to prevent infinite loading
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 30000)
-        )
-        
-        const response = await Promise.race([apiCall(), timeoutPromise])
-        const data = await response.json()
-        
-        // Debug: Log the raw data structure
-        console.log(`🔍 Raw API response for ${loadingKey}:`, data)
-        console.log(`🔍 Data type:`, typeof data)
-        console.log(`🔍 Is array:`, Array.isArray(data))
-        console.log(`🔍 Data keys:`, Object.keys(data || {}))
-        
-        if (data.success) {
-          // Handle different response formats
-          if (data.templates) {
-            console.log(`✅ Found data.templates:`, data.templates)
-            setter(data.templates)
-          } else if (data.designs) {
-            console.log(`✅ Found data.designs:`, data.designs)
-            setter(data.designs)
-          } else if (data.orders) {
-            console.log(`✅ Found data.orders:`, data.orders)
-            setter(data.orders)
-          } else if (data.preferences) {
-            console.log(`✅ Found data.preferences:`, data.preferences)
-            setter(data.preferences)
-          } else if (Array.isArray(data)) {
-            // Handle direct array responses
-            console.log(`✅ Found direct array:`, data)
-            setter(data)
-          } else {
-            console.log(`⚠️ Fallback to full data:`, data)
-            setter(data)
-          }
-        } else {
-          console.warn(`API returned error for ${loadingKey}:`, data)
-          setter(fallback)
+  const loadDataSafely = async (apiCall, setter, fallback, loadingKey, cacheKey = null) => {
+    try {
+      // Check cache first if cacheKey is provided
+      if (cacheKey && user?.id) {
+        const cachedData = cacheService.get(cacheKey)
+        if (cachedData) {
+          console.log(`📦 Using cached data for ${loadingKey}`)
+          setter(cachedData)
+          setLoadingStates(prev => ({ ...prev, [loadingKey]: false }))
+          return
         }
-      } catch (error) {
-        console.warn(`API call failed for ${loadingKey}, using fallback:`, error)
-        setter(fallback)
-        
-        // Only show error toast for critical data
-        if (['designs', 'orders'].includes(loadingKey)) {
-          toast.error(`Failed to load ${loadingKey}. Using offline mode.`)
-        }
-      } finally {
-        setLoadingStates(prev => ({ ...prev, [loadingKey]: false }))
       }
+
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 30000)
+      )
+      
+      const response = await Promise.race([apiCall(), timeoutPromise])
+      const data = await response.json()
+      
+      // Debug: Log the raw data structure
+      console.log(`🔍 Raw API response for ${loadingKey}:`, data)
+      console.log(`🔍 Data type:`, typeof data)
+      console.log(`🔍 Is array:`, Array.isArray(data))
+      console.log(`🔍 Data keys:`, Object.keys(data || {}))
+      
+      if (data.success) {
+        let processedData = null
+        
+        // Handle different response formats
+        if (data.templates) {
+          console.log(`✅ Found data.templates:`, data.templates)
+          processedData = data.templates
+        } else if (data.designs) {
+          console.log(`✅ Found data.designs:`, data.designs)
+          processedData = data.designs
+        } else if (data.orders) {
+          console.log(`✅ Found data.orders:`, data.orders)
+          processedData = data.orders
+        } else if (data.preferences) {
+          console.log(`✅ Found data.preferences:`, data.preferences)
+          processedData = data.preferences
+        } else if (Array.isArray(data)) {
+          // Handle direct array responses
+          console.log(`✅ Found direct array:`, data)
+          processedData = data
+        } else {
+          console.log(`⚠️ Fallback to full data:`, data)
+          processedData = data
+        }
+        
+        // Cache the data if cacheKey is provided
+        if (cacheKey && user?.id && processedData) {
+          cacheService.set(cacheKey, processedData)
+          console.log(`💾 Cached data for ${loadingKey}`)
+        }
+        
+        setter(processedData)
+      } else {
+        console.warn(`API returned error for ${loadingKey}:`, data)
+        setter(fallback)
+      }
+    } catch (error) {
+      console.warn(`API call failed for ${loadingKey}, using fallback:`, error)
+      setter(fallback)
+      
+      // Only show error toast for critical data
+      if (['designs', 'orders'].includes(loadingKey)) {
+        toast.error(`Failed to load ${loadingKey}. Using offline mode.`)
+      }
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [loadingKey]: false }))
     }
+  }
 
     // Load core data first (designs and orders)
     await Promise.all([
@@ -178,7 +201,8 @@ const Dashboard = () => {
           setCompletedDesigns(completed)
         },
         [],
-        'designs'
+        'designs',
+        `designs_${user?.id}`
       ),
       loadDataSafely(
         () => authService.authenticatedRequest('/api/orders'),
@@ -195,7 +219,8 @@ const Dashboard = () => {
           setPendingOrders(pending)
         },
         [],
-        'orders'
+        'orders',
+        `orders_${user?.id}`
       )
     ])
 
@@ -212,7 +237,8 @@ const Dashboard = () => {
           setTemplates(data)
         },
         [],
-        'templates'
+        'templates',
+        `templates_${user?.id}`
       )
     ])
 
@@ -356,12 +382,44 @@ const Dashboard = () => {
       if (response.ok) {
         toast.success('Template deleted successfully')
         setTemplates(templates.filter(t => t.id !== templateId))
+        
+        // Invalidate cache
+        if (user?.id) {
+          cacheService.invalidateTemplates(user.id)
+          cacheService.invalidateTemplate(templateId)
+        }
       } else {
         throw new Error('Failed to delete template')
       }
     } catch (error) {
       console.error('Error deleting template:', error)
       toast.error('Failed to delete template')
+    }
+  }
+
+  const refreshTemplates = async () => {
+    if (!user?.id) return
+    
+    setLoadingStates(prev => ({ ...prev, templates: true }))
+    
+    // Invalidate cache and reload
+    cacheService.invalidateTemplates(user.id)
+    
+    try {
+      const response = await authService.authenticatedRequest('/api/templates/user')
+      const data = await response.json()
+      
+      if (data.success || Array.isArray(data)) {
+        const templatesData = data.templates || data
+        setTemplates(templatesData)
+        cacheService.setTemplates(user.id, templatesData)
+        toast.success('Templates refreshed')
+      }
+    } catch (error) {
+      console.error('Error refreshing templates:', error)
+      toast.error('Failed to refresh templates')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, templates: false }))
     }
   }
 
@@ -857,18 +915,34 @@ const Dashboard = () => {
                   <p className="text-gray-600 mt-1">Custom banner templates you've created and saved</p>
                 </div>
               </div>
-              <Link
-                to="/editor"
-                onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-xl text-white font-semibold flex items-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Create Template
-              </Link>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={refreshTemplates}
+                  disabled={loadingStates.templates}
+                  className="px-4 py-3 bg-white/20 hover:bg-white/40 rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Refresh templates"
+                >
+                  <RefreshCw className={`w-5 h-5 ${loadingStates.templates ? 'animate-spin' : ''}`} />
+                </button>
+                <Link
+                  to="/editor"
+                  onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-xl text-white font-semibold flex items-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Create Template
+                </Link>
+              </div>
             </div>
 
             {console.log('Dashboard: Rendering templates, count:', templates.length, 'templates:', templates)}
-            {templates.length > 0 ? (
+            {loadingStates.templates ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <SkeletonTemplateCard key={i} />
+                ))}
+              </div>
+            ) : templates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {templates.map((template) => (
                   <div key={template.id} className="group relative">

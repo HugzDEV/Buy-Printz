@@ -12,11 +12,62 @@ from typing import Optional, Dict, Any
 import aiofiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
+import time
 
 # Import our modules
 from database import db_manager
 from auth import auth_manager, get_current_user
 from ai_agent_adapter import ai_agent_adapter
+
+# Simple in-memory cache
+class SimpleCache:
+    def __init__(self, default_ttl=300):  # 5 minutes default
+        self.cache = {}
+        self.default_ttl = default_ttl
+    
+    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
+        ttl = ttl or self.default_ttl
+        self.cache[key] = {
+            'value': value,
+            'expires': time.time() + ttl
+        }
+    
+    def get(self, key: str) -> Optional[Any]:
+        if key not in self.cache:
+            return None
+        
+        item = self.cache[key]
+        if time.time() > item['expires']:
+            del self.cache[key]
+            return None
+        
+        return item['value']
+    
+    def delete(self, key: str) -> bool:
+        if key in self.cache:
+            del self.cache[key]
+            return True
+        return False
+    
+    def clear(self) -> None:
+        self.cache.clear()
+    
+    def cleanup(self) -> int:
+        """Remove expired entries and return count of removed items"""
+        current_time = time.time()
+        expired_keys = [key for key, item in self.cache.items() if current_time > item['expires']]
+        for key in expired_keys:
+            del self.cache[key]
+        return len(expired_keys)
+    
+    def stats(self) -> Dict[str, Any]:
+        return {
+            'size': len(self.cache),
+            'keys': list(self.cache.keys())
+        }
+
+# Initialize cache
+cache = SimpleCache()
 
 # Load environment variables
 load_dotenv()
@@ -829,6 +880,12 @@ async def save_custom_template(
         )
         
         if result["success"]:
+            # Invalidate cache for this user
+            user_id = current_user["user_id"]
+            cache_key = f"templates_user_{user_id}"
+            cache.delete(cache_key)
+            logger.info(f"Invalidated cache for user templates: {user_id}")
+            
             return {
                 "success": True,
                 "template_id": result["template_id"],
@@ -848,10 +905,25 @@ async def save_custom_template(
 
 @app.get("/api/templates/user")
 async def get_user_templates(current_user: dict = Depends(get_current_user)):
-    """Get user's custom templates"""
+    """Get user's custom templates with caching"""
     try:
-        templates = await db_manager.get_user_templates(current_user["user_id"])
-        return {"success": True, "templates": templates}
+        user_id = current_user["user_id"]
+        cache_key = f"templates_user_{user_id}"
+        
+        # Check cache first
+        cached_templates = cache.get(cache_key)
+        if cached_templates is not None:
+            logger.info(f"Cache hit for user templates: {user_id}")
+            return {"success": True, "templates": cached_templates, "cached": True}
+        
+        # Fetch from database
+        templates = await db_manager.get_user_templates(user_id)
+        
+        # Cache for 10 minutes
+        cache.set(cache_key, templates, ttl=600)
+        logger.info(f"Cached user templates: {user_id}")
+        
+        return {"success": True, "templates": templates, "cached": False}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1505,6 +1577,48 @@ async def clear_canvas_state(
     except Exception as e:
         logger.error(f"Error clearing canvas state: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Cache management endpoints
+@app.get("/api/cache/stats")
+async def get_cache_stats():
+    """Get cache statistics"""
+    return {
+        "success": True,
+        "stats": cache.stats(),
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.post("/api/cache/clear")
+async def clear_cache():
+    """Clear all cache entries"""
+    cache.clear()
+    return {
+        "success": True,
+        "message": "Cache cleared successfully",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.post("/api/cache/cleanup")
+async def cleanup_cache():
+    """Remove expired cache entries"""
+    removed_count = cache.cleanup()
+    return {
+        "success": True,
+        "removed_entries": removed_count,
+        "message": f"Removed {removed_count} expired cache entries",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.delete("/api/cache/invalidate/{cache_key}")
+async def invalidate_cache_key(cache_key: str):
+    """Invalidate a specific cache key"""
+    deleted = cache.delete(cache_key)
+    return {
+        "success": True,
+        "deleted": deleted,
+        "message": f"Cache key '{cache_key}' {'deleted' if deleted else 'not found'}",
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 if __name__ == "__main__":
     import uvicorn

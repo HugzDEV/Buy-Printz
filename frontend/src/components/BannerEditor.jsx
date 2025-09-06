@@ -20,6 +20,7 @@ import AIAgent from './AIAgent'
 import SaveModal from './SaveModal'
 import SuccessNotification from './SuccessNotification'
 import authService from '../services/auth'
+import cacheService from '../services/cache'
 
 const BannerEditorNew = () => {
   const navigate = useNavigate()
@@ -1646,6 +1647,12 @@ const BannerEditorNew = () => {
         setShowSuccessNotification(true)
         // Update current design ID for future modifications
         setCurrentDesignId(result.design_id)
+        
+        // Invalidate cache to ensure fresh data on next load
+        const currentUser = await authService.getCurrentUser()
+        if (currentUser?.id) {
+          cacheService.invalidateDesigns(currentUser.id)
+        }
       } else {
         throw new Error(result.error || 'Failed to save design')
       }
@@ -1721,6 +1728,13 @@ const BannerEditorNew = () => {
           message: 'Your template has been saved successfully and is now available in your templates collection!'
         })
         setShowSuccessNotification(true)
+        
+        // Invalidate cache to ensure fresh data on next load
+        const currentUser = await authService.getCurrentUser()
+        if (currentUser?.id) {
+          cacheService.invalidateTemplates(currentUser.id)
+        }
+        
         return true
       } else {
         throw new Error(result.error || 'Failed to save template')
