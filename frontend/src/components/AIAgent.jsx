@@ -60,33 +60,20 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
         })
       });
 
-      // Debug the raw response first
-      console.log('🔍 Raw response object:', response);
-      console.log('🔍 Response has json method:', typeof response.json);
-      console.log('🔍 Response status:', response.status);
-      console.log('🔍 Response ok:', response.ok);
-
       // Parse the response if it's a Response object
       let responseData;
       if (response && typeof response.json === 'function') {
         try {
           responseData = await response.json();
-          console.log('🔍 Successfully parsed JSON response:', responseData);
         } catch (parseError) {
-          console.error('🔍 Error parsing JSON response:', parseError);
+          console.error('Error parsing JSON response:', parseError);
           throw new Error('Failed to parse response JSON: ' + parseError.message);
         }
       } else if (response && typeof response === 'object') {
         responseData = response;
-        console.log('🔍 Using response as-is (not a Response object)');
       } else {
         throw new Error('Invalid response format');
       }
-
-      // Debug logging
-      console.log('AI Agent Response:', responseData);
-      console.log('Response type:', typeof responseData);
-      console.log('Response keys:', Object.keys(responseData || {}));
 
       const aiResponse = {
         id: Date.now() + 1,
@@ -99,20 +86,10 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
       setMessages(prev => [...prev, aiResponse]);
 
       // Handle design generation/modification
-      console.log('Design flags:', {
-        design_created: responseData.design_created,
-        design_modified: responseData.design_modified,
-        has_design_data: !!responseData.design_data,
-        onDesignGenerated: !!onDesignGenerated,
-        onDesignModified: !!onDesignModified
-      });
-      
       if (responseData.design_created && onDesignGenerated) {
-        console.log('Calling onDesignGenerated with:', responseData.design_data);
         onDesignGenerated(responseData.design_data);
       }
       if (responseData.design_modified && onDesignModified) {
-        console.log('Calling onDesignModified with:', responseData.design_data);
         onDesignModified(responseData.design_data);
       }
 
