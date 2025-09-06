@@ -103,14 +103,24 @@ const BannerEditorNew = () => {
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState('landscape') // 'landscape' or 'portrait'
   
-  // Check if user is first time user
+  // Check if user is first time user - only from landing page
   useEffect(() => {
     const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
-    if (!tourCompleted) {
+    const fromLandingPage = sessionStorage.getItem('fromLandingPage')
+    
+    console.log('🎯 Tour check - tourCompleted:', tourCompleted, 'fromLandingPage:', fromLandingPage)
+    
+    // Only show tour if:
+    // 1. Tour hasn't been completed
+    // 2. User came from landing page (not dashboard)
+    if (!tourCompleted && fromLandingPage === 'true') {
+      console.log('🎯 First time user from landing page - showing tour')
       setIsFirstTimeUser(true)
       setShowTour(true)
+      // Clear the flag so tour doesn't show again on subsequent visits
+      sessionStorage.removeItem('fromLandingPage')
     } else {
-      // User has already completed the tour, don't show it again
+      console.log('🎯 Not showing tour - either completed or not from landing page')
       setIsFirstTimeUser(false)
       setShowTour(false)
     }
@@ -2479,12 +2489,14 @@ const BannerEditorNew = () => {
     <OnboardingTour
       isFirstTimeUser={isFirstTimeUser}
       onTourComplete={() => {
+        console.log('🎯 Tour completed - marking as completed in localStorage')
         setShowTour(false)
         setIsFirstTimeUser(false)
         // Store in localStorage that user has seen the tour
         localStorage.setItem('buyprintz-tour-completed', 'true')
       }}
       onSkipTour={() => {
+        console.log('🎯 Tour skipped - marking as completed in localStorage')
         setShowTour(false)
         setIsFirstTimeUser(false)
         // Store in localStorage that user has seen the tour

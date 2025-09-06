@@ -71,7 +71,10 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 
               to="/editor" 
-              onClick={() => sessionStorage.setItem('newDesign', 'true')}
+              onClick={() => {
+                sessionStorage.setItem('newDesign', 'true')
+                sessionStorage.setItem('fromLandingPage', 'true')
+              }}
               className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
             >
               Create Banner
@@ -209,7 +212,10 @@ const LandingPage = () => {
                   
                   <Link 
                     to="/editor" 
-                    onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                    onClick={() => {
+                      sessionStorage.setItem('newDesign', 'true')
+                      sessionStorage.setItem('fromLandingPage', 'true')
+                    }}
                     className="bg-buyprint-brand hover:bg-buyprint-600 border border-buyprint-brand hover:border-buyprint-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
                   >
                     Design Now
@@ -237,7 +243,10 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row gap-8 justify-center">
               <Link 
                 to="/editor" 
-                onClick={() => sessionStorage.setItem('newDesign', 'true')}
+                onClick={() => {
+                  sessionStorage.setItem('newDesign', 'true')
+                  sessionStorage.setItem('fromLandingPage', 'true')
+                }}
                 className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-2xl px-14 py-7 inline-flex items-center justify-center gap-4 rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[280px] hover:scale-105"
               >
                 Start Designing Now
