@@ -1835,6 +1835,106 @@ const BannerEditorNew = () => {
     navigate('/checkout')
   }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate])
 
+  // Helper function to find the correct image path for an asset
+  const findAssetImagePath = useCallback(async (assetName) => {
+    // Define the asset categories and their files (matching BannerSidebar structure)
+    const assetCategories = {
+      zodiac: [
+        { name: 'Cancer', file: '1_Cancer_FINAL_with text.png' },
+        { name: 'Taurus', file: '2_Taurus_FINAL-1_with text.png' },
+        { name: 'Capricorn', file: '3_Capricornus_FINAL-1_with text.png' },
+        { name: 'Pisces', file: '4_Pisces_FINAL-1_with text.png' },
+        { name: 'Leo', file: '5_Leo_FINAL-1_with text.png' },
+        { name: 'Aquarius', file: '6_Aquarius_FINAL_with text.png' },
+        { name: 'Libra', file: '7_Libra_FINAL-1_with text.png' },
+        { name: 'Sagittarius', file: '8_Sagittarius_FINAL_with text.png' },
+        { name: 'Gemini', file: '9_Gemini_FINAL-2_with text.png' },
+        { name: 'Aries', file: '10_Aries_FINAL_with text.png' },
+        { name: 'Virgo', file: '11_Virgo_FINAL-2_with text.png' },
+        { name: 'Scorpio', file: '12_Scorpio_FINAL_with text.png' }
+      ],
+      abstract: [
+        { name: 'Abstract Design 1', file: 'abstract1.png' },
+        { name: 'Abstract Design 2', file: 'abstract2.png' },
+        { name: 'Abstract Design 3', file: 'abstract3.png' }
+      ],
+      business: [
+        { name: 'Business Icon 1', file: 'business1.png' },
+        { name: 'Business Icon 2', file: 'business2.png' },
+        { name: 'Business Icon 3', file: 'business3.png' }
+      ],
+      skins: [
+        { name: 'SKINS Design 00 Front/Back', file: 'SKINS_DESIGN 00_FRONT OR BACK.png' },
+        { name: 'SKINS Design 00A Back', file: 'SKINS_DESIGN 00A_BACK.png' },
+        { name: 'SKINS Design 00A Front', file: 'SKINS_DESIGN 00A_FRONT.png' },
+        { name: 'SKINS Design 1 Back', file: 'SKINS_DESIGN 1_BACK.png' },
+        { name: 'SKINS Design 1 Front', file: 'SKINS_DESIGN 1_FRONT.png' },
+        { name: 'SKINS Design 10 Back', file: 'SKINS_DESIGN 10_BACK.png' },
+        { name: 'SKINS Design 10 Front', file: 'SKINS_DESIGN 10_FRONT.png' },
+        { name: 'SKINS Design 11 Back', file: 'SKINS_DESIGN 11_BACK.png' },
+        { name: 'SKINS Design 11 Front', file: 'SKINS_DESIGN 11_FRONT.png' },
+        { name: 'SKINS Design 12 Back', file: 'SKINS_DESIGN 12_BACK.png' },
+        { name: 'SKINS Design 12 Front', file: 'SKINS_DESIGN 12_FRONT.png' },
+        { name: 'SKINS Design 13 Back', file: 'SKINS_DESIGN 13_BACK.png' },
+        { name: 'SKINS Design 13 Front', file: 'SKINS_DESIGN 13_FRONT.png' },
+        { name: 'SKINS Design 14 Front/Back', file: 'SKINS_DESIGN 14_FRONT OR BACK.png' },
+        { name: 'SKINS Design 15 Front/Back', file: 'SKINS_DESIGN 15_FRONT OR BACK.png' },
+        { name: 'SKINS Design 16 Front/Back', file: 'SKINS_DESIGN 16_FRONT OR BACK.png' },
+        { name: 'SKINS Design 17 Back', file: 'SKINS_DESIGN 17_BACK.png' },
+        { name: 'SKINS Design 17 Front', file: 'SKINS_DESIGN 17_FRONT.png' },
+        { name: 'SKINS Design 18A Front/Back', file: 'SKINS_DESIGN 18A_FRONT OR BACK.png' },
+        { name: 'SKINS Design 18B Front/Back', file: 'SKINS_DESIGN 18B_FRONT OR BACK.png' },
+        { name: 'SKINS Design 19 Back', file: 'SKINS_DESIGN 19_BACK.png' },
+        { name: 'SKINS Design 19 Front', file: 'SKINS_DESIGN 19_FRONT.png' },
+        { name: 'SKINS Design 2 Back', file: 'SKINS_DESIGN 2_BACK.png' },
+        { name: 'SKINS Design 2 Front', file: 'SKINS_DESIGN 2_FRONT.png' },
+        { name: 'SKINS Design 20 Back', file: 'SKINS_DESIGN 20_BACK.png' },
+        { name: 'SKINS Design 20 Front', file: 'SKINS_DESIGN 20_FRONT.png' },
+        { name: 'SKINS Design 21 Back', file: 'SKINS_DESIGN 21_BACK.png' },
+        { name: 'SKINS Design 21 Front', file: 'SKINS_DESIGN 21_FRONT.png' },
+        { name: 'SKINS Design 22 Back', file: 'SKINS_DESIGN 22_BACK.png' },
+        { name: 'SKINS Design 22 Front', file: 'SKINS_DESIGN 22_FRONT.png' },
+        { name: 'SKINS Design 23 Back', file: 'SKINS_DESIGN 23_BACK.png' },
+        { name: 'SKINS Design 23 Front', file: 'SKINS_DESIGN 23_FRONT.png' },
+        { name: 'SKINS Design 24 Back', file: 'SKINS_DESIGN 24_BACK.png' },
+        { name: 'SKINS Design 24 Front', file: 'SKINS_DESIGN 24_FRONT.png' },
+        { name: 'SKINS Design 25 Back', file: 'SKINS_DESIGN 25_BACK.png' },
+        { name: 'SKINS Design 25 Front', file: 'SKINS_DESIGN 25_FRONT.png' },
+        { name: 'SKINS Design 26 Back', file: 'SKINS_DESIGN 26_BACK.png' },
+        { name: 'SKINS Design 26 Front', file: 'SKINS_DESIGN 26_FRONT.png' },
+        { name: 'SKINS Design 27 Back', file: 'SKINS_DESIGN 27_BACK.png' },
+        { name: 'SKINS Design 27 Front', file: 'SKINS_DESIGN 27_FRONT.png' },
+        { name: 'SKINS Design 28 Black', file: 'SKINS_DESIGN 28_FRONT OR BACK.png' },
+        { name: 'SKINS Design 3 Black', file: 'SKINS_DESIGN 3_BLACK.png' },
+        { name: 'SKINS Design 3 Front', file: 'SKINS_DESIGN 3_FRONT.png' },
+        { name: 'SKINS Design 4 Back', file: 'SKINS_DESIGN 4_BACK.png' },
+        { name: 'SKINS Design 4 Front', file: 'SKINS_DESIGN 4_FRONT.png' },
+        { name: 'SKINS Design 5 Back', file: 'SKINS_DESIGN 5_BACK.png' },
+        { name: 'SKINS Design 5 Front', file: 'SKINS_DESIGN 5_FRONT.png' },
+        { name: 'SKINS Design 6 Back', file: 'SKINS_DESIGN 6_BACK.png' },
+        { name: 'SKINS Design 6 Front', file: 'SKINS_DESIGN 6_FRONT.png' },
+        { name: 'SKINS Design 7 Back', file: 'SKINS_DESIGN 7_BACK.png' },
+        { name: 'SKINS Design 7 Front', file: 'SKINS_DESIGN 7_FRONT.png' },
+        { name: 'SKINS Design 8 Back', file: 'SKINS_DESIGN 8_BACK.png' },
+        { name: 'SKINS Design 8 Front', file: 'SKINS_DESIGN 8_FRONT.png' },
+        { name: 'SKINS Design 9 Back', file: 'SKINS_DESIGN 9_BACK.png' },
+        { name: 'SKINS Design 9 Front', file: 'SKINS_DESIGN 9_FRONT.png' }
+      ]
+    }
+
+    // Search through all categories to find the matching asset
+    for (const [categoryName, assets] of Object.entries(assetCategories)) {
+      const foundAsset = assets.find(asset => asset.name === assetName)
+      if (foundAsset) {
+        return `/assets/images/${foundAsset.file}`
+      }
+    }
+
+    // If not found in predefined categories, try direct path construction
+    // This handles cases where the assetName might be the filename itself
+    return `/assets/images/${assetName}`
+  }, [])
+
   // Function to restore image elements from serialized data
   const restoreImageElements = useCallback(async (elements) => {
     const restoredElements = []
@@ -1952,106 +2052,6 @@ const BannerEditorNew = () => {
     
     return restoredElements
   }, [findAssetImagePath])
-
-  // Helper function to find the correct image path for an asset
-  const findAssetImagePath = useCallback(async (assetName) => {
-    // Define the asset categories and their files (matching BannerSidebar structure)
-    const assetCategories = {
-      zodiac: [
-        { name: 'Cancer', file: '1_Cancer_FINAL_with text.png' },
-        { name: 'Taurus', file: '2_Taurus_FINAL-1_with text.png' },
-        { name: 'Capricorn', file: '3_Capricornus_FINAL-1_with text.png' },
-        { name: 'Pisces', file: '4_Pisces_FINAL-1_with text.png' },
-        { name: 'Leo', file: '5_Leo_FINAL-1_with text.png' },
-        { name: 'Aquarius', file: '6_Aquarius_FINAL_with text.png' },
-        { name: 'Libra', file: '7_Libra_FINAL-1_with text.png' },
-        { name: 'Sagittarius', file: '8_Sagittarius_FINAL_with text.png' },
-        { name: 'Gemini', file: '9_Gemini_FINAL-2_with text.png' },
-        { name: 'Aries', file: '10_Aries_FINAL_with text.png' },
-        { name: 'Virgo', file: '11_Virgo_FINAL-2_with text.png' },
-        { name: 'Scorpio', file: '12_Scorpio_FINAL_with text.png' }
-      ],
-      abstract: [
-        { name: 'Abstract Design 1', file: 'abstract1.png' },
-        { name: 'Abstract Design 2', file: 'abstract2.png' },
-        { name: 'Abstract Design 3', file: 'abstract3.png' }
-      ],
-      business: [
-        { name: 'Business Icon 1', file: 'business1.png' },
-        { name: 'Business Icon 2', file: 'business2.png' },
-        { name: 'Business Icon 3', file: 'business3.png' }
-      ],
-      skins: [
-        { name: 'SKINS Design 00 Front/Back', file: 'SKINS_DESIGN 00_FRONT OR BACK.png' },
-        { name: 'SKINS Design 00A Back', file: 'SKINS_DESIGN 00A_BACK.png' },
-        { name: 'SKINS Design 00A Front', file: 'SKINS_DESIGN 00A_FRONT.png' },
-        { name: 'SKINS Design 1 Back', file: 'SKINS_DESIGN 1_BACK.png' },
-        { name: 'SKINS Design 1 Front', file: 'SKINS_DESIGN 1_FRONT.png' },
-        { name: 'SKINS Design 10 Back', file: 'SKINS_DESIGN 10_BACK.png' },
-        { name: 'SKINS Design 10 Front', file: 'SKINS_DESIGN 10_FRONT.png' },
-        { name: 'SKINS Design 11 Back', file: 'SKINS_DESIGN 11_BACK.png' },
-        { name: 'SKINS Design 11 Front', file: 'SKINS_DESIGN 11_FRONT.png' },
-        { name: 'SKINS Design 12 Back', file: 'SKINS_DESIGN 12_BACK.png' },
-        { name: 'SKINS Design 12 Front', file: 'SKINS_DESIGN 12_FRONT.png' },
-        { name: 'SKINS Design 13 Back', file: 'SKINS_DESIGN 13_BACK.png' },
-        { name: 'SKINS Design 13 Front', file: 'SKINS_DESIGN 13_FRONT.png' },
-        { name: 'SKINS Design 14 Front/Back', file: 'SKINS_DESIGN 14_FRONT OR BACK.png' },
-        { name: 'SKINS Design 15 Front/Back', file: 'SKINS_DESIGN 15_FRONT OR BACK.png' },
-        { name: 'SKINS Design 16 Front/Back', file: 'SKINS_DESIGN 16_FRONT OR BACK.png' },
-        { name: 'SKINS Design 17 Back', file: 'SKINS_DESIGN 17_BACK.png' },
-        { name: 'SKINS Design 17 Front', file: 'SKINS_DESIGN 17_FRONT.png' },
-        { name: 'SKINS Design 18A Front/Back', file: 'SKINS_DESIGN 18A_FRONT OR BACK.png' },
-        { name: 'SKINS Design 18B Front/Back', file: 'SKINS_DESIGN 18B_FRONT OR BACK.png' },
-        { name: 'SKINS Design 19 Back', file: 'SKINS_DESIGN 19_BACK.png' },
-        { name: 'SKINS Design 19 Front', file: 'SKINS_DESIGN 19_FRONT.png' },
-        { name: 'SKINS Design 2 Back', file: 'SKINS_DESIGN 2_BACK.png' },
-        { name: 'SKINS Design 2 Front', file: 'SKINS_DESIGN 2_FRONT.png' },
-        { name: 'SKINS Design 20 Back', file: 'SKINS_DESIGN 20_BACK.png' },
-        { name: 'SKINS Design 20 Front', file: 'SKINS_DESIGN 20_FRONT.png' },
-        { name: 'SKINS Design 21 Back', file: 'SKINS_DESIGN 21_BACK.png' },
-        { name: 'SKINS Design 21 Front', file: 'SKINS_DESIGN 21_FRONT.png' },
-        { name: 'SKINS Design 22 Back', file: 'SKINS_DESIGN 22_BACK.png' },
-        { name: 'SKINS Design 22 Front', file: 'SKINS_DESIGN 22_FRONT.png' },
-        { name: 'SKINS Design 23 Back', file: 'SKINS_DESIGN 23_BACK.png' },
-        { name: 'SKINS Design 23 Front', file: 'SKINS_DESIGN 23_FRONT.png' },
-        { name: 'SKINS Design 24 Back', file: 'SKINS_DESIGN 24_BACK.png' },
-        { name: 'SKINS Design 24 Front', file: 'SKINS_DESIGN 24_FRONT.png' },
-        { name: 'SKINS Design 25 Back', file: 'SKINS_DESIGN 25_BACK.png' },
-        { name: 'SKINS Design 25 Front', file: 'SKINS_DESIGN 25_FRONT.png' },
-        { name: 'SKINS Design 26 Back', file: 'SKINS_DESIGN 26_BACK.png' },
-        { name: 'SKINS Design 26 Front', file: 'SKINS_DESIGN 26_FRONT.png' },
-        { name: 'SKINS Design 27 Back', file: 'SKINS_DESIGN 27_BACK.png' },
-        { name: 'SKINS Design 27 Front', file: 'SKINS_DESIGN 27_FRONT.png' },
-        { name: 'SKINS Design 28 Black', file: 'SKINS_DESIGN 28_FRONT OR BACK.png' },
-        { name: 'SKINS Design 3 Black', file: 'SKINS_DESIGN 3_BLACK.png' },
-        { name: 'SKINS Design 3 Front', file: 'SKINS_DESIGN 3_FRONT.png' },
-        { name: 'SKINS Design 4 Back', file: 'SKINS_DESIGN 4_BACK.png' },
-        { name: 'SKINS Design 4 Front', file: 'SKINS_DESIGN 4_FRONT.png' },
-        { name: 'SKINS Design 5 Back', file: 'SKINS_DESIGN 5_BACK.png' },
-        { name: 'SKINS Design 5 Front', file: 'SKINS_DESIGN 5_FRONT.png' },
-        { name: 'SKINS Design 6 Back', file: 'SKINS_DESIGN 6_BACK.png' },
-        { name: 'SKINS Design 6 Front', file: 'SKINS_DESIGN 6_FRONT.png' },
-        { name: 'SKINS Design 7 Back', file: 'SKINS_DESIGN 7_BACK.png' },
-        { name: 'SKINS Design 7 Front', file: 'SKINS_DESIGN 7_FRONT.png' },
-        { name: 'SKINS Design 8 Back', file: 'SKINS_DESIGN 8_BACK.png' },
-        { name: 'SKINS Design 8 Front', file: 'SKINS_DESIGN 8_FRONT.png' },
-        { name: 'SKINS Design 9 Back', file: 'SKINS_DESIGN 9_BACK.png' },
-        { name: 'SKINS Design 9 Front', file: 'SKINS_DESIGN 9_FRONT.png' }
-      ]
-    }
-
-    // Search through all categories to find the matching asset
-    for (const [categoryName, assets] of Object.entries(assetCategories)) {
-      const foundAsset = assets.find(asset => asset.name === assetName)
-      if (foundAsset) {
-        return `/assets/images/${foundAsset.file}`
-      }
-    }
-
-    // If not found in predefined categories, try direct path construction
-    // This handles cases where the assetName might be the filename itself
-    return `/assets/images/${assetName}`
-  }, [])
 
   // Load design from database
   const loadDesignFromDatabase = useCallback(async (designId) => {

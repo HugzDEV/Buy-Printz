@@ -38,9 +38,9 @@ const SaveModal = ({
       
       {/* Modal */}
       <div className="relative w-full max-w-md">
-        <div className="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+        <div className="backdrop-blur-xl bg-white/95 rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="p-6 border-b border-white/20">
+          <div className="p-6 border-b border-gray-200/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl shadow-lg border border-white/30">
@@ -51,7 +51,7 @@ const SaveModal = ({
                   )}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  <h2 className="text-xl font-bold text-gray-800">
                     Save {type === 'template' ? 'Template' : 'Design'}
                   </h2>
                   <p className="text-sm text-gray-600">
@@ -64,7 +64,7 @@ const SaveModal = ({
               </div>
               <button
                 onClick={handleClose}
-                className="p-2 bg-white/20 hover:bg-white/30 rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-200"
+                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-200"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -75,7 +75,7 @@ const SaveModal = ({
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50/80 border border-red-200/50 rounded-xl backdrop-blur-sm">
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
                 <div className="flex items-center space-x-2">
                   <AlertCircle className="w-5 h-5 text-red-500" />
                   <p className="text-sm text-red-700">{error}</p>
@@ -93,7 +93,7 @@ const SaveModal = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={`Enter ${type === 'template' ? 'template' : 'design'} name...`}
-                className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl backdrop-blur-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all duration-200"
                 required
                 disabled={isLoading}
               />
@@ -110,7 +110,7 @@ const SaveModal = ({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe your template..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl backdrop-blur-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all duration-200 resize-none"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all duration-200 resize-none"
                   disabled={isLoading}
                 />
               </div>
@@ -121,7 +121,7 @@ const SaveModal = ({
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 px-4 py-3 bg-white/20 hover:bg-white/30 text-gray-700 rounded-xl font-semibold transition-all duration-200 border border-white/30 hover:border-white/50"
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all duration-200 border border-gray-300 hover:border-gray-400"
                 disabled={isLoading}
               >
                 Cancel
