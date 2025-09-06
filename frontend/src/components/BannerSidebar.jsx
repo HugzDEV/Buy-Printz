@@ -1299,6 +1299,72 @@ const BannerSidebar = ({
                 </div>
               </div>
               
+              {/* Text Stroke/Outline */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Text Outline</h4>
+                
+                {/* Stroke Toggle */}
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!selectedElement?.stroke}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          onTextPropertyChange('stroke', selectedElement?.stroke || '#000000')
+                          onTextPropertyChange('strokeWidth', selectedElement?.strokeWidth || 2)
+                        } else {
+                          onTextPropertyChange('stroke', null)
+                          onTextPropertyChange('strokeWidth', 0)
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <span className="text-sm text-gray-700">Enable Outline</span>
+                  </label>
+                </div>
+                
+                {/* Stroke Color and Width */}
+                {selectedElement?.stroke && (
+                  <div className="space-y-2 pl-6">
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-gray-600">Color:</label>
+                      <input
+                        type="color"
+                        value={selectedElement?.stroke || '#000000'}
+                        onChange={(e) => onTextPropertyChange('stroke', e.target.value)}
+                        className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+                        title="Choose outline color"
+                      />
+                      <span className="text-xs text-gray-500 font-mono">
+                        {selectedElement?.stroke || '#000000'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-gray-600">Width:</label>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => onTextPropertyChange('strokeWidth', Math.max(0, (selectedElement?.strokeWidth || 2) - 1))}
+                          className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold"
+                        >
+                          -
+                        </button>
+                        <span className="text-xs text-gray-700 min-w-[20px] text-center">
+                          {selectedElement?.strokeWidth || 2}px
+                        </span>
+                        <button
+                          onClick={() => onTextPropertyChange('strokeWidth', Math.min(20, (selectedElement?.strokeWidth || 2) + 1))}
+                          className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               {/* Text Alignment */}
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-gray-700">Alignment</h4>

@@ -657,6 +657,8 @@ const BannerCanvas = ({
           width: 200,
           height: 50,
           fill: '#000000',
+          stroke: null,
+          strokeWidth: 0,
           align: 'left',
           verticalAlign: 'top',
           padding: 0
@@ -918,6 +920,8 @@ const BannerCanvas = ({
         if (!element.fontFamily) element.fontFamily = 'Arial'
         if (!element.width) element.width = 200
         if (!element.height) element.height = 50
+        if (element.stroke === undefined) element.stroke = null
+        if (element.strokeWidth === undefined) element.strokeWidth = 0
         break
       case 'rect':
         if (!element.width) element.width = 100
@@ -1016,6 +1020,8 @@ const BannerCanvas = ({
             fontSize={safeElement.fontSize || 24}
             fontFamily={safeElement.fontFamily || 'Arial'}
             fill={safeElement.fill || '#000000'}
+            stroke={safeElement.stroke || null}
+            strokeWidth={safeElement.strokeWidth || 0}
             align={safeElement.align || 'left'}
             verticalAlign={safeElement.verticalAlign || 'top'}
             width={safeElement.width || 200}
@@ -2112,6 +2118,65 @@ const BannerCanvas = ({
                 </div>
               </div>
               
+              {/* Divider */}
+              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
+              
+              {/* Text Stroke/Outline */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Outline:</span>
+                <div className="flex items-center gap-1">
+                  {/* Stroke Toggle */}
+                  <button
+                    onClick={() => {
+                      if (selectedElement?.stroke) {
+                        handleElementChange(selectedId, { stroke: null, strokeWidth: 0 })
+                      } else {
+                        handleElementChange(selectedId, { stroke: '#000000', strokeWidth: 2 })
+                      }
+                    }}
+                    className={`w-6 h-6 rounded text-xs transition-colors duration-200 ${
+                      selectedElement?.stroke
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                    title={selectedElement?.stroke ? "Disable Outline" : "Enable Outline"}
+                  >
+                    ⭕
+                  </button>
+                  
+                  {/* Stroke Color (only show if stroke is enabled) */}
+                  {selectedElement?.stroke && (
+                    <>
+                      <input
+                        type="color"
+                        value={selectedElement?.stroke || '#000000'}
+                        onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
+                        className="w-6 h-6 rounded border border-gray-300 cursor-pointer"
+                        title="Choose outline color"
+                      />
+                      
+                      {/* Stroke Width */}
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleElementChange(selectedId, { strokeWidth: Math.max(0, (selectedElement?.strokeWidth || 2) - 1) })}
+                          className="w-5 h-5 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                        >
+                          -
+                        </button>
+                        <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] text-center">
+                          {selectedElement?.strokeWidth || 2}
+                        </span>
+                        <button
+                          onClick={() => handleElementChange(selectedId, { strokeWidth: Math.min(20, (selectedElement?.strokeWidth || 2) + 1) })}
+                          className="w-5 h-5 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
 
             </div>
           )}
