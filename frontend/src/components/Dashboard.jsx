@@ -634,36 +634,36 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
-      {/* GlassUI Header */}
+      {/* GlassUI Header - Mobile optimized */}
       <div className="backdrop-blur-xl bg-white/10 border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4 sm:py-6">
-            <div className="flex items-center">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex justify-between items-center py-3 sm:py-4 lg:py-6">
+            <div className="flex items-center min-w-0 flex-1">
               <Link to="/" className="flex items-center">
                 <img 
                   src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
                   alt="Buy Printz" 
-                  className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain hover:opacity-80 transition-opacity cursor-pointer"
+                  className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain hover:opacity-80 transition-opacity cursor-pointer flex-shrink-0"
                 />
               </Link>
-              <div className="ml-3 sm:ml-4">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              <div className="ml-2 sm:ml-3 lg:ml-4 min-w-0">
+                <h1 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent truncate">
                   Dashboard
                 </h1>
-                <p className="text-sm text-gray-600">Professional Design Studio</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Professional Design Studio</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="hidden sm:block backdrop-blur-sm bg-white/20 rounded-xl px-4 py-2 border border-white/30">
+            <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4 flex-shrink-0">
+              <div className="hidden md:block backdrop-blur-sm bg-white/20 rounded-xl px-3 lg:px-4 py-2 border border-white/30">
                 <span className="text-gray-700 text-sm font-medium">
                   Welcome, {user?.email?.split('@')[0]}
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 text-gray-700 hover:text-gray-900"
+                className="flex items-center px-3 sm:px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg sm:rounded-xl transition-all duration-200 text-gray-700 hover:text-gray-900"
               >
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline text-sm font-medium">Logout</span>
               </button>
             </div>
@@ -671,10 +671,10 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* GlassUI Navigation Tabs */}
-        <div className="backdrop-blur-sm bg-white/30 rounded-2xl p-2 mb-8 border border-white/30">
-          <nav className="flex space-x-1 overflow-x-auto">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* GlassUI Navigation Tabs - Mobile optimized */}
+        <div className="backdrop-blur-sm bg-white/30 rounded-xl sm:rounded-2xl p-1 sm:p-2 mb-4 sm:mb-6 lg:mb-8 border border-white/30">
+          <nav className="flex space-x-1 overflow-x-auto scrollbar-hide">
             {[
               { id: 'overview', name: 'Overview', shortName: 'Home', icon: BarChart3 },
               { id: 'designs', name: 'My Designs', shortName: 'Designs', icon: Palette },
@@ -686,13 +686,13 @@ const Dashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center py-3 px-4 rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${
+                className={`flex items-center py-2 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
                   activeTab === tab.id
                     ? 'bg-white/50 text-blue-700 shadow-lg border border-white/40'
                     : 'text-gray-600 hover:text-gray-800 hover:bg-white/20'
                 }`}
               >
-                <tab.icon className="w-4 h-4 mr-2" />
+                <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" />
                 <span className="sm:hidden">{tab.shortName}</span>
                 <span className="hidden sm:inline">{tab.name}</span>
               </button>
@@ -702,43 +702,43 @@ const Dashboard = () => {
 
         {/* Overview Tab */}
         {activeTab === 'overview' && (
-          <div className="space-y-8">
-            {/* Welcome Section */}
-            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-8 border border-white/30 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+          <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+            {/* Welcome Section - Mobile optimized */}
+            <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/30 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
                     Welcome back, {user?.email?.split('@')[0]}! 👋
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-sm sm:text-base text-gray-600">
                     Your professional banner design studio
                   </p>
                 </div>
-                <div className="flex space-x-3">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                   <Link
                     to="/editor"
                     onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg sm:rounded-xl text-white font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
                   >
-                    <Plus className="w-5 h-5 mr-2" />
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     New Banner
                   </Link>
                   <button
                     onClick={loadDashboardData}
-                    className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl text-gray-600 transition-all duration-200"
+                    className="p-2 sm:p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg sm:rounded-xl text-gray-600 transition-all duration-200"
                   >
-                    <RefreshCw className="w-5 h-5" />
+                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Enhanced Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
+            {/* Enhanced Stats Cards - Mobile optimized */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">Total Designs</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Total Designs</p>
                     {loadingStates.designs || loadingStates.completedDesigns ? (
                       <div className="animate-pulse">
                         <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
@@ -746,7 +746,7 @@ const Dashboard = () => {
                       </div>
                     ) : (
                       <>
-                        <p className="text-3xl font-bold text-gray-800">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
                         <p className="text-xs text-green-600 flex items-center mt-1">
                           <TrendingUp className="w-3 h-3 mr-1" />
                           Active creations
@@ -754,49 +754,49 @@ const Dashboard = () => {
                       </>
                     )}
                   </div>
-                  <div className="p-4 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-xl border border-blue-200/30">
-                    <Palette className="w-8 h-8 text-blue-600" />
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-lg sm:rounded-xl border border-blue-200/30 flex-shrink-0">
+                    <Palette className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                   </div>
                 </div>
               </div>
 
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
+              <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">Templates</p>
-                    <p className="text-3xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Templates</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
                     <p className="text-xs text-purple-600 flex items-center mt-1">
                       <Star className="w-3 h-3 mr-1" />
                       Custom saved
                     </p>
                   </div>
-                  <div className="p-4 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-xl border border-purple-200/30">
-                    <Layout className="w-8 h-8 text-purple-600" />
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-lg sm:rounded-xl border border-purple-200/30 flex-shrink-0">
+                    <Layout className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
                   </div>
                 </div>
               </div>
 
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
+              <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">Total Orders</p>
-                    <p className="text-3xl font-bold text-gray-800">{userStats?.total_orders || 0}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Total Orders</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_orders || 0}</p>
                     <p className="text-xs text-green-600 flex items-center mt-1">
                       <CheckCircle className="w-3 h-3 mr-1" />
                       {userStats?.order_stats?.paid || userStats?.order_stats?.completed || 0} completed
                     </p>
                   </div>
-                  <div className="p-4 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-xl border border-green-200/30">
-                    <ShoppingBag className="w-8 h-8 text-green-600" />
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-lg sm:rounded-xl border border-green-200/30 flex-shrink-0">
+                    <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
                   </div>
                 </div>
               </div>
 
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
+              <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">Total Spent</p>
-                    <p className="text-3xl font-bold text-gray-800">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Total Spent</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">
                       {formatCurrency(userStats?.total_spent || 0)}
                     </p>
                     <p className="text-xs text-blue-600 flex items-center mt-1">
@@ -804,8 +804,8 @@ const Dashboard = () => {
                       This year
                     </p>
                   </div>
-                  <div className="p-4 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-xl border border-yellow-200/30">
-                    <Crown className="w-8 h-8 text-yellow-600" />
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-lg sm:rounded-xl border border-yellow-200/30 flex-shrink-0">
+                    <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
                   </div>
                 </div>
               </div>
@@ -903,47 +903,52 @@ const Dashboard = () => {
         {/* Templates Tab */}
         {activeTab === 'templates' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center space-x-4">
-                <div className="p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl shadow-lg border border-white/30">
-                  <Layout className="w-8 h-8 text-purple-600" />
+            {/* Mobile-optimized header */}
+            <div className="mb-6 sm:mb-8">
+              {/* Title section */}
+              <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-0">
+                <div className="p-3 sm:p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl sm:rounded-2xl shadow-lg border border-white/30">
+                  <Layout className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
                 </div>
-                <div>
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-purple-700 to-blue-600 bg-clip-text text-transparent">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 via-purple-700 to-blue-600 bg-clip-text text-transparent">
                     My Templates
                   </h2>
-                  <p className="text-gray-600 mt-1">Custom banner templates you've created and saved</p>
+                  <p className="text-sm sm:text-base text-gray-600 mt-1 hidden sm:block">Custom banner templates you've created and saved</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              
+              {/* Action buttons - responsive layout */}
+              <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3">
                 <button
                   onClick={refreshTemplates}
                   disabled={loadingStates.templates}
-                  className="px-4 py-3 bg-white/20 hover:bg-white/40 rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 sm:p-3 bg-white/20 hover:bg-white/40 rounded-lg sm:rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Refresh templates"
                 >
-                  <RefreshCw className={`w-5 h-5 ${loadingStates.templates ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${loadingStates.templates ? 'animate-spin' : ''}`} />
                 </button>
                 <Link
                   to="/editor"
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-xl text-white font-semibold flex items-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
+                  className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-lg sm:rounded-xl text-white font-semibold flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20 text-sm sm:text-base"
                 >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create Template
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <span className="hidden xs:inline">Create Template</span>
+                  <span className="xs:hidden">Create</span>
                 </Link>
               </div>
             </div>
 
             {console.log('Dashboard: Rendering templates, count:', templates.length, 'templates:', templates)}
             {loadingStates.templates ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <SkeletonTemplateCard key={i} />
                 ))}
               </div>
             ) : templates.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {templates.map((template) => (
                   <div key={template.id} className="group relative">
                     {/* Main Template Card */}
@@ -951,44 +956,46 @@ const Dashboard = () => {
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       
-                      <div className="relative p-8">
-                        {/* Header Section */}
-                        <div className="flex items-start justify-between mb-6">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-gray-800 text-xl mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                      <div className="relative p-4 sm:p-6 lg:p-8">
+                        {/* Header Section - Mobile optimized */}
+                        <div className="flex items-start justify-between mb-4 sm:mb-6">
+                          <div className="flex-1 min-w-0 pr-2">
+                            <h3 className="font-bold text-gray-800 text-lg sm:text-xl mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent truncate">
                               {template.name}
                             </h3>
-                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{template.description}</p>
+                            <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 leading-relaxed line-clamp-2">{template.description}</p>
                             
-                            {/* Enhanced Tags */}
-                            <div className="flex items-center space-x-3">
-                              <span className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700 text-xs font-semibold rounded-full border border-purple-200/50 shadow-sm">
-                                <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                            {/* Enhanced Tags - Mobile responsive */}
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700 text-xs font-semibold rounded-full border border-purple-200/50 shadow-sm">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-400 rounded-full mr-1.5 sm:mr-2"></div>
                                 {template.category}
                               </span>
                               {template.banner_type && (
-                                <span className={`inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm ${getBannerTypeColor(template.banner_type)}`}>
-                                  <div className="w-2 h-2 bg-current rounded-full mr-2 opacity-60"></div>
-                                  {template.banner_type}
+                                <span className={`inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-full border shadow-sm ${getBannerTypeColor(template.banner_type)}`}>
+                                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-current rounded-full mr-1.5 sm:mr-2 opacity-60"></div>
+                                  <span className="hidden sm:inline">{template.banner_type}</span>
+                                  <span className="sm:hidden">{template.banner_type.split(' ')[0]}</span>
                                 </span>
                               )}
                             </div>
                           </div>
                           
-                          {/* Enhanced Delete Button */}
+                          {/* Enhanced Delete Button - Mobile optimized */}
                           <button
                             onClick={() => deleteTemplate(template.id)}
-                            className="p-3 bg-white/20 hover:bg-red-50/80 rounded-xl text-red-500 hover:text-red-600 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-red-200/50"
+                            className="p-2 sm:p-3 bg-white/20 hover:bg-red-50/80 rounded-lg sm:rounded-xl text-red-500 hover:text-red-600 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-red-200/50 flex-shrink-0"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </button>
                         </div>
                         
-                        {/* Timestamp Section */}
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-6 px-4 py-3 bg-white/10 rounded-xl border border-white/20">
+                        {/* Timestamp Section - Mobile optimized */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs text-gray-500 mb-4 sm:mb-6 px-3 sm:px-4 py-2 sm:py-3 bg-white/10 rounded-lg sm:rounded-xl border border-white/20 space-y-1 sm:space-y-0">
                           <span className="flex items-center">
-                            <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                            Created {formatDate(template.created_at)}
+                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full mr-1.5 sm:mr-2"></div>
+                            <span className="hidden sm:inline">Created </span>
+                            {formatDate(template.created_at)}
                           </span>
                           <span className="flex items-center">
                             <Clock className="w-3 h-3 mr-1" />
@@ -996,16 +1003,17 @@ const Dashboard = () => {
                           </span>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex space-x-3">
+                        {/* Action Buttons - Mobile optimized */}
+                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                           <button
                             onClick={() => loadDesignInEditor(template)}
-                            className="flex-1 p-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 rounded-xl text-sm font-semibold text-white flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
+                            className="flex-1 p-3 sm:p-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 rounded-lg sm:rounded-xl text-sm font-semibold text-white flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
                           >
                             <Edit className="w-4 h-4 mr-2" />
-                            Use Template
+                            <span className="hidden sm:inline">Use Template</span>
+                            <span className="sm:hidden">Use</span>
                           </button>
-                          <button className="p-4 bg-white/20 hover:bg-white/40 rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50">
+                          <button className="p-3 sm:p-4 bg-white/20 hover:bg-white/40 rounded-lg sm:rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50">
                             <Eye className="w-4 h-4" />
                           </button>
                         </div>
