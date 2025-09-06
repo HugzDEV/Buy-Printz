@@ -30,10 +30,6 @@ const BannerEditorNew = () => {
   // Core state
   const [elements, setElements] = useState([])
   
-  // Debug elements state changes
-  useEffect(() => {
-    console.log('🎨 Elements state updated:', elements);
-  }, [elements]);
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
@@ -108,45 +104,15 @@ const BannerEditorNew = () => {
     const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
     const fromLandingPage = sessionStorage.getItem('fromLandingPage')
     
-    console.log('🎯 Tour check - tourCompleted:', tourCompleted, 'fromLandingPage:', fromLandingPage)
-    
     // Only show tour if:
     // 1. Tour hasn't been completed
     // 2. User came from landing page (not dashboard)
     if (!tourCompleted && fromLandingPage === 'true') {
-      console.log('🎯 First time user from landing page - showing tour')
       setIsFirstTimeUser(true)
       setShowTour(true)
-      // Don't clear the flag immediately - let the tour component handle it
     } else {
-      console.log('🎯 Not showing tour - either completed or not from landing page')
       setIsFirstTimeUser(false)
       setShowTour(false)
-    }
-    
-    // Add global function for testing - remove in production
-    window.resetTour = () => {
-      console.log('🎯 Resetting tour for testing')
-      localStorage.removeItem('buyprintz-tour-completed')
-      sessionStorage.setItem('fromLandingPage', 'true')
-      setIsFirstTimeUser(true)
-      setShowTour(true)
-    }
-    
-    // Add global function to force show tour
-    window.forceShowTour = () => {
-      console.log('🎯 Force showing tour for testing')
-      setIsFirstTimeUser(true)
-      setShowTour(true)
-    }
-    
-    // Add global function to simulate new user
-    window.simulateNewUser = () => {
-      console.log('🎯 Simulating new user for testing')
-      localStorage.removeItem('buyprintz-tour-completed')
-      sessionStorage.setItem('fromLandingPage', 'true')
-      setIsFirstTimeUser(true)
-      setShowTour(true)
     }
   }, [])
   
@@ -2514,17 +2480,13 @@ const BannerEditorNew = () => {
       isFirstTimeUser={isFirstTimeUser}
       showTour={showTour}
       onTourComplete={() => {
-        console.log('🎯 Tour completed - marking as completed in localStorage')
         setShowTour(false)
         setIsFirstTimeUser(false)
-        // Store in localStorage that user has seen the tour
         localStorage.setItem('buyprintz-tour-completed', 'true')
       }}
       onSkipTour={() => {
-        console.log('🎯 Tour skipped - marking as completed in localStorage')
         setShowTour(false)
         setIsFirstTimeUser(false)
-        // Store in localStorage that user has seen the tour
         localStorage.setItem('buyprintz-tour-completed', 'true')
       }}
     />

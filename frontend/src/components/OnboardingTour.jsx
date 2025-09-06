@@ -25,11 +25,9 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
       // Double-check that tour hasn't been completed
       const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
       if (!tourCompleted) {
-        console.log('🎯 OnboardingTour: Showing welcome dialog')
         setShowWelcomeDialog(true)
       }
     } else {
-      console.log('🎯 OnboardingTour: Hiding welcome dialog - isFirstTimeUser:', isFirstTimeUser, 'showTour:', showTour)
       setShowWelcomeDialog(false)
     }
   }, [isFirstTimeUser, showTour])
@@ -51,7 +49,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
   // Desktop tour steps
   const desktopTourSteps = [
     {
-      target: '.canvas-container',
+      target: '.final-step',
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
@@ -59,31 +57,14 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
               <MousePointer className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Your Creative Canvas</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Welcome to BuyPrintz!</h3>
           <p className="text-gray-600">
-            This is where the magic happens! Your banner design lives here.
+            This is your professional banner design studio. Let's take a quick tour!
           </p>
         </div>
       ),
       placement: 'center',
       disableBeacon: true,
-    },
-    {
-      target: '.sidebar-tools',
-      content: (
-        <div className="text-center space-y-3">
-          <div className="flex justify-center">
-            <div className="p-3 bg-green-100 rounded-full">
-              <Palette className="w-8 h-8 text-green-600" />
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">Design Tools</h3>
-          <p className="text-gray-600">
-            Add shapes, icons, text, and images to create your perfect banner.
-          </p>
-        </div>
-      ),
-      placement: 'right',
     },
     {
       target: '.action-buttons',
@@ -96,7 +77,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Save & Order</h3>
           <p className="text-gray-600">
-            Save your design, preview it, and order when you're ready!
+            Save your design, create templates, and order when you're ready!
           </p>
         </div>
       ),
@@ -120,21 +101,21 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
       placement: 'left',
     },
     {
-      target: '.element-selection',
+      target: '.mobile-hamburger',
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
-            <div className="p-3 bg-pink-100 rounded-full">
-              <MousePointer className="w-8 h-8 text-pink-600" />
+            <div className="p-3 bg-green-100 rounded-full">
+              <Menu className="w-8 h-8 text-green-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Element Control</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Design Tools</h3>
           <p className="text-gray-600">
-            Click any element to select, move, resize, or edit it.
+            Click here to access all design tools - text, shapes, icons, and more!
           </p>
         </div>
       ),
-      placement: 'center',
+      placement: 'right',
     },
     {
       target: '.final-step',
@@ -162,7 +143,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
   // Mobile tour steps
   const mobileTourSteps = [
     {
-      target: '.canvas-container',
+      target: '.final-step',
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
@@ -170,9 +151,9 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
               <MousePointer className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Your Creative Canvas</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Welcome to BuyPrintz!</h3>
           <p className="text-gray-600">
-            This is where the magic happens! Your banner design lives here.
+            This is your professional banner design studio. Let's take a quick tour!
           </p>
         </div>
       ),
@@ -212,23 +193,6 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
         </div>
       ),
       placement: 'left',
-    },
-    {
-      target: '.element-selection',
-      content: (
-        <div className="text-center space-y-3">
-          <div className="flex justify-center">
-            <div className="p-3 bg-pink-100 rounded-full">
-              <MousePointer className="w-8 h-8 text-pink-600" />
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">Element Control</h3>
-          <p className="text-gray-600">
-            Click any element to select, move, resize, or edit it.
-          </p>
-        </div>
-      ),
-      placement: 'center',
     },
     {
       target: '.final-step',
