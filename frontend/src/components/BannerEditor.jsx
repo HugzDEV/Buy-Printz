@@ -117,8 +117,7 @@ const BannerEditorNew = () => {
       console.log('🎯 First time user from landing page - showing tour')
       setIsFirstTimeUser(true)
       setShowTour(true)
-      // Clear the flag so tour doesn't show again on subsequent visits
-      sessionStorage.removeItem('fromLandingPage')
+      // Don't clear the flag immediately - let the tour component handle it
     } else {
       console.log('🎯 Not showing tour - either completed or not from landing page')
       setIsFirstTimeUser(false)
@@ -137,6 +136,15 @@ const BannerEditorNew = () => {
     // Add global function to force show tour
     window.forceShowTour = () => {
       console.log('🎯 Force showing tour for testing')
+      setIsFirstTimeUser(true)
+      setShowTour(true)
+    }
+    
+    // Add global function to simulate new user
+    window.simulateNewUser = () => {
+      console.log('🎯 Simulating new user for testing')
+      localStorage.removeItem('buyprintz-tour-completed')
+      sessionStorage.setItem('fromLandingPage', 'true')
       setIsFirstTimeUser(true)
       setShowTour(true)
     }

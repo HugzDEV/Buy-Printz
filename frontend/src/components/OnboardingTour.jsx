@@ -273,6 +273,8 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
     
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       setRunTour(false)
+      // Clear the fromLandingPage flag
+      sessionStorage.removeItem('fromLandingPage')
       onTourComplete()
     }
   }
@@ -365,6 +367,8 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
 
   const handleSkipTour = () => {
     setShowWelcomeDialog(false)
+    // Clear the fromLandingPage flag
+    sessionStorage.removeItem('fromLandingPage')
     onSkipTour()
   }
 
