@@ -56,10 +56,10 @@ const BannerCanvas = ({
   backgroundColor,
   onExport,
   onSave,
+
   onCreateOrder,
   onClearCanvas,
-  hasElements,
-  onStatusBarVisibilityChange
+  hasElements
 }) => {
   const stageRef = useRef()
   const transformerRef = useRef()
@@ -69,14 +69,6 @@ const BannerCanvas = ({
   
   // Get the currently selected element
   const selectedElement = elements.find(el => el.id === selectedId)
-  
-  // Notify parent when status bar visibility changes
-  useEffect(() => {
-    const isVisible = selectedId || selectedIds.length > 0
-    if (onStatusBarVisibilityChange) {
-      onStatusBarVisibilityChange(isVisible)
-    }
-  }, [selectedId, selectedIds.length, onStatusBarVisibilityChange])
   
   // Auto-adjust scale when canvas size changes - DISABLED for user control
   // useEffect(() => {
@@ -1959,7 +1951,7 @@ const BannerCanvas = ({
           bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
         transform transition-transform duration-300 ease-in-out
           max-h-[30vh] sm:max-h-[35vh] overflow-y-auto
-          shadow-2xl z-[9999]
+          shadow-2xl z-[60]
           ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
         `}
       >
