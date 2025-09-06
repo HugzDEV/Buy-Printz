@@ -3,7 +3,7 @@ import { GlassCard, GlassButton, GlassPanel } from './ui/index';
 import { Sparkles, Bot, Send, Loader2, Wand2, Palette, Edit3, Plus } from 'lucide-react';
 import authService from '../services/auth';
 
-const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
+const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId, isStatusBarVisible = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -140,6 +140,11 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
   ];
 
   if (!isOpen) {
+    // Hide AI button when status bar is visible to prevent blocking
+    if (isStatusBarVisible) {
+      return null;
+    }
+    
     return (
       <div className="fixed bottom-6 right-6 z-50">
         <GlassButton
@@ -155,6 +160,11 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
         </GlassButton>
       </div>
     );
+  }
+
+  // Hide AI chat when status bar is visible to prevent blocking
+  if (isStatusBarVisible) {
+    return null;
   }
 
   return (

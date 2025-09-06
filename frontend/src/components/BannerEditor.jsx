@@ -42,6 +42,7 @@ const BannerEditorNew = () => {
   
   // AI Agent state
   const [currentDesignId, setCurrentDesignId] = useState(null)
+  const [isStatusBarVisible, setIsStatusBarVisible] = useState(false)
   
   // Save Modal state
   const [showSaveModal, setShowSaveModal] = useState(false)
@@ -2458,6 +2459,7 @@ const BannerEditorNew = () => {
             onCreateOrder={createOrder}
             onClearCanvas={clearCanvas}
             hasElements={elements.length > 0}
+            onStatusBarVisibilityChange={setIsStatusBarVisible}
           />
           
                 {/* Mobile Overlay when sidebar is open */}
@@ -2500,6 +2502,7 @@ const BannerEditorNew = () => {
       onDesignGenerated={handleAIDesignGenerated}
       onDesignModified={handleAIDesignModified}
       currentDesignId={currentDesignId}
+      isStatusBarVisible={isStatusBarVisible}
     />
     
     {/* Save Modal */}

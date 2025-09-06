@@ -56,10 +56,10 @@ const BannerCanvas = ({
   backgroundColor,
   onExport,
   onSave,
-
   onCreateOrder,
   onClearCanvas,
-  hasElements
+  hasElements,
+  onStatusBarVisibilityChange
 }) => {
   const stageRef = useRef()
   const transformerRef = useRef()
@@ -69,6 +69,14 @@ const BannerCanvas = ({
   
   // Get the currently selected element
   const selectedElement = elements.find(el => el.id === selectedId)
+  
+  // Notify parent when status bar visibility changes
+  useEffect(() => {
+    const isVisible = selectedId || selectedIds.length > 0
+    if (onStatusBarVisibilityChange) {
+      onStatusBarVisibilityChange(isVisible)
+    }
+  }, [selectedId, selectedIds.length, onStatusBarVisibilityChange])
   
   // Auto-adjust scale when canvas size changes - DISABLED for user control
   // useEffect(() => {
