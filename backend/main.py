@@ -899,14 +899,23 @@ async def save_custom_template(
 ):
     """Save a custom banner template"""
     try:
+        user_id = current_user["user_id"]
+        
+        # Check template limit before saving
+        limit_check = await db_manager.check_template_limit(user_id, limit=20)
+        if not limit_check["can_save"]:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Template limit reached. You can save up to {limit_check['limit']} templates. Please delete some templates to save new ones."
+            )
+        
         result = await db_manager.save_custom_template(
-            current_user["user_id"],
+            user_id,
             template_data.dict()
         )
         
         if result["success"]:
             # Invalidate cache for this user
-            user_id = current_user["user_id"]
             cache_key = f"templates_user_{user_id}"
             cache.delete(cache_key)
             logger.info(f"Invalidated cache for user templates: {user_id}")
@@ -914,7 +923,9 @@ async def save_custom_template(
             return {
                 "success": True,
                 "template_id": result["template_id"],
-                "message": "Template saved successfully"
+                "message": "Template saved successfully",
+                "template_count": limit_check["current_count"] + 1,
+                "remaining": limit_check["remaining"] - 1
             }
         else:
             # Check if it's a duplicate name error
@@ -949,6 +960,16 @@ async def get_user_templates(current_user: dict = Depends(get_current_user)):
         logger.info(f"Cached user templates: {user_id}")
         
         return {"success": True, "templates": templates, "cached": False}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/templates/limit")
+async def get_template_limit(current_user: dict = Depends(get_current_user)):
+    """Get user's template count and limit information"""
+    try:
+        user_id = current_user["user_id"]
+        limit_info = await db_manager.check_template_limit(user_id, limit=20)
+        return {"success": True, **limit_info}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1011,6 +1032,35 @@ async def get_template(template_id: str, current_user: dict = Depends(get_curren
                 raise HTTPException(status_code=403, detail="Access denied")
         else:
             raise HTTPException(status_code=404, detail="Template not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/templates/{template_id}")
+async def delete_template(template_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a template (only by owner)"""
+    try:
+        # First check if template exists and user owns it
+        template = await db_manager.get_template(template_id)
+        if not template:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        if template["user_id"] != current_user["user_id"]:
+            raise HTTPException(status_code=403, detail="Access denied - you can only delete your own templates")
+        
+        # Delete the template
+        success = await db_manager.delete_template(template_id)
+        if success:
+            # Invalidate cache for this user
+            user_id = current_user["user_id"]
+            cache_key = f"templates_user_{user_id}"
+            cache.delete(cache_key)
+            logger.info(f"Deleted template {template_id} and invalidated cache for user {user_id}")
+            
+            return {"success": True, "message": "Template deleted successfully"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to delete template")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

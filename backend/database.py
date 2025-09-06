@@ -634,6 +634,67 @@ class DatabaseManager:
                 return None
             return None
 
+    async def delete_template(self, template_id: str) -> bool:
+        """Delete a template by ID"""
+        if not self.is_connected():
+            print("Database not connected, cannot delete template")
+            return False
+        
+        try:
+            print(f"Deleting template with ID: {template_id}")
+            response = self.supabase.table("banner_templates").delete().eq("id", template_id).execute()
+            
+            if response.data:
+                print(f"Successfully deleted template: {template_id}")
+                return True
+            else:
+                print("Template not found for deletion")
+                return False
+                
+        except Exception as e:
+            print(f"Error deleting template: {e}")
+            # If table doesn't exist, return False
+            if "relation \"banner_templates\" does not exist" in str(e):
+                print("banner_templates table does not exist. Please run the SQL setup.")
+                return False
+            return False
+
+    async def get_user_template_count(self, user_id: str) -> int:
+        """Get the number of templates a user has"""
+        if not self.is_connected():
+            print("Database not connected, returning 0 for template count")
+            return 0
+        
+        try:
+            response = self.supabase.table("banner_templates").select("id", count="exact").eq("user_id", user_id).execute()
+            count = response.count if response.count is not None else 0
+            print(f"User {user_id} has {count} templates")
+            return count
+        except Exception as e:
+            print(f"Error getting template count: {e}")
+            return 0
+
+    async def check_template_limit(self, user_id: str, limit: int = 20) -> Dict[str, Any]:
+        """Check if user has reached template limit"""
+        try:
+            current_count = await self.get_user_template_count(user_id)
+            can_save = current_count < limit
+            
+            return {
+                "current_count": current_count,
+                "limit": limit,
+                "can_save": can_save,
+                "remaining": max(0, limit - current_count)
+            }
+        except Exception as e:
+            print(f"Error checking template limit: {e}")
+            return {
+                "current_count": 0,
+                "limit": limit,
+                "can_save": True,
+                "remaining": limit
+            }
+
     async def get_public_templates(self) -> List[Dict[str, Any]]:
         """Get all public templates"""
         if not self.is_connected():
