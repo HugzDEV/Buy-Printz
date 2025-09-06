@@ -15,22 +15,24 @@ import {
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 
-const OnboardingTour = ({ isFirstTimeUser, onTourComplete, onSkipTour }) => {
+const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour }) => {
   const [runTour, setRunTour] = useState(false)
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false)
   const [tourReady, setTourReady] = useState(false)
 
   useEffect(() => {
-    if (isFirstTimeUser) {
+    if (isFirstTimeUser && showTour) {
       // Double-check that tour hasn't been completed
       const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
       if (!tourCompleted) {
+        console.log('🎯 OnboardingTour: Showing welcome dialog')
         setShowWelcomeDialog(true)
       }
     } else {
+      console.log('🎯 OnboardingTour: Hiding welcome dialog - isFirstTimeUser:', isFirstTimeUser, 'showTour:', showTour)
       setShowWelcomeDialog(false)
     }
-  }, [isFirstTimeUser])
+  }, [isFirstTimeUser, showTour])
 
   // Detect device type for responsive tour
   const [isMobile, setIsMobile] = useState(false)

@@ -124,6 +124,22 @@ const BannerEditorNew = () => {
       setIsFirstTimeUser(false)
       setShowTour(false)
     }
+    
+    // Add global function for testing - remove in production
+    window.resetTour = () => {
+      console.log('🎯 Resetting tour for testing')
+      localStorage.removeItem('buyprintz-tour-completed')
+      sessionStorage.setItem('fromLandingPage', 'true')
+      setIsFirstTimeUser(true)
+      setShowTour(true)
+    }
+    
+    // Add global function to force show tour
+    window.forceShowTour = () => {
+      console.log('🎯 Force showing tour for testing')
+      setIsFirstTimeUser(true)
+      setShowTour(true)
+    }
   }, [])
   
   // Banner size presets - Standard banner dimensions (H x W format)
@@ -2488,6 +2504,7 @@ const BannerEditorNew = () => {
     {/* Onboarding Tour */}
     <OnboardingTour
       isFirstTimeUser={isFirstTimeUser}
+      showTour={showTour}
       onTourComplete={() => {
         console.log('🎯 Tour completed - marking as completed in localStorage')
         setShowTour(false)
