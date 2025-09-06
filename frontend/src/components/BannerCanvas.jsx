@@ -1951,7 +1951,7 @@ const BannerCanvas = ({
           bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
         transform transition-transform duration-300 ease-in-out
           max-h-[30vh] sm:max-h-[35vh] overflow-y-auto
-          shadow-2xl z-50
+          shadow-2xl z-[60]
           ${(selectedId || selectedIds.length > 0) ? 'translate-y-0' : 'translate-y-full'}
         `}
       >
