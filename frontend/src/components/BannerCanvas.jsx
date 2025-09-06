@@ -56,7 +56,9 @@ const BannerCanvas = ({
   backgroundColor,
   onExport,
   onSave,
-  onCreateOrder
+  onCreateOrder,
+  onClearCanvas,
+  hasElements
 }) => {
   const stageRef = useRef()
   const transformerRef = useRef()
@@ -1415,8 +1417,18 @@ const BannerCanvas = ({
 
           {/* Right Section - Action Buttons */}
           <div className="flex items-center gap-1">
-            {/* Mobile: Save and Order buttons */}
+            {/* Mobile: Clear, Save and Order buttons */}
             <div className="sm:hidden flex items-center gap-1">
+              <GlassButton 
+                onClick={onClearCanvas} 
+                disabled={!hasElements}
+                variant="danger" 
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" 
+                title="Clear Canvas"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </GlassButton>
+              
               <GlassButton onClick={onSave} variant="success" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Save Design">
                 <Save className="w-3.5 h-3.5" />
               </GlassButton>
@@ -1447,6 +1459,16 @@ const BannerCanvas = ({
             </GlassButton>
             
               <div className="w-px h-5 bg-white/20 mx-1" />
+            
+              <GlassButton 
+                onClick={onClearCanvas} 
+                disabled={!hasElements}
+                variant="danger" 
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" 
+                title="Clear Canvas"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </GlassButton>
             
               <GlassButton onClick={onSave} variant="success" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <Save className="w-3.5 h-3.5" />

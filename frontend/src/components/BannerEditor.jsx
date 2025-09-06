@@ -2369,15 +2369,6 @@ const BannerEditorNew = () => {
         {/* Mobile Controls - Show on Mobile */}
         <div className="flex items-center gap-2 md:hidden">
           <button
-            onClick={clearCanvas}
-            disabled={elements.length === 0}
-            className="p-3 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm border border-red-400/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Clear Canvas"
-          >
-            <Trash2 className="w-5 h-5 text-red-600" />
-          </button>
-          
-          <button
             onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
             className="mobile-hamburger p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center z-50"
           >
@@ -2387,16 +2378,6 @@ const BannerEditorNew = () => {
 
         {/* Right Section */}
         <div className="action-buttons hidden sm:flex items-center gap-2 md:gap-3">
-          <button
-            onClick={clearCanvas}
-            disabled={elements.length === 0}
-            className="px-3 md:px-4 py-1.5 md:py-2 bg-red-500/20 hover:bg-red-500/30 text-red-700 border border-red-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Clear Canvas"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span className="hidden md:inline">Clear</span>
-          </button>
-          
           <button
             onClick={saveDesign}
             className="px-3 md:px-4 py-1.5 md:py-2 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
@@ -2485,6 +2466,8 @@ const BannerEditorNew = () => {
             onExport={exportToPDF}
             onSave={saveDesign}
             onCreateOrder={createOrder}
+            onClearCanvas={clearCanvas}
+            hasElements={elements.length > 0}
           />
           
                 {/* Mobile Overlay when sidebar is open */}
