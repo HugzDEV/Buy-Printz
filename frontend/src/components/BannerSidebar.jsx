@@ -16,7 +16,8 @@ import {
   FileText,
   X,
   QrCode,
-  Link
+  Link,
+  Trash2
 } from 'lucide-react'
 
 const BannerSidebar = ({ 
@@ -34,6 +35,7 @@ const BannerSidebar = ({
   onAddQRCode,
   onLoadTemplate,
   onImageUpload,
+  onClearCanvas,
   onTextPropertyChange,
   onShapePropertyChange,
   onChangeBannerType,
@@ -41,7 +43,8 @@ const BannerSidebar = ({
   onToggleCanvasOrientation,
   bannerTemplates = [],
   userTemplates = [],
-  selectedElement = null
+  selectedElement = null,
+  elementsCount = 0
 }) => {
   const [expandedSections, setExpandedSections] = useState({
     specifications: false,

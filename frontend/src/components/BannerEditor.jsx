@@ -11,7 +11,8 @@ import {
   X,
   QrCode,
   Link,
-  Palette
+  Palette,
+  Trash2
 } from 'lucide-react'
 import BannerSidebar from './BannerSidebar'
 import BannerCanvas from './BannerCanvas'
@@ -35,6 +36,9 @@ const BannerEditorNew = () => {
   }, [elements]);
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  
+  // Navigation state
+  const [cameFromTemplate, setCameFromTemplate] = useState(false)
   
   // Tour state
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false)
@@ -249,6 +253,18 @@ const BannerEditorNew = () => {
 
   // Utility functions
   const generateId = (type) => `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+  // Clear canvas function
+  const clearCanvas = useCallback(() => {
+    if (elements.length === 0) return
+    
+    if (confirm('Are you sure you want to clear the canvas? This will remove all elements and cannot be undone.')) {
+      setElements([])
+      setSelectedId(null)
+      // Show success feedback
+      console.log('Canvas cleared successfully')
+    }
+  }, [elements.length])
 
 
 
@@ -2231,8 +2247,10 @@ const BannerEditorNew = () => {
     const templateId = searchParams.get('template')
     
     if (designId) {
+      setCameFromTemplate(false)
       loadDesignFromDatabase(designId)
     } else if (templateId) {
+      setCameFromTemplate(true)
       // Check for template data in sessionStorage first
       const templateData = sessionStorage.getItem('templateData')
       if (templateData) {
@@ -2305,11 +2323,13 @@ const BannerEditorNew = () => {
         {/* Left Section */}
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(cameFromTemplate ? '/dashboard?tab=templates' : '/dashboard')}
             className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span className="hidden md:inline text-sm font-medium">Dashboard</span>
+            <span className="hidden md:inline text-sm font-medium">
+              {cameFromTemplate ? 'Templates' : 'Dashboard'}
+            </span>
           </button>
           
           <div className="hidden md:block w-px h-6 bg-white/30" />
@@ -2327,16 +2347,37 @@ const BannerEditorNew = () => {
           </button>
         </div>
 
-        {/* Mobile Menu Toggle - Show on Mobile Landscape and Portrait */}
-        <button
-          onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          className="mobile-hamburger block md:hidden p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center z-50"
-        >
-          {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        {/* Mobile Controls - Show on Mobile */}
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={clearCanvas}
+            disabled={elements.length === 0}
+            className="p-3 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm border border-red-400/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Clear Canvas"
+          >
+            <Trash2 className="w-5 h-5 text-red-600" />
+          </button>
+          
+          <button
+            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+            className="mobile-hamburger p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center z-50"
+          >
+            {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
 
         {/* Right Section */}
         <div className="action-buttons hidden sm:flex items-center gap-2 md:gap-3">
+          <button
+            onClick={clearCanvas}
+            disabled={elements.length === 0}
+            className="px-3 md:px-4 py-1.5 md:py-2 bg-red-500/20 hover:bg-red-500/30 text-red-700 border border-red-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Clear Canvas"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="hidden md:inline">Clear</span>
+          </button>
+          
           <button
             onClick={saveDesign}
             className="px-3 md:px-4 py-1.5 md:py-2 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
