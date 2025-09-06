@@ -424,6 +424,31 @@ async def change_user_password(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/user/tour-status")
+async def get_tour_status(current_user: dict = Depends(get_current_user)):
+    """Get user's tour completion status"""
+    try:
+        user_id = current_user["user_id"]
+        tour_completed = await db_manager.is_tour_completed(user_id)
+        return {"success": True, "tour_completed": tour_completed}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/user/mark-tour-completed")
+async def mark_tour_completed(current_user: dict = Depends(get_current_user)):
+    """Mark tour as completed for the current user"""
+    try:
+        user_id = current_user["user_id"]
+        success = await db_manager.mark_tour_completed(user_id)
+        if success:
+            return {"success": True, "message": "Tour marked as completed"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to mark tour as completed")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.delete("/api/user/delete-account")
 async def delete_user_account(
     password_data: Dict[str, str],

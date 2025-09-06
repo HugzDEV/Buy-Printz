@@ -122,6 +122,29 @@ class DatabaseManager:
             print(f"Error updating user profile: {e}")
             return False
 
+    async def mark_tour_completed(self, user_id: str) -> bool:
+        """Mark tour as completed for a user"""
+        try:
+            response = self.supabase.table("user_profiles").update({
+                "tour_completed": True,
+                "updated_at": datetime.utcnow().isoformat()
+            }).eq("id", user_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error marking tour as completed: {e}")
+            return False
+
+    async def is_tour_completed(self, user_id: str) -> bool:
+        """Check if user has completed the tour"""
+        try:
+            response = self.supabase.table("user_profiles").select("tour_completed").eq("id", user_id).execute()
+            if response.data:
+                return response.data[0].get("tour_completed", False)
+            return False
+        except Exception as e:
+            print(f"Error checking tour completion: {e}")
+            return False
+
     # Order Management
     async def create_order(self, user_id: str, order_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new order"""

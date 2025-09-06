@@ -101,19 +101,38 @@ const BannerEditorNew = () => {
   
   // Check if user is first time user - only from landing page
   useEffect(() => {
-    const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
-    const fromLandingPage = sessionStorage.getItem('fromLandingPage')
-    
-    // Only show tour if:
-    // 1. Tour hasn't been completed
-    // 2. User came from landing page (not dashboard)
-    if (!tourCompleted && fromLandingPage === 'true') {
-      setIsFirstTimeUser(true)
-      setShowTour(true)
-    } else {
-      setIsFirstTimeUser(false)
-      setShowTour(false)
+    const checkTourStatus = async () => {
+      try {
+        const fromLandingPage = sessionStorage.getItem('fromLandingPage')
+        
+        // Only check tour status if user came from landing page
+        if (fromLandingPage === 'true') {
+          const response = await authService.authenticatedRequest('/api/user/tour-status')
+          const tourCompleted = response.tour_completed
+          
+          // Only show tour if:
+          // 1. Tour hasn't been completed
+          // 2. User came from landing page (not dashboard)
+          if (!tourCompleted) {
+            setIsFirstTimeUser(true)
+            setShowTour(true)
+          } else {
+            setIsFirstTimeUser(false)
+            setShowTour(false)
+          }
+        } else {
+          setIsFirstTimeUser(false)
+          setShowTour(false)
+        }
+      } catch (error) {
+        console.error('Error checking tour status:', error)
+        // If there's an error, don't show the tour
+        setIsFirstTimeUser(false)
+        setShowTour(false)
+      }
     }
+    
+    checkTourStatus()
   }, [])
   
   // Banner size presets - Standard banner dimensions (H x W format)
@@ -2479,15 +2498,27 @@ const BannerEditorNew = () => {
     <OnboardingTour
       isFirstTimeUser={isFirstTimeUser}
       showTour={showTour}
-      onTourComplete={() => {
+      onTourComplete={async () => {
         setShowTour(false)
         setIsFirstTimeUser(false)
-        localStorage.setItem('buyprintz-tour-completed', 'true')
+        try {
+          await authService.authenticatedRequest('/api/user/mark-tour-completed', {
+            method: 'POST'
+          })
+        } catch (error) {
+          console.error('Error marking tour as completed:', error)
+        }
       }}
-      onSkipTour={() => {
+      onSkipTour={async () => {
         setShowTour(false)
         setIsFirstTimeUser(false)
-        localStorage.setItem('buyprintz-tour-completed', 'true')
+        try {
+          await authService.authenticatedRequest('/api/user/mark-tour-completed', {
+            method: 'POST'
+          })
+        } catch (error) {
+          console.error('Error marking tour as completed:', error)
+        }
       }}
     />
     

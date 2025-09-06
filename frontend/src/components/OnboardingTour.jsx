@@ -22,11 +22,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
 
   useEffect(() => {
     if (isFirstTimeUser && showTour) {
-      // Double-check that tour hasn't been completed
-      const tourCompleted = localStorage.getItem('buyprintz-tour-completed')
-      if (!tourCompleted) {
-        setShowWelcomeDialog(true)
-      }
+      setShowWelcomeDialog(true)
     } else {
       setShowWelcomeDialog(false)
     }
