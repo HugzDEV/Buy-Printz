@@ -757,36 +757,25 @@ class DatabaseManager:
 
     # Analytics and Tracking
     async def get_user_stats(self, user_id: str) -> Dict[str, Any]:
-        """Get user statistics and usage data"""
+        """Get user statistics and usage data - only user-facing information"""
         try:
-            # Get all orders with status and total_amount
-            orders_response = self.supabase.table("orders").select("status, total_amount").eq("user_id", user_id).execute()
-            orders = orders_response.data or []
+            # Only get completed orders for user-facing stats
+            completed_orders_response = self.supabase.table("orders").select("status, total_amount").eq("user_id", user_id).in_("status", ['completed', 'paid', 'approved', 'shipped', 'delivered']).execute()
+            completed_orders = completed_orders_response.data or []
             
             # Get template count (templates are now our "designs")
             templates_response = self.supabase.table("banner_templates").select("id").eq("user_id", user_id).execute()
             templates_count = len(templates_response.data or [])
             
-            # Calculate order statistics
-            order_stats = {}
-            completed_orders = []
+            # Calculate total spent from completed orders only
             total_spent = 0
-            
-            for order in orders:
-                status = order["status"]
-                order_stats[status] = order_stats.get(status, 0) + 1
-                
-                # Only count completed/paid orders for totals and spending
-                if status in ['completed', 'paid', 'approved', 'shipped', 'delivered']:
-                    completed_orders.append(order)
-                    if order.get("total_amount"):
-                        total_spent += order["total_amount"]
+            for order in completed_orders:
+                if order.get("total_amount"):
+                    total_spent += order["total_amount"]
             
             return {
                 "total_orders": len(completed_orders),  # Only completed orders
                 "total_spent": total_spent,  # Only from completed orders
-                "order_stats": order_stats,  # All order statuses for breakdown
-                "pending_orders": order_stats.get('pending', 0),  # Pending orders count
                 "total_designs": templates_count,  # Templates are now our "designs"
                 "total_templates": templates_count,
                 "success": True

@@ -764,7 +764,7 @@ const Dashboard = () => {
                     <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_orders || 0}</p>
                     <p className="text-xs text-green-600 flex items-center mt-1">
                       <CheckCircle className="w-3 h-3 mr-1" />
-                      {userStats?.order_stats?.paid || userStats?.order_stats?.completed || 0} completed
+                      {userStats?.total_orders || 0} completed
                     </p>
                   </div>
                   <div className="p-3 sm:p-4 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-lg sm:rounded-xl border border-green-200/30 flex-shrink-0">
@@ -792,26 +792,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Order Status Breakdown */}
-            {userStats?.order_stats && (
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                  <Activity className="w-5 h-5 mr-2 text-blue-600" />
-                  Order Status Overview
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {Object.entries(userStats.order_stats).map(([status, count]) => (
-                    <div key={status} className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30 hover:bg-white/40 transition-all duration-200">
-                      <div className="flex items-center justify-center mb-2">
-                        {getStatusIcon(status)}
-                      </div>
-                      <p className="text-2xl font-bold text-gray-800">{count}</p>
-                      <p className="text-xs text-gray-600 capitalize">{status.replace('_', ' ')}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Quick Actions */}
             <div className="backdrop-blur-xl bg-white/20 rounded-2xl border border-white/30 shadow-xl">
