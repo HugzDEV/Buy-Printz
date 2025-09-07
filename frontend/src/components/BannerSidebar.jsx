@@ -1553,13 +1553,15 @@ const BannerSidebar = ({
                       type="checkbox"
                       checked={!!(selectedElement?.stroke && selectedElement?.strokeWidth > 0)}
                       onChange={(e) => {
-                        if (e.target.checked) {
-                          onTextPropertyChange('stroke', selectedElement?.stroke || '#000000')
-                          onTextPropertyChange('strokeWidth', selectedElement?.strokeWidth || 2)
-                        } else {
-                          onTextPropertyChange('stroke', null)
-                          onTextPropertyChange('strokeWidth', 0)
-                        }
+                        preserveScrollPosition(() => {
+                          if (e.target.checked) {
+                            onTextPropertyChange('stroke', selectedElement?.stroke || '#000000')
+                            onTextPropertyChange('strokeWidth', selectedElement?.strokeWidth || 2)
+                          } else {
+                            onTextPropertyChange('stroke', null)
+                            onTextPropertyChange('strokeWidth', 0)
+                          }
+                        })
                       }}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
@@ -1567,28 +1569,29 @@ const BannerSidebar = ({
                   </label>
                 </div>
                 
-                {/* Stroke Color and Width */}
-                {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
-                  <div className="space-y-2 pl-6">
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs text-gray-600">Color:</label>
-                      <input
-                        type="color"
-                        value={selectedElement?.stroke || '#000000'}
-                        onChange={(e) => onTextPropertyChange('stroke', e.target.value)}
-                        className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
-                        title="Choose outline color"
-                      />
-                      <span className="text-xs text-gray-500 font-mono">
-                        {selectedElement?.stroke || '#000000'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs text-gray-600">Width:</label>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
+                {/* Stroke Color and Width - Always rendered to prevent layout shifts */}
+                <div className={`space-y-2 pl-6 transition-all duration-200 ${selectedElement?.stroke && selectedElement?.strokeWidth > 0 ? 'opacity-100 max-h-32' : 'opacity-50 max-h-0 overflow-hidden'}`}>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600">Color:</label>
+                    <input
+                      type="color"
+                      value={selectedElement?.stroke || '#000000'}
+                      onChange={(e) => preserveScrollPosition(() => onTextPropertyChange('stroke', e.target.value))}
+                      className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+                      title="Choose outline color"
+                      disabled={!(selectedElement?.stroke && selectedElement?.strokeWidth > 0)}
+                    />
+                    <span className="text-xs text-gray-500 font-mono">
+                      {selectedElement?.stroke || '#000000'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-600">Width:</label>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          preserveScrollPosition(() => {
                             const currentWidth = selectedElement?.strokeWidth || 0
                             const newWidth = Math.max(0, currentWidth - 1)
                             onTextPropertyChange('strokeWidth', newWidth)
@@ -1596,16 +1599,19 @@ const BannerSidebar = ({
                             if (newWidth === 0) {
                               onTextPropertyChange('stroke', null)
                             }
-                          }}
-                          className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold"
-                        >
-                          -
-                        </button>
-                        <span className="text-xs text-gray-700 min-w-[20px] text-center">
-                          {selectedElement?.strokeWidth || 0}px
-                        </span>
-                        <button
-                          onClick={() => {
+                          })
+                        }}
+                        className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!(selectedElement?.stroke && selectedElement?.strokeWidth > 0)}
+                      >
+                        -
+                      </button>
+                      <span className="text-xs text-gray-700 min-w-[20px] text-center">
+                        {selectedElement?.strokeWidth || 0}px
+                      </span>
+                      <button
+                        onClick={() => {
+                          preserveScrollPosition(() => {
                             const currentWidth = selectedElement?.strokeWidth || 0
                             const newWidth = Math.min(20, currentWidth + 1)
                             onTextPropertyChange('strokeWidth', newWidth)
@@ -1613,15 +1619,16 @@ const BannerSidebar = ({
                             if (newWidth > 0 && !selectedElement?.stroke) {
                               onTextPropertyChange('stroke', '#000000')
                             }
-                          }}
-                          className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold"
-                        >
-                          +
-                        </button>
-                      </div>
+                          })
+                        }}
+                        className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!(selectedElement?.stroke && selectedElement?.strokeWidth > 0)}
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
               
               {/* Text Alignment */}
