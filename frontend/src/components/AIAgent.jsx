@@ -141,7 +141,7 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-40 transition-all duration-300">
         <GlassButton
           onClick={() => setIsOpen(true)}
           className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 p-3 rounded-full"
@@ -158,7 +158,7 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 max-h-[600px]">
+    <div className="fixed bottom-6 right-6 z-40 w-96 max-h-[600px] transition-all duration-300">
       <GlassCard className="bg-white/95 backdrop-blur-md border border-white/50 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/20">
