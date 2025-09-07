@@ -476,16 +476,21 @@ const BannerCanvas = ({
       node.scaleX(1)
       node.scaleY(1)
     } else if (element.type === 'star') {
-      // For stars, update outer radius based on scale
+      // For stars, update both inner and outer radius proportionally to maintain star shape
       if (autoScaling) {
         // Auto-scaling: use the smaller scale to maintain star shape
         const scale = Math.min(node.scaleX(), node.scaleY())
         const newOuterRadius = Math.max(10, (element.outerRadius || 50) * scale)
+        const newInnerRadius = Math.max(5, (element.innerRadius || 30) * scale)
         updatedElement.outerRadius = newOuterRadius
+        updatedElement.innerRadius = newInnerRadius
       } else {
-        // Free scaling: use the larger scale
-        const newOuterRadius = Math.max(10, (element.outerRadius || 50) * Math.max(node.scaleX(), node.scaleY()))
+        // Free scaling: use the larger scale but maintain inner/outer ratio
+        const scale = Math.max(node.scaleX(), node.scaleY())
+        const newOuterRadius = Math.max(10, (element.outerRadius || 50) * scale)
+        const newInnerRadius = Math.max(5, (element.innerRadius || 30) * scale)
         updatedElement.outerRadius = newOuterRadius
+        updatedElement.innerRadius = newInnerRadius
       }
       
       // Reset scale to 1
@@ -1832,7 +1837,7 @@ const BannerCanvas = ({
                   enabledAnchors={['middle-left', 'middle-right', 'top-center', 'bottom-center', 'top-left', 'top-right', 'bottom-left', 'bottom-right']}
                   rotateEnabled={true}
                   keepRatio={autoScaling}
-                  ignoreStroke={false}
+                  ignoreStroke={selectedId && elements.find(el => el.id === selectedId)?.type === 'star'}
                   useSingleNodeRotation={true}
                   shouldOverdrawWholeArea={false}
                   anchorSize={8}
