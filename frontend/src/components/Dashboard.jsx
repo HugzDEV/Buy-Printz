@@ -18,7 +18,7 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState(null)
-  const [shoppingCart, setShoppingCart] = useState([]) // Unified cart for all orders
+  const [orders, setOrders] = useState([])
   const [templates, setTemplates] = useState([])
   
   // Debug: Log templates state changes
@@ -27,13 +27,13 @@ const Dashboard = () => {
   }, [templates])
   const [userStats, setUserStats] = useState(null)
   const [preferences, setPreferences] = useState(null)
-  const [completedDesigns, setCompletedDesigns] = useState([])
+  const [checkoutOrders, setCheckoutOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingStates, setLoadingStates] = useState({
     designs: true,
-    shoppingCart: true,
+    orders: true,
     templates: true,
-    completedDesigns: true,
+    checkoutOrders: true,
     stats: true,
     preferences: true
   })
@@ -60,7 +60,7 @@ const Dashboard = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const tabParam = searchParams.get('tab')
-    if (tabParam && ['overview', 'templates', 'cart', 'profile'].includes(tabParam)) {
+    if (tabParam && ['overview', 'templates', 'orders', 'profile'].includes(tabParam)) {
       setActiveTab(tabParam)
     }
   }, [location.search])
@@ -93,9 +93,9 @@ const Dashboard = () => {
       // Set all loading states to false to show empty states
       setLoadingStates({
         designs: false,
-        shoppingCart: false,
+        orders: false,
         templates: false,
-        completedDesigns: false,
+        checkoutOrders: false,
         stats: false,
         preferences: false
       })
@@ -179,17 +179,29 @@ const Dashboard = () => {
     }
   }
 
-    // Load unified shopping cart data (all orders - completed and pending)
+    // Load core data first (orders)
     await Promise.all([
       loadDataSafely(
         () => authService.authenticatedRequest('/api/orders'),
         (data) => {
-          const allOrders = data.orders || []
-          setShoppingCart(allOrders)
+          const orders = data.orders || []
+          setOrders(orders)
         },
         [],
-        'shoppingCart',
-        `shopping_cart_${user?.id}`
+        'orders',
+        `orders_${user?.id}`
+      ),
+      
+      // Load checkout orders (orders that reached checkout but may not be paid)
+      loadDataSafely(
+        () => authService.authenticatedRequest('/api/orders/pending'),
+        (data) => {
+          const checkoutOrders = data.orders || []
+          setCheckoutOrders(checkoutOrders)
+        },
+        [],
+        'checkoutOrders',
+        `checkout_orders_${user?.id}`
       )
     ])
 
@@ -247,6 +259,8 @@ const Dashboard = () => {
         return 'bg-green-100 text-green-800'
       case 'pending':
         return 'bg-yellow-100 text-yellow-800'
+      case 'checkout':
+        return 'bg-orange-100 text-orange-800'
       case 'processing':
         return 'bg-blue-100 text-blue-800'
       case 'shipped':
@@ -268,6 +282,8 @@ const Dashboard = () => {
         return <CheckCircle className="w-4 h-4" />
       case 'pending':
         return <Clock className="w-4 h-4" />
+      case 'checkout':
+        return <ShoppingCart className="w-4 h-4" />
       case 'processing':
         return <Activity className="w-4 h-4" />
       case 'shipped':
@@ -306,31 +322,27 @@ const Dashboard = () => {
     })
   }
 
-  // Filter shopping cart items based on search and status
-  const getOrdersByStatus = (status) => {
-    if (status === 'all') return shoppingCart
-    if (status === 'completed') {
-      return shoppingCart.filter(order => 
-        ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(order.status)
-      )
-    }
-    if (status === 'pending') {
-      return shoppingCart.filter(order => 
-        ['pending', 'processing', 'new', 'payment_failed', 'incomplete'].includes(order.status) ||
-        (order.created_at && !order.shipped_at) // Fallback: assume orders without shipping date are pending
-      )
-    }
-    return shoppingCart.filter(order => order.status === status)
-  }
+  // Create unified orders list (completed orders + checkout orders)
+  const allOrders = [
+    ...orders.filter(order => 
+      ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(order.status)
+    ),
+    ...checkoutOrders.map(order => ({
+      ...order,
+      status: order.status || 'checkout', // Mark as checkout if no status
+      isCheckoutOrder: true // Flag to identify checkout orders
+    }))
+  ]
   
-  const filteredCartItems = getOrdersByStatus(statusFilter).filter(order => {
+  const filteredOrders = allOrders.filter(order => {
     const matchesSearch = searchTerm === '' || 
       order.banner_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.banner_material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.banner_size?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id?.toLowerCase().includes(searchTerm.toLowerCase())
+      order.id.toLowerCase().includes(searchTerm.toLowerCase())
     
-    return matchesSearch
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter
+    
+    return matchesSearch && matchesStatus
   })
 
   const loadDesignInEditor = (item) => {
@@ -417,6 +429,23 @@ const Dashboard = () => {
     // Navigate to editor with order ID in URL
     navigate(`/editor?order=${order.id}`)
     toast.success('Order data loaded for reordering')
+  }
+
+  const editCheckoutOrder = (order) => {
+    // Navigate to editor with checkout order data
+    if (order.canvas_data) {
+      // Store the order data in sessionStorage for the editor to load
+      sessionStorage.setItem('checkoutOrderData', JSON.stringify({
+        orderId: order.id,
+        canvasData: order.canvas_data,
+        orderDetails: order.order_details,
+        bannerSpecs: order.banner_specs
+      }))
+      navigate('/editor')
+      toast.success('Checkout order loaded for editing')
+    } else {
+      toast.error('Order data not available for editing')
+    }
   }
 
   const reorderDesign = (design) => {
@@ -633,7 +662,7 @@ const Dashboard = () => {
             {[
               { id: 'overview', name: 'Overview', shortName: 'Home', icon: BarChart3 },
               { id: 'templates', name: 'Templates', shortName: 'Templates', icon: Layout },
-              { id: 'cart', name: 'Shopping Cart', shortName: 'Cart', icon: ShoppingCart },
+              { id: 'orders', name: 'Orders', shortName: 'Orders', icon: ShoppingBag },
               { id: 'profile', name: 'Profile', shortName: 'Profile', icon: Settings }
             ].map((tab) => (
               <button
@@ -699,7 +728,7 @@ const Dashboard = () => {
                       </div>
                     ) : (
                       <>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_designs || designs.length}</p>
                         <p className="text-xs text-green-600 flex items-center mt-1">
                           <TrendingUp className="w-3 h-3 mr-1" />
                           Active creations
@@ -732,15 +761,15 @@ const Dashboard = () => {
               <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Shopping Cart</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{shoppingCart.length}</p>
-                    <p className="text-xs text-blue-600 flex items-center mt-1">
-                      <ShoppingCart className="w-3 h-3 mr-1" />
-                      {getOrdersByStatus('completed').length} completed, {getOrdersByStatus('pending').length} pending
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Total Orders</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_orders || 0}</p>
+                    <p className="text-xs text-green-600 flex items-center mt-1">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      {userStats?.order_stats?.paid || userStats?.order_stats?.completed || 0} completed
                     </p>
                   </div>
-                  <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-lg sm:rounded-xl border border-blue-200/30 flex-shrink-0">
-                    <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-lg sm:rounded-xl border border-green-200/30 flex-shrink-0">
+                    <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
                   </div>
                 </div>
               </div>
@@ -824,9 +853,9 @@ const Dashboard = () => {
                 <h3 className="text-lg font-bold text-gray-800">Recent Orders</h3>
               </div>
               <div className="p-6">
-                {shoppingCart.slice(0, 5).length > 0 ? (
+                {orders.slice(0, 5).length > 0 ? (
                   <div className="space-y-4">
-                    {shoppingCart.slice(0, 5).map((order) => (
+                    {orders.slice(0, 5).map((order) => (
                       <div key={order.id} className="flex items-center justify-between p-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/30 hover:bg-white/40 transition-all duration-200">
                         <div className="flex items-center">
                           <Package className="w-5 h-5 text-gray-500 mr-3" />
@@ -1013,163 +1042,14 @@ const Dashboard = () => {
         )}
 
 
-        {/* Shopping Cart Tab */}
-        {activeTab === 'cart' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Shopping Cart</h2>
-                <p className="text-gray-600 text-sm mt-1">All your orders - completed and pending</p>
-              </div>
-              <div className="flex gap-2">
-                <span className="backdrop-blur-sm bg-green-400/20 px-4 py-2 rounded-xl border border-green-200/30 text-green-800 font-medium w-fit">
-                  {getOrdersByStatus('completed').length} Completed
-                </span>
-                <span className="backdrop-blur-sm bg-yellow-400/20 px-4 py-2 rounded-xl border border-yellow-200/30 text-yellow-800 font-medium w-fit">
-                  {getOrdersByStatus('pending').length} Pending
-                </span>
-              </div>
-            </div>
 
-            {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search orders..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 w-full sm:w-64"
-                />
-              </div>
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-10 pr-8 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 appearance-none"
-                >
-                  <option value="all">All Orders</option>
-                  <option value="completed">Completed</option>
-                  <option value="pending">Pending</option>
-                  <option value="paid">Paid</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Show orders based on filter */}
-            {filteredCartItems.length === 0 ? (
-               <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-12 text-center border border-white/30 shadow-xl">
-                 <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                 <h3 className="text-lg font-bold text-gray-800 mb-2">No orders found</h3>
-                 <p className="text-gray-600 mb-6">
-                   {statusFilter === 'all' 
-                     ? "Your shopping cart is empty. Create your first design to get started!"
-                     : `No ${statusFilter} orders found. Try adjusting your search or filter.`
-                   }
-                 </p>
-                <Link 
-                  to="/editor" 
-                  onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium inline-flex items-center shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create New Order
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {filteredCartItems.map((order) => (
-                  <div key={order.id} className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="font-bold text-gray-800 text-lg">Order #{order.id.slice(-8)}</h3>
-                        <p className="text-sm text-gray-600">
-                          Created {formatDate(order.created_at)}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center gap-1">
-                          {getStatusIcon(order.status)}
-                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
-                        </div>
-                        <span className="text-lg font-bold text-gray-800">
-                          {formatCurrency(order.total_amount)}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
-                        <div className="text-xs text-gray-600 mb-1">Banner Size</div>
-                        <div className="font-medium text-gray-800">
-                          {order.order_details?.banner_size || 'Not specified'}
-                        </div>
-                      </div>
-                      <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
-                        <div className="text-xs text-gray-600 mb-1">Material</div>
-                        <div className="font-medium text-gray-800">
-                          {order.order_details?.banner_material || 'Standard Vinyl'}
-                        </div>
-                      </div>
-                      <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
-                        <div className="text-xs text-gray-600 mb-1">Finish</div>
-                        <div className="font-medium text-gray-800">
-                          {order.order_details?.banner_finish || 'Standard'}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-3">
-                      {['pending', 'processing', 'new', 'payment_failed', 'incomplete'].includes(order.status) ? (
-                        <button
-                          onClick={() => reorderDesign(order)}
-                          className="flex-1 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
-                        >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Resume & Complete Order
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => reorderDesign(order)}
-                          className="flex-1 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
-                        >
-                          <Copy className="w-4 h-4 mr-2" />
-                          Reorder
-                        </button>
-                      )}
-                      <button
-                        onClick={() => {
-                          setSelectedOrder(order)
-                          setShowOrderModal(true)
-                        }}
-                        className="px-4 py-3 text-sm font-medium text-gray-700 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 flex items-center justify-center"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        View Details
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Profile Tab */}
-        {activeTab === 'profile' && (
+        {/* Orders Tab */}
+        {activeTab === 'orders' && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Order History</h2>
-                <p className="text-gray-600">{userStats?.total_orders || 0} completed orders</p>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Orders</h2>
+                <p className="text-gray-600">{allOrders.length} total orders ({checkoutOrders.length} checkout, {orders.filter(o => ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(o.status)).length} completed)</p>
               </div>
               
               {/* Search and Filter */}
@@ -1191,8 +1071,9 @@ const Dashboard = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="pl-10 pr-8 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 appearance-none"
                   >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
+                    <option value="all">All Orders</option>
+                    <option value="checkout">Checkout (Unpaid)</option>
+                    <option value="pending">Pending Payment</option>
                     <option value="paid">Paid</option>
                     <option value="processing">Processing</option>
                     <option value="shipped">Shipped</option>
@@ -1280,6 +1161,15 @@ const Dashboard = () => {
                           <Eye className="w-4 h-4 mr-1" />
                           View Details
                         </button>
+                        {order.isCheckoutOrder && (
+                          <button 
+                            onClick={() => editCheckoutOrder(order)}
+                            className="px-4 py-2 rounded-lg text-sm font-medium text-orange-600 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200 flex items-center"
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            Edit Order
+                          </button>
+                        )}
                         {order.status === 'delivered' && (
                           <button 
                             onClick={() => reorderItem(order)}
@@ -1396,7 +1286,7 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <Palette className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">{userStats?.total_designs || (completedDesigns.length + designs.length)}</p>
+                  <p className="text-2xl font-bold text-gray-800">{userStats?.total_designs || designs.length}</p>
                   <p className="text-xs text-gray-600">Total Designs</p>
                 </div>
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
