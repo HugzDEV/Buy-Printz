@@ -1512,50 +1512,50 @@ const BannerCanvas = ({
           </div>
 
           {/* Right Section - Action Buttons */}
-          <div className="flex items-center gap-1">
-            {/* Mobile: All toolbar tools */}
-            <div className="sm:hidden flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+            {/* Mobile: Compact toolbar tools */}
+            <div className="sm:hidden flex items-center gap-0.5 min-w-0 flex-shrink-0">
               <GlassButton 
                 onClick={() => setAutoScaling(!autoScaling)} 
                 variant={autoScaling ? "primary" : "default"}
-                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
                 title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
               >
-                <Maximize2 className="w-3.5 h-3.5" />
+                <Maximize2 className="w-3 h-3" />
               </GlassButton>
               
               <GlassButton 
                 onClick={() => setShowGrid(!showGrid)} 
                 variant={showGrid ? "primary" : "default"}
-                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
                 title={showGrid ? "Hide Grid" : "Show Grid"}
               >
-                <Grid3X3 className="w-3.5 h-3.5" />
+                <Grid3X3 className="w-3 h-3" />
               </GlassButton>
               
               <GlassButton 
                 onClick={() => setShowGuides(!showGuides)} 
                 variant={showGuides ? "primary" : "default"}
-                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
                 title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
               >
-                {showGuides ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                {showGuides ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
               </GlassButton>
               
-              <div className="w-px h-5 bg-white/20 mx-1" />
+              <div className="w-px h-4 bg-white/20 mx-0.5 flex-shrink-0" />
               
               <GlassButton 
                 onClick={handleClearCanvas} 
                 disabled={!hasElements}
                 variant="warning" 
-                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border-2 border-orange-400/50" 
-                title="Clear Entire Canvas - Removes all elements"
+                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border border-orange-400/50 flex-shrink-0" 
+                title="Clear Canvas"
               >
-                <Eraser className="w-3.5 h-3.5" />
+                <Eraser className="w-3 h-3" />
               </GlassButton>
               
-              <GlassButton onClick={onExport} variant="primary" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Export PDF">
-                <Download className="w-3.5 h-3.5" />
+              <GlassButton onClick={onExport} variant="primary" className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0" title="Export PDF">
+                <Download className="w-3 h-3" />
               </GlassButton>
             </div>
             

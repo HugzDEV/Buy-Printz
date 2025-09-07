@@ -841,8 +841,8 @@ const BannerSidebar = ({
       
       <div className="p-4 space-y-4">
         
-        {/* Mobile Header with Close Button */}
-        <div className="flex items-center justify-between sm:hidden">
+        {/* Mobile & Landscape Header with Close Button */}
+        <div className="flex items-center justify-between md:hidden">
           <div className="text-left">
             <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
               Design Tools
@@ -858,7 +858,7 @@ const BannerSidebar = ({
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden sm:block text-center py-4">
+        <div className="hidden md:block text-center py-4">
           <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
             Design Tools
           </h2>

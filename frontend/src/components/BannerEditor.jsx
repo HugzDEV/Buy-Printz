@@ -2265,16 +2265,6 @@ const BannerEditorNew = () => {
           </button>
         </div>
 
-        {/* Mobile Controls - Show on Mobile */}
-        <div className="flex items-center gap-2 md:hidden">
-          <button
-            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-            className="mobile-hamburger p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[48px] min-h-[48px] flex items-center justify-center z-50"
-          >
-            {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
         {/* Right Section */}
         <div className="action-buttons flex items-center gap-2 md:gap-3">
           <button
@@ -2292,6 +2282,14 @@ const BannerEditorNew = () => {
             <ShoppingCart className="w-3 h-3 md:w-4 md:h-4" />
             <span className="hidden sm:inline">Create Order</span>
             <span className="sm:hidden">Order</span>
+          </button>
+          
+          {/* Mobile Hamburger - After action buttons */}
+          <button
+            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+            className="mobile-hamburger md:hidden p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center z-50"
+          >
+            {isMobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
         
