@@ -1492,18 +1492,21 @@ const BannerCanvas = ({
               <div className="w-px h-5 bg-white/20 mx-1" />
             </div>
             
-            {/* Mobile & Desktop: Zoom Controls */}
-            <GlassButton onClick={zoomOut} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
-              <ZoomOut className="w-3.5 h-3.5" />
-            </GlassButton>
+            {/* Desktop: Full Zoom Controls */}
+            <div className="hidden sm:flex items-center gap-1">
+              <GlassButton onClick={zoomOut} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
+                <ZoomOut className="w-3.5 h-3.5" />
+              </GlassButton>
+              
+              <GlassButton onClick={resetZoom} className="px-2 py-1.5 text-xs min-w-[50px] min-h-[36px] flex items-center justify-center">
+                {Math.round(scale * 100)}%
+              </GlassButton>
+              
+              <GlassButton onClick={zoomIn} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
+                <ZoomIn className="w-3.5 h-3.5" />
+              </GlassButton>
+            </div>
             
-            <GlassButton onClick={resetZoom} className="px-2 py-1.5 text-xs min-w-[50px] min-h-[36px] flex items-center justify-center">
-              {Math.round(scale * 100)}%
-            </GlassButton>
-            
-            <GlassButton onClick={zoomIn} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
-              <ZoomIn className="w-3.5 h-3.5" />
-            </GlassButton>
           </div>
 
           {/* Center Section - Canvas Info (Desktop Only) */}
@@ -1517,34 +1520,49 @@ const BannerCanvas = ({
           </div>
 
           {/* Right Section - Action Buttons */}
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
             {/* Mobile: Compact toolbar tools */}
-            <div className="sm:hidden flex items-center gap-0.5 min-w-0 flex-shrink-0">
+            <div className="sm:hidden flex items-center gap-0.5 min-w-0 flex-shrink-0 flex-1 justify-end">
+              {/* Mobile: Compact Zoom Controls */}
+              <GlassButton onClick={zoomOut} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
+                <ZoomOut className="w-2.5 h-2.5" />
+              </GlassButton>
+              
+              <GlassButton onClick={resetZoom} className="px-1 py-1 text-xs min-w-[35px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
+                {Math.round(scale * 100)}%
+              </GlassButton>
+              
+              <GlassButton onClick={zoomIn} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Zoom In">
+                <ZoomIn className="w-2.5 h-2.5" />
+              </GlassButton>
+              
+              <div className="w-px h-4 bg-white/20 mx-0.5 flex-shrink-0" />
+              
               <GlassButton 
                 onClick={() => setAutoScaling(!autoScaling)} 
                 variant={autoScaling ? "primary" : "default"}
-                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
                 title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
               >
-                <Maximize2 className="w-3 h-3" />
+                <Maximize2 className="w-2.5 h-2.5" />
               </GlassButton>
               
               <GlassButton 
                 onClick={() => setShowGrid(!showGrid)} 
                 variant={showGrid ? "primary" : "default"}
-                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
                 title={showGrid ? "Hide Grid" : "Show Grid"}
               >
-                <Grid3X3 className="w-3 h-3" />
+                <Grid3X3 className="w-2.5 h-2.5" />
               </GlassButton>
               
               <GlassButton 
                 onClick={() => setShowGuides(!showGuides)} 
                 variant={showGuides ? "primary" : "default"}
-                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
                 title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
               >
-                {showGuides ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                {showGuides ? <Eye className="w-2.5 h-2.5" /> : <EyeOff className="w-2.5 h-2.5" />}
               </GlassButton>
               
               <div className="w-px h-4 bg-white/20 mx-0.5 flex-shrink-0" />
@@ -1553,14 +1571,14 @@ const BannerCanvas = ({
                 onClick={handleClearCanvas} 
                 disabled={!hasElements}
                 variant="warning" 
-                className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border border-orange-400/50 flex-shrink-0" 
+                className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border border-orange-400/50 flex-shrink-0" 
                 title="Clear Canvas"
               >
-                <Eraser className="w-3 h-3" />
+                <Eraser className="w-2.5 h-2.5" />
               </GlassButton>
               
-              <GlassButton onClick={onExport} variant="primary" className="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0" title="Export PDF">
-                <Download className="w-3 h-3" />
+              <GlassButton onClick={onExport} variant="primary" className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Export PDF">
+                <Download className="w-2.5 h-2.5" />
               </GlassButton>
             </div>
             
