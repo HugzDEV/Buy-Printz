@@ -447,7 +447,7 @@ const BannerCanvas = ({
         updatedElement.width = newWidth
         // Keep height as 'auto' for proper text wrapping
         updatedElement.height = 'auto'
-      } else {
+        } else {
         // Free scaling: allow independent width/height scaling
         const newWidth = Math.max(50, node.width() * node.scaleX())
         const newHeight = Math.max(30, node.height() * node.scaleY())
@@ -520,7 +520,7 @@ const BannerCanvas = ({
         const scale = Math.min(node.scaleX(), node.scaleY())
         const newPoints = points.map(point => point * scale)
         updatedElement.points = newPoints
-      } else {
+          } else {
         // Free scaling: allow independent X/Y scaling
         const newPoints = points.map((point, index) => {
           if (index % 2 === 0) {
@@ -567,7 +567,7 @@ const BannerCanvas = ({
         
         updatedElement.width = newWidth
         updatedElement.height = newHeight
-      } else {
+        } else {
         // Free scaling: allow independent width/height scaling
         const newWidth = Math.max(10, (element.width || 200) * node.scaleX())
         const newHeight = Math.max(10, (element.height || 200) * node.scaleY())
@@ -1508,17 +1508,17 @@ const BannerCanvas = ({
             <div className="hidden sm:flex items-center gap-1">
               <GlassButton onClick={zoomOut} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <ZoomOut className="w-3.5 h-3.5" />
-              </GlassButton>
-              
+            </GlassButton>
+            
               <GlassButton onClick={resetZoom} className="px-2 py-1.5 text-xs min-w-[50px] min-h-[36px] flex items-center justify-center">
-                {Math.round(scale * 100)}%
-              </GlassButton>
-              
+              {Math.round(scale * 100)}%
+            </GlassButton>
+            
               <GlassButton onClick={zoomIn} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <ZoomIn className="w-3.5 h-3.5" />
-              </GlassButton>
-            </div>
-            
+            </GlassButton>
+          </div>
+
           </div>
 
           {/* Center Section - Canvas Info (Desktop Only) */}
@@ -1559,24 +1559,24 @@ const BannerCanvas = ({
                 <Maximize2 className="w-2.5 h-2.5" />
               </GlassButton>
               
-              <GlassButton 
-                onClick={() => setShowGrid(!showGrid)} 
-                variant={showGrid ? "primary" : "default"}
+            <GlassButton 
+              onClick={() => setShowGrid(!showGrid)} 
+              variant={showGrid ? "primary" : "default"}
                 className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
-                title={showGrid ? "Hide Grid" : "Show Grid"}
-              >
+              title={showGrid ? "Hide Grid" : "Show Grid"}
+            >
                 <Grid3X3 className="w-2.5 h-2.5" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={() => setShowGuides(!showGuides)} 
-                variant={showGuides ? "primary" : "default"}
+            </GlassButton>
+            
+            <GlassButton 
+              onClick={() => setShowGuides(!showGuides)} 
+              variant={showGuides ? "primary" : "default"}
                 className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
-                title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
-              >
+              title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
+            >
                 {showGuides ? <Eye className="w-2.5 h-2.5" /> : <EyeOff className="w-2.5 h-2.5" />}
-              </GlassButton>
-              
+            </GlassButton>
+            
               <div className="w-px h-4 bg-white/20 mx-0.5 flex-shrink-0" />
               
               <GlassButton 
@@ -1587,11 +1587,11 @@ const BannerCanvas = ({
                 title="Clear Canvas"
               >
                 <Eraser className="w-2.5 h-2.5" />
-              </GlassButton>
-              
+            </GlassButton>
+            
               <GlassButton onClick={onExport} variant="primary" className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Export PDF">
                 <Download className="w-2.5 h-2.5" />
-              </GlassButton>
+            </GlassButton>
             </div>
             
             {/* Desktop: Full controls */}
@@ -2249,7 +2249,7 @@ const BannerCanvas = ({
                         >
                           +
                         </button>
-                      </div>
+            </div>
                     </>
                   )}
                 </div>
@@ -2465,7 +2465,7 @@ const BannerCanvas = ({
               >
                 <Redo className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
               </GlassButton>
-            </div>
+          </div>
           </div>
         </div>
       </div>

@@ -58,8 +58,6 @@ const BannerSidebar = ({
 
   const [searchTerm, setSearchTerm] = useState('')
   const [sizeCategory, setSizeCategory] = useState('landscape')
-  const [customWidth, setCustomWidth] = useState('800')
-  const [customHeight, setCustomHeight] = useState('400')
   const [uploadedImages, setUploadedImages] = useState([])
 
   // QR Code state
@@ -483,17 +481,17 @@ const BannerSidebar = ({
 
   const toggleSection = (sectionKey) => {
     preserveScrollPosition(() => {
-      setExpandedSections(prev => ({
-        ...prev,
-        [sectionKey]: !prev[sectionKey]
-      }))
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }))
     })
   }
 
   const handleAssetClick = (asset) => {
     preserveScrollPosition(() => {
-      const imagePath = `/assets/images/${asset.file}`
-      onAddAsset(imagePath, asset.name)
+    const imagePath = `/assets/images/${asset.file}`
+    onAddAsset(imagePath, asset.name)
     })
   }
 
@@ -1063,32 +1061,45 @@ const BannerSidebar = ({
                 {/* Custom Size Input */}
                 {sizeCategory === 'custom' && (
                   <div className="mt-3 pt-3 border-t border-white/20">
+                    <div className="mb-3">
+                      <div className="text-xs text-gray-600 mb-1">Current Custom Size</div>
+                      <div className="text-sm font-medium text-gray-800 bg-white/40 rounded-lg px-3 py-2">
+                        {canvasSize.width} × {canvasSize.height}px
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="text-xs text-gray-600 block mb-1">Width (px)</label>
                         <input
                           type="number"
-                          value={customWidth}
-                          onChange={(e) => setCustomWidth(e.target.value)}
                           className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 hover:border-white/50 active:border-blue-500/50"
                           placeholder="800"
+                          defaultValue={canvasSize.width}
                         />
                       </div>
                       <div>
                         <label className="text-xs text-gray-600 block mb-1">Height (px)</label>
                         <input
                           type="number"
-                          value={customHeight}
-                          onChange={(e) => setCustomHeight(e.target.value)}
                           className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 hover:border-white/50 active:border-blue-500/50"
                           placeholder="400"
+                          defaultValue={canvasSize.height}
                         />
                       </div>
                     </div>
                     <button
                       onClick={() => {
-                        if (customWidth && customHeight) {
-                          onChangeCanvasSize?.(`Custom ${customWidth}x${customHeight}`)
+                        const widthInput = document.querySelector('input[placeholder="800"]')
+                        const heightInput = document.querySelector('input[placeholder="400"]')
+                        if (widthInput && heightInput && widthInput.value.trim() && heightInput.value.trim()) {
+                          const width = parseInt(widthInput.value.trim())
+                          const height = parseInt(heightInput.value.trim())
+                          if (!isNaN(width) && !isNaN(height) && width >= 100 && width <= 5000 && height >= 100 && height <= 5000) {
+                            onChangeCanvasSize?.(`Custom ${width}x${height}`)
+                            // Update the input values to reflect the new canvas size
+                            widthInput.value = width.toString()
+                            heightInput.value = height.toString()
+                          }
                         }
                       }}
                       className="w-full mt-2 px-3 py-1 bg-green-500/20 hover:bg-green-500/30 active:bg-green-500/40 text-green-700 border border-green-400/30 rounded text-xs font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-500/50 shadow-sm hover:shadow-md"
