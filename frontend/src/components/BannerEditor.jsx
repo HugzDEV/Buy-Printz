@@ -1340,6 +1340,694 @@ const BannerEditorNew = () => {
           lineHeight: 1.2
         }
       ]
+    },
+
+    // NEW PROFESSIONAL TEMPLATES - Built with Real Assets
+    // RESTAURANT & FOOD TEMPLATES
+    {
+      id: 'pizza-special-offer',
+      name: 'Pizza Special Offer',
+      category: 'Restaurant & Food',
+      description: 'Eye-catching pizza promotion with food icons and special pricing',
+      tags: ['pizza', 'restaurant', 'food', 'special offer'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 800, height: 400,
+          fill: '#FF6B35'
+        },
+        {
+          id: generateId('pizza-bg'),
+          type: 'image',
+          x: 50, y: 50,
+          width: 200, height: 200,
+          src: '/assets/images/food/Pizza.svg',
+          opacity: 0.1
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 300, y: 80,
+          text: 'PIZZA SPECIAL',
+          fontSize: 48,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FFFFFF',
+          stroke: '#000000',
+          strokeWidth: 2
+        },
+        {
+          id: generateId('text2'),
+          type: 'text',
+          x: 300, y: 140,
+          text: 'Buy 2 Get 1 FREE',
+          fontSize: 24,
+          fontFamily: 'Inter',
+          fill: '#FFD700',
+          stroke: '#000000',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('text3'),
+          type: 'text',
+          x: 300, y: 200,
+          text: 'Starting at $12.99',
+          fontSize: 20,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        },
+        {
+          id: generateId('text4'),
+          type: 'text',
+          x: 300, y: 250,
+          text: 'Call: (555) 123-PIZZA',
+          fontSize: 18,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        },
+        {
+          id: generateId('qrcode'),
+          type: 'qrcode',
+          x: 600, y: 250,
+          width: 120, height: 120,
+          qrData: {
+            text: 'https://yourrestaurant.com/menu',
+            color: '#FFFFFF',
+            backgroundColor: '#000000'
+          }
+        }
+      ]
+    },
+
+    {
+      id: 'coffee-shop-opening',
+      name: 'Coffee Shop Grand Opening',
+      category: 'Restaurant & Food',
+      description: 'Elegant coffee shop announcement with warm colors and coffee icons',
+      tags: ['coffee', 'grand opening', 'restaurant', 'cafe'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 800, height: 400,
+          fill: '#8B4513'
+        },
+        {
+          id: generateId('coffee-bg'),
+          type: 'image',
+          x: 50, y: 100,
+          width: 150, height: 150,
+          src: '/assets/images/food/Coffee.svg',
+          opacity: 0.2
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 250, y: 60,
+          text: 'GRAND OPENING',
+          fontSize: 42,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FFFFFF',
+          stroke: '#8B4513',
+          strokeWidth: 2
+        },
+        {
+          id: generateId('text2'),
+          type: 'text',
+          x: 250, y: 120,
+          text: 'Brew & Bean Café',
+          fontSize: 32,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FFD700'
+        },
+        {
+          id: generateId('text3'),
+          type: 'text',
+          x: 250, y: 170,
+          text: 'Saturday, March 15th',
+          fontSize: 20,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        },
+        {
+          id: generateId('text4'),
+          type: 'text',
+          x: 250, y: 200,
+          text: '10:00 AM - 6:00 PM',
+          fontSize: 18,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        },
+        {
+          id: generateId('text5'),
+          type: 'text',
+          x: 250, y: 240,
+          text: 'FREE Coffee for First 100 Customers!',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#FFD700',
+          fontWeight: 'bold'
+        },
+        {
+          id: generateId('text6'),
+          type: 'text',
+          x: 250, y: 280,
+          text: '123 Main Street, Downtown',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        }
+      ]
+    },
+
+    {
+      id: 'construction-safety-first',
+      name: 'Construction Safety First',
+      category: 'Construction',
+      description: 'Professional construction safety banner with industry icons',
+      tags: ['construction', 'safety', 'professional', 'building'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 800, height: 400,
+          fill: '#FFA500'
+        },
+        {
+          id: generateId('construction-bg'),
+          type: 'image',
+          x: 50, y: 50,
+          width: 200, height: 200,
+          src: '/assets/images/Construction/BANNER-1_Constr.svg',
+          opacity: 0.15
+        },
+        {
+          id: generateId('text'),
+          type: 'text',
+          x: 300, y: 80,
+          text: 'SAFETY FIRST',
+          fontSize: 48,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FFFFFF',
+          stroke: '#000000',
+          strokeWidth: 3
+        },
+        {
+          id: generateId('text2'),
+          type: 'text',
+          x: 300, y: 140,
+          text: 'BuildRight Construction',
+          fontSize: 28,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#000000'
+        },
+        {
+          id: generateId('text3'),
+          type: 'text',
+          x: 300, y: 180,
+          text: 'Building Tomorrow, Safely Today',
+          fontSize: 20,
+          fontFamily: 'Inter',
+          fill: '#000000'
+        },
+        {
+          id: generateId('text4'),
+          type: 'text',
+          x: 300, y: 220,
+          text: 'Licensed & Insured • 20+ Years Experience',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#000000'
+        },
+        {
+          id: generateId('text5'),
+          type: 'text',
+          x: 300, y: 250,
+          text: 'Call: (555) 123-BUILD',
+          fontSize: 18,
+          fontFamily: 'Inter',
+          fill: '#000000',
+          fontWeight: 'bold'
+        },
+        {
+          id: generateId('text6'),
+          type: 'text',
+          x: 300, y: 280,
+          text: 'www.buildrightconstruction.com',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#000000'
+        }
+      ]
+    },
+
+    // ENHANCED PROFESSIONAL TEMPLATES - Showcasing All Editor Features
+    {
+      id: 'tech-startup-launch',
+      name: 'Tech Startup Launch',
+      category: 'Business & Tech',
+      description: 'Modern tech startup with icons, shapes, and QR code integration',
+      tags: ['startup', 'tech', 'launch', 'modern'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 800, height: 400,
+          fill: '#1E293B'
+        },
+        {
+          id: generateId('gradient-shape'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 300, height: 400,
+          fill: '#3B82F6',
+          opacity: 0.8
+        },
+        {
+          id: generateId('tech-icon'),
+          type: 'image',
+          x: 50, y: 100,
+          width: 120, height: 120,
+          src: '/assets/images/icons/Cloud Computing.svg',
+          opacity: 0.9
+        },
+        {
+          id: generateId('main-text'),
+          type: 'text',
+          x: 350, y: 80,
+          text: 'TECHNOVATE',
+          fontSize: 48,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FFFFFF',
+          stroke: '#1E293B',
+          strokeWidth: 2
+        },
+        {
+          id: generateId('sub-text'),
+          type: 'text',
+          x: 350, y: 140,
+          text: 'Revolutionary AI Platform',
+          fontSize: 24,
+          fontFamily: 'Inter',
+          fill: '#60A5FA',
+          stroke: '#1E293B',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('features-text'),
+          type: 'text',
+          x: 350, y: 180,
+          text: '✓ Machine Learning ✓ Real-time Analytics ✓ Cloud Integration',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#E2E8F0'
+        },
+        {
+          id: generateId('cta-text'),
+          type: 'text',
+          x: 350, y: 220,
+          text: 'Join the Future Today!',
+          fontSize: 20,
+          fontFamily: 'Inter',
+          fill: '#FBBF24',
+          fontWeight: 'bold',
+          stroke: '#1E293B',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('website-text'),
+          type: 'text',
+          x: 350, y: 260,
+          text: 'www.technovate.ai',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        },
+        {
+          id: generateId('qr-code'),
+          type: 'qrcode',
+          x: 600, y: 200,
+          width: 120, height: 120,
+          qrData: {
+            text: 'https://technovate.ai/signup',
+            color: '#FFFFFF',
+            backgroundColor: '#1E293B'
+          }
+        }
+      ]
+    },
+
+    {
+      id: 'fitness-gym-promotion',
+      name: 'Fitness Gym Promotion',
+      category: 'Health & Fitness',
+      description: 'Dynamic fitness promotion with icons, shapes, and modern design',
+      tags: ['fitness', 'gym', 'health', 'promotion'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 800, height: 400,
+          fill: '#DC2626'
+        },
+        {
+          id: generateId('circle-bg'),
+          type: 'circle',
+          x: 600, y: 50,
+          width: 150, height: 150,
+          fill: '#FBBF24',
+          opacity: 0.3
+        },
+        {
+          id: generateId('fitness-icon'),
+          type: 'image',
+          x: 50, y: 100,
+          width: 150, height: 150,
+          src: '/assets/images/medical assets/DrawKit Vector Medical Health Icons/medical-1.svg',
+          opacity: 0.2
+        },
+        {
+          id: generateId('main-text'),
+          type: 'text',
+          x: 250, y: 60,
+          text: 'POWER GYM',
+          fontSize: 52,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FFFFFF',
+          stroke: '#DC2626',
+          strokeWidth: 3
+        },
+        {
+          id: generateId('offer-text'),
+          type: 'text',
+          x: 250, y: 130,
+          text: 'NEW YEAR SPECIAL',
+          fontSize: 28,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FBBF24',
+          stroke: '#DC2626',
+          strokeWidth: 2
+        },
+        {
+          id: generateId('deal-text'),
+          type: 'text',
+          x: 250, y: 180,
+          text: '50% OFF First Month',
+          fontSize: 24,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF',
+          stroke: '#DC2626',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('features-text'),
+          type: 'text',
+          x: 250, y: 220,
+          text: '✓ 24/7 Access ✓ Personal Training ✓ Group Classes',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#FEF2F2'
+        },
+        {
+          id: generateId('contact-text'),
+          type: 'text',
+          x: 250, y: 260,
+          text: 'Call: (555) 123-FIT',
+          fontSize: 18,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF',
+          fontWeight: 'bold'
+        },
+        {
+          id: generateId('address-text'),
+          type: 'text',
+          x: 250, y: 290,
+          text: '789 Fitness Street, Health District',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        },
+        {
+          id: generateId('qr-code'),
+          type: 'qrcode',
+          x: 600, y: 220,
+          width: 120, height: 120,
+          qrData: {
+            text: 'https://powergym.com/signup',
+            color: '#FFFFFF',
+            backgroundColor: '#DC2626'
+          }
+        }
+      ]
+    },
+
+    {
+      id: 'real-estate-luxury',
+      name: 'Luxury Real Estate',
+      category: 'Real Estate',
+      description: 'Premium real estate listing with elegant design and QR code',
+      tags: ['real estate', 'luxury', 'property', 'elegant'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 800, height: 400,
+          fill: '#0F172A'
+        },
+        {
+          id: generateId('gold-accent'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 200, height: 400,
+          fill: '#FBBF24',
+          opacity: 0.9
+        },
+        {
+          id: generateId('luxury-icon'),
+          type: 'image',
+          x: 50, y: 120,
+          width: 100, height: 100,
+          src: '/assets/images/icons/Home.svg',
+          opacity: 0.8
+        },
+        {
+          id: generateId('main-text'),
+          type: 'text',
+          x: 250, y: 80,
+          text: 'LUXURY LIVING',
+          fontSize: 48,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FFFFFF',
+          stroke: '#0F172A',
+          strokeWidth: 2
+        },
+        {
+          id: generateId('property-text'),
+          type: 'text',
+          x: 250, y: 140,
+          text: 'Exclusive Waterfront Estate',
+          fontSize: 28,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#FBBF24',
+          stroke: '#0F172A',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('price-text'),
+          type: 'text',
+          x: 250, y: 180,
+          text: 'Starting at $2.5M',
+          fontSize: 24,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF',
+          stroke: '#0F172A',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('features-text'),
+          type: 'text',
+          x: 250, y: 220,
+          text: '✓ 5 Bedrooms ✓ 4 Bathrooms ✓ Ocean View ✓ Private Dock',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#E2E8F0'
+        },
+        {
+          id: generateId('agent-text'),
+          type: 'text',
+          x: 250, y: 260,
+          text: 'Sarah Johnson, Luxury Specialist',
+          fontSize: 18,
+          fontFamily: 'Inter',
+          fill: '#FBBF24',
+          fontWeight: 'bold'
+        },
+        {
+          id: generateId('contact-text'),
+          type: 'text',
+          x: 250, y: 290,
+          text: 'Call: (555) 123-LUXE',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#FFFFFF'
+        },
+        {
+          id: generateId('qr-code'),
+          type: 'qrcode',
+          x: 600, y: 200,
+          width: 120, height: 120,
+          qrData: {
+            text: 'https://luxuryrealestate.com/property/123',
+            color: '#FFFFFF',
+            backgroundColor: '#0F172A'
+          }
+        }
+      ]
+    },
+
+    {
+      id: 'wedding-announcement',
+      name: 'Wedding Announcement',
+      category: 'Events & Parties',
+      description: 'Elegant wedding announcement with romantic design and QR code',
+      tags: ['wedding', 'announcement', 'romantic', 'elegant'],
+      orientation: 'landscape',
+      recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
+      elements: [
+        {
+          id: generateId('rect'),
+          type: 'rect',
+          x: 0, y: 0,
+          width: 800, height: 400,
+          fill: '#F8FAFC'
+        },
+        {
+          id: generateId('romantic-bg'),
+          type: 'circle',
+          x: 100, y: 100,
+          width: 120, height: 120,
+          fill: '#FECACA',
+          opacity: 0.3
+        },
+        {
+          id: generateId('romantic-bg2'),
+          type: 'circle',
+          x: 600, y: 200,
+          width: 100, height: 100,
+          fill: '#FED7D7',
+          opacity: 0.3
+        },
+        {
+          id: generateId('heart-icon'),
+          type: 'image',
+          x: 50, y: 150,
+          width: 80, height: 80,
+          src: '/assets/images/icons/Heart.svg',
+          opacity: 0.4
+        },
+        {
+          id: generateId('main-text'),
+          type: 'text',
+          x: 200, y: 80,
+          text: 'SAVE THE DATE',
+          fontSize: 42,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#DC2626',
+          stroke: '#FFFFFF',
+          strokeWidth: 2
+        },
+        {
+          id: generateId('couple-text'),
+          type: 'text',
+          x: 200, y: 130,
+          text: 'Sarah & Michael',
+          fontSize: 36,
+          fontFamily: 'Inter',
+          fontWeight: 'bold',
+          fill: '#1E293B',
+          stroke: '#FFFFFF',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('date-text'),
+          type: 'text',
+          x: 200, y: 180,
+          text: 'June 15th, 2024',
+          fontSize: 24,
+          fontFamily: 'Inter',
+          fill: '#DC2626',
+          stroke: '#FFFFFF',
+          strokeWidth: 1
+        },
+        {
+          id: generateId('time-text'),
+          type: 'text',
+          x: 200, y: 210,
+          text: '4:00 PM Ceremony',
+          fontSize: 20,
+          fontFamily: 'Inter',
+          fill: '#1E293B'
+        },
+        {
+          id: generateId('venue-text'),
+          type: 'text',
+          x: 200, y: 240,
+          text: 'Garden Manor Estate',
+          fontSize: 18,
+          fontFamily: 'Inter',
+          fill: '#1E293B'
+        },
+        {
+          id: generateId('rsvp-text'),
+          type: 'text',
+          x: 200, y: 280,
+          text: 'RSVP by May 1st',
+          fontSize: 16,
+          fontFamily: 'Inter',
+          fill: '#DC2626',
+          fontWeight: 'bold'
+        },
+        {
+          id: generateId('qr-code'),
+          type: 'qrcode',
+          x: 600, y: 200,
+          width: 120, height: 120,
+          qrData: {
+            text: 'https://sarahandmichael.com/rsvp',
+            color: '#DC2626',
+            backgroundColor: '#FFFFFF'
+          }
+        }
+      ]
     }
   ]
 

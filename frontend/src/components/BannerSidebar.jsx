@@ -1768,17 +1768,27 @@ const BannerSidebar = ({
             <div className="px-4 pb-4 space-y-4">
               {/* User Templates */}
               {userTemplates.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">My Templates</h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-gray-800">My Templates</h4>
+                    <span className="text-xs text-gray-500 bg-green-100 px-2 py-1 rounded-full">
+                      {userTemplates.length} saved
+                    </span>
+                  </div>
+                  <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                     {userTemplates.map((template) => (
                       <button
                         key={template.id}
                         onClick={() => onLoadTemplate(template)}
-                        className="w-full text-left p-3 bg-white/20 hover:bg-white/30 rounded-lg transition-colors border border-white/30"
+                        className="w-full text-left p-3 bg-white/15 hover:bg-white/25 active:bg-white/35 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/40 transform hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-green-500/50 shadow-sm hover:shadow-md group"
                       >
-                        <div className="font-medium text-gray-800 text-sm">{template.name}</div>
-                        <div className="text-xs text-gray-600">{template.description}</div>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="font-semibold text-gray-800 text-sm group-hover:text-green-700 transition-colors duration-200">
+                            {template.name}
+                          </div>
+                          <div className="w-2 h-2 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                        </div>
+                        <div className="text-xs text-gray-600 leading-relaxed">{template.description}</div>
                       </button>
                     ))}
                   </div>
@@ -1787,37 +1797,111 @@ const BannerSidebar = ({
 
               {/* Professional Templates */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Professional Templates</h4>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-gray-800">Professional Templates</h4>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                    {bannerTemplates.length} templates
+                  </span>
+                </div>
+                
+                <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   {bannerTemplates.map((template) => (
                     <button
                       key={template.id}
                       onClick={() => onLoadTemplate(template)}
-                      className="w-full text-left p-3 bg-white/20 hover:bg-white/30 active:bg-white/40 rounded-lg transition-all duration-200 border border-white/30 hover:border-white/50 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm hover:shadow-md"
+                      className="w-full text-left p-4 bg-white/15 hover:bg-white/25 active:bg-white/35 rounded-xl transition-all duration-300 border border-white/20 hover:border-white/40 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm hover:shadow-lg group"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="font-medium text-gray-800 text-sm">{template.name}</div>
-                        <div className="flex gap-1">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
+                      {/* Header with title and badges */}
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-semibold text-gray-800 text-sm leading-tight mb-1 group-hover:text-blue-700 transition-colors duration-200">
+                            {template.name}
+                          </h5>
+                        </div>
+                        <div className="flex flex-col gap-1 ml-2">
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                             template.orientation === 'landscape' 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-purple-100 text-purple-700'
+                              ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' 
+                              : 'bg-violet-100 text-violet-700 border border-violet-200'
                           }`}>
-                            {template.orientation === 'landscape' ? 'Landscape' : 'Portrait'}
+                            {template.orientation === 'landscape' ? '📐 Landscape' : '📱 Portrait'}
                           </span>
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium border border-blue-200">
                             {template.category}
                           </span>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-600 mb-2">{template.description}</div>
-                      {template.recommendedSizes && (
-                        <div className="text-xs text-gray-500">
-                          Best for: {template.recommendedSizes.join(', ')} ft
+                      
+                      {/* Description */}
+                      <div className="text-xs text-gray-600 leading-relaxed mb-3 line-clamp-2">
+                        {template.description}
+                      </div>
+                      
+                      {/* Features and sizes */}
+                      <div className="space-y-2">
+                        {template.recommendedSizes && template.recommendedSizes.length > 0 && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 font-medium">Best for:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {template.recommendedSizes.slice(0, 3).map((size, index) => (
+                                <span 
+                                  key={index}
+                                  className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium"
+                                >
+                                  {size} ft
+                                </span>
+                              ))}
+                              {template.recommendedSizes.length > 3 && (
+                                <span className="text-xs text-gray-500">
+                                  +{template.recommendedSizes.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Tags */}
+                        {template.tags && template.tags.length > 0 && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 font-medium">Tags:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {template.tags.slice(0, 2).map((tag, index) => (
+                                <span 
+                                  key={index}
+                                  className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-md font-medium border border-purple-100"
+                                >
+                                  #{tag}
+                                </span>
+                              ))}
+                              {template.tags.length > 2 && (
+                                <span className="text-xs text-gray-500">
+                                  +{template.tags.length - 2} more
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Hover indicator */}
+                      <div className="mt-3 pt-2 border-t border-white/10">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors duration-200">
+                            Click to load template
+                          </span>
+                          <div className="w-2 h-2 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
-                      )}
+                      </div>
                     </button>
                   ))}
+                </div>
+                
+                {/* Template count and info */}
+                <div className="mt-3 pt-3 border-t border-white/20">
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Professional designs with real assets</span>
+                    <span>✨ QR codes • Icons • Shapes</span>
+                  </div>
                 </div>
               </div>
             </div>
