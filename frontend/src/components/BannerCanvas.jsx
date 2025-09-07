@@ -65,19 +65,24 @@ const BannerCanvas = ({
   const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
   const [autoScaling, setAutoScaling] = useState(true) // Auto-scaling enabled by default for mobile
+  const [showClearModal, setShowClearModal] = useState(false)
   
   // Handle clear canvas with confirmation
   const handleClearCanvas = useCallback(() => {
     if (elements.length === 0) return
-    
-    const confirmed = window.confirm(
-      '⚠️ Clear Entire Canvas?\n\nThis will remove ALL elements from your canvas. This action cannot be undone.\n\nAre you sure you want to continue?'
-    )
-    
-    if (confirmed) {
-      onClearCanvas()
-    }
-  }, [elements.length, onClearCanvas])
+    setShowClearModal(true)
+  }, [elements.length])
+
+  // Confirm clear canvas
+  const confirmClearCanvas = useCallback(() => {
+    onClearCanvas()
+    setShowClearModal(false)
+  }, [onClearCanvas])
+
+  // Cancel clear canvas
+  const cancelClearCanvas = useCallback(() => {
+    setShowClearModal(false)
+  }, [])
   
   // Get the currently selected element
   const selectedElement = elements.find(el => el.id === selectedId)
@@ -2424,6 +2429,40 @@ const BannerCanvas = ({
           </div>
         </GlassPanel>
       </div>
+      )}
+
+      {/* Clear Canvas Confirmation Modal */}
+      {showClearModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+          <GlassPanel className="max-w-md w-full">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eraser className="w-8 h-8 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Clear Entire Canvas?</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                This will remove <strong>ALL elements</strong> from your canvas. This action cannot be undone.
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <GlassButton
+                onClick={cancelClearCanvas}
+                variant="default"
+                className="flex-1 px-4 py-3"
+              >
+                Cancel
+              </GlassButton>
+              <GlassButton
+                onClick={confirmClearCanvas}
+                variant="warning"
+                className="flex-1 px-4 py-3"
+              >
+                Clear Canvas
+              </GlassButton>
+            </div>
+          </GlassPanel>
+        </div>
       )}
 
     </div>
