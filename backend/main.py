@@ -505,82 +505,8 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Canvas design management
-@app.post("/api/designs/save")
-async def save_canvas_design(
-    design_data: CanvasData,
-    current_user: dict = Depends(get_current_user)
-):
-    """Save canvas design"""
-    try:
-        result = await db_manager.save_canvas_design(
-            current_user["user_id"],
-            design_data.dict()
-        )
-        
-        if result["success"]:
-            return {
-                "success": True,
-                "design_id": result["design_id"],
-                "message": "Design saved successfully"
-            }
-        else:
-            raise HTTPException(status_code=500, detail=result["error"])
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# Canvas design management - REMOVED (using templates instead)
 
-@app.get("/api/designs")
-async def get_user_designs(current_user: dict = Depends(get_current_user)):
-    """Get user's saved designs"""
-    try:
-        designs = await db_manager.get_user_designs(current_user["user_id"])
-        return {"success": True, "designs": designs}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/designs/count-info")
-async def get_design_count_info(current_user: dict = Depends(get_current_user)):
-    """Get design count and limit information"""
-    try:
-        count_info = await db_manager.get_design_count_info(current_user["user_id"])
-        return count_info
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/designs/{design_id}")
-async def get_design(design_id: str, current_user: dict = Depends(get_current_user)):
-    """Get specific design"""
-    try:
-        print(f"🔍 API: Getting design {design_id} for user {current_user['user_id']}")
-        design = await db_manager.get_design(design_id)
-        print(f"🔍 API: Design result: {design}")
-        
-        if design and design["user_id"] == current_user["user_id"]:
-            print(f"✅ API: Design found and authorized")
-            return {"success": True, "design": design}
-        elif design:
-            print(f"❌ API: Design found but user mismatch. Design user: {design.get('user_id')}, Request user: {current_user['user_id']}")
-            raise HTTPException(status_code=403, detail="Access denied")
-        else:
-            print(f"❌ API: Design not found")
-            raise HTTPException(status_code=404, detail="Design not found")
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"❌ API: Unexpected error getting design {design_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.delete("/api/designs/{design_id}")
-async def delete_design(design_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a saved design"""
-    try:
-        success = await db_manager.delete_design(design_id, current_user["user_id"])
-        if success:
-            return {"success": True, "message": "Design deleted successfully"}
-        else:
-            raise HTTPException(status_code=404, detail="Design not found or not authorized")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 # File upload
 @app.post("/api/upload-artwork")

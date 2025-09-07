@@ -45,7 +45,7 @@ const BannerEditorNew = () => {
   
   // Save Modal state
   const [showSaveModal, setShowSaveModal] = useState(false)
-  const [saveModalType, setSaveModalType] = useState('design') // 'design' or 'template'
+  const [saveModalType, setSaveModalType] = useState('template') // Only templates now
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   
@@ -1608,97 +1608,6 @@ const BannerEditorNew = () => {
     pdf.save('banner-design.pdf')
   }, [canvasSize])
 
-  // Save design to Supabase
-  const saveDesign = useCallback(() => {
-    setSaveModalType('design')
-    setSaveError(null)
-    setShowSaveModal(true)
-  }, [])
-
-  const handleSaveDesign = useCallback(async (name, description) => {
-    setIsSaving(true)
-    setSaveError(null)
-    
-    try {
-      const designData = {
-        name: name || `Banner Design ${new Date().toLocaleDateString()}`,
-        canvas_data: {
-          elements,
-          canvasSize,
-          backgroundColor,
-          bannerSpecs,
-          timestamp: new Date().toISOString()
-        },
-        product_type: 'banner',
-        dimensions: {
-          width: 2, // Default 2ft width
-          height: 4, // Default 4ft height
-          orientation: canvasOrientation
-        },
-        banner_type: bannerSpecs?.id || 'vinyl-13oz',
-        banner_material: bannerSpecs?.material || '13oz Vinyl',
-        banner_finish: bannerSpecs?.finish || 'Matte',
-        banner_size: `${canvasSize.width}x${canvasSize.height}px (${canvasOrientation})`,
-        banner_category: bannerSpecs?.category || 'Vinyl Banners',
-        background_color: backgroundColor,
-        print_options: {}
-      }
-      
-      console.log('Sending design data:', designData)
-      
-      const response = await authService.authenticatedRequest('/api/designs/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(designData)
-      })
-      
-      console.log('Save response status:', response.status)
-      
-      if (!response.ok) {
-        const errorData = await response.json()
-        console.error('Save error response:', errorData)
-        throw new Error(errorData.detail || 'Failed to save design')
-      }
-      
-      const result = await response.json()
-      console.log('Save result:', result)
-      
-      if (result.success) {
-        setShowSaveModal(false)
-        setSuccessMessage({
-          title: 'Design Saved!',
-          message: `Your design has been saved successfully! (${result.design_count}/${result.design_limit} designs)`
-        })
-        setShowSuccessNotification(true)
-        // Update current design ID for future modifications
-        setCurrentDesignId(result.design_id)
-        
-        // Invalidate cache to ensure fresh data on next load
-        const currentUser = await authService.getCurrentUser()
-        if (currentUser?.id) {
-          cacheService.invalidateDesigns(currentUser.id)
-        }
-      } else {
-        throw new Error(result.error || 'Failed to save design')
-      }
-    } catch (error) {
-      console.error('Failed to save design:', error)
-      
-      // Provide more specific error messages
-      let errorMessage = error.message
-      if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
-        errorMessage = 'Network error. Please check your connection and try again.'
-      } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
-        errorMessage = 'Authentication error. Please log in again.'
-      } else if (error.message.includes('Design limit reached')) {
-        errorMessage = error.message
-      }
-      
-      setSaveError(errorMessage)
-    } finally {
-      setIsSaving(false)
-    }
-  }, [elements, canvasSize, backgroundColor, bannerSpecs, canvasOrientation])
 
   // Save as template
   const saveAsTemplate = useCallback(() => {
@@ -2369,13 +2278,6 @@ const BannerEditorNew = () => {
         {/* Right Section */}
         <div className="action-buttons hidden sm:flex items-center gap-2 md:gap-3">
           <button
-            onClick={saveDesign}
-            className="px-3 md:px-4 py-1.5 md:py-2 bg-green-500/20 hover:bg-green-500/30 text-green-700 border border-green-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
-          >
-            Save Design
-          </button>
-          
-          <button
             onClick={saveAsTemplate}
             className="px-3 md:px-4 py-1.5 md:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
           >
@@ -2454,7 +2356,6 @@ const BannerEditorNew = () => {
             canvasSize={canvasSize}
             backgroundColor={backgroundColor}
             onExport={exportToPDF}
-            onSave={saveDesign}
             onCreateOrder={createOrder}
             onClearCanvas={clearCanvas}
             hasElements={elements.length > 0}
@@ -2509,7 +2410,7 @@ const BannerEditorNew = () => {
         setShowSaveModal(false)
         setSaveError(null)
       }}
-      onSave={saveModalType === 'template' ? handleSaveTemplate : handleSaveDesign}
+      onSave={handleSaveTemplate}
       type={saveModalType}
       isLoading={isSaving}
       error={saveError}

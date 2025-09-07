@@ -55,8 +55,6 @@ const BannerCanvas = ({
   canvasSize,
   backgroundColor,
   onExport,
-  onSave,
-
   onCreateOrder,
   onClearCanvas,
   hasElements
@@ -1522,9 +1520,6 @@ const BannerCanvas = ({
                 <Maximize2 className="w-3.5 h-3.5" />
               </GlassButton>
               
-              <GlassButton onClick={onSave} variant="success" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Save Design">
-                <Save className="w-3.5 h-3.5" />
-              </GlassButton>
               
               <GlassButton onClick={onCreateOrder} variant="primary" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Create Order">
                 <ShoppingCart className="w-3.5 h-3.5" />
@@ -1572,9 +1567,6 @@ const BannerCanvas = ({
                 <Trash2 className="w-3.5 h-3.5" />
               </GlassButton>
             
-              <GlassButton onClick={onSave} variant="success" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
-                <Save className="w-3.5 h-3.5" />
-            </GlassButton>
             
               <GlassButton onClick={onExport} variant="primary" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <Download className="w-3.5 h-3.5" />
