@@ -1302,32 +1302,37 @@ const BannerSidebar = ({
 
           {expandedSections.text && (
             <div className="px-4 pb-4 space-y-4">
-              {/* Simple Text Input */}
+              {/* Multi-line Text Input */}
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-gray-700">Add Text</h4>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Enter text..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                <div className="space-y-2">
+                  <textarea
+                    placeholder="Enter text... (Press Enter for new lines, Ctrl+Enter to add)"
+                    className="w-full h-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.target.value.trim()) {
+                      // Allow Enter for new lines, Ctrl+Enter or Cmd+Enter to add text
+                      if ((e.key === 'Enter' && (e.ctrlKey || e.metaKey)) && e.target.value.trim()) {
+                        e.preventDefault();
                         handleTextAdd(e.target.value.trim())
                         e.target.value = ''
                       }
+                      // Allow Shift+Enter for new lines (default behavior)
                     }}
                   />
+                  <p className="text-xs text-gray-500">
+                    Press Enter for new lines • Ctrl+Enter to add text
+                  </p>
                   <button
                     onClick={() => {
-                      const input = document.querySelector('input[placeholder="Enter text..."]')
-                      if (input && input.value.trim()) {
-                        handleTextAdd(input.value.trim())
-                        input.value = ''
+                      const textarea = document.querySelector('textarea[placeholder*="Enter text"]')
+                      if (textarea && textarea.value.trim()) {
+                        handleTextAdd(textarea.value.trim())
+                        textarea.value = ''
                       }
                     }}
-                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                    className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
                   >
-                    Add
+                    Add Text
                   </button>
                 </div>
               </div>
