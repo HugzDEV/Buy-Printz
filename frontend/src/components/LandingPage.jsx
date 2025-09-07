@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Star, Truck, Shield, Palette, Zap, Award, Users, Sparkles } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
+import Footer from './Footer'
 
 const LandingPage = () => {
   const features = [
@@ -264,6 +265,8 @@ const LandingPage = () => {
         </div>
       </section>
       </div>
+      
+      <Footer />
     </>
   )
 }

@@ -137,10 +137,10 @@ const TermsOfService = () => {
               <p className="text-gray-700 leading-relaxed">
                 If you have any questions about these Terms of Service, please contact us at:
               </p>
-              <div className="mt-4 text-gray-700">
-                <p>Email: legal@buyprintz.com</p>
-                <p>Phone: (555) 123-4567</p>
-                <p>Address: 123 Business Ave, Suite 100, Business City, BC 12345</p>
+              <div className="mt-4 text-gray-700 space-y-2">
+                <p><strong>Email:</strong> <a href="mailto:order@buyprintz.com" className="text-blue-600 hover:text-blue-800 underline">order@buyprintz.com</a></p>
+                <p><strong>Phone:</strong> <a href="tel:+16178009049" className="text-blue-600 hover:text-blue-800 underline">(617) 800-9049</a></p>
+                <p><strong>Address:</strong> 816 Morton Street, Boston, MA 02124</p>
               </div>
             </section>
           </div>
