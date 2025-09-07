@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { 
   Image as ImageIcon, 
@@ -70,6 +70,12 @@ const BannerSidebar = ({
   const [scrollDirection, setScrollDirection] = useState('down')
 
   const sidebarRef = useRef(null)
+  const templatesScrollRef = useRef(null)
+  const [scrollPositions, setScrollPositions] = useState({})
+  const [isPreservingScroll, setIsPreservingScroll] = useState(false)
+  
+  // Count open sections to adjust timing
+  const openSectionsCount = Object.values(expandedSections).filter(Boolean).length
 
   // Cleanup object URLs when component unmounts
   useEffect(() => {
@@ -81,6 +87,21 @@ const BannerSidebar = ({
       })
     }
   }, [])
+
+  // Handle scroll restoration after layout changes
+  useLayoutEffect(() => {
+    if (isPreservingScroll) {
+      const sidebar = sidebarRef.current
+      const templates = templatesScrollRef.current
+      
+      if (sidebar && scrollPositions.sidebar !== undefined) {
+        sidebar.scrollTop = scrollPositions.sidebar
+      }
+      if (templates && scrollPositions.templates !== undefined) {
+        templates.scrollTop = scrollPositions.templates
+      }
+    }
+  }, [expandedSections, isPreservingScroll, scrollPositions])
 
   // Function to remove uploaded image
   const removeUploadedImage = (index) => {
@@ -422,16 +443,88 @@ const BannerSidebar = ({
     }
   }
 
+  const preserveScrollPosition = useCallback((callback) => {
+    const currentScrollTop = sidebarRef.current?.scrollTop || 0
+    const templatesScrollTop = templatesScrollRef.current?.scrollTop || 0
+    
+    // Store scroll positions in state for useLayoutEffect
+    setScrollPositions({
+      sidebar: currentScrollTop,
+      templates: templatesScrollTop
+    })
+    
+    setIsPreservingScroll(true)
+    
+    // Temporarily disable scroll events
+    const sidebar = sidebarRef.current
+    const templates = templatesScrollRef.current
+    
+    if (sidebar) {
+      sidebar.style.pointerEvents = 'none'
+    }
+    if (templates) {
+      templates.style.pointerEvents = 'none'
+    }
+    
+    // Execute the callback
+    callback()
+    
+    // Re-enable pointer events after a delay
+    setTimeout(() => {
+      if (sidebar) {
+        sidebar.style.pointerEvents = 'auto'
+      }
+      if (templates) {
+        templates.style.pointerEvents = 'auto'
+      }
+      setIsPreservingScroll(false)
+    }, 150)
+  }, [openSectionsCount])
+
   const toggleSection = (sectionKey) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionKey]: !prev[sectionKey]
-    }))
+    preserveScrollPosition(() => {
+      setExpandedSections(prev => ({
+        ...prev,
+        [sectionKey]: !prev[sectionKey]
+      }))
+    })
   }
 
   const handleAssetClick = (asset) => {
-    const imagePath = `/assets/images/${asset.file}`
-    onAddAsset(imagePath, asset.name)
+    preserveScrollPosition(() => {
+      const imagePath = `/assets/images/${asset.file}`
+      onAddAsset(imagePath, asset.name)
+    })
+  }
+
+  const handleTemplateClick = (template) => {
+    preserveScrollPosition(() => {
+      onLoadTemplate(template)
+    })
+  }
+
+  const handleIconClick = (name, symbol, imagePath) => {
+    preserveScrollPosition(() => {
+      onAddIcon(name, symbol, imagePath)
+    })
+  }
+
+  const handleShapeClick = (shapeType) => {
+    preserveScrollPosition(() => {
+      onAddShape(shapeType)
+    })
+  }
+
+  const handleTextAdd = (text = '') => {
+    preserveScrollPosition(() => {
+      onAddText(text)
+    })
+  }
+
+  const handleQRCodeAdd = (url, color, backgroundColor) => {
+    preserveScrollPosition(() => {
+      onAddQRCode(url, color, backgroundColor)
+    })
   }
 
   const getFilteredAssets = (assets) => {
@@ -538,7 +631,7 @@ const BannerSidebar = ({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800">Text</h3>
         <button
-          onClick={() => onAddText()}
+          onClick={() => handleTextAdd()}
           className="px-3 py-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-md hover:shadow-lg"
         >
           Add Text
@@ -552,7 +645,7 @@ const BannerSidebar = ({
           {['HEADLINE', 'Subtitle', 'Body Text', 'Call to Action'].map((text) => (
             <button
               key={text}
-              onClick={() => onAddText(text)}
+              onClick={() => handleTextAdd(text)}
               className="px-3 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 rounded-lg text-sm transition-all duration-200 text-center transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500/50 shadow-sm hover:shadow-md"
             >
               {text}
@@ -803,7 +896,8 @@ const BannerSidebar = ({
       backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
       border-r border-white/20
       overflow-y-auto
-        relative
+      relative
+      ${isPreservingScroll ? 'scroll-preserve' : ''}
       `}
       onScroll={() => {
         const sidebar = sidebarRef.current
@@ -1218,7 +1312,7 @@ const BannerSidebar = ({
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && e.target.value.trim()) {
-                        onAddText(e.target.value.trim())
+                        handleTextAdd(e.target.value.trim())
                         e.target.value = ''
                       }
                     }}
@@ -1227,7 +1321,7 @@ const BannerSidebar = ({
                     onClick={() => {
                       const input = document.querySelector('input[placeholder="Enter text..."]')
                       if (input && input.value.trim()) {
-                        onAddText(input.value.trim())
+                        handleTextAdd(input.value.trim())
                         input.value = ''
                       }
                     }}
@@ -1453,7 +1547,7 @@ const BannerSidebar = ({
                       e.stopPropagation()
                       if (e.key === 'Enter' && e.target.value.trim()) {
                         if (e.target.value.trim().startsWith('http')) {
-                          onAddQRCode(e.target.value.trim(), qrColor, qrBackgroundColor)
+                          handleQRCodeAdd(e.target.value.trim(), qrColor, qrBackgroundColor)
                           e.target.value = ''
                         } else {
                           alert('Please enter a valid URL starting with http:// or https://')
@@ -1467,7 +1561,7 @@ const BannerSidebar = ({
                       const input = document.querySelector('input[placeholder="https://example.com"]')
                       if (input && input.value.trim()) {
                         if (input.value.trim().startsWith('http')) {
-                          onAddQRCode(input.value.trim(), qrColor, qrBackgroundColor)
+                          handleQRCodeAdd(input.value.trim(), qrColor, qrBackgroundColor)
                           input.value = ''
                         } else {
                           alert('Please enter a valid URL starting with http:// or https://')
@@ -1571,7 +1665,7 @@ const BannerSidebar = ({
                   {shapeLibrary.filter(shape => shape.category === 'basic').map((shape) => (
                     <NeumorphicButton
                       key={shape.type}
-                      onClick={() => onAddShape(shape.type)}
+                      onClick={() => handleShapeClick(shape.type)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1589,7 +1683,7 @@ const BannerSidebar = ({
                   {shapeLibrary.filter(shape => shape.category === 'decorative').map((shape) => (
                     <NeumorphicButton
                       key={shape.type}
-                      onClick={() => onAddShape(shape.type)}
+                      onClick={() => handleShapeClick(shape.type)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1607,7 +1701,7 @@ const BannerSidebar = ({
                   {shapeLibrary.filter(shape => shape.category === 'arrows').map((shape) => (
                     <NeumorphicButton
                       key={shape.type}
-                      onClick={() => onAddShape(shape.type)}
+                      onClick={() => handleShapeClick(shape.type)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1625,7 +1719,7 @@ const BannerSidebar = ({
                   {shapeLibrary.filter(shape => shape.category === 'business').map((shape) => (
                     <NeumorphicButton
                       key={shape.type}
-                      onClick={() => onAddShape(shape.type)}
+                      onClick={() => handleShapeClick(shape.type)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1643,7 +1737,7 @@ const BannerSidebar = ({
                   {iconLibrary.filter(icon => icon.category === 'medical').map((icon) => (
                     <NeumorphicButton
                       key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
+                      onClick={() => handleIconClick(icon.name, icon.symbol, icon.imagePath)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1669,7 +1763,7 @@ const BannerSidebar = ({
                   {iconLibrary.filter(icon => icon.category === 'technology').map((icon) => (
                     <NeumorphicButton
                       key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
+                      onClick={() => handleIconClick(icon.name, icon.symbol, icon.imagePath)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1695,7 +1789,7 @@ const BannerSidebar = ({
                   {iconLibrary.filter(icon => icon.category === 'food').map((icon) => (
                     <NeumorphicButton
                       key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
+                      onClick={() => handleIconClick(icon.name, icon.symbol, icon.imagePath)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1721,7 +1815,7 @@ const BannerSidebar = ({
                   {iconLibrary.filter(icon => icon.category === 'social').map((icon) => (
                     <NeumorphicButton
                       key={icon.name}
-                      onClick={() => onAddIcon(icon.name, icon.symbol, icon.imagePath)}
+                      onClick={() => handleIconClick(icon.name, icon.symbol, icon.imagePath)}
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
@@ -1779,16 +1873,18 @@ const BannerSidebar = ({
                     {userTemplates.map((template) => (
                       <button
                         key={template.id}
-                        onClick={() => onLoadTemplate(template)}
-                        className="w-full text-left p-3 bg-white/15 hover:bg-white/25 active:bg-white/35 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/40 transform hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-green-500/50 shadow-sm hover:shadow-md group"
+                        onClick={() => handleTemplateClick(template)}
+                        className="w-full text-left p-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-green-500/50 group"
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <div className="font-semibold text-gray-800 text-sm group-hover:text-green-700 transition-colors duration-200">
+                          <div className="font-semibold text-gray-800 text-sm group-hover:text-green-700 transition-colors duration-200 flex-1 truncate">
                             {template.name}
                           </div>
-                          <div className="w-2 h-2 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                          <span className="text-gray-400 group-hover:text-green-500 transition-colors duration-200">
+                            →
+                          </span>
                         </div>
-                        <div className="text-xs text-gray-600 leading-relaxed">{template.description}</div>
+                        <div className="text-xs text-gray-600 leading-relaxed line-clamp-2">{template.description}</div>
                       </button>
                     ))}
                   </div>
@@ -1804,93 +1900,60 @@ const BannerSidebar = ({
                   </span>
                 </div>
                 
-                <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                <div 
+                  ref={templatesScrollRef}
+                  className="space-y-2 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+                >
                   {bannerTemplates.map((template) => (
                     <button
                       key={template.id}
-                      onClick={() => onLoadTemplate(template)}
-                      className="w-full text-left p-4 bg-white/15 hover:bg-white/25 active:bg-white/35 rounded-xl transition-all duration-300 border border-white/20 hover:border-white/40 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm hover:shadow-lg group"
+                      onClick={() => handleTemplateClick(template)}
+                      className="w-full text-left p-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 group"
                     >
                       {/* Header with title and badges */}
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h5 className="font-semibold text-gray-800 text-sm leading-tight mb-1 group-hover:text-blue-700 transition-colors duration-200">
-                            {template.name}
-                          </h5>
-                        </div>
-                        <div className="flex flex-col gap-1 ml-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold text-gray-800 text-sm group-hover:text-blue-700 transition-colors duration-200 flex-1 truncate">
+                          {template.name}
+                        </h5>
+                        <div className="flex gap-1 ml-2">
                           <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                             template.orientation === 'landscape' 
-                              ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' 
-                              : 'bg-violet-100 text-violet-700 border border-violet-200'
+                              ? 'bg-emerald-100 text-emerald-700' 
+                              : 'bg-violet-100 text-violet-700'
                           }`}>
-                            {template.orientation === 'landscape' ? '📐 Landscape' : '📱 Portrait'}
+                            {template.orientation === 'landscape' ? '📐' : '📱'}
                           </span>
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium border border-blue-200">
-                            {template.category}
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                            {template.category.split(' ')[0]}
                           </span>
                         </div>
                       </div>
                       
                       {/* Description */}
-                      <div className="text-xs text-gray-600 leading-relaxed mb-3 line-clamp-2">
+                      <div className="text-xs text-gray-600 leading-relaxed mb-2 line-clamp-2">
                         {template.description}
-                      </div>
-                      
-                      {/* Features and sizes */}
-                      <div className="space-y-2">
-                        {template.recommendedSizes && template.recommendedSizes.length > 0 && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 font-medium">Best for:</span>
-                            <div className="flex flex-wrap gap-1">
-                              {template.recommendedSizes.slice(0, 3).map((size, index) => (
-                                <span 
-                                  key={index}
-                                  className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium"
-                                >
-                                  {size} ft
-                                </span>
-                              ))}
-                              {template.recommendedSizes.length > 3 && (
-                                <span className="text-xs text-gray-500">
-                                  +{template.recommendedSizes.length - 3} more
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Tags */}
-                        {template.tags && template.tags.length > 0 && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 font-medium">Tags:</span>
-                            <div className="flex flex-wrap gap-1">
-                              {template.tags.slice(0, 2).map((tag, index) => (
-                                <span 
-                                  key={index}
-                                  className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-md font-medium border border-purple-100"
-                                >
-                                  #{tag}
-                                </span>
-                              ))}
-                              {template.tags.length > 2 && (
-                                <span className="text-xs text-gray-500">
-                                  +{template.tags.length - 2} more
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Hover indicator */}
-                      <div className="mt-3 pt-2 border-t border-white/10">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors duration-200">
-                            Click to load template
-                          </span>
-                          <div className="w-2 h-2 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
+                      
+                      {/* Features */}
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          {template.recommendedSizes && template.recommendedSizes.length > 0 && (
+                            <span className="text-gray-500">
+                              {template.recommendedSizes[0]} ft
+                            </span>
+                          )}
+                          {template.tags && template.tags.length > 0 && (
+                            <span className="text-gray-400">•</span>
+                          )}
+                          {template.tags && template.tags.length > 0 && (
+                            <span className="text-gray-500">
+                              {template.tags[0]}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-gray-400 group-hover:text-blue-500 transition-colors duration-200">
+                          →
+                        </span>
                       </div>
                     </button>
                   ))}
@@ -1898,9 +1961,16 @@ const BannerSidebar = ({
                 
                 {/* Template count and info */}
                 <div className="mt-3 pt-3 border-t border-white/20">
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>Professional designs with real assets</span>
-                    <span>✨ QR codes • Icons • Shapes</span>
+                  <div className="text-center text-xs text-gray-500">
+                    <div className="mb-1">Professional designs with real assets</div>
+                    <div className="flex items-center justify-center gap-2">
+                      <span>✨</span>
+                      <span>QR codes</span>
+                      <span>•</span>
+                      <span>Icons</span>
+                      <span>•</span>
+                      <span>Shapes</span>
+                    </div>
                   </div>
                 </div>
               </div>

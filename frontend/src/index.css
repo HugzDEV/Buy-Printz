@@ -129,3 +129,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Scroll preservation utility */
+.scroll-preserve {
+  scroll-behavior: auto !important;
+}
