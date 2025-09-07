@@ -1975,10 +1975,11 @@ const BannerCanvas = ({
           fixed bottom-0 left-0 right-0 border-t border-white/20 
           bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
           max-h-[30vh] sm:max-h-[35vh] overflow-y-auto
-          shadow-2xl z-[100]
+          shadow-2xl z-[999] !important
           transition-all duration-300 ease-in-out
           ${(selectedId || selectedIds.length > 0) ? 'opacity-100 visible' : 'opacity-0 invisible'}
         `}
+        style={{ zIndex: 999 }}
       >
         <div className="flex flex-col gap-1.5 sm:gap-3 max-h-full p-1.5 sm:p-3">
           
