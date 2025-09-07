@@ -776,8 +776,7 @@ class DatabaseManager:
             return {
                 "total_orders": len(completed_orders),  # Only completed orders
                 "total_spent": total_spent,  # Only from completed orders
-                "total_designs": templates_count,  # Templates are now our "designs"
-                "total_templates": templates_count,
+                "total_templates": templates_count,  # User's saved templates
                 "success": True
             }
         except Exception as e:

@@ -715,31 +715,7 @@ const Dashboard = () => {
             </div>
 
             {/* Enhanced Stats Cards - Mobile optimized */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Total Designs</p>
-                    {loadingStates.templates ? (
-                      <div className="animate-pulse">
-                        <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-24"></div>
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
-                        <p className="text-xs text-green-600 flex items-center mt-1">
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                          Saved templates
-                        </p>
-                      </>
-                    )}
-                  </div>
-                  <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-lg sm:rounded-xl border border-blue-200/30 flex-shrink-0">
-                    <Palette className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-                  </div>
-                </div>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
 
               <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
