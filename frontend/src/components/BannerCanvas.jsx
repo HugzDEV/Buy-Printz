@@ -2451,35 +2451,64 @@ const BannerCanvas = ({
 
       {/* Clear Canvas Confirmation Modal */}
       {showClearModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-          <GlassPanel className="max-w-md w-full">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eraser className="w-8 h-8 text-orange-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={cancelClearCanvas}
+          />
+          
+          {/* Modal */}
+          <div className="relative w-full max-w-md">
+            <div className="backdrop-blur-xl bg-white/95 rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="p-6 border-b border-gray-200/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl shadow-lg border border-white/30">
+                      <Eraser className="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800">Clear Entire Canvas?</h3>
+                      <p className="text-gray-600 text-sm">This action cannot be undone</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={cancelClearCanvas}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Clear Entire Canvas?</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                This will remove <strong>ALL elements</strong> from your canvas. This action cannot be undone.
-              </p>
+              
+              {/* Content */}
+              <div className="p-6">
+                <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                  This will remove <strong className="text-orange-600">ALL elements</strong> from your canvas. 
+                  Make sure you have saved any important work before proceeding.
+                </p>
+                
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <GlassButton
+                    onClick={cancelClearCanvas}
+                    variant="default"
+                    className="flex-1 px-4 py-3"
+                  >
+                    Cancel
+                  </GlassButton>
+                  <GlassButton
+                    onClick={confirmClearCanvas}
+                    variant="warning"
+                    className="flex-1 px-4 py-3"
+                  >
+                    Clear Canvas
+                  </GlassButton>
+                </div>
+              </div>
             </div>
-            
-            <div className="flex gap-3">
-              <GlassButton
-                onClick={cancelClearCanvas}
-                variant="default"
-                className="flex-1 px-4 py-3"
-              >
-                Cancel
-              </GlassButton>
-              <GlassButton
-                onClick={confirmClearCanvas}
-                variant="warning"
-                className="flex-1 px-4 py-3"
-              >
-                Clear Canvas
-              </GlassButton>
-            </div>
-          </GlassPanel>
+          </div>
         </div>
       )}
 
