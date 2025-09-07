@@ -1648,7 +1648,7 @@ const BannerCanvas = ({
               maxWidth: '100%',
               maxHeight: '70vh', // Prevent canvas from taking full height
               userSelect: 'none', // Prevent text selection
-              transform: window.innerWidth < 768 ? 'translateY(-20px)' : 'none' // Move canvas content up slightly on mobile only
+              transform: window.innerWidth < 768 ? 'translateY(-40px)' : 'translateY(-20px)' // Move canvas content up to avoid status bar collision
             }}
           >
             
