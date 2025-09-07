@@ -18,7 +18,7 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState(null)
-  const [orders, setOrders] = useState([])
+  const [shoppingCart, setShoppingCart] = useState([]) // Unified cart for all orders
   const [templates, setTemplates] = useState([])
   
   // Debug: Log templates state changes
@@ -27,14 +27,12 @@ const Dashboard = () => {
   }, [templates])
   const [userStats, setUserStats] = useState(null)
   const [preferences, setPreferences] = useState(null)
-  const [pendingOrders, setPendingOrders] = useState([])
   const [completedDesigns, setCompletedDesigns] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingStates, setLoadingStates] = useState({
     designs: true,
-    orders: true,
+    shoppingCart: true,
     templates: true,
-    pendingOrders: true,
     completedDesigns: true,
     stats: true,
     preferences: true
@@ -62,7 +60,7 @@ const Dashboard = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const tabParam = searchParams.get('tab')
-    if (tabParam && ['overview', 'templates', 'orders', 'pending', 'profile'].includes(tabParam)) {
+    if (tabParam && ['overview', 'templates', 'cart', 'profile'].includes(tabParam)) {
       setActiveTab(tabParam)
     }
   }, [location.search])
@@ -95,9 +93,8 @@ const Dashboard = () => {
       // Set all loading states to false to show empty states
       setLoadingStates({
         designs: false,
-        orders: false,
+        shoppingCart: false,
         templates: false,
-        pendingOrders: false,
         completedDesigns: false,
         stats: false,
         preferences: false
@@ -182,25 +179,17 @@ const Dashboard = () => {
     }
   }
 
-    // Load core data first (orders)
+    // Load unified shopping cart data (all orders - completed and pending)
     await Promise.all([
       loadDataSafely(
         () => authService.authenticatedRequest('/api/orders'),
         (data) => {
-          const orders = data.orders || []
-          setOrders(orders)
-          // Filter pending orders from main orders data
-          const pending = orders.filter(order => 
-            order.status === 'pending' || 
-            order.status === 'processing' || 
-            order.status === 'new' ||
-            (order.created_at && !order.shipped_at) // Fallback: assume orders without shipping date are pending
-          )
-          setPendingOrders(pending)
+          const allOrders = data.orders || []
+          setShoppingCart(allOrders)
         },
         [],
-        'orders',
-        `orders_${user?.id}`
+        'shoppingCart',
+        `shopping_cart_${user?.id}`
       )
     ])
 
@@ -317,20 +306,31 @@ const Dashboard = () => {
     })
   }
 
-  // Filter orders based on search and status - only show completed orders
-  const completedOrders = orders.filter(order => 
-    ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(order.status)
-  )
+  // Filter shopping cart items based on search and status
+  const getOrdersByStatus = (status) => {
+    if (status === 'all') return shoppingCart
+    if (status === 'completed') {
+      return shoppingCart.filter(order => 
+        ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(order.status)
+      )
+    }
+    if (status === 'pending') {
+      return shoppingCart.filter(order => 
+        ['pending', 'processing', 'new', 'payment_failed', 'incomplete'].includes(order.status) ||
+        (order.created_at && !order.shipped_at) // Fallback: assume orders without shipping date are pending
+      )
+    }
+    return shoppingCart.filter(order => order.status === status)
+  }
   
-  const filteredOrders = completedOrders.filter(order => {
+  const filteredCartItems = getOrdersByStatus(statusFilter).filter(order => {
     const matchesSearch = searchTerm === '' || 
       order.banner_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.banner_material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase())
+      order.banner_size?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.id?.toLowerCase().includes(searchTerm.toLowerCase())
     
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter
-    
-    return matchesSearch && matchesStatus
+    return matchesSearch
   })
 
   const loadDesignInEditor = (item) => {
@@ -633,8 +633,7 @@ const Dashboard = () => {
             {[
               { id: 'overview', name: 'Overview', shortName: 'Home', icon: BarChart3 },
               { id: 'templates', name: 'Templates', shortName: 'Templates', icon: Layout },
-              { id: 'orders', name: 'Orders', shortName: 'Orders', icon: ShoppingBag },
-              { id: 'pending', name: 'Pending Orders', shortName: 'Pending', icon: Clock },
+              { id: 'cart', name: 'Shopping Cart', shortName: 'Cart', icon: ShoppingCart },
               { id: 'profile', name: 'Profile', shortName: 'Profile', icon: Settings }
             ].map((tab) => (
               <button
@@ -733,15 +732,15 @@ const Dashboard = () => {
               <div className="backdrop-blur-xl bg-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Total Orders</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_orders || 0}</p>
-                    <p className="text-xs text-green-600 flex items-center mt-1">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      {userStats?.order_stats?.paid || userStats?.order_stats?.completed || 0} completed
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Shopping Cart</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{shoppingCart.length}</p>
+                    <p className="text-xs text-blue-600 flex items-center mt-1">
+                      <ShoppingCart className="w-3 h-3 mr-1" />
+                      {getOrdersByStatus('completed').length} completed, {getOrdersByStatus('pending').length} pending
                     </p>
                   </div>
-                  <div className="p-3 sm:p-4 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-lg sm:rounded-xl border border-green-200/30 flex-shrink-0">
-                    <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-lg sm:rounded-xl border border-blue-200/30 flex-shrink-0">
+                    <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                   </div>
                 </div>
               </div>
@@ -825,9 +824,9 @@ const Dashboard = () => {
                 <h3 className="text-lg font-bold text-gray-800">Recent Orders</h3>
               </div>
               <div className="p-6">
-                {orders.slice(0, 5).length > 0 ? (
+                {shoppingCart.slice(0, 5).length > 0 ? (
                   <div className="space-y-4">
-                    {orders.slice(0, 5).map((order) => (
+                    {shoppingCart.slice(0, 5).map((order) => (
                       <div key={order.id} className="flex items-center justify-between p-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/30 hover:bg-white/40 transition-all duration-200">
                         <div className="flex items-center">
                           <Package className="w-5 h-5 text-gray-500 mr-3" />
@@ -1014,25 +1013,66 @@ const Dashboard = () => {
         )}
 
 
-        {/* Pending Orders Tab */}
-        {activeTab === 'pending' && (
+        {/* Shopping Cart Tab */}
+        {activeTab === 'cart' && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Pending Orders</h2>
-                <p className="text-gray-600 text-sm mt-1">Orders that require payment to complete</p>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Shopping Cart</h2>
+                <p className="text-gray-600 text-sm mt-1">All your orders - completed and pending</p>
               </div>
-              <span className="backdrop-blur-sm bg-yellow-400/20 px-4 py-2 rounded-xl border border-yellow-200/30 text-yellow-800 font-medium w-fit">
-                {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').length} Pending
-              </span>
+              <div className="flex gap-2">
+                <span className="backdrop-blur-sm bg-green-400/20 px-4 py-2 rounded-xl border border-green-200/30 text-green-800 font-medium w-fit">
+                  {getOrdersByStatus('completed').length} Completed
+                </span>
+                <span className="backdrop-blur-sm bg-yellow-400/20 px-4 py-2 rounded-xl border border-yellow-200/30 text-yellow-800 font-medium w-fit">
+                  {getOrdersByStatus('pending').length} Pending
+                </span>
+              </div>
             </div>
 
-            {/* Show actual pending orders count and filter client-side for safety */}
-            {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').length === 0 ? (
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search orders..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 w-full sm:w-64"
+                />
+              </div>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="pl-10 pr-8 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 appearance-none"
+                >
+                  <option value="all">All Orders</option>
+                  <option value="completed">Completed</option>
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Show orders based on filter */}
+            {filteredCartItems.length === 0 ? (
                <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-12 text-center border border-white/30 shadow-xl">
-                 <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                 <h3 className="text-lg font-bold text-gray-800 mb-2">No pending orders</h3>
-                 <p className="text-gray-600 mb-6">All your orders are complete! Pending orders appear here when you create a design but haven't completed payment.</p>
+                 <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                 <h3 className="text-lg font-bold text-gray-800 mb-2">No orders found</h3>
+                 <p className="text-gray-600 mb-6">
+                   {statusFilter === 'all' 
+                     ? "Your shopping cart is empty. Create your first design to get started!"
+                     : `No ${statusFilter} orders found. Try adjusting your search or filter.`
+                   }
+                 </p>
                 <Link 
                   to="/editor" 
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
@@ -1044,7 +1084,7 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {pendingOrders.filter(order => order.status === 'pending' || order.status === 'payment_failed' || order.status === 'incomplete').map((order) => (
+                {filteredCartItems.map((order) => (
                   <div key={order.id} className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                       <div>
@@ -1054,14 +1094,12 @@ const Dashboard = () => {
                         </p>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className={`backdrop-blur-sm px-3 py-1 rounded-lg text-sm font-medium ${
-                          order.status === 'payment_failed' 
-                            ? 'bg-red-400/20 text-red-800 border border-red-200/30' 
-                            : 'bg-yellow-400/20 text-yellow-800 border border-yellow-200/30'
-                        }`}>
-                          {order.status === 'payment_failed' ? 'Payment Failed' : 
-                           order.status === 'incomplete' ? 'Incomplete' : 'Pending Payment'}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          {getStatusIcon(order.status)}
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </span>
+                        </div>
                         <span className="text-lg font-bold text-gray-800">
                           {formatCurrency(order.total_amount)}
                         </span>
@@ -1090,13 +1128,23 @@ const Dashboard = () => {
                     </div>
 
                     <div className="flex space-x-3">
-                      <button
-                        onClick={() => reorderDesign(order)}
-                        className="flex-1 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Resume & Complete Order
-                      </button>
+                      {['pending', 'processing', 'new', 'payment_failed', 'incomplete'].includes(order.status) ? (
+                        <button
+                          onClick={() => reorderDesign(order)}
+                          className="flex-1 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          Resume & Complete Order
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => reorderDesign(order)}
+                          className="flex-1 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Reorder
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           setSelectedOrder(order)
@@ -1115,8 +1163,8 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Orders Tab */}
-        {activeTab === 'orders' && (
+        {/* Profile Tab */}
+        {activeTab === 'profile' && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
