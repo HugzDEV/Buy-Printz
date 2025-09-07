@@ -30,7 +30,6 @@ const Dashboard = () => {
   const [checkoutOrders, setCheckoutOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingStates, setLoadingStates] = useState({
-    designs: true,
     orders: true,
     templates: true,
     checkoutOrders: true,
@@ -92,7 +91,6 @@ const Dashboard = () => {
       
       // Set all loading states to false to show empty states
       setLoadingStates({
-        designs: false,
         orders: false,
         templates: false,
         checkoutOrders: false,
@@ -220,7 +218,8 @@ const Dashboard = () => {
         [],
         'templates',
         `templates_${user?.id}`
-      )
+      ),
+      
     ])
 
     // Another small delay
@@ -721,17 +720,17 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Total Designs</p>
-                    {loadingStates.designs || loadingStates.completedDesigns ? (
+                    {loadingStates.templates ? (
                       <div className="animate-pulse">
                         <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
                         <div className="h-3 bg-gray-200 rounded w-24"></div>
                       </div>
                     ) : (
                       <>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_designs || designs.length}</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
                         <p className="text-xs text-green-600 flex items-center mt-1">
                           <TrendingUp className="w-3 h-3 mr-1" />
-                          Active creations
+                          Saved templates
                         </p>
                       </>
                     )}
@@ -1286,7 +1285,7 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <Palette className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">{userStats?.total_designs || designs.length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
                   <p className="text-xs text-gray-600">Total Designs</p>
                 </div>
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">

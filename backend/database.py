@@ -763,11 +763,7 @@ class DatabaseManager:
             orders_response = self.supabase.table("orders").select("status, total_amount").eq("user_id", user_id).execute()
             orders = orders_response.data or []
             
-            # Get design count
-            designs_response = self.supabase.table("canvas_designs").select("id").eq("user_id", user_id).execute()
-            designs_count = len(designs_response.data or [])
-            
-            # Get template count
+            # Get template count (templates are now our "designs")
             templates_response = self.supabase.table("banner_templates").select("id").eq("user_id", user_id).execute()
             templates_count = len(templates_response.data or [])
             
@@ -791,7 +787,7 @@ class DatabaseManager:
                 "total_spent": total_spent,  # Only from completed orders
                 "order_stats": order_stats,  # All order statuses for breakdown
                 "pending_orders": order_stats.get('pending', 0),  # Pending orders count
-                "total_designs": designs_count,
+                "total_designs": templates_count,  # Templates are now our "designs"
                 "total_templates": templates_count,
                 "success": True
             }

@@ -1081,14 +1081,6 @@ async def delete_pending_order(pending_order_id: str, current_user: dict = Depen
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/designs/completed")
-async def get_completed_designs(current_user: dict = Depends(get_current_user)):
-    """Get user's completed banner designs from successful orders"""
-    try:
-        completed_designs = await db_manager.get_completed_designs(current_user["user_id"])
-        return {"success": True, "designs": completed_designs}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 # Design history endpoints
 @app.get("/api/designs/{design_id}/history")
