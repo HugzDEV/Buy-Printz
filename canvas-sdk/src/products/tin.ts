@@ -4,25 +4,25 @@ export const TIN_SURFACES: TinSurface[] = [
   {
     id: 'front',
     name: 'Front',
-    dimensions: { width: 350, height: 250 }, // 3.5" x 2.5" in pixels at 100 DPI
+    dimensions: { width: 374, height: 225 }, // 3.74" x 2.25" in pixels at 100 DPI
     required: true
   },
   {
     id: 'back',
     name: 'Back',
-    dimensions: { width: 350, height: 250 },
+    dimensions: { width: 374, height: 225 },
     required: true
   },
   {
     id: 'inside',
     name: 'Inside',
-    dimensions: { width: 350, height: 250 },
+    dimensions: { width: 374, height: 225 },
     required: false
   },
   {
     id: 'lid',
     name: 'Lid',
-    dimensions: { width: 350, height: 250 },
+    dimensions: { width: 374, height: 225 },
     required: false
   }
 ];
@@ -32,10 +32,9 @@ export const BUSINESS_CARD_TIN_PRODUCT: TinProduct = {
   name: 'Business Card Tin',
   category: 'Business Cards',
   description: 'Premium aluminum business card tins with custom vinyl stickers',
-  defaultSize: { width: 350, height: 250 },
+  defaultSize: { width: 374, height: 225 },
   availableSizes: [
-    { width: 350, height: 250 }, // Standard tin
-    { width: 400, height: 300 }  // Premium tin
+    { width: 374, height: 225 } // 3.74" x 2.25" tin
   ],
   surfaces: TIN_SURFACES,
   quantities: [100, 250, 500],

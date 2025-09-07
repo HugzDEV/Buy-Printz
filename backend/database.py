@@ -1051,5 +1051,138 @@ class DatabaseManager:
             print(f"Error deleting user account: {e}")
             return False
 
+    # Business Card Tins Management
+    async def create_business_card_tin_order(self, user_id: str, order_id: str, tin_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new business card tin order"""
+        try:
+            # Calculate pricing based on quantity, finish, and surface coverage
+            base_prices = {
+                100: {'front-back': 399.99, 'all-sides': 499.99},
+                250: {'front-back': 749.99, 'all-sides': 849.99},
+                500: {'front-back': 1000.00, 'all-sides': 1100.00}
+            }
+            
+            finish_surcharges = {
+                'silver': 0.00,
+                'black': 0.25,
+                'gold': 0.50
+            }
+            
+            quantity = tin_data.get('quantity', 100)
+            surface_coverage = tin_data.get('surface_coverage', 'front-back')
+            tin_finish = tin_data.get('tin_finish', 'silver')
+            
+            base_price = base_prices.get(quantity, {}).get(surface_coverage, 399.99)
+            finish_surcharge = finish_surcharges.get(tin_finish, 0.00)
+            total_price = base_price + finish_surcharge
+            
+            tin_record = {
+                "order_id": order_id,
+                "user_id": user_id,
+                "quantity": quantity,
+                "surface_coverage": surface_coverage,
+                "tin_finish": tin_finish,
+                "printing_method": tin_data.get('printing_method', 'premium-vinyl'),
+                "surface_designs": tin_data.get('surface_designs', {}),
+                "sticker_specifications": tin_data.get('sticker_specifications', {
+                    "dpi": 300,
+                    "colorMode": "CMYK",
+                    "material": tin_data.get('printing_method', 'premium-vinyl')
+                }),
+                "base_price": base_price,
+                "finish_surcharge": finish_surcharge,
+                "total_price": total_price,
+                "status": "pending",
+                "notes": tin_data.get('notes', '')
+            }
+            
+            print(f"Creating business card tin order: {tin_record}")
+            
+            response = self.supabase.table("business_card_tins").insert(tin_record).execute()
+            
+            if response.data:
+                return {
+                    "tin_id": response.data[0]["id"],
+                    "success": True,
+                    "total_price": total_price
+                }
+            else:
+                return {"success": False, "error": "Failed to create tin order"}
+                
+        except Exception as e:
+            print(f"Error creating business card tin order: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def get_business_card_tin(self, tin_id: str) -> Optional[Dict[str, Any]]:
+        """Get a specific business card tin by ID"""
+        try:
+            response = self.supabase.table("business_card_tins").select("*").eq("id", tin_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting business card tin: {e}")
+            return None
+
+    async def get_user_business_card_tins(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get all business card tins for a user"""
+        try:
+            response = self.supabase.table("business_card_tins").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            return response.data or []
+        except Exception as e:
+            print(f"Error getting user business card tins: {e}")
+            return []
+
+    async def update_business_card_tin_design(self, tin_id: str, surface_designs: Dict[str, Any]) -> bool:
+        """Update the design data for a business card tin"""
+        try:
+            update_data = {
+                "surface_designs": surface_designs,
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            response = self.supabase.table("business_card_tins").update(update_data).eq("id", tin_id).execute()
+            return bool(response.data)
+        except Exception as e:
+            print(f"Error updating business card tin design: {e}")
+            return False
+
+    async def update_business_card_tin_status(self, tin_id: str, status: str, notes: str = "") -> bool:
+        """Update the status of a business card tin"""
+        try:
+            update_data = {
+                "status": status,
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            
+            if notes:
+                update_data["notes"] = notes
+            
+            response = self.supabase.table("business_card_tins").update(update_data).eq("id", tin_id).execute()
+            return bool(response.data)
+        except Exception as e:
+            print(f"Error updating business card tin status: {e}")
+            return False
+
+    async def delete_business_card_tin(self, tin_id: str) -> bool:
+        """Delete a business card tin order"""
+        try:
+            response = self.supabase.table("business_card_tins").delete().eq("id", tin_id).execute()
+            return bool(response.data)
+        except Exception as e:
+            print(f"Error deleting business card tin: {e}")
+            return False
+
+    async def get_business_card_tin_by_order(self, order_id: str) -> Optional[Dict[str, Any]]:
+        """Get business card tin by order ID"""
+        try:
+            response = self.supabase.table("business_card_tins").select("*").eq("order_id", order_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting business card tin by order: {e}")
+            return None
+
 # Initialize database manager
 db_manager = DatabaseManager()

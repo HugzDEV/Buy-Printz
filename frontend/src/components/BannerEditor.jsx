@@ -26,8 +26,44 @@ const BannerEditorNew = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   
-  // Core state
-  const [elements, setElements] = useState([])
+  // Product type selection - Must be declared first
+  const [productType, setProductType] = useState('banner') // 'banner', 'tin', 'tent'
+  
+  // Surface navigation state - Must be declared before elements
+  const [currentSurface, setCurrentSurface] = useState('front')
+  
+  // Core state - Multi-surface support for tins and tents
+  const [surfaceElements, setSurfaceElements] = useState({
+    // Tin surfaces
+    front: [],
+    back: [],
+    inside: [],
+    lid: [],
+    // Tent surfaces
+    canopy_front: [],
+    canopy_back: [],
+    canopy_left: [],
+    canopy_right: [],
+    sidewall_left: [],
+    sidewall_right: [],
+    backwall: []
+  })
+  
+  // Current elements based on product type and surface
+  const elements = (productType === 'tin' || productType === 'tent') ? surfaceElements[currentSurface] : surfaceElements.front
+  const setElements = (productType === 'tin' || productType === 'tent')
+    ? (newElements) => {
+        setSurfaceElements(prev => ({
+          ...prev,
+          [currentSurface]: typeof newElements === 'function' ? newElements(prev[currentSurface]) : newElements
+        }))
+      }
+    : (newElements) => {
+        setSurfaceElements(prev => ({
+          ...prev,
+          front: typeof newElements === 'function' ? newElements(prev.front) : newElements
+        }))
+      }
   
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -55,6 +91,99 @@ const BannerEditorNew = () => {
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 })
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState('landscape') // 'landscape' or 'portrait'
+  
+  // Tin specifications state
+  const [tinSpecs, setTinSpecs] = useState({
+    finish: 'silver',
+    surfaceCoverage: 'front-back',
+    printingMethod: 'premium-vinyl'
+  })
+  
+  // Banner size presets - Standard banner dimensions (H x W format)
+  const bannerSizes = [
+    // Landscape Banners (Horizontal - wider than tall)
+    { name: '2x3 ft (Landscape)', width: 900, height: 600, orientation: 'landscape', category: 'landscape' },
+    { name: '2x4 ft (Landscape)', width: 1200, height: 600, orientation: 'landscape', category: 'landscape' },
+    { name: '2x5 ft (Landscape)', width: 1500, height: 600, orientation: 'landscape', category: 'landscape' },
+    { name: '2x6 ft (Landscape)', width: 1800, height: 600, orientation: 'landscape', category: 'landscape' },
+    { name: '3x4 ft (Landscape)', width: 1200, height: 900, orientation: 'landscape', category: 'landscape' },
+    { name: '3x5 ft (Landscape)', width: 1500, height: 900, orientation: 'landscape', category: 'landscape' },
+    { name: '3x6 ft (Landscape)', width: 1800, height: 900, orientation: 'landscape', category: 'landscape' },
+    { name: '4x8 ft (Landscape)', width: 2400, height: 1200, orientation: 'landscape', category: 'landscape' },
+    { name: '5x10 ft (Landscape)', width: 3000, height: 1500, orientation: 'landscape', category: 'landscape' },
+    
+    // Portrait Banners (Vertical - taller than wide)
+    { name: '3x2 ft (Portrait)', width: 600, height: 900, orientation: 'portrait', category: 'portrait' },
+    { name: '4x2 ft (Portrait)', width: 600, height: 1200, orientation: 'portrait', category: 'portrait' },
+    { name: '5x2 ft (Portrait)', width: 600, height: 1500, orientation: 'portrait', category: 'portrait' },
+    { name: '6x2 ft (Portrait)', width: 600, height: 1800, orientation: 'portrait', category: 'portrait' },
+    { name: '4x3 ft (Portrait)', width: 900, height: 1200, orientation: 'portrait', category: 'portrait' },
+    { name: '5x3 ft (Portrait)', width: 900, height: 1500, orientation: 'portrait', category: 'portrait' },
+    { name: '6x3 ft (Portrait)', width: 900, height: 1800, orientation: 'portrait', category: 'portrait' },
+    { name: '8x4 ft (Portrait)', width: 1200, height: 2400, orientation: 'portrait', category: 'portrait' },
+    
+    // Custom option
+    { name: 'Custom Size', width: 800, height: 400, orientation: 'landscape', category: 'custom' }
+  ]
+  
+  // Product type configurations
+  const productConfigs = {
+    banner: {
+      name: 'Vinyl Banner',
+      defaultSize: { width: 800, height: 400 },
+      sizes: bannerSizes,
+      description: 'High-quality vinyl banners for outdoor and indoor use'
+    },
+    tin: {
+      name: 'Business Card Tin',
+      defaultSize: { width: 374, height: 225 }, // 3.74" x 2.25" at 100 DPI
+      sizes: [
+        { name: 'Business Card Tin', width: 374, height: 225, orientation: 'landscape', category: 'standard' }
+      ],
+      description: 'Premium aluminum business card tins with custom vinyl stickers'
+    },
+    tent: {
+      name: 'Tradeshow Tent',
+      defaultSize: { width: 1200, height: 1200 },
+      sizes: [
+        { name: '10x10 ft Tent', width: 1200, height: 1200, orientation: 'square', category: 'standard' },
+        { name: '10x20 ft Tent', width: 2400, height: 1200, orientation: 'landscape', category: 'large' }
+      ],
+      description: 'Professional tradeshow tents with custom graphics'
+    }
+  }
+  
+  // Handle product type change
+  const handleProductTypeChange = useCallback((newProductType) => {
+    setProductType(newProductType)
+    const config = productConfigs[newProductType]
+    setCanvasSize(config.defaultSize)
+    setCanvasOrientation(config.defaultSize.width > config.defaultSize.height ? 'landscape' : 'portrait')
+    
+    // Set appropriate default surface for each product type
+    if (newProductType === 'tin') {
+      setCurrentSurface('front')
+    } else if (newProductType === 'tent') {
+      setCurrentSurface('canopy_front')
+    } else {
+      setCurrentSurface('front')
+    }
+  }, [productConfigs])
+
+  // Handle tin specification changes
+  const handleTinSpecChange = useCallback((key, value) => {
+    setTinSpecs(prev => ({
+      ...prev,
+      [key]: value
+    }))
+  }, [])
+
+  // Handle surface navigation
+  const handleSurfaceChange = useCallback((surface) => {
+    setCurrentSurface(surface)
+    // Clear selection when switching surfaces
+    setSelectedId(null)
+  }, [])
   
   // Check if user is first time user - only from landing page
   useEffect(() => {
@@ -91,33 +220,6 @@ const BannerEditorNew = () => {
     
     checkTourStatus()
   }, [])
-  
-  // Banner size presets - Standard banner dimensions (H x W format)
-  const bannerSizes = [
-    // Landscape Banners (Horizontal - wider than tall)
-    { name: '2x3 ft (Landscape)', width: 900, height: 600, orientation: 'landscape', category: 'landscape' },
-    { name: '2x4 ft (Landscape)', width: 1200, height: 600, orientation: 'landscape', category: 'landscape' },
-    { name: '2x5 ft (Landscape)', width: 1500, height: 600, orientation: 'landscape', category: 'landscape' },
-    { name: '2x6 ft (Landscape)', width: 1800, height: 600, orientation: 'landscape', category: 'landscape' },
-    { name: '3x4 ft (Landscape)', width: 1200, height: 900, orientation: 'landscape', category: 'landscape' },
-    { name: '3x5 ft (Landscape)', width: 1500, height: 900, orientation: 'landscape', category: 'landscape' },
-    { name: '3x6 ft (Landscape)', width: 1800, height: 900, orientation: 'landscape', category: 'landscape' },
-    { name: '4x8 ft (Landscape)', width: 2400, height: 1200, orientation: 'landscape', category: 'landscape' },
-    { name: '5x10 ft (Landscape)', width: 3000, height: 1500, orientation: 'landscape', category: 'landscape' },
-    
-    // Portrait Banners (Vertical - taller than wide)
-    { name: '3x2 ft (Portrait)', width: 600, height: 900, orientation: 'portrait', category: 'portrait' },
-    { name: '4x2 ft (Portrait)', width: 600, height: 1200, orientation: 'portrait', category: 'portrait' },
-    { name: '5x2 ft (Portrait)', width: 600, height: 1500, orientation: 'portrait', category: 'portrait' },
-    { name: '6x2 ft (Portrait)', width: 600, height: 1800, orientation: 'portrait', category: 'portrait' },
-    { name: '4x3 ft (Portrait)', width: 900, height: 1200, orientation: 'portrait', category: 'portrait' },
-    { name: '5x3 ft (Portrait)', width: 900, height: 1500, orientation: 'portrait', category: 'portrait' },
-    { name: '6x3 ft (Portrait)', width: 900, height: 1800, orientation: 'portrait', category: 'portrait' },
-    { name: '8x4 ft (Portrait)', width: 1200, height: 2400, orientation: 'portrait', category: 'portrait' },
-    
-    // Custom option
-    { name: 'Custom Size', width: 800, height: 400, orientation: 'landscape', category: 'custom' }
-  ]
   
   // All available banner types from products
   const bannerTypes = [
@@ -2921,6 +3023,22 @@ const BannerEditorNew = () => {
           </button>
         </div>
 
+        {/* Center Section - Product Type Selector */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700 hidden md:block">
+            Product:
+          </label>
+          <select
+            value={productType}
+            onChange={(e) => handleProductTypeChange(e.target.value)}
+            className="px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          >
+            <option value="banner">🏷️ Vinyl Banner</option>
+            <option value="tin">🗃️ Business Card Tin</option>
+            <option value="tent">🏕️ Tradeshow Tent</option>
+          </select>
+        </div>
+
         {/* Right Section */}
         <div className="action-buttons flex items-center gap-2 md:gap-3">
           <button
@@ -2973,9 +3091,14 @@ const BannerEditorNew = () => {
             isMobileOpen={isMobileSidebarOpen}
             bannerSpecs={bannerSpecs}
             bannerTypes={bannerTypes}
-            bannerSizes={bannerSizes}
+            bannerSizes={productConfigs[productType].sizes}
             canvasSize={canvasSize}
             canvasOrientation={canvasOrientation}
+            productType={productType}
+            tinSpecs={tinSpecs}
+            onTinSpecsChange={handleTinSpecChange}
+            currentSurface={currentSurface}
+            onSurfaceChange={handleSurfaceChange}
 
             onAddShape={addShape}
             onAddText={addText}
@@ -3015,6 +3138,9 @@ const BannerEditorNew = () => {
             onCreateOrder={createOrder}
             onClearCanvas={clearCanvas}
             hasElements={elements.length > 0}
+            productType={productType}
+            currentSurface={currentSurface}
+            onSurfaceChange={handleSurfaceChange}
           />
           
                 {/* Mobile Overlay when sidebar is open */}

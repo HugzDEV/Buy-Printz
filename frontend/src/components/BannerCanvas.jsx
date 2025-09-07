@@ -29,7 +29,9 @@ import {
   Undo,
   Redo,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight
 } from 'lucide-react'
 import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
@@ -58,7 +60,10 @@ const BannerCanvas = ({
   onExport,
   onCreateOrder,
   onClearCanvas,
-  hasElements
+  hasElements,
+  productType = 'banner',
+  currentSurface = 'front',
+  onSurfaceChange
 }) => {
   const stageRef = useRef()
   const transformerRef = useRef()
@@ -72,6 +77,26 @@ const BannerCanvas = ({
     if (elements.length === 0) return
     setShowClearModal(true)
   }, [elements.length])
+
+  // Handle surface navigation for tins and tents
+  const handleSurfaceNavigation = useCallback((direction) => {
+    if ((productType !== 'tin' && productType !== 'tent') || !onSurfaceChange) return
+    
+    let surfaces = []
+    if (productType === 'tin') {
+      surfaces = ['front', 'back', 'inside', 'lid']
+    } else if (productType === 'tent') {
+      surfaces = ['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right', 'sidewall_left', 'sidewall_right', 'backwall']
+    }
+    
+    const currentIndex = surfaces.indexOf(currentSurface)
+    
+    if (direction === 'prev' && currentIndex > 0) {
+      onSurfaceChange(surfaces[currentIndex - 1])
+    } else if (direction === 'next' && currentIndex < surfaces.length - 1) {
+      onSurfaceChange(surfaces[currentIndex + 1])
+    }
+  }, [productType, currentSurface, onSurfaceChange])
 
   // Confirm clear canvas
   const confirmClearCanvas = useCallback(() => {
@@ -1491,15 +1516,47 @@ const BannerCanvas = ({
           
           {/* Left Section - Zoom Controls */}
           <div className="zoom-controls flex items-center gap-1">
-            {/* Desktop: Undo/Redo + Zoom */}
+            {/* Desktop: Undo/Redo + Zoom OR Surface Navigation for Tins/Tents */}
             <div className="hidden sm:flex items-center gap-1">
-              <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
-                <Undo2 className="w-3.5 h-3.5" />
+              {(productType === 'tin' || productType === 'tent') ? (
+                <>
+                  <GlassButton 
+                    onClick={() => handleSurfaceNavigation('prev')} 
+                    disabled={productType === 'tin' ? currentSurface === 'front' : currentSurface === 'canopy_front'}
+                    className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                    title="Previous Surface"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                  </GlassButton>
+                  
+                  {/* Surface Indicator */}
+                  <div className="px-2 py-1 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-xs font-medium text-gray-800 min-w-[60px] text-center">
+                    {productType === 'tin' 
+                      ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
+                      : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+                    }
+                  </div>
+                  
+                  <GlassButton 
+                    onClick={() => handleSurfaceNavigation('next')} 
+                    disabled={productType === 'tin' ? currentSurface === 'lid' : currentSurface === 'backwall'}
+                    className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                    title="Next Surface"
+                  >
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </GlassButton>
+                </>
+              ) : (
+                <>
+                  <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
+                    <Undo2 className="w-3.5 h-3.5" />
             </GlassButton>
             
-              <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
-                <Redo2 className="w-3.5 h-3.5" />
-            </GlassButton>
+                  <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
+                    <Redo2 className="w-3.5 h-3.5" />
+                  </GlassButton>
+                </>
+              )}
             
               <div className="w-px h-5 bg-white/20 mx-1" />
             </div>
@@ -1650,6 +1707,22 @@ const BannerCanvas = ({
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
+
+          {/* Surface Indicator for Tins and Tents */}
+          {(productType === 'tin' || productType === 'tent') && (
+            <div className="absolute top-4 left-4 z-10">
+              <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-2 shadow-lg">
+                <div className="text-sm font-medium text-gray-800">
+                  Editing: <span className="text-blue-600 capitalize">
+                    {productType === 'tin' 
+                      ? currentSurface 
+                      : currentSurface.replace('_', ' ')
+                    }
+                  </span> Surface
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Canvas - Mobile Responsive Scaling */}
           <div 
@@ -2518,25 +2591,57 @@ const BannerCanvas = ({
             {/* Divider */}
             <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
             
-            {/* Undo/Redo */}
+            {/* Undo/Redo OR Surface Navigation for Tins/Tents */}
             <div className="flex gap-1">
-              <GlassButton 
-                onClick={undo} 
-                disabled={historyStep <= 0}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Undo"
-              >
-                <Undo className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={redo} 
-                disabled={historyStep >= history.length - 1}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Redo"
-              >
-                <Redo className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-              </GlassButton>
+              {(productType === 'tin' || productType === 'tent') ? (
+                <>
+                  <GlassButton 
+                    onClick={() => handleSurfaceNavigation('prev')} 
+                    disabled={productType === 'tin' ? currentSurface === 'front' : currentSurface === 'canopy_front'}
+                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Previous Surface"
+                  >
+                    <ArrowLeft className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                  </GlassButton>
+                  
+                  {/* Surface Indicator - Mobile */}
+                  <div className="px-1.5 sm:px-2 py-1 bg-white/30 backdrop-blur-sm border border-white/30 rounded text-xs font-medium text-gray-800 min-w-[50px] sm:min-w-[60px] text-center">
+                    {productType === 'tin' 
+                      ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
+                      : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+                    }
+                  </div>
+                  
+                  <GlassButton 
+                    onClick={() => handleSurfaceNavigation('next')} 
+                    disabled={productType === 'tin' ? currentSurface === 'lid' : currentSurface === 'backwall'}
+                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Next Surface"
+                  >
+                    <ArrowRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                  </GlassButton>
+                </>
+              ) : (
+                <>
+                  <GlassButton 
+                    onClick={undo} 
+                    disabled={historyStep <= 0}
+                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Undo"
+                  >
+                    <Undo className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                  </GlassButton>
+                  
+                  <GlassButton 
+                    onClick={redo} 
+                    disabled={historyStep >= history.length - 1}
+                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Redo"
+                  >
+                    <Redo className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                  </GlassButton>
+                </>
+              )}
           </div>
           </div>
         </div>

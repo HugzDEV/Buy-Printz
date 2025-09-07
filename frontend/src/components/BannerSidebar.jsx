@@ -27,6 +27,11 @@ const BannerSidebar = ({
   bannerSizes = [],
   canvasSize,
   canvasOrientation,
+  productType = 'banner',
+  tinSpecs = { finish: 'silver', surfaceCoverage: 'front-back', printingMethod: 'premium-vinyl' },
+  onTinSpecsChange,
+  currentSurface = 'front',
+  onSurfaceChange,
 
   onAddShape,
   onAddAsset,
@@ -63,6 +68,7 @@ const BannerSidebar = ({
   // QR Code state
   const [qrColor, setQrColor] = useState('#000000')
   const [qrBackgroundColor, setQrBackgroundColor] = useState('#ffffff')
+
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [scrollDirection, setScrollDirection] = useState('down')
@@ -485,7 +491,21 @@ const BannerSidebar = ({
       ...prev,
       [sectionKey]: !prev[sectionKey]
     }))
-    })
+  })
+  }
+
+  // Handle tin specification changes
+  const handleTinSpecChange = (key, value) => {
+    if (onTinSpecsChange) {
+      onTinSpecsChange(key, value)
+    }
+  }
+
+  // Handle surface navigation
+  const handleSurfaceChange = (surface) => {
+    if (onSurfaceChange) {
+      onSurfaceChange(surface)
+    }
   }
 
   const handleAssetClick = (asset) => {
@@ -1032,8 +1052,16 @@ const BannerSidebar = ({
                 <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-gray-800 text-sm sm:text-base">Specifications</h3>
-                <p className="text-xs text-gray-500">Banner details</p>
+                <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
+                  {productType === 'banner' && 'Specifications'}
+                  {productType === 'tin' && 'Tin Specifications'}
+                  {productType === 'tent' && 'Tent Specifications'}
+                </h3>
+                <p className="text-xs text-gray-500">
+                  {productType === 'banner' && 'Banner details'}
+                  {productType === 'tin' && 'Tin details'}
+                  {productType === 'tent' && 'Tent details'}
+                </p>
               </div>
             </div>
             {expandedSections.specifications ? 
@@ -1044,64 +1072,174 @@ const BannerSidebar = ({
 
           {expandedSections.specifications && (
             <div className="px-4 pb-4 space-y-3">
-              {/* Banner Type Selector */}
+              {/* Product Type Selector */}
               <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                <div className="text-sm font-medium text-gray-800 mb-3">Banner Type</div>
+                <div className="text-sm font-medium text-gray-800 mb-3">
+                  {productType === 'banner' && 'Banner Type'}
+                  {productType === 'tin' && 'Tin Finish'}
+                  {productType === 'tent' && 'Tent Material'}
+                </div>
                 <select 
-                  value={bannerSpecs?.id || ''}
-                  onChange={(e) => onChangeBannerType?.(e.target.value)}
+                  value={productType === 'tin' ? tinSpecs.finish : (bannerSpecs?.id || '')}
+                  onChange={(e) => {
+                    if (productType === 'tin') {
+                      handleTinSpecChange('finish', e.target.value)
+                    } else {
+                      onChangeBannerType?.(e.target.value)
+                    }
+                  }}
                   className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 >
-                  {bannerTypes.map((type) => (
+                  {productType === 'banner' && bannerTypes.map((type) => (
                     <option key={type.id} value={type.id}>
                       {type.name}
                     </option>
                   ))}
+                  {productType === 'tin' && (
+                    <>
+                      <option value="silver">Silver</option>
+                      <option value="black">Black</option>
+                      <option value="gold">Gold</option>
+                    </>
+                  )}
+                  {productType === 'tent' && (
+                    <>
+                      <option value="vinyl">Vinyl</option>
+                      <option value="mesh">Mesh</option>
+                      <option value="fabric">Fabric</option>
+                    </>
+                  )}
                 </select>
               </div>
 
-              {/* Canvas Size Selector */}
-              <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                <div className="text-sm font-medium text-gray-800 mb-3">Banner Size</div>
+              {/* Tin-Specific Options */}
+              {productType === 'tin' && (
+                <>
+                  {/* Surface Coverage */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Surface Coverage</div>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          name="surface-coverage" 
+                          value="front-back" 
+                          checked={tinSpecs.surfaceCoverage === 'front-back'}
+                          onChange={(e) => handleTinSpecChange('surfaceCoverage', e.target.value)}
+                          className="text-blue-500" 
+                        />
+                        <span className="text-sm text-gray-700">Front + Back Only</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          name="surface-coverage" 
+                          value="all-sides" 
+                          checked={tinSpecs.surfaceCoverage === 'all-sides'}
+                          onChange={(e) => handleTinSpecChange('surfaceCoverage', e.target.value)}
+                          className="text-blue-500" 
+                        />
+                        <span className="text-sm text-gray-700">All Sides (Front, Back, Inside, Lid)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Printing Method */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Printing Method</div>
+                    <select 
+                      value={tinSpecs.printingMethod}
+                      onChange={(e) => handleTinSpecChange('printingMethod', e.target.value)}
+                      className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    >
+                      <option value="premium-vinyl">Premium Vinyl Stickers</option>
+                      <option value="premium-clear-vinyl">Premium Clear Vinyl Stickers</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* Tent-Specific Options */}
+              {productType === 'tent' && (
+                <>
+                  {/* Tent Size */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Tent Size</div>
+                    <select className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                      <option value="10x10">10x10 ft Tent</option>
+                      <option value="10x20">10x20 ft Tent</option>
+                    </select>
+                  </div>
+
+                  {/* Components */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Components</div>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked className="text-blue-500" />
+                        <span className="text-sm text-gray-700">Tent</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked className="text-blue-500" />
+                        <span className="text-sm text-gray-700">Table Cloth</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked className="text-blue-500" />
+                        <span className="text-sm text-gray-700">Flag</span>
+                      </label>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Canvas Size Selector - Only for banners and tents */}
+              {(productType === 'banner' || productType === 'tent') && (
+                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                  <div className="text-sm font-medium text-gray-800 mb-3">
+                    {productType === 'banner' && 'Banner Size'}
+                    {productType === 'tent' && 'Tent Size'}
+                  </div>
                 
-                {/* Size Category Tabs */}
-                <div className="flex gap-1 mb-3">
-                  <button
-                    onClick={() => setSizeCategory('landscape')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                      sizeCategory === 'landscape' 
-                        ? 'bg-blue-500 text-white shadow-lg' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
-                    }`}
-                  >
-                    Landscape
-                  </button>
-                  <button
-                    onClick={() => setSizeCategory('portrait')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                      sizeCategory === 'portrait' 
-                        ? 'bg-blue-500 text-white shadow-lg' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
-                    }`}
-                  >
-                    Portrait
-                  </button>
-                  <button
-                    onClick={() => setSizeCategory('custom')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                      sizeCategory === 'custom' 
-                        ? 'bg-blue-500 text-white shadow-lg' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
-                    }`}
-                  >
-                    Custom
-                  </button>
-                </div>
+                {/* Size Category Tabs - Only show for banners */}
+                {productType === 'banner' && (
+                  <div className="flex gap-1 mb-3">
+                    <button
+                      onClick={() => setSizeCategory('landscape')}
+                      className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        sizeCategory === 'landscape' 
+                          ? 'bg-blue-500 text-white shadow-lg' 
+                          : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
+                      }`}
+                    >
+                      Landscape
+                    </button>
+                    <button
+                      onClick={() => setSizeCategory('portrait')}
+                      className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        sizeCategory === 'portrait' 
+                          ? 'bg-blue-500 text-white shadow-lg' 
+                          : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
+                      }`}
+                    >
+                      Portrait
+                    </button>
+                    <button
+                      onClick={() => setSizeCategory('custom')}
+                      className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        sizeCategory === 'custom' 
+                          ? 'bg-blue-500 text-white shadow-lg' 
+                          : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
+                      }`}
+                    >
+                      Custom
+                    </button>
+                  </div>
+                )}
 
                 {/* Size Options */}
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {bannerSizes
-                    .filter(size => size.category === sizeCategory)
+                    .filter(size => productType === 'banner' ? size.category === sizeCategory : true)
                     .map((size) => (
                       <button
                         key={size.name}
@@ -1122,8 +1260,8 @@ const BannerSidebar = ({
                     ))}
                 </div>
 
-                {/* Custom Size Input */}
-                {sizeCategory === 'custom' && (
+                {/* Custom Size Input - Only for banners */}
+                {productType === 'banner' && sizeCategory === 'custom' && (
                   <div className="mt-3 pt-3 border-t border-white/20">
                     <div className="mb-3">
                       <div className="text-xs text-gray-600 mb-1">Current Custom Size</div>
@@ -1173,6 +1311,7 @@ const BannerSidebar = ({
                   </div>
                 )}
               </div>
+              )}
 
               {/* Current Specifications */}
               <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3 space-y-3">
@@ -1190,36 +1329,108 @@ const BannerSidebar = ({
                     {canvasOrientation === 'landscape' ? 'Landscape' : 'Portrait'}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Type:</span>
-                  <span className="font-medium text-gray-800">{bannerSpecs?.name || 'Custom'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Category:</span>
-                  <span className="font-medium text-gray-800">{bannerSpecs?.category || 'Custom'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Material:</span>
-                  <span className="font-medium text-gray-800">{bannerSpecs?.material || 'Premium'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Finish:</span>
-                  <span className="font-medium text-gray-800">{bannerSpecs?.finish || 'Standard'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Specs:</span>
-                  <span className="font-medium text-gray-800">{bannerSpecs?.specs || 'Standard'}</span>
-                </div>
                 
-                {bannerSpecs?.description && (
+                {productType === 'banner' && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Type:</span>
+                      <span className="font-medium text-gray-800">{bannerSpecs?.name || 'Custom'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Category:</span>
+                      <span className="font-medium text-gray-800">{bannerSpecs?.category || 'Custom'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Material:</span>
+                      <span className="font-medium text-gray-800">{bannerSpecs?.material || 'Premium'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Finish:</span>
+                      <span className="font-medium text-gray-800">{bannerSpecs?.finish || 'Standard'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Specs:</span>
+                      <span className="font-medium text-gray-800">{bannerSpecs?.specs || 'Standard'}</span>
+                    </div>
+                  </>
+                )}
+
+                {productType === 'tin' && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Product:</span>
+                      <span className="font-medium text-gray-800">Business Card Tin</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tin Finish:</span>
+                      <span className="font-medium text-gray-800 capitalize">{tinSpecs.finish}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Surface Coverage:</span>
+                      <span className="font-medium text-gray-800">
+                        {tinSpecs.surfaceCoverage === 'front-back' ? 'Front + Back' : 'All Sides'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Printing:</span>
+                      <span className="font-medium text-gray-800">
+                        {tinSpecs.printingMethod === 'premium-vinyl' ? 'Premium Vinyl Stickers' : 'Premium Clear Vinyl Stickers'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Dimensions:</span>
+                      <span className="font-medium text-gray-800">3.74" × 2.25" × 0.78"</span>
+                    </div>
+                  </>
+                )}
+
+                {productType === 'tent' && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Product:</span>
+                      <span className="font-medium text-gray-800">Tradeshow Tent</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tent Size:</span>
+                      <span className="font-medium text-gray-800">10×10 ft</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Material:</span>
+                      <span className="font-medium text-gray-800">Vinyl</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Components:</span>
+                      <span className="font-medium text-gray-800">Tent + Table Cloth + Flag</span>
+                    </div>
+                  </>
+                )}
+                
+                {/* Product-specific description and uses */}
+                {productType === 'banner' && bannerSpecs?.description && (
                   <div className="pt-2 border-t border-white/20">
                     <p className="text-xs text-gray-600 leading-relaxed">
                       {bannerSpecs.description}
                     </p>
                   </div>
                 )}
+
+                {productType === 'tin' && (
+                  <div className="pt-2 border-t border-white/20">
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      Premium aluminum business card tins with custom vinyl stickers. Perfect for memorable networking and professional branding.
+                    </p>
+                  </div>
+                )}
+
+                {productType === 'tent' && (
+                  <div className="pt-2 border-t border-white/20">
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      Professional tradeshow tents with custom graphics. Ideal for events, conferences, and outdoor marketing.
+                    </p>
+                  </div>
+                )}
                 
-                {bannerSpecs?.uses && bannerSpecs.uses.length > 0 && (
+                {productType === 'banner' && bannerSpecs?.uses && bannerSpecs.uses.length > 0 && (
                   <div className="pt-2 border-t border-white/20">
                     <p className="text-xs font-medium text-gray-700 mb-1">Best for:</p>
                     <div className="flex flex-wrap gap-1">
@@ -1234,7 +1445,30 @@ const BannerSidebar = ({
                     </div>
                   </div>
                 )}
+
+                {productType === 'tin' && (
+                  <div className="pt-2 border-t border-white/20">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Best for:</p>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Networking</span>
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Professional Branding</span>
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Memorable Business Cards</span>
+                    </div>
+                  </div>
+                )}
+
+                {productType === 'tent' && (
+                  <div className="pt-2 border-t border-white/20">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Best for:</p>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Trade Shows</span>
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Outdoor Events</span>
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Marketing</span>
+                    </div>
+                  </div>
+                )}
               </div>
+
             </div>
           )}
         </GlassCard>
@@ -1347,6 +1581,157 @@ const BannerSidebar = ({
                         </button>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Surface Navigation for Tins */}
+              {productType === 'tin' && (
+                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                  <div className="text-sm font-medium text-gray-800 mb-3">Surface Navigation</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleSurfaceChange('front')}
+                      className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        currentSurface === 'front'
+                          ? 'bg-blue-500 text-white shadow-lg'
+                          : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                      }`}
+                    >
+                      Front
+                    </button>
+                    <button
+                      onClick={() => handleSurfaceChange('back')}
+                      className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        currentSurface === 'back'
+                          ? 'bg-blue-500 text-white shadow-lg'
+                          : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                      }`}
+                    >
+                      Back
+                    </button>
+                    {tinSpecs.surfaceCoverage === 'all-sides' && (
+                      <>
+                        <button
+                          onClick={() => handleSurfaceChange('inside')}
+                          className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                            currentSurface === 'inside'
+                              ? 'bg-blue-500 text-white shadow-lg'
+                              : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                          }`}
+                        >
+                          Inside
+                        </button>
+                        <button
+                          onClick={() => handleSurfaceChange('lid')}
+                          className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                            currentSurface === 'lid'
+                              ? 'bg-blue-500 text-white shadow-lg'
+                              : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                          }`}
+                        >
+                          Lid
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <div className="mt-2 text-xs text-gray-600 text-center">
+                    Currently editing: <span className="font-medium capitalize">{currentSurface}</span> surface
+                  </div>
+                </div>
+              )}
+
+              {/* Surface Navigation for Tents */}
+              {productType === 'tent' && (
+                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                  <div className="text-sm font-medium text-gray-800 mb-3">Surface Navigation</div>
+                  
+                  {/* Canopy Surfaces */}
+                  <div className="mb-3">
+                    <div className="text-xs font-medium text-gray-600 mb-2">Canopy Surfaces</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => handleSurfaceChange('canopy_front')}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === 'canopy_front'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        Front
+                      </button>
+                      <button
+                        onClick={() => handleSurfaceChange('canopy_back')}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === 'canopy_back'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={() => handleSurfaceChange('canopy_left')}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === 'canopy_left'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        Left
+                      </button>
+                      <button
+                        onClick={() => handleSurfaceChange('canopy_right')}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === 'canopy_right'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        Right
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Sidewalls and Backwall */}
+                  <div>
+                    <div className="text-xs font-medium text-gray-600 mb-2">Sidewalls & Backwall</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => handleSurfaceChange('sidewall_left')}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === 'sidewall_left'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        Left Wall
+                      </button>
+                      <button
+                        onClick={() => handleSurfaceChange('sidewall_right')}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === 'sidewall_right'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        Right Wall
+                      </button>
+                      <button
+                        onClick={() => handleSurfaceChange('backwall')}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === 'backwall'
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        Back Wall
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-2 text-xs text-gray-600 text-center">
+                    Currently editing: <span className="font-medium capitalize">{currentSurface.replace('_', ' ')}</span> surface
                   </div>
                 </div>
               )}

@@ -1613,6 +1613,258 @@ async def invalidate_cache_key(cache_key: str):
         "timestamp": datetime.utcnow().isoformat()
     }
 
+# Business Card Tins API Endpoints
+
+class BusinessCardTinRequest(BaseModel):
+    quantity: int
+    surface_coverage: str
+    tin_finish: str
+    printing_method: str
+    surface_designs: Optional[Dict[str, Any]] = {}
+    notes: Optional[str] = ""
+
+class BusinessCardTinDesignUpdate(BaseModel):
+    surface_designs: Dict[str, Any]
+
+class BusinessCardTinStatusUpdate(BaseModel):
+    status: str
+    notes: Optional[str] = ""
+
+@app.post("/api/business-card-tins/create")
+async def create_business_card_tin_order(
+    tin_request: BusinessCardTinRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a new business card tin order"""
+    try:
+        # First create a basic order
+        order_data = {
+            "user_id": current_user["id"],
+            "product_type": "business_card_tin",
+            "status": "pending",
+            "total_amount": 0,  # Will be calculated by tin creation
+            "order_details": {
+                "quantity": tin_request.quantity,
+                "surface_coverage": tin_request.surface_coverage,
+                "tin_finish": tin_request.tin_finish,
+                "printing_method": tin_request.printing_method
+            }
+        }
+        
+        order_result = await db_manager.create_order(order_data)
+        if not order_result.get("success"):
+            raise HTTPException(status_code=400, detail=order_result.get("error", "Failed to create order"))
+        
+        order_id = order_result["order_id"]
+        
+        # Create the business card tin record
+        tin_data = {
+            "quantity": tin_request.quantity,
+            "surface_coverage": tin_request.surface_coverage,
+            "tin_finish": tin_request.tin_finish,
+            "printing_method": tin_request.printing_method,
+            "surface_designs": tin_request.surface_designs,
+            "notes": tin_request.notes
+        }
+        
+        tin_result = await db_manager.create_business_card_tin_order(
+            current_user["id"], 
+            order_id, 
+            tin_data
+        )
+        
+        if not tin_result.get("success"):
+            # Clean up the order if tin creation failed
+            await db_manager.delete_order(order_id)
+            raise HTTPException(status_code=400, detail=tin_result.get("error", "Failed to create tin order"))
+        
+        # Update the order with the calculated total
+        await db_manager.update_order_status(order_id, "pending", tin_result["total_price"])
+        
+        return {
+            "success": True,
+            "order_id": order_id,
+            "tin_id": tin_result["tin_id"],
+            "total_price": tin_result["total_price"],
+            "message": "Business card tin order created successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error creating business card tin order: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/business-card-tins/{tin_id}")
+async def get_business_card_tin(
+    tin_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get a specific business card tin by ID"""
+    try:
+        tin = await db_manager.get_business_card_tin(tin_id)
+        if not tin:
+            raise HTTPException(status_code=404, detail="Business card tin not found")
+        
+        # Verify user owns this tin
+        if tin["user_id"] != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        return {
+            "success": True,
+            "tin": tin
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting business card tin: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/business-card-tins")
+async def get_user_business_card_tins(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all business card tins for the current user"""
+    try:
+        tins = await db_manager.get_user_business_card_tins(current_user["id"])
+        return {
+            "success": True,
+            "tins": tins
+        }
+        
+    except Exception as e:
+        print(f"Error getting user business card tins: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/business-card-tins/{tin_id}/design")
+async def update_business_card_tin_design(
+    tin_id: str,
+    design_update: BusinessCardTinDesignUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update the design data for a business card tin"""
+    try:
+        # Verify user owns this tin
+        tin = await db_manager.get_business_card_tin(tin_id)
+        if not tin:
+            raise HTTPException(status_code=404, detail="Business card tin not found")
+        
+        if tin["user_id"] != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        success = await db_manager.update_business_card_tin_design(
+            tin_id, 
+            design_update.surface_designs
+        )
+        
+        if not success:
+            raise HTTPException(status_code=400, detail="Failed to update design")
+        
+        return {
+            "success": True,
+            "message": "Design updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating business card tin design: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/business-card-tins/{tin_id}/status")
+async def update_business_card_tin_status(
+    tin_id: str,
+    status_update: BusinessCardTinStatusUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update the status of a business card tin"""
+    try:
+        # Verify user owns this tin
+        tin = await db_manager.get_business_card_tin(tin_id)
+        if not tin:
+            raise HTTPException(status_code=404, detail="Business card tin not found")
+        
+        if tin["user_id"] != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        success = await db_manager.update_business_card_tin_status(
+            tin_id, 
+            status_update.status,
+            status_update.notes
+        )
+        
+        if not success:
+            raise HTTPException(status_code=400, detail="Failed to update status")
+        
+        return {
+            "success": True,
+            "message": "Status updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating business card tin status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/business-card-tins/{tin_id}")
+async def delete_business_card_tin(
+    tin_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a business card tin order"""
+    try:
+        # Verify user owns this tin
+        tin = await db_manager.get_business_card_tin(tin_id)
+        if not tin:
+            raise HTTPException(status_code=404, detail="Business card tin not found")
+        
+        if tin["user_id"] != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        success = await db_manager.delete_business_card_tin(tin_id)
+        
+        if not success:
+            raise HTTPException(status_code=400, detail="Failed to delete tin order")
+        
+        return {
+            "success": True,
+            "message": "Business card tin order deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error deleting business card tin: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/business-card-tins/order/{order_id}")
+async def get_business_card_tin_by_order(
+    order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get business card tin by order ID"""
+    try:
+        tin = await db_manager.get_business_card_tin_by_order(order_id)
+        if not tin:
+            raise HTTPException(status_code=404, detail="Business card tin not found for this order")
+        
+        # Verify user owns this tin
+        if tin["user_id"] != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        return {
+            "success": True,
+            "tin": tin
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting business card tin by order: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
