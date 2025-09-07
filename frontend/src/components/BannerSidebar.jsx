@@ -1402,7 +1402,7 @@ const BannerSidebar = ({
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={!!selectedElement?.stroke}
+                      checked={!!(selectedElement?.stroke && selectedElement?.strokeWidth > 0)}
                       onChange={(e) => {
                         if (e.target.checked) {
                           onTextPropertyChange('stroke', selectedElement?.stroke || '#000000')
@@ -1419,7 +1419,7 @@ const BannerSidebar = ({
                 </div>
                 
                 {/* Stroke Color and Width */}
-                {selectedElement?.stroke && (
+                {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
                   <div className="space-y-2 pl-6">
                     <div className="flex items-center gap-2">
                       <label className="text-xs text-gray-600">Color:</label>
@@ -1439,16 +1439,32 @@ const BannerSidebar = ({
                       <label className="text-xs text-gray-600">Width:</label>
                       <div className="flex items-center gap-1">
                         <button
-                          onClick={() => onTextPropertyChange('strokeWidth', Math.max(0, (selectedElement?.strokeWidth || 2) - 1))}
+                          onClick={() => {
+                            const currentWidth = selectedElement?.strokeWidth || 0
+                            const newWidth = Math.max(0, currentWidth - 1)
+                            onTextPropertyChange('strokeWidth', newWidth)
+                            // If width becomes 0, also disable stroke
+                            if (newWidth === 0) {
+                              onTextPropertyChange('stroke', null)
+                            }
+                          }}
                           className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold"
                         >
                           -
                         </button>
                         <span className="text-xs text-gray-700 min-w-[20px] text-center">
-                          {selectedElement?.strokeWidth || 2}px
+                          {selectedElement?.strokeWidth || 0}px
                         </span>
                         <button
-                          onClick={() => onTextPropertyChange('strokeWidth', Math.min(20, (selectedElement?.strokeWidth || 2) + 1))}
+                          onClick={() => {
+                            const currentWidth = selectedElement?.strokeWidth || 0
+                            const newWidth = Math.min(20, currentWidth + 1)
+                            onTextPropertyChange('strokeWidth', newWidth)
+                            // If width becomes > 0 and no stroke color, set default stroke
+                            if (newWidth > 0 && !selectedElement?.stroke) {
+                              onTextPropertyChange('stroke', '#000000')
+                            }
+                          }}
                           className="w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold"
                         >
                           +

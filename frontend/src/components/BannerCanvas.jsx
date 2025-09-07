@@ -1095,6 +1095,7 @@ const BannerCanvas = ({
             fill={safeElement.fill || '#ffff00'}
             stroke={safeElement.stroke || '#000000'}
             strokeWidth={safeElement.strokeWidth || 1}
+            strokeScaleEnabled={false}
             rotation={safeElement.rotation || 0}
             // Ensure proper bounds for transformer
             width={safeElement.outerRadius * 2 || 100}
@@ -2176,24 +2177,25 @@ const BannerCanvas = ({
                   {/* Stroke Toggle */}
                   <button
                     onClick={() => {
-                      if (selectedElement?.stroke) {
+                      const hasStroke = selectedElement?.stroke && selectedElement?.strokeWidth > 0
+                      if (hasStroke) {
                         handleElementChange(selectedId, { stroke: null, strokeWidth: 0 })
                       } else {
                         handleElementChange(selectedId, { stroke: '#000000', strokeWidth: 2 })
                       }
                     }}
                     className={`w-6 h-6 rounded text-xs transition-colors duration-200 ${
-                      selectedElement?.stroke
+                      selectedElement?.stroke && selectedElement?.strokeWidth > 0
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                     }`}
-                    title={selectedElement?.stroke ? "Disable Outline" : "Enable Outline"}
+                    title={selectedElement?.stroke && selectedElement?.strokeWidth > 0 ? "Disable Outline" : "Enable Outline"}
                   >
                     ⭕
                   </button>
                   
                   {/* Stroke Color (only show if stroke is enabled) */}
-                  {selectedElement?.stroke && (
+                  {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
                     <>
                       <input
                         type="color"
@@ -2206,16 +2208,32 @@ const BannerCanvas = ({
                       {/* Stroke Width */}
                       <div className="flex items-center gap-1">
                         <button
-                          onClick={() => handleElementChange(selectedId, { strokeWidth: Math.max(0, (selectedElement?.strokeWidth || 2) - 1) })}
+                          onClick={() => {
+                            const currentWidth = selectedElement?.strokeWidth || 0
+                            const newWidth = Math.max(0, currentWidth - 1)
+                            handleElementChange(selectedId, { strokeWidth: newWidth })
+                            // If width becomes 0, also disable stroke
+                            if (newWidth === 0) {
+                              handleElementChange(selectedId, { stroke: null })
+                            }
+                          }}
                           className="w-5 h-5 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
                         >
                           -
                         </button>
                         <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] text-center">
-                          {selectedElement?.strokeWidth || 2}
+                          {selectedElement?.strokeWidth || 0}
                         </span>
                         <button
-                          onClick={() => handleElementChange(selectedId, { strokeWidth: Math.min(20, (selectedElement?.strokeWidth || 2) + 1) })}
+                          onClick={() => {
+                            const currentWidth = selectedElement?.strokeWidth || 0
+                            const newWidth = Math.min(20, currentWidth + 1)
+                            handleElementChange(selectedId, { strokeWidth: newWidth })
+                            // If width becomes > 0 and no stroke color, set default stroke
+                            if (newWidth > 0 && !selectedElement?.stroke) {
+                              handleElementChange(selectedId, { stroke: '#000000' })
+                            }
+                          }}
                           className="w-5 h-5 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
                         >
                           +
@@ -2260,45 +2278,85 @@ const BannerCanvas = ({
               {/* Divider */}
               <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
               
-              {/* Stroke Color Picker */}
+              {/* Shape Stroke/Outline */}
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Stroke:</span>
-                <input
-                  type="color"
-                  value={selectedElement?.stroke || '#374151'}
-                  onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
-                  className="w-8 h-8 rounded border-2 border-white/30 cursor-pointer"
-                  title="Choose stroke color"
-                />
-                <span className="text-xs text-gray-500 font-mono min-w-[4rem]">
-                  {selectedElement?.stroke || '#374151'}
-                </span>
+                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Outline:</span>
+                <div className="flex items-center gap-1">
+                  {/* Stroke Toggle */}
+                  <button
+                    onClick={() => {
+                      const hasStroke = selectedElement?.stroke && selectedElement?.strokeWidth > 0
+                      if (hasStroke) {
+                        handleElementChange(selectedId, { stroke: null, strokeWidth: 0 })
+                      } else {
+                        handleElementChange(selectedId, { stroke: '#374151', strokeWidth: 2 })
+                      }
+                    }}
+                    className={`w-6 h-6 rounded text-xs transition-colors duration-200 ${
+                      selectedElement?.stroke && selectedElement?.strokeWidth > 0
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                    title={selectedElement?.stroke && selectedElement?.strokeWidth > 0 ? "Disable Outline" : "Enable Outline"}
+                  >
+                    ⭕
+                  </button>
+                  
+                  {/* Stroke Color (only show if stroke is enabled) */}
+                  {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
+                    <input
+                      type="color"
+                      value={selectedElement?.stroke || '#374151'}
+                      onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
+                      className="w-6 h-6 rounded border border-gray-300 cursor-pointer"
+                      title="Choose outline color"
+                    />
+                  )}
+                </div>
               </div>
               
               {/* Divider */}
               <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
               
-              {/* Stroke Width */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Width:</span>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleElementChange(selectedId, { strokeWidth: Math.max(0, (selectedElement?.strokeWidth || 2) - 1) })}
-                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
-                  >
-                    -
-                  </button>
-                  <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] text-center">
-                    {selectedElement?.strokeWidth || 2}
-                  </span>
-                  <button
-                    onClick={() => handleElementChange(selectedId, { strokeWidth: (selectedElement?.strokeWidth || 2) + 1 })}
-                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
-                  >
-                    +
-                  </button>
+              {/* Stroke Width (only show if stroke is enabled) */}
+              {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Width:</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        const currentWidth = selectedElement?.strokeWidth || 0
+                        const newWidth = Math.max(0, currentWidth - 1)
+                        handleElementChange(selectedId, { strokeWidth: newWidth })
+                        // If width becomes 0, also disable stroke
+                        if (newWidth === 0) {
+                          handleElementChange(selectedId, { stroke: null })
+                        }
+                      }}
+                      className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                    >
+                      -
+                    </button>
+                    <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] text-center">
+                      {selectedElement?.strokeWidth || 0}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const currentWidth = selectedElement?.strokeWidth || 0
+                        const newWidth = Math.min(20, currentWidth + 1)
+                        handleElementChange(selectedId, { strokeWidth: newWidth })
+                        // If width becomes > 0 and no stroke color, set default stroke
+                        if (newWidth > 0 && !selectedElement?.stroke) {
+                          handleElementChange(selectedId, { stroke: '#374151' })
+                        }
+                      }}
+                      className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
           
