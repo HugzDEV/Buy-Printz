@@ -23,6 +23,7 @@ import {
   MoveDown,
   MoveUp,
   Layers,
+  Eraser,
   Settings,
   Undo,
   Redo,
@@ -64,6 +65,19 @@ const BannerCanvas = ({
   const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
   const [autoScaling, setAutoScaling] = useState(true) // Auto-scaling enabled by default for mobile
+  
+  // Handle clear canvas with confirmation
+  const handleClearCanvas = useCallback(() => {
+    if (elements.length === 0) return
+    
+    const confirmed = window.confirm(
+      '⚠️ Clear Entire Canvas?\n\nThis will remove ALL elements from your canvas. This action cannot be undone.\n\nAre you sure you want to continue?'
+    )
+    
+    if (confirmed) {
+      onClearCanvas()
+    }
+  }, [elements.length, onClearCanvas])
   
   // Get the currently selected element
   const selectedElement = elements.find(el => el.id === selectedId)
@@ -1502,13 +1516,13 @@ const BannerCanvas = ({
             {/* Mobile: Clear, Auto-scaling, Save and Order buttons */}
             <div className="sm:hidden flex items-center gap-1">
               <GlassButton 
-                onClick={onClearCanvas} 
+                onClick={handleClearCanvas} 
                 disabled={!hasElements}
-                variant="danger" 
-                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" 
-                title="Clear Canvas"
+                variant="warning" 
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border-2 border-orange-400/50" 
+                title="Clear Entire Canvas - Removes all elements"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Eraser className="w-3.5 h-3.5" />
               </GlassButton>
               
               <GlassButton 
@@ -1558,13 +1572,13 @@ const BannerCanvas = ({
               <div className="w-px h-5 bg-white/20 mx-1" />
             
               <GlassButton 
-                onClick={onClearCanvas} 
+                onClick={handleClearCanvas} 
                 disabled={!hasElements}
-                variant="danger" 
-                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" 
-                title="Clear Canvas"
+                variant="warning" 
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border-2 border-orange-400/50" 
+                title="Clear Entire Canvas - Removes all elements"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Eraser className="w-3.5 h-3.5" />
               </GlassButton>
             
             
