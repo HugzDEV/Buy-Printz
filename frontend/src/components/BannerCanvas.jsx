@@ -2142,8 +2142,8 @@ const BannerCanvas = ({
                 >
                   {/* Sans-serif Fonts */}
                   <optgroup label="Sans-serif">
-                    <option value="Arial">Arial</option>
-                    <option value="Helvetica">Helvetica</option>
+                  <option value="Arial">Arial</option>
+                  <option value="Helvetica">Helvetica</option>
                     <option value="Verdana">Verdana</option>
                     <option value="Tahoma">Tahoma</option>
                     <option value="Trebuchet MS">Trebuchet MS</option>
@@ -2161,8 +2161,8 @@ const BannerCanvas = ({
                   
                   {/* Serif Fonts */}
                   <optgroup label="Serif">
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Georgia">Georgia</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Georgia">Georgia</option>
                     <option value="Garamond">Garamond</option>
                     <option value="Book Antiqua">Book Antiqua</option>
                     <option value="Palatino">Palatino</option>
@@ -2176,8 +2176,8 @@ const BannerCanvas = ({
                   
                   {/* Display/Decorative Fonts */}
                   <optgroup label="Display & Decorative">
-                    <option value="Impact">Impact</option>
-                    <option value="Comic Sans MS">Comic Sans MS</option>
+                  <option value="Impact">Impact</option>
+                  <option value="Comic Sans MS">Comic Sans MS</option>
                     <option value="Papyrus">Papyrus</option>
                     <option value="Chalkduster">Chalkduster</option>
                     <option value="Marker Felt">Marker Felt</option>
@@ -2198,7 +2198,7 @@ const BannerCanvas = ({
                   
                   {/* Monospace Fonts */}
                   <optgroup label="Monospace">
-                    <option value="Courier New">Courier New</option>
+                  <option value="Courier New">Courier New</option>
                     <option value="Lucida Console">Lucida Console</option>
                     <option value="Monaco">Monaco</option>
                     <option value="Consolas">Consolas</option>

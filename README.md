@@ -10,6 +10,7 @@ A powerful, modular canvas editor SDK built with React and Konva.js, designed fo
 - **Advanced Canvas Editor**: Built with Konva.js for high performance
 - **TypeScript Support**: Full type safety and IntelliSense
 - **Modular Architecture**: Use only what you need
+
 - **Professional Templates**: Pre-built templates for all product types
 - **Print Specifications**: Built-in print validation and specifications
 - **Pricing Integration**: Automatic pricing calculations
