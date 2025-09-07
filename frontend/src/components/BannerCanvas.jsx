@@ -2140,13 +2140,85 @@ const BannerCanvas = ({
                   onChange={(e) => handleElementChange(selectedId, { fontFamily: e.target.value })}
                   className="px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                 >
-                  <option value="Arial">Arial</option>
-                  <option value="Helvetica">Helvetica</option>
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Verdana">Verdana</option>
-                  <option value="Impact">Impact</option>
-                  <option value="Comic Sans MS">Comic Sans MS</option>
+                  {/* Sans-serif Fonts */}
+                  <optgroup label="Sans-serif">
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Tahoma">Tahoma</option>
+                    <option value="Trebuchet MS">Trebuchet MS</option>
+                    <option value="Calibri">Calibri</option>
+                    <option value="Segoe UI">Segoe UI</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Montserrat">Montserrat</option>
+                    <option value="Source Sans Pro">Source Sans Pro</option>
+                    <option value="Nunito">Nunito</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Inter">Inter</option>
+                  </optgroup>
+                  
+                  {/* Serif Fonts */}
+                  <optgroup label="Serif">
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Garamond">Garamond</option>
+                    <option value="Book Antiqua">Book Antiqua</option>
+                    <option value="Palatino">Palatino</option>
+                    <option value="Times">Times</option>
+                    <option value="Baskerville">Baskerville</option>
+                    <option value="Playfair Display">Playfair Display</option>
+                    <option value="Merriweather">Merriweather</option>
+                    <option value="Lora">Lora</option>
+                    <option value="Crimson Text">Crimson Text</option>
+                  </optgroup>
+                  
+                  {/* Display/Decorative Fonts */}
+                  <optgroup label="Display & Decorative">
+                    <option value="Impact">Impact</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                    <option value="Papyrus">Papyrus</option>
+                    <option value="Chalkduster">Chalkduster</option>
+                    <option value="Marker Felt">Marker Felt</option>
+                    <option value="Bradley Hand">Bradley Hand</option>
+                    <option value="Brush Script MT">Brush Script MT</option>
+                    <option value="Lobster">Lobster</option>
+                    <option value="Pacifico">Pacifico</option>
+                    <option value="Dancing Script">Dancing Script</option>
+                    <option value="Great Vibes">Great Vibes</option>
+                    <option value="Satisfy">Satisfy</option>
+                    <option value="Kaushan Script">Kaushan Script</option>
+                    <option value="Righteous">Righteous</option>
+                    <option value="Fredoka One">Fredoka One</option>
+                    <option value="Bangers">Bangers</option>
+                    <option value="Chewy">Chewy</option>
+                    <option value="Luckiest Guy">Luckiest Guy</option>
+                  </optgroup>
+                  
+                  {/* Monospace Fonts */}
+                  <optgroup label="Monospace">
+                    <option value="Courier New">Courier New</option>
+                    <option value="Lucida Console">Lucida Console</option>
+                    <option value="Monaco">Monaco</option>
+                    <option value="Consolas">Consolas</option>
+                    <option value="Source Code Pro">Source Code Pro</option>
+                    <option value="Fira Code">Fira Code</option>
+                    <option value="JetBrains Mono">JetBrains Mono</option>
+                  </optgroup>
+                  
+                  {/* Handwriting Fonts */}
+                  <optgroup label="Handwriting">
+                    <option value="Caveat">Caveat</option>
+                    <option value="Kalam">Kalam</option>
+                    <option value="Indie Flower">Indie Flower</option>
+                    <option value="Shadows Into Light">Shadows Into Light</option>
+                    <option value="Amatic SC">Amatic SC</option>
+                    <option value="Permanent Marker">Permanent Marker</option>
+                    <option value="Rock Salt">Rock Salt</option>
+                    <option value="Cedarville Cursive">Cedarville Cursive</option>
+                    <option value="Handlee">Handlee</option>
+                  </optgroup>
                 </select>
               </div>
               
