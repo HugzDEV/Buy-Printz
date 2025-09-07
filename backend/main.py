@@ -1082,15 +1082,15 @@ async def delete_pending_order(pending_order_id: str, current_user: dict = Depen
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Design history endpoints
-@app.get("/api/designs/{design_id}/history")
-async def get_design_history(design_id: str, current_user: dict = Depends(get_current_user)):
-    """Get design version history"""
-    try:
-        history = await db_manager.get_design_history(design_id)
-        return {"success": True, "history": history}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# Design history endpoints - DEPRECATED: Using templates instead
+# @app.get("/api/designs/{design_id}/history")
+# async def get_design_history(design_id: str, current_user: dict = Depends(get_current_user)):
+#     """Get design version history - DEPRECATED"""
+#     try:
+#         history = await db_manager.get_design_history(design_id)
+#         return {"success": True, "history": history}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 # AI Agent Endpoints
 @app.post("/api/ai/chat")
@@ -1346,7 +1346,7 @@ async def test_database_connection():
             }
         
         # Test basic query
-        test_response = db_manager.supabase.table("canvas_designs").select("id").limit(1).execute()
+        test_response = db_manager.supabase.table("banner_templates").select("id").limit(1).execute()
         
         return {
             "success": True,

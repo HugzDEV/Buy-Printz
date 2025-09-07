@@ -293,8 +293,8 @@ class DatabaseManager:
             print(f"Saving design record: {design_record['name']}")
             print(f"Design record data: {design_record}")
             
-            # The database trigger will automatically enforce the 10-design limit
-            response = self.supabase.table("canvas_designs").insert(design_record).execute()
+            # Use banner_templates table instead of canvas_designs
+            response = self.supabase.table("banner_templates").insert(design_record).execute()
             
             if response.data:
                 print(f"Design saved successfully with ID: {response.data[0]['id']}")
@@ -338,7 +338,7 @@ class DatabaseManager:
         
         try:
             print(f"Fetching designs for user: {user_id}")
-            response = self.supabase.table("canvas_designs").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            response = self.supabase.table("banner_templates").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
             
             if response.data:
                 print(f"Found {len(response.data)} designs for user")
@@ -406,7 +406,7 @@ class DatabaseManager:
             
         try:
             print(f"🔍 Getting design {design_id}")
-            response = self.supabase.table("canvas_designs").select("*").eq("id", design_id).execute()
+            response = self.supabase.table("banner_templates").select("*").eq("id", design_id).execute()
             print(f"🔍 Design query response: {response}")
             if response.data:
                 print(f"✅ Found design: {response.data[0].get('name', 'unnamed')}")
@@ -428,7 +428,7 @@ class DatabaseManager:
             # Add updated timestamp
             update_data["updated_at"] = datetime.utcnow().isoformat()
             
-            response = self.supabase.table("canvas_designs").update(update_data).eq("id", design_id).execute()
+            response = self.supabase.table("banner_templates").update(update_data).eq("id", design_id).execute()
             
             if response.data:
                 return {
@@ -1031,9 +1031,6 @@ class DatabaseManager:
             
             # Delete banner templates
             self.supabase.table("banner_templates").delete().eq("user_id", user_id).execute()
-            
-            # Delete canvas designs
-            self.supabase.table("canvas_designs").delete().eq("user_id", user_id).execute()
             
             # Delete orders
             self.supabase.table("orders").delete().eq("user_id", user_id).execute()
