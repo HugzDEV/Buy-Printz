@@ -13,6 +13,7 @@ import {
   Redo2, 
   FileText,
   Move,
+  X,
   RotateCw,
   Maximize2,
   Minimize2,
@@ -28,8 +29,7 @@ import {
   Undo,
   Redo,
   ArrowUp,
-  ArrowDown,
-  X
+  ArrowDown
 } from 'lucide-react'
 import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
@@ -2470,52 +2470,87 @@ const BannerCanvas = ({
         </div>
       </div>
 
-      {/* Custom GlassUI Text Editing Modal */}
+      {/* Enhanced Text Editing Modal */}
       {isEditingText && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-          <GlassPanel className="max-w-md w-full">
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Edit Text</h3>
-              <p className="text-sm text-gray-600">Modify your text content below</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={handleTextCancel}
+          />
+          
+          {/* Modal */}
+          <div className="relative w-full max-w-md">
+            <div className="backdrop-blur-xl bg-white/95 rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="p-6 border-b border-gray-200/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl shadow-lg border border-white/30">
+                      <FileText className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-800">Edit Text</h2>
+                      <p className="text-sm text-gray-600">Modify your text content below</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleTextCancel}
+                    className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-200"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Text Content
+                  </label>
+                  <textarea
+                    value={editingTextValue}
+                    onChange={(e) => setEditingTextValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      // Allow Enter for new lines, Ctrl+Enter or Cmd+Enter to save
+                      if ((e.key === 'Enter' && (e.ctrlKey || e.metaKey)) || e.key === 'Escape') {
+                        e.preventDefault();
+                        if (e.key === 'Escape') {
+                          handleTextCancel();
+                        } else {
+                          handleTextSave();
+                        }
+                      }
+                      // Allow Shift+Enter for new lines (default behavior)
+                    }}
+                    className="w-full h-32 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/90 backdrop-blur-sm text-gray-800 placeholder-gray-500"
+                    placeholder="Enter your text... (Press Enter for new lines, Ctrl+Enter to save)"
+                    autoFocus
+                  />
+                  <p className="mt-2 text-xs text-gray-500">
+                    Press Enter for new lines • Ctrl+Enter to save • Escape to cancel
+                  </p>
+                </div>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleTextCancel}
+                    className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-all duration-200 border border-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleTextSave}
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
             </div>
-            
-            <div className="mb-6">
-              <textarea
-                value={editingTextValue}
-                onChange={(e) => setEditingTextValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleTextSave();
-                  }
-                  if (e.key === 'Escape') {
-                    handleTextCancel();
-                  }
-                }}
-                className="w-full h-32 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white/80 backdrop-blur-sm"
-                placeholder="Enter your text..."
-                autoFocus
-              />
-            </div>
-            
-            <div className="flex gap-3">
-              <GlassButton
-                onClick={handleTextCancel}
-                variant="default"
-                className="flex-1 px-4 py-3"
-              >
-                Cancel
-              </GlassButton>
-              <GlassButton
-                onClick={handleTextSave}
-                variant="primary"
-                className="flex-1 px-4 py-3"
-              >
-                Save Changes
-              </GlassButton>
           </div>
-        </GlassPanel>
-      </div>
+        </div>
       )}
 
       {/* Clear Canvas Confirmation Modal */}
