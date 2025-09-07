@@ -464,7 +464,8 @@ const BannerEditorNew = () => {
       letterSpacing: 0,
       padding: 0,
       width: 200,
-      height: 30,
+      height: 'auto',
+      wrap: 'word',
       rotation: 0
     }
     

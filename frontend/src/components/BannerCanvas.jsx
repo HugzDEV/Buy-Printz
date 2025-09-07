@@ -443,14 +443,14 @@ const BannerCanvas = ({
         // Auto-scaling: use the smaller scale to maintain aspect ratio
         const scale = Math.min(node.scaleX(), node.scaleY())
         const newWidth = Math.max(50, node.width() * scale)
-        const newHeight = Math.max(50, node.height() * scale)
         
         updatedElement.width = newWidth
-        updatedElement.height = newHeight
+        // Keep height as 'auto' for proper text wrapping
+        updatedElement.height = 'auto'
       } else {
         // Free scaling: allow independent width/height scaling
         const newWidth = Math.max(50, node.width() * node.scaleX())
-        const newHeight = Math.max(50, node.height() * node.scaleY())
+        const newHeight = Math.max(30, node.height() * node.scaleY())
         
         updatedElement.width = newWidth
         updatedElement.height = newHeight
@@ -677,13 +677,15 @@ const BannerCanvas = ({
           fontSize: 24,
           fontFamily: 'Arial',
           width: 200,
-          height: 50,
+          height: 'auto',
           fill: '#000000',
           stroke: null,
           strokeWidth: 0,
           align: 'left',
           verticalAlign: 'top',
-          padding: 0
+          padding: 0,
+          wrap: 'word',
+          lineHeight: 1.2
         }
       case 'rect':
         return {
@@ -941,9 +943,11 @@ const BannerCanvas = ({
         if (!element.fontSize) element.fontSize = 24
         if (!element.fontFamily) element.fontFamily = 'Arial'
         if (!element.width) element.width = 200
-        if (!element.height) element.height = 50
+        if (!element.height) element.height = 'auto'
         if (element.stroke === undefined) element.stroke = null
         if (element.strokeWidth === undefined) element.strokeWidth = 0
+        if (!element.wrap) element.wrap = 'word'
+        if (!element.lineHeight) element.lineHeight = 1.2
         break
       case 'rect':
         if (!element.width) element.width = 100
@@ -1047,8 +1051,10 @@ const BannerCanvas = ({
             align={safeElement.align || 'left'}
             verticalAlign={safeElement.verticalAlign || 'top'}
             width={safeElement.width || 200}
-            height={safeElement.height || 50}
+            height={safeElement.height || 'auto'}
             padding={safeElement.padding || 0}
+            wrap="word"
+            lineHeight={safeElement.lineHeight || 1.2}
             listening={true}
             onDblClick={() => {
               handleTextEdit(safeElement.id);
