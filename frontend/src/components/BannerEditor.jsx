@@ -2276,20 +2276,22 @@ const BannerEditorNew = () => {
         </div>
 
         {/* Right Section */}
-        <div className="action-buttons hidden sm:flex items-center gap-2 md:gap-3">
+        <div className="action-buttons flex items-center gap-2 md:gap-3">
           <button
             onClick={saveAsTemplate}
-            className="px-3 md:px-4 py-1.5 md:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium"
+            className="px-2 md:px-4 py-1 md:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium text-xs md:text-sm"
           >
-            Save as Template
+            <span className="hidden sm:inline">Save as Template</span>
+            <span className="sm:hidden">Save</span>
           </button>
           
           <button
             onClick={createOrder}
-            className="px-3 md:px-4 py-1.5 md:py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center gap-2"
+            className="px-2 md:px-4 py-1 md:py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center gap-1 md:gap-2 text-xs md:text-sm"
           >
-            <ShoppingCart className="w-4 h-4" />
-            Create Order
+            <ShoppingCart className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden sm:inline">Create Order</span>
+            <span className="sm:hidden">Order</span>
           </button>
         </div>
         

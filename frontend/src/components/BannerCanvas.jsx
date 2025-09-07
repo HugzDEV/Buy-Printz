@@ -1513,8 +1513,37 @@ const BannerCanvas = ({
 
           {/* Right Section - Action Buttons */}
           <div className="flex items-center gap-1">
-            {/* Mobile: Clear, Auto-scaling, Save and Order buttons */}
+            {/* Mobile: All toolbar tools */}
             <div className="sm:hidden flex items-center gap-1">
+              <GlassButton 
+                onClick={() => setAutoScaling(!autoScaling)} 
+                variant={autoScaling ? "primary" : "default"}
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={() => setShowGrid(!showGrid)} 
+                variant={showGrid ? "primary" : "default"}
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                title={showGrid ? "Hide Grid" : "Show Grid"}
+              >
+                <Grid3X3 className="w-3.5 h-3.5" />
+              </GlassButton>
+              
+              <GlassButton 
+                onClick={() => setShowGuides(!showGuides)} 
+                variant={showGuides ? "primary" : "default"}
+                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+                title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
+              >
+                {showGuides ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+              </GlassButton>
+              
+              <div className="w-px h-5 bg-white/20 mx-1" />
+              
               <GlassButton 
                 onClick={handleClearCanvas} 
                 disabled={!hasElements}
@@ -1525,18 +1554,8 @@ const BannerCanvas = ({
                 <Eraser className="w-3.5 h-3.5" />
               </GlassButton>
               
-              <GlassButton 
-                onClick={() => setAutoScaling(!autoScaling)} 
-                variant={autoScaling ? "primary" : "default"}
-                className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
-                title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-              </GlassButton>
-              
-              
-              <GlassButton onClick={onCreateOrder} variant="primary" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Create Order">
-                <ShoppingCart className="w-3.5 h-3.5" />
+              <GlassButton onClick={onExport} variant="primary" className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Export PDF">
+                <Download className="w-3.5 h-3.5" />
               </GlassButton>
             </div>
             
