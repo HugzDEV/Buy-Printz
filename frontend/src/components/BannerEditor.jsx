@@ -17,7 +17,6 @@ import {
 import BannerSidebar from './BannerSidebar'
 import BannerCanvas from './BannerCanvas'
 import OnboardingTour from './OnboardingTour'
-import AIAgent from './AIAgent'
 import SaveModal from './SaveModal'
 import SuccessNotification from './SuccessNotification'
 import authService from '../services/auth'
@@ -40,8 +39,6 @@ const BannerEditorNew = () => {
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false)
   const [showTour, setShowTour] = useState(false)
   
-  // AI Agent state
-  const [currentDesignId, setCurrentDesignId] = useState(null)
   
   // Save Modal state
   const [showSaveModal, setShowSaveModal] = useState(false)
@@ -53,36 +50,6 @@ const BannerEditorNew = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [successMessage, setSuccessMessage] = useState({ title: '', message: '' })
   
-  // AI Agent handlers
-  const handleAIDesignGenerated = useCallback((designData) => {
-    if (designData && designData.canvas_data) {
-      // Load the AI-generated design into the canvas
-      const canvasData = designData.canvas_data;
-      if (canvasData.objects) {
-        setElements(canvasData.objects);
-      }
-      if (canvasData.background) {
-        setBackgroundColor(canvasData.background);
-      }
-      if (canvasData.width && canvasData.height) {
-        setCanvasSize({ width: canvasData.width, height: canvasData.height });
-      }
-      setCurrentDesignId(designData.design_id);
-    }
-  }, []);
-
-  const handleAIDesignModified = useCallback((designData) => {
-    if (designData && designData.canvas_data) {
-      // Apply AI modifications to the canvas
-      const canvasData = designData.canvas_data;
-      if (canvasData.objects) {
-        setElements(canvasData.objects);
-      }
-      if (canvasData.background) {
-        setBackgroundColor(canvasData.background);
-      }
-    }
-  }, []);
   
   // Canvas configuration
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 })
@@ -2396,12 +2363,6 @@ const BannerEditorNew = () => {
       }}
     />
     
-    {/* AI Agent */}
-    <AIAgent
-      onDesignGenerated={handleAIDesignGenerated}
-      onDesignModified={handleAIDesignModified}
-      currentDesignId={currentDesignId}
-    />
     
     {/* Save Modal */}
     <SaveModal
