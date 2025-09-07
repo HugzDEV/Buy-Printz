@@ -2363,7 +2363,7 @@ const BannerEditorNew = () => {
           
                 {/* Mobile Overlay when sidebar is open */}
       {isMobileSidebarOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setIsMobileSidebarOpen(false)} />
+        <div className="md:hidden fixed inset-0 bg-black/20 z-20" onClick={() => setIsMobileSidebarOpen(false)} />
       )}
       </div>
     </div>
