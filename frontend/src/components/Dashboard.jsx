@@ -740,7 +740,7 @@ const Dashboard = () => {
                   <Link
                     to="/editor"
                     onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg sm:rounded-xl text-white font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
+                    className="px-4 sm:px-6 py-2 sm:py-3 bg-buyprint-brand hover:bg-buyprint-600 rounded-lg sm:rounded-xl text-white font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
                   >
                     <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     New Design
@@ -909,7 +909,7 @@ const Dashboard = () => {
                 <Link
                   to="/editor"
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-lg sm:rounded-xl text-white font-semibold flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20 text-sm sm:text-base"
+                  className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 bg-buyprint-brand hover:bg-buyprint-600 rounded-lg sm:rounded-xl text-white font-semibold flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-buyprint-brand/20 text-sm sm:text-base"
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   <span className="hidden xs:inline">Create Template</span>
@@ -1026,7 +1026,7 @@ const Dashboard = () => {
                   <Link 
                     to="/editor" 
                     onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 rounded-xl text-white font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
+                    className="inline-flex items-center px-8 py-4 bg-buyprint-brand hover:bg-buyprint-600 rounded-xl text-white font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-buyprint-brand/20"
                   >
                     <Plus className="w-6 h-6 mr-3" />
                     Create First Template
@@ -1192,7 +1192,7 @@ const Dashboard = () => {
                 <Link 
                   to="/editor" 
                   onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="px-6 py-3 bg-buyprint-brand hover:bg-buyprint-600 rounded-xl text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   Start Designing
                 </Link>
