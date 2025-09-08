@@ -390,7 +390,7 @@ const Products = () => {
           </p>
           <div className="flex justify-center">
             <Link 
-              to="/editor" 
+              to="/editor?product=banner" 
               className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105"
             >
               Start Designing
