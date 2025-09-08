@@ -48,10 +48,10 @@ const PrintPreviewModal = ({
       ]
     } else if (productType === 'tent') {
       const allSurfaces = [
-        { key: 'canopy_front', name: 'Canopy Front', description: 'Front canopy surface' },
-        { key: 'canopy_back', name: 'Canopy Back', description: 'Back canopy surface' },
-        { key: 'canopy_left', name: 'Canopy Left', description: 'Left canopy surface' },
-        { key: 'canopy_right', name: 'Canopy Right', description: 'Right canopy surface' },
+        { key: 'canopy_front', name: 'Canopy Front + Valence', description: 'Front canopy with valence' },
+        { key: 'canopy_back', name: 'Canopy Back + Valence', description: 'Back canopy with valence' },
+        { key: 'canopy_left', name: 'Canopy Left + Valence', description: 'Left canopy with valence' },
+        { key: 'canopy_right', name: 'Canopy Right + Valence', description: 'Right canopy with valence' },
         { key: 'sidewall_left', name: 'Left Sidewall', description: 'Left sidewall panel' },
         { key: 'sidewall_right', name: 'Right Sidewall', description: 'Right sidewall panel' },
         { key: 'backwall', name: 'Back Wall', description: 'Back wall panel' }
@@ -73,15 +73,15 @@ const PrintPreviewModal = ({
   // Get tent surface dimensions
   const getTentSurfaceDimensions = (surfaceKey) => {
     const tentDimensions = {
-      'canopy_front': { width: 1160, height: 789, shape: 'triangular' },
-      'canopy_back': { width: 1160, height: 789, shape: 'triangular' },
-      'canopy_left': { width: 1160, height: 789, shape: 'triangular' },
-      'canopy_right': { width: 1160, height: 789, shape: 'triangular' },
+      'canopy_front': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
+      'canopy_back': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
+      'canopy_left': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
+      'canopy_right': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
       'sidewall_left': { width: 1110, height: 390, shape: 'rectangular' },
       'sidewall_right': { width: 1110, height: 390, shape: 'rectangular' },
       'backwall': { width: 1110, height: 780, shape: 'rectangular' }
     }
-    return tentDimensions[surfaceKey] || { width: 1160, height: 789, shape: 'triangular' }
+    return tentDimensions[surfaceKey] || { width: 1160, height: 1049, shape: 'triangular + rectangular' }
   }
 
   // Get current surface dimensions
@@ -141,18 +141,45 @@ const PrintPreviewModal = ({
     }
   }
 
-  // Set preview image when modal opens - NO PDF generation for preview
+  // Modified useEffect to handle missing surface images
   useEffect(() => {
-    if (isOpen && orderDetails?.canvas_image) {
-      console.log('Setting high-quality canvas image for preview!')
-      setPreviewImage(orderDetails.canvas_image)
-      setIsGenerating(false)
-    } else if (isOpen && !orderDetails?.canvas_image) {
-      console.warn('No canvas image available for preview!')
-      setPreviewImage(null)
+    if (isOpen && orderDetails) {
+      // For multi-surface products, use surface-specific images
+      if (hasMultipleSurfaces() && orderDetails.surface_images) {
+        const surfaceImage = orderDetails.surface_images[selectedSurface]
+        
+        if (typeof surfaceImage === 'string') {
+          setPreviewImage(surfaceImage)
+        } else {
+          // Fallback to main canvas image if specific surface image is missing
+          console.warn(`No specific image found for surface: ${selectedSurface}, using main canvas image as fallback`)
+          if (typeof orderDetails.canvas_image === 'string') {
+            setPreviewImage(orderDetails.canvas_image)
+          } else {
+            setPreviewImage(null)
+          }
+        }
+      } else if (hasMultipleSurfaces() && !orderDetails.surface_images && orderDetails?.canvas_image) {
+        // Fallback: Use main canvas image for all surfaces when surface_images is missing
+        console.warn(`No surface_images found for ${productType}, using main canvas image for all surfaces`)
+        if (typeof orderDetails.canvas_image === 'string') {
+          setPreviewImage(orderDetails.canvas_image)
+        } else {
+          setPreviewImage(null)
+        }
+      } else if (orderDetails?.canvas_image) {
+        // For single-surface products, use the main canvas image
+        if (typeof orderDetails.canvas_image === 'string') {
+          setPreviewImage(orderDetails.canvas_image)
+        } else {
+          setPreviewImage(null)
+        }
+      } else {
+        setPreviewImage(null)
+      }
       setIsGenerating(false)
     }
-  }, [isOpen, orderDetails])
+  }, [isOpen, orderDetails, selectedSurface, hasMultipleSurfaces])
 
   // Debug image dimensions when it loads
   const handleImageLoad = (event) => {
@@ -379,23 +406,29 @@ const PrintPreviewModal = ({
                                maxHeight: window.innerWidth < 768 ? '240px' : '320px',
                              }}>
                                {previewImage ? (
-                                 <img
-                                   src={previewImage}
-                                   alt={`${productType} ${selectedSurface} Preview`}
-                                   className={`border shadow-lg ${productType === 'tin' ? 'rounded-lg' : 'rounded'}`}
-                                   style={{
-                                     width: 'auto',
-                                     height: 'auto',
-                                     maxWidth: '100%',
-                                     maxHeight: window.innerWidth < 768 ? '180px' : '280px',
-                                     minHeight: window.innerWidth < 768 ? '120px' : '250px',
-                                     objectFit: 'contain',
-                                     transform: `scale(${imageScale})`,
-                                     transformOrigin: 'center center',
-                                     borderRadius: productType === 'tin' ? '2.3px' : undefined
-                                   }}
-                                   onLoad={handleImageLoad}
-                                 />
+                                 <>
+                                   <img
+                                     src={previewImage}
+                                     alt={`${productType} ${selectedSurface} Preview`}
+                                     className={`border shadow-lg ${productType === 'tin' ? 'rounded-lg' : 'rounded'}`}
+                                     style={{
+                                       width: 'auto',
+                                       height: 'auto',
+                                       maxWidth: '100%',
+                                       maxHeight: window.innerWidth < 768 ? '180px' : '280px',
+                                       minHeight: window.innerWidth < 768 ? '120px' : '250px',
+                                       objectFit: 'contain',
+                                       transform: `scale(${imageScale})`,
+                                       transformOrigin: 'center center',
+                                       borderRadius: productType === 'tin' ? '2.3px' : undefined
+                                     }}
+                                     onLoad={handleImageLoad}
+                                     onError={(e) => {
+                                       console.error('Image failed to load:', e)
+                                       console.error('Image src:', typeof previewImage === 'string' ? previewImage.substring(0, 100) : previewImage)
+                                     }}
+                                   />
+                                 </>
                                ) : (
                                  <div className="text-center text-gray-500 p-8">
                                    <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
@@ -513,7 +546,7 @@ const PrintPreviewModal = ({
                            let filename = 'design'
                            
                            if (productType === 'tent') {
-                             filename = `tent-${orderDetails?.tent_size || '10x10'}-${selectedSurface}`
+                             filename = `tent-${orderDetails?.tent_size || '10x10'}-${selectedSurface.replace('_', '-')}`
                            } else if (productType === 'tin') {
                              filename = `tin-${selectedSurface}`
                            } else {

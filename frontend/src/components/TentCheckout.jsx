@@ -120,7 +120,7 @@ const TentCheckout = () => {
 
   // Load order data from session storage
   useEffect(() => {
-    const savedOrderData = sessionStorage.getItem('tentOrderData')
+    const savedOrderData = sessionStorage.getItem('orderData')
     if (savedOrderData) {
       try {
         const parsed = JSON.parse(savedOrderData)
@@ -132,6 +132,7 @@ const TentCheckout = () => {
     } else {
       // Set default order data for preview modal
       const defaultOrderData = {
+        product_type: 'tradeshow_tent',
         tent_size: tentSpecs.tentSize,
         tent_type: tentSpecs.tentType,
         tent_material: '6oz Tent Fabric',
@@ -675,9 +676,13 @@ const TentCheckout = () => {
         onClose={handlePreviewCancel}
         onApprove={handlePreviewApprove}
         canvasData={orderData?.canvas_data}
-        orderDetails={orderData}
+        orderDetails={{
+          ...orderData,
+          // canvas_image should already be the correct data URL from BannerEditor
+          // Don't override it with canvas_data object
+        }}
         dimensions={orderData?.dimensions}
-        productType={orderData?.product_type || 'tent'}
+        productType={orderData?.product_type === 'tradeshow_tent' ? 'tent' : orderData?.product_type || 'tent'}
         surfaceElements={orderData?.surface_elements || {}}
         currentSurface={orderData?.current_surface || 'canopy_front'}
       />

@@ -1156,7 +1156,7 @@ const TinCheckout = () => {
         canvasData={orderData?.canvas_data}
         orderDetails={orderData}
         dimensions={orderData?.dimensions}
-        productType={orderData?.product_type || 'business_card_tin'}
+        productType={orderData?.product_type === 'business_card_tin' ? 'tin' : orderData?.product_type || 'tin'}
         surfaceElements={orderData?.surface_elements || {}}
         currentSurface={orderData?.current_surface || 'front'}
       />

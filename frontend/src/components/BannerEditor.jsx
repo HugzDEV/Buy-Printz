@@ -63,6 +63,17 @@ const BannerEditorNew = () => {
     backwall: []
   })
   
+  // Function to copy design elements between surfaces
+  const copyDesignToSurface = useCallback((sourceSurface, targetSurface) => {
+    if (surfaceElements[sourceSurface] && surfaceElements[sourceSurface].length > 0) {
+      setSurfaceElements(prev => ({
+        ...prev,
+        [targetSurface]: [...prev[sourceSurface]] // Copy elements from source to target
+      }))
+      console.log(`🎨 Copied design from ${sourceSurface} to ${targetSurface}`)
+    }
+  }, [surfaceElements])
+  
   // Current elements based on product type and surface
   const elements = (productType === 'tin' || productType === 'tent') ? surfaceElements[currentSurface] : surfaceElements.front
   const setElements = (productType === 'tin' || productType === 'tent')
@@ -401,15 +412,20 @@ const BannerEditorNew = () => {
   const [bannerSpecs, setBannerSpecs] = useState(() => {
     // Get product type from URL parameter
     const productType = searchParams.get('product')
-    console.log('URL product parameter:', productType)
     
     // Find the matching banner type
     const selectedBannerType = bannerTypes.find(banner => banner.id === productType)
-    console.log('Selected banner type:', selectedBannerType)
     
     // Return the selected banner type or default to first one
     return selectedBannerType || bannerTypes[0]
   })
+
+  // Log banner specs once when component mounts
+  useEffect(() => {
+    const productType = searchParams.get('product')
+    console.log('URL product parameter:', productType)
+    console.log('Selected banner type:', bannerSpecs)
+  }, []) // Only run once on mount
 
   // Utility functions
   const generateId = (type) => `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -2589,7 +2605,7 @@ const BannerEditorNew = () => {
   }, [elements, canvasSize, backgroundColor, bannerSpecs])
 
   // Create order
-  const createOrder = useCallback(() => {
+  const createOrder = useCallback(async () => {
     // Generate canvas image data for preview
     const generateCanvasImage = () => {
       try {
@@ -2632,6 +2648,57 @@ const BannerEditorNew = () => {
       }
     }
 
+    // Capture images for all surfaces (proper multi-surface solution)
+    const captureAllSurfaceImages = async () => {
+      if (productType === 'tin' || productType === 'tent') {
+        const surfaceImages = {}
+        
+        // Get all available surfaces
+        const allSurfaces = productType === 'tin' 
+          ? ['front', 'back', 'inside', 'lid']
+          : ['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right', 'sidewall_left', 'sidewall_right', 'backwall']
+        
+        // Store current surface to restore later
+        const originalSurface = currentSurface
+        
+        try {
+          // Capture image for each surface
+          for (const surface of allSurfaces) {
+            // Switch to the surface
+            setCurrentSurface(surface)
+            
+            // Wait for the canvas to update
+            await new Promise(resolve => setTimeout(resolve, 100))
+            
+            // Capture the canvas image for this surface
+            const surfaceImage = generateCanvasImage()
+            if (surfaceImage) {
+              surfaceImages[surface] = surfaceImage
+            }
+          }
+          
+          // Restore original surface
+          setCurrentSurface(originalSurface)
+          
+          console.log('🎨 Captured images for all surfaces:', Object.keys(surfaceImages))
+          return surfaceImages
+        } catch (error) {
+          console.error('Error capturing surface images:', error)
+          // Restore original surface on error
+          setCurrentSurface(originalSurface)
+          
+          // Fallback: use current surface image for all
+          const fallbackImage = generateCanvasImage()
+          allSurfaces.forEach(surface => {
+            surfaceImages[surface] = fallbackImage
+          })
+          return surfaceImages
+        }
+      }
+      
+      return { front: generateCanvasImage() }
+    }
+
     // Navigate to checkout with design data
     const orderData = {
       // Canvas data (required by backend)
@@ -2652,6 +2719,8 @@ const BannerEditorNew = () => {
         timestamp: new Date().toISOString()
       },
       canvas_image: generateCanvasImage(),
+      surface_images: await captureAllSurfaceImages(),
+      surface_elements: surfaceElements, // Include surface elements for restoration
       
       // Order metadata (required by backend)
       product_type: productType === 'tin' ? 'business_card_tin' : productType === 'tent' ? 'tradeshow_tent' : 'banner',
@@ -3033,9 +3102,10 @@ const BannerEditorNew = () => {
       try {
         const orderData = JSON.parse(cancelledOrder)
         if (orderData.canvas_data) {
-          // Restore image elements properly
-          restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
-            setElements(restoredElements)
+          // For multi-surface products, restore surface_elements if available
+          if (orderData.surface_elements && (productType === 'tin' || productType === 'tent')) {
+            console.log('🎨 Restoring multi-surface elements:', orderData.surface_elements)
+            setSurfaceElements(orderData.surface_elements)
             setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
             if (orderData.canvas_data.bannerSpecs) {
               setBannerSpecs(orderData.canvas_data.bannerSpecs)
@@ -3044,19 +3114,32 @@ const BannerEditorNew = () => {
               setCanvasSize(orderData.canvas_data.canvasSize)
               setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
             }
-          }).catch(error => {
-            console.error('Failed to restore image elements:', error)
-            // Fallback to loading without images
-            setElements(orderData.canvas_data.elements || [])
-            setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
-            if (orderData.canvas_data.bannerSpecs) {
-              setBannerSpecs(orderData.canvas_data.bannerSpecs)
-            }
-            if (orderData.canvas_data.canvasSize) {
-              setCanvasSize(orderData.canvas_data.canvasSize)
-              setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
-            }
-          })
+          } else {
+            // For single-surface products or fallback, restore image elements properly
+            restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
+              setElements(restoredElements)
+              setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
+              if (orderData.canvas_data.bannerSpecs) {
+                setBannerSpecs(orderData.canvas_data.bannerSpecs)
+              }
+              if (orderData.canvas_data.canvasSize) {
+                setCanvasSize(orderData.canvas_data.canvasSize)
+                setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+              }
+            }).catch(error => {
+              console.error('Failed to restore image elements:', error)
+              // Fallback to loading without images
+              setElements(orderData.canvas_data.elements || [])
+              setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
+              if (orderData.canvas_data.bannerSpecs) {
+                setBannerSpecs(orderData.canvas_data.bannerSpecs)
+              }
+              if (orderData.canvas_data.canvasSize) {
+                setCanvasSize(orderData.canvas_data.canvasSize)
+                setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+              }
+            })
+          }
         }
         sessionStorage.removeItem('cancelledOrder')
       } catch (error) {
@@ -3196,7 +3279,7 @@ const BannerEditorNew = () => {
           </button>
           
           <button
-            onClick={createOrder}
+            onClick={() => createOrder()}
             className="px-2 md:px-4 py-1 md:py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium flex items-center gap-1 md:gap-2 text-xs md:text-sm"
           >
             <ShoppingCart className="w-3 h-3 md:w-4 md:h-4" />
@@ -3246,6 +3329,7 @@ const BannerEditorNew = () => {
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
             onAvailableSurfacesChange={handleAvailableSurfacesChange}
+            onCopyDesignToSurface={copyDesignToSurface}
 
             onAddShape={addShape}
             onAddText={addText}

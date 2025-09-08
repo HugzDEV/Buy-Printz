@@ -33,6 +33,7 @@ const BannerSidebar = ({
   currentSurface = 'front',
   onSurfaceChange,
   onAvailableSurfacesChange,
+  onCopyDesignToSurface,
 
   onAddShape,
   onAddAsset,
@@ -69,8 +70,28 @@ const BannerSidebar = ({
 
   // Stable callback for radio button changes
   const handleTentDesignOptionChange = useCallback((value) => {
+    const previousOption = tentDesignOption
     setTentDesignOption(value)
-  }, [])
+    
+    // Handle design transfer when new surfaces become available
+    if (previousOption !== value) {
+      // If switching to "all-sides" from "canopy-only" or "canopy-backwall"
+      if (value === 'all-sides' && (previousOption === 'canopy-only' || previousOption === 'canopy-backwall')) {
+        // Copy canopy front design to sidewalls
+        setTimeout(() => {
+          onCopyDesignToSurface('canopy_front', 'sidewall_left')
+          onCopyDesignToSurface('canopy_front', 'sidewall_right')
+        }, 100)
+      }
+      // If switching to "canopy-backwall" from "canopy-only"
+      else if (value === 'canopy-backwall' && previousOption === 'canopy-only') {
+        // Copy canopy front design to backwall
+        setTimeout(() => {
+          onCopyDesignToSurface('canopy_front', 'backwall')
+        }, 100)
+      }
+    }
+  }, [tentDesignOption, onCopyDesignToSurface])
 
   // Memoized available tent surfaces based on design option
   const availableTentSurfaces = useMemo(() => {
