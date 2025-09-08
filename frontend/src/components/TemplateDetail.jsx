@@ -73,7 +73,12 @@ const TemplateDetail = () => {
         
         // Initialize Stripe
         if (window.Stripe) {
-          const stripe = window.Stripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY)
+          const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+          if (!stripeKey) {
+            setError('Stripe configuration missing. Please contact support.')
+            return
+          }
+          const stripe = window.Stripe(stripeKey)
           
           // Confirm payment
           const { error } = await stripe.confirmCardPayment(data.client_secret, {

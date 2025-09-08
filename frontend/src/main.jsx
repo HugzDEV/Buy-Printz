@@ -8,7 +8,12 @@ import App from './App.jsx'
 import './index.css'
 
 // Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_your_key_here')
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null
+
+if (!stripeKey) {
+  console.warn('VITE_STRIPE_PUBLISHABLE_KEY not found. Payment functionality will be disabled.')
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
