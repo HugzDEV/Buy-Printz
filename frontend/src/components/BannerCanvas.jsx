@@ -645,6 +645,68 @@ const BannerCanvas = ({
     }
   }
 
+  // Auto-adjust text positioning when elements are loaded/restored
+  useEffect(() => {
+    // Small delay to ensure Konva has rendered the text
+    const timer = setTimeout(() => {
+      elements.forEach(element => {
+        if (element.type === 'text') {
+          // Find the Konva text node
+          const textNode = stageRef.current?.findOne(`#${element.id}`);
+          if (textNode && textNode.getClassName() === 'Text') {
+            const textHeight = textNode.height();
+            const textWidth = textNode.width();
+            
+            // If text is too close to canvas edges, adjust position
+            const canvasWidth = canvasSize.width;
+            const canvasHeight = canvasSize.height;
+            const margin = 20;
+            
+            let newX = textNode.x();
+            let newY = textNode.y();
+            let needsUpdate = false;
+            
+            // Adjust horizontal position if text goes beyond canvas
+            if (newX + textWidth > canvasWidth - margin) {
+              newX = Math.max(margin, canvasWidth - textWidth - margin);
+              needsUpdate = true;
+            }
+            if (newX < margin) {
+              newX = margin;
+              needsUpdate = true;
+            }
+            
+            // Adjust vertical position if text goes beyond canvas
+            if (newY + textHeight > canvasHeight - margin) {
+              newY = Math.max(margin, canvasHeight - textHeight - margin);
+              needsUpdate = true;
+            }
+            if (newY < margin) {
+              newY = margin;
+              needsUpdate = true;
+            }
+            
+            // Update position if needed
+            if (needsUpdate) {
+              textNode.x(newX);
+              textNode.y(newY);
+              textNode.getLayer()?.batchDraw();
+              
+              // Update the element in state
+              setElements(prev => prev.map(el => 
+                el.id === element.id 
+                  ? { ...el, x: newX, y: newY }
+                  : el
+              ));
+            }
+          }
+        }
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [elements, canvasSize]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -1090,6 +1152,43 @@ const BannerCanvas = ({
             }}
             onDblTap={() => {
               handleTextEdit(safeElement.id);
+            }}
+            onTextChange={(e) => {
+              // Auto-adjust text positioning when text content changes
+              const textNode = e.target;
+              const textHeight = textNode.height();
+              const textWidth = textNode.width();
+              
+              // If text is too close to canvas edges, adjust position
+              const canvasWidth = canvasSize.width;
+              const canvasHeight = canvasSize.height;
+              const margin = 20;
+              
+              let newX = textNode.x();
+              let newY = textNode.y();
+              
+              // Adjust horizontal position if text goes beyond canvas
+              if (newX + textWidth > canvasWidth - margin) {
+                newX = Math.max(margin, canvasWidth - textWidth - margin);
+              }
+              if (newX < margin) {
+                newX = margin;
+              }
+              
+              // Adjust vertical position if text goes beyond canvas
+              if (newY + textHeight > canvasHeight - margin) {
+                newY = Math.max(margin, canvasHeight - textHeight - margin);
+              }
+              if (newY < margin) {
+                newY = margin;
+              }
+              
+              // Only update if position actually changed
+              if (newX !== textNode.x() || newY !== textNode.y()) {
+                textNode.x(newX);
+                textNode.y(newY);
+                textNode.getLayer()?.batchDraw();
+              }
             }}
           />
         )

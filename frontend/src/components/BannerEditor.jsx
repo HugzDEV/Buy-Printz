@@ -116,7 +116,7 @@ const BannerEditorNew = () => {
   const [canvasSize, setCanvasSize] = useState(() => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return { width: 374, height: 225 } // tin default
-    if (urlProduct === 'tent') return { width: 1160, height: 789 } // tent canopy default (116" x 78.86" scaled to pixels)
+    if (urlProduct === 'tent') return { width: 1160, height: 1049 } // tent canopy+valence default (canopy 789px + gap 20px + valence 200px + padding 40px)
     return { width: 800, height: 400 } // banner default
   })
 
