@@ -21,7 +21,7 @@ const TinProducts = () => {
       name: "Business Card Tin - Silver",
       price: "From $399",
       description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking",
-      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      image: "/assets/images/Silver tin-buyprintz.jpg",
       features: ["Premium silver aluminum", "Custom vinyl stickers", "100-500 units", "Professional finish"],
       bestseller: true,
       specs: {
@@ -43,7 +43,7 @@ const TinProducts = () => {
       name: "Business Card Tin - Black",
       price: "From $399",
       description: "Sleek black aluminum business card tins with custom vinyl stickers - modern and sophisticated",
-      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      image: "/assets/images/black tins-buyprintz.jpg",
       features: ["Premium black aluminum", "Custom vinyl stickers", "100-500 units", "Modern finish"],
       popular: true,
       specs: {
@@ -65,7 +65,7 @@ const TinProducts = () => {
       name: "Business Card Tin - Gold",
       price: "From $399",
       description: "Luxurious gold aluminum business card tins with custom vinyl stickers - premium and elegant",
-      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      image: "/assets/images/gold tins-buyprintz.jpg",
       features: ["Premium gold aluminum", "Custom vinyl stickers", "100-500 units", "Luxury finish"],
       premium: true,
       specs: {
