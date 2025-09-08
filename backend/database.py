@@ -1441,6 +1441,61 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error getting creator analytics: {e}")
             return {}
+    
+    # =============================================
+    # PURCHASE MANAGEMENT METHODS
+    # =============================================
+    
+    async def create_template_purchase(self, purchase_data: Dict[str, Any]) -> bool:
+        """Create a template purchase record"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            response = self.supabase.table("template_purchases").insert(purchase_data).execute()
+            return response.data is not None
+            
+        except Exception as e:
+            print(f"Error creating template purchase: {e}")
+            return False
+    
+    async def get_user_purchases(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get all purchases made by a user"""
+        try:
+            if not self.is_connected():
+                return []
+            
+            response = self.supabase.table("template_purchases").select("*").eq("buyer_id", user_id).order("purchased_at", desc=True).execute()
+            return response.data or []
+            
+        except Exception as e:
+            print(f"Error getting user purchases: {e}")
+            return []
+    
+    async def get_creator_earnings(self, creator_id: str) -> Dict[str, Any]:
+        """Get earnings summary for a creator"""
+        try:
+            if not self.is_connected():
+                return {}
+            
+            # Get total earnings
+            earnings_response = self.supabase.table("template_purchases").select("creator_earnings").eq("creator_id", creator_id).eq("status", "completed").execute()
+            total_earnings = sum(float(purchase["creator_earnings"]) for purchase in earnings_response.data or [])
+            
+            # Get recent sales (last 30 days)
+            thirty_days_ago = (datetime.utcnow() - timedelta(days=30)).isoformat()
+            recent_sales_response = self.supabase.table("template_purchases").select("*").eq("creator_id", creator_id).gte("purchased_at", thirty_days_ago).execute()
+            recent_sales = recent_sales_response.data or []
+            
+            return {
+                "total_earnings": round(total_earnings, 2),
+                "recent_sales_count": len(recent_sales),
+                "recent_earnings": round(sum(float(sale["creator_earnings"]) for sale in recent_sales), 2)
+            }
+            
+        except Exception as e:
+            print(f"Error getting creator earnings: {e}")
+            return {}
 
 # Initialize database manager
 db_manager = DatabaseManager()

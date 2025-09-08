@@ -14,6 +14,17 @@ import stripe
 from database import DatabaseManager
 from auth import get_current_user
 from generate_thumbnails import process_single_image, validate_image_file
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Initialize Stripe
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+if STRIPE_SECRET_KEY:
+    stripe.api_key = STRIPE_SECRET_KEY
+else:
+    print("⚠️ STRIPE_SECRET_KEY not found. Payment processing will fail.")
 
 # Initialize router
 router = APIRouter(prefix="/api/creator-marketplace", tags=["creator-marketplace"])
