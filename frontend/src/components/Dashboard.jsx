@@ -985,7 +985,7 @@ const Dashboard = () => {
                         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                           <button
                             onClick={() => loadDesignInEditor(template)}
-                            className="flex-1 p-3 sm:p-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 rounded-lg sm:rounded-xl text-sm font-semibold text-white flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-blue-400/20"
+                            className="flex-1 p-3 sm:p-4 bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold rounded-lg sm:rounded-xl flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-buyprint-brand/20"
                           >
                             <Edit className="w-4 h-4 mr-2" />
                             <span className="hidden sm:inline">Use Template</span>
@@ -1441,7 +1441,7 @@ const Dashboard = () => {
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => reorderItem(selectedOrder)}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                    className="flex-1 bg-buyprint-brand hover:bg-buyprint-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center"
                   >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Reorder This Item
@@ -1510,7 +1510,7 @@ const Dashboard = () => {
                   <div className="flex space-x-3 pt-4">
                     <button
                       onClick={updateProfile}
-                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 bg-buyprint-brand hover:bg-buyprint-600 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       Update Profile
                     </button>

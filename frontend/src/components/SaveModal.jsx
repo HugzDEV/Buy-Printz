@@ -129,7 +129,7 @@ const SaveModal = ({
               <button
                 type="submit"
                 disabled={!name.trim() || isLoading}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:via-gray-500 disabled:to-gray-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl border border-blue-400/20 flex items-center justify-center space-x-2"
+                className="flex-1 px-4 py-3 bg-buyprint-brand hover:bg-buyprint-600 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl border border-buyprint-brand/20 flex items-center justify-center space-x-2"
               >
                 {isLoading ? (
                   <>

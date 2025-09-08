@@ -491,7 +491,7 @@ const Checkout = () => {
           <p className="text-gray-600 mb-4">You need to be logged in to access the checkout.</p>
           <button
             onClick={() => navigate('/login')}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            className="px-6 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-lg transition-colors"
           >
             Go to Login
           </button>
@@ -631,7 +631,7 @@ const Checkout = () => {
                 </p>
                 <button
                   onClick={() => setShowPreviewModal(true)}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
+                  className="px-6 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
                 >
                   <Eye className="w-5 h-5" />
                   Preview Design
