@@ -198,7 +198,7 @@ const TinProducts = () => {
                 
                 <Link
                   to="/editor?product=tin"
-                  className="w-full inline-flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl px-8 py-6 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
+                  className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold text-xl px-8 py-6 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
                 >
                   <Sparkles className="w-6 h-6" />
                   Design Now
