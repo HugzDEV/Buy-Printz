@@ -63,7 +63,8 @@ const BannerCanvas = ({
   hasElements,
   productType = 'banner',
   currentSurface = 'front',
-  onSurfaceChange
+  onSurfaceChange,
+  clipFunc = null
 }) => {
   const stageRef = useRef()
   const transformerRef = useRef()
@@ -1811,7 +1812,7 @@ const BannerCanvas = ({
                   }
                 }}
             >
-              <Layer>
+              <Layer clipFunc={clipFunc}>
                 {/* Background */}
                 <Rect
                   width={canvasSize.width}
@@ -1957,83 +1958,155 @@ const BannerCanvas = ({
                 {/* Safe Printing Zone - Dotted Red Border (On Top) */}
                 {showGuides && (
                   <>
-                    {/* Top border */}
-                    <Line
-                      points={[20, 20, canvasSize.width - 20, 20]}
-                      stroke="#dc2626"
-                      strokeWidth={2}
-                      dash={[8, 4]}
-                      lineCap="round"
-                      listening={false}
-                    />
-                    {/* Right border */}
-                    <Line
-                      points={[canvasSize.width - 20, 20, canvasSize.width - 20, canvasSize.height - 20]}
-                      stroke="#dc2626"
-                      strokeWidth={2}
-                      dash={[8, 4]}
-                      lineCap="round"
-                      listening={false}
-                    />
-                    {/* Bottom border */}
-                    <Line
-                      points={[canvasSize.width - 20, canvasSize.height - 20, 20, canvasSize.height - 20]}
-                      stroke="#dc2626"
-                      strokeWidth={2}
-                      dash={[8, 4]}
-                      lineCap="round"
-                      listening={false}
-                    />
-                    {/* Left border */}
-                    <Line
-                      points={[20, canvasSize.height - 20, 20, 20]}
-                      stroke="#dc2626"
-                      strokeWidth={2}
-                      dash={[8, 4]}
-                      lineCap="round"
-                      listening={false}
-                    />
-                    
-                    {/* Corner indicators */}
-                    <Circle
-                      x={20}
-                      y={20}
-                      radius={3}
-                      fill="#dc2626"
-                      listening={false}
-                    />
-                    <Circle
-                      x={canvasSize.width - 20}
-                      y={20}
-                      radius={3}
-                      fill="#dc2626"
-                      listening={false}
-                    />
-                    <Circle
-                      x={canvasSize.width - 20}
-                      y={canvasSize.height - 20}
-                      radius={3}
-                      fill="#dc2626"
-                      listening={false}
-                    />
-                    <Circle
-                      x={20}
-                      y={canvasSize.height - 20}
-                      radius={3}
-                      fill="#dc2626"
-                      listening={false}
-                    />
-                    
-                    {/* Safe Zone Label */}
-                    <Text
-                      x={30}
-                      y={canvasSize.height - 15}
-                      text="Safe Printing Zone"
-                      fontSize={12}
-                      fontFamily="Arial"
-                      fill="#dc2626"
-                      listening={false}
-                    />
+                    {productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? (
+                      // Triangular safe zone for tent canopy
+                      <>
+                        {/* Left side of triangle */}
+                        <Line
+                          points={[20, canvasSize.height - 20, canvasSize.width / 2, 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Right side of triangle */}
+                        <Line
+                          points={[canvasSize.width / 2, 20, canvasSize.width - 20, canvasSize.height - 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Bottom side of triangle */}
+                        <Line
+                          points={[canvasSize.width - 20, canvasSize.height - 20, 20, canvasSize.height - 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Corner indicators */}
+                        <Circle
+                          x={20}
+                          y={canvasSize.height - 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={canvasSize.width / 2}
+                          y={20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={canvasSize.width - 20}
+                          y={canvasSize.height - 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        
+                        {/* Safe Zone Label */}
+                        <Text
+                          x={canvasSize.width / 2 - 60}
+                          y={canvasSize.height - 15}
+                          text="Safe Printing Zone"
+                          fontSize={12}
+                          fontFamily="Arial"
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                      </>
+                    ) : (
+                      // Rectangular safe zone for other products
+                      <>
+                        {/* Top border */}
+                        <Line
+                          points={[20, 20, canvasSize.width - 20, 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        {/* Right border */}
+                        <Line
+                          points={[canvasSize.width - 20, 20, canvasSize.width - 20, canvasSize.height - 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        {/* Bottom border */}
+                        <Line
+                          points={[canvasSize.width - 20, canvasSize.height - 20, 20, canvasSize.height - 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        {/* Left border */}
+                        <Line
+                          points={[20, canvasSize.height - 20, 20, 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Corner indicators */}
+                        <Circle
+                          x={20}
+                          y={20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={canvasSize.width - 20}
+                          y={20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={canvasSize.width - 20}
+                          y={canvasSize.height - 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={20}
+                          y={canvasSize.height - 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        
+                        {/* Safe Zone Label */}
+                        <Text
+                          x={30}
+                          y={canvasSize.height - 15}
+                          text="Safe Printing Zone"
+                          fontSize={12}
+                          fontFamily="Arial"
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                      </>
+                    )}
                   </>
                 )}
 

@@ -102,14 +102,29 @@ const BannerEditorNew = () => {
   const [canvasSize, setCanvasSize] = useState(() => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return { width: 374, height: 225 } // tin default
-    if (urlProduct === 'tent') return { width: 1200, height: 1200 } // tent default
+    if (urlProduct === 'tent') return { width: 1160, height: 789 } // tent canopy default (116" x 78.86" scaled to pixels)
     return { width: 800, height: 400 } // banner default
   })
+
+  // Triangular clipping function for tent canopy
+  const getTentCanopyClipFunc = () => {
+    return (ctx) => {
+      ctx.beginPath()
+      // Create triangular path for tent canopy
+      // Top point (center top)
+      ctx.moveTo(canvasSize.width / 2, 0)
+      // Bottom left point
+      ctx.lineTo(0, canvasSize.height)
+      // Bottom right point
+      ctx.lineTo(canvasSize.width, canvasSize.height)
+      ctx.closePath()
+    }
+  }
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState(() => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return 'landscape'
-    if (urlProduct === 'tent') return 'square'
+    if (urlProduct === 'tent') return 'landscape' // tent canopy is landscape
     return 'landscape'
   })
   
@@ -165,10 +180,11 @@ const BannerEditorNew = () => {
     },
     tent: {
       name: 'Tradeshow Tent',
-      defaultSize: { width: 1200, height: 1200 },
+      defaultSize: { width: 1160, height: 789 }, // Canopy default (116" x 78.86" scaled to pixels)
       sizes: [
-        { name: '10x10 ft Tent', width: 1200, height: 1200, orientation: 'square', category: 'standard' },
-        { name: '10x20 ft Tent', width: 2400, height: 1200, orientation: 'landscape', category: 'large' }
+        { name: 'Canopy', width: 1160, height: 789, orientation: 'landscape', category: 'canopy' },
+        { name: 'Full Wall', width: 1110, height: 780, orientation: 'landscape', category: 'wall' },
+        { name: 'Half Wall', width: 1110, height: 370, orientation: 'landscape', category: 'wall' }
       ],
       description: 'Professional tradeshow tents with custom graphics'
     }
@@ -204,7 +220,21 @@ const BannerEditorNew = () => {
     setCurrentSurface(surface)
     // Clear selection when switching surfaces
     setSelectedId(null)
-  }, [])
+    
+    // Update canvas size based on tent surface
+    if (productType === 'tent') {
+      if (surface === 'sidewall_left' || surface === 'sidewall_right') {
+        // Sidewalls: same width, half height (1110 x 390 for full wall, 1110 x 185 for half wall)
+        setCanvasSize({ width: 1110, height: 390 })
+      } else if (surface === 'backwall') {
+        // Backwall: original size (1110 x 780 for full wall, 1110 x 370 for half wall)
+        setCanvasSize({ width: 1110, height: 780 })
+      } else if (surface.startsWith('canopy_')) {
+        // Canopy surfaces: triangular size
+        setCanvasSize({ width: 1160, height: 789 })
+      }
+    }
+  }, [productType])
   
   // Check if user is first time user - only from landing page
   useEffect(() => {
@@ -3226,6 +3256,7 @@ const BannerEditorNew = () => {
             productType={productType}
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
+            clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyClipFunc() : null}
           />
           
                 {/* Mobile Overlay when sidebar is open */}
