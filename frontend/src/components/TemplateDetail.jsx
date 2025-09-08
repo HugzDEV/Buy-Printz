@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Star, 
   Eye, 
@@ -18,20 +18,31 @@ import {
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 import authService from '../services/auth'
+import PaymentModal from './PaymentModal'
 
 const TemplateDetail = () => {
   const { templateId } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [template, setTemplate] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [purchasing, setPurchasing] = useState(false)
   const [purchaseSuccess, setPurchaseSuccess] = useState(false)
   const [alreadyPurchased, setAlreadyPurchased] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
 
   useEffect(() => {
     loadTemplate()
-  }, [templateId])
+    
+    // Check if user returned from successful payment
+    if (searchParams.get('purchase') === 'success') {
+      setPurchaseSuccess(true)
+      setAlreadyPurchased(true)
+      // Clean up URL
+      navigate(`/marketplace/${templateId}`, { replace: true })
+    }
+  }, [templateId, searchParams, navigate])
 
   const loadTemplate = async () => {
     try {
@@ -59,56 +70,19 @@ const TemplateDetail = () => {
     }
   }
 
-  const handlePurchase = async () => {
-    try {
-      setPurchasing(true)
-      
-      // Create payment intent
-      const response = await authService.authenticatedRequest(`/api/creator-marketplace/templates/${templateId}/purchase`, {
-        method: 'POST'
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        
-        // Initialize Stripe
-        if (window.Stripe) {
-          const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-          if (!stripeKey) {
-            setError('Stripe configuration missing. Please contact support.')
-            return
-          }
-          const stripe = window.Stripe(stripeKey)
-          
-          // Confirm payment
-          const { error } = await stripe.confirmCardPayment(data.client_secret, {
-            payment_method: {
-              card: {
-                // In a real app, you'd collect card details here
-                // For demo purposes, we'll use a test card
-              }
-            }
-          })
-          
-          if (error) {
-            setError(`Payment failed: ${error.message}`)
-          } else {
-            setPurchaseSuccess(true)
-            setAlreadyPurchased(true)
-          }
-        } else {
-          setError('Stripe not loaded')
-        }
-      } else {
-        const errorData = await response.json()
-        setError(errorData.detail || 'Failed to process purchase')
-      }
-    } catch (error) {
-      console.error('Purchase error:', error)
-      setError('Network error during purchase')
-    } finally {
-      setPurchasing(false)
-    }
+  const handlePurchase = () => {
+    setShowPaymentModal(true)
+  }
+
+  const handlePaymentSuccess = (paymentIntent) => {
+    setShowPaymentModal(false)
+    setPurchaseSuccess(true)
+    setAlreadyPurchased(true)
+    setError(null)
+  }
+
+  const handlePaymentError = (errorMessage) => {
+    setError(errorMessage)
   }
 
   const formatCurrency = (amount) => {
@@ -451,6 +425,17 @@ const TemplateDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {template && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          template={template}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
+      )}
     </div>
   )
 }
