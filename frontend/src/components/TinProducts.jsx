@@ -33,7 +33,6 @@ const TinProducts = () => {
       vinylTypes: [
         "Matte Vinyl - Professional, non-reflective finish",
         "Gloss Vinyl - High-shine, eye-catching appearance", 
-        "Metallic Vinyl - Premium metallic look",
         "Clear Vinyl - Transparent overlay effect"
       ]
     },
@@ -55,7 +54,6 @@ const TinProducts = () => {
       vinylTypes: [
         "Matte Vinyl - Professional, non-reflective finish",
         "Gloss Vinyl - High-shine, eye-catching appearance", 
-        "Metallic Vinyl - Premium metallic look",
         "Clear Vinyl - Transparent overlay effect"
       ]
     },
@@ -77,7 +75,6 @@ const TinProducts = () => {
       vinylTypes: [
         "Matte Vinyl - Professional, non-reflective finish",
         "Gloss Vinyl - High-shine, eye-catching appearance", 
-        "Metallic Vinyl - Premium metallic look",
         "Clear Vinyl - Transparent overlay effect"
       ]
     }
