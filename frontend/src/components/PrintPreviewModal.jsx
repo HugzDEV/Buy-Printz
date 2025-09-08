@@ -34,8 +34,10 @@ const PrintPreviewModal = ({
   const [previewImage, setPreviewImage] = useState(null)
   const [imageScale, setImageScale] = useState(1.5)
   const [selectedSurface, setSelectedSurface] = useState(currentSurface)
+  const [approvedSurfaces, setApprovedSurfaces] = useState(new Set())
+  const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
 
-  // Get surface names based on product type
+  // Get surface names based on product type and design option
   const getSurfaceNames = () => {
     if (productType === 'tin') {
       return [
@@ -45,7 +47,7 @@ const PrintPreviewModal = ({
         { key: 'lid', name: 'Lid', description: 'Lid surface' }
       ]
     } else if (productType === 'tent') {
-      return [
+      const allSurfaces = [
         { key: 'canopy_front', name: 'Canopy Front', description: 'Front canopy surface' },
         { key: 'canopy_back', name: 'Canopy Back', description: 'Back canopy surface' },
         { key: 'canopy_left', name: 'Canopy Left', description: 'Left canopy surface' },
@@ -54,8 +56,89 @@ const PrintPreviewModal = ({
         { key: 'sidewall_right', name: 'Right Sidewall', description: 'Right sidewall panel' },
         { key: 'backwall', name: 'Back Wall', description: 'Back wall panel' }
       ]
+      
+      // Filter surfaces based on design option
+      const designOption = orderDetails?.design_option || 'canopy-only'
+      if (designOption === 'canopy-only') {
+        return allSurfaces.filter(s => s.key.startsWith('canopy_'))
+      } else if (designOption === 'canopy-backwall') {
+        return allSurfaces.filter(s => s.key.startsWith('canopy_') || s.key === 'backwall')
+      } else {
+        return allSurfaces // all-sides
+      }
     }
     return [{ key: 'front', name: 'Design', description: 'Main design' }]
+  }
+
+  // Get tent surface dimensions
+  const getTentSurfaceDimensions = (surfaceKey) => {
+    const tentDimensions = {
+      'canopy_front': { width: 1160, height: 789, shape: 'triangular' },
+      'canopy_back': { width: 1160, height: 789, shape: 'triangular' },
+      'canopy_left': { width: 1160, height: 789, shape: 'triangular' },
+      'canopy_right': { width: 1160, height: 789, shape: 'triangular' },
+      'sidewall_left': { width: 1110, height: 390, shape: 'rectangular' },
+      'sidewall_right': { width: 1110, height: 390, shape: 'rectangular' },
+      'backwall': { width: 1110, height: 780, shape: 'rectangular' }
+    }
+    return tentDimensions[surfaceKey] || { width: 1160, height: 789, shape: 'triangular' }
+  }
+
+  // Get current surface dimensions
+  const getCurrentSurfaceDimensions = () => {
+    if (productType === 'tent') {
+      return getTentSurfaceDimensions(selectedSurface)
+    }
+    return dimensions
+  }
+
+  // Get all surfaces for multi-surface products
+  const getAllSurfaces = () => {
+    return getSurfaceNames()
+  }
+
+  // Check if current product has multiple surfaces
+  const hasMultipleSurfaces = () => {
+    return productType === 'tin' || productType === 'tent'
+  }
+
+  // Handle surface approval
+  const handleSurfaceApproval = (surfaceKey) => {
+    setApprovedSurfaces(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(surfaceKey)) {
+        newSet.delete(surfaceKey)
+      } else {
+        newSet.add(surfaceKey)
+      }
+      return newSet
+    })
+  }
+
+  // Navigate between surfaces
+  const navigateToSurface = (index) => {
+    const surfaces = getAllSurfaces()
+    if (index >= 0 && index < surfaces.length) {
+      setCurrentSurfaceIndex(index)
+      setSelectedSurface(surfaces[index].key)
+    }
+  }
+
+  // Check if all surfaces are approved
+  const areAllSurfacesApproved = () => {
+    if (!hasMultipleSurfaces()) return true
+    const surfaces = getAllSurfaces()
+    return surfaces.every(surface => approvedSurfaces.has(surface.key))
+  }
+
+  // Get approval progress
+  const getApprovalProgress = () => {
+    if (!hasMultipleSurfaces()) return { current: 1, total: 1 }
+    const surfaces = getAllSurfaces()
+    return {
+      current: approvedSurfaces.size,
+      total: surfaces.length
+    }
   }
 
   // Set preview image when modal opens - NO PDF generation for preview
@@ -123,11 +206,20 @@ const PrintPreviewModal = ({
   // Create PDF directly from canvas image (production quality)
   const createPDFFromImage = async (imageDataURL) => {
     try {
-      // Convert feet to inches for printing
-      const printWidthFeet = parseFloat(dimensions.width) || 2
-      const printHeightFeet = parseFloat(dimensions.height) || 4
-      const pdfWidthInches = printWidthFeet * 12
-      const pdfHeightInches = printHeightFeet * 12
+      let pdfWidthInches, pdfHeightInches
+      
+      if (productType === 'tent') {
+        // For tents, use pixel dimensions converted to inches at 150 DPI
+        const surfaceDims = getCurrentSurfaceDimensions()
+        pdfWidthInches = surfaceDims.width / 150 // Convert pixels to inches at 150 DPI
+        pdfHeightInches = surfaceDims.height / 150
+      } else {
+        // For banners and tins, convert feet to inches for printing
+        const printWidthFeet = parseFloat(dimensions.width) || 2
+        const printHeightFeet = parseFloat(dimensions.height) || 4
+        pdfWidthInches = printWidthFeet * 12
+        pdfHeightInches = printHeightFeet * 12
+      }
 
       // Create PDF with actual print dimensions and production quality settings
       const pdf = new jsPDF({
@@ -177,9 +269,19 @@ const PrintPreviewModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-1 sm:p-4">
         <DialogHeader className="pb-4 sm:pb-4">
-          <DialogTitle className="flex items-center gap-2">
-            <Printer className="h-5 w-5" />
-            Print Preview & Approval
+          <DialogTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Printer className="h-5 w-5" />
+              Print Preview & Approval
+            </div>
+            {hasMultipleSurfaces() && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-600">Progress:</span>
+                <span className="font-semibold text-blue-600">
+                  {getApprovalProgress().current}/{getApprovalProgress().total} Surfaces Approved
+                </span>
+              </div>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -204,57 +306,124 @@ const PrintPreviewModal = ({
                  ) : previewImage ? (
                    <div className="space-y-3 sm:space-y-4">
                      {/* Multi-Surface Preview for Tins and Tents */}
-                     {(productType === 'tin' || productType === 'tent') ? (
-                       <div className="space-y-4">
-                         {/* Surface Selection */}
-                         <div className="flex flex-wrap gap-2">
-                           {getSurfaceNames().map((surface) => (
-                             <button
-                               key={surface.key}
-                               onClick={() => setSelectedSurface(surface.key)}
-                               className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                 selectedSurface === surface.key
-                                   ? 'bg-blue-500 text-white shadow-lg'
-                                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                               }`}
-                               title={surface.description}
-                             >
-                               {surface.name}
-                             </button>
-                           ))}
-                         </div>
+        {(productType === 'tin' || productType === 'tent') ? (
+          <div className="space-y-4">
+            {/* Surface Selection with Approval Status */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-gray-900">Review All Surfaces</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {getSurfaceNames().map((surface, index) => (
+                  <div key={surface.key} className="space-y-2">
+                    <button
+                      onClick={() => {
+                        setSelectedSurface(surface.key)
+                        setCurrentSurfaceIndex(index)
+                      }}
+                      className={`w-full px-3 py-2 rounded-lg text-sm transition-all duration-200 flex items-center justify-between ${
+                        selectedSurface === surface.key
+                          ? 'bg-blue-500 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                      title={surface.description}
+                    >
+                      <span>{surface.name}</span>
+                      {approvedSurfaces.has(surface.key) && (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleSurfaceApproval(surface.key)}
+                      className={`w-full px-2 py-1 rounded text-xs transition-all duration-200 ${
+                        approvedSurfaces.has(surface.key)
+                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                          : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {approvedSurfaces.has(surface.key) ? '✓ Approved' : 'Approve'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
                          
-                         {/* Surface Preview */}
-                         <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center overflow-hidden">
-                           <div className="relative flex items-center justify-center w-full" style={{ 
-                             minHeight: window.innerWidth < 768 ? '200px' : '280px',
-                             maxHeight: window.innerWidth < 768 ? '240px' : '320px',
-                           }}>
-                             {previewImage ? (
-                               <img
-                                 src={previewImage}
-                                 alt={`${productType} ${selectedSurface} Preview`}
-                                 className={`border shadow-lg ${productType === 'tin' ? 'rounded-lg' : 'rounded'}`}
-                                 style={{
-                                   width: 'auto',
-                                   height: 'auto',
-                                   maxWidth: '100%',
-                                   maxHeight: window.innerWidth < 768 ? '180px' : '280px',
-                                   minHeight: window.innerWidth < 768 ? '120px' : '250px',
-                                   objectFit: 'contain',
-                                   transform: `scale(${imageScale})`,
-                                   transformOrigin: 'center center',
-                                   // Add rounded corners for tins
-                                   borderRadius: productType === 'tin' ? '2.3px' : undefined
-                                 }}
-                                 onLoad={handleImageLoad}
-                               />
-                             ) : (
-                               <div className="text-center text-gray-500 p-8">
-                                 <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                                 <p className="text-sm">No preview available for {selectedSurface}</p>
-                               </div>
-                             )}
+                         {/* Surface Preview with Navigation */}
+                         <div className="space-y-3">
+                           <div className="flex items-center justify-between">
+                             <h5 className="font-medium text-gray-900">
+                               {getSurfaceNames().find(s => s.key === selectedSurface)?.name} Preview
+                             </h5>
+                             <div className="flex items-center gap-2">
+                               <button
+                                 onClick={() => navigateToSurface(currentSurfaceIndex - 1)}
+                                 disabled={currentSurfaceIndex === 0}
+                                 className="p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+                               >
+                                 ←
+                               </button>
+                               <span className="text-sm text-gray-600">
+                                 {currentSurfaceIndex + 1} of {getSurfaceNames().length}
+                               </span>
+                               <button
+                                 onClick={() => navigateToSurface(currentSurfaceIndex + 1)}
+                                 disabled={currentSurfaceIndex === getSurfaceNames().length - 1}
+                                 className="p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+                               >
+                                 →
+                               </button>
+                             </div>
+                           </div>
+                           
+                           <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center overflow-hidden">
+                             <div className="relative flex items-center justify-center w-full" style={{ 
+                               minHeight: window.innerWidth < 768 ? '200px' : '280px',
+                               maxHeight: window.innerWidth < 768 ? '240px' : '320px',
+                             }}>
+                               {previewImage ? (
+                                 <img
+                                   src={previewImage}
+                                   alt={`${productType} ${selectedSurface} Preview`}
+                                   className={`border shadow-lg ${productType === 'tin' ? 'rounded-lg' : 'rounded'}`}
+                                   style={{
+                                     width: 'auto',
+                                     height: 'auto',
+                                     maxWidth: '100%',
+                                     maxHeight: window.innerWidth < 768 ? '180px' : '280px',
+                                     minHeight: window.innerWidth < 768 ? '120px' : '250px',
+                                     objectFit: 'contain',
+                                     transform: `scale(${imageScale})`,
+                                     transformOrigin: 'center center',
+                                     borderRadius: productType === 'tin' ? '2.3px' : undefined
+                                   }}
+                                   onLoad={handleImageLoad}
+                                 />
+                               ) : (
+                                 <div className="text-center text-gray-500 p-8">
+                                   <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                                   <p className="text-sm">No preview available for {selectedSurface}</p>
+                                 </div>
+                               )}
+                             </div>
+                           </div>
+                           
+                           {/* Current Surface Approval */}
+                           <div className="flex items-center justify-center">
+                             <button
+                               onClick={() => handleSurfaceApproval(selectedSurface)}
+                               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                 approvedSurfaces.has(selectedSurface)
+                                   ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                   : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                               }`}
+                             >
+                               {approvedSurfaces.has(selectedSurface) ? (
+                                 <>
+                                   <CheckCircle className="w-4 h-4 inline mr-2" />
+                                   Approved
+                                 </>
+                               ) : (
+                                 'Approve This Surface'
+                               )}
+                             </button>
                            </div>
                          </div>
                        </div>
@@ -323,7 +492,11 @@ const PrintPreviewModal = ({
                      <div className="bg-green-50 rounded-lg p-2 sm:p-4">
                        <div className="text-center">
                          <p className="text-sm font-medium text-green-900">
-                           {dimensions.width}ft × {dimensions.height}ft - Production Ready
+                           {productType === 'tent' ? (
+                             `${getCurrentSurfaceDimensions().width}px × ${getCurrentSurfaceDimensions().height}px - ${getCurrentSurfaceDimensions().shape}`
+                           ) : (
+                             `${dimensions.width}ft × ${dimensions.height}ft`
+                           )} - Production Ready
                          </p>
                          <p className="text-xs text-green-700 mt-1">
                            This is the exact image that will be printed
@@ -337,7 +510,17 @@ const PrintPreviewModal = ({
                          variant="outline"
                          onClick={() => {
                            const link = document.createElement('a')
-                           link.download = `banner-design-${orderDetails.banner_type || 'custom'}.png`
+                           let filename = 'design'
+                           
+                           if (productType === 'tent') {
+                             filename = `tent-${orderDetails?.tent_size || '10x10'}-${selectedSurface}`
+                           } else if (productType === 'tin') {
+                             filename = `tin-${selectedSurface}`
+                           } else {
+                             filename = `banner-${orderDetails?.banner_type || 'custom'}`
+                           }
+                           
+                           link.download = `${filename}.png`
                            link.href = previewImage
                            link.click()
                          }}
@@ -375,31 +558,49 @@ const PrintPreviewModal = ({
                   <div className="space-y-2 sm:space-y-3">
                     <p className="text-sm font-medium text-gray-600">Dimensions</p>
                     <Badge variant="outline">
-                      {dimensions.width}ft × {dimensions.height}ft
+                      {productType === 'tent' ? (
+                        `${getCurrentSurfaceDimensions().width}px × ${getCurrentSurfaceDimensions().height}px`
+                      ) : (
+                        `${dimensions.width}ft × ${dimensions.height}ft`
+                      )}
                     </Badge>
                   </div>
                   <div className="space-y-2 sm:space-y-3">
                     <p className="text-sm font-medium text-gray-600">Material</p>
                     <Badge variant="outline">
-                      {orderDetails.banner_material || 'Standard Vinyl'}
+                      {productType === 'tent' ? (
+                        orderDetails?.tent_material || '6oz Tent Fabric'
+                      ) : productType === 'tin' ? (
+                        'Premium Vinyl Stickers'
+                      ) : (
+                        orderDetails?.banner_material || 'Standard Vinyl'
+                      )}
                     </Badge>
                   </div>
                   <div className="space-y-2 sm:space-y-3">
-                    <p className="text-sm font-medium text-gray-600">Finish</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      {productType === 'tent' ? 'Print Method' : 'Finish'}
+                    </p>
                     <Badge variant="outline">
-                      {orderDetails.banner_finish || 'Matte'}
+                      {productType === 'tent' ? (
+                        orderDetails?.tent_print_method || 'Dye-Sublimation'
+                      ) : productType === 'tin' ? (
+                        orderDetails?.tin_finish || 'Silver'
+                      ) : (
+                        orderDetails?.banner_finish || 'Matte'
+                      )}
                     </Badge>
                   </div>
                   <div className="space-y-2 sm:space-y-3">
                     <p className="text-sm font-medium text-gray-600">Quantity</p>
                     <Badge variant="outline">
-                      {orderDetails.quantity} piece(s)
+                      {orderDetails?.quantity || 1} piece(s)
                     </Badge>
                   </div>
                   <div className="space-y-2 sm:space-y-3">
                     <p className="text-sm font-medium text-gray-600">Resolution</p>
                     <Badge variant="outline" className="bg-green-50 text-green-700">
-                      300 DPI
+                      {productType === 'tent' ? '150 DPI' : '300 DPI'}
                     </Badge>
                   </div>
                   <div className="space-y-2 sm:space-y-3">
@@ -409,6 +610,38 @@ const PrintPreviewModal = ({
                     </Badge>
                   </div>
                 </div>
+                
+                {/* Tent-specific specifications */}
+                {productType === 'tent' && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                      <div className="space-y-2 sm:space-y-3">
+                        <p className="text-sm font-medium text-gray-600">Tent Size</p>
+                        <Badge variant="outline">
+                          {orderDetails?.tent_size || '10x10'}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2 sm:space-y-3">
+                        <p className="text-sm font-medium text-gray-600">Frame Type</p>
+                        <Badge variant="outline">
+                          {orderDetails?.tent_frame_type || '40mm Aluminum Hex'}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2 sm:space-y-3">
+                        <p className="text-sm font-medium text-gray-600">Surface Shape</p>
+                        <Badge variant="outline" className="bg-purple-50 text-purple-700">
+                          {getCurrentSurfaceDimensions().shape}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2 sm:space-y-3">
+                        <p className="text-sm font-medium text-gray-600">Surface Type</p>
+                        <Badge variant="outline" className="bg-orange-50 text-orange-700">
+                          {selectedSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -434,17 +667,23 @@ const PrintPreviewModal = ({
               Cancel
             </Button>
             
+            {hasMultipleSurfaces() && !areAllSurfacesApproved() && (
+              <div className="flex-1 text-center py-2">
+                <p className="text-sm text-amber-600 font-medium">
+                  Please approve all {getApprovalProgress().total} surfaces before continuing
+                </p>
+              </div>
+            )}
+            
             <Button
               onClick={handleApprove}
-              disabled={!orderDetails?.canvas_image}
+              disabled={!orderDetails?.canvas_image || (hasMultipleSurfaces() && !areAllSurfacesApproved())}
               className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <Check className="h-4 w-4" />
-              Approve & Print
+              {hasMultipleSurfaces() ? 'Approve All & Print' : 'Approve & Print'}
             </Button>
           </div>
-          
-
         </DialogFooter>
       </DialogContent>
     </Dialog>

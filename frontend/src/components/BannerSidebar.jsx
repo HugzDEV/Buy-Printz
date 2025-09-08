@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { 
   Image as ImageIcon, 
@@ -64,6 +64,42 @@ const BannerSidebar = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [sizeCategory, setSizeCategory] = useState('landscape')
   const [uploadedImages, setUploadedImages] = useState([])
+  const [tentDesignOption, setTentDesignOption] = useState('canopy-only')
+
+  // Stable callback for radio button changes
+  const handleTentDesignOptionChange = useCallback((value) => {
+    setTentDesignOption(value)
+  }, [])
+
+  // Memoized available tent surfaces based on design option
+  const availableTentSurfaces = useMemo(() => {
+    const allSurfaces = [
+      { key: 'canopy_front', name: 'Canopy Front', group: 'canopy' },
+      { key: 'canopy_back', name: 'Canopy Back', group: 'canopy' },
+      { key: 'canopy_left', name: 'Canopy Left', group: 'canopy' },
+      { key: 'canopy_right', name: 'Canopy Right', group: 'canopy' },
+      { key: 'backwall', name: 'Back Wall', group: 'wall' }, // Moved backwall right after canopy
+      { key: 'sidewall_left', name: 'Left Sidewall', group: 'wall' },
+      { key: 'sidewall_right', name: 'Right Sidewall', group: 'wall' }
+    ]
+
+    let filteredSurfaces = []
+    if (tentDesignOption === 'canopy-only') {
+      filteredSurfaces = allSurfaces.filter(s => s.group === 'canopy')
+    } else if (tentDesignOption === 'canopy-backwall') {
+      // For canopy + backwall, return canopy surfaces + backwall in order
+      filteredSurfaces = [
+        ...allSurfaces.filter(s => s.group === 'canopy'),
+        ...allSurfaces.filter(s => s.key === 'backwall')
+      ]
+    } else {
+      filteredSurfaces = allSurfaces // all-sides
+    }
+    
+    return filteredSurfaces
+  }, [tentDesignOption])
+
+  // Note: Removed useEffect to prevent double render issues
 
   // QR Code state
   const [qrColor, setQrColor] = useState('#000000')
@@ -1162,68 +1198,108 @@ const BannerSidebar = ({
               {/* Tent-Specific Options */}
               {productType === 'tent' && (
                 <>
-                  {/* Tent Size */}
+                  {/* Design Coverage */}
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                    <div className="text-sm font-medium text-gray-800 mb-3">Tent Size</div>
-                    <select className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-                      <option value="10x10">10x10 ft Tent</option>
-                      <option value="10x20">10x20 ft Tent</option>
-                    </select>
-                  </div>
-
-                  {/* Components */}
-                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                    <div className="text-sm font-medium text-gray-800 mb-3">Components</div>
+                    <div className="text-sm font-medium text-gray-800 mb-3">Design Coverage</div>
                     <div className="space-y-2">
                       <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="text-blue-500" />
-                        <span className="text-sm text-gray-700">Tent</span>
+                        <input 
+                          type="radio" 
+                          name="tentDesignOption" 
+                          value="canopy-only"
+                          checked={tentDesignOption === 'canopy-only'}
+                          className="text-blue-500"
+                          onChange={(e) => handleTentDesignOptionChange(e.target.value)}
+                        />
+                        <span className="text-sm text-gray-700">Canopy Only (4 surfaces)</span>
                       </label>
                       <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="text-blue-500" />
-                        <span className="text-sm text-gray-700">Table Cloth</span>
+                        <input 
+                          type="radio" 
+                          name="tentDesignOption" 
+                          value="canopy-backwall"
+                          checked={tentDesignOption === 'canopy-backwall'}
+                          className="text-blue-500"
+                          onChange={(e) => handleTentDesignOptionChange(e.target.value)}
+                        />
+                        <span className="text-sm text-gray-700">Canopy + Back Wall (5 surfaces)</span>
                       </label>
                       <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="text-blue-500" />
-                        <span className="text-sm text-gray-700">Flag</span>
+                        <input 
+                          type="radio" 
+                          name="tentDesignOption" 
+                          value="all-sides"
+                          checked={tentDesignOption === 'all-sides'}
+                          className="text-blue-500"
+                          onChange={(e) => handleTentDesignOptionChange(e.target.value)}
+                        />
+                        <span className="text-sm text-gray-700">All Sides (7 surfaces)</span>
                       </label>
+                    </div>
+                  </div>
+
+                  {/* Surface Selector */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Design Surface</div>
+                    <select
+                      className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      value={currentSurface}
+                      onChange={(e) => {
+                        onSurfaceChange?.(e.target.value)
+                      }}
+                    >
+                      {availableTentSurfaces.map((surface) => (
+                        <option key={surface.key} value={surface.key}>
+                          {surface.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="mt-2 text-xs text-gray-600">
+                      {availableTentSurfaces.length} surface{availableTentSurfaces.length !== 1 ? 's' : ''} available
+                    </div>
+                  </div>
+
+                  {/* Tent Specifications */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Tent Specifications</div>
+                    <div className="space-y-2 text-xs text-gray-600">
+                      <div>• 10x10 ft Event Tent</div>
+                      <div>• 6oz Tent Fabric</div>
+                      <div>• 40mm Aluminum Hex Frame</div>
+                      <div>• Dye-Sublimation Printing</div>
                     </div>
                   </div>
                 </>
               )}
 
-              {/* Canvas Size Selector - Only for banners and tents */}
-              {(productType === 'banner' || productType === 'tent') && (
+              {/* Canvas Size Selector - Only for banners */}
+              {productType === 'banner' && (
                 <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                  <div className="text-sm font-medium text-gray-800 mb-3">
-                    {productType === 'banner' && 'Banner Size'}
-                    {productType === 'tent' && 'Tent Size'}
-                  </div>
+                  <div className="text-sm font-medium text-gray-800 mb-3">Banner Size</div>
                 
                 {/* Size Category Tabs - Only show for banners */}
-                {productType === 'banner' && (
-                  <div className="flex gap-1 mb-3">
-                    <button
-                      onClick={() => setSizeCategory('landscape')}
-                      className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                        sizeCategory === 'landscape' 
-                          ? 'bg-blue-500 text-white shadow-lg' 
-                          : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
-                      }`}
-                    >
-                      Landscape
-                    </button>
-                    <button
-                      onClick={() => setSizeCategory('portrait')}
-                      className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                        sizeCategory === 'portrait' 
-                          ? 'bg-blue-500 text-white shadow-lg' 
-                          : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
-                      }`}
-                    >
-                      Portrait
-                    </button>
-                    <button
+                <div className="flex gap-1 mb-3">
+                  <button
+                    onClick={() => setSizeCategory('landscape')}
+                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                      sizeCategory === 'landscape' 
+                        ? 'bg-blue-500 text-white shadow-lg' 
+                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
+                    }`}
+                  >
+                    Landscape
+                  </button>
+                  <button
+                    onClick={() => setSizeCategory('portrait')}
+                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                      sizeCategory === 'portrait' 
+                        ? 'bg-blue-500 text-white shadow-lg' 
+                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
+                    }`}
+                  >
+                    Portrait
+                  </button>
+                  <button
                       onClick={() => setSizeCategory('custom')}
                       className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                         sizeCategory === 'custom' 
@@ -1234,7 +1310,7 @@ const BannerSidebar = ({
                       Custom
                     </button>
                   </div>
-                )}
+                )
 
                 {/* Size Options */}
                 <div className="space-y-2 max-h-32 overflow-y-auto">
