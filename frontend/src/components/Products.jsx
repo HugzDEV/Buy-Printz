@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle, Filter, Search, Star, Truck, Award, Clock } from 'lucide-react'
+import { ArrowRight, CheckCircle, Filter, Search, Star, Truck, Award, Clock, ArrowLeft } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
 
 const Products = () => {
@@ -180,6 +180,17 @@ const Products = () => {
         </div>
         
         <div className="relative container mx-auto px-4">
+          {/* Back Button */}
+          <div className="mb-6">
+            <Link 
+              to="/all-products" 
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors duration-200 group"
+            >
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
+              <span className="font-medium">Back to All Products</span>
+            </Link>
+          </div>
+          
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">
               Professional Banner Products
