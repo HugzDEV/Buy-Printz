@@ -10,7 +10,7 @@ const AllProducts = () => {
       price: "From $25",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
-      link: "/products",
+      link: "/banner-products",
       badge: "Best Seller",
       badgeColor: "bg-red-500",
       icon: <Package className="w-8 h-8" />

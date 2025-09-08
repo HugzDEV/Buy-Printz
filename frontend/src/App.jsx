@@ -128,7 +128,7 @@ function App() {
           </>
         } />
         
-        <Route path="/products" element={
+        <Route path="/banner-products" element={
           <>
             <Header />
             <Products />

@@ -733,10 +733,10 @@ const ProductDetail = () => {
 
   // Determine the correct back route based on product type
   const getBackRoute = () => {
-    if (!product) return "/products"
+    if (!product) return "/banner-products"
     if (productId?.startsWith('tent-')) return "/tent-products"
     if (productId?.startsWith('tin-')) return "/tin-products"
-    return "/products"
+    return "/banner-products"
   }
 
   if (!product) {

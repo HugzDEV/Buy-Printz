@@ -365,7 +365,7 @@ const TinProducts = () => {
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link 
-                to="/products"
+                to="/banner-products"
                 className="bg-transparent border-2 border-white/50 text-white hover:bg-white/10 text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
               >
                 View All Products

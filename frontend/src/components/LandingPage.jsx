@@ -38,7 +38,7 @@ const LandingPage = () => {
       features: ["Weather resistant", "Full color printing", "Grommets included"],
       badge: "Best Seller",
       category: "banner",
-      link: "/products"
+      link: "/banner-products"
     },
     {
       name: "Business Card Tins",
