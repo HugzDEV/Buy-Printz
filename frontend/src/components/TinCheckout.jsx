@@ -40,7 +40,7 @@ import authService from '../services/auth'
 import PrintPreviewModal from './PrintPreviewModal'
 import { GlassCard } from './ui'
 
-// Collapsible Section Component - Reused from banner checkout
+// Collapsible Section Component - Standardized design
 const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle, defaultExpanded = false }) => (
   <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
     <button
@@ -51,24 +51,19 @@ const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle,
         <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
           <Icon className="h-5 w-5 text-blue-600" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <span className="font-semibold text-gray-900">{title}</span>
       </div>
-      <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
-        {isExpanded ? (
-          <ChevronUp className="h-5 w-5 text-gray-600" />
-        ) : (
-          <ChevronDown className="h-5 w-5 text-gray-600" />
-        )}
-      </div>
+      {isExpanded ? (
+        <ChevronUp className="h-5 w-5 text-gray-500 group-hover:text-gray-700 transition-colors" />
+      ) : (
+        <ChevronDown className="h-5 w-5 text-gray-500 group-hover:text-gray-700 transition-colors" />
+      )}
     </button>
-    
-    <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-      isExpanded ? 'max-h-[8000px] sm:max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
-    }`}>
-      <div className="p-4 sm:p-6">
+    {isExpanded && (
+      <div className="p-6 bg-white">
         {children}
       </div>
-    </div>
+    )}
   </div>
 )
 
@@ -519,10 +514,11 @@ const TinCheckout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 py-4 lg:py-8">
-      <div className="container mx-auto px-2 sm:px-4 max-w-6xl">
-        <div className="text-center mb-4 lg:mb-8">
-          <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
             <button
               onClick={() => {
                 if (orderData) {
@@ -536,98 +532,20 @@ const TinCheckout = () => {
               <ChevronLeft className="w-5 h-5" />
               Back to Tin Editor
             </button>
-            <div></div>
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Business Card Tin Checkout</h1>
-          <p className="text-gray-600">Complete your tin order and payment</p>
-        </div>
-
-        {/* Progress Indicator */}
-        <div className="mb-8 backdrop-blur-xl bg-white/20 rounded-2xl p-4 lg:p-6 border border-white/30 shadow-xl overflow-x-auto">
-          <div className="flex items-center justify-between min-w-[600px] lg:min-w-0">
+            
             <div className="flex items-center gap-2">
-              {getStepIcon('printPreview', checkoutStep)}
-              <span className={getStepStatus('printPreview', checkoutStep)}>Print Preview</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-gray-200 mx-2">
-              <div className={`h-full transition-all duration-500 ${
-                ['tinOptions', 'shipping', 'customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
-                  ? 'bg-blue-500 w-full' 
-                  : 'bg-gray-200 w-0'
-              }`} />
-            </div>
-            <div className="flex items-center gap-2">
-              {getStepIcon('tinOptions', checkoutStep)}
-              <span className={getStepStatus('tinOptions', checkoutStep)}>Tin Options</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-gray-200 mx-2">
-              <div className={`h-full transition-all duration-500 ${
-                ['shipping', 'customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
-                  ? 'bg-blue-500 w-full' 
-                  : 'bg-gray-200 w-0'
-              }`} />
-            </div>
-            <div className="flex items-center gap-2">
-              {getStepIcon('shipping', checkoutStep)}
-              <span className={getStepStatus('shipping', checkoutStep)}>Shipping</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-gray-200 mx-2">
-              <div className={`h-full transition-all duration-500 ${
-                ['customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
-                  ? 'bg-blue-500 w-full' 
-                  : 'bg-gray-200 w-0'
-              }`} />
-            </div>
-            <div className="flex items-center gap-2">
-              {getStepIcon('customerInfo', checkoutStep)}
-              <span className={getStepStatus('customerInfo', checkoutStep)}>Customer Info</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-gray-200 mx-2">
-              <div className={`h-full transition-all duration-500 ${
-                ['reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
-                  ? 'bg-blue-500 w-full' 
-                  : 'bg-gray-200 w-0'
-              }`} />
-            </div>
-            <div className="flex items-center gap-2">
-              {getStepIcon('reviewPayment', checkoutStep)}
-              <span className={getStepStatus('reviewPayment', checkoutStep)}>Review & Payment</span>
+              <Shield className="w-5 h-5 text-green-600" />
+              <span className="text-sm font-medium text-gray-700">Secure Checkout</span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Order Summary Card - Sticky Container */}
-        <div className="sticky top-0 z-20 mb-4 sm:mb-6">
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-3 sm:p-4 lg:p-6 border border-white/30 shadow-xl">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Box className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-                <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Tin Order Summary</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">
-                    {tinOptions.quantity} Business Card Tins
-                    {tinOptions.surfaceCoverage === 'all-sides' ? ' (All Sides)' : ' (Front + Back)'}
-                  </p>
-                  <p className="text-xs sm:text-sm text-blue-600 font-medium">
-                    {tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)?.label} Finish
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-xl sm:text-2xl font-bold text-green-600">
-                  ${totalAmount.toFixed(2)}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-600">Total (including shipping)</p>
-                <div className="text-xs text-gray-500 mt-1">
-                  <p>Base: ${tinBasePrice.toFixed(2)}</p>
-                  <p>Shipping: +${shippingCost.toFixed(2)}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <div className="space-y-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
           {/* Print Preview - Step 1 */}
           <CollapsibleSection
             title="Print Preview"
@@ -1145,6 +1063,88 @@ const TinCheckout = () => {
               </div>
             </div>
           </CollapsibleSection>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <GlassCard className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  Order Summary
+                </h3>
+                
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      {tinOptions.quantity} Business Card Tins
+                    </span>
+                    <span className="font-medium">
+                      ${tinBasePrice.toFixed(2)}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Surface Coverage:</span>
+                    <span className="font-medium">
+                      {tinOptions.surfaceCoverage === 'all-sides' ? 'All Sides' : 'Front + Back'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tin Finish:</span>
+                    <span className="font-medium">
+                      {tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)?.label}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Printing Method:</span>
+                    <span className="font-medium">
+                      {tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)?.label}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Shipping:</span>
+                    <span className="font-medium">
+                      {shippingOption === 'standard' ? 'Free' : 
+                       shippingOption === 'express' ? '+$25' : '+$45'}
+                    </span>
+                  </div>
+                  
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="flex justify-between text-lg font-semibold">
+                      <span>Total</span>
+                      <span>${totalAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSubmitOrder}
+                  disabled={loading || !customerInfo.name || !customerInfo.email}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      Complete Order - ${totalAmount.toFixed(2)}
+                    </>
+                  )}
+                </button>
+
+                <div className="mt-4 text-xs text-gray-500 text-center">
+                  By completing this order, you agree to our Terms of Service and Privacy Policy
+                </div>
+              </GlassCard>
+            </div>
+          </div>
         </div>
       </div>
 
