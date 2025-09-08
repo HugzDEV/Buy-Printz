@@ -32,13 +32,15 @@ import {
   ShoppingCart,
   FileText,
   CreditCard as CreditCardIcon,
-  Check
+  Check,
+  Layers,
+  Box
 } from 'lucide-react'
 import authService from '../services/auth'
 import PrintPreviewModal from './PrintPreviewModal'
 import { GlassCard } from './ui'
 
-// Collapsible Section Component - Defined outside to prevent recreation
+// Collapsible Section Component - Reused from banner checkout
 const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle, defaultExpanded = false }) => (
   <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
     <button
@@ -70,7 +72,7 @@ const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle,
   </div>
 )
 
-const Checkout = () => {
+const TinCheckout = () => {
   const navigate = useNavigate()
   const stripe = useStripe()
   const elements = useElements()
@@ -90,97 +92,63 @@ const Checkout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
   
-  // Banner Options Configuration - Updated to match Supabase table
-  const bannerOptionsConfig = {
-    // 1. Width x Height (from editor - already handled)
-    // 2. # of sides
-    sides: [
-      { value: 1, label: 'Single Sided', price: 0 },
-      { value: 2, label: 'Double Sided', description: 'Additional cost applies' }
+  // Business Card Tin Configuration - Based on GALACTIC_EXPANSION_PLAN.md
+  const tinConfig = {
+    // Quantity Options
+    quantities: [
+      { value: 100, label: '100 Units', basePrice: 399.99 },
+      { value: 250, label: '250 Units', basePrice: 749.99 },
+      { value: 500, label: '500 Units', basePrice: 1000.00 }
     ],
     
-    // 3. Material (from editor - already handled)
-    // 4. Pole Pockets - 10% markup (internal)
-    polePockets: [
-      { value: 'none', label: 'No Pole Pockets', price: 0 },
-      { value: '2in-top', label: '2" Pocket - Top Only (fits 1" pole)', description: 'Additional cost applies' },
-      { value: '3in-top', label: '3" Pocket - Top Only (fits 1.5" pole)', description: 'Additional cost applies' },
-      { value: '4in-top', label: '4" Pocket - Top Only (fits 2" pole)', description: 'Additional cost applies' },
-      { value: '2in-top-bottom', label: '2" Pockets - Top & Bottom', description: 'Additional cost applies' },
-      { value: '3in-top-bottom', label: '3" Pockets - Top & Bottom', description: 'Additional cost applies' },
-      { value: '4in-top-bottom', label: '4" Pockets - Top & Bottom', description: 'Additional cost applies' }
+    // Surface Coverage Options
+    surfaceCoverage: [
+      { 
+        value: 'front-back', 
+        label: 'Front + Back Only', 
+        description: 'Design on front and back surfaces',
+        priceModifier: 0.00
+      },
+      { 
+        value: 'all-sides', 
+        label: 'All Sides (Front + Back + Inside + Lid)', 
+        description: 'Complete tin branding on all surfaces',
+        priceModifier: 100.00
+      }
     ],
     
-    // 5. Hem Options - Free
-    hem: [
-      { value: 'no-hem', label: 'No Hem', price: 0 },
-      { value: 'all-sides', label: 'All Sides Hem', price: 0 }
+    // Tin Finish Options
+    tinFinishes: [
+      { value: 'silver', label: 'Silver', priceModifier: 0.00, description: 'Classic silver finish' },
+      { value: 'black', label: 'Black', priceModifier: 0.25, description: 'Premium black finish' },
+      { value: 'gold', label: 'Gold', priceModifier: 0.50, description: 'Luxury gold finish' }
     ],
     
-    // 6. Grommet Options - $3.00 flat rate
-    grommets: [
-      { value: 'every-2ft-all-sides', label: 'Every 2\' - All Sides', price: 3.00 },
-      { value: 'every-2ft-top-bottom', label: 'Every 2\' - Top & Bottom', price: 3.00 },
-      { value: 'every-2ft-left-right', label: 'Every 2\' - Left & Right', price: 3.00 },
-      { value: '4-corners-only', label: '4 Corners Only', price: 3.00 },
-      { value: 'no-grommets', label: 'No Grommets', price: 0 }
-    ],
-    
-    // 7. Webbing Options - 27% markup (internal)
-    webbing: [
-      { value: 'no-webbing', label: 'No Webbing', price: 0 },
-      { value: '1in-webbing', label: '1" Webbing', description: 'Additional cost applies' },
-      { value: '1in-webbing-d-rings', label: '1" Webbing w/ D-rings', description: 'Additional cost applies' },
-      { value: '1in-velcro-all-sides', label: '1" Velcro - All Sides', description: 'Additional cost applies' }
-    ],
-    
-    // 8. Corner Reinforcement - 16% markup (internal)
-    corners: [
-      { value: 'no-reinforcement', label: 'No Reinforced Corners', price: 0 },
-      { value: 'reinforce-top-only', label: 'Reinforce Top Only', description: 'Additional cost applies' },
-      { value: 'reinforce-bottom-only', label: 'Reinforce Bottom Only', description: 'Additional cost applies' },
-      { value: 'reinforce-all-corners', label: 'Reinforce All Corners', description: 'Additional cost applies' }
-    ],
-    
-    // 9. Rope Options - 35-70% markup (internal)
-    rope: [
-      { value: 'no-rope', label: 'No Rope', price: 0 },
-      { value: '3-16-top-only', label: '3/16" Rope - Top Only', description: 'Additional cost applies' },
-      { value: '3-16-bottom-only', label: '3/16" Rope - Bottom Only', description: 'Additional cost applies' },
-      { value: '3-16-top-bottom', label: '3/16" Rope - Top & Bottom', description: 'Additional cost applies' },
-      { value: '5-16-top-only', label: '5/16" Rope - Top Only', description: 'Additional cost applies' },
-      { value: '5-16-bottom-only', label: '5/16" Rope - Bottom Only', description: 'Additional cost applies' },
-      { value: '5-16-top-bottom', label: '5/16" Rope - Top & Bottom', description: 'Additional cost applies' }
-    ],
-    
-    // 10. Wind Slits - Keep existing flat rate
-    windslits: [
-      { value: 'no-windslits', label: 'No Wind Slits', price: 0 },
-      { value: 'standard-windslits', label: 'Standard Wind Slits', price: 8.00 }
-    ],
-    
-    // Turnaround Time
-    turnaround: [
-      { value: 'next-day', label: 'Next Day (4pm PST Cutoff) - Free', price: 0 },
-      { value: 'same-day', label: 'Same Day (12pm PST Cutoff) +$15.00', price: 15 }
+    // Printing Options
+    printingMethods: [
+      { 
+        value: 'premium-vinyl', 
+        label: 'Premium Vinyl Stickers', 
+        description: 'High-quality vinyl stickers for tin application',
+        priceModifier: 0.00
+      },
+      { 
+        value: 'premium-clear-vinyl', 
+        label: 'Premium Clear Vinyl Stickers', 
+        description: 'Clear vinyl stickers for transparent effect',
+        priceModifier: 25.00
+      }
     ]
   }
 
-  // Banner Options State - Updated to match Supabase structure
-  const [bannerOptions, setBannerOptions] = useState({
-    sides: 1,
-    polePockets: 'none',
-    hem: 'no-hem',
-    grommets: 'every-2ft-all-sides',
-    webbing: 'no-webbing',
-    corners: 'no-reinforcement',
-    rope: 'no-rope',
-    windslits: 'no-windslits',
-    turnaround: 'next-day',
+  // Tin Options State
+  const [tinOptions, setTinOptions] = useState({
+    quantity: 100,
+    surfaceCoverage: 'front-back',
+    tinFinish: 'silver',
+    printingMethod: 'premium-vinyl',
     jobName: '',
-    quantity: 1,
-    material: '13oz-vinyl', // Added material selection
-    showAdvancedOptions: false // Added for advanced options expansion
+    showAdvancedOptions: false
   })
   
   // Shipping Options State
@@ -189,8 +157,8 @@ const Checkout = () => {
   // Collapsible sections state - Progressive user journey
   const [expandedSections, setExpandedSections] = useState({
     printPreview: true,      // Start with print preview
-    bannerOptions: false,    // Opens after preview approval
-    shipping: false,         // Opens after banner options
+    tinOptions: false,       // Opens after preview approval
+    shipping: false,         // Opens after tin options
     customerInfo: false,     // Opens after shipping selection
     reviewPayment: false     // Opens after customer info completion
   })
@@ -198,7 +166,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false)
   const [paymentIntent, setPaymentIntent] = useState(null)
   const [orderId, setOrderId] = useState(null)
-  const [checkoutStep, setCheckoutStep] = useState('printPreview') // printPreview, bannerOptions, shipping, customerInfo, reviewPayment, processing, completed, error
+  const [checkoutStep, setCheckoutStep] = useState('printPreview')
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [approvedPDF, setApprovedPDF] = useState(null)
   const [previewApproved, setPreviewApproved] = useState(false)
@@ -229,7 +197,7 @@ const Checkout = () => {
 
   // Progressive navigation functions
   const continueToNextSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'bannerOptions', 'shipping', 'customerInfo', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'tinOptions', 'shipping', 'customerInfo', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const nextSection = sectionOrder[currentIndex + 1]
     
@@ -253,7 +221,7 @@ const Checkout = () => {
   }
 
   const goToPreviousSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'bannerOptions', 'shipping', 'customerInfo', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'tinOptions', 'shipping', 'customerInfo', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const prevSection = sectionOrder[currentIndex - 1]
     
@@ -276,6 +244,35 @@ const Checkout = () => {
     }
   }
 
+  // Calculate tin pricing
+  const calculateTinPrice = () => {
+    const baseQuantity = tinConfig.quantities.find(q => q.value === tinOptions.quantity)
+    const surfaceCoverage = tinConfig.surfaceCoverage.find(s => s.value === tinOptions.surfaceCoverage)
+    const tinFinish = tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)
+    const printingMethod = tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)
+    
+    if (!baseQuantity || !surfaceCoverage || !tinFinish || !printingMethod) {
+      return 0
+    }
+    
+    let totalPrice = baseQuantity.basePrice
+    
+    // Add surface coverage modifier
+    totalPrice += surfaceCoverage.priceModifier
+    
+    // Add tin finish modifier (per unit)
+    totalPrice += (tinFinish.priceModifier * tinOptions.quantity)
+    
+    // Add printing method modifier
+    totalPrice += printingMethod.priceModifier
+    
+    return totalPrice
+  }
+  
+  const tinBasePrice = calculateTinPrice()
+  const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
+  const totalAmount = tinBasePrice + shippingCost
+
   useEffect(() => {
     const savedOrderData = sessionStorage.getItem('orderData')
     if (!savedOrderData) {
@@ -285,7 +282,7 @@ const Checkout = () => {
 
     try {
       const parsedOrderData = JSON.parse(savedOrderData)
-      console.log('Loading order data from sessionStorage:', parsedOrderData)
+      console.log('Loading tin order data from sessionStorage:', parsedOrderData)
       setOrderData(parsedOrderData)
     } catch (error) {
       console.error('Failed to parse order data:', error)
@@ -303,14 +300,13 @@ const Checkout = () => {
         
         if (!authenticated) {
           console.log('User not authenticated, redirecting to login')
-          // Save current location to redirect back after login
-          sessionStorage.setItem('redirectAfterLogin', '/checkout')
+          sessionStorage.setItem('redirectAfterLogin', '/tin-checkout')
           navigate('/login')
           return
         }
       } catch (error) {
         console.error('Authentication check failed:', error)
-        sessionStorage.setItem('redirectAfterLogin', '/checkout')
+        sessionStorage.setItem('redirectAfterLogin', '/tin-checkout')
         navigate('/login')
         return
       } finally {
@@ -329,12 +325,13 @@ const Checkout = () => {
 
   const createOrder = async () => {
     try {
-      console.log('Creating order with data:', orderData)
+      console.log('Creating tin order with data:', orderData)
       
-      // Update order data with banner options
+      // Update order data with tin options
       const updatedOrderData = {
         ...orderData,
-        print_options: bannerOptions,
+        product_type: 'business_card_tin',
+        tin_options: tinOptions,
         shipping_option: shippingOption
       }
       
@@ -345,26 +342,26 @@ const Checkout = () => {
       
       if (!response.ok) {
         const errorData = await response.json()
-        console.error('Order creation failed:', errorData)
-        throw new Error(errorData.detail || 'Failed to create order')
+        console.error('Tin order creation failed:', errorData)
+        throw new Error(errorData.detail || 'Failed to create tin order')
       }
       
       const data = await response.json()
-      console.log('Order created successfully:', data)
+      console.log('Tin order created successfully:', data)
       
       if (data.success) {
         setOrderId(data.order_id)
         createPaymentIntent(data.order_id)
-        setCheckoutStep('preview') // Show preview before payment
-        toast.success('Order created successfully!')
+        setCheckoutStep('preview')
+        toast.success('Tin order created successfully!')
       } else {
         setCheckoutStep('error')
-        toast.error('Failed to create order')
+        toast.error('Failed to create tin order')
       }
     } catch (error) {
-      console.error('Order creation error:', error)
+      console.error('Tin order creation error:', error)
       setCheckoutStep('error')
-      toast.error(`Error creating order: ${error.message}`)
+      toast.error(`Error creating tin order: ${error.message}`)
     }
   }
 
@@ -382,7 +379,6 @@ const Checkout = () => {
       
       const data = await response.json()
       setPaymentIntent(data)
-      // Don't set ready here - payment intent is created during preview step
     } catch (error) {
       console.error('Payment intent error:', error)
       setCheckoutStep('error')
@@ -397,8 +393,8 @@ const Checkout = () => {
     }))
   }
 
-  const handleBannerOptionChange = (option, value) => {
-    setBannerOptions(prev => ({
+  const handleTinOptionChange = (option, value) => {
+    setTinOptions(prev => ({
       ...prev,
       [option]: value
     }))
@@ -412,12 +408,12 @@ const Checkout = () => {
     setApprovedPDF(pdfBlob)
     setPreviewApproved(true)
     setShowPreviewModal(false)
-    setCheckoutStep('bannerOptions')
+    setCheckoutStep('tinOptions')
     setExpandedSections(prev => ({
       ...prev,
-      bannerOptions: true
+      tinOptions: true
     }))
-    toast.success('Design approved! Now configure your banner options.')
+    toast.success('Design approved! Now configure your tin options.')
   }
 
   const handlePreviewCancel = () => {
@@ -427,8 +423,6 @@ const Checkout = () => {
   // Save customer information
   const saveCustomerInfo = async () => {
     try {
-      // Here you would typically save to your backend
-      // For now, we'll just log it
       console.log('Saving customer info:', customerInfo)
       return true
     } catch (error) {
@@ -448,28 +442,37 @@ const Checkout = () => {
     setCheckoutStep('processing')
 
     try {
-      // Save customer information first
       await saveCustomerInfo()
-
-      // Simulate order processing
       await new Promise(resolve => setTimeout(resolve, 2000))
 
-      // Order successful
       setCheckoutStep('completed')
-      toast.success('Order submitted successfully!')
+      toast.success('Tin order submitted successfully!')
       
-      // Navigate to confirmation or show success message
       setTimeout(() => {
         navigate('/confirmation')
       }, 1500)
 
     } catch (error) {
-      console.error('Order submission error:', error)
+      console.error('Tin order submission error:', error)
       setCheckoutStep('error')
-      toast.error('Order submission failed. Please try again.')
+      toast.error('Tin order submission failed. Please try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const getStepIcon = (step, currentStep) => {
+    if (step === 'error') return <XCircle className="w-5 h-5 text-red-500" />
+    if (step === 'completed') return <CheckCircle className="w-5 h-5 text-green-500" />
+    if (step === currentStep) return <Clock className="w-5 h-5 text-blue-500 animate-pulse" />
+    if (currentStep === 'completed' || currentStep === 'error') return <CheckCircle className="w-5 h-5 text-green-500" />
+    return <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
+  }
+
+  const getStepStatus = (step, currentStep) => {
+    if (step === currentStep) return 'text-blue-600 font-medium'
+    if (currentStep === 'completed' || currentStep === 'error') return 'text-green-600'
+    return 'text-gray-500'
   }
 
   // Early return for loading and error states
@@ -493,7 +496,7 @@ const Checkout = () => {
             <Lock className="w-8 h-8 text-red-600" />
           </div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h2>
-          <p className="text-gray-600 mb-4">You need to be logged in to access the checkout.</p>
+          <p className="text-gray-600 mb-4">You need to be logged in to access the tin checkout.</p>
           <button
             onClick={() => navigate('/login')}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
@@ -515,73 +518,6 @@ const Checkout = () => {
     )
   }
 
-  // Material pricing per square foot
-  const materialPricing = {
-    '13oz-vinyl': 1.60,
-    '18oz-blackout': 2.50,
-    'mesh': 1.80,
-    'indoor': 2.50,
-    'pole': 3.00,
-    '9oz-fabric': 2.75,
-    'blockout-fabric': 7.00,
-    'tension-fabric': 5.15,
-    'backlit': 7.00
-  }
-
-  // Calculate banner options costs - Now handled by backend with dynamic markup
-  const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
-  const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
-  const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
-  const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
-  
-  // Calculate base price from material and dimensions
-  const getBasePrice = () => {
-    const materialPrice = materialPricing[bannerOptions.material] || 1.60
-    const width = orderData?.dimensions?.width || 2
-    const height = orderData?.dimensions?.height || 4
-    return materialPrice * width * height
-  }
-  
-  const basePrice = getBasePrice()
-  
-  // Calculate percentage-based options for instant pricing updates
-  const sidesCost = bannerOptions.sides === 2 ? basePrice : 0 // 100% markup for double sided
-  const polePocketCost = bannerOptions.polePockets !== 'none' ? basePrice * 0.10 : 0 // 10% markup
-  const webbingCost = bannerOptions.webbing !== 'no-webbing' ? basePrice * 0.27 : 0 // 27% markup
-  const cornersCost = bannerOptions.corners !== 'no-reinforcement' ? basePrice * 0.16 : 0 // 16% markup
-  
-  // Rope pricing based on size and placement
-  const getRopeCost = () => {
-    if (bannerOptions.rope === 'no-rope') return 0
-    if (bannerOptions.rope.includes('3-16')) {
-      return bannerOptions.rope.includes('top-bottom') ? basePrice * 0.50 : basePrice * 0.35
-    }
-    if (bannerOptions.rope.includes('5-16')) {
-      return bannerOptions.rope.includes('top-bottom') ? basePrice * 0.70 : basePrice * 0.50
-    }
-    return 0
-  }
-  const ropeCost = getRopeCost()
-  
-  // Calculate total options cost including all percentage-based options
-  const optionsTotal = sidesCost + polePocketCost + grommetCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
-  const subtotal = basePrice * bannerOptions.quantity + optionsTotal
-  const totalAmount = subtotal + shippingCost
-
-  const getStepIcon = (step, currentStep) => {
-    if (step === 'error') return <XCircle className="w-5 h-5 text-red-500" />
-    if (step === 'completed') return <CheckCircle className="w-5 h-5 text-green-500" />
-    if (step === currentStep) return <Clock className="w-5 h-5 text-blue-500 animate-pulse" />
-    if (currentStep === 'completed' || currentStep === 'error') return <CheckCircle className="w-5 h-5 text-green-500" />
-    return <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
-  }
-
-  const getStepStatus = (step, currentStep) => {
-    if (step === currentStep) return 'text-blue-600 font-medium'
-    if (currentStep === 'completed' || currentStep === 'error') return 'text-green-600'
-    return 'text-gray-500'
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 py-4 lg:py-8">
       <div className="container mx-auto px-2 sm:px-4 max-w-6xl">
@@ -589,10 +525,9 @@ const Checkout = () => {
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => {
-                // Save current order data to sessionStorage before going back
                 if (orderData) {
                   sessionStorage.setItem('cancelledOrder', JSON.stringify(orderData))
-                  console.log('Saved cancelled order data for restoration')
+                  console.log('Saved cancelled tin order data for restoration')
                 }
                 navigate('/editor')
               }}
@@ -601,10 +536,10 @@ const Checkout = () => {
               <ChevronLeft className="w-5 h-5" />
               Back to Editor
             </button>
-            <div></div> {/* Spacer for centering */}
+            <div></div>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Checkout</h1>
-          <p className="text-gray-600">Complete your order and payment</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Business Card Tin Checkout</h1>
+          <p className="text-gray-600">Complete your tin order and payment</p>
         </div>
 
         {/* Progress Indicator */}
@@ -616,14 +551,14 @@ const Checkout = () => {
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2">
               <div className={`h-full transition-all duration-500 ${
-                ['bannerOptions', 'shipping', 'customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
+                ['tinOptions', 'shipping', 'customerInfo', 'reviewPayment', 'processing', 'completed', 'error'].includes(checkoutStep) 
                   ? 'bg-blue-500 w-full' 
                   : 'bg-gray-200 w-0'
               }`} />
             </div>
             <div className="flex items-center gap-2">
-              {getStepIcon('bannerOptions', checkoutStep)}
-              <span className={getStepStatus('bannerOptions', checkoutStep)}>Banner Options</span>
+              {getStepIcon('tinOptions', checkoutStep)}
+              <span className={getStepStatus('tinOptions', checkoutStep)}>Tin Options</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2">
               <div className={`h-full transition-all duration-500 ${
@@ -666,21 +601,15 @@ const Checkout = () => {
           <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-3 sm:p-4 lg:p-6 border border-white/30 shadow-xl">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4">
               <div className="flex items-center gap-2 sm:gap-3">
-                <Package className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+                <Box className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Order Summary</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Tin Order Summary</h3>
                   <p className="text-xs sm:text-sm text-gray-600">
-                    {orderData?.dimensions?.width || 2}ft × {orderData?.dimensions?.height || 4}ft Banner
-                    {bannerOptions.quantity > 1 && ` × ${bannerOptions.quantity}`}
-                    {bannerOptions.sides === 2 && ' (Double Sided)'}
+                    {tinOptions.quantity} Business Card Tins
+                    {tinOptions.surfaceCoverage === 'all-sides' ? ' (All Sides)' : ' (Front + Back)'}
                   </p>
                   <p className="text-xs sm:text-sm text-blue-600 font-medium">
-                    {bannerOptions.material ? 
-                      Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1] ? 
-                      `${Object.entries(materialPricing).find(([key]) => key === bannerOptions.material)?.[1]}/sqft` : 
-                      'Material pricing' : 
-                      'Select material'
-                    }
+                    {tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)?.label} Finish
                   </p>
                 </div>
               </div>
@@ -688,21 +617,10 @@ const Checkout = () => {
                 <p className="text-xl sm:text-2xl font-bold text-green-600">
                   ${totalAmount.toFixed(2)}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">Total (including all options & shipping)</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total (including shipping)</p>
                 <div className="text-xs text-gray-500 mt-1">
-                  <p>Base: ${(basePrice * bannerOptions.quantity).toFixed(2)}</p>
-                  <p>Options: +${optionsTotal.toFixed(2)}</p>
+                  <p>Base: ${tinBasePrice.toFixed(2)}</p>
                   <p>Shipping: +${shippingCost.toFixed(2)}</p>
-                  <div className="mt-1 text-xs text-gray-400">
-                    <p>• Sides: +${sidesCost.toFixed(2)}</p>
-                    <p>• Pole Pockets: +${polePocketCost.toFixed(2)}</p>
-                    <p>• Grommets: +${grommetCost.toFixed(2)}</p>
-                    <p>• Webbing: +${webbingCost.toFixed(2)}</p>
-                    <p>• Corners: +${cornersCost.toFixed(2)}</p>
-                    <p>• Rope: +${ropeCost.toFixed(2)}</p>
-                    <p>• Wind Slits: +${windSlitCost.toFixed(2)}</p>
-                    <p>• Turnaround: +${turnaroundCost.toFixed(2)}</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -722,16 +640,16 @@ const Checkout = () => {
             <div className="space-y-4">
               <div className="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
                 <Eye className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">Review Your Design</h3>
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">Review Your Tin Design</h3>
                 <p className="text-blue-700 mb-4">
-                  Before proceeding, please review your banner design to ensure it's exactly what you want printed.
+                  Before proceeding, please review your business card tin design to ensure it's exactly what you want printed.
                 </p>
                 <button
                   onClick={() => setShowPreviewModal(true)}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
                 >
                   <Eye className="w-5 h-5" />
-                  Preview Design
+                  Preview Tin Design
                 </button>
               </div>
               
@@ -741,28 +659,28 @@ const Checkout = () => {
                     <CheckCircle className="w-6 h-6 text-green-600" />
                     <div>
                       <p className="font-semibold text-green-900">Design Approved!</p>
-                      <p className="text-sm text-green-700">Your design has been approved and is ready for production.</p>
+                      <p className="text-sm text-green-700">Your tin design has been approved and is ready for production.</p>
                     </div>
                   </div>
                   <button
                     onClick={() => continueToNextSection('printPreview')}
                     className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
                   >
-                    Continue to Banner Options →
+                    Continue to Tin Options →
                   </button>
                 </div>
               )}
             </div>
           </CollapsibleSection>
 
-          {/* Banner Options - Step 2 */}
+          {/* Tin Options - Step 2 */}
           <CollapsibleSection
-            title="Banner Options"
+            title="Tin Options"
             icon={Settings}
-            isExpanded={expandedSections.bannerOptions}
-            onToggle={() => toggleSection('bannerOptions')}
+            isExpanded={expandedSections.tinOptions}
+            onToggle={() => toggleSection('tinOptions')}
             defaultExpanded={false}
-            data-section="bannerOptions"
+            data-section="tinOptions"
           >
             <div className="space-y-6 pb-6">
               {/* Pricing Note */}
@@ -770,8 +688,8 @@ const Checkout = () => {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-blue-800">
-                    <p className="font-medium mb-1">Professional Banner Options</p>
-                    <p>Advanced options are priced based on your banner specifications to ensure fair, scalable pricing. Final costs will be calculated based on your selected size, material, and options.</p>
+                    <p className="font-medium mb-1">Premium Business Card Tins</p>
+                    <p>High-quality metal tins with premium vinyl sticker printing. Perfect for professional networking and memorable business interactions.</p>
                   </div>
                 </div>
               </div>
@@ -787,76 +705,63 @@ const Checkout = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Job Name</label>
                     <input
                       type="text"
-                      value={bannerOptions.jobName}
-                      onChange={(e) => setBannerOptions(prev => ({ ...prev, jobName: e.target.value }))}
+                      value={tinOptions.jobName}
+                      onChange={(e) => setTinOptions(prev => ({ ...prev, jobName: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter job name (optional)"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={bannerOptions.quantity}
-                      onChange={(e) => setBannerOptions(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
                 </div>
               </div>
 
-              {/* Material Selection */}
+              {/* Quantity Selection */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                   <Package className="w-4 h-4 text-blue-600" />
-                  Banner Material
+                  Quantity
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {tinConfig.quantities.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2">
+                      <input 
+                        type="radio" 
+                        name="quantity" 
+                        value={option.value} 
+                        checked={tinOptions.quantity === option.value} 
+                        onChange={(e) => setTinOptions(prev => ({ ...prev, quantity: parseInt(e.target.value) }))} 
+                        className="mr-3 text-blue-600 focus:ring-blue-500" 
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className="text-sm text-green-600 font-medium">${option.basePrice}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Surface Coverage */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-purple-600" />
+                  Surface Coverage
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { value: '13oz-vinyl', label: '13oz. Vinyl Banner', price: 1.60, description: 'Standard outdoor vinyl' },
-                    { value: '18oz-blackout', label: '18oz Blackout Banner', price: 2.50, description: 'Heavy-duty blackout material' },
-                    { value: 'mesh', label: 'Mesh Banner', price: 1.80, description: 'Wind-resistant mesh' },
-                    { value: 'indoor', label: 'Indoor Banner', price: 2.50, description: 'Premium indoor material' },
-                    { value: 'pole', label: 'Pole Banner', price: 3.00, description: 'Durable pole banner material' },
-                    { value: '9oz-fabric', label: '9oz Fabric Banner', price: 2.75, description: 'Lightweight fabric' },
-                    { value: 'blockout-fabric', label: 'Blockout Fabric Banner', price: 7.00, description: 'Premium blockout fabric' },
-                    { value: 'tension-fabric', label: 'Tension Fabric', price: 5.15, description: 'Professional tension fabric' },
-                    { value: 'backlit', label: 'Backlit Banner', price: 7.00, description: 'Premium backlit material' }
-                  ].map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="material"
-                        value={option.value}
-                        checked={bannerOptions.material === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, material: e.target.value }))}
-                        className="mr-3 text-blue-600"
+                  {tinConfig.surfaceCoverage.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 active:bg-purple-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2">
+                      <input 
+                        type="radio" 
+                        name="surfaceCoverage" 
+                        value={option.value} 
+                        checked={tinOptions.surfaceCoverage === option.value} 
+                        onChange={(e) => setTinOptions(prev => ({ ...prev, surfaceCoverage: e.target.value }))} 
+                        className="mr-3 text-purple-600 focus:ring-purple-500" 
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
                         <p className="text-sm text-gray-600">{option.description}</p>
-                        <p className="text-sm text-green-600 font-medium">${option.price}/sqft</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sides */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Package className="w-4 h-4 text-purple-600" />
-                  Number of Sides
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.sides.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2">
-                      <input type="radio" name="sides" value={option.value} checked={bannerOptions.sides === option.value} onChange={(e) => setBannerOptions(prev => ({ ...prev, sides: parseInt(e.target.value) }))} className="mr-3 text-blue-600 focus:ring-blue-500" />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : option.description ? `${option.description}` : 'No additional cost'}
+                        <p className={`text-sm ${option.priceModifier > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.priceModifier > 0 ? `+$${option.priceModifier}` : 'No additional cost'}
                         </p>
                       </div>
                     </label>
@@ -864,249 +769,57 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Pole Pockets */}
+              {/* Tin Finish */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Package className="w-4 h-4 text-indigo-600" />
-                  Pole Pockets
+                  <Palette className="w-4 h-4 text-yellow-600" />
+                  Tin Finish
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {tinConfig.tinFinishes.map((option) => (
+                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 active:bg-yellow-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-yellow-500 focus-within:ring-offset-2">
+                      <input 
+                        type="radio" 
+                        name="tinFinish" 
+                        value={option.value} 
+                        checked={tinOptions.tinFinish === option.value} 
+                        onChange={(e) => setTinOptions(prev => ({ ...prev, tinFinish: e.target.value }))} 
+                        className="mr-3 text-yellow-600 focus:ring-yellow-500" 
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className="text-sm text-gray-600">{option.description}</p>
+                        <p className={`text-sm ${option.priceModifier > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.priceModifier > 0 ? `+$${option.priceModifier}/unit` : 'No additional cost'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Printing Method */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-green-600" />
+                  Printing Method
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.polePockets.map((option) => (
+                  {tinConfig.printingMethods.map((option) => (
                     <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
-                      <input type="radio" name="polePockets" value={option.value} checked={bannerOptions.polePockets === option.value} onChange={(e) => setBannerOptions(prev => ({ ...prev, polePockets: e.target.value }))} className="mr-3 text-green-600 focus:ring-green-500" />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : option.description ? `${option.description}` : 'No additional cost'}
-                        </p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Hem Options */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Ruler className="w-4 h-4 text-purple-600" />
-                  Hem Style
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.hem.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="hem"
-                        value={option.value}
-                        checked={bannerOptions.hem === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, hem: e.target.value }))}
-                        className="mr-3 text-purple-600"
+                      <input 
+                        type="radio" 
+                        name="printingMethod" 
+                        value={option.value} 
+                        checked={tinOptions.printingMethod === option.value} 
+                        onChange={(e) => setTinOptions(prev => ({ ...prev, printingMethod: e.target.value }))} 
+                        className="mr-3 text-green-600 focus:ring-green-500" 
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
-                        </p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Grommets */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Anchor className="w-4 h-4 text-blue-600" />
-                  Grommets
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.grommets.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 active:bg-orange-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2">
-                      <input type="radio" name="grommets" value={option.value} checked={bannerOptions.grommets === option.value} onChange={(e) => setBannerOptions(prev => ({ ...prev, grommets: e.target.value }))} className="mr-3 text-orange-600 focus:ring-orange-500" />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
-                        </p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Additional Options - Expandable Section */}
-              <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={() => setBannerOptions(prev => ({ ...prev, showAdvancedOptions: !prev.showAdvancedOptions }))}
-                  className="flex items-center justify-between w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-gray-600" />
-                    <span className="font-semibold text-gray-900">Additional Options</span>
-                    <span className="text-sm text-gray-500">(Webbing, Corners, Rope, Wind Slits)</span>
-                  </div>
-                  <ChevronDown className={`w-5 h-5 text-gray-600 transition-transform ${bannerOptions.showAdvancedOptions ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {bannerOptions.showAdvancedOptions && (
-                  <div className="space-y-6 pl-4 border-l-2 border-gray-200">
-                    {/* Webbing */}
-                    <div className="space-y-3">
-                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
-                        <Package className="w-4 h-4 text-green-600" />
-                        Webbing & Hanging Options
-                      </h5>
-                      
-                      {/* Webbing Recommendation Note */}
-                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                          <div className="text-sm text-amber-800">
-                            <p className="font-medium">Professional Recommendation</p>
-                            <p>Banners over 100 square feet should include webbing for proper hanging and stability. This ensures your banner is securely mounted and won't sag or tear.</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {bannerOptionsConfig.webbing.map((option) => (
-                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 cursor-pointer transition-colors">
-                            <input
-                              type="radio"
-                              name="webbing"
-                              value={option.value}
-                              checked={bannerOptions.webbing === option.value}
-                              onChange={(e) => setBannerOptions(prev => ({ ...prev, webbing: e.target.value }))}
-                              className="mr-3 text-green-600"
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 
-                                 option.description ? `${option.description}` : 
-                                 'No additional cost'}
-                              </p>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Corner Reinforcement */}
-                    <div className="space-y-3">
-                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
-                        <Package className="w-4 h-4 text-orange-600" />
-                        Corner Reinforcement
-                      </h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {bannerOptionsConfig.corners.map((option) => (
-                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer transition-colors">
-                            <input
-                              type="radio"
-                              name="corners"
-                              value={option.value}
-                              checked={bannerOptions.corners === option.value}
-                              onChange={(e) => setBannerOptions(prev => ({ ...prev, corners: e.target.value }))}
-                              className="mr-3 text-orange-600"
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 
-                                 option.description ? `${option.description}` : 
-                                 'No additional cost'}
-                              </p>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Rope Options */}
-                    <div className="space-y-3">
-                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
-                        <Package className="w-4 h-4 text-red-600" />
-                        Rope Options
-                      </h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {bannerOptionsConfig.rope.map((option) => (
-                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-red-300 cursor-pointer transition-colors">
-                            <input
-                              type="radio"
-                              name="rope"
-                              value={option.value}
-                              checked={bannerOptions.rope === option.value}
-                              onChange={(e) => setBannerOptions(prev => ({ ...prev, rope: e.target.value }))}
-                              className="mr-3 text-red-600"
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 
-                                 option.description ? `${option.description}` : 
-                                 'No additional cost'}
-                              </p>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Wind Slits */}
-                    <div className="space-y-3">
-                      <h5 className="font-medium text-gray-800 flex items-center gap-2">
-                        <Wind className="w-4 h-4 text-cyan-600" />
-                        Wind Slits
-                      </h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {bannerOptionsConfig.windslits.map((option) => (
-                          <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-cyan-300 cursor-pointer transition-colors">
-                            <input
-                              type="radio"
-                              name="windslits"
-                              value={option.value}
-                              checked={bannerOptions.windslits === option.value}
-                              onChange={(e) => setBannerOptions(prev => ({ ...prev, windslits: e.target.value }))}
-                              className="mr-3 text-cyan-600"
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{option.label}</p>
-                              <p className={`text-sm ${option.price > 0 ? 'text-green-600' : option.description ? 'text-blue-600' : 'text-gray-500'}`}>
-                                {option.price > 0 ? `+$${option.price}` : 
-                                 option.description ? `${option.description}` : 
-                                 'No additional cost'}
-                              </p>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Turnaround Time */}
-              <div className="space-y-3 mb-6">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-yellow-600" />
-                  Turnaround Time
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {bannerOptionsConfig.turnaround.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-yellow-300 cursor-pointer transition-colors">
-                      <input
-                        type="radio"
-                        name="turnaround"
-                        value={option.value}
-                        checked={bannerOptions.turnaround === option.value}
-                        onChange={(e) => setBannerOptions(prev => ({ ...prev, turnaround: e.target.value }))}
-                        className="mr-3 text-yellow-600"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.price > 0 ? `+$${option.price}` : 'No additional cost'}
+                        <p className="text-sm text-gray-600">{option.description}</p>
+                        <p className={`text-sm ${option.priceModifier > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                          {option.priceModifier > 0 ? `+$${option.priceModifier}` : 'No additional cost'}
                         </p>
                       </div>
                     </label>
@@ -1117,13 +830,13 @@ const Checkout = () => {
               {/* Navigation */}
               <div className="flex justify-between pt-6 pb-2 border-t border-gray-200 mt-6">
                 <button
-                  onClick={() => goToPreviousSection('bannerOptions')}
+                  onClick={() => goToPreviousSection('tinOptions')}
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 active:scale-95 transition-all duration-200 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   ← Back to Preview
                 </button>
                 <button
-                  onClick={() => continueToNextSection('bannerOptions')}
+                  onClick={() => continueToNextSection('tinOptions')}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 active:scale-95 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
                 >
                   Continue to Shipping →
@@ -1187,7 +900,7 @@ const Checkout = () => {
                   onClick={() => goToPreviousSection('shipping')}
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
                 >
-                  ← Back to Banner Options
+                  ← Back to Tin Options
                 </button>
                 <button
                   onClick={() => continueToNextSection('shipping')}
@@ -1326,66 +1039,35 @@ const Checkout = () => {
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-blue-600" />
-                  Order Summary
+                  Tin Order Summary
                 </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Banner Design:</span>
-                    <span className="font-medium">${basePrice * bannerOptions.quantity}</span>
+                    <span className="text-gray-600">Quantity:</span>
+                    <span className="font-medium">{tinOptions.quantity} Business Card Tins</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Sides ({bannerOptions.sides === 2 ? 'Double' : 'Single'}):</span>
+                    <span className="text-gray-600">Surface Coverage:</span>
                     <span className="font-medium">
-                      {sidesCost > 0 ? <span className="text-green-600">+${sidesCost.toFixed(2)}</span> : 'No additional cost'}
+                      {tinOptions.surfaceCoverage === 'all-sides' ? 'All Sides (Front + Back + Inside + Lid)' : 'Front + Back Only'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Pole Pockets:</span>
+                    <span className="text-gray-600">Tin Finish:</span>
                     <span className="font-medium">
-                      {polePocketCost > 0 ? <span className="text-green-600">+${polePocketCost.toFixed(2)}</span> : 'No additional cost'}
+                      {tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)?.label}
+                      {tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)?.priceModifier > 0 && 
+                        <span className="text-green-600 ml-1">(+${tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)?.priceModifier}/unit)</span>
+                      }
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Hem Style:</span>
+                    <span className="text-gray-600">Printing Method:</span>
                     <span className="font-medium">
-                      {/* Hem is free, no additional cost */}
-                      <span className="text-gray-500">No additional cost</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Grommets:</span>
-                    <span className="font-medium">
-                      {grommetCost > 0 ? <span className="text-green-600">+${grommetCost.toFixed(2)}</span> : 'No additional cost'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Webbing:</span>
-                    <span className="font-medium">
-                      {webbingCost > 0 ? <span className="text-green-600">+${webbingCost.toFixed(2)}</span> : 'No additional cost'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Corner Reinforcement:</span>
-                    <span className="font-medium">
-                      {cornersCost > 0 ? <span className="text-green-600">+${cornersCost.toFixed(2)}</span> : 'No additional cost'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Rope:</span>
-                    <span className="font-medium">
-                      {ropeCost > 0 ? <span className="text-green-600">+${ropeCost.toFixed(2)}</span> : 'No additional cost'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Wind Slits:</span>
-                    <span className="font-medium">
-                      {windSlitCost > 0 ? <span className="text-green-600">+${windSlitCost.toFixed(2)}</span> : 'No additional cost'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Turnaround:</span>
-                    <span className="font-medium">
-                      {turnaroundCost > 0 ? <span className="text-green-600">+${turnaroundCost.toFixed(2)}</span> : 'No additional cost'}
+                      {tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)?.label}
+                      {tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)?.priceModifier > 0 && 
+                        <span className="text-green-600 ml-1">(+${tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)?.priceModifier})</span>
+                      }
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -1399,7 +1081,7 @@ const Checkout = () => {
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total:</span>
                       <span className="text-blue-600">
-                        ${totalAmount}
+                        ${totalAmount.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -1456,7 +1138,7 @@ const Checkout = () => {
                   ) : (
                     <>
                       <Check className="w-5 h-5" />
-                      Complete Order
+                      Complete Tin Order
                     </>
                   )}
                 </button>
@@ -1474,7 +1156,7 @@ const Checkout = () => {
         canvasData={orderData?.canvas_data}
         orderDetails={orderData}
         dimensions={orderData?.dimensions}
-        productType={orderData?.product_type || 'banner'}
+        productType={orderData?.product_type || 'business_card_tin'}
         surfaceElements={orderData?.surface_elements || {}}
         currentSurface={orderData?.current_surface || 'front'}
       />
@@ -1482,4 +1164,4 @@ const Checkout = () => {
   )
 }
 
-export default Checkout
+export default TinCheckout

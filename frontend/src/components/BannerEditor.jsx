@@ -2572,7 +2572,7 @@ const BannerEditorNew = () => {
       canvas_image: generateCanvasImage(),
       
       // Order metadata (required by backend)
-      product_type: 'banner',
+      product_type: productType === 'tin' ? 'business_card_tin' : productType === 'tent' ? 'tradeshow_tent' : 'banner',
       quantity: 1,
               dimensions: {
           width: 2, // Default 2ft width
@@ -2594,8 +2594,16 @@ const BannerEditorNew = () => {
     
     // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
     sessionStorage.setItem('orderData', JSON.stringify(orderData))
-    navigate('/checkout')
-  }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate])
+    
+    // Route to appropriate checkout based on product type
+    if (orderData.product_type === 'business_card_tin') {
+      navigate('/tin-checkout')
+    } else if (orderData.product_type === 'tradeshow_tent') {
+      navigate('/tent-checkout') // Future implementation
+    } else {
+      navigate('/checkout')
+    }
+  }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate, productType])
 
   // Helper function to find the correct image path for an asset
   const findAssetImagePath = useCallback(async (assetName) => {

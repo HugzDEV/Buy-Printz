@@ -1726,14 +1726,16 @@ const BannerCanvas = ({
 
           {/* Canvas - Mobile Responsive Scaling */}
           <div 
-            className="relative rounded-xl overflow-hidden"
+            className={`relative overflow-hidden ${productType === 'tin' ? 'rounded-lg' : 'rounded-xl'}`}
             style={{
               width: canvasSize.width * scale,
               height: canvasSize.height * scale,
               maxWidth: '100%',
               maxHeight: '70vh', // Prevent canvas from taking full height
               userSelect: 'none', // Prevent text selection
-              transform: window.innerWidth < 768 ? 'translateY(-40px)' : 'translateY(-20px)' // Move canvas content up to avoid status bar collision
+              transform: window.innerWidth < 768 ? 'translateY(-40px)' : 'translateY(-20px)', // Move canvas content up to avoid status bar collision
+              // Add rounded corners for tins (0.33 degree radius = ~2.3px at 100 DPI)
+              borderRadius: productType === 'tin' ? '2.3px' : undefined
             }}
           >
             

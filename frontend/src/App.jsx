@@ -10,6 +10,7 @@ import Register from './components/Register'
 import Dashboard from './components/Dashboard'
 import BannerEditor from './components/BannerEditor'
 import Checkout from './components/Checkout'
+import TinCheckout from './components/TinCheckout'
 import OrderConfirmation from './components/OrderConfirmation'
 import TermsOfService from './components/TermsOfService'
 import PrivacyPolicy from './components/PrivacyPolicy'
@@ -178,6 +179,15 @@ function App() {
             <>
               <Header />
               <Checkout />
+            </>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/tin-checkout" element={
+          <ProtectedRoute>
+            <>
+              <Header />
+              <TinCheckout />
             </>
           </ProtectedRoute>
         } />
