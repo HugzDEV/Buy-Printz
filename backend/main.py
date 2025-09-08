@@ -19,6 +19,14 @@ from database import db_manager
 from auth import auth_manager, get_current_user
 from ai_agent_adapter import ai_agent_adapter
 
+# Import creator marketplace routes
+try:
+    from creator_marketplace import router as creator_marketplace_router
+    CREATOR_MARKETPLACE_AVAILABLE = True
+except ImportError:
+    CREATOR_MARKETPLACE_AVAILABLE = False
+    print("Warning: Creator marketplace module not available")
+
 # Simple in-memory cache
 class SimpleCache:
     def __init__(self, default_ttl=300):  # 5 minutes default
@@ -143,6 +151,13 @@ app.add_middleware(
     allow_headers=["*"],
     allow_origin_regex=r"https://.*\.vercel\.app$"
 )
+
+# Include creator marketplace routes if available
+if CREATOR_MARKETPLACE_AVAILABLE:
+    app.include_router(creator_marketplace_router)
+    logger.info("Creator marketplace routes loaded successfully")
+else:
+    logger.warning("Creator marketplace routes not available - module not found")
 
 # Mount static files - create uploads directory if it doesn't exist
 uploads_dir = "uploads"

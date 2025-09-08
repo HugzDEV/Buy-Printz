@@ -3,6 +3,7 @@ import os
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timedelta
 import json
+import uuid
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -1183,6 +1184,263 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error getting business card tin by order: {e}")
             return None
+
+    # =============================================
+    # CREATOR MARKETPLACE METHODS
+    # =============================================
+    
+    async def create_creator(self, creator_data: Dict[str, Any]) -> bool:
+        """Create a new creator profile"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            response = self.supabase.table("creators").insert(creator_data).execute()
+            return response.data is not None
+            
+        except Exception as e:
+            print(f"Error creating creator: {e}")
+            return False
+    
+    async def get_creator_by_id(self, creator_id: str) -> Optional[Dict[str, Any]]:
+        """Get creator by ID"""
+        try:
+            if not self.is_connected():
+                return None
+            
+            response = self.supabase.table("creators").select("*").eq("id", creator_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+            
+        except Exception as e:
+            print(f"Error getting creator by ID: {e}")
+            return None
+    
+    async def get_creator_by_user_id(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Get creator by user ID"""
+        try:
+            if not self.is_connected():
+                return None
+            
+            response = self.supabase.table("creators").select("*").eq("user_id", user_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+            
+        except Exception as e:
+            print(f"Error getting creator by user ID: {e}")
+            return None
+    
+    async def update_creator(self, creator_id: str, update_data: Dict[str, Any]) -> bool:
+        """Update creator profile"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            response = self.supabase.table("creators").update(update_data).eq("id", creator_id).execute()
+            return response.data is not None
+            
+        except Exception as e:
+            print(f"Error updating creator: {e}")
+            return False
+    
+    async def create_creator_template(self, template_data: Dict[str, Any]) -> bool:
+        """Create a new creator template"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            response = self.supabase.table("creator_templates").insert(template_data).execute()
+            return response.data is not None
+            
+        except Exception as e:
+            print(f"Error creating creator template: {e}")
+            return False
+    
+    async def get_creator_template(self, template_id: str) -> Optional[Dict[str, Any]]:
+        """Get creator template by ID"""
+        try:
+            if not self.is_connected():
+                return None
+            
+            response = self.supabase.table("creator_templates").select("*").eq("id", template_id).execute()
+            if response.data:
+                return response.data[0]
+            return None
+            
+        except Exception as e:
+            print(f"Error getting creator template: {e}")
+            return None
+    
+    async def get_creator_templates(self, creator_id: str) -> List[Dict[str, Any]]:
+        """Get all templates for a creator"""
+        try:
+            if not self.is_connected():
+                return []
+            
+            response = self.supabase.table("creator_templates").select("*").eq("creator_id", creator_id).order("created_at", desc=True).execute()
+            return response.data or []
+            
+        except Exception as e:
+            print(f"Error getting creator templates: {e}")
+            return []
+    
+    async def get_marketplace_templates(self, filters: Dict[str, Any] = None, limit: int = 20, offset: int = 0) -> List[Dict[str, Any]]:
+        """Get approved templates for marketplace"""
+        try:
+            if not self.is_connected():
+                return []
+            
+            query = self.supabase.table("creator_templates").select("*, creators!inner(display_name, is_verified)")
+            
+            # Apply filters
+            if filters:
+                if filters.get('is_approved') is not None:
+                    query = query.eq("is_approved", filters['is_approved'])
+                if filters.get('is_active') is not None:
+                    query = query.eq("is_active", filters['is_active'])
+                if filters.get('category'):
+                    query = query.eq("category", filters['category'])
+                if filters.get('min_price') is not None:
+                    query = query.gte("price", filters['min_price'])
+                if filters.get('max_price') is not None:
+                    query = query.lte("price", filters['max_price'])
+                if filters.get('search'):
+                    search_term = f"%{filters['search']}%"
+                    query = query.or_(f"name.ilike.{search_term},description.ilike.{search_term}")
+            
+            # Apply pagination and ordering
+            query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+            
+            response = query.execute()
+            return response.data or []
+            
+        except Exception as e:
+            print(f"Error getting marketplace templates: {e}")
+            return []
+    
+    async def increment_template_views(self, template_id: str) -> bool:
+        """Increment template view count"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            # Get current view count
+            current = self.supabase.table("creator_templates").select("view_count").eq("id", template_id).execute()
+            if not current.data:
+                return False
+            
+            current_views = current.data[0].get("view_count", 0)
+            
+            # Increment view count
+            response = self.supabase.table("creator_templates").update({"view_count": current_views + 1}).eq("id", template_id).execute()
+            return response.data is not None
+            
+        except Exception as e:
+            print(f"Error incrementing template views: {e}")
+            return False
+    
+    async def approve_template(self, template_id: str, approved_by: str) -> bool:
+        """Approve a template for marketplace"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            now = datetime.utcnow().isoformat()
+            update_data = {
+                "is_approved": True,
+                "approved_at": now,
+                "approved_by": approved_by,
+                "updated_at": now
+            }
+            
+            response = self.supabase.table("creator_templates").update(update_data).eq("id", template_id).execute()
+            return response.data is not None
+            
+        except Exception as e:
+            print(f"Error approving template: {e}")
+            return False
+    
+    async def reject_template(self, template_id: str, reason: str, rejected_by: str) -> bool:
+        """Reject a template"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            now = datetime.utcnow().isoformat()
+            update_data = {
+                "is_active": False,
+                "updated_at": now
+            }
+            
+            response = self.supabase.table("creator_templates").update(update_data).eq("id", template_id).execute()
+            return response.data is not None
+            
+        except Exception as e:
+            print(f"Error rejecting template: {e}")
+            return False
+    
+    async def get_pending_templates(self) -> List[Dict[str, Any]]:
+        """Get templates pending approval"""
+        try:
+            if not self.is_connected():
+                return []
+            
+            response = self.supabase.table("creator_templates").select("*, creators!inner(display_name, user_id)").eq("is_approved", False).eq("is_active", True).order("created_at", desc=False).execute()
+            return response.data or []
+            
+        except Exception as e:
+            print(f"Error getting pending templates: {e}")
+            return []
+    
+    async def get_creator_analytics(self, creator_id: str) -> Dict[str, Any]:
+        """Get comprehensive analytics for a creator"""
+        try:
+            if not self.is_connected():
+                return {}
+            
+            # Get basic creator stats
+            creator = await self.get_creator_by_id(creator_id)
+            if not creator:
+                return {}
+            
+            # Get template stats
+            templates_response = self.supabase.table("creator_templates").select("*").eq("creator_id", creator_id).execute()
+            templates = templates_response.data or []
+            
+            template_stats = {
+                "total_templates": len(templates),
+                "approved_templates": len([t for t in templates if t.get("is_approved", False)]),
+                "pending_templates": len([t for t in templates if not t.get("is_approved", False)]),
+                "total_sales": sum(t.get("sales_count", 0) for t in templates),
+                "total_views": sum(t.get("view_count", 0) for t in templates),
+                "average_rating": sum(t.get("rating", 0) for t in templates) / len(templates) if templates else 0
+            }
+            
+            # Get recent sales (last 30 days)
+            thirty_days_ago = (datetime.utcnow() - timedelta(days=30)).isoformat()
+            recent_sales_response = self.supabase.table("template_purchases").select("*").eq("creator_id", creator_id).gte("purchased_at", thirty_days_ago).execute()
+            recent_sales_data = recent_sales_response.data or []
+            
+            recent_sales = {
+                "recent_sales": len(recent_sales_data),
+                "recent_earnings": sum(sale.get("creator_earnings", 0) for sale in recent_sales_data)
+            }
+            
+            # Get top performing templates
+            top_templates = sorted(templates, key=lambda x: x.get("sales_count", 0), reverse=True)[:5]
+            
+            return {
+                "creator": creator,
+                "template_stats": template_stats,
+                "recent_sales": recent_sales,
+                "top_templates": top_templates
+            }
+            
+        except Exception as e:
+            print(f"Error getting creator analytics: {e}")
+            return {}
 
 # Initialize database manager
 db_manager = DatabaseManager()
