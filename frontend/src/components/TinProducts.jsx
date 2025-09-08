@@ -8,143 +8,74 @@ const TinProducts = () => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const finishes = [
-    { id: 'all', name: 'All Products', count: 6 },
-    { id: 'silver', name: 'Silver', count: 6 },
-    { id: 'black', name: 'Black', count: 0 },
-    { id: 'gold', name: 'Gold', count: 0 }
+    { id: 'all', name: 'All Finishes', count: 3 },
+    { id: 'silver', name: 'Silver', count: 1 },
+    { id: 'black', name: 'Black', count: 1 },
+    { id: 'gold', name: 'Gold', count: 1 }
   ]
 
   const tinProducts = [
     {
-      id: 'tin-100-front-back-silver',
+      id: 'tin-silver',
       finish: 'silver',
-      name: "Business Card Tin - 100 Units (Front + Back)",
-      price: "$399.99",
-      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking. Includes 100 units with front and back surface coverage.",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
-      features: ["100 units", "Front + Back coverage", "Premium vinyl stickers", "Silver finish"],
+      name: "Business Card Tin - Silver",
+      price: "From $399",
+      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking",
+      image: "/assets/images/Silver tin-buyprintz.jpg",
+      features: ["Premium silver aluminum", "Custom vinyl stickers", "100-500 units", "Professional finish"],
       bestseller: true,
       specs: {
         material: "Premium Silver Aluminum",
         finish: "Silver",
-        quantity: "100 units",
-        surfaceCoverage: "Front + Back",
         durability: "Lifetime",
         applications: ["Networking", "Business cards", "Promotional items"]
       },
       vinylTypes: [
-        "Premium Vinyl Stickers - High-quality vinyl stickers for tin application",
-        "Premium Clear Vinyl Stickers - Clear vinyl stickers for transparent effect"
+        "Matte Vinyl - Professional, non-reflective finish",
+        "Gloss Vinyl - High-shine, eye-catching appearance", 
+        "Clear Vinyl - Transparent overlay effect"
       ]
     },
     {
-      id: 'tin-250-front-back-silver',
-      finish: 'silver',
-      name: "Business Card Tin - 250 Units (Front + Back)",
-      price: "$749.99",
-      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking. Includes 250 units with front and back surface coverage.",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
-      features: ["250 units", "Front + Back coverage", "Premium vinyl stickers", "Silver finish"],
+      id: 'tin-black',
+      finish: 'black',
+      name: "Business Card Tin - Black",
+      price: "From $399",
+      description: "Sleek black aluminum business card tins with custom vinyl stickers - modern and sophisticated",
+      image: "/assets/images/black tins-buyprintz.jpg",
+      features: ["Premium black aluminum", "Custom vinyl stickers", "100-500 units", "Modern finish"],
       popular: true,
       specs: {
-        material: "Premium Silver Aluminum",
-        finish: "Silver",
-        quantity: "250 units",
-        surfaceCoverage: "Front + Back",
+        material: "Premium Black Aluminum",
+        finish: "Black",
         durability: "Lifetime",
         applications: ["Networking", "Business cards", "Promotional items"]
       },
       vinylTypes: [
-        "Premium Vinyl Stickers - High-quality vinyl stickers for tin application",
-        "Premium Clear Vinyl Stickers - Clear vinyl stickers for transparent effect"
+        "Matte Vinyl - Professional, non-reflective finish",
+        "Gloss Vinyl - High-shine, eye-catching appearance", 
+        "Clear Vinyl - Transparent overlay effect"
       ]
     },
     {
-      id: 'tin-500-front-back-silver',
-      finish: 'silver',
-      name: "Business Card Tin - 500 Units (Front + Back)",
-      price: "$1000.00",
-      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking. Includes 500 units with front and back surface coverage.",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
-      features: ["500 units", "Front + Back coverage", "Premium vinyl stickers", "Silver finish"],
+      id: 'tin-gold',
+      finish: 'gold',
+      name: "Business Card Tin - Gold",
+      price: "From $399",
+      description: "Luxurious gold aluminum business card tins with custom vinyl stickers - premium and elegant",
+      image: "/assets/images/gold tins-buyprintz.jpg",
+      features: ["Premium gold aluminum", "Custom vinyl stickers", "100-500 units", "Luxury finish"],
       premium: true,
       specs: {
-        material: "Premium Silver Aluminum",
-        finish: "Silver",
-        quantity: "500 units",
-        surfaceCoverage: "Front + Back",
+        material: "Premium Gold Aluminum",
+        finish: "Gold",
         durability: "Lifetime",
         applications: ["Networking", "Business cards", "Promotional items"]
       },
       vinylTypes: [
-        "Premium Vinyl Stickers - High-quality vinyl stickers for tin application",
-        "Premium Clear Vinyl Stickers - Clear vinyl stickers for transparent effect"
-      ]
-    },
-    {
-      id: 'tin-100-all-sides-silver',
-      finish: 'silver',
-      name: "Business Card Tin - 100 Units (All Sides)",
-      price: "$499.99",
-      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking. Includes 100 units with complete surface coverage (front, back, inside, lid).",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
-      features: ["100 units", "All Sides coverage", "Premium vinyl stickers", "Silver finish"],
-      bestseller: true,
-      specs: {
-        material: "Premium Silver Aluminum",
-        finish: "Silver",
-        quantity: "100 units",
-        surfaceCoverage: "All Sides",
-        durability: "Lifetime",
-        applications: ["Networking", "Business cards", "Promotional items"]
-      },
-      vinylTypes: [
-        "Premium Vinyl Stickers - High-quality vinyl stickers for tin application",
-        "Premium Clear Vinyl Stickers - Clear vinyl stickers for transparent effect"
-      ]
-    },
-    {
-      id: 'tin-250-all-sides-silver',
-      finish: 'silver',
-      name: "Business Card Tin - 250 Units (All Sides)",
-      price: "$849.99",
-      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking. Includes 250 units with complete surface coverage (front, back, inside, lid).",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
-      features: ["250 units", "All Sides coverage", "Premium vinyl stickers", "Silver finish"],
-      popular: true,
-      specs: {
-        material: "Premium Silver Aluminum",
-        finish: "Silver",
-        quantity: "250 units",
-        surfaceCoverage: "All Sides",
-        durability: "Lifetime",
-        applications: ["Networking", "Business cards", "Promotional items"]
-      },
-      vinylTypes: [
-        "Premium Vinyl Stickers - High-quality vinyl stickers for tin application",
-        "Premium Clear Vinyl Stickers - Clear vinyl stickers for transparent effect"
-      ]
-    },
-    {
-      id: 'tin-500-all-sides-silver',
-      finish: 'silver',
-      name: "Business Card Tin - 500 Units (All Sides)",
-      price: "$1100.00",
-      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking. Includes 500 units with complete surface coverage (front, back, inside, lid).",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
-      features: ["500 units", "All Sides coverage", "Premium vinyl stickers", "Silver finish"],
-      premium: true,
-      specs: {
-        material: "Premium Silver Aluminum",
-        finish: "Silver",
-        quantity: "500 units",
-        surfaceCoverage: "All Sides",
-        durability: "Lifetime",
-        applications: ["Networking", "Business cards", "Promotional items"]
-      },
-      vinylTypes: [
-        "Premium Vinyl Stickers - High-quality vinyl stickers for tin application",
-        "Premium Clear Vinyl Stickers - Clear vinyl stickers for transparent effect"
+        "Matte Vinyl - Professional, non-reflective finish",
+        "Gloss Vinyl - High-shine, eye-catching appearance", 
+        "Clear Vinyl - Transparent overlay effect"
       ]
     }
   ]
@@ -188,7 +119,7 @@ const TinProducts = () => {
               Business Card Tins
             </h1>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto drop-shadow-md">
-              Premium aluminum business card tins with custom vinyl stickers - choose from 100, 250, or 500 units with front+back or all-sides coverage for professional networking
+              Premium aluminum business card tins with custom vinyl stickers - make a lasting impression with professional networking accessories
             </p>
           </div>
           
@@ -208,9 +139,9 @@ const TinProducts = () => {
                 <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-white">Flexible Options</span>
+                <span className="text-2xl font-bold text-white">Custom Design</span>
               </div>
-              <p className="text-primary-100">100-500 units, front+back or all-sides</p>
+              <p className="text-primary-100">Professional vinyl sticker application</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
@@ -379,17 +310,22 @@ const TinProducts = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                name: "Premium Vinyl Stickers",
-                description: "High-quality vinyl stickers for tin application with professional finish",
-                features: ["High-quality vinyl", "Professional finish", "Durable application"]
+                name: "Matte Vinyl",
+                description: "Professional, non-reflective finish perfect for corporate branding",
+                features: ["Non-reflective", "Professional look", "Easy to read"]
               },
               {
-                name: "Premium Clear Vinyl Stickers", 
-                description: "Clear vinyl stickers for transparent effect that lets the tin show through",
-                features: ["Transparent effect", "Unique design", "Modern appearance"]
+                name: "Gloss Vinyl", 
+                description: "High-shine, eye-catching appearance for maximum impact",
+                features: ["High-shine finish", "Eye-catching", "Premium look"]
+              },
+              {
+                name: "Clear Vinyl",
+                description: "Transparent overlay effect that lets the tin show through",
+                features: ["Transparent", "Unique effect", "Modern design"]
               }
             ].map((vinyl, index) => (
               <div key={index} className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-6 text-center hover:shadow-2xl hover:scale-105 transition-all duration-300">
@@ -421,7 +357,7 @@ const TinProducts = () => {
               Ready to Create Your Perfect Business Card Tins?
             </h2>
             <p className="text-xl mb-12 text-white/90 leading-relaxed">
-              Choose from 100, 250, or 500 units with front+back or all-sides coverage. Start designing with our professional tools and make a lasting impression at your next networking event
+              Start designing with our professional tools and make a lasting impression at your next networking event
             </p>
             <div className="flex flex-col sm:flex-row gap-8 justify-center">
               <Link 
