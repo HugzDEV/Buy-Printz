@@ -28,31 +28,37 @@ const LandingPage = () => {
     }
   ]
 
-  // Showcase only the 3 most common banners
+  // Showcase our three main services
   const featuredProducts = [
     {
-      name: "13oz Vinyl Banner",
+      name: "Vinyl Banners",
       price: "From $25",
-      description: "Our most popular banner - perfect for outdoor use with weather resistance",
+      description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included"],
-      badge: "Best Seller"
+      badge: "Best Seller",
+      category: "banner",
+      link: "/products"
     },
     {
-      name: "Mesh Banner",
-      price: "From $30",
-      description: "Best seller for windy conditions with 70% air flow",
-      image: "/assets/images/Mesh Banner - BuyPrintz.jpg",
-      features: ["Wind resistant", "70% air flow", "Fade resistant"],
-      badge: "Popular"
+      name: "Business Card Tins",
+      price: "From $399",
+      description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking",
+      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      features: ["Premium aluminum", "Custom vinyl stickers", "100-500 units"],
+      badge: "New",
+      category: "tin",
+      link: "/tin-products"
     },
     {
-      name: "18oz Blocked Banner", 
-      price: "From $35",
-      description: "18 oz matte blockout banner - Full color UV printed, indoor and outdoor ready",
-      image: "/assets/images/blockout Banner -BuyPrintz.jpg",
-      features: ["Single or double sided printing", "Free hemming and grommets", "Additional finishing available"],
-      badge: "Premium"
+      name: "Tradeshow Tents",
+      price: "From $299",
+      description: "Professional tradeshow tents with custom graphics for maximum event impact",
+      image: "/assets/images/Mesh Banner - BuyPrintz.jpg", // Placeholder - will need tent image
+      features: ["10x10 & 10x20 sizes", "Custom graphics", "Complete package"],
+      badge: "Coming Soon",
+      category: "tent",
+      link: "/tent-products"
     }
   ]
 
@@ -64,10 +70,10 @@ const LandingPage = () => {
       <section className="text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Professional Banner Printing for Business
+            Professional Business Branding Solutions
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-primary-100">
-            Create custom banners, trade show displays, and outdoor signage with professional design tools
+            Create custom banners, business card tins, and tradeshow tents with professional design tools
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 
@@ -78,7 +84,7 @@ const LandingPage = () => {
               }}
               className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
             >
-              Create Banner
+              Start Designing
               <ArrowRight className="w-6 h-6" />
             </Link>
             <Link 
@@ -156,10 +162,10 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Most Popular Banners
+              Our Business Branding Solutions
             </h2>
             <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-              Our top 3 banner types - covering 90% of customer needs with premium quality and fast delivery
+              Professional banners, premium business card tins, and tradeshow tents - everything you need for complete business branding
             </p>
           </div>
           
@@ -181,6 +187,8 @@ const LandingPage = () => {
                     </div>
                     <div className={`backdrop-blur-md border text-white px-3 py-1 text-xs font-semibold rounded-full shadow-lg ${
                       product.badge === 'Best Seller' ? 'bg-buyprint-600/90 border-buyprint-500/50' :
+                      product.badge === 'New' ? 'bg-green-500/90 border-green-400/50' :
+                      product.badge === 'Coming Soon' ? 'bg-purple-500/90 border-purple-400/50' :
                       product.badge === 'Popular' ? 'bg-orange-500/90 border-orange-400/50' : 'bg-purple-500/90 border-purple-400/50'
                     }`}>
                       {product.badge}
@@ -212,14 +220,10 @@ const LandingPage = () => {
                   </div>
                   
                   <Link 
-                    to="/editor" 
-                    onClick={() => {
-                      sessionStorage.setItem('newDesign', 'true')
-                      sessionStorage.setItem('fromLandingPage', 'true')
-                    }}
+                    to={product.link} 
                     className="bg-buyprint-brand hover:bg-buyprint-600 border border-buyprint-brand hover:border-buyprint-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
                   >
-                    Design Now
+                    View Products
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -236,7 +240,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-5xl md:text-6xl font-bold mb-8">
-              Ready to Create Your Perfect Sign?
+              Ready to Create Your Perfect Branding?
             </h2>
             <p className="text-2xl mb-12 text-white/90 leading-relaxed">
               Start designing with our professional tools and get your order in minutes

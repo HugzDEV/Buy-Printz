@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import LandingPage from './components/LandingPage'
 import Products from './components/Products'
+import TinProducts from './components/TinProducts'
+import TentProducts from './components/TentProducts'
 import ProductDetail from './components/ProductDetail'
 import Contact from './components/Contact'
 import Login from './components/Login'
@@ -120,6 +122,22 @@ function App() {
           <>
             <Header />
             <Products />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/tin-products" element={
+          <>
+            <Header />
+            <TinProducts />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/tent-products" element={
+          <>
+            <Header />
+            <TentProducts />
             <Footer />
           </>
         } />

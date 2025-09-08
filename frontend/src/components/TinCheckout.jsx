@@ -529,12 +529,12 @@ const TinCheckout = () => {
                   sessionStorage.setItem('cancelledOrder', JSON.stringify(orderData))
                   console.log('Saved cancelled tin order data for restoration')
                 }
-                navigate('/editor')
+                navigate('/editor?product=tin')
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors backdrop-blur-sm bg-white/20 rounded-xl px-4 py-2 border border-white/30"
             >
               <ChevronLeft className="w-5 h-5" />
-              Back to Editor
+              Back to Tin Editor
             </button>
             <div></div>
           </div>

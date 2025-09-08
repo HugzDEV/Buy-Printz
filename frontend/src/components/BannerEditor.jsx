@@ -27,10 +27,21 @@ const BannerEditorNew = () => {
   const [searchParams] = useSearchParams()
   
   // Product type selection - Must be declared first
-  const [productType, setProductType] = useState('banner') // 'banner', 'tin', 'tent'
+  const [productType, setProductType] = useState(() => {
+    // Initialize from URL parameter
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'tin') return 'tin'
+    if (urlProduct === 'tent') return 'tent'
+    return 'banner' // default
+  })
   
   // Surface navigation state - Must be declared before elements
-  const [currentSurface, setCurrentSurface] = useState('front')
+  const [currentSurface, setCurrentSurface] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'tin') return 'front'
+    if (urlProduct === 'tent') return 'canopy_front'
+    return 'front'
+  })
   
   // Core state - Multi-surface support for tins and tents
   const [surfaceElements, setSurfaceElements] = useState({
@@ -87,10 +98,20 @@ const BannerEditorNew = () => {
   const [successMessage, setSuccessMessage] = useState({ title: '', message: '' })
   
   
-  // Canvas configuration
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 })
+  // Canvas configuration - Initialize based on product type
+  const [canvasSize, setCanvasSize] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'tin') return { width: 374, height: 225 } // tin default
+    if (urlProduct === 'tent') return { width: 1200, height: 1200 } // tent default
+    return { width: 800, height: 400 } // banner default
+  })
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
-  const [canvasOrientation, setCanvasOrientation] = useState('landscape') // 'landscape' or 'portrait'
+  const [canvasOrientation, setCanvasOrientation] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'tin') return 'landscape'
+    if (urlProduct === 'tent') return 'square'
+    return 'landscape'
+  })
   
   // Tin specifications state
   const [tinSpecs, setTinSpecs] = useState({
