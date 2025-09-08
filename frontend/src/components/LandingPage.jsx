@@ -42,7 +42,7 @@ const LandingPage = () => {
     },
     {
       name: "Business Card Tins",
-      price: "From $399",
+      price: "From $399.99",
       description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking",
       image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
       features: ["Premium aluminum", "Custom vinyl stickers", "100-500 units"],
@@ -52,11 +52,11 @@ const LandingPage = () => {
     },
     {
       name: "Tradeshow Tents",
-      price: "From $299",
+      price: "From $299.99",
       description: "Professional tradeshow tents with custom graphics for maximum event impact",
       image: "/assets/images/tent_complete-buyprintz.jpg",
       features: ["10x10 & 10x20 sizes", "Custom graphics", "Complete package"],
-      badge: "Coming Soon",
+      badge: "New",
       category: "tent",
       link: "/tent-products"
     }
@@ -88,7 +88,7 @@ const LandingPage = () => {
               <ArrowRight className="w-6 h-6" />
             </Link>
             <Link 
-              to="/products"
+              to="/all-products"
               className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-xl px-12 py-6 rounded-2xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-3 min-w-[240px]"
             >
               View Products
@@ -258,7 +258,7 @@ const LandingPage = () => {
                 <ArrowRight className="w-7 h-7" />
               </Link>
               <Link 
-                to="/products" 
+                to="/all-products" 
                 className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-2xl px-14 py-7 rounded-3xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-4 min-w-[280px] hover:scale-105"
               >
                 Browse Products

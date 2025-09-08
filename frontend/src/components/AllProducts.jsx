@@ -17,7 +17,7 @@ const AllProducts = () => {
     },
     {
       name: "Business Card Tins",
-      price: "From $89",
+      price: "From $399.99",
       description: "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
       image: "/assets/images/SKINS_DESIGN 00_FRONT OR BACK.png",
       link: "/tin-products",
@@ -27,11 +27,11 @@ const AllProducts = () => {
     },
     {
       name: "Tradeshow Tents",
-      price: "From $299",
+      price: "From $299.99",
       description: "Professional event tents with 360-degree branding coverage and heavy-duty aluminum frames",
       image: "/assets/images/tent_complete-buyprintz.jpg",
       link: "/tent-products",
-      badge: "Coming Soon",
+      badge: "New",
       badgeColor: "bg-purple-500",
       icon: <Layers className="w-8 h-8" />
     }
