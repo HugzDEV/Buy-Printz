@@ -543,9 +543,17 @@ const BannerEditorNew = () => {
         return
     }
 
-    setElements(prev => [...prev, shape])
+    // Use multi-surface logic for tin and tent products
+    if (productType === 'tin' || productType === 'tent') {
+      setSurfaceElements(prev => ({
+        ...prev,
+        [currentSurface]: [...prev[currentSurface], shape]
+      }))
+    } else {
+      setElements(prev => [...prev, shape])
+    }
     setSelectedId(shape.id)
-  }, [canvasSize])
+  }, [canvasSize, productType, currentSurface])
 
   // Add text element
   const addText = useCallback((textContent = 'Sample Text') => {
@@ -571,9 +579,17 @@ const BannerEditorNew = () => {
       rotation: 0
     }
     
-    setElements(prev => [...prev, newText])
+    // Use multi-surface logic for tin and tent products
+    if (productType === 'tin' || productType === 'tent') {
+      setSurfaceElements(prev => ({
+        ...prev,
+        [currentSurface]: [...prev[currentSurface], newText]
+      }))
+    } else {
+      setElements(prev => [...prev, newText])
+    }
     setSelectedId(newText.id)
-  }, [canvasSize])
+  }, [canvasSize, productType, currentSurface])
 
   // Add icon as text element or image element
   const addIcon = useCallback((iconName, symbol, imagePath = null) => {
@@ -593,7 +609,15 @@ const BannerEditorNew = () => {
           assetName: iconName,
           imagePath: imagePath // Store the actual image path for restoration
         }
-        setElements(prev => [...prev, newIcon])
+        // Use multi-surface logic for tin and tent products
+        if (productType === 'tin' || productType === 'tent') {
+          setSurfaceElements(prev => ({
+            ...prev,
+            [currentSurface]: [...prev[currentSurface], newIcon]
+          }))
+        } else {
+          setElements(prev => [...prev, newIcon])
+        }
         setSelectedId(newIcon.id)
       }
       img.onerror = () => {
@@ -611,7 +635,15 @@ const BannerEditorNew = () => {
           align: 'center',
           verticalAlign: 'middle'
         }
-        setElements(prev => [...prev, newIcon])
+        // Use multi-surface logic for tin and tent products
+        if (productType === 'tin' || productType === 'tent') {
+          setSurfaceElements(prev => ({
+            ...prev,
+            [currentSurface]: [...prev[currentSurface], newIcon]
+          }))
+        } else {
+          setElements(prev => [...prev, newIcon])
+        }
         setSelectedId(newIcon.id)
       }
       img.src = imagePath
@@ -629,10 +661,18 @@ const BannerEditorNew = () => {
         align: 'center',
         verticalAlign: 'middle'
       }
-      setElements(prev => [...prev, newIcon])
+      // Use multi-surface logic for tin and tent products
+      if (productType === 'tin' || productType === 'tent') {
+        setSurfaceElements(prev => ({
+          ...prev,
+          [currentSurface]: [...prev[currentSurface], newIcon]
+        }))
+      } else {
+        setElements(prev => [...prev, newIcon])
+      }
       setSelectedId(newIcon.id)
     }
-  }, [canvasSize])
+  }, [canvasSize, productType, currentSurface])
 
   // Add QR code element
   const addQRCode = useCallback((url, qrColor = '#000000', backgroundColor = '#ffffff') => {
@@ -682,7 +722,15 @@ const BannerEditorNew = () => {
               backgroundColor: backgroundColor
             }
           }
-          setElements(prev => [...prev, newQRCode])
+          // Use multi-surface logic for tin and tent products
+          if (productType === 'tin' || productType === 'tent') {
+            setSurfaceElements(prev => ({
+              ...prev,
+              [currentSurface]: [...prev[currentSurface], newQRCode]
+            }))
+          } else {
+            setElements(prev => [...prev, newQRCode])
+          }
           setSelectedId(newQRCode.id)
         }
         img.src = qrDataUrl
@@ -691,7 +739,7 @@ const BannerEditorNew = () => {
         document.body.removeChild(qrContainer)
       }
     }, 100)
-  }, [canvasSize])
+  }, [canvasSize, productType, currentSurface])
 
 
 
@@ -2273,7 +2321,15 @@ const BannerEditorNew = () => {
         imagePath: imagePath // Store the actual image path for restoration
       }
       
-      setElements(prev => [...prev, newImage])
+      // Use multi-surface logic for tin and tent products
+      if (productType === 'tin' || productType === 'tent') {
+        setSurfaceElements(prev => ({
+          ...prev,
+          [currentSurface]: [...prev[currentSurface], newImage]
+        }))
+      } else {
+        setElements(prev => [...prev, newImage])
+      }
       setSelectedId(newImage.id)
     }
     img.onerror = () => {
@@ -2281,7 +2337,7 @@ const BannerEditorNew = () => {
       alert('Failed to load asset. Please try again.')
     }
     img.src = imagePath
-  }, [canvasSize])
+  }, [canvasSize, productType, currentSurface])
 
   // Handle image upload
   const handleImageUpload = useCallback(async (file) => {
