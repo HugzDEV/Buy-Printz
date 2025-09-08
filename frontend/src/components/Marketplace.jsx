@@ -72,7 +72,9 @@ const Marketplace = () => {
         }
       })
       
-      const response = await fetch(`/api/creator-marketplace/templates/marketplace?${queryParams}`)
+      // Use the same API URL as authService but without authentication
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://buy-printz-production.up.railway.app'
+      const response = await fetch(`${apiUrl}/api/creator-marketplace/templates/marketplace?${queryParams}`)
       
       if (response.ok) {
         const data = await response.json()
