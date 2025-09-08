@@ -310,7 +310,7 @@ const TinProducts = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
                 name: "Matte Vinyl",
@@ -321,11 +321,6 @@ const TinProducts = () => {
                 name: "Gloss Vinyl", 
                 description: "High-shine, eye-catching appearance for maximum impact",
                 features: ["High-shine finish", "Eye-catching", "Premium look"]
-              },
-              {
-                name: "Metallic Vinyl",
-                description: "Premium metallic look that complements your tin finish",
-                features: ["Metallic appearance", "Premium quality", "Luxury finish"]
               },
               {
                 name: "Clear Vinyl",
