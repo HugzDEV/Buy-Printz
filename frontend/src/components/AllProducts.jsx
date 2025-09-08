@@ -19,7 +19,7 @@ const AllProducts = () => {
       name: "Business Card Tins",
       price: "From $399.99",
       description: "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
-      image: "/assets/images/SKINS_DESIGN 00_FRONT OR BACK.png",
+      image: "/assets/Tins_BC_v2_new phone number.png",
       link: "/tin-products",
       badge: "New",
       badgeColor: "bg-green-500",
@@ -75,12 +75,12 @@ const AllProducts = () => {
             
             <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
               {featuredProducts.map((product, index) => (
-                <div key={index} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[600px]">
+                <div key={index} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[550px]">
                   <div className="relative overflow-hidden rounded-t-3xl">
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute top-4 right-4">
                       <span className={`${product.badgeColor} text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg`}>

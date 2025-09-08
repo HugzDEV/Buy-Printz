@@ -200,7 +200,7 @@ const TinProducts = () => {
               <div key={product.id} className="group">
                 <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:bg-white/80 h-full flex flex-col transform hover:scale-105 active:scale-95">
                   {/* Product Image */}
-                  <div className="relative h-48">
+                  <div className="relative h-80">
                     <img 
                       src={product.image} 
                       alt={product.name}

@@ -44,7 +44,7 @@ const LandingPage = () => {
       name: "Business Card Tins",
       price: "From $399.99",
       description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking",
-      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      image: "/assets/Tins_BC_v2_new phone number.png",
       features: ["Premium aluminum", "Custom vinyl stickers", "100-500 units"],
       badge: "New",
       category: "tin",
@@ -171,12 +171,12 @@ const LandingPage = () => {
           
           <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {featuredProducts.map((product, index) => (
-              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[600px]">
+              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[550px]">
                 <div className="relative overflow-hidden rounded-t-3xl">
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${index}`
                     }}
