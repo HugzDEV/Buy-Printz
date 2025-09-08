@@ -64,6 +64,7 @@ const BannerCanvas = ({
   productType = 'banner',
   currentSurface = 'front',
   onSurfaceChange,
+  availableSurfaces = [],
   clipFunc = null
 }) => {
   const stageRef = useRef()
@@ -85,9 +86,11 @@ const BannerCanvas = ({
     
     let surfaces = []
     if (productType === 'tin') {
-      surfaces = ['front', 'back', 'inside', 'lid']
+      // Use available surfaces from sidebar instead of hardcoded list
+      surfaces = availableSurfaces.length > 0 ? availableSurfaces : ['front', 'back', 'inside', 'lid']
     } else if (productType === 'tent') {
-      surfaces = ['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right', 'sidewall_left', 'sidewall_right', 'backwall']
+      // Use available surfaces from sidebar instead of hardcoded list
+      surfaces = availableSurfaces.length > 0 ? availableSurfaces : ['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right', 'sidewall_left', 'sidewall_right', 'backwall']
     }
     
     const currentIndex = surfaces.indexOf(currentSurface)
@@ -97,7 +100,7 @@ const BannerCanvas = ({
     } else if (direction === 'next' && currentIndex < surfaces.length - 1) {
       onSurfaceChange(surfaces[currentIndex + 1])
     }
-  }, [productType, currentSurface, onSurfaceChange])
+  }, [productType, currentSurface, onSurfaceChange, availableSurfaces])
 
   // Confirm clear canvas
   const confirmClearCanvas = useCallback(() => {
@@ -1523,7 +1526,7 @@ const BannerCanvas = ({
                 <>
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('prev')} 
-                    disabled={productType === 'tin' ? currentSurface === 'front' : currentSurface === 'canopy_front'}
+                    disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
                     className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Previous Surface"
                   >
@@ -1540,7 +1543,7 @@ const BannerCanvas = ({
                   
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('next')} 
-                    disabled={productType === 'tin' ? currentSurface === 'lid' : currentSurface === 'backwall'}
+                    disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
                     className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Next Surface"
                   >
@@ -2672,7 +2675,7 @@ const BannerCanvas = ({
                 <>
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('prev')} 
-                    disabled={productType === 'tin' ? currentSurface === 'front' : currentSurface === 'canopy_front'}
+                    disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
                     className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Previous Surface"
                   >
@@ -2689,7 +2692,7 @@ const BannerCanvas = ({
                   
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('next')} 
-                    disabled={productType === 'tin' ? currentSurface === 'lid' : currentSurface === 'backwall'}
+                    disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
                     className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Next Surface"
                   >

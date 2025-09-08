@@ -32,6 +32,7 @@ const BannerSidebar = ({
   onTinSpecsChange,
   currentSurface = 'front',
   onSurfaceChange,
+  onAvailableSurfacesChange,
 
   onAddShape,
   onAddAsset,
@@ -98,6 +99,52 @@ const BannerSidebar = ({
     
     return filteredSurfaces
   }, [tentDesignOption])
+
+  // Memoized available tin surfaces based on surface coverage
+  const availableTinSurfaces = useMemo(() => {
+    const allSurfaces = [
+      { key: 'front', name: 'Front', group: 'main' },
+      { key: 'back', name: 'Back', group: 'main' },
+      { key: 'inside', name: 'Inside', group: 'secondary' },
+      { key: 'lid', name: 'Lid', group: 'secondary' }
+    ]
+
+    if (tinSpecs.surfaceCoverage === 'front-back') {
+      return allSurfaces.filter(s => s.group === 'main')
+    } else {
+      return allSurfaces // all-sides
+    }
+  }, [tinSpecs.surfaceCoverage])
+
+  // Update currentSurface if it's not available in the new filtered surfaces
+  useEffect(() => {
+    if (productType === 'tent') {
+      const availableSurfaceKeys = availableTentSurfaces.map(s => s.key)
+      if (!availableSurfaceKeys.includes(currentSurface)) {
+        if (availableTentSurfaces.length > 0) {
+          onSurfaceChange?.(availableTentSurfaces[0].key)
+        }
+      }
+    } else if (productType === 'tin') {
+      const availableSurfaceKeys = availableTinSurfaces.map(s => s.key)
+      if (!availableSurfaceKeys.includes(currentSurface)) {
+        if (availableTinSurfaces.length > 0) {
+          onSurfaceChange?.(availableTinSurfaces[0].key)
+        }
+      }
+    }
+  }, [availableTentSurfaces, availableTinSurfaces, currentSurface, onSurfaceChange, productType])
+
+  // Notify parent component of available surfaces change
+  useEffect(() => {
+    if (productType === 'tent' && onAvailableSurfacesChange) {
+      const availableSurfaceKeys = availableTentSurfaces.map(s => s.key)
+      onAvailableSurfacesChange(availableSurfaceKeys)
+    } else if (productType === 'tin' && onAvailableSurfacesChange) {
+      const availableSurfaceKeys = availableTinSurfaces.map(s => s.key)
+      onAvailableSurfacesChange(availableSurfaceKeys)
+    }
+  }, [availableTentSurfaces, availableTinSurfaces, productType, onAvailableSurfacesChange])
 
   // Note: Removed useEffect to prevent double render issues
 
@@ -1115,37 +1162,36 @@ const BannerSidebar = ({
                   {productType === 'tin' && 'Tin Finish'}
                   {productType === 'tent' && 'Tent Material'}
                 </div>
-                <select 
-                  value={productType === 'tin' ? tinSpecs.finish : (bannerSpecs?.id || '')}
-                  onChange={(e) => {
-                    if (productType === 'tin') {
-                      handleTinSpecChange('finish', e.target.value)
-                    } else {
-                      onChangeBannerType?.(e.target.value)
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                >
-                  {productType === 'banner' && bannerTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                  {productType === 'tin' && (
-                    <>
-                      <option value="silver">Silver</option>
-                      <option value="black">Black</option>
-                      <option value="gold">Gold</option>
-                    </>
-                  )}
-                  {productType === 'tent' && (
-                    <>
-                      <option value="vinyl">Vinyl</option>
-                      <option value="mesh">Mesh</option>
-                      <option value="fabric">Fabric</option>
-                    </>
-                  )}
-                </select>
+                {productType === 'tent' ? (
+                  <div className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm text-gray-700">
+                    6oz Tent Fabric (600x600 denier)
+                  </div>
+                ) : (
+                  <select 
+                    value={productType === 'tin' ? tinSpecs.finish : (bannerSpecs?.id || '')}
+                    onChange={(e) => {
+                      if (productType === 'tin') {
+                        handleTinSpecChange('finish', e.target.value)
+                      } else {
+                        onChangeBannerType?.(e.target.value)
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  >
+                    {productType === 'banner' && bannerTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                    {productType === 'tin' && (
+                      <>
+                        <option value="silver">Silver</option>
+                        <option value="black">Black</option>
+                        <option value="gold">Gold</option>
+                      </>
+                    )}
+                  </select>
+                )}
               </div>
 
               {/* Tin-Specific Options */}
@@ -1242,6 +1288,7 @@ const BannerSidebar = ({
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                     <div className="text-sm font-medium text-gray-800 mb-3">Design Surface</div>
                     <select
+                      key={`tent-surface-selector-${tentDesignOption}`}
                       className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       value={currentSurface}
                       onChange={(e) => {
@@ -1263,10 +1310,11 @@ const BannerSidebar = ({
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                     <div className="text-sm font-medium text-gray-800 mb-3">Tent Specifications</div>
                     <div className="space-y-2 text-xs text-gray-600">
-                      <div>• 10x10 ft Event Tent</div>
-                      <div>• 6oz Tent Fabric</div>
-                      <div>• 40mm Aluminum Hex Frame</div>
-                      <div>• Dye-Sublimation Printing</div>
+                      <div>• 10x10 ft Event Tent (120"w x 120"d x 124.5"-137"h)</div>
+                      <div>• 6oz Tent Fabric (600x600 denier)</div>
+                      <div>• 40mm Aluminum Hex Hardware (1mm wall thickness)</div>
+                      <div>• Dye-Sublimation Graphic (Scratch & Weather Resistant)</div>
+                      <div>• Weight: 51 lbs (43 lbs Hardware + 8 lbs Canopy)</div>
                     </div>
                   </div>
                 </>
@@ -1472,11 +1520,11 @@ const BannerSidebar = ({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Material:</span>
-                      <span className="font-medium text-gray-800">Vinyl</span>
+                      <span className="font-medium text-gray-800">6oz Tent Fabric</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Components:</span>
-                      <span className="font-medium text-gray-800">Tent + Table Cloth + Flag</span>
+                      <span className="font-medium text-gray-800">Tent + Accessories</span>
                     </div>
                   </>
                 )}

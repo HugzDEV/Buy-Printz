@@ -43,6 +43,9 @@ const BannerEditorNew = () => {
     return 'front'
   })
   
+  // Available surfaces for multi-surface product navigation
+  const [availableSurfaces, setAvailableSurfaces] = useState([])
+  
   // Core state - Multi-surface support for tins and tents
   const [surfaceElements, setSurfaceElements] = useState({
     // Tin surfaces
@@ -235,6 +238,11 @@ const BannerEditorNew = () => {
       }
     }
   }, [productType])
+
+  // Handle available surfaces change from sidebar
+  const handleAvailableSurfacesChange = useCallback((surfaces) => {
+    setAvailableSurfaces(surfaces)
+  }, [])
   
   // Check if user is first time user - only from landing page
   useEffect(() => {
@@ -3214,6 +3222,7 @@ const BannerEditorNew = () => {
             onTinSpecsChange={handleTinSpecChange}
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
+            onAvailableSurfacesChange={handleAvailableSurfacesChange}
 
             onAddShape={addShape}
             onAddText={addText}
@@ -3256,6 +3265,7 @@ const BannerEditorNew = () => {
             productType={productType}
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
+            availableSurfaces={availableSurfaces}
             clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyClipFunc() : null}
           />
           

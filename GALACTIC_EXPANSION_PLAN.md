@@ -142,31 +142,65 @@ CREATE TABLE business_card_tins (
 ```javascript
 tradeshowTents = [
   {
-    id: '10x10-tent',
-    name: '10x10 Tradeshow Tent',
-    dimensions: { width: 10, height: 10, depth: 10 }, // feet
-    material: 'Vinyl',
-    finish: 'Matte/Glossy',
-    components: ['tent', 'table-cloth', 'flag'],
-    price: 299.99
+    id: 'tent-10x10',
+    name: '10x10 Event Tent',
+    dimensions: { width: 120, height: 120, depth: 120 }, // inches
+    assembled: { 
+      shortest: '120"w x 120"d x 124.5"h',
+      tallest: '120"w x 120"d x 137"h'
+    },
+    material: '6oz Tent Fabric (600x600 denier)',
+    frame: '40mm Aluminum Hex Hardware (1mm wall thickness)',
+    print: 'Dye-Sublimation Graphic (Scratch & Weather Resistant)',
+    weight: '51 lbs (43 lbs Hardware + 8 lbs Canopy)',
+    components: ['canopy', 'full-wall', 'half-wall'],
+    accessories: ['carrying-bag', 'sandbags', 'ropes-stakes'],
+    price: 299.99,
+    description: 'The next level in outdoor advertising. Achieve 360 degrees of branding with a custom full fabric dye sub canopy and hardware package.'
   },
   {
-    id: '10x20-tent',
-    name: '10x20 Tradeshow Tent',
-    dimensions: { width: 20, height: 10, depth: 10 },
-    material: 'Vinyl',
-    finish: 'Matte/Glossy',
-    components: ['tent', 'table-cloth', 'flag'],
-    price: 499.99
+    id: 'tent-10x20',
+    name: '10x20 Event Tent',
+    dimensions: { width: 240, height: 120, depth: 120 }, // inches
+    material: '6oz Tent Fabric (600x600 denier)',
+    frame: '40mm Aluminum Hex Hardware (1mm wall thickness)',
+    print: 'Dye-Sublimation Graphic (Scratch & Weather Resistant)',
+    components: ['canopy', 'full-wall', 'half-wall'],
+    accessories: ['carrying-bag', 'sandbags', 'ropes-stakes'],
+    price: 499.99,
+    description: 'Extended coverage for larger events and exhibitions with professional-grade materials.'
   }
+]
+
+// Tent Surface Types
+tentSurfaces = [
+  { id: 'canopy_front', name: 'Canopy Front', dimensions: { width: 1160, height: 789 } },
+  { id: 'canopy_back', name: 'Canopy Back', dimensions: { width: 1160, height: 789 } },
+  { id: 'canopy_left', name: 'Canopy Left', dimensions: { width: 1160, height: 789 } },
+  { id: 'canopy_right', name: 'Canopy Right', dimensions: { width: 1160, height: 789 } },
+  { id: 'sidewall_left', name: 'Left Sidewall', dimensions: { width: 1110, height: 390 } },
+  { id: 'sidewall_right', name: 'Right Sidewall', dimensions: { width: 1110, height: 390 } },
+  { id: 'backwall', name: 'Back Wall', dimensions: { width: 1110, height: 780 } }
+]
+
+// Tent Accessories
+tentAccessories = [
+  { id: 'carrying-bag', name: 'Carrying Bag w/ Wheels', price: 49.99 },
+  { id: 'sandbags', name: 'Sandbags (Sand not included)', price: 24.99 },
+  { id: 'ropes-stakes', name: 'Reinforced Strip', price: 19.99 },
+  { id: 'full-wall', name: 'Full Wall', price: 199.99 },
+  { id: 'half-wall', name: 'Half Wall', price: 149.99 }
 ]
 ```
 
 #### **Canvas Requirements:**
-- **Large Format Support:** Handle 10x10 and 10x20 foot designs
-- **Component Management:** Separate designs for tent, table cloth, and flag
+- **Multi-Surface Editor:** 7 separate design surfaces (4 canopy sides, 2 sidewalls, 1 backwall)
+- **Triangular Clipping:** Special triangular clipping for canopy surfaces
+- **Surface Navigation:** Tab-based interface to switch between surfaces
+- **Dynamic Sizing:** Automatic canvas resizing based on surface type
+- **Large Format Support:** Handle 10x10 and 10x20 foot designs (1160x789px canopy, 1110x780px walls)
 - **Vector Graphics:** High-resolution vector support for large prints
-- **Template System:** Industry-specific tent templates
+- **Safe Zone Guidance:** Triangular safe zones for canopy, rectangular for walls
 
 #### **Database Schema:**
 ```sql
@@ -174,11 +208,17 @@ tradeshowTents = [
 CREATE TABLE tradeshow_tents (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID REFERENCES orders(id) ON DELETE CASCADE NOT NULL,
-    tent_type VARCHAR(50) NOT NULL,
-    material VARCHAR(50) NOT NULL,
-    finish VARCHAR(50) NOT NULL,
-    component_designs JSONB NOT NULL, -- {tent: {...}, table_cloth: {...}, flag: {...}}
-    print_specifications JSONB NOT NULL,
+    tent_size VARCHAR(20) NOT NULL CHECK (tent_size IN ('10x10', '10x20')),
+    tent_type VARCHAR(50) NOT NULL DEFAULT 'event-tent',
+    material VARCHAR(50) NOT NULL DEFAULT '6oz-tent-fabric',
+    frame_type VARCHAR(50) NOT NULL DEFAULT '40mm-aluminum-hex',
+    print_method VARCHAR(50) NOT NULL DEFAULT 'dye-sublimation',
+    surface_designs JSONB NOT NULL, -- {canopy_front: {...}, canopy_back: {...}, sidewall_left: {...}, etc.}
+    accessories JSONB DEFAULT '[]', -- Selected accessories array
+    base_price DECIMAL(10,2) NOT NULL,
+    accessories_total DECIMAL(10,2) DEFAULT 0.00,
+    total_price DECIMAL(10,2) NOT NULL,
+    file_setup JSONB NOT NULL, -- File specifications and requirements
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
@@ -230,9 +270,14 @@ CREATE TABLE tradeshow_tents (
 - **500 Units (All Sides):** $1100.00 (Silver) / $1100.25 (Black) / $1100.50 (Gold)
 
 ### **Tradeshow Tents:**
-- **10x10 Tent Package:** $299.99 (tent + table cloth + flag)
-- **10x20 Tent Package:** $499.99 (tent + table cloth + flag)
-- **Individual Components:** Available separately
+- **10x10 Event Tent:** $299.99 (base tent with canopy)
+- **10x20 Event Tent:** $499.99 (base tent with canopy)
+- **Accessories:**
+  - Carrying Bag w/ Wheels: $49.99
+  - Sandbags: $24.99
+  - Reinforced Strip: $19.99
+  - Full Wall: $199.99
+  - Half Wall: $149.99
 
 ---
 
