@@ -75,10 +75,10 @@ const BannerSidebar = ({
   // Memoized available tent surfaces based on design option
   const availableTentSurfaces = useMemo(() => {
     const allSurfaces = [
-      { key: 'canopy_front', name: 'Canopy Front', group: 'canopy' },
-      { key: 'canopy_back', name: 'Canopy Back', group: 'canopy' },
-      { key: 'canopy_left', name: 'Canopy Left', group: 'canopy' },
-      { key: 'canopy_right', name: 'Canopy Right', group: 'canopy' },
+      { key: 'canopy_front', name: 'Canopy Front + Valence', group: 'canopy' },
+      { key: 'canopy_back', name: 'Canopy Back + Valence', group: 'canopy' },
+      { key: 'canopy_left', name: 'Canopy Left + Valence', group: 'canopy' },
+      { key: 'canopy_right', name: 'Canopy Right + Valence', group: 'canopy' },
       { key: 'backwall', name: 'Back Wall', group: 'wall' }, // Moved backwall right after canopy
       { key: 'sidewall_left', name: 'Left Sidewall', group: 'wall' },
       { key: 'sidewall_right', name: 'Right Sidewall', group: 'wall' }
@@ -86,6 +86,7 @@ const BannerSidebar = ({
 
     let filteredSurfaces = []
     if (tentDesignOption === 'canopy-only') {
+      // Include canopy surfaces (now with integrated valence)
       filteredSurfaces = allSurfaces.filter(s => s.group === 'canopy')
     } else if (tentDesignOption === 'canopy-backwall') {
       // For canopy + backwall, return canopy surfaces + backwall in order

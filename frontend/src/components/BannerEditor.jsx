@@ -123,6 +123,28 @@ const BannerEditorNew = () => {
       ctx.closePath()
     }
   }
+
+  // Combined clipping function for tent canopy + valence
+  const getTentCanopyValenceClipFunc = () => {
+    return (ctx) => {
+      // Create a single clipping path that includes both triangular canopy and rectangular valence
+      ctx.beginPath()
+      
+      // Start with triangular canopy path
+      ctx.moveTo(canvasSize.width / 2, 0) // Top point (center top)
+      ctx.lineTo(0, 789)                  // Bottom left of triangle
+      ctx.lineTo(canvasSize.width, 789)   // Bottom right of triangle
+      
+      // Continue to rectangular valence path (no closePath between them)
+      ctx.lineTo(canvasSize.width, 809)   // Top right of valence
+      ctx.lineTo(0, 809)                  // Top left of valence
+      ctx.lineTo(0, 1009)                 // Bottom left of valence (789 + 20 + 200)
+      ctx.lineTo(canvasSize.width, 1009)  // Bottom right of valence
+      ctx.lineTo(canvasSize.width, 789)   // Back to bottom right of triangle
+      
+      ctx.closePath()
+    }
+  }
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState(() => {
     const urlProduct = searchParams.get('product')
@@ -233,8 +255,9 @@ const BannerEditorNew = () => {
         // Backwall: original size (1110 x 780 for full wall, 1110 x 370 for half wall)
         setCanvasSize({ width: 1110, height: 780 })
       } else if (surface.startsWith('canopy_')) {
-        // Canopy surfaces: triangular size
-        setCanvasSize({ width: 1160, height: 789 })
+        // Canopy surfaces: triangular canopy + rectangular valence below
+        // Total height: canopy height (789px) + gap (20px) + valence height (200px) + bottom padding (40px) = 1049px
+        setCanvasSize({ width: 1160, height: 1049 })
       }
     }
   }, [productType])
@@ -3266,7 +3289,7 @@ const BannerEditorNew = () => {
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
             availableSurfaces={availableSurfaces}
-            clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyClipFunc() : null}
+            clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyValenceClipFunc() : null}
           />
           
                 {/* Mobile Overlay when sidebar is open */}

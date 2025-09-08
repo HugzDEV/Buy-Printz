@@ -1707,7 +1707,7 @@ const BannerCanvas = ({
       </div>
 
       {/* Canvas Area - Mobile Optimized */}
-      <div className={`element-selection absolute top-16 sm:top-20 left-0 right-0 bottom-4 md:bottom-20 flex items-start justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
+      <div className={`element-selection absolute top-16 sm:top-20 left-0 right-0 bottom-0 flex items-start justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
@@ -1735,7 +1735,7 @@ const BannerCanvas = ({
               width: canvasSize.width * scale,
               height: canvasSize.height * scale,
               maxWidth: '100%',
-              maxHeight: '70vh', // Prevent canvas from taking full height
+              maxHeight: '95vh', // Use maximum available height
               userSelect: 'none', // Prevent text selection
               transform: window.innerWidth < 768 ? 'translateY(-40px)' : 'translateY(-20px)', // Move canvas content up to avoid status bar collision
               // Add rounded corners for tins (0.33 degree radius = ~2.3px at 100 DPI)
@@ -1962,11 +1962,12 @@ const BannerCanvas = ({
                 {showGuides && (
                   <>
                     {productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? (
-                      // Triangular safe zone for tent canopy
+                      // Combined safe zones for tent canopy + valence
                       <>
+                        {/* Triangular canopy safe zone */}
                         {/* Left side of triangle */}
                         <Line
-                          points={[20, canvasSize.height - 20, canvasSize.width / 2, 20]}
+                          points={[20, 789 - 20, canvasSize.width / 2, 20]}
                           stroke="#dc2626"
                           strokeWidth={2}
                           dash={[8, 4]}
@@ -1976,7 +1977,7 @@ const BannerCanvas = ({
                         
                         {/* Right side of triangle */}
                         <Line
-                          points={[canvasSize.width / 2, 20, canvasSize.width - 20, canvasSize.height - 20]}
+                          points={[canvasSize.width / 2, 20, canvasSize.width - 20, 789 - 20]}
                           stroke="#dc2626"
                           strokeWidth={2}
                           dash={[8, 4]}
@@ -1986,7 +1987,7 @@ const BannerCanvas = ({
                         
                         {/* Bottom side of triangle */}
                         <Line
-                          points={[canvasSize.width - 20, canvasSize.height - 20, 20, canvasSize.height - 20]}
+                          points={[canvasSize.width - 20, 789 - 20, 20, 789 - 20]}
                           stroke="#dc2626"
                           strokeWidth={2}
                           dash={[8, 4]}
@@ -1994,10 +1995,51 @@ const BannerCanvas = ({
                           listening={false}
                         />
                         
-                        {/* Corner indicators */}
+                        {/* Rectangular valence safe zone */}
+                        {/* Top border of valence */}
+                        <Line
+                          points={[20, 809 + 20, canvasSize.width - 20, 809 + 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Bottom border of valence */}
+                        <Line
+                          points={[20, 1009 - 20, canvasSize.width - 20, 1009 - 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Left border of valence */}
+                        <Line
+                          points={[20, 809 + 20, 20, 1009 - 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Right border of valence */}
+                        <Line
+                          points={[canvasSize.width - 20, 809 + 20, canvasSize.width - 20, 1009 - 20]}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Corner indicators for canopy */}
                         <Circle
                           x={20}
-                          y={canvasSize.height - 20}
+                          y={789 - 20}
                           radius={3}
                           fill="#dc2626"
                           listening={false}
@@ -2011,17 +2053,56 @@ const BannerCanvas = ({
                         />
                         <Circle
                           x={canvasSize.width - 20}
-                          y={canvasSize.height - 20}
+                          y={789 - 20}
                           radius={3}
                           fill="#dc2626"
                           listening={false}
                         />
                         
-                        {/* Safe Zone Label */}
+                        {/* Corner indicators for valence */}
+                        <Circle
+                          x={20}
+                          y={809 + 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={canvasSize.width - 20}
+                          y={809 + 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={20}
+                          y={1009 - 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Circle
+                          x={canvasSize.width - 20}
+                          y={1009 - 20}
+                          radius={3}
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        
+                        {/* Safe Zone Labels */}
                         <Text
                           x={canvasSize.width / 2 - 60}
-                          y={canvasSize.height - 15}
-                          text="Safe Printing Zone"
+                          y={789 - 15}
+                          text="Canopy Safe Zone"
+                          fontSize={12}
+                          fontFamily="Arial"
+                          fill="#dc2626"
+                          listening={false}
+                        />
+                        <Text
+                          x={canvasSize.width / 2 - 60}
+                          y={1009 - 15}
+                          text="Valence Safe Zone"
                           fontSize={12}
                           fontFamily="Arial"
                           fill="#dc2626"
