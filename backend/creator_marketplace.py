@@ -3,13 +3,14 @@ BuyPrintz Creator Marketplace API Endpoints
 Phase 1: Foundation - Creator registration and basic template management
 """
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 import json
 import uuid
 import os
+import stripe
 from database import DatabaseManager
 from auth import get_current_user
 
@@ -650,6 +651,214 @@ async def reject_template(
         raise
     except Exception as e:
         print(f"Error rejecting template: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
+
+# =============================================
+# PAYMENT PROCESSING ENDPOINTS
+# =============================================
+
+@router.post("/templates/{template_id}/purchase")
+async def create_template_purchase_intent(
+    template_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a payment intent for template purchase"""
+    try:
+        # Get template details
+        template = await db_manager.get_creator_template(template_id)
+        if not template:
+            raise HTTPException(
+                status_code=404,
+                detail="Template not found"
+            )
+        
+        # Check if template is approved and active
+        if not template.get("is_approved", False) or not template.get("is_active", False):
+            raise HTTPException(
+                status_code=400,
+                detail="Template is not available for purchase"
+            )
+        
+        # Check if user already purchased this template
+        user_purchases = await db_manager.get_user_purchases(current_user["user_id"])
+        if any(purchase["template_id"] == template_id for purchase in user_purchases):
+            raise HTTPException(
+                status_code=400,
+                detail="You have already purchased this template"
+            )
+        
+        # Calculate commission and earnings
+        price = float(template["price"])
+        commission_amount = round(price * 0.20, 2)  # 20% commission
+        creator_earnings = round(price * 0.80, 2)   # 80% creator earnings
+        
+        # Create payment intent
+        payment_intent = stripe.PaymentIntent.create(
+            amount=int(price * 100),  # Convert to cents
+            currency="usd",
+            metadata={
+                "template_id": template_id,
+                "creator_id": template["creator_id"],
+                "buyer_id": current_user["user_id"],
+                "commission_amount": str(commission_amount),
+                "creator_earnings": str(creator_earnings),
+                "type": "template_purchase"
+            }
+        )
+        
+        return {
+            "success": True,
+            "client_secret": payment_intent.client_secret,
+            "amount": price,
+            "currency": "usd",
+            "template": {
+                "id": template["id"],
+                "name": template["name"],
+                "price": price,
+                "creator_name": template.get("creator_name", "Unknown")
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except stripe.error.StripeError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Payment processing error: {str(e)}"
+        )
+    except Exception as e:
+        print(f"Error creating template purchase intent: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
+
+@router.post("/payments/webhook")
+async def handle_template_purchase_webhook(request: Request):
+    """Handle Stripe webhooks for template purchases"""
+    try:
+        payload = await request.body()
+        sig_header = request.headers.get("stripe-signature")
+        
+        if not sig_header:
+            raise HTTPException(status_code=400, detail="No signature header")
+        
+        # Get webhook secret from environment
+        webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+        if not webhook_secret:
+            raise HTTPException(status_code=500, detail="Webhook secret not configured")
+        
+        # Verify webhook signature
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+        
+        # Handle payment success
+        if event["type"] == "payment_intent.succeeded":
+            payment_intent = event["data"]["object"]
+            
+            # Check if this is a template purchase
+            if payment_intent.get("metadata", {}).get("type") == "template_purchase":
+                await process_template_purchase(payment_intent)
+        
+        return {"success": True}
+        
+    except stripe.error.SignatureVerificationError:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+    except Exception as e:
+        print(f"Error processing webhook: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+async def process_template_purchase(payment_intent):
+    """Process a successful template purchase"""
+    try:
+        metadata = payment_intent.get("metadata", {})
+        
+        template_id = metadata.get("template_id")
+        creator_id = metadata.get("creator_id")
+        buyer_id = metadata.get("buyer_id")
+        commission_amount = float(metadata.get("commission_amount", 0))
+        creator_earnings = float(metadata.get("creator_earnings", 0))
+        
+        if not all([template_id, creator_id, buyer_id]):
+            print("Missing required metadata for template purchase")
+            return
+        
+        # Create purchase record
+        purchase_data = {
+            "id": str(uuid.uuid4()),
+            "template_id": template_id,
+            "buyer_id": buyer_id,
+            "creator_id": creator_id,
+            "price_paid": payment_intent["amount"] / 100,  # Convert from cents
+            "commission_amount": commission_amount,
+            "creator_earnings": creator_earnings,
+            "stripe_payment_intent_id": payment_intent["id"],
+            "stripe_charge_id": payment_intent.get("charges", {}).get("data", [{}])[0].get("id"),
+            "status": "completed",
+            "purchased_at": datetime.utcnow().isoformat()
+        }
+        
+        # Save purchase to database
+        success = await db_manager.create_template_purchase(purchase_data)
+        
+        if success:
+            print(f"Template purchase processed successfully: {template_id}")
+        else:
+            print(f"Failed to save template purchase: {template_id}")
+            
+    except Exception as e:
+        print(f"Error processing template purchase: {e}")
+
+@router.get("/purchases/my-purchases")
+async def get_my_purchases(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get current user's template purchases"""
+    try:
+        purchases = await db_manager.get_user_purchases(current_user["user_id"])
+        
+        return {
+            "success": True,
+            "purchases": purchases
+        }
+        
+    except Exception as e:
+        print(f"Error getting user purchases: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
+
+@router.get("/creators/{creator_id}/earnings")
+async def get_creator_earnings(
+    creator_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get creator's earnings from template sales"""
+    try:
+        # Check if user is the creator
+        creator = await db_manager.get_creator_by_user_id(current_user["user_id"])
+        if not creator or creator["id"] != creator_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied"
+            )
+        
+        earnings = await db_manager.get_creator_earnings(creator_id)
+        
+        return {
+            "success": True,
+            "earnings": earnings
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting creator earnings: {e}")
         raise HTTPException(
             status_code=500,
             detail="Internal server error"
