@@ -3234,10 +3234,10 @@ const BannerEditorNew = () => {
       <div className="flex items-center justify-between">
         
         {/* Left Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
           <button
             onClick={() => navigate(cameFromTemplate ? '/dashboard?tab=templates' : '/dashboard')}
-            className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
+            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200"
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="hidden md:inline text-sm font-medium">
@@ -3255,13 +3255,13 @@ const BannerEditorNew = () => {
             <img 
               src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
               alt="BuyPrintz" 
-              className="h-12 md:h-16 w-auto"
+              className="h-8 md:h-16 w-auto"
             />
           </button>
         </div>
 
-        {/* Center Section - Product Type Selector */}
-        <div className="flex items-center gap-2">
+        {/* Center Section - Product Type Selector - Hidden on mobile to save space */}
+        <div className="hidden sm:flex items-center gap-2">
           <label className="text-sm font-medium text-gray-700 hidden md:block">
             Product:
           </label>
@@ -3277,7 +3277,7 @@ const BannerEditorNew = () => {
         </div>
 
         {/* Right Section */}
-        <div className="action-buttons flex items-center gap-2 md:gap-3">
+        <div className="action-buttons flex items-center gap-1 md:gap-3 flex-shrink-0">
           <button
             onClick={saveAsTemplate}
             className="px-2 md:px-4 py-1 md:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-xl transition-all duration-200 font-medium text-xs md:text-sm"
@@ -3298,9 +3298,9 @@ const BannerEditorNew = () => {
           {/* Mobile Hamburger - After action buttons */}
           <button
             onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-            className="mobile-hamburger md:hidden p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center z-50"
+            className="mobile-hamburger md:hidden p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center z-50 relative flex-shrink-0"
           >
-            {isMobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isMobileSidebarOpen ? <X className="w-5 h-5 text-gray-800" /> : <Menu className="w-5 h-5 text-gray-800" />}
           </button>
         </div>
         
