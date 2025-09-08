@@ -116,7 +116,6 @@ function App() {
           <>
             <Header />
             <LandingPage />
-            <Footer />
           </>
         } />
         
