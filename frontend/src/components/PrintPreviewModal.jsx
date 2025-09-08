@@ -24,12 +24,39 @@ const PrintPreviewModal = ({
   onApprove, 
   canvasData, 
   orderDetails,
-  dimensions 
+  dimensions,
+  productType = 'banner',
+  surfaceElements = {},
+  currentSurface = 'front'
 }) => {
   const [pdfBlob, setPdfBlob] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [previewImage, setPreviewImage] = useState(null)
   const [imageScale, setImageScale] = useState(1.5)
+  const [selectedSurface, setSelectedSurface] = useState(currentSurface)
+
+  // Get surface names based on product type
+  const getSurfaceNames = () => {
+    if (productType === 'tin') {
+      return [
+        { key: 'front', name: 'Front', description: 'Main front surface' },
+        { key: 'back', name: 'Back', description: 'Back surface' },
+        { key: 'inside', name: 'Inside', description: 'Inside surface' },
+        { key: 'lid', name: 'Lid', description: 'Lid surface' }
+      ]
+    } else if (productType === 'tent') {
+      return [
+        { key: 'canopy_front', name: 'Canopy Front', description: 'Front canopy surface' },
+        { key: 'canopy_back', name: 'Canopy Back', description: 'Back canopy surface' },
+        { key: 'canopy_left', name: 'Canopy Left', description: 'Left canopy surface' },
+        { key: 'canopy_right', name: 'Canopy Right', description: 'Right canopy surface' },
+        { key: 'sidewall_left', name: 'Left Sidewall', description: 'Left sidewall panel' },
+        { key: 'sidewall_right', name: 'Right Sidewall', description: 'Right sidewall panel' },
+        { key: 'backwall', name: 'Back Wall', description: 'Back wall panel' }
+      ]
+    }
+    return [{ key: 'front', name: 'Design', description: 'Main design' }]
+  }
 
   // Set preview image when modal opens - NO PDF generation for preview
   useEffect(() => {
@@ -159,132 +186,192 @@ const PrintPreviewModal = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
           {/* Left Column - Preview */}
           <div className="space-y-2 sm:space-y-4">
-                                      <Card>
-               <CardHeader className="pb-3 sm:pb-4">
-                 <CardTitle className="flex items-center gap-2">
-                   <Eye className="h-4 w-4" />
-                   Design Preview
-                 </CardTitle>
-               </CardHeader>
-               <CardContent className="space-y-3 sm:space-y-4">
+            <Card>
+              <CardHeader className="pb-3 sm:pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Design Preview
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 sm:space-y-4">
                  {isGenerating ? (
                    <div className="flex items-center justify-center p-4 sm:p-12">
                      <div className="text-center space-y-2">
                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                       <p className="text-sm text-gray-600">Generating your banner preview...</p>
+                       <p className="text-sm text-gray-600">Generating your {productType} preview...</p>
                      </div>
                    </div>
                  ) : previewImage ? (
                    <div className="space-y-3 sm:space-y-4">
-                                         {/* Main Banner Preview */}
-                                                                                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
-                        <div className="relative flex items-center justify-center w-full" style={{ 
-                          minHeight: window.innerWidth < 768 ? '200px' : '280px',
-                          maxHeight: window.innerWidth < 768 ? '240px' : '320px',
-                          // Mobile positioning adjustments - 25% larger, perfect centering
-                          transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
-                        }}>
-                          <img
-                            src={previewImage}
-                            alt="Banner Design Preview"
-                            className="rounded border shadow-lg"
-                            style={{
-                              width: 'auto',
-                              height: 'auto',
-                              maxWidth: '100%',
-                              maxHeight: window.innerWidth < 768 ? '180px' : '280px',
-                              minHeight: window.innerWidth < 768 ? '120px' : '250px',
-                              objectFit: 'contain',
-                              transform: `scale(${imageScale})`,
-                              transformOrigin: 'center center',
-                              // Ensure mobile positioning is correct
-                              display: 'block',
-                              margin: '0 auto'
-                            }}
-                            onLoad={handleImageLoad}
-                          />
-                         
-                         {/* BuyPrintz Watermark Overlay - IP Protection - Aligned with canvas */}
-                         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
-                           <img
-                             src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                             alt="BuyPrintz Watermark"
-                             className="w-full h-full object-cover opacity-30"
-                             style={{
-                               position: 'absolute',
-                               top: 0,
-                               left: 0,
-                               zIndex: 10,
-                               opacity: 0.3,
-                               // Mobile positioning to match canvas transform
-                               transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
-                             }}
-                           />
+                     {/* Multi-Surface Preview for Tins and Tents */}
+                     {(productType === 'tin' || productType === 'tent') ? (
+                       <div className="space-y-4">
+                         {/* Surface Selection */}
+                         <div className="flex flex-wrap gap-2">
+                           {getSurfaceNames().map((surface) => (
+                             <button
+                               key={surface.key}
+                               onClick={() => setSelectedSurface(surface.key)}
+                               className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                                 selectedSurface === surface.key
+                                   ? 'bg-blue-500 text-white shadow-lg'
+                                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                               }`}
+                               title={surface.description}
+                             >
+                               {surface.name}
+                             </button>
+                           ))}
                          </div>
-                        
-                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ 
-                          zIndex: 20,
-                                                     // Mobile positioning to match canvas transform
+                         
+                         {/* Surface Preview */}
+                         <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center overflow-hidden">
+                           <div className="relative flex items-center justify-center w-full" style={{ 
+                             minHeight: window.innerWidth < 768 ? '200px' : '280px',
+                             maxHeight: window.innerWidth < 768 ? '240px' : '320px',
+                           }}>
+                             {previewImage ? (
+                               <img
+                                 src={previewImage}
+                                 alt={`${productType} ${selectedSurface} Preview`}
+                                 className={`border shadow-lg ${productType === 'tin' ? 'rounded-lg' : 'rounded'}`}
+                                 style={{
+                                   width: 'auto',
+                                   height: 'auto',
+                                   maxWidth: '100%',
+                                   maxHeight: window.innerWidth < 768 ? '180px' : '280px',
+                                   minHeight: window.innerWidth < 768 ? '120px' : '250px',
+                                   objectFit: 'contain',
+                                   transform: `scale(${imageScale})`,
+                                   transformOrigin: 'center center',
+                                   // Add rounded corners for tins
+                                   borderRadius: productType === 'tin' ? '2.3px' : undefined
+                                 }}
+                                 onLoad={handleImageLoad}
+                               />
+                             ) : (
+                               <div className="text-center text-gray-500 p-8">
+                                 <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                                 <p className="text-sm">No preview available for {selectedSurface}</p>
+                               </div>
+                             )}
+                           </div>
+                         </div>
+                       </div>
+                     ) : (
+                       /* Banner Preview */
+                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
+                         <div className="relative flex items-center justify-center w-full" style={{ 
+                           minHeight: window.innerWidth < 768 ? '200px' : '280px',
+                           maxHeight: window.innerWidth < 768 ? '240px' : '320px',
                            transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
-                        }}>
-                          Preview
-                        </div>
-                      </div>
-                    </div>
+                         }}>
+                           {previewImage ? (
+                             <img
+                               src={previewImage}
+                               alt="Banner Design Preview"
+                               className="rounded border shadow-lg"
+                               style={{
+                                 width: 'auto',
+                                 height: 'auto',
+                                 maxWidth: '100%',
+                                 maxHeight: window.innerWidth < 768 ? '180px' : '280px',
+                                 minHeight: window.innerWidth < 768 ? '120px' : '250px',
+                                 objectFit: 'contain',
+                                 transform: `scale(${imageScale})`,
+                                 transformOrigin: 'center center'
+                               }}
+                               onLoad={handleImageLoad}
+                             />
+                           ) : (
+                             <div className="text-center text-gray-500 p-8">
+                               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                               <p className="text-sm">No preview available</p>
+                             </div>
+                           )}
+                           
+                           {/* BuyPrintz Watermark Overlay - IP Protection - Aligned with canvas */}
+                           <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+                             <img
+                               src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
+                               alt="BuyPrintz Watermark"
+                               className="w-full h-full object-cover opacity-30"
+                               style={{
+                                 position: 'absolute',
+                                 top: 0,
+                                 left: 0,
+                                 zIndex: 10,
+                                 opacity: 0.3,
+                                 // Mobile positioning to match canvas transform
+                                 transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
+                               }}
+                             />
+                           </div>
+                          
+                          <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ 
+                            zIndex: 20,
+                            // Mobile positioning to match canvas transform
+                            transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
+                          }}>
+                            Preview
+                          </div>
+                         </div>
+                       </div>
+                     )}
+                     
+                     {/* Print Information */}
+                     <div className="bg-green-50 rounded-lg p-2 sm:p-4">
+                       <div className="text-center">
+                         <p className="text-sm font-medium text-green-900">
+                           {dimensions.width}ft × {dimensions.height}ft - Production Ready
+                         </p>
+                         <p className="text-xs text-green-700 mt-1">
+                           This is the exact image that will be printed
+                         </p>
+                       </div>
+                     </div>
 
-                    {/* Print Information */}
-                    <div className="bg-green-50 rounded-lg p-2 sm:p-4">
-                      <div className="text-center">
-                        <p className="text-sm font-medium text-green-900">
-                          {dimensions.width}ft × {dimensions.height}ft - Production Ready
-                        </p>
-                        <p className="text-xs text-green-700 mt-1">
-                          This is the exact image that will be printed
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          const link = document.createElement('a')
-                          link.download = `banner-design-${orderDetails.banner_type || 'custom'}.png`
-                          link.href = previewImage
-                          link.click()
-                        }}
-                        className="flex items-center gap-2"
-                      >
-                        <Download className="h-4 w-4" />
-                        Download Production Image
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
+                     {/* Quick Actions */}
+                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+                       <Button
+                         variant="outline"
+                         onClick={() => {
+                           const link = document.createElement('a')
+                           link.download = `banner-design-${orderDetails.banner_type || 'custom'}.png`
+                           link.href = previewImage
+                           link.click()
+                         }}
+                         className="flex items-center gap-2"
+                       >
+                         <Download className="h-4 w-4" />
+                         Download Production Image
+                       </Button>
+                     </div>
+                   </div>
+                 ) : (
                   <div className="flex items-center justify-center p-6 sm:p-12">
                     <div className="text-center space-y-2">
                       <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto" />
                       <p className="text-sm text-gray-600">No preview available</p>
                     </div>
                   </div>
-                )}
-              </CardContent>
+                 )}
+               </CardContent>
             </Card>
           </div>
 
           {/* Right Column - Specifications */}
           <div className="space-y-2 sm:space-y-4">
             {/* Print Specifications */}
-                         <Card>
+            <Card>
               <CardHeader className="pb-3 sm:pb-4">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Print Specifications
                 </CardTitle>
               </CardHeader>
-                             <CardContent className="p-4 sm:p-6">
-                                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <CardContent className="p-4 sm:p-6">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2 sm:space-y-3">
                     <p className="text-sm font-medium text-gray-600">Dimensions</p>
                     <Badge variant="outline">
@@ -317,13 +404,13 @@ const PrintPreviewModal = ({
                   </div>
                   <div className="space-y-2 sm:space-y-3">
                     <p className="text-sm font-medium text-gray-600">Color Profile</p>
-                                         <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                       CMYK
-                     </Badge>
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                      CMYK
+                    </Badge>
                   </div>
-                                 </div>
-               </CardContent>
-             </Card>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Print Ready Status */}
             <Alert variant="success" className="p-2 sm:p-4">
