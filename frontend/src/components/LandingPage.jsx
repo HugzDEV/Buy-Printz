@@ -200,6 +200,11 @@ const LandingPage = () => {
                   <h3 className="text-xl font-bold text-white mb-3 leading-tight">
                     {product.name}
                   </h3>
+                  
+                  <div className="text-3xl font-bold text-buyprint-brand mb-4">
+                    {product.price}
+                  </div>
+                  
                   <p className="text-white/80 mb-4 leading-relaxed text-base">
                     {product.description}
                   </p>
@@ -221,7 +226,7 @@ const LandingPage = () => {
                   
                   <Link 
                     to={product.link} 
-                    className="bg-buyprint-brand hover:bg-buyprint-600 border border-buyprint-brand hover:border-buyprint-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 border border-green-500 hover:border-green-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
                   >
                     View Products
                     <ArrowRight className="w-4 h-4" />
