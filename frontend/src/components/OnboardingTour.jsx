@@ -11,7 +11,8 @@ import {
   X,
   CheckCircle,
   Sparkles,
-  Menu
+  Menu,
+  Package
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 
@@ -61,6 +62,23 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
       ),
       placement: 'center',
       disableBeacon: true,
+    },
+    {
+      target: '.product-selector',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-indigo-100 rounded-full">
+              <Package className="w-8 h-8 text-indigo-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Choose Your Product</h3>
+          <p className="text-gray-600">
+            Switch between Vinyl Banners, Business Card Tins, and Tradeshow Tents. Each product has unique design options and specifications!
+          </p>
+        </div>
+      ),
+      placement: 'bottom',
     },
     {
       target: '.action-buttons',
@@ -165,9 +183,9 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
               <Menu className="w-8 h-8 text-yellow-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Mobile Tools Access</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Design Tools & Product Selection</h3>
           <p className="text-gray-600">
-            Tap this button to open all your design tools and options on mobile!
+            Tap this button to access all design tools AND switch between products (Banners, Tins, Tents). Each product has unique design options!
           </p>
         </div>
       ),
@@ -292,6 +310,41 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
             if (foundButton) {
               // Add the mobile-hamburger class to the found button
               foundButton.classList.add('mobile-hamburger')
+              
+              // Wait a bit for the class to be applied, then retry
+              setTimeout(() => {
+                checkTargets()
+              }, 100)
+              return
+            }
+          }
+          
+          // Special handling for product selector if it's missing
+          if (missingTargets.includes('.product-selector')) {
+            // Try to find the product selector by alternative means
+            const productSelectors = [
+              'select[data-tour="product-selector"]',
+              'select[class*="product-selector"]',
+              'select[value*="banner"]',
+              'select option[value="banner"]'
+            ]
+            
+            let foundSelector = null
+            for (const selector of productSelectors) {
+              try {
+                const element = document.querySelector(selector)
+                if (element) {
+                  foundSelector = element
+                  break
+                }
+              } catch (e) {
+                // Selector failed, continue to next
+              }
+            }
+            
+            if (foundSelector) {
+              // Add the product-selector class to the found element
+              foundSelector.classList.add('product-selector')
               
               // Wait a bit for the class to be applied, then retry
               setTimeout(() => {

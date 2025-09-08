@@ -3268,7 +3268,8 @@ const BannerEditorNew = () => {
           <select
             value={productType}
             onChange={(e) => handleProductTypeChange(e.target.value)}
-            className="px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="product-selector px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            data-tour="product-selector"
           >
             <option value="banner">🏷️ Vinyl Banner</option>
             <option value="tin">🗃️ Business Card Tin</option>
