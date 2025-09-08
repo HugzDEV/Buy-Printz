@@ -74,7 +74,7 @@ const Header = () => {
                     sessionStorage.setItem('newDesign', 'true')
                   }
                 }}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-base font-medium transition-colors ${
                   location.pathname === item.href
                     ? 'text-white font-semibold'
                     : 'text-gray-300 hover:text-white'
@@ -89,10 +89,10 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                <span className="text-sm text-gray-300">Welcome, {user.email}</span>
+                <span className="text-base text-gray-300">Welcome, {user.email}</span>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center text-gray-300 hover:text-white transition-colors"
+                  className="flex items-center text-base text-gray-300 hover:text-white transition-colors"
                 >
                   <LogOut className="w-4 h-4 mr-1" />
                   Logout
@@ -102,13 +102,13 @@ const Header = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  className="text-base font-medium text-gray-300 hover:text-white transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-white text-blue-900 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-white text-blue-900 hover:bg-gray-100 px-4 py-2 rounded-lg text-base font-medium transition-colors"
                 >
                   Get Started
                 </Link>
@@ -143,7 +143,7 @@ const Header = () => {
                     }
                     setMobileMenuOpen(false)
                   }}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`text-base font-medium transition-colors ${
                     location.pathname === item.href
                       ? 'text-white font-semibold'
                       : 'text-gray-300 hover:text-white'
@@ -155,7 +155,7 @@ const Header = () => {
               
               {user ? (
                 <div className="pt-4 border-t border-blue-700">
-                  <div className="flex items-center text-sm text-gray-300 mb-2">
+                  <div className="flex items-center text-base text-gray-300 mb-2">
                     <User className="w-4 h-4 mr-2" />
                     {user.email}
                   </div>
@@ -164,7 +164,7 @@ const Header = () => {
                       handleLogout()
                       setMobileMenuOpen(false)
                     }}
-                    className="flex items-center text-sm text-gray-300 hover:text-white transition-colors"
+                    className="flex items-center text-base text-gray-300 hover:text-white transition-colors"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
@@ -175,14 +175,14 @@ const Header = () => {
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                    className="block text-base font-medium text-gray-300 hover:text-white transition-colors"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="bg-white text-blue-900 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors w-full text-center block"
+                    className="bg-white text-blue-900 hover:bg-gray-100 px-4 py-2 rounded-lg text-base font-medium transition-colors w-full text-center block"
                   >
                     Get Started
                   </Link>
