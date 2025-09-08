@@ -139,8 +139,8 @@ const TermsOfService = () => {
               </p>
               <div className="mt-4 text-gray-700 space-y-2">
                 <p><strong>Email:</strong> <a href="mailto:order@buyprintz.com" className="text-blue-600 hover:text-blue-800 underline">order@buyprintz.com</a></p>
-                <p><strong>Phone:</strong> <a href="tel:+16178009049" className="text-blue-600 hover:text-blue-800 underline">(617) 800-9049</a></p>
-                <p><strong>Address:</strong> 816 Morton Street, Boston, MA 02124</p>
+                <p><strong>Phone:</strong> <a href="tel:+16179020969" className="text-blue-600 hover:text-blue-800 underline">(617) 902-0969</a></p>
+                <p><strong>Address:</strong> Boston, MA 02124</p>
               </div>
             </section>
           </div>

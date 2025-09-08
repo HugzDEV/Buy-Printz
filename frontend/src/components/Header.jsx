@@ -42,7 +42,8 @@ const Header = () => {
   const authenticatedNavigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Design', href: '/editor' },
-    { name: 'Products', href: '/all-products' }
+    { name: 'Products', href: '/all-products' },
+    { name: 'Contact', href: '/contact' }
   ]
 
   const currentNavigation = user ? authenticatedNavigation : navigation
