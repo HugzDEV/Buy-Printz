@@ -269,10 +269,26 @@ const Marketplace = () => {
                   // Grid View
                   <>
                     {/* Template Preview */}
-                    <div className="aspect-video bg-gray-100 rounded-xl mb-4 flex items-center justify-center">
-                      <div className="text-center text-gray-400">
-                        <div className="text-4xl mb-2">🎨</div>
-                        <p className="text-sm">Template Preview</p>
+                    <div className="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
+                      {template.preview_image_url ? (
+                        <img 
+                          src={template.preview_image_url} 
+                          alt={template.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`w-full h-full flex items-center justify-center ${template.preview_image_url ? 'hidden' : 'flex'}`}
+                        style={{ display: template.preview_image_url ? 'none' : 'flex' }}
+                      >
+                        <div className="text-center text-gray-400">
+                          <div className="text-4xl mb-2">🎨</div>
+                          <p className="text-sm">Template Preview</p>
+                        </div>
                       </div>
                     </div>
 
@@ -322,10 +338,26 @@ const Marketplace = () => {
                 ) : (
                   // List View
                   <>
-                    <div className="w-32 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <div className="text-center text-gray-400">
-                        <div className="text-2xl mb-1">🎨</div>
-                        <p className="text-xs">Preview</p>
+                    <div className="w-32 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {template.preview_image_url ? (
+                        <img 
+                          src={template.preview_image_url} 
+                          alt={template.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`w-full h-full flex items-center justify-center ${template.preview_image_url ? 'hidden' : 'flex'}`}
+                        style={{ display: template.preview_image_url ? 'none' : 'flex' }}
+                      >
+                        <div className="text-center text-gray-400">
+                          <div className="text-2xl mb-1">🎨</div>
+                          <p className="text-xs">Preview</p>
+                        </div>
                       </div>
                     </div>
 

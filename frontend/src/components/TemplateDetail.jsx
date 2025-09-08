@@ -227,11 +227,27 @@ const TemplateDetail = () => {
           {/* Template Preview */}
           <div className="lg:col-span-2">
             <GlassCard className="p-6">
-              <div className="aspect-video bg-gray-100 rounded-xl mb-6 flex items-center justify-center">
-                <div className="text-center text-gray-400">
-                  <div className="text-6xl mb-4">🎨</div>
-                  <p className="text-lg">Template Preview</p>
-                  <p className="text-sm">Interactive preview would be displayed here</p>
+              <div className="aspect-video bg-gray-100 rounded-xl mb-6 overflow-hidden">
+                {template.preview_image_url ? (
+                  <img 
+                    src={template.preview_image_url} 
+                    alt={template.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div 
+                  className={`w-full h-full flex items-center justify-center ${template.preview_image_url ? 'hidden' : 'flex'}`}
+                  style={{ display: template.preview_image_url ? 'none' : 'flex' }}
+                >
+                  <div className="text-center text-gray-400">
+                    <div className="text-6xl mb-4">🎨</div>
+                    <p className="text-lg">Template Preview</p>
+                    <p className="text-sm">Interactive preview would be displayed here</p>
+                  </div>
                 </div>
               </div>
 
