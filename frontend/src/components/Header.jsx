@@ -36,6 +36,7 @@ const Header = () => {
     { name: 'Home', href: '/' },
     { name: 'Design', href: '/editor' },
     { name: 'Products', href: '/all-products' },
+    { name: 'Marketplace', href: '/marketplace' },
     { name: 'Contact', href: '/contact' }
   ]
 
@@ -43,6 +44,7 @@ const Header = () => {
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Design', href: '/editor' },
     { name: 'Products', href: '/all-products' },
+    { name: 'Marketplace', href: '/marketplace' },
     { name: 'Contact', href: '/contact' }
   ]
 

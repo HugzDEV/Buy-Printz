@@ -23,6 +23,12 @@ import CheckEmail from './components/CheckEmail'
 import ResetPassword from './components/ResetPassword'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import Marketplace from './components/Marketplace'
+import TemplateDetail from './components/TemplateDetail'
+import CreatorRegistration from './components/CreatorRegistration'
+import CreatorDashboard from './components/CreatorDashboard'
+import TemplateUpload from './components/TemplateUpload'
+import CreatorEarnings from './components/CreatorEarnings'
 import authService from './services/auth'
 
 // Protected Route Component with Optimized Mobile Handling
@@ -159,6 +165,22 @@ function App() {
           </>
         } />
         
+        <Route path="/marketplace" element={
+          <>
+            <Header />
+            <Marketplace />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/marketplace/template/:templateId" element={
+          <>
+            <Header />
+            <TemplateDetail />
+            <Footer />
+          </>
+        } />
+        
         <Route path="/product/:productId" element={
           <>
             <Header />
@@ -235,6 +257,31 @@ function App() {
               <OrderConfirmation />
               <Footer />
             </>
+          </ProtectedRoute>
+        } />
+        
+        {/* Creator Routes */}
+        <Route path="/creator/register" element={
+          <ProtectedRoute>
+            <CreatorRegistration />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/creator/dashboard" element={
+          <ProtectedRoute>
+            <CreatorDashboard />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/creator/upload" element={
+          <ProtectedRoute>
+            <TemplateUpload />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/creator/earnings" element={
+          <ProtectedRoute>
+            <CreatorEarnings />
           </ProtectedRoute>
         } />
 

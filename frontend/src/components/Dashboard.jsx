@@ -59,7 +59,7 @@ const Dashboard = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const tabParam = searchParams.get('tab')
-    if (tabParam && ['overview', 'templates', 'orders', 'profile'].includes(tabParam)) {
+    if (tabParam && ['overview', 'templates', 'orders', 'creator', 'profile'].includes(tabParam)) {
       setActiveTab(tabParam)
     }
   }, [location.search])
@@ -703,6 +703,7 @@ const Dashboard = () => {
               { id: 'overview', name: 'Overview', shortName: 'Home', icon: BarChart3 },
               { id: 'templates', name: 'Templates', shortName: 'Templates', icon: Layout },
               { id: 'orders', name: 'Orders', shortName: 'Orders', icon: ShoppingBag },
+              { id: 'creator', name: 'Creator', shortName: 'Creator', icon: Crown },
               { id: 'profile', name: 'Profile', shortName: 'Profile', icon: Settings }
             ].map((tab) => (
               <button
@@ -1198,6 +1199,118 @@ const Dashboard = () => {
                 </Link>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Creator Tab */}
+        {activeTab === 'creator' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Creator Dashboard</h2>
+              <div className="flex items-center space-x-2 backdrop-blur-sm bg-white/20 rounded-xl px-4 py-2 border border-white/30">
+                <Crown className="w-6 h-6 text-purple-500" />
+                <span className="text-sm font-medium text-gray-700">Creator Tools</span>
+              </div>
+            </div>
+
+            {/* Creator Status Check */}
+            <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Crown className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Become a Creator</h3>
+                <p className="text-gray-600 mb-6">
+                  Start earning by selling your design templates to small businesses. Join our creator community and turn your designs into income!
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    to="/creator/register"
+                    className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Crown className="w-5 h-5 mr-2 inline" />
+                    Register as Creator
+                  </Link>
+                  <Link
+                    to="/creator/dashboard"
+                    className="bg-white/20 hover:bg-white/30 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-200 border border-white/30"
+                  >
+                    Creator Dashboard
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Creator Benefits */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <DollarSign className="w-6 h-6 text-green-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Earn 80%</h4>
+                <p className="text-gray-600 text-sm">
+                  Keep 80% of every template sale. Set your own prices from $3-$25.
+                </p>
+              </div>
+
+              <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <TrendingUp className="w-6 h-6 text-blue-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Weekly Payouts</h4>
+                <p className="text-gray-600 text-sm">
+                  Get paid weekly via Stripe. No minimum payout requirements.
+                </p>
+              </div>
+
+              <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                  <Star className="w-6 h-6 text-purple-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Support Small Business</h4>
+                <p className="text-gray-600 text-sm">
+                  Help small businesses get professional designs at affordable prices.
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Link
+                  to="/creator/register"
+                  className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                >
+                  <Crown className="w-5 h-5 text-purple-600 mr-3" />
+                  <span className="font-medium text-gray-800">Register</span>
+                </Link>
+                
+                <Link
+                  to="/creator/upload"
+                  className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                >
+                  <Plus className="w-5 h-5 text-blue-600 mr-3" />
+                  <span className="font-medium text-gray-800">Upload Template</span>
+                </Link>
+                
+                <Link
+                  to="/creator/earnings"
+                  className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                >
+                  <BarChart3 className="w-5 h-5 text-green-600 mr-3" />
+                  <span className="font-medium text-gray-800">View Earnings</span>
+                </Link>
+                
+                <Link
+                  to="/marketplace"
+                  className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                >
+                  <ShoppingCart className="w-5 h-5 text-orange-600 mr-3" />
+                  <span className="font-medium text-gray-800">Browse Marketplace</span>
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 
