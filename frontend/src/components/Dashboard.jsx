@@ -298,6 +298,43 @@ const Dashboard = () => {
     }
   }
 
+  const getProductIcon = (productType) => {
+    if (productType?.includes('banner') || productType?.includes('vinyl') || productType?.includes('mesh') || productType?.includes('fabric')) {
+      return <Package className="w-4 h-4" />
+    }
+    if (productType?.includes('tin') || productType?.includes('business_card')) {
+      return <Crown className="w-4 h-4" />
+    }
+    if (productType?.includes('tent') || productType?.includes('tradeshow')) {
+      return <Layers className="w-4 h-4" />
+    }
+    return <Package className="w-4 h-4" />
+  }
+
+  const getProductTypeColor = (productType, bannerType) => {
+    // Handle tin products
+    if (productType?.includes('tin') || productType?.includes('business_card')) {
+      if (bannerType?.includes('silver')) return 'bg-gray-100 text-gray-800'
+      if (bannerType?.includes('black')) return 'bg-gray-800 text-white'
+      if (bannerType?.includes('gold')) return 'bg-yellow-100 text-yellow-800'
+      return 'bg-purple-100 text-purple-800' // Default for tins
+    }
+    
+    // Handle tent products
+    if (productType?.includes('tent') || productType?.includes('tradeshow')) {
+      return 'bg-green-100 text-green-800'
+    }
+    
+    // Handle banner products (existing logic)
+    if (bannerType?.includes('vinyl')) return 'bg-blue-100 text-blue-800'
+    if (bannerType?.includes('mesh')) return 'bg-green-100 text-green-800'
+    if (bannerType?.includes('fabric')) return 'bg-purple-100 text-purple-800'
+    if (bannerType?.includes('indoor')) return 'bg-orange-100 text-orange-800'
+    
+    return 'bg-gray-100 text-gray-800'
+  }
+
+  // Keep the old function for backward compatibility
   const getBannerTypeColor = (bannerType) => {
     if (bannerType?.includes('vinyl')) return 'bg-blue-100 text-blue-800'
     if (bannerType?.includes('mesh')) return 'bg-green-100 text-green-800'
@@ -337,6 +374,10 @@ const Dashboard = () => {
     const matchesSearch = searchTerm === '' || 
       order.banner_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.banner_material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.product_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.tin_finish?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.tin_quantity?.toString().includes(searchTerm.toLowerCase()) ||
+      order.tent_size?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.id.toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter
@@ -702,7 +743,7 @@ const Dashboard = () => {
                     className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg sm:rounded-xl text-white font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
                   >
                     <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    New Banner
+                    New Design
                   </Link>
                   <button
                     onClick={loadDashboardData}
@@ -813,8 +854,8 @@ const Dashboard = () => {
                     {orders.slice(0, 5).map((order) => (
                       <div key={order.id} className="flex items-center justify-between p-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/30 hover:bg-white/40 transition-all duration-200">
                         <div className="flex items-center">
-                          <Package className="w-5 h-5 text-gray-500 mr-3" />
-                          <div>
+                          {getProductIcon(order.product_type)}
+                          <div className="ml-3">
                             <p className="font-medium text-gray-800">
                               {order.product_type} - Qty: {order.quantity}
                             </p>
@@ -909,7 +950,7 @@ const Dashboard = () => {
                                 {template.category}
                               </span>
                               {template.banner_type && (
-                                <span className={`inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-full border shadow-sm ${getBannerTypeColor(template.banner_type)}`}>
+                                <span className={`inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-full border shadow-sm ${getProductTypeColor(template.product_type, template.banner_type)}`}>
                                   <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-current rounded-full mr-1.5 sm:mr-2 opacity-60"></div>
                                   <span className="hidden sm:inline">{template.banner_type}</span>
                                   <span className="sm:hidden">{template.banner_type.split(' ')[0]}</span>
@@ -1061,13 +1102,17 @@ const Dashboard = () => {
                           <div className="backdrop-blur-sm bg-white/30 p-3 rounded-xl border border-white/30">
                             <div className="flex items-center text-xs text-gray-600 mb-1">
                               <Tag className="w-3 h-3 mr-1" />
-                              Banner Type
+                              {order.product_type?.includes('tin') ? 'Tin Finish' : 
+                               order.product_type?.includes('tent') ? 'Tent Type' : 'Banner Type'}
                             </div>
                             <p className="font-medium text-gray-900">
-                              {order.banner_material || order.product_type}
+                              {order.tin_finish || order.tent_size || order.banner_material || order.product_type}
                             </p>
                             {order.banner_finish && (
                               <p className="text-xs text-gray-600">{order.banner_finish} finish</p>
+                            )}
+                            {order.tin_quantity && (
+                              <p className="text-xs text-gray-600">{order.tin_quantity} units</p>
                             )}
                           </div>
                           
@@ -1319,15 +1364,15 @@ const Dashboard = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Material:</span>
-                        <span className="font-medium">{selectedOrder.banner_material || 'N/A'}</span>
+                        <span className="font-medium">{selectedOrder.banner_material || selectedOrder.tin_finish || selectedOrder.tent_size || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Finish:</span>
-                        <span className="font-medium">{selectedOrder.banner_finish || 'N/A'}</span>
+                        <span className="font-medium">{selectedOrder.banner_finish || selectedOrder.tin_finish || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Quantity:</span>
-                        <span className="font-medium">{selectedOrder.quantity}</span>
+                        <span className="font-medium">{selectedOrder.quantity || selectedOrder.tin_quantity || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -1349,7 +1394,7 @@ const Dashboard = () => {
                       {selectedOrder.banner_type && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Type:</span>
-                          <span className={`px-2 py-1 text-xs rounded-full font-medium ${getBannerTypeColor(selectedOrder.banner_type)}`}>
+                          <span className={`px-2 py-1 text-xs rounded-full font-medium ${getProductTypeColor(selectedOrder.product_type, selectedOrder.banner_type)}`}>
                             {selectedOrder.banner_type}
                           </span>
                         </div>

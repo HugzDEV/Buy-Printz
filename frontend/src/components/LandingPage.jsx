@@ -54,7 +54,7 @@ const LandingPage = () => {
       name: "Tradeshow Tents",
       price: "From $299",
       description: "Professional tradeshow tents with custom graphics for maximum event impact",
-      image: "/assets/images/Mesh Banner - BuyPrintz.jpg", // Placeholder - will need tent image
+      image: "/assets/images/tent_complete-buyprintz.jpg",
       features: ["10x10 & 10x20 sizes", "Custom graphics", "Complete package"],
       badge: "Coming Soon",
       category: "tent",
@@ -158,7 +158,7 @@ const LandingPage = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-24">
+      <section id="products" className="py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

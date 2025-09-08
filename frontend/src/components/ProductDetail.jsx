@@ -473,17 +473,278 @@ const ProductDetail = () => {
           "Use provided design templates when available"
         ]
       }
+    },
+    'tent-10x10': {
+      name: "10x10 Event Tent",
+      price: "From $299",
+      image: "/assets/images/tent_complete-buyprintz.jpg",
+      description: "The 10x10 Event Tent is the next level in outdoor advertising. Achieve 360 degrees of branding with a custom full fabric dye sub canopy and hardware package.\n\nCanopy is printed and sewn weather resistant tent polyester. Print your brand message on each of the four peaks and valance panels. Our large format full color capabilities take artwork seam to seam unlike competitor tents that rely on small vinyl applications.\n\nHeavy duty hex shape 40 mm. aluminum hardware gives the tent extra strength when exhibited outdoors, our frame is a serious upgrade from steel framed tents that bend and buckle easily. Telescopic legs allow you to adjust the height, and the interior lattice expands the tent interior with the crank of a handle. Each leg has a foot plate ready to be staked to the ground. (Ropes, stakes, and standard carrying bag included with hardware).",
+      spec: {
+        features: [
+          "360 degrees of branding coverage",
+          "Custom full fabric dye sub canopy",
+          "Heavy duty 40mm aluminum hex hardware",
+          "Telescopic legs with height adjustment",
+          "Interior lattice expansion system",
+          "Weather resistant waterproof fabric",
+          "Scratch resistant graphics",
+          "Professional tent hardware included"
+        ],
+        material: "6oz Tent Fabric (600x600 denier)",
+        frame: "40mm Aluminum Hex Hardware (1mm wall thickness)",
+        print: "Dye-Sublimation Graphic",
+        durability: "Weather resistant (waterproof coated fabric)",
+        weight: "51 lbs (43 lbs Hardware + 8 lbs Canopy)",
+        dimensions: {
+          shortest: "120\"w x 120\"d x 124.5\"h",
+          tallest: "120\"w x 120\"d x 137\"h"
+        },
+        included: "Ropes, stakes, and standard carrying bag",
+        optionalAccessories: [
+          "Carrying Bag w/ Wheels",
+          "Sandbags (Sand not included)",
+          "Reinforced Strip",
+          "Full Wall",
+          "Half Wall"
+        ]
+      },
+      fileSetup: {
+        acceptedFormats: ["JPEG", "PDF (single page only)"],
+        colorSpace: "CMYK",
+        resolution: "150dpi for raster images (More than enough for large format)",
+        maxFileSize: "300MB",
+        requirements: [
+          "Submit artwork built to ordered size - Scaled artwork is automatically detected and fit to order",
+          "Do not include crop marks or bleeds",
+          "Use provided design templates when available"
+        ],
+        additionalTips: [
+          "Do not submit with Pantones/Spot Colors - Convert to CMYK",
+          "Convert live fonts to outlines",
+          "Use provided design templates when available",
+          "Do not adjust artboard size",
+          "Do not reposition guidelines",
+          "Design on layer labelled 'Artwork'",
+          "Delete mask/guide layers when instructed by template"
+        ]
+      }
+    },
+    'tent-10x20': {
+      name: "10x20 Event Tent",
+      price: "From $499",
+      image: "/assets/images/full_10x20_tent-buyprintz.jpg",
+      description: "The 10x20 Event Tent provides maximum branding impact for major trade shows and outdoor events. This large format tent offers double the space of our 10x10 tent while maintaining the same professional quality and features.\n\nPerfect for companies that need maximum visibility and space at trade shows, outdoor events, festivals, and corporate gatherings. The larger footprint allows for more elaborate displays and increased foot traffic.\n\nSame heavy duty 40mm aluminum hex hardware and weather resistant fabric as our 10x10 tent, but with expanded dimensions for maximum impact.",
+      spec: {
+        features: [
+          "360 degrees of branding coverage",
+          "Custom full fabric dye sub canopy",
+          "Heavy duty 40mm aluminum hex hardware",
+          "Telescopic legs with height adjustment",
+          "Interior lattice expansion system",
+          "Weather resistant waterproof fabric",
+          "Scratch resistant graphics",
+          "Professional tent hardware included",
+          "Double the space of 10x10 tent"
+        ],
+        material: "6oz Tent Fabric (600x600 denier)",
+        frame: "40mm Aluminum Hex Hardware (1mm wall thickness)",
+        print: "Dye-Sublimation Graphic",
+        durability: "Weather resistant (waterproof coated fabric)",
+        weight: "85 lbs (Full Package)",
+        dimensions: {
+          shortest: "240\"w x 120\"d x 124.5\"h",
+          tallest: "240\"w x 120\"d x 137\"h"
+        },
+        included: "Ropes, stakes, and standard carrying bag",
+        optionalAccessories: [
+          "Carrying Bag w/ Wheels",
+          "Sandbags (Sand not included)",
+          "Reinforced Strip",
+          "Full Wall",
+          "Half Wall"
+        ]
+      },
+      fileSetup: {
+        acceptedFormats: ["JPEG", "PDF (single page only)"],
+        colorSpace: "CMYK",
+        resolution: "150dpi for raster images (More than enough for large format)",
+        maxFileSize: "300MB",
+        requirements: [
+          "Submit artwork built to ordered size - Scaled artwork is automatically detected and fit to order",
+          "Do not include crop marks or bleeds",
+          "Use provided design templates when available"
+        ],
+        additionalTips: [
+          "Do not submit with Pantones/Spot Colors - Convert to CMYK",
+          "Convert live fonts to outlines",
+          "Use provided design templates when available",
+          "Do not adjust artboard size",
+          "Do not reposition guidelines",
+          "Design on layer labelled 'Artwork'",
+          "Delete mask/guide layers when instructed by template"
+        ]
+      }
+    },
+    'tin-100-front-back': {
+      name: "Business Card Tin - 100 Units (Front + Back)",
+      price: "From $399",
+      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      description: "Premium aluminum business card tins with custom vinyl stickers on front and back surfaces. Perfect for professional networking and memorable business card storage.\n\nThese high-quality aluminum tins provide a premium feel and lasting impression. The custom vinyl stickers are professionally applied and designed to withstand daily use while maintaining their vibrant appearance.\n\nIdeal for real estate agents, financial advisors, consultants, and any professional who wants to make a lasting impression with their business cards.",
+      spec: {
+        features: [
+          "Premium aluminum construction",
+          "Custom vinyl stickers on front and back",
+          "Professional application process",
+          "Durable and long-lasting",
+          "Perfect for business networking",
+          "Memorable branding solution"
+        ],
+        material: "Premium Aluminum",
+        finish: "Silver/Black/Gold options available",
+        print: "Custom Vinyl Stickers",
+        durability: "Lifetime durability",
+        quantity: "100 units",
+        dimensions: "Standard business card tin size",
+        included: "Custom vinyl stickers, professional application",
+        vinylTypes: [
+          "Matte Vinyl - Professional, non-reflective finish",
+          "Gloss Vinyl - High-shine, eye-catching appearance",
+          "Metallic Vinyl - Premium metallic look",
+          "Clear Vinyl - Transparent overlay effect"
+        ]
+      },
+      fileSetup: {
+        acceptedFormats: ["JPEG", "PDF", "PNG"],
+        colorSpace: "CMYK",
+        resolution: "300dpi minimum for best quality",
+        maxFileSize: "50MB",
+        requirements: [
+          "Submit artwork for front and back designs",
+          "Provide high-resolution logo and text",
+          "Include contact information and branding elements"
+        ],
+        additionalTips: [
+          "Use high contrast colors for better visibility",
+          "Keep text readable at small sizes",
+          "Include your logo prominently",
+          "Consider your brand colors and style"
+        ]
+      }
+    },
+    'tin-250-front-back': {
+      name: "Business Card Tin - 250 Units (Front + Back)",
+      price: "From $749",
+      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      description: "Premium aluminum business card tins with custom vinyl stickers - perfect for larger networking events and businesses with high client volume.\n\nThis larger quantity option provides excellent value for businesses that attend multiple trade shows, conferences, or networking events throughout the year. The same premium quality and professional application as our 100-unit option.\n\nPerfect for established businesses, franchises, or companies with large sales teams who need a consistent, professional branding solution.",
+      spec: {
+        features: [
+          "Premium aluminum construction",
+          "Custom vinyl stickers on front and back",
+          "Professional application process",
+          "Durable and long-lasting",
+          "Perfect for business networking",
+          "Memorable branding solution",
+          "Bulk quantity pricing"
+        ],
+        material: "Premium Aluminum",
+        finish: "Silver/Black/Gold options available",
+        print: "Custom Vinyl Stickers",
+        durability: "Lifetime durability",
+        quantity: "250 units",
+        dimensions: "Standard business card tin size",
+        included: "Custom vinyl stickers, professional application",
+        vinylTypes: [
+          "Matte Vinyl - Professional, non-reflective finish",
+          "Gloss Vinyl - High-shine, eye-catching appearance",
+          "Metallic Vinyl - Premium metallic look",
+          "Clear Vinyl - Transparent overlay effect"
+        ]
+      },
+      fileSetup: {
+        acceptedFormats: ["JPEG", "PDF", "PNG"],
+        colorSpace: "CMYK",
+        resolution: "300dpi minimum for best quality",
+        maxFileSize: "50MB",
+        requirements: [
+          "Submit artwork for front and back designs",
+          "Provide high-resolution logo and text",
+          "Include contact information and branding elements"
+        ],
+        additionalTips: [
+          "Use high contrast colors for better visibility",
+          "Keep text readable at small sizes",
+          "Include your logo prominently",
+          "Consider your brand colors and style"
+        ]
+      }
+    },
+    'tin-100-all-sides': {
+      name: "Business Card Tin - 100 Units (All Sides)",
+      price: "From $499",
+      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      description: "Complete tin branding with custom vinyl stickers on all surfaces - front, back, inside, and lid. The ultimate branding solution for maximum impact.\n\nThis comprehensive branding package ensures your business information is visible from every angle. Perfect for high-end networking events where you want to make the strongest possible impression.\n\nIdeal for luxury brands, premium services, and professionals who want to showcase attention to detail and quality in every aspect of their business presentation.",
+      spec: {
+        features: [
+          "Premium aluminum construction",
+          "Custom vinyl stickers on all surfaces",
+          "Complete 360-degree branding",
+          "Professional application process",
+          "Durable and long-lasting",
+          "Maximum branding impact",
+          "Premium presentation"
+        ],
+        material: "Premium Aluminum",
+        finish: "Silver/Black/Gold options available",
+        print: "Custom Vinyl Stickers (All Sides)",
+        durability: "Lifetime durability",
+        quantity: "100 units",
+        dimensions: "Standard business card tin size",
+        included: "Custom vinyl stickers for all surfaces, professional application",
+        vinylTypes: [
+          "Matte Vinyl - Professional, non-reflective finish",
+          "Gloss Vinyl - High-shine, eye-catching appearance",
+          "Metallic Vinyl - Premium metallic look",
+          "Clear Vinyl - Transparent overlay effect"
+        ]
+      },
+      fileSetup: {
+        acceptedFormats: ["JPEG", "PDF", "PNG"],
+        colorSpace: "CMYK",
+        resolution: "300dpi minimum for best quality",
+        maxFileSize: "50MB",
+        requirements: [
+          "Submit artwork for all surfaces (front, back, inside, lid)",
+          "Provide high-resolution logo and text",
+          "Include contact information and branding elements",
+          "Consider different layouts for different surfaces"
+        ],
+        additionalTips: [
+          "Use high contrast colors for better visibility",
+          "Keep text readable at small sizes",
+          "Include your logo prominently",
+          "Consider your brand colors and style",
+          "Design cohesive layouts for all surfaces"
+        ]
+      }
     }
   }
 
   const product = productDetails[productId]
+
+  // Determine the correct back route based on product type
+  const getBackRoute = () => {
+    if (!product) return "/products"
+    if (productId?.startsWith('tent-')) return "/tent-products"
+    if (productId?.startsWith('tin-')) return "/tin-products"
+    return "/products"
+  }
 
   if (!product) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
-          <Link to="/products" className="text-primary-600 hover:text-primary-700">
+          <Link to={getBackRoute()} className="text-primary-600 hover:text-primary-700">
             Back to Products
           </Link>
         </div>
@@ -508,7 +769,7 @@ const ProductDetail = () => {
           <div className="relative container mx-auto px-4 max-w-7xl">
             <div className="flex items-center mb-8">
               <Link 
-                to="/products" 
+                to={getBackRoute()} 
                 className="flex items-center text-white hover:text-primary-100 transition-colors mr-6"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
@@ -524,16 +785,13 @@ const ProductDetail = () => {
                 <p className="text-2xl font-semibold text-primary-100 mb-6">
                   {product.price}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex justify-center">
                   <Link 
                     to={`/editor?product=${productId}`}
                     className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105 font-semibold justify-center"
                   >
                     Design This Product
                   </Link>
-                  <button className="bg-transparent border-2 border-white/80 backdrop-blur-sm text-white hover:bg-white/20 px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105 font-semibold">
-                    Get Quote
-                  </button>
                 </div>
               </div>
               
@@ -601,32 +859,100 @@ const ProductDetail = () => {
                       <p className="text-gray-700">{product.spec.material}</p>
                     </div>
 
+                    {product.spec.printOptions && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Print Options</h3>
+                        <ul className="space-y-1">
+                          {product.spec.printOptions.map((option, index) => (
+                            <li key={index} className="text-gray-700">• {option}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {product.spec.optionalMaterials && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Optional Materials</h3>
+                        <ul className="space-y-1">
+                          {product.spec.optionalMaterials.map((material, index) => (
+                            <li key={index} className="text-gray-700">• {material}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Print Options</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        {product.spec.optionalFinishing ? 'Optional Finishing' : 'Optional Accessories'}
+                      </h3>
                       <ul className="space-y-1">
-                        {product.spec.printOptions.map((option, index) => (
-                          <li key={index} className="text-gray-700">• {option}</li>
+                        {(product.spec.optionalFinishing || product.spec.optionalAccessories).map((item, index) => (
+                          <li key={index} className="text-gray-700">• {item}</li>
                         ))}
                       </ul>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Optional Materials</h3>
-                      <ul className="space-y-1">
-                        {product.spec.optionalMaterials.map((material, index) => (
-                          <li key={index} className="text-gray-700">• {material}</li>
-                        ))}
-                      </ul>
-                    </div>
+                    {/* Tent-specific specifications */}
+                    {product.spec.frame && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Frame</h3>
+                        <p className="text-gray-700">{product.spec.frame}</p>
+                      </div>
+                    )}
 
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Optional Finishing</h3>
-                      <ul className="space-y-1">
-                        {product.spec.optionalFinishing.map((finishing, index) => (
-                          <li key={index} className="text-gray-700">• {finishing}</li>
-                        ))}
-                      </ul>
-                    </div>
+                    {product.spec.weight && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Weight</h3>
+                        <p className="text-gray-700">{product.spec.weight}</p>
+                      </div>
+                    )}
+
+                    {product.spec.dimensions && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Dimensions</h3>
+                        {typeof product.spec.dimensions === 'object' ? (
+                          <div className="text-gray-700">
+                            <p><strong>Shortest:</strong> {product.spec.dimensions.shortest}</p>
+                            <p><strong>Tallest:</strong> {product.spec.dimensions.tallest}</p>
+                          </div>
+                        ) : (
+                          <p className="text-gray-700">{product.spec.dimensions}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {product.spec.included && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Included</h3>
+                        <p className="text-gray-700">{product.spec.included}</p>
+                      </div>
+                    )}
+
+                    {/* Tin-specific specifications */}
+                    {product.spec.quantity && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Quantity</h3>
+                        <p className="text-gray-700">{product.spec.quantity}</p>
+                      </div>
+                    )}
+
+                    {product.spec.finish && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Finish Options</h3>
+                        <p className="text-gray-700">{product.spec.finish}</p>
+                      </div>
+                    )}
+
+                    {product.spec.vinylTypes && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Available Vinyl Types</h3>
+                        <ul className="space-y-1">
+                          {product.spec.vinylTypes.map((vinyl, index) => (
+                            <li key={index} className="text-gray-700">• {vinyl}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

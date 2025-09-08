@@ -35,14 +35,14 @@ const Header = () => {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Design', href: '/editor' },
-    { name: 'Products', href: '/products' },
+    { name: 'Products', href: '/all-products' },
     { name: 'Contact', href: '/contact' }
   ]
 
   const authenticatedNavigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Design', href: '/editor' },
-    { name: 'Products', href: '/products' }
+    { name: 'Products', href: '/all-products' }
   ]
 
   const currentNavigation = user ? authenticatedNavigation : navigation

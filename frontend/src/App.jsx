@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import LandingPage from './components/LandingPage'
+import AllProducts from './components/AllProducts'
 import Products from './components/Products'
 import TinProducts from './components/TinProducts'
 import TentProducts from './components/TentProducts'
@@ -114,6 +115,14 @@ function App() {
           <>
             <Header />
             <LandingPage />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/all-products" element={
+          <>
+            <Header />
+            <AllProducts />
             <Footer />
           </>
         } />

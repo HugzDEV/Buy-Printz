@@ -388,7 +388,7 @@ const Products = () => {
           <p className="text-xl mb-8 text-primary-100 drop-shadow-md">
             Our experts are here to help you find the perfect banner solution for your needs
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Link 
               to="/editor" 
               className="bg-white/90 backdrop-blur-sm text-primary-600 hover:bg-white hover:shadow-xl text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 shadow-lg hover:scale-105"
@@ -396,12 +396,6 @@ const Products = () => {
               Start Designing
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <a 
-              href="#contact" 
-              className="bg-transparent border-2 border-white/80 backdrop-blur-sm text-white hover:bg-white/20 text-lg px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:scale-105"
-            >
-              Contact Expert
-            </a>
           </div>
         </div>
       </section>
