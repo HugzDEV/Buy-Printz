@@ -3220,6 +3220,14 @@ const BannerEditorNew = () => {
     }
   }, [])
 
+  // Ensure canvas size is properly set for tent products on initial load
+  useEffect(() => {
+    if (productType === 'tent' && currentSurface.startsWith('canopy_')) {
+      // Ensure canvas size includes valence for canopy surfaces
+      setCanvasSize({ width: 1160, height: 1049 })
+    }
+  }, [productType, currentSurface]) // Run when productType or currentSurface changes
+
   // Glass UI Header Component
   const GlassHeader = () => (
     <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 p-2 md:p-4">

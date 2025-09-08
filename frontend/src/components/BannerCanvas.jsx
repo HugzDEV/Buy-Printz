@@ -1695,18 +1695,51 @@ const BannerCanvas = ({
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
             {/* Mobile: Compact toolbar tools */}
             <div className="sm:hidden flex items-center gap-0.5 min-w-0 flex-shrink-0 flex-1 justify-end">
-              {/* Mobile: Compact Zoom Controls */}
-              <GlassButton onClick={zoomOut} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
-                <ZoomOut className="w-2.5 h-2.5" />
-              </GlassButton>
-              
-              <GlassButton onClick={resetZoom} className="px-1 py-1 text-xs min-w-[35px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
-                {Math.round(scale * 100)}%
-              </GlassButton>
-              
-              <GlassButton onClick={zoomIn} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Zoom In">
-                <ZoomIn className="w-2.5 h-2.5" />
-              </GlassButton>
+              {/* Mobile: Surface Navigation for Tins/Tents OR Zoom Controls for Banners */}
+              {(productType === 'tin' || productType === 'tent') ? (
+                <>
+                  <GlassButton 
+                    onClick={() => handleSurfaceNavigation('prev')} 
+                    disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
+                    className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
+                    title="Previous Surface"
+                  >
+                    <ArrowLeft className="w-2.5 h-2.5" />
+                  </GlassButton>
+                  
+                  {/* Surface Indicator */}
+                  <div className="px-1 py-1 bg-white/30 backdrop-blur-sm border border-white/30 rounded text-xs font-medium text-gray-800 min-w-[50px] text-center flex-shrink-0">
+                    {productType === 'tin' 
+                      ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
+                      : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+                    }
+                  </div>
+                  
+                  <GlassButton 
+                    onClick={() => handleSurfaceNavigation('next')} 
+                    disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
+                    className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
+                    title="Next Surface"
+                  >
+                    <ArrowRight className="w-2.5 h-2.5" />
+                  </GlassButton>
+                </>
+              ) : (
+                <>
+                  {/* Mobile: Compact Zoom Controls for Banners */}
+                  <GlassButton onClick={zoomOut} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
+                    <ZoomOut className="w-2.5 h-2.5" />
+                  </GlassButton>
+                  
+                  <GlassButton onClick={resetZoom} className="px-1 py-1 text-xs min-w-[35px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
+                    {Math.round(scale * 100)}%
+                  </GlassButton>
+                  
+                  <GlassButton onClick={zoomIn} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Zoom In">
+                    <ZoomIn className="w-2.5 h-2.5" />
+                  </GlassButton>
+                </>
+              )}
               
               <div className="w-px h-4 bg-white/20 mx-0.5 flex-shrink-0" />
               
