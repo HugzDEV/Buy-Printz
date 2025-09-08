@@ -13,6 +13,7 @@ import os
 import stripe
 from database import DatabaseManager
 from auth import get_current_user
+from generate_thumbnails import process_single_image, validate_image_file
 
 # Initialize router
 router = APIRouter(prefix="/api/creator-marketplace", tags=["creator-marketplace"])
@@ -863,3 +864,95 @@ async def get_creator_earnings(
             status_code=500,
             detail="Internal server error"
         )
+
+@router.post("/templates/generate-thumbnail")
+async def generate_template_thumbnail(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate a thumbnail for an uploaded template image"""
+    try:
+        # Validate file type
+        if not file.content_type or not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        # Create temporary file to process
+        temp_path = f"temp_{uuid.uuid4()}_{file.filename}"
+        
+        try:
+            # Save uploaded file temporarily
+            with open(temp_path, "wb") as buffer:
+                content = await file.read()
+                buffer.write(content)
+            
+            # Validate the image
+            is_valid, message = validate_image_file(temp_path)
+            if not is_valid:
+                raise HTTPException(status_code=400, detail=f"Invalid image: {message}")
+            
+            # Generate thumbnail
+            result = process_single_image(temp_path)
+            
+            if result['success']:
+                return {
+                    "success": True,
+                    "thumbnail_url": result['thumbnail_url'],
+                    "file_size": result['file_size'],
+                    "thumbnail_size": result['thumbnail_size'],
+                    "message": "Thumbnail generated successfully"
+                }
+            else:
+                raise HTTPException(status_code=500, detail=f"Failed to generate thumbnail: {result['error']}")
+        
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating thumbnail: {str(e)}")
+
+@router.post("/templates/validate-image")
+async def validate_template_image(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Validate an uploaded template image"""
+    try:
+        # Validate file type
+        if not file.content_type or not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        # Create temporary file to validate
+        temp_path = f"temp_{uuid.uuid4()}_{file.filename}"
+        
+        try:
+            # Save uploaded file temporarily
+            with open(temp_path, "wb") as buffer:
+                content = await file.read()
+                buffer.write(content)
+            
+            # Validate the image
+            is_valid, message = validate_image_file(temp_path)
+            file_size = os.path.getsize(temp_path)
+            
+            return {
+                "success": True,
+                "valid": is_valid,
+                "message": message,
+                "file_size": file_size,
+                "filename": file.filename,
+                "content_type": file.content_type
+            }
+        
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error validating image: {str(e)}")
