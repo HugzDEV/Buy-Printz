@@ -1101,3 +1101,81 @@ async def process_order_templates(
     except Exception as e:
         print(f"Error processing order templates: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/templates/{template_id}/protected-image")
+async def get_protected_image(
+    template_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Serve protected template images with access controls"""
+    try:
+        # Get template details
+        template = await db_manager.get_template_by_id(template_id)
+        if not template:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        # Check if user has purchased this template
+        purchase = await db_manager.get_template_purchase(template_id, current_user['id'])
+        
+        # If not purchased, serve low-quality preview only
+        if not purchase:
+            # Return a low-quality, heavily watermarked version
+            return {
+                "success": True,
+                "image_url": template.get('preview_image_url'),
+                "is_purchased": False,
+                "message": "Preview only - purchase required for full quality"
+            }
+        
+        # If purchased, serve full quality image
+        return {
+            "success": True,
+            "image_url": template.get('preview_image_url'),
+            "high_res_url": template.get('preview_image_url_high_res'),
+            "is_purchased": True,
+            "message": "Full access granted"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error serving protected image: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/templates/{template_id}/download-url")
+async def get_download_url(
+    template_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get secure download URL for purchased templates"""
+    try:
+        # Check if user has purchased this template
+        purchase = await db_manager.get_template_purchase(template_id, current_user['id'])
+        if not purchase:
+            raise HTTPException(
+                status_code=403,
+                detail="Template not purchased. Please purchase the template first."
+            )
+        
+        # Get template details
+        template = await db_manager.get_template_by_id(template_id)
+        if not template:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        # Generate secure download URL (you might want to add expiration, etc.)
+        download_url = template.get('download_url') or template.get('preview_image_url')
+        
+        return {
+            "success": True,
+            "download_url": download_url,
+            "template_name": template.get('name'),
+            "purchased_at": purchase.get('created_at')
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting download URL: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")

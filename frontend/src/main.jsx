@@ -6,6 +6,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Toaster } from 'react-hot-toast'
 import App from './App.jsx'
 import './index.css'
+import { addGlobalDownloadProtection } from './utils/downloadProtection'
 
 // Initialize Stripe
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
@@ -14,6 +15,9 @@ const stripePromise = stripeKey ? loadStripe(stripeKey) : null
 if (!stripeKey) {
   console.warn('VITE_STRIPE_PUBLISHABLE_KEY not found. Payment functionality will be disabled.')
 }
+
+// Initialize download protection
+addGlobalDownloadProtection()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
