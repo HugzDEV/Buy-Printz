@@ -47,18 +47,18 @@ const WideFeatureCard3D = ({
           style={{ background: selectedColor.background }}
         >
           <span className="feature-card-title">{title}</span>
-          {description && (
-            <p className="feature-card-content">{description}</p>
-          )}
-          {options.length > 0 && (
-            <div className="feature-options">
-              {options.map((option, index) => (
-                <div key={index} className="feature-option">
-                  {option}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="feature-card-content">
+            {description && <p>{description}</p>}
+            {options.length > 0 && (
+              <div className="feature-options">
+                {options.map((option, index) => (
+                  <div key={index} className="feature-option-item">
+                    {option}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         {icons.map((icon, index) => (
           <div 
@@ -66,7 +66,8 @@ const WideFeatureCard3D = ({
             className="feature-icon-box"
             style={{ 
               borderColor: selectedColor.border,
-              '--icon-color': selectedColor.icon
+              '--icon-color': selectedColor.icon,
+              right: `${60 + (index * 70)}px`
             }}
           >
             {icon}
@@ -87,7 +88,8 @@ const WideFeatureCard3D = ({
           transform-style: preserve-3d;
           background: rgba(1, 14, 49, 0.1);
           width: 100%;
-          height: 300px;
+          min-height: 300px;
+          height: auto;
           box-shadow: rgba(142, 142, 142, 0.3) 0px 30px 30px -10px;
           transition: all 0.5s ease-in-out;
           position: relative;
@@ -102,7 +104,8 @@ const WideFeatureCard3D = ({
           padding: 60px 25px 25px 25px;
           transform-style: preserve-3d;
           margin-top: 50px;
-          height: calc(100% - 50px);
+          min-height: calc(100% - 50px);
+          height: auto;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -135,24 +138,11 @@ const WideFeatureCard3D = ({
         }
 
         .feature-options {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          margin-top: 15px;
+          margin-top: 10px;
         }
 
-        .feature-content-box .feature-option {
-          font-size: 12px;
-          font-weight: 700;
-          color: #f2f2f2;
-          transition: all 0.5s ease-in-out;
-          transform: translate3d(0px, 0px, 30px);
-          cursor: pointer;
-        }
-
-        .feature-content-box .feature-option:hover {
-          transform: translate3d(0px, 0px, 60px);
-          color: white;
+        .feature-content-box .feature-option-item {
+          margin: 4px 0;
         }
 
         .feature-icon-box {
@@ -171,21 +161,6 @@ const WideFeatureCard3D = ({
           justify-content: center;
         }
 
-        .feature-icon-box:nth-child(3) {
-          right: 100px;
-        }
-
-        .feature-icon-box:nth-child(4) {
-          right: 170px;
-        }
-
-        .feature-icon-box:nth-child(5) {
-          right: 240px;
-        }
-
-        .feature-icon-box:nth-child(6) {
-          right: 310px;
-        }
 
         .feature-icon-box svg {
           color: var(--icon-color, #00D755);

@@ -69,50 +69,50 @@ const LandingPage = () => {
       <SEOHead {...seoConfigs.home} />
       <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900">
       {/* Hero Section */}
-      <section className="text-white py-20">
+      <section className="text-white py-12 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">
             Professional Business Branding Solutions
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-primary-100">
+          <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-primary-100 max-w-4xl mx-auto px-4">
             Create custom banners, business card tins, and tradeshow tents with professional design tools
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center px-4">
             <Link 
               to="/editor" 
               onClick={() => {
                 sessionStorage.setItem('newDesign', 'true')
                 sessionStorage.setItem('fromLandingPage', 'true')
               }}
-              className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
+              className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center gap-2 rounded-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 w-full sm:w-auto sm:min-w-[180px]"
             >
               Start Designing
-              <ArrowRight className="w-6 h-6" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </Link>
             <Link 
               to="/all-products"
-              className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-xl px-12 py-6 rounded-2xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-3 min-w-[240px]"
+              className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[180px]"
             >
               View Products
-              <Star className="w-6 h-6" />
+              <Star className="w-5 h-5 sm:w-6 sm:h-6" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Featured Products Section - Enhanced with 3D Interactive Cards */}
-      <section id="products" className="py-24">
+      <section id="products" className="py-12 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <div className="text-center mb-12 md:mb-20">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
               Our Business Branding Solutions
             </h2>
-            <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed px-4">
               Professional banners, premium business card tins, and tradeshow tents - everything you need for complete business branding
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-12 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12 max-w-7xl mx-auto">
             {featuredProducts.map((product, index) => (
               <ProductCard3D
                 key={index}
@@ -130,18 +130,18 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24">
+      <section className="py-12 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <div className="text-center mb-12 md:mb-20">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
               Why Choose BuyPrintz?
             </h2>
-            <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed px-4">
               Professional-grade design tools combined with premium printing materials and lightning-fast delivery
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             {features.map((feature, index) => (
               <FeatureCard3D
                 key={index}
@@ -156,27 +156,27 @@ const LandingPage = () => {
       </section>
 
       {/* Delivery Promise Section */}
-      <section className="py-16">
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 md:mb-6">
               ⚡ Lightning Fast Delivery Promise
             </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto px-4">
               Choose your delivery speed based on your timeline needs
             </p>
           </div>
           
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <WideFeatureCard3D
               title="⚡ Lightning Fast Delivery Promise"
               description="Choose your delivery speed based on your timeline needs"
               icons={[
-                <Clock className="w-7 h-7" />,
-                <Package className="w-7 h-7" />,
-                <Target className="w-7 h-7" />,
-                <MapPin className="w-7 h-7" />,
-                <CheckCircle2 className="w-7 h-7" />
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />,
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />,
+                <Target className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />,
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />,
+                <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
               ]}
               options={[
                 "🚀 SUPER RUSH: Order by 12:00 PM → 2 business days (Mon-Fri delivery)",
@@ -194,33 +194,33 @@ const LandingPage = () => {
 
 
       {/* CTA Section */}
-      <section className="py-24 text-white relative overflow-hidden">
+      <section className="py-12 md:py-24 text-white relative overflow-hidden">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-5xl md:text-6xl font-bold mb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8 leading-tight">
               Ready to Create Your Perfect Branding?
             </h2>
-            <p className="text-2xl mb-12 text-white/90 leading-relaxed">
+            <p className="text-lg sm:text-xl md:text-2xl mb-8 md:mb-12 text-white/90 leading-relaxed px-4">
               Start designing with our professional tools and get your order in minutes
             </p>
-            <div className="flex flex-col sm:flex-row gap-8 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-8 justify-center items-center px-4">
               <Link 
                 to="/editor" 
                 onClick={() => {
                   sessionStorage.setItem('newDesign', 'true')
                   sessionStorage.setItem('fromLandingPage', 'true')
                 }}
-                className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-2xl px-14 py-7 inline-flex items-center justify-center gap-4 rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[280px] hover:scale-105"
+                className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-lg sm:text-xl px-8 sm:px-10 py-4 sm:py-5 inline-flex items-center justify-center gap-2 sm:gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 w-full sm:w-auto sm:min-w-[200px] hover:scale-105"
               >
                 Start Designing Now
-                <ArrowRight className="w-7 h-7" />
+                <ArrowRight className="w-6 h-6 sm:w-7 sm:h-7" />
               </Link>
               <Link 
                 to="/all-products" 
-                className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-2xl px-14 py-7 rounded-3xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-4 min-w-[280px] hover:scale-105"
+                className="neumorphic-button-hero-secondary bg-transparent border-2 border-buyprint-brand text-buyprint-brand hover:bg-buyprint-brand hover:text-white text-lg sm:text-xl px-8 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold transition-all duration-300 inline-flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto sm:min-w-[200px] hover:scale-105"
               >
                 Browse Products
-                <Palette className="w-7 h-7" />
+                <Palette className="w-6 h-6 sm:w-7 sm:h-7" />
               </Link>
             </div>
           </div>
