@@ -16,6 +16,7 @@ const ProtectedImage = ({
   const [showFullImage, setShowFullImage] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const imgRef = useRef(null)
   const containerRef = useRef(null)
 
@@ -95,6 +96,18 @@ const ProtectedImage = ({
     return false
   }
 
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Add protection event listeners
   useEffect(() => {
     const container = containerRef.current
@@ -162,7 +175,7 @@ const ProtectedImage = ({
         src={src}
         alt={alt}
         className={`w-full h-full object-cover transition-all duration-300 ${
-          showFullImage ? 'blur-none' : 'blur-sm'
+          showFullImage || isMobile ? 'blur-none' : 'blur-sm'
         }`}
         onLoad={handleImageLoad}
         onError={handleImageError}
@@ -171,7 +184,7 @@ const ProtectedImage = ({
         onDrag={preventDrag}
         onSelectStart={preventSelection}
         style={{
-          filter: showFullImage ? 'none' : 'blur(8px) brightness(0.7)',
+          filter: showFullImage || isMobile ? 'none' : 'blur(8px) brightness(0.7)',
           userSelect: 'none',
           webkitUserSelect: 'none',
           mozUserSelect: 'none',
@@ -226,8 +239,8 @@ const ProtectedImage = ({
         />
       )}
 
-      {/* Protection Overlay */}
-      {!showFullImage && imageLoaded && (
+      {/* Protection Overlay - Hidden on mobile */}
+      {!showFullImage && imageLoaded && !isMobile && (
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-auto">
           <div className="text-center text-white">
             <Lock className="w-8 h-8 mx-auto mb-2 opacity-80" />
@@ -255,8 +268,8 @@ const ProtectedImage = ({
         </div>
       )}
 
-      {/* Hide Button */}
-      {showFullImage && (
+      {/* Hide Button - Hidden on mobile */}
+      {showFullImage && !isMobile && (
         <button
           onClick={toggleImageVisibility}
           className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 touch-manipulation"
