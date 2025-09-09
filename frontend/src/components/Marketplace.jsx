@@ -15,6 +15,8 @@ import {
   Loader2
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
+import ProtectedImage from './ProtectedImage'
+import useImageProtection from '../hooks/useImageProtection'
 import authService from '../services/auth'
 
 const Marketplace = () => {
@@ -30,6 +32,9 @@ const Marketplace = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [totalTemplates, setTotalTemplates] = useState(0)
+
+  // Enable image protection
+  useImageProtection()
 
   const categories = [
     'Restaurant & Food',
@@ -47,6 +52,7 @@ const Marketplace = () => {
     setHasMore(true)
     loadTemplates(0, true)
   }, [selectedCategory, priceRange])
+
 
   const loadTemplates = async (page = 0, reset = false) => {
     try {
@@ -313,10 +319,13 @@ const Marketplace = () => {
                     {/* Template Preview */}
                     <div className="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
                       {template.preview_image_url ? (
-                        <img 
-                          src={template.preview_image_url} 
+                        <ProtectedImage
+                          src={template.preview_image_url}
                           alt={template.name}
                           className="w-full h-full object-cover"
+                          watermark={true}
+                          watermarkText="BuyPrintz"
+                          watermarkPosition="bottom-right"
                           onError={(e) => {
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'flex';
@@ -382,10 +391,13 @@ const Marketplace = () => {
                   <>
                     <div className="w-full sm:w-32 h-24 sm:h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {template.preview_image_url ? (
-                        <img 
-                          src={template.preview_image_url} 
+                        <ProtectedImage
+                          src={template.preview_image_url}
                           alt={template.name}
                           className="w-full h-full object-cover"
+                          watermark={true}
+                          watermarkText="BP"
+                          watermarkPosition="bottom-right"
                           onError={(e) => {
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'flex';

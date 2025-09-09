@@ -17,6 +17,8 @@ import {
   Calendar
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
+import ProtectedImage from './ProtectedImage'
+import useImageProtection from '../hooks/useImageProtection'
 import authService from '../services/auth'
 import PaymentModal from './PaymentModal'
 
@@ -28,6 +30,9 @@ const TemplateDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [purchasing, setPurchasing] = useState(false)
+
+  // Enable image protection
+  useImageProtection()
   const [purchaseSuccess, setPurchaseSuccess] = useState(false)
   const [alreadyPurchased, setAlreadyPurchased] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -208,10 +213,13 @@ const TemplateDetail = () => {
             <GlassCard className="p-6">
               <div className="aspect-video bg-gray-100 rounded-xl mb-6 overflow-hidden">
                 {template.preview_image_url ? (
-                  <img 
-                    src={template.preview_image_url} 
+                  <ProtectedImage
+                    src={template.preview_image_url}
                     alt={template.name}
                     className="w-full h-full object-cover"
+                    watermark={true}
+                    watermarkText="BuyPrintz"
+                    watermarkPosition="center"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';
