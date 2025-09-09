@@ -2392,10 +2392,19 @@ const BannerEditorNew = () => {
             
             // Preload the image to ensure it loads properly
             const img = new window.Image()
+            img.crossOrigin = 'anonymous'
             img.onload = () => {
               console.log('🎨 Marketplace template image loaded successfully')
               console.log('🎨 Product type after loading:', productType) // Should be unchanged
-              setElements([imageElement])
+              
+              // Update the image element with the loaded image object
+              const loadedImageElement = {
+                ...imageElement,
+                image: img, // Konva needs the HTML Image object, not just src
+                imagePath: templateData.template_file // Keep the path for reference
+              }
+              
+              setElements([loadedImageElement])
               setSelectedId(null)
             }
             img.onerror = (error) => {
