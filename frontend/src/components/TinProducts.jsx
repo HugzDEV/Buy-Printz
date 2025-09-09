@@ -2,38 +2,39 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Star, Truck, Award, Clock, Sparkles, ArrowLeft, Crown, Package, Layers } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
+import { ProductCard3D } from './ui'
 
 const TinProducts = () => {
   const tinFinishes = [
     {
       id: 'silver',
-      name: "Silver",
+      title: "Silver",
       price: "$399",
       description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking",
       image: "/assets/images/silvertin-buyprintz.jpg",
-      features: ["Premium silver aluminum", "Custom vinyl stickers", "Professional finish"],
-      bestseller: true,
-      icon: <Package className="w-8 h-8" />
+      features: ["Premium silver aluminum", "Custom vinyl stickers", "Professional finish", "Memorable branding"],
+      link: "/product/silver-tin",
+      bestseller: true
     },
     {
       id: 'black',
-      name: "Black",
+      title: "Black",
       price: "$425",
       description: "Sleek black aluminum business card tins with custom vinyl stickers - modern and sophisticated",
       image: "/assets/images/black tins-buyprintz.jpg",
-      features: ["Premium black aluminum", "Custom vinyl stickers", "Modern finish"],
-      popular: true,
-      icon: <Layers className="w-8 h-8" />
+      features: ["Premium black aluminum", "Custom vinyl stickers", "Modern finish", "Professional look"],
+      link: "/product/black-tin",
+      popular: true
     },
     {
       id: 'gold',
-      name: "Gold",
+      title: "Gold",
       price: "$450",
       description: "Luxurious gold aluminum business card tins with custom vinyl stickers - premium and elegant",
       image: "/assets/images/gold tins-buyprintz.jpg",
-      features: ["Premium gold aluminum", "Custom vinyl stickers", "Luxury finish"],
-      premium: true,
-      icon: <Crown className="w-8 h-8" />
+      features: ["Premium gold aluminum", "Custom vinyl stickers", "Luxury finish", "Premium quality"],
+      link: "/product/gold-tin",
+      premium: true
     }
   ]
 
@@ -126,62 +127,15 @@ const TinProducts = () => {
             
             <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-12">
               {tinFinishes.map((finish) => (
-                <div key={finish.id} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col">
-                  <div className="relative overflow-hidden rounded-t-3xl">
-                    <img 
-                      src={finish.image} 
-                      alt={`${finish.name} Business Card Tin`}
-                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute top-4 right-4">
-                      {finish.bestseller && (
-                        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                          Best Seller
-                        </span>
-                      )}
-                      {finish.popular && (
-                        <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                          Popular
-                        </span>
-                      )}
-                      {finish.premium && (
-                        <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                          Premium
-                        </span>
-                      )}
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </div>
-                  
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="flex items-center mb-4">
-                      <div className="text-blue-600 mr-3">
-                        {finish.icon}
-                      </div>
-                      <h3 className="text-2xl font-bold text-gray-900">{finish.name}</h3>
-                    </div>
-                    
-                    <p className="text-gray-600 mb-4 flex-grow">{finish.description}</p>
-                    
-                    <div className="space-y-3 mb-6">
-                      {finish.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                          <span className="text-sm text-gray-600">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="text-3xl font-bold text-blue-600">{finish.price}</div>
-                      <div className="flex items-center gap-1 text-yellow-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
-                        ))}
-                        <span className="text-sm text-gray-600 ml-1">(4.9)</span>
-                      </div>
-                    </div>
-                  </div>
+                <div key={finish.id} className="parent">
+                  <ProductCard3D
+                    title={finish.title}
+                    price={finish.price}
+                    description={finish.description}
+                    image={finish.image}
+                    features={finish.features}
+                    link={finish.link}
+                  />
                 </div>
               ))}
             </div>
@@ -220,7 +174,7 @@ const TinProducts = () => {
                 
                 <Link
                   to="/editor?product=tin"
-                  className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold text-xl px-8 py-6 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
+                  className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-buyprint-brand to-buyprint-600 hover:from-buyprint-600 hover:to-buyprint-700 text-white font-bold text-xl px-8 py-6 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
                 >
                   <Sparkles className="w-6 h-6" />
                   Design Now
