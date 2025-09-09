@@ -1063,7 +1063,7 @@ const TinCheckout = () => {
                 <button
                   onClick={handleSubmitOrder}
                   disabled={loading || !customerInfo.name || !customerInfo.email}
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 active:scale-95 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:transform-none"
+                  className="flex-1 px-6 py-3 bg-buyprint-brand hover:bg-buyprint-600 active:bg-buyprint-700 active:scale-95 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-buyprint-brand focus:ring-offset-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {loading ? (
                     <>
@@ -1151,7 +1151,7 @@ const TinCheckout = () => {
                 <button
                   onClick={handleSubmitOrder}
                   disabled={loading || !customerInfo.name || !customerInfo.email}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-buyprint-brand to-buyprint-600 hover:from-buyprint-600 hover:to-buyprint-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
