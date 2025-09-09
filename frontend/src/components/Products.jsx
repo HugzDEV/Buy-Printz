@@ -300,6 +300,7 @@ const Products = () => {
                   image={product.image}
                   features={product.features}
                   link={product.link}
+                  color="yellow"
                 />
               </div>
             ))}

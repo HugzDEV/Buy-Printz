@@ -202,6 +202,7 @@ const TentProducts = () => {
                   image={product.image}
                   features={product.features}
                   link={product.link}
+                  color="red"
                 />
               </div>
             ))}

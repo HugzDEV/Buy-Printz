@@ -78,6 +78,7 @@ const AllProducts = () => {
                     image={product.image}
                     features={product.features}
                     link={product.link}
+                    color={index === 0 ? "yellow" : index === 1 ? "emerald" : "red"}
                   />
                 </div>
               ))}

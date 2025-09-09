@@ -135,6 +135,7 @@ const TinProducts = () => {
                     image={finish.image}
                     features={finish.features}
                     link={finish.link}
+                    color="emerald"
                   />
                 </div>
               ))}

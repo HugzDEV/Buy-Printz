@@ -84,7 +84,7 @@ const WideFeatureCard3D = ({
 
         .feature-card {
           padding-top: 50px;
-          border: 3px solid rgba(1, 14, 49, 0.8);
+          border: 3px solid rgba(255, 255, 255, 0.3);
           transform-style: preserve-3d;
           background: rgba(1, 14, 49, 0.1);
           width: 100%;
