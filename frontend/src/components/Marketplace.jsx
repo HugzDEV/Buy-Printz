@@ -185,7 +185,7 @@ const Marketplace = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-6 mb-8">
+        <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-4 sm:p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <form onSubmit={handleSearch} className="flex-1">
@@ -214,7 +214,7 @@ const Marketplace = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-3 rounded-xl transition-all duration-200 backdrop-blur-sm ${
+                className={`p-2 sm:p-3 rounded-xl transition-all duration-200 backdrop-blur-sm ${
                   viewMode === 'grid' 
                     ? 'bg-buyprint-brand/20 border border-buyprint-brand/30 text-buyprint-brand' 
                     : 'bg-white/20 hover:bg-white/30 border border-white/30 text-gray-700'
@@ -224,7 +224,7 @@ const Marketplace = () => {
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-3 rounded-xl transition-all duration-200 backdrop-blur-sm ${
+                className={`p-2 sm:p-3 rounded-xl transition-all duration-200 backdrop-blur-sm ${
                   viewMode === 'list' 
                     ? 'bg-buyprint-brand/20 border border-buyprint-brand/30 text-buyprint-brand' 
                     : 'bg-white/20 hover:bg-white/30 border border-white/30 text-gray-700'
@@ -306,7 +306,7 @@ const Marketplace = () => {
         ) : (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
             {templates.map((template) => (
-              <div key={template.id} className={`backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-6 group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 ${viewMode === 'list' ? 'flex items-center gap-6' : ''}`}>
+              <div key={template.id} className={`backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-4 sm:p-6 group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 ${viewMode === 'list' ? 'flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6' : ''}`}>
                 {viewMode === 'grid' ? (
                   // Grid View
                   <>
@@ -380,7 +380,7 @@ const Marketplace = () => {
                 ) : (
                   // List View
                   <>
-                    <div className="w-32 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="w-full sm:w-32 h-24 sm:h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {template.preview_image_url ? (
                         <img 
                           src={template.preview_image_url} 
@@ -403,26 +403,26 @@ const Marketplace = () => {
                       </div>
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0 w-full sm:w-auto">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 gap-2">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-gray-900 mb-1">
+                          <h3 className="font-bold text-gray-900 mb-1 line-clamp-2">
                             {template.name}
                           </h3>
                           <p className="text-sm text-gray-600 line-clamp-2">
                             {template.description}
                           </p>
                         </div>
-                        <span className="font-bold text-lg text-gray-900 ml-4">
+                        <span className="font-bold text-lg text-gray-900 sm:ml-4 self-start sm:self-auto">
                           {formatCurrency(template.price)}
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 gap-2">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                           <span className="flex items-center">
                             <User className="w-3 h-3 mr-1" />
-                            {template.creators?.display_name || 'Unknown'}
+                            <span className="truncate">{template.creators?.display_name || 'Unknown'}</span>
                           </span>
                           <span className="flex items-center">
                             <Eye className="w-3 h-3 mr-1" />
@@ -430,7 +430,7 @@ const Marketplace = () => {
                           </span>
                           <span className="flex items-center">
                             <Tag className="w-3 h-3 mr-1" />
-                            {template.category}
+                            <span className="truncate">{template.category}</span>
                           </span>
                         </div>
                         <div className="flex items-center">
@@ -444,10 +444,11 @@ const Marketplace = () => {
 
                     <button
                       onClick={() => window.location.href = `/marketplace/template/${template.id}`}
-                      className="px-4 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl flex-shrink-0"
+                      className="w-full sm:w-auto px-4 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl flex-shrink-0"
                     >
                       <ShoppingCart className="w-4 h-4" />
-                      View
+                      <span className="sm:hidden">View Details</span>
+                      <span className="hidden sm:inline">View</span>
                     </button>
                   </>
                 )}
@@ -462,15 +463,19 @@ const Marketplace = () => {
             <button 
               onClick={loadMoreTemplates}
               disabled={loadingMore}
-              className="px-8 py-4 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl min-w-[200px] mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 sm:px-8 py-3 sm:py-4 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl w-full sm:w-auto sm:min-w-[200px] mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loadingMore ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Loading More...
+                  <span className="sm:hidden">Loading...</span>
+                  <span className="hidden sm:inline">Loading More...</span>
                 </>
               ) : (
-                `Load More Templates (${totalTemplates - templates.length} remaining)`
+                <>
+                  <span className="sm:hidden">Load More ({totalTemplates - templates.length})</span>
+                  <span className="hidden sm:inline">Load More Templates ({totalTemplates - templates.length} remaining)</span>
+                </>
               )}
             </button>
           </div>
