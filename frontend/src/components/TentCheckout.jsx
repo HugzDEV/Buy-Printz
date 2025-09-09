@@ -161,6 +161,12 @@ const TentCheckout = () => {
   }
 
   const totalPrice = calculateTentPrice()
+  
+  // Calculate marketplace template costs
+  const marketplaceCost = orderData?.marketplace_templates ? 
+    orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
+  
+  const finalTotalPrice = totalPrice + marketplaceCost
 
   // Handle accessory selection
   const handleAccessoryToggle = (accessoryId) => {
@@ -203,7 +209,7 @@ const TentCheckout = () => {
           'Authorization': `Bearer ${authService.getToken()}`
         },
         body: JSON.stringify({
-          amount: Math.round(totalPrice * 100), // Convert to cents
+          amount: Math.round(finalTotalPrice * 100), // Convert to cents
           currency: 'usd',
           metadata: {
             product_type: 'tradeshow_tent',
@@ -635,10 +641,20 @@ const TentCheckout = () => {
                     ) : null
                   })}
                   
+                  {/* Marketplace Templates */}
+                  {orderData?.marketplace_templates && orderData.marketplace_templates.length > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Marketplace Templates:</span>
+                      <span className="font-medium text-buyprint-brand">
+                        +${marketplaceCost.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between text-lg font-semibold">
                       <span>Total</span>
-                      <span>${totalPrice.toFixed(2)}</span>
+                      <span>${finalTotalPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -656,7 +672,7 @@ const TentCheckout = () => {
                   ) : (
                     <>
                       <Lock className="w-4 h-4" />
-                      Complete Order - ${totalPrice.toFixed(2)}
+                      Complete Order - ${finalTotalPrice.toFixed(2)}
                     </>
                   )}
                 </button>

@@ -266,7 +266,12 @@ const TinCheckout = () => {
   
   const tinBasePrice = calculateTinPrice()
   const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
-  const totalAmount = tinBasePrice + shippingCost
+  
+  // Calculate marketplace template costs
+  const marketplaceCost = orderData?.marketplace_templates ? 
+    orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
+  
+  const totalAmount = tinBasePrice + shippingCost + marketplaceCost
 
   useEffect(() => {
     const savedOrderData = sessionStorage.getItem('orderData')
@@ -988,6 +993,18 @@ const TinCheckout = () => {
                       }
                     </span>
                   </div>
+                  
+                  {/* Marketplace Templates */}
+                  {orderData?.marketplace_templates && orderData.marketplace_templates.length > 0 && (
+                    <>
+                      {orderData.marketplace_templates.map((template, index) => (
+                        <div key={index} className="flex justify-between">
+                          <span className="text-gray-600">Marketplace Template:</span>
+                          <span className="font-medium text-buyprint-brand">+${template.price}</span>
+                        </div>
+                      ))}
+                    </>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
@@ -1104,6 +1121,16 @@ const TinCheckout = () => {
                       {tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)?.label}
                     </span>
                   </div>
+                  
+                  {/* Marketplace Templates in sidebar */}
+                  {orderData?.marketplace_templates && orderData.marketplace_templates.length > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Marketplace Templates:</span>
+                      <span className="font-medium text-buyprint-brand">
+                        +${marketplaceCost.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>

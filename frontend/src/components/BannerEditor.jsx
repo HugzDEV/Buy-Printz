@@ -98,6 +98,9 @@ const BannerEditorNew = () => {
   
   // Tour state
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false)
+  
+  // Marketplace templates tracking
+  const [marketplaceTemplates, setMarketplaceTemplates] = useState([])
   const [showTour, setShowTour] = useState(false)
   
   
@@ -2356,6 +2359,24 @@ const BannerEditorNew = () => {
       console.log('🎨 Loading marketplace template:', template.name)
       console.log('🎨 Marketplace template will preserve current product type:', productType)
       
+      // Track marketplace template for pricing
+      const marketplaceTemplate = {
+        id: template.id,
+        name: template.name,
+        price: template.price,
+        creator: template.creator,
+        category: template.category
+      }
+      
+      // Add to marketplace templates if not already added
+      setMarketplaceTemplates(prev => {
+        const exists = prev.find(t => t.id === template.id)
+        if (!exists) {
+          return [...prev, marketplaceTemplate]
+        }
+        return prev
+      })
+      
       // Handle marketplace template
       if (template.templateData) {
         try {
@@ -2829,6 +2850,9 @@ const BannerEditorNew = () => {
       surface_images: await captureAllSurfaceImages(),
       surface_elements: surfaceElements, // Include surface elements for restoration
       
+      // Marketplace templates used in the design
+      marketplace_templates: marketplaceTemplates,
+      
       // Order metadata (required by backend)
       product_type: productType === 'tin' ? 'business_card_tin' : productType === 'tent' ? 'tradeshow_tent' : 'banner',
       quantity: 1,
@@ -2861,7 +2885,7 @@ const BannerEditorNew = () => {
     } else {
       navigate('/checkout')
     }
-  }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate, productType])
+  }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate, productType, marketplaceTemplates])
 
   // Helper function to find the correct image path for an asset
   const findAssetImagePath = useCallback(async (assetName) => {

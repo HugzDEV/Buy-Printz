@@ -558,9 +558,13 @@ const Checkout = () => {
   }
   const ropeCost = getRopeCost()
   
+  // Calculate marketplace template costs
+  const marketplaceCost = orderData?.marketplace_templates ? 
+    orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
+  
   // Calculate total options cost including all percentage-based options
   const optionsTotal = sidesCost + polePocketCost + grommetCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
-  const subtotal = basePrice * bannerOptions.quantity + optionsTotal
+  const subtotal = basePrice * bannerOptions.quantity + optionsTotal + marketplaceCost
   const totalAmount = subtotal + shippingCost
 
   const getStepIcon = (step, currentStep) => {
@@ -1236,6 +1240,18 @@ const Checkout = () => {
                     <span className="text-gray-600">Banner Design:</span>
                     <span className="font-medium">${basePrice * bannerOptions.quantity}</span>
                   </div>
+                  
+                  {/* Marketplace Templates */}
+                  {orderData?.marketplace_templates && orderData.marketplace_templates.length > 0 && (
+                    <>
+                      {orderData.marketplace_templates.map((template, index) => (
+                        <div key={index} className="flex justify-between">
+                          <span className="text-gray-600">Marketplace Template:</span>
+                          <span className="font-medium text-buyprint-brand">+${template.price}</span>
+                        </div>
+                      ))}
+                    </>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-gray-600">Sides ({bannerOptions.sides === 2 ? 'Double' : 'Single'}):</span>
                     <span className="font-medium">
@@ -1417,6 +1433,16 @@ const Checkout = () => {
                       +${optionsTotal.toFixed(2)}
                     </span>
                   </div>
+                  
+                  {/* Marketplace Templates in sidebar */}
+                  {orderData?.marketplace_templates && orderData.marketplace_templates.length > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Marketplace Templates:</span>
+                      <span className="font-medium text-buyprint-brand">
+                        +${marketplaceCost.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
