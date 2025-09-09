@@ -2348,10 +2348,13 @@ const BannerEditorNew = () => {
   // Load template functionality
   const loadTemplate = useCallback((template) => {
     console.log('🎨 Loading template:', template)
+    console.log('🎨 Current product type:', productType)
+    console.log('🎨 Current surface:', currentSurface)
     
     // Check if it's a marketplace template
     if (template.marketplaceTemplate) {
       console.log('🎨 Loading marketplace template:', template.name)
+      console.log('🎨 Marketplace template will preserve current product type:', productType)
       
       // Handle marketplace template
       if (template.templateData) {
@@ -2391,6 +2394,7 @@ const BannerEditorNew = () => {
             const img = new window.Image()
             img.onload = () => {
               console.log('🎨 Marketplace template image loaded successfully')
+              console.log('🎨 Product type after loading:', productType) // Should be unchanged
               setElements([imageElement])
               setSelectedId(null)
             }
@@ -2462,7 +2466,7 @@ const BannerEditorNew = () => {
         alert('Template not found. Please try again.')
       }
     }
-  }, [bannerTemplates, scaleTemplateElements, canvasSize.width, canvasSize.height])
+  }, [bannerTemplates, scaleTemplateElements, canvasSize.width, canvasSize.height, productType, currentSurface])
 
   // Add asset from library
   const addAsset = useCallback((imagePath, assetName) => {
