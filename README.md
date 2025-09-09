@@ -1,110 +1,124 @@
-# @buyprintz/canvas-sdk
+# BuyPrintz Platform
 
-🚀 **Professional Canvas Editor SDK for Banners, Business Card Tins, and Tradeshow Tents**
+**Full-stack business branding platform with integrated marketplace and checkout system.**
 
-A powerful, modular canvas editor SDK built with React and Konva.js, designed for creating professional designs for print products.
+## Architecture
 
-## ✨ Features
+- **Frontend**: React + Vite + Tailwind CSS + Konva.js
+- **Backend**: FastAPI + Python
+- **Database**: Supabase (PostgreSQL)
+- **Payments**: Stripe
+- **Deployment**: Railway (backend) + Vercel (frontend)
 
-- **Multi-Product Support**: Banners, Business Card Tins, Tradeshow Tents
-- **Advanced Canvas Editor**: Built with Konva.js for high performance
-- **TypeScript Support**: Full type safety and IntelliSense
-- **Modular Architecture**: Use only what you need
+## Core Components
 
-- **Professional Templates**: Pre-built templates for all product types
-- **Print Specifications**: Built-in print validation and specifications
-- **Pricing Integration**: Automatic pricing calculations
+### Canvas Editor (`BannerEditor.jsx`)
+- Multi-surface editor for banners, tins, and tents
+- Konva.js-based canvas with element management
+- Template system (user templates + marketplace templates)
+- Real-time preview and export functionality
 
-## 🎯 Product Types
+### Marketplace System
+- Creator template marketplace with pricing
+- IP protection and download controls
+- Template categorization and search
+- Integrated checkout flow
 
-### 🏷️ Banners
-- Multiple materials (Vinyl, Mesh, Fabric)
-- Various sizes and finishes
-- Print specifications for outdoor/indoor use
+### Checkout System
+- **Banner Checkout**: Material selection, options, pricing
+- **Tin Checkout**: Quantity, finish, surface coverage
+- **Tent Checkout**: Size, accessories, specifications
+- Stripe payment integration with marketplace template pricing
 
-### 🗃️ Business Card Tins
-- Multi-surface design (Front, Back, Inside, Lid)
-- Premium vinyl sticker printing
-- Bulk quantities (100, 250, 500 units)
-- Multiple finishes (Silver, Black, Gold)
+## Product Types
 
-### 🏕️ Tradeshow Tents
-- Large format designs (10x10, 10x20 ft)
-- Component management (Tent, Table Cloth, Flag)
-- Professional materials and finishes
-
-## 📦 Installation
-
-```bash
-npm install @buyprintz/canvas-sdk
-```
-
-## 🚀 Quick Start
-
-```tsx
-import React from 'react';
-import { CanvasEditor, getProduct } from '@buyprintz/canvas-sdk';
-
-function App() {
-  const handleSave = (design) => {
-    console.log('Design saved:', design);
-  };
-
-  const handleExport = (design) => {
-    console.log('Design exported:', design);
-  };
-
-  return (
-    <CanvasEditor
-      productType="banner"
-      canvasSize={{ width: 800, height: 400 }}
-      onSave={handleSave}
-      onExport={handleExport}
-      showGrid={true}
-      showGuides={true}
-    />
-  );
-}
-```
-
-## 🎨 Advanced Usage
+### Banners
+- Materials: 13oz Vinyl, 18oz Blackout, Mesh, Indoor, Pole, Fabric
+- Options: Sides, pole pockets, grommets, webbing, corners, rope, wind slits
+- Pricing: Material-based per square foot + option modifiers
 
 ### Business Card Tins
+- Quantities: 100, 250, 500 units
+- Surfaces: Front+Back or All Sides (Front, Back, Inside, Lid)
+- Finishes: Silver ($0), Black (+$0.25/unit), Gold (+$0.50/unit)
+- Printing: Premium vinyl stickers or clear vinyl stickers
 
-```tsx
-import { CanvasEditor, BUSINESS_CARD_TIN_PRODUCT } from '@buyprintz/canvas-sdk';
+### Tradeshow Tents
+- Sizes: 10x10 ($299.99), 10x20 ($499.99)
+- Materials: 6oz Tent Fabric (600x600 denier)
+- Frame: 40mm Aluminum Hex Hardware
+- Accessories: Carrying bag, sandbags, ropes/stakes, walls
 
-function TinEditor() {
-  return (
-    <CanvasEditor
-      productType="tin"
-      canvasSize={{ width: 350, height: 250 }}
-      onSave={(design) => {
-        console.log('Tin design:', design);
-      }}
-    />
-  );
-}
+## Database Schema
+
+### Core Tables
+- `orders`: Order management with product type and canvas data
+- `users`: User authentication and profiles
+- `templates`: User-created templates
+- `creator_templates`: Marketplace templates
+- `template_purchases`: Marketplace purchase tracking
+
+### Product-Specific Tables
+- `business_card_tins`: Tin specifications and surface designs
+- `tradeshow_tents`: Tent specifications and component designs
+
+## API Endpoints
+
+### Core
+- `POST /api/orders/create`: Create new order
+- `POST /api/payments/create-intent`: Create Stripe payment intent
+- `GET /api/templates/user`: Get user templates
+- `POST /api/templates/save`: Save user template
+
+### Marketplace
+- `GET /api/creator-marketplace/templates/marketplace`: Get marketplace templates
+- `POST /api/creator-marketplace/templates/{id}/purchase`: Purchase template
+- `GET /api/creator-marketplace/templates/{id}/download`: Download template
+
+## Environment Variables
+
+### Backend (Railway)
+```
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+JWT_SECRET_KEY=
+OPENAI_API_KEY=
+FRONTEND_URL=
 ```
 
-## 🛠️ API Reference
+### Frontend (Vercel)
+```
+VITE_API_URL=
+VITE_STRIPE_PUBLISHABLE_KEY=
+```
 
-### CanvasEditor Props
+## Development Setup
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `productType` | `'banner' \| 'tin' \| 'tent'` | - | Product type for the editor |
-| `canvasSize` | `{ width: number; height: number }` | - | Canvas dimensions |
-| `backgroundColor` | `string` | `'#ffffff'` | Canvas background color |
-| `onSave` | `(design: CanvasData) => void` | - | Save callback |
-| `onExport` | `(design: CanvasData) => void` | - | Export callback |
-| `readOnly` | `boolean` | `false` | Read-only mode |
-| `showGrid` | `boolean` | `true` | Show grid overlay |
+### Backend
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
 
-## 📄 License
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-MIT License - see [LICENSE](LICENSE) for details.
+## Key Features
 
----
+- **Multi-surface Canvas Editor**: Support for banners, tins, and tents
+- **Template System**: User templates and marketplace templates
+- **IP Protection**: Watermarking and download controls
+- **Integrated Checkout**: Seamless payment flow with marketplace pricing
+- **Responsive Design**: Mobile-optimized interface
+- **Real-time Preview**: Live design preview and export
 
-**Built with ❤️ by the BuyPrintz team**
+## License
+
+MIT License
