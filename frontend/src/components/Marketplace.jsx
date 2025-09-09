@@ -162,71 +162,76 @@ const Marketplace = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading marketplace...</p>
+      <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 flex items-center justify-center">
+        <div className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl p-12 text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-buyprint-brand mx-auto mb-6" />
+          <p className="text-white text-lg">Loading marketplace...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-purple-700 to-blue-600 bg-clip-text text-transparent">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Creator Marketplace
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Discover amazing templates created by talented designers
           </p>
         </div>
 
         {/* Search and Filters */}
-        <GlassCard className="p-6 mb-8">
+        <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <form onSubmit={handleSearch} className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search templates..."
-                  className="w-full pl-10 pr-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 bg-white/20 border border-white/30 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent transition-all duration-200"
                 />
               </div>
             </form>
 
             {/* Filters Toggle */}
-            <GlassButton
+            <button
               onClick={() => setShowFilters(!showFilters)}
-              variant="outline"
-              className="flex items-center gap-2"
+              className="px-4 py-3 bg-white/20 hover:bg-white/30 border border-white/30 rounded-xl text-gray-700 font-medium transition-all duration-200 flex items-center gap-2 backdrop-blur-sm"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filters
-            </GlassButton>
+            </button>
 
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2">
-              <GlassButton
+              <button
                 onClick={() => setViewMode('grid')}
-                variant={viewMode === 'grid' ? 'primary' : 'outline'}
-                size="sm"
+                className={`p-3 rounded-xl transition-all duration-200 backdrop-blur-sm ${
+                  viewMode === 'grid' 
+                    ? 'bg-buyprint-brand/20 border border-buyprint-brand/30 text-buyprint-brand' 
+                    : 'bg-white/20 hover:bg-white/30 border border-white/30 text-gray-700'
+                }`}
               >
                 <Grid className="w-4 h-4" />
-              </GlassButton>
-              <GlassButton
+              </button>
+              <button
                 onClick={() => setViewMode('list')}
-                variant={viewMode === 'list' ? 'primary' : 'outline'}
-                size="sm"
+                className={`p-3 rounded-xl transition-all duration-200 backdrop-blur-sm ${
+                  viewMode === 'list' 
+                    ? 'bg-buyprint-brand/20 border border-buyprint-brand/30 text-buyprint-brand' 
+                    : 'bg-white/20 hover:bg-white/30 border border-white/30 text-gray-700'
+                }`}
               >
                 <List className="w-4 h-4" />
-              </GlassButton>
+              </button>
             </div>
           </div>
 
@@ -242,11 +247,11 @@ const Marketplace = () => {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
+                    className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent transition-all duration-200"
                   >
                     <option value="">All Categories</option>
                     {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                      <option key={category} value={category} className="bg-gray-800 text-white">{category}</option>
                     ))}
                   </select>
                 </div>
@@ -263,7 +268,7 @@ const Marketplace = () => {
                       max="25"
                       value={priceRange.min}
                       onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) }))}
-                      className="w-full"
+                      className="w-full accent-buyprint-brand"
                     />
                     <input
                       type="range"
@@ -271,37 +276,37 @@ const Marketplace = () => {
                       max="25"
                       value={priceRange.max}
                       onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
-                      className="w-full"
+                      className="w-full accent-buyprint-brand"
                     />
                   </div>
                 </div>
               </div>
             </div>
           )}
-        </GlassCard>
+        </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <div className="mb-6 p-4 backdrop-blur-md bg-red-50 border border-red-200 rounded-xl">
             <p className="text-red-700">{error}</p>
           </div>
         )}
 
         {/* Templates Grid/List */}
         {templates.length === 0 ? (
-          <GlassCard className="p-8 text-center">
-            <div className="text-gray-400 mb-4">
-              <Search className="w-16 h-16 mx-auto" />
+          <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-12 text-center">
+            <div className="text-gray-400 mb-6">
+              <Search className="w-20 h-20 mx-auto" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">No Templates Found</h2>
-            <p className="text-gray-600">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">No Templates Found</h2>
+            <p className="text-gray-600 text-lg">
               Try adjusting your search criteria or browse all categories
             </p>
-          </GlassCard>
+          </div>
         ) : (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
             {templates.map((template) => (
-              <GlassCard key={template.id} className={`p-6 ${viewMode === 'list' ? 'flex items-center gap-6' : ''}`}>
+              <div key={template.id} className={`backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-6 group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 ${viewMode === 'list' ? 'flex items-center gap-6' : ''}`}>
                 {viewMode === 'grid' ? (
                   // Grid View
                   <>
@@ -363,13 +368,13 @@ const Marketplace = () => {
                         </span>
                       </div>
 
-                      <GlassButton
+                      <button
                         onClick={() => window.location.href = `/marketplace/template/${template.id}`}
-                        className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
+                        className="w-full px-4 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                       >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        <ShoppingCart className="w-4 h-4" />
                         View Details
-                      </GlassButton>
+                      </button>
                     </div>
                   </>
                 ) : (
@@ -437,16 +442,16 @@ const Marketplace = () => {
                       </div>
                     </div>
 
-                    <GlassButton
+                    <button
                       onClick={() => window.location.href = `/marketplace/template/${template.id}`}
-                      className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white flex-shrink-0"
+                      className="px-4 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl flex-shrink-0"
                     >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      <ShoppingCart className="w-4 h-4" />
                       View
-                    </GlassButton>
+                    </button>
                   </>
                 )}
-              </GlassCard>
+              </div>
             ))}
           </div>
         )}
@@ -454,27 +459,26 @@ const Marketplace = () => {
         {/* Load More Button */}
         {templates.length > 0 && hasMore && (
           <div className="text-center mt-8">
-            <GlassButton 
-              variant="outline"
+            <button 
               onClick={loadMoreTemplates}
               disabled={loadingMore}
-              className="min-w-[200px]"
+              className="px-8 py-4 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl min-w-[200px] mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loadingMore ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Loading More...
                 </>
               ) : (
                 `Load More Templates (${totalTemplates - templates.length} remaining)`
               )}
-            </GlassButton>
+            </button>
           </div>
         )}
 
         {/* Results Summary */}
         {templates.length > 0 && (
-          <div className="text-center mt-4 text-sm text-gray-600">
+          <div className="text-center mt-4 text-sm text-white/90">
             Showing {templates.length} of {totalTemplates} templates
           </div>
         )}

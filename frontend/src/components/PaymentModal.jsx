@@ -110,13 +110,13 @@ const PaymentModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-xl border border-gray-200 shadow-lg">
+      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CreditCard className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-buyprint-brand/20 rounded-lg">
+                <CreditCard className="w-5 h-5 text-buyprint-brand" />
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Complete Purchase</h2>
@@ -125,14 +125,14 @@ const PaymentModal = ({
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
 
           {/* Template Info */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+          <div className="bg-white/20 rounded-lg p-4 mb-6 border border-white/30">
             <div className="flex items-center gap-3">
               {template.preview_image_url && (
                 <img 
@@ -146,7 +146,7 @@ const PaymentModal = ({
                 <p className="text-sm text-gray-600">by {template.creator_name || 'BuyPrintz'}</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold text-green-600">${template.price}</p>
+                <p className="text-lg font-semibold text-buyprint-brand">${template.price}</p>
               </div>
             </div>
           </div>
@@ -169,7 +169,7 @@ const PaymentModal = ({
                     required
                     value={billingDetails.name}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent"
                     placeholder="John Doe"
                   />
                 </div>
@@ -182,7 +182,7 @@ const PaymentModal = ({
                     required
                     value={billingDetails.email}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -197,7 +197,7 @@ const PaymentModal = ({
                   required
                   value={billingDetails.address}
                   onChange={(e) => setBillingDetails(prev => ({ ...prev, address: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent"
                   placeholder="123 Main St"
                 />
               </div>
@@ -212,7 +212,7 @@ const PaymentModal = ({
                     required
                     value={billingDetails.city}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent"
                     placeholder="New York"
                   />
                 </div>
@@ -225,7 +225,7 @@ const PaymentModal = ({
                     required
                     value={billingDetails.state}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, state: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent"
                     placeholder="NY"
                   />
                 </div>
@@ -238,7 +238,7 @@ const PaymentModal = ({
                     required
                     value={billingDetails.zip}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, zip: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent"
                     placeholder="10001"
                   />
                 </div>
@@ -252,15 +252,15 @@ const PaymentModal = ({
                 Payment Information
               </h3>
               
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="p-4 bg-white/20 border border-white/30 rounded-lg">
                 <CardElement options={cardElementOptions} />
               </div>
             </div>
 
             {/* Security Notice */}
-            <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <Lock className="w-5 h-5 text-green-600" />
-              <p className="text-sm text-green-700">
+            <div className="flex items-center gap-3 p-3 bg-buyprint-brand/10 border border-buyprint-brand/20 rounded-lg">
+              <Lock className="w-5 h-5 text-buyprint-brand" />
+              <p className="text-sm text-buyprint-brand">
                 Your payment information is secure and encrypted. We never store your card details.
               </p>
             </div>
@@ -270,14 +270,14 @@ const PaymentModal = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 bg-white/20 hover:bg-white/30 border border-white/30 rounded-lg text-gray-700 transition-all duration-200"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!stripe || processing}
-                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="flex-1 px-4 py-2 bg-buyprint-brand hover:bg-buyprint-600 text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl"
               >
                 {processing ? (
                   <>
