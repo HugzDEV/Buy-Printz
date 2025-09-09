@@ -20,12 +20,16 @@ import authService from '../services/auth'
 const Marketplace = () => {
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [priceRange, setPriceRange] = useState({ min: 0, max: 25 })
   const [viewMode, setViewMode] = useState('grid')
   const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const [totalTemplates, setTotalTemplates] = useState(0)
 
   const categories = [
     'Restaurant & Food',
@@ -37,16 +41,29 @@ const Marketplace = () => {
   ]
 
   useEffect(() => {
-    loadTemplates()
+    // Reset pagination when filters change
+    setCurrentPage(0)
+    setTemplates([])
+    setHasMore(true)
+    loadTemplates(0, true)
   }, [selectedCategory, priceRange])
 
-  const loadTemplates = async () => {
+  const loadTemplates = async (page = 0, reset = false) => {
     try {
-      setLoading(true)
+      if (reset) {
+        setLoading(true)
+      } else {
+        setLoadingMore(true)
+      }
+      
+      const limit = 20
+      const offset = page * limit
       
       const filters = {
         is_approved: true,
-        is_active: true
+        is_active: true,
+        limit: limit,
+        offset: offset
       }
       
       if (selectedCategory) {
@@ -78,7 +95,16 @@ const Marketplace = () => {
       
       if (response.ok) {
         const data = await response.json()
-        setTemplates(data.templates)
+        
+        if (reset) {
+          setTemplates(data.templates || [])
+        } else {
+          setTemplates(prev => [...prev, ...(data.templates || [])])
+        }
+        
+        setTotalTemplates(data.total || 0)
+        setHasMore((data.templates || []).length === limit)
+        setCurrentPage(page)
       } else {
         setError('Failed to load templates')
       }
@@ -87,12 +113,23 @@ const Marketplace = () => {
       setError('Network error loading templates')
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
 
   const handleSearch = (e) => {
     e.preventDefault()
-    loadTemplates()
+    // Reset pagination when searching
+    setCurrentPage(0)
+    setTemplates([])
+    setHasMore(true)
+    loadTemplates(0, true)
+  }
+
+  const loadMoreTemplates = () => {
+    if (!loadingMore && hasMore) {
+      loadTemplates(currentPage + 1, false)
+    }
   }
 
   const formatCurrency = (amount) => {
@@ -415,11 +452,30 @@ const Marketplace = () => {
         )}
 
         {/* Load More Button */}
-        {templates.length > 0 && (
+        {templates.length > 0 && hasMore && (
           <div className="text-center mt-8">
-            <GlassButton variant="outline">
-              Load More Templates
+            <GlassButton 
+              variant="outline"
+              onClick={loadMoreTemplates}
+              disabled={loadingMore}
+              className="min-w-[200px]"
+            >
+              {loadingMore ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Loading More...
+                </>
+              ) : (
+                `Load More Templates (${totalTemplates - templates.length} remaining)`
+              )}
             </GlassButton>
+          </div>
+        )}
+
+        {/* Results Summary */}
+        {templates.length > 0 && (
+          <div className="text-center mt-4 text-sm text-gray-600">
+            Showing {templates.length} of {totalTemplates} templates
           </div>
         )}
       </div>

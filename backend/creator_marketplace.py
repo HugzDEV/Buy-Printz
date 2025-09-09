@@ -434,8 +434,8 @@ async def get_marketplace_templates(
         if search:
             filters["search"] = search
         
-        # Get templates
-        templates = await db_manager.get_marketplace_templates(
+        # Get templates with total count
+        result = await db_manager.get_marketplace_templates(
             filters=filters,
             limit=limit,
             offset=offset
@@ -443,8 +443,8 @@ async def get_marketplace_templates(
         
         return {
             "success": True,
-            "templates": templates,
-            "count": len(templates)
+            "templates": result["templates"],
+            "total": result["total"]
         }
         
     except Exception as e:

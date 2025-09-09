@@ -1286,39 +1286,56 @@ class DatabaseManager:
             print(f"Error getting creator templates: {e}")
             return []
     
-    async def get_marketplace_templates(self, filters: Dict[str, Any] = None, limit: int = 20, offset: int = 0) -> List[Dict[str, Any]]:
-        """Get approved templates for marketplace"""
+    async def get_marketplace_templates(self, filters: Dict[str, Any] = None, limit: int = 20, offset: int = 0) -> Dict[str, Any]:
+        """Get approved templates for marketplace with total count"""
         try:
             if not self.is_connected():
-                return []
+                return {"templates": [], "total": 0}
             
+            # Build base query for templates
             query = self.supabase.table("creator_templates").select("*, creators!inner(display_name, is_verified)")
             
-            # Apply filters
+            # Build count query
+            count_query = self.supabase.table("creator_templates").select("id", count="exact")
+            
+            # Apply filters to both queries
             if filters:
                 if filters.get('is_approved') is not None:
                     query = query.eq("is_approved", filters['is_approved'])
+                    count_query = count_query.eq("is_approved", filters['is_approved'])
                 if filters.get('is_active') is not None:
                     query = query.eq("is_active", filters['is_active'])
+                    count_query = count_query.eq("is_active", filters['is_active'])
                 if filters.get('category'):
                     query = query.eq("category", filters['category'])
+                    count_query = count_query.eq("category", filters['category'])
                 if filters.get('min_price') is not None:
                     query = query.gte("price", filters['min_price'])
+                    count_query = count_query.gte("price", filters['min_price'])
                 if filters.get('max_price') is not None:
                     query = query.lte("price", filters['max_price'])
+                    count_query = count_query.lte("price", filters['max_price'])
                 if filters.get('search'):
                     search_term = f"%{filters['search']}%"
                     query = query.or_(f"name.ilike.{search_term},description.ilike.{search_term}")
+                    count_query = count_query.or_(f"name.ilike.{search_term},description.ilike.{search_term}")
             
-            # Apply pagination and ordering
+            # Get total count
+            count_response = count_query.execute()
+            total = count_response.count if count_response.count is not None else 0
+            
+            # Apply pagination and ordering to main query
             query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
             
             response = query.execute()
-            return response.data or []
+            return {
+                "templates": response.data or [],
+                "total": total
+            }
             
         except Exception as e:
             print(f"Error getting marketplace templates: {e}")
-            return []
+            return {"templates": [], "total": 0}
     
     async def increment_template_views(self, template_id: str) -> bool:
         """Increment template view count"""
