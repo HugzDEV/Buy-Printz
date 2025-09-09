@@ -176,7 +176,7 @@ const ProtectedImage = ({
           webkitUserSelect: 'none',
           mozUserSelect: 'none',
           msUserSelect: 'none',
-          pointerEvents: 'none',
+          pointerEvents: 'auto',
           draggable: false
         }}
         draggable={false}
@@ -228,14 +228,15 @@ const ProtectedImage = ({
 
       {/* Protection Overlay */}
       {!showFullImage && imageLoaded && (
-        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-auto">
           <div className="text-center text-white">
             <Lock className="w-8 h-8 mx-auto mb-2 opacity-80" />
             <p className="text-sm font-medium mb-3">Protected Content</p>
             <div className="flex gap-2 justify-center">
               <button
                 onClick={toggleImageVisibility}
-                className="px-3 py-1 bg-white/20 hover:bg-white/30 border border-white/30 rounded-lg text-white text-xs transition-all duration-200 flex items-center gap-1"
+                className="px-3 py-1 bg-white/20 hover:bg-white/30 border border-white/30 rounded-lg text-white text-xs transition-all duration-200 flex items-center gap-1 touch-manipulation"
+                style={{ touchAction: 'manipulation' }}
               >
                 <Eye className="w-3 h-3" />
                 Preview
@@ -243,7 +244,8 @@ const ProtectedImage = ({
               {onUpgrade && (
                 <button
                   onClick={handleUpgrade}
-                  className="px-3 py-1 bg-buyprint-brand hover:bg-buyprint-600 text-white text-xs rounded-lg transition-all duration-200"
+                  className="px-3 py-1 bg-buyprint-brand hover:bg-buyprint-600 text-white text-xs rounded-lg transition-all duration-200 touch-manipulation"
+                  style={{ touchAction: 'manipulation' }}
                 >
                   Purchase
                 </button>
@@ -257,7 +259,8 @@ const ProtectedImage = ({
       {showFullImage && (
         <button
           onClick={toggleImageVisibility}
-          className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200"
+          className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 touch-manipulation"
+          style={{ touchAction: 'manipulation' }}
         >
           <EyeOff className="w-4 h-4" />
         </button>
