@@ -110,29 +110,29 @@ const PaymentModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <GlassCard className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-xl border border-gray-200 shadow-lg">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/20 rounded-lg">
-                <CreditCard className="w-5 h-5 text-green-500" />
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CreditCard className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-white">Complete Purchase</h2>
-                <p className="text-sm text-gray-300">Secure payment powered by Stripe</p>
+                <h2 className="text-xl font-semibold text-gray-900">Complete Purchase</h2>
+                <p className="text-sm text-gray-600">Secure payment powered by Stripe</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-400" />
+              <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
 
           {/* Template Info */}
-          <div className="bg-white/5 rounded-lg p-4 mb-6">
+          <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
             <div className="flex items-center gap-3">
               {template.preview_image_url && (
                 <img 
@@ -142,11 +142,11 @@ const PaymentModal = ({
                 />
               )}
               <div className="flex-1">
-                <h3 className="font-medium text-white">{template.name}</h3>
-                <p className="text-sm text-gray-300">by {template.creator_name || 'BuyPrintz'}</p>
+                <h3 className="font-medium text-gray-900">{template.name}</h3>
+                <p className="text-sm text-gray-600">by {template.creator_name || 'BuyPrintz'}</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold text-green-400">${template.price}</p>
+                <p className="text-lg font-semibold text-green-600">${template.price}</p>
               </div>
             </div>
           </div>
@@ -154,14 +154,14 @@ const PaymentModal = ({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Billing Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-white flex items-center gap-2">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
                 <User className="w-5 h-5" />
                 Billing Information
               </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Full Name *
                   </label>
                   <input
@@ -169,12 +169,12 @@ const PaymentModal = ({
                     required
                     value={billingDetails.name}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="John Doe"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Email *
                   </label>
                   <input
@@ -182,14 +182,14 @@ const PaymentModal = ({
                     required
                     value={billingDetails.email}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="john@example.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Address *
                 </label>
                 <input
@@ -197,14 +197,14 @@ const PaymentModal = ({
                   required
                   value={billingDetails.address}
                   onChange={(e) => setBillingDetails(prev => ({ ...prev, address: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="123 Main St"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     City *
                   </label>
                   <input
@@ -212,12 +212,12 @@ const PaymentModal = ({
                     required
                     value={billingDetails.city}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="New York"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     State *
                   </label>
                   <input
@@ -225,12 +225,12 @@ const PaymentModal = ({
                     required
                     value={billingDetails.state}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, state: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="NY"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     ZIP *
                   </label>
                   <input
@@ -238,7 +238,7 @@ const PaymentModal = ({
                     required
                     value={billingDetails.zip}
                     onChange={(e) => setBillingDetails(prev => ({ ...prev, zip: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="10001"
                   />
                 </div>
@@ -247,37 +247,37 @@ const PaymentModal = ({
 
             {/* Payment Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-white flex items-center gap-2">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
                 <CreditCard className="w-5 h-5" />
                 Payment Information
               </h3>
               
-              <div className="p-4 bg-white/5 border border-white/20 rounded-lg">
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <CardElement options={cardElementOptions} />
               </div>
             </div>
 
             {/* Security Notice */}
-            <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-              <Lock className="w-5 h-5 text-green-400" />
-              <p className="text-sm text-green-300">
+            <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <Lock className="w-5 h-5 text-green-600" />
+              <p className="text-sm text-green-700">
                 Your payment information is secure and encrypted. We never store your card details.
               </p>
             </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
-              <GlassButton
+              <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-white/10 hover:bg-white/20"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Cancel
-              </GlassButton>
-              <GlassButton
+              </button>
+              <button
                 type="submit"
                 disabled={!stripe || processing}
-                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {processing ? (
                   <>
@@ -290,11 +290,11 @@ const PaymentModal = ({
                     Pay ${template.price}
                   </>
                 )}
-              </GlassButton>
+              </button>
             </div>
           </form>
         </div>
-      </GlassCard>
+      </div>
     </div>
   )
 }
