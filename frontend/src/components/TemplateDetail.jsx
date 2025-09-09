@@ -136,16 +136,19 @@ const TemplateDetail = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <GlassCard className="max-w-md w-full p-8 text-center">
+        <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl max-w-md w-full p-8 text-center">
           <div className="text-red-500 mb-4">
             <AlertCircle className="w-12 h-12 mx-auto" />
           </div>
           <h2 className="text-xl font-bold text-gray-800 mb-2">Error</h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <GlassButton onClick={() => navigate('/marketplace')}>
+          <button
+            onClick={() => navigate('/marketplace')}
+            className="px-4 py-2 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+          >
             Back to Marketplace
-          </GlassButton>
-        </GlassCard>
+          </button>
+        </div>
       </div>
     )
   }
@@ -153,10 +156,10 @@ const TemplateDetail = () => {
   if (purchaseSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <GlassCard className="max-w-md w-full p-8 text-center">
+        <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl max-w-md w-full p-8 text-center">
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-green-100 rounded-full">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+            <div className="p-4 bg-white/60 border border-white/70 rounded-full shadow-inner">
+              <CheckCircle className="w-12 h-12 text-buyprint-brand" />
             </div>
           </div>
           
@@ -169,21 +172,20 @@ const TemplateDetail = () => {
           </p>
           
           <div className="flex gap-4">
-            <GlassButton
+            <button
               onClick={() => navigate('/dashboard')}
-              className="flex-1"
+              className="flex-1 px-4 py-2 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
             >
               Go to Dashboard
-            </GlassButton>
-            <GlassButton
+            </button>
+            <button
               onClick={() => navigate('/marketplace')}
-              variant="outline"
-              className="flex-1"
+              className="flex-1 px-4 py-2 bg-white/40 hover:bg-white/60 border border-white/50 rounded-xl text-gray-700 hover:text-gray-900 transition-all duration-200 shadow-inner hover:shadow-lg"
             >
               Browse More
-            </GlassButton>
+            </button>
           </div>
-        </GlassCard>
+        </div>
       </div>
     )
   }
@@ -193,21 +195,20 @@ const TemplateDetail = () => {
       <div className="max-w-6xl mx-auto">
         {/* Back Button */}
         <div className="mb-6">
-          <GlassButton
+          <button
             onClick={() => navigate('/marketplace')}
-            variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2 bg-white/80 hover:bg-white/90 border border-white/30 rounded-xl text-gray-700 hover:text-gray-900 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-1"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Marketplace
-          </GlassButton>
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Template Preview */}
           <div className="lg:col-span-2">
-            <GlassCard className="p-6">
-              <div className="aspect-video bg-gray-100 rounded-xl mb-6 overflow-hidden">
+            <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-6">
+              <div className="aspect-video bg-white/60 border border-white/40 rounded-2xl mb-6 overflow-hidden shadow-inner">
                 {template.preview_image_url ? (
                   <ProtectedImage
                     src={template.preview_image_url}
@@ -245,9 +246,9 @@ const TemplateDetail = () => {
                 </div>
 
                 {/* Creator Info */}
-                <div className="flex items-center gap-4 p-4 bg-white/20 rounded-xl">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <User className="w-6 h-6 text-purple-600" />
+                <div className="flex items-center gap-4 p-4 bg-white/40 border border-white/50 rounded-2xl shadow-inner">
+                  <div className="w-12 h-12 bg-white/60 border border-white/70 rounded-full flex items-center justify-center shadow-inner">
+                    <User className="w-6 h-6 text-gray-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">
@@ -268,9 +269,9 @@ const TemplateDetail = () => {
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-white/20 rounded-xl">
+                  <div className="text-center p-4 bg-white/40 border border-white/50 rounded-2xl shadow-inner">
                     <div className="flex items-center justify-center mb-2">
-                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                      <Star className="w-5 h-5 text-yellow-500 fill-current" />
                     </div>
                     <p className="text-2xl font-bold text-gray-900">
                       {template.rating ? template.rating.toFixed(1) : '0.0'}
@@ -280,9 +281,9 @@ const TemplateDetail = () => {
                     </p>
                   </div>
                   
-                  <div className="text-center p-4 bg-white/20 rounded-xl">
+                  <div className="text-center p-4 bg-white/40 border border-white/50 rounded-2xl shadow-inner">
                     <div className="flex items-center justify-center mb-2">
-                      <Eye className="w-5 h-5 text-blue-400" />
+                      <Eye className="w-5 h-5 text-blue-500" />
                     </div>
                     <p className="text-2xl font-bold text-gray-900">
                       {template.view_count || 0}
@@ -290,9 +291,9 @@ const TemplateDetail = () => {
                     <p className="text-sm text-gray-600">views</p>
                   </div>
                   
-                  <div className="text-center p-4 bg-white/20 rounded-xl">
+                  <div className="text-center p-4 bg-white/40 border border-white/50 rounded-2xl shadow-inner">
                     <div className="flex items-center justify-center mb-2">
-                      <ShoppingCart className="w-5 h-5 text-green-400" />
+                      <ShoppingCart className="w-5 h-5 text-buyprint-brand" />
                     </div>
                     <p className="text-2xl font-bold text-gray-900">
                       {template.sales_count || 0}
@@ -309,7 +310,7 @@ const TemplateDetail = () => {
                       {template.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+                          className="px-3 py-1 bg-white/60 border border-white/70 text-gray-700 rounded-full text-sm shadow-inner"
                         >
                           <Tag className="w-3 h-3 inline mr-1" />
                           {tag}
@@ -331,12 +332,12 @@ const TemplateDetail = () => {
                   </div>
                 </div>
               </div>
-            </GlassCard>
+            </div>
           </div>
 
           {/* Purchase Panel */}
           <div className="lg:col-span-1">
-            <GlassCard className="p-6 sticky top-6">
+            <div className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl p-6 sticky top-6">
               <div className="text-center mb-6">
                 <div className="text-4xl font-bold text-gray-900 mb-2">
                   {formatCurrency(template.price)}
@@ -352,33 +353,33 @@ const TemplateDetail = () => {
                     <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
                     <p className="text-green-700 font-medium">You own this template!</p>
                   </div>
-                  <GlassButton
+                  <button
                     onClick={() => navigate('/dashboard')}
-                    className="w-full"
+                    className="w-full px-4 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
                   >
-                    <Download className="w-4 h-4 mr-2" />
+                    <Download className="w-4 h-4" />
                     Access in Dashboard
-                  </GlassButton>
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <GlassButton
+                  <button
                     onClick={handlePurchase}
                     disabled={purchasing}
-                    className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-full px-4 py-3 bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {purchasing ? (
                       <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        <Loader2 className="w-5 h-5 animate-spin" />
                         Processing...
                       </>
                     ) : (
                       <>
-                        <ShoppingCart className="w-5 h-5 mr-2" />
+                        <ShoppingCart className="w-5 h-5" />
                         Purchase Template
                       </>
                     )}
-                  </GlassButton>
+                  </button>
 
                   <div className="text-center">
                     <p className="text-sm text-gray-600">
@@ -393,38 +394,38 @@ const TemplateDetail = () => {
                 <h3 className="font-semibold text-gray-900">What you get:</h3>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-buyprint-brand mr-2 flex-shrink-0" />
                     Full template files
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-buyprint-brand mr-2 flex-shrink-0" />
                     Commercial use license
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-buyprint-brand mr-2 flex-shrink-0" />
                     Lifetime access
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-buyprint-brand mr-2 flex-shrink-0" />
                     Easy customization
                   </li>
                 </ul>
               </div>
 
               {/* Share Buttons */}
-              <div className="mt-8 pt-6 border-t border-white/20">
+              <div className="mt-8 pt-6 border-t border-white/30">
                 <div className="flex gap-2">
-                  <GlassButton variant="outline" className="flex-1">
-                    <Heart className="w-4 h-4 mr-2" />
+                  <button className="flex-1 px-3 py-2 bg-white/40 hover:bg-white/60 border border-white/50 rounded-xl text-gray-700 hover:text-gray-900 transition-all duration-200 flex items-center justify-center gap-2 shadow-inner hover:shadow-lg">
+                    <Heart className="w-4 h-4" />
                     Save
-                  </GlassButton>
-                  <GlassButton variant="outline" className="flex-1">
-                    <Share2 className="w-4 h-4 mr-2" />
+                  </button>
+                  <button className="flex-1 px-3 py-2 bg-white/40 hover:bg-white/60 border border-white/50 rounded-xl text-gray-700 hover:text-gray-900 transition-all duration-200 flex items-center justify-center gap-2 shadow-inner hover:shadow-lg">
+                    <Share2 className="w-4 h-4" />
                     Share
-                  </GlassButton>
+                  </button>
                 </div>
               </div>
-            </GlassCard>
+            </div>
           </div>
         </div>
       </div>
