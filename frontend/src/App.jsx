@@ -18,6 +18,7 @@ import TentCheckout from './components/TentCheckout'
 import OrderConfirmation from './components/OrderConfirmation'
 import TermsOfService from './components/TermsOfService'
 import PrivacyPolicy from './components/PrivacyPolicy'
+import Support from './components/Support'
 import EmailConfirmed from './components/EmailConfirmed'
 import CheckEmail from './components/CheckEmail'
 import ResetPassword from './components/ResetPassword'
@@ -204,6 +205,7 @@ function App() {
         {/* Legal Pages */}
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/support" element={<Support />} />
         
         {/* Email Confirmation */}
         <Route path="/email-confirmed" element={<EmailConfirmed />} />

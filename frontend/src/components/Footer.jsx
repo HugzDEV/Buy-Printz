@@ -18,8 +18,8 @@ const Footer = () => {
               <span className="text-xl font-bold">Buy Printz</span>
             </Link>
             <p className="text-gray-300 mb-4 max-w-md">
-              Professional banner printing solutions with advanced design tools. 
-              Create, customize, and order high-quality banners and signs with our easy-to-use platform.
+              Complete business branding platform with professional design tools. 
+              Create banners, business card tins, and tradeshow tents with our integrated marketplace and checkout system.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -49,6 +49,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/marketplace" className="text-gray-300 hover:text-white transition-colors">
+                  Marketplace
+                </Link>
+              </li>
+              <li>
                 <a href="/#products" className="text-gray-300 hover:text-white transition-colors">
                   Products
                 </a>
@@ -71,7 +76,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2 text-gray-300">
                 <Phone className="w-4 h-4" />
-                <span>(617) 902-0969</span>
+                <span>(617) 505-0603</span>
               </div>
               <div className="flex items-center gap-2 text-gray-300">
                 <MapPin className="w-4 h-4" />
@@ -93,7 +98,7 @@ const Footer = () => {
               Support
             </a>
           </div>
-          <p>&copy; 2025 Buy Printz. All rights reserved. | Professional Banner Printing Solutions</p>
+          <p>&copy; 2025 Buy Printz. All rights reserved. | Complete Business Branding Platform</p>
         </div>
       </div>
     </footer>

@@ -31,7 +31,8 @@ const PrivacyPolicy = () => {
 
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Design and Usage Data</h3>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Banner designs and uploaded content</li>
+                <li>Banner, tin, and tent designs and uploaded content</li>
+                <li>Marketplace template purchases and usage</li>
                 <li>Order history and preferences</li>
                 <li>Platform usage and interaction data</li>
                 <li>Technical information (IP address, browser type, device information)</li>
@@ -172,7 +173,7 @@ const PrivacyPolicy = () => {
               </p>
               <div className="mt-4 text-gray-700 space-y-2">
                 <p><strong>Email:</strong> <a href="mailto:order@buyprintz.com" className="text-blue-600 hover:text-blue-800 underline">order@buyprintz.com</a></p>
-                <p><strong>Phone:</strong> <a href="tel:+16179020969" className="text-blue-600 hover:text-blue-800 underline">(617) 902-0969</a></p>
+                <p><strong>Phone:</strong> <a href="tel:+16175050603" className="text-blue-600 hover:text-blue-800 underline">(617) 505-0603</a></p>
                 <p><strong>Address:</strong> Boston, MA 02124</p>
               </div>
             </section>

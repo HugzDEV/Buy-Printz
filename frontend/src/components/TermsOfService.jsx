@@ -25,14 +25,16 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Service Description</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
-                Buy Printz provides an online platform for designing and ordering custom banners and signage. 
+                Buy Printz provides a complete business branding platform for designing and ordering custom products. 
                 Our services include:
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Online design editor for creating custom banners</li>
-                <li>Professional printing services</li>
+                <li>Multi-product design editor (banners, business card tins, tradeshow tents)</li>
+                <li>Creator marketplace with template sharing and purchasing</li>
+                <li>Professional printing and manufacturing services</li>
+                <li>Integrated checkout and payment processing</li>
                 <li>Order management and tracking</li>
-                <li>Customer support</li>
+                <li>Customer support and design assistance</li>
               </ul>
             </section>
 
@@ -139,7 +141,7 @@ const TermsOfService = () => {
               </p>
               <div className="mt-4 text-gray-700 space-y-2">
                 <p><strong>Email:</strong> <a href="mailto:order@buyprintz.com" className="text-blue-600 hover:text-blue-800 underline">order@buyprintz.com</a></p>
-                <p><strong>Phone:</strong> <a href="tel:+16179020969" className="text-blue-600 hover:text-blue-800 underline">(617) 902-0969</a></p>
+                <p><strong>Phone:</strong> <a href="tel:+16175050603" className="text-blue-600 hover:text-blue-800 underline">(617) 505-0603</a></p>
                 <p><strong>Address:</strong> Boston, MA 02124</p>
               </div>
             </section>
