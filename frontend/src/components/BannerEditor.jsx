@@ -3173,11 +3173,40 @@ const BannerEditorNew = () => {
           if (canvasData.productType) {
             console.log('🎨 Restoring product type from template:', canvasData.productType)
             setProductType(canvasData.productType)
+          } else {
+            console.log('🎨 No productType in template data, attempting to detect from bannerSpecs:', canvasData.bannerSpecs)
+            // Fallback: try to detect product type from bannerSpecs
+            if (canvasData.bannerSpecs) {
+              const bannerId = canvasData.bannerSpecs.id || canvasData.bannerSpecs
+              if (bannerId && typeof bannerId === 'string') {
+                if (bannerId.includes('tin') || bannerId.includes('business_card')) {
+                  console.log('🎨 Detected tin product type from bannerSpecs')
+                  setProductType('tin')
+                } else if (bannerId.includes('tent') || bannerId.includes('tradeshow')) {
+                  console.log('🎨 Detected tent product type from bannerSpecs')
+                  setProductType('tent')
+                } else {
+                  console.log('🎨 Defaulting to banner product type')
+                  setProductType('banner')
+                }
+              }
+            }
           }
           
           if (canvasData.currentSurface) {
             console.log('🎨 Restoring current surface from template:', canvasData.currentSurface)
             setCurrentSurface(canvasData.currentSurface)
+          } else {
+            console.log('🎨 No currentSurface in template data, using default based on product type')
+            // Set default surface based on product type
+            const detectedProductType = canvasData.productType || 'banner'
+            if (detectedProductType === 'tin') {
+              setCurrentSurface('front')
+            } else if (detectedProductType === 'tent') {
+              setCurrentSurface('canopy_front')
+            } else {
+              setCurrentSurface('front')
+            }
           }
           
           // For multi-surface products, restore surface_elements if available
@@ -3286,11 +3315,40 @@ const BannerEditorNew = () => {
           if (canvasData.productType) {
             console.log('🎨 Restoring product type from sessionStorage:', canvasData.productType)
             setProductType(canvasData.productType)
+          } else {
+            console.log('🎨 No productType in sessionStorage data, attempting to detect from bannerSpecs:', canvasData.bannerSpecs)
+            // Fallback: try to detect product type from bannerSpecs
+            if (canvasData.bannerSpecs) {
+              const bannerId = canvasData.bannerSpecs.id || canvasData.bannerSpecs
+              if (bannerId && typeof bannerId === 'string') {
+                if (bannerId.includes('tin') || bannerId.includes('business_card')) {
+                  console.log('🎨 Detected tin product type from bannerSpecs')
+                  setProductType('tin')
+                } else if (bannerId.includes('tent') || bannerId.includes('tradeshow')) {
+                  console.log('🎨 Detected tent product type from bannerSpecs')
+                  setProductType('tent')
+                } else {
+                  console.log('🎨 Defaulting to banner product type')
+                  setProductType('banner')
+                }
+              }
+            }
           }
           
           if (canvasData.currentSurface) {
             console.log('🎨 Restoring current surface from sessionStorage:', canvasData.currentSurface)
             setCurrentSurface(canvasData.currentSurface)
+          } else {
+            console.log('🎨 No currentSurface in sessionStorage data, using default based on product type')
+            // Set default surface based on product type
+            const detectedProductType = canvasData.productType || 'banner'
+            if (detectedProductType === 'tin') {
+              setCurrentSurface('front')
+            } else if (detectedProductType === 'tent') {
+              setCurrentSurface('canopy_front')
+            } else {
+              setCurrentSurface('front')
+            }
           }
           
           // For multi-surface products, restore surface_elements if available
