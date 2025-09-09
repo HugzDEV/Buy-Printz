@@ -11,6 +11,8 @@ import json
 import uuid
 import os
 import stripe
+from PIL import Image
+import io
 from database import DatabaseManager
 from auth import get_current_user
 from generate_thumbnails import process_single_image, validate_image_file
@@ -28,6 +30,46 @@ else:
 
 # Initialize router
 router = APIRouter(prefix="/api/creator-marketplace", tags=["creator-marketplace"])
+
+def generate_low_res_preview(image_url: str, max_width: int = 400, quality: int = 60) -> str:
+    """
+    Generate a low-resolution preview version of an image
+    Returns the URL of the low-res version
+    """
+    try:
+        # For now, we'll use the same image but with reduced quality
+        # In production, you'd want to actually resize and compress the image
+        # and store it in Supabase Storage
+        
+        # This is a placeholder implementation
+        # In a real implementation, you would:
+        # 1. Download the original image
+        # 2. Resize it to max_width
+        # 3. Compress it with the specified quality
+        # 4. Upload to Supabase Storage
+        # 5. Return the new URL
+        
+        # For now, we'll return the original URL with a query parameter
+        # to indicate it's a preview version
+        return f"{image_url}?preview=true&w={max_width}&q={quality}"
+        
+    except Exception as e:
+        print(f"Error generating low-res preview: {e}")
+        return image_url  # Fallback to original
+
+def generate_high_res_url(image_url: str) -> str:
+    """
+    Generate a high-resolution URL for purchased templates
+    Returns the original high-quality URL
+    """
+    try:
+        # Remove any preview parameters to get the original high-res URL
+        if '?preview=true' in image_url:
+            return image_url.split('?preview=true')[0]
+        return image_url
+    except Exception as e:
+        print(f"Error generating high-res URL: {e}")
+        return image_url
 
 # Initialize database manager
 db_manager = DatabaseManager()
@@ -441,9 +483,24 @@ async def get_marketplace_templates(
             offset=offset
         )
         
+        # Add low-resolution preview URLs for marketplace display
+        templates = result["templates"]
+        for template in templates:
+            if template.get("preview_image_url"):
+                # Generate low-res preview URL
+                template["preview_image_url_low_res"] = generate_low_res_preview(
+                    template["preview_image_url"]
+                )
+                # Keep original URL for high-res (after purchase)
+                template["preview_image_url_high_res"] = generate_high_res_url(
+                    template["preview_image_url"]
+                )
+                # Use low-res for marketplace display
+                template["preview_image_url"] = template["preview_image_url_low_res"]
+        
         return {
             "success": True,
-            "templates": result["templates"],
+            "templates": templates,
             "total": result["total"]
         }
         
@@ -479,19 +536,30 @@ async def get_template_details(template_id: str):
         # Get creator information
         creator = await db_manager.get_creator_by_id(template["creator_id"])
         
+        # Handle image URLs - always provide low-res for preview
+        preview_image_url = template.get("preview_image_url")
+        if preview_image_url:
+            preview_image_url_low_res = generate_low_res_preview(preview_image_url)
+            preview_image_url_high_res = generate_high_res_url(preview_image_url)
+        else:
+            preview_image_url_low_res = None
+            preview_image_url_high_res = None
+        
         template_details = {
             "id": template["id"],
             "name": template["name"],
             "description": template["description"],
             "category": template["category"],
             "price": template["price"],
-            "preview_image_url": template.get("preview_image_url"),
+            "preview_image_url": preview_image_url_low_res,  # Low-res for preview
+            "preview_image_url_high_res": preview_image_url_high_res,  # High-res for purchase
             "tags": template.get("tags", []),
             "sales_count": template.get("sales_count", 0),
             "view_count": template.get("view_count", 0),
             "rating": template.get("rating", 0.0),
             "rating_count": template.get("rating_count", 0),
             "created_at": template["created_at"],
+            "is_purchased": False,  # Will be updated if user is authenticated
             "creator": {
                 "id": creator["id"],
                 "display_name": creator["display_name"],

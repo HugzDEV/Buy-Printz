@@ -218,8 +218,11 @@ const TemplateDetail = () => {
                     alt={template.name}
                     className="w-full h-full object-cover"
                     watermark={true}
-                    watermarkText="BuyPrintz"
-                    watermarkPosition="center"
+                    watermarkType="custom"
+                    watermarkOpacity={!template.is_purchased ? 0.2 : 0}
+                    isPreview={!template.is_purchased}
+                    highResSrc={template.preview_image_url_high_res}
+                    onUpgrade={() => setShowPaymentModal(true)}
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';

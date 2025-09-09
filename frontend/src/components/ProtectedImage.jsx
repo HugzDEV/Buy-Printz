@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import WatermarkOverlay from './WatermarkOverlay';
 
 const ProtectedImage = ({ 
   src, 
@@ -7,8 +8,14 @@ const ProtectedImage = ({
   watermark = true, 
   watermarkText = 'BuyPrintz',
   watermarkPosition = 'bottom-right',
+  watermarkType = 'custom',
+  watermarkOpacity = 0.2,
+  isPreview = true,
+  highResSrc = null,
+  onUpgrade = null,
   ...props 
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const handleContextMenu = (e) => {
     e.preventDefault();
     return false;
@@ -40,22 +47,37 @@ const ProtectedImage = ({
   };
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden group">
       <img
         src={src}
         alt={alt}
-        className={`select-none pointer-events-none ${className}`}
+        className={`select-none pointer-events-none ${className} transition-all duration-300`}
         draggable="false"
         onContextMenu={handleContextMenu}
         onDragStart={handleDragStart}
         onSelectStart={handleSelectStart}
+        onLoad={() => setImageLoaded(true)}
         {...props}
       />
+      
+      {/* Watermark */}
       {watermark && (
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/20 pointer-events-none">
-          <div className={`absolute ${getWatermarkPosition()} text-white/60 text-xs font-medium bg-black/30 px-2 py-1 rounded backdrop-blur-sm`}>
-            {watermarkText}
-          </div>
+        <WatermarkOverlay 
+          type={watermarkType}
+          opacity={watermarkOpacity}
+          customText={watermarkText}
+        />
+      )}
+      
+      {/* Upgrade prompt for high-res - only show on hover for previews */}
+      {isPreview && highResSrc && onUpgrade && (
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <button
+            onClick={onUpgrade}
+            className="bg-buyprint-brand hover:bg-buyprint-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-lg"
+          >
+            Purchase for High-Res
+          </button>
         </div>
       )}
     </div>

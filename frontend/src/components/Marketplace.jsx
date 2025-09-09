@@ -324,8 +324,11 @@ const Marketplace = () => {
                           alt={template.name}
                           className="w-full h-full object-cover"
                           watermark={true}
-                          watermarkText="BuyPrintz"
-                          watermarkPosition="bottom-right"
+                          watermarkType="custom"
+                          watermarkOpacity={0.15}
+                          isPreview={true}
+                          highResSrc={template.preview_image_url_high_res}
+                          onUpgrade={() => window.location.href = `/marketplace/template/${template.id}`}
                           onError={(e) => {
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'flex';
@@ -396,8 +399,11 @@ const Marketplace = () => {
                           alt={template.name}
                           className="w-full h-full object-cover"
                           watermark={true}
-                          watermarkText="BP"
-                          watermarkPosition="bottom-right"
+                          watermarkType="custom"
+                          watermarkOpacity={0.15}
+                          isPreview={true}
+                          highResSrc={template.preview_image_url_high_res}
+                          onUpgrade={() => window.location.href = `/marketplace/template/${template.id}`}
                           onError={(e) => {
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'flex';
