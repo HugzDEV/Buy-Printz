@@ -219,6 +219,7 @@ class OrderRequest(BaseModel):
     background_color: Optional[str] = "#ffffff"
     print_options: Optional[Dict[str, Any]] = {}
     total_amount: Optional[float] = 0.0
+    marketplace_templates: Optional[list] = []  # List of marketplace templates used
 
 class AddressData(BaseModel):
     full_name: str
@@ -577,6 +578,17 @@ async def create_order(
         base_price = base_prices.get(order_data.product_type, 50.00)
         total_amount = base_price * order_data.quantity
         
+        # Add marketplace template costs
+        marketplace_cost = 0.0
+        if order_data.marketplace_templates:
+            for template in order_data.marketplace_templates:
+                if isinstance(template, dict) and 'price' in template:
+                    marketplace_cost += float(template['price'])
+                elif isinstance(template, (int, float)):
+                    marketplace_cost += float(template)
+        
+        total_amount += marketplace_cost
+        
         # Create comprehensive order data
         order_payload = {
             "product_type": order_data.product_type,
@@ -591,6 +603,8 @@ async def create_order(
             "banner_category": order_data.banner_category,
             "background_color": order_data.background_color,
             "print_options": order_data.print_options,
+            "marketplace_templates": order_data.marketplace_templates,
+            "marketplace_cost": marketplace_cost,
             "total_amount": total_amount,
             "status": "pending"
         }
@@ -606,6 +620,8 @@ async def create_order(
                 "success": True,
                 "order_id": order_result["order_id"],
                 "total_amount": total_amount,
+                "base_amount": base_price * order_data.quantity,
+                "marketplace_cost": marketplace_cost,
                 "order_details": order_payload
             }
         else:

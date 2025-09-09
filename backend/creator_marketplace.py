@@ -1044,3 +1044,60 @@ async def track_download(
     except Exception as e:
         print(f"Error tracking download: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post("/templates/process-order-templates")
+async def process_order_templates(
+    order_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Process marketplace templates from an order and create purchase records"""
+    try:
+        marketplace_templates = order_data.get('marketplace_templates', [])
+        order_id = order_data.get('order_id')
+        
+        if not marketplace_templates or not order_id:
+            return {"success": True, "message": "No marketplace templates to process"}
+        
+        processed_templates = []
+        
+        for template in marketplace_templates:
+            if isinstance(template, dict) and 'id' in template:
+                # Create purchase record for this template
+                purchase_data = {
+                    "template_id": template['id'],
+                    "user_id": current_user['id'],
+                    "order_id": order_id,
+                    "amount_paid": float(template.get('price', 0)),
+                    "status": "completed"
+                }
+                
+                # Get template details to calculate creator earnings
+                template_details = await db_manager.get_template_by_id(template['id'])
+                if template_details:
+                    creator_id = template_details.get('creator_id')
+                    if creator_id:
+                        # Calculate creator earnings (70% of template price)
+                        creator_earnings = float(template.get('price', 0)) * 0.7
+                        purchase_data["creator_id"] = creator_id
+                        purchase_data["creator_earnings"] = creator_earnings
+                
+                # Create the purchase record
+                purchase_result = await db_manager.create_template_purchase(purchase_data)
+                if purchase_result:
+                    processed_templates.append({
+                        "template_id": template['id'],
+                        "template_name": template.get('name', 'Unknown'),
+                        "price": template.get('price', 0),
+                        "purchase_id": purchase_result.get('id')
+                    })
+        
+        return {
+            "success": True,
+            "processed_templates": processed_templates,
+            "message": f"Processed {len(processed_templates)} marketplace templates"
+        }
+        
+    except Exception as e:
+        print(f"Error processing order templates: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")

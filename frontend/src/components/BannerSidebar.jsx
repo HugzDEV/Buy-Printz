@@ -17,7 +17,13 @@ import {
   X,
   QrCode,
   Link,
-  Trash2
+  Trash2,
+  ShoppingCart,
+  Store,
+  Loader2,
+  Eye,
+  User,
+  Tag
 } from 'lucide-react'
 
 const BannerSidebar = ({ 
@@ -60,13 +66,21 @@ const BannerSidebar = ({
     qrcode: false,
     templates: false,
     assets: false,
-    upload: false
+    upload: false,
+    marketplace: false
   })
 
   const [searchTerm, setSearchTerm] = useState('')
   const [sizeCategory, setSizeCategory] = useState('landscape')
   const [uploadedImages, setUploadedImages] = useState([])
   const [tentDesignOption, setTentDesignOption] = useState('canopy-only')
+  
+  // Marketplace state
+  const [marketplaceTemplates, setMarketplaceTemplates] = useState([])
+  const [marketplaceLoading, setMarketplaceLoading] = useState(false)
+  const [marketplaceError, setMarketplaceError] = useState(null)
+  const [marketplaceSearchTerm, setMarketplaceSearchTerm] = useState('')
+  const [selectedMarketplaceCategory, setSelectedMarketplaceCategory] = useState('')
 
   // Stable callback for radio button changes
   const handleTentDesignOptionChange = useCallback((value) => {
@@ -196,6 +210,74 @@ const BannerSidebar = ({
       })
     }
   }, [])
+
+  // Marketplace categories
+  const marketplaceCategories = [
+    'Restaurant & Food',
+    'Retail & Shopping', 
+    'Service Businesses',
+    'Events & Community',
+    'Seasonal',
+    'Industry Specific'
+  ]
+
+  // Load marketplace templates
+  const loadMarketplaceTemplates = async () => {
+    try {
+      setMarketplaceLoading(true)
+      setMarketplaceError(null)
+      
+      const filters = {
+        is_approved: true,
+        is_active: true,
+        limit: 20
+      }
+      
+      if (selectedMarketplaceCategory) {
+        filters.category = selectedMarketplaceCategory
+      }
+      
+      if (marketplaceSearchTerm) {
+        filters.search = marketplaceSearchTerm
+      }
+      
+      const queryParams = new URLSearchParams()
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          queryParams.append(key, value)
+        }
+      })
+      
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://buy-printz-production.up.railway.app'
+      const response = await fetch(`${apiUrl}/api/creator-marketplace/templates/marketplace?${queryParams}`)
+      
+      if (response.ok) {
+        const data = await response.json()
+        setMarketplaceTemplates(data.templates || [])
+      } else {
+        setMarketplaceError('Failed to load marketplace templates')
+      }
+    } catch (error) {
+      console.error('Error loading marketplace templates:', error)
+      setMarketplaceError('Network error loading templates')
+    } finally {
+      setMarketplaceLoading(false)
+    }
+  }
+
+  // Load marketplace templates when section is expanded
+  useEffect(() => {
+    if (expandedSections.marketplace && marketplaceTemplates.length === 0) {
+      loadMarketplaceTemplates()
+    }
+  }, [expandedSections.marketplace])
+
+  // Reload when search or category changes
+  useEffect(() => {
+    if (expandedSections.marketplace) {
+      loadMarketplaceTemplates()
+    }
+  }, [marketplaceSearchTerm, selectedMarketplaceCategory])
 
   // Handle scroll restoration after layout changes
   useLayoutEffect(() => {
@@ -2735,6 +2817,165 @@ const BannerSidebar = ({
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+        </GlassCard>
+
+        {/* Marketplace Section */}
+        <GlassCard className="mb-4">
+          <button
+            onClick={() => setExpandedSections(prev => ({ ...prev, marketplace: !prev.marketplace }))}
+            className="w-full flex items-center justify-between p-4 hover:bg-white/10 transition-colors duration-200 rounded-lg"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-green-400 to-green-600 rounded-lg shadow-lg">
+                <Store className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-800">Marketplace</h3>
+                <p className="text-xs text-gray-500">Premium templates</p>
+              </div>
+            </div>
+            {expandedSections.marketplace ? 
+              <ChevronUp className="w-4 h-4 text-gray-500" /> : 
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            }
+          </button>
+
+          {expandedSections.marketplace && (
+            <div className="px-4 pb-4 space-y-4">
+              {/* Search */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search marketplace..."
+                  value={marketplaceSearchTerm}
+                  onChange={(e) => setMarketplaceSearchTerm(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-green-400/50 placeholder-gray-500 transition-all duration-200 hover:border-white/50 active:border-green-400/50 focus:shadow-lg"
+                />
+              </div>
+
+              {/* Category Filter */}
+              <div>
+                <select
+                  value={selectedMarketplaceCategory}
+                  onChange={(e) => setSelectedMarketplaceCategory(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/30 border border-white/30 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent transition-all duration-200"
+                >
+                  <option value="">All Categories</option>
+                  {marketplaceCategories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Loading State */}
+              {marketplaceLoading && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-green-500" />
+                  <span className="ml-2 text-sm text-gray-600">Loading templates...</span>
+                </div>
+              )}
+
+              {/* Error State */}
+              {marketplaceError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm">{marketplaceError}</p>
+                </div>
+              )}
+
+              {/* Templates Grid */}
+              {!marketplaceLoading && !marketplaceError && (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {marketplaceTemplates.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Store className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm">No templates found</p>
+                    </div>
+                  ) : (
+                    marketplaceTemplates.map((template) => (
+                      <div key={template.id} className="bg-white/20 border border-white/30 rounded-lg p-3 hover:bg-white/30 transition-all duration-200">
+                        <div className="flex gap-3">
+                          {/* Template Preview */}
+                          <div className="w-16 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                            {template.preview_image_url ? (
+                              <img 
+                                src={template.preview_image_url} 
+                                alt={template.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <div className="text-gray-400 text-xs">🎨</div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Template Info */}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-800 text-sm line-clamp-1 mb-1">
+                              {template.name}
+                            </h4>
+                            <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                              {template.description}
+                            </p>
+                            
+                            {/* Template Meta */}
+                            <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="flex items-center">
+                                  <User className="w-3 h-3 mr-1" />
+                                  {template.creators?.display_name || 'Unknown'}
+                                </span>
+                                <span className="flex items-center">
+                                  <Tag className="w-3 h-3 mr-1" />
+                                  {template.category}
+                                </span>
+                              </div>
+                              <span className="font-semibold text-green-600">
+                                ${template.price}
+                              </span>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => window.open(`/marketplace/template/${template.id}`, '_blank')}
+                                className="flex-1 px-2 py-1 bg-white/30 hover:bg-white/40 border border-white/30 rounded text-xs text-gray-700 transition-all duration-200 flex items-center justify-center gap-1"
+                              >
+                                <Eye className="w-3 h-3" />
+                                Preview
+                              </button>
+                              <button
+                                onClick={() => {
+                                  // Load marketplace template onto canvas (same as regular templates)
+                                  if (onLoadTemplate) {
+                                    onLoadTemplate({
+                                      id: template.id,
+                                      name: template.name,
+                                      type: 'marketplace',
+                                      price: template.price,
+                                      templateData: template.template_data,
+                                      previewImage: template.preview_image_url,
+                                      creator: template.creators?.display_name,
+                                      category: template.category,
+                                      marketplaceTemplate: true // Flag to identify marketplace templates
+                                    })
+                                  }
+                                }}
+                                className="flex-1 px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs transition-all duration-200 flex items-center justify-center gap-1"
+                              >
+                                <Sparkles className="w-3 h-3" />
+                                Use
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           )}
         </GlassCard>
