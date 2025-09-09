@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
-import useImageProtection from './hooks/useImageProtection'
-import './styles/image-protection.css'
 import LandingPage from './components/LandingPage'
 import AllProducts from './components/AllProducts'
 import Products from './components/Products'
@@ -115,9 +113,6 @@ const PublicRoute = ({ children }) => {
 }
 
 function App() {
-  // Enable global image protection
-  useImageProtection()
-
   return (
     <HelmetProvider>
       <div className="min-h-screen bg-gray-50">

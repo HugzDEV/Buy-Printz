@@ -1514,5 +1514,41 @@ class DatabaseManager:
             print(f"Error getting creator earnings: {e}")
             return {}
 
+    async def get_template_by_id(self, template_id: str) -> Dict[str, Any]:
+        """Get a template by its ID"""
+        try:
+            if not self.is_connected():
+                return None
+            
+            response = self.supabase.table("creator_templates").select("*").eq("id", template_id).execute()
+            return response.data[0] if response.data else None
+            
+        except Exception as e:
+            print(f"Error getting template by ID: {e}")
+            return None
+
+    async def increment_template_downloads(self, template_id: str, user_id: str) -> bool:
+        """Increment download count for a template purchase"""
+        try:
+            if not self.is_connected():
+                return False
+            
+            # Get current download count
+            purchase_response = self.supabase.table("template_purchases").select("download_count").eq("template_id", template_id).eq("user_id", user_id).execute()
+            
+            if purchase_response.data:
+                current_count = purchase_response.data[0].get("download_count", 0)
+                new_count = current_count + 1
+                
+                # Update download count
+                update_response = self.supabase.table("template_purchases").update({"download_count": new_count}).eq("template_id", template_id).eq("user_id", user_id).execute()
+                return bool(update_response.data)
+            
+            return False
+            
+        except Exception as e:
+            print(f"Error incrementing template downloads: {e}")
+            return False
+
 # Initialize database manager
 db_manager = DatabaseManager()

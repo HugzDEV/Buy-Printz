@@ -16,7 +16,6 @@ import {
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 import ProtectedImage from './ProtectedImage'
-import useImageProtection from '../hooks/useImageProtection'
 import authService from '../services/auth'
 
 const Marketplace = () => {
@@ -32,9 +31,6 @@ const Marketplace = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [totalTemplates, setTotalTemplates] = useState(0)
-
-  // Enable image protection
-  useImageProtection()
 
   const categories = [
     'Restaurant & Food',
@@ -52,7 +48,6 @@ const Marketplace = () => {
     setHasMore(true)
     loadTemplates(0, true)
   }, [selectedCategory, priceRange])
-
 
   const loadTemplates = async (page = 0, reset = false) => {
     try {
@@ -316,35 +311,31 @@ const Marketplace = () => {
                 {viewMode === 'grid' ? (
                   // Grid View
                   <>
-                    {/* Template Preview */}
-                    <div className="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
-                      {template.preview_image_url ? (
-                        <ProtectedImage
-                          src={template.preview_image_url}
-                          alt={template.name}
-                          className="w-full h-full object-cover"
-                          watermark={true}
-                          watermarkType="custom"
-                          watermarkOpacity={0.15}
-                          isPreview={true}
-                          highResSrc={template.preview_image_url_high_res}
-                          onUpgrade={() => window.location.href = `/marketplace/template/${template.id}`}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className={`w-full h-full flex items-center justify-center ${template.preview_image_url ? 'hidden' : 'flex'}`}
-                        style={{ display: template.preview_image_url ? 'none' : 'flex' }}
-                      >
-                        <div className="text-center text-gray-400">
-                          <div className="text-4xl mb-2">🎨</div>
-                          <p className="text-sm">Template Preview</p>
-                        </div>
-                      </div>
-                    </div>
+                     {/* Template Preview */}
+                     <div className="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
+                       {template.preview_image_url ? (
+                         <ProtectedImage
+                           src={template.preview_image_url}
+                           alt={template.name}
+                           className="w-full h-full"
+                           watermark={true}
+                           watermarkOpacity={0.15}
+                           isPreview={true}
+                           onUpgrade={() => window.location.href = `/marketplace/template/${template.id}`}
+                           onError={(e) => {
+                             e.target.style.display = 'none';
+                             e.target.nextSibling.style.display = 'flex';
+                           }}
+                         />
+                       ) : (
+                         <div className="w-full h-full flex items-center justify-center">
+                           <div className="text-center text-gray-400">
+                             <div className="text-4xl mb-2">🎨</div>
+                             <p className="text-sm">Template Preview</p>
+                           </div>
+                         </div>
+                       )}
+                     </div>
 
                     {/* Template Info */}
                     <div className="space-y-3">
@@ -392,34 +383,30 @@ const Marketplace = () => {
                 ) : (
                   // List View
                   <>
-                    <div className="w-full sm:w-32 h-24 sm:h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {template.preview_image_url ? (
-                        <ProtectedImage
-                          src={template.preview_image_url}
-                          alt={template.name}
-                          className="w-full h-full object-cover"
-                          watermark={true}
-                          watermarkType="custom"
-                          watermarkOpacity={0.15}
-                          isPreview={true}
-                          highResSrc={template.preview_image_url_high_res}
-                          onUpgrade={() => window.location.href = `/marketplace/template/${template.id}`}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className={`w-full h-full flex items-center justify-center ${template.preview_image_url ? 'hidden' : 'flex'}`}
-                        style={{ display: template.preview_image_url ? 'none' : 'flex' }}
-                      >
-                        <div className="text-center text-gray-400">
-                          <div className="text-2xl mb-1">🎨</div>
-                          <p className="text-xs">Preview</p>
-                        </div>
-                      </div>
-                    </div>
+                     <div className="w-full sm:w-32 h-24 sm:h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                       {template.preview_image_url ? (
+                         <ProtectedImage
+                           src={template.preview_image_url}
+                           alt={template.name}
+                           className="w-full h-full"
+                           watermark={true}
+                           watermarkOpacity={0.15}
+                           isPreview={true}
+                           onUpgrade={() => window.location.href = `/marketplace/template/${template.id}`}
+                           onError={(e) => {
+                             e.target.style.display = 'none';
+                             e.target.nextSibling.style.display = 'flex';
+                           }}
+                         />
+                       ) : (
+                         <div className="w-full h-full flex items-center justify-center">
+                           <div className="text-center text-gray-400">
+                             <div className="text-2xl mb-1">🎨</div>
+                             <p className="text-xs">Preview</p>
+                           </div>
+                         </div>
+                       )}
+                     </div>
 
                     <div className="flex-1 min-w-0 w-full sm:w-auto">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 gap-2">

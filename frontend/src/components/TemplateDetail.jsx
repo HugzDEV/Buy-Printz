@@ -18,7 +18,6 @@ import {
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 import ProtectedImage from './ProtectedImage'
-import useImageProtection from '../hooks/useImageProtection'
 import authService from '../services/auth'
 import PaymentModal from './PaymentModal'
 
@@ -30,9 +29,6 @@ const TemplateDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [purchasing, setPurchasing] = useState(false)
-
-  // Enable image protection
-  useImageProtection()
   const [purchaseSuccess, setPurchaseSuccess] = useState(false)
   const [alreadyPurchased, setAlreadyPurchased] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -216,29 +212,25 @@ const TemplateDetail = () => {
                   <ProtectedImage
                     src={template.preview_image_url}
                     alt={template.name}
-                    className="w-full h-full object-cover"
-                    watermark={true}
-                    watermarkType="custom"
-                    watermarkOpacity={!template.is_purchased ? 0.2 : 0}
-                    isPreview={!template.is_purchased}
-                    highResSrc={template.preview_image_url_high_res}
+                    className="w-full h-full"
+                    watermark={!alreadyPurchased}
+                    watermarkOpacity={alreadyPurchased ? 0.05 : 0.2}
+                    isPreview={!alreadyPurchased}
                     onUpgrade={() => setShowPaymentModal(true)}
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';
                     }}
                   />
-                ) : null}
-                <div 
-                  className={`w-full h-full flex items-center justify-center ${template.preview_image_url ? 'hidden' : 'flex'}`}
-                  style={{ display: template.preview_image_url ? 'none' : 'flex' }}
-                >
-                  <div className="text-center text-gray-400">
-                    <div className="text-6xl mb-4">🎨</div>
-                    <p className="text-lg">Template Preview</p>
-                    <p className="text-sm">Interactive preview would be displayed here</p>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-center text-gray-400">
+                      <div className="text-6xl mb-4">🎨</div>
+                      <p className="text-lg">Template Preview</p>
+                      <p className="text-sm">Interactive preview would be displayed here</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Template Info */}
