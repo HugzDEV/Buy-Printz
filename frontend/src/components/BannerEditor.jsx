@@ -2347,8 +2347,12 @@ const BannerEditorNew = () => {
 
   // Load template functionality
   const loadTemplate = useCallback((template) => {
+    console.log('🎨 Loading template:', template)
+    
     // Check if it's a marketplace template
     if (template.marketplaceTemplate) {
+      console.log('🎨 Loading marketplace template:', template.name)
+      
       // Handle marketplace template
       if (template.templateData) {
         try {
@@ -2357,11 +2361,16 @@ const BannerEditorNew = () => {
             ? JSON.parse(template.templateData) 
             : template.templateData
           
+          console.log('🎨 Parsed template data:', templateData)
+          
           // Clear existing elements
           setElements([])
           
           // For marketplace templates, create a background image element
           if (templateData.template_type === 'image' && templateData.template_file) {
+            console.log('🎨 Creating image element from template file:', templateData.template_file)
+            
+            // Create image element that will be loaded asynchronously
             const imageElement = {
               id: generateId('image'),
               type: 'image',
@@ -2378,10 +2387,21 @@ const BannerEditorNew = () => {
               zIndex: 0
             }
             
-            setElements([imageElement])
-            setSelectedId(null)
+            // Preload the image to ensure it loads properly
+            const img = new window.Image()
+            img.onload = () => {
+              console.log('🎨 Marketplace template image loaded successfully')
+              setElements([imageElement])
+              setSelectedId(null)
+            }
+            img.onerror = (error) => {
+              console.error('🎨 Failed to load marketplace template image:', error)
+              console.error('🎨 Image src:', templateData.template_file)
+              alert(`Failed to load template image. Please check if the image exists at: ${templateData.template_file}`)
+            }
+            img.src = templateData.template_file
             
-            console.log(`Loaded marketplace template as background image: ${template.name}`)
+            console.log(`🎨 Loading marketplace template as background image: ${template.name}`)
           } else {
             // If it has elements array, use that
             if (templateData.elements && Array.isArray(templateData.elements)) {
@@ -2397,20 +2417,24 @@ const BannerEditorNew = () => {
               setElements(scaledElements)
               setSelectedId(null)
               
-              console.log(`Loaded marketplace template with elements: ${template.name}`)
+              console.log(`🎨 Loaded marketplace template with elements: ${template.name}`)
             } else {
+              console.error('🎨 Unsupported marketplace template format:', templateData)
               alert('Marketplace template format not supported. Please try a different template.')
             }
           }
         } catch (error) {
-          console.error('Error parsing marketplace template data:', error)
+          console.error('🎨 Error parsing marketplace template data:', error)
+          console.error('🎨 Template data:', template.templateData)
           alert('Error loading marketplace template. Please try again.')
         }
       } else {
+        console.error('🎨 No template data available for marketplace template:', template)
         alert('Marketplace template data not available. Please try again.')
       }
     } else {
       // Handle regular banner template
+      console.log('🎨 Loading regular template:', template.name)
       const selectedTemplate = bannerTemplates.find(t => t.id === template.id)
       
       if (selectedTemplate) {
@@ -2431,7 +2455,10 @@ const BannerEditorNew = () => {
         
         // Clear selection
         setSelectedId(null)
+        
+        console.log(`🎨 Loaded regular template: ${template.name}`)
       } else {
+        console.error('🎨 Template not found in bannerTemplates:', template.id)
         alert('Template not found. Please try again.')
       }
     }
