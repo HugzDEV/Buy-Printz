@@ -67,7 +67,7 @@ const WideFeatureCard3D = ({
             style={{ 
               borderColor: selectedColor.border,
               '--icon-color': selectedColor.icon,
-              right: `${60 + (index * 70)}px`
+              right: `${20 + (index * 45)}px`
             }}
           >
             {icon}
@@ -83,16 +83,23 @@ const WideFeatureCard3D = ({
         }
 
         .feature-card {
-          padding-top: 50px;
+          padding-top: 30px;
           border: 3px solid rgba(255, 255, 255, 0.3);
           transform-style: preserve-3d;
           background: rgba(1, 14, 49, 0.1);
           width: 100%;
-          min-height: 300px;
+          min-height: 250px;
           height: auto;
           box-shadow: rgba(142, 142, 142, 0.3) 0px 30px 30px -10px;
           transition: all 0.5s ease-in-out;
           position: relative;
+        }
+
+        @media (min-width: 640px) {
+          .feature-card {
+            padding-top: 50px;
+            min-height: 300px;
+          }
         }
 
         .feature-card:hover {
@@ -101,23 +108,37 @@ const WideFeatureCard3D = ({
 
         .feature-content-box {
           transition: all 0.5s ease-in-out;
-          padding: 60px 25px 25px 25px;
+          padding: 40px 15px 20px 15px;
           transform-style: preserve-3d;
-          margin-top: 50px;
-          min-height: calc(100% - 50px);
+          margin-top: 30px;
+          min-height: calc(100% - 30px);
           height: auto;
           display: flex;
           flex-direction: column;
           justify-content: center;
         }
 
+        @media (min-width: 640px) {
+          .feature-content-box {
+            padding: 60px 25px 25px 25px;
+            margin-top: 50px;
+            min-height: calc(100% - 50px);
+          }
+        }
+
         .feature-content-box .feature-card-title {
           display: inline-block;
           color: white;
-          font-size: 25px;
+          font-size: 18px;
           font-weight: 900;
           transition: all 0.5s ease-in-out;
           transform: translate3d(0px, 0px, 50px);
+        }
+
+        @media (min-width: 640px) {
+          .feature-content-box .feature-card-title {
+            font-size: 25px;
+          }
         }
 
         .feature-content-box .feature-card-title:hover {
@@ -125,12 +146,19 @@ const WideFeatureCard3D = ({
         }
 
         .feature-content-box .feature-card-content {
-          margin-top: 10px;
-          font-size: 12px;
+          margin-top: 8px;
+          font-size: 11px;
           font-weight: 700;
           color: #f2f2f2;
           transition: all 0.5s ease-in-out;
           transform: translate3d(0px, 0px, 30px);
+        }
+
+        @media (min-width: 640px) {
+          .feature-content-box .feature-card-content {
+            margin-top: 10px;
+            font-size: 12px;
+          }
         }
 
         .feature-content-box .feature-card-content:hover {
@@ -138,22 +166,36 @@ const WideFeatureCard3D = ({
         }
 
         .feature-options {
-          margin-top: 10px;
+          margin-top: 8px;
         }
 
         .feature-content-box .feature-option-item {
-          margin: 4px 0;
+          margin: 3px 0;
+          font-size: 10px;
+          line-height: 1.3;
+        }
+
+        @media (min-width: 640px) {
+          .feature-options {
+            margin-top: 10px;
+          }
+          
+          .feature-content-box .feature-option-item {
+            margin: 4px 0;
+            font-size: 12px;
+            line-height: 1.4;
+          }
         }
 
         .feature-icon-box {
           position: absolute;
-          top: 30px;
-          right: 30px;
-          height: 60px;
-          width: 60px;
+          top: 20px;
+          right: 20px;
+          height: 50px;
+          width: 50px;
           background: rgba(1, 14, 49, 0.9);
           border: 1px solid;
-          padding: 10px;
+          padding: 8px;
           transform: translate3d(0px, 0px, 80px);
           box-shadow: rgba(100, 100, 111, 0.2) 0px 17px 10px -10px;
           display: flex;
@@ -161,12 +203,30 @@ const WideFeatureCard3D = ({
           justify-content: center;
         }
 
+        @media (min-width: 640px) {
+          .feature-icon-box {
+            top: 30px;
+            right: 30px;
+            height: 60px;
+            width: 60px;
+            padding: 10px;
+          }
+        }
+
 
         .feature-icon-box svg {
           color: var(--icon-color, #00D755);
-          width: 24px;
-          height: 24px;
+          width: 20px;
+          height: 20px;
         }
+
+        @media (min-width: 640px) {
+          .feature-icon-box svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+
       `}</style>
     </div>
   )
