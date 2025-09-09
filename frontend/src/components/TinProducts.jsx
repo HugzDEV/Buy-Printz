@@ -65,27 +65,49 @@ const TinProducts = () => {
     <>
       <SEOHead {...seoConfigs.products} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        {/* Header Section */}
+        {/* Header Section with Integrated Product Image */}
         <section className="relative py-16 overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800"></div>
           <div className="absolute inset-0 bg-black/20"></div>
           
-          <div className="relative container mx-auto px-4 text-center">
+          <div className="relative container mx-auto px-4">
             <Link 
               to="/all-products" 
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-200 mb-6"
+              className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-200 mb-8"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to All Products
             </Link>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-              Business Card Tins
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-4xl mx-auto drop-shadow-md">
-              Premium aluminum tins with custom vinyl stickers - perfect for memorable networking and professional branding
-            </p>
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Text Content */}
+              <div className="text-center lg:text-left">
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+                  Business Card Tins
+                </h1>
+                <p className="text-xl md:text-2xl text-blue-100 mb-8 drop-shadow-md">
+                  Premium aluminum tins with custom vinyl stickers - perfect for memorable networking and professional branding
+                </p>
+                <div className="flex justify-center lg:justify-start">
+                  <Link
+                    to="/editor"
+                    className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg"
+                  >
+                    Design Now
+                  </Link>
+                </div>
+              </div>
+              
+              {/* Product Image */}
+              <div className="flex justify-center lg:justify-end">
+                <img
+                  src="/assets/images/Tins_BC_v2_new phone number.png"
+                  alt="Finished Business Card Tin Product"
+                  className="w-full max-w-md object-contain"
+                />
+              </div>
+            </div>
           </div>
         </section>
 

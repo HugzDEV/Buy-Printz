@@ -19,6 +19,8 @@ import OrderConfirmation from './components/OrderConfirmation'
 import TermsOfService from './components/TermsOfService'
 import PrivacyPolicy from './components/PrivacyPolicy'
 import Support from './components/Support'
+import Blog from './components/Blog'
+import BlogPost from './components/BlogPost'
 import EmailConfirmed from './components/EmailConfirmed'
 import CheckEmail from './components/CheckEmail'
 import ResetPassword from './components/ResetPassword'
@@ -206,6 +208,10 @@ function App() {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/support" element={<Support />} />
+        
+        {/* Blog Pages */}
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogPost />} />
         
         {/* Email Confirmation */}
         <Route path="/email-confirmed" element={<EmailConfirmed />} />

@@ -57,15 +57,13 @@ const Header = () => {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Design', href: '/editor' },
-    { name: 'Marketplace', href: '/marketplace' },
-    { name: 'Contact', href: '/contact' }
+    { name: 'Marketplace', href: '/marketplace' }
   ]
 
   const authenticatedNavigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Design', href: '/editor' },
-    { name: 'Marketplace', href: '/marketplace' },
-    { name: 'Contact', href: '/contact' }
+    { name: 'Marketplace', href: '/marketplace' }
   ]
 
   const currentNavigation = user ? authenticatedNavigation : navigation
@@ -83,8 +81,8 @@ const Header = () => {
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - Aligned with buttons */}
+          <nav className="hidden md:flex items-center space-x-8 ml-60">
             {currentNavigation.map((item) => (
               <Link
                 key={item.name}
