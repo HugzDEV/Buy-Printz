@@ -441,9 +441,18 @@ async def get_marketplace_templates(
             offset=offset
         )
         
+        # Transform templates to include template_data field
+        transformed_templates = []
+        for template in result["templates"]:
+            transformed_template = template.copy()
+            # Add template_data field from canvas_data for frontend compatibility
+            if template.get('canvas_data'):
+                transformed_template['template_data'] = template['canvas_data']
+            transformed_templates.append(transformed_template)
+        
         return {
             "success": True,
-            "templates": result["templates"],
+            "templates": transformed_templates,
             "total": result["total"]
         }
         
@@ -486,6 +495,7 @@ async def get_template_details(template_id: str):
             "category": template["category"],
             "price": template["price"],
             "preview_image_url": template.get("preview_image_url"),
+            "template_data": template.get("canvas_data"),  # Add template_data for frontend compatibility
             "tags": template.get("tags", []),
             "sales_count": template.get("sales_count", 0),
             "view_count": template.get("view_count", 0),
@@ -1002,7 +1012,7 @@ async def download_template(
                 "name": template['name'],
                 "description": template['description'],
                 "preview_image_url": template.get('preview_image_url'),
-                "template_data": template.get('template_data'),
+                "template_data": template.get('canvas_data'),
                 "download_url": template.get('download_url'),
                 "file_format": template.get('file_format', 'json')
             },
