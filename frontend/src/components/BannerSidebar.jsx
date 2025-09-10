@@ -230,7 +230,7 @@ const BannerSidebar = ({
       const filters = {
         is_approved: true,
         is_active: true,
-        limit: 20
+        limit: 1000  // Load all available templates for sidebar
       }
       
       if (selectedMarketplaceCategory) {
