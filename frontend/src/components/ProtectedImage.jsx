@@ -16,7 +16,6 @@ const ProtectedImage = ({
   const [showFullImage, setShowFullImage] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const imgRef = useRef(null)
   const containerRef = useRef(null)
 
@@ -96,18 +95,6 @@ const ProtectedImage = ({
     return false
   }
 
-  // Detect mobile device
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
   // Add protection event listeners
   useEffect(() => {
     const container = containerRef.current
@@ -175,7 +162,7 @@ const ProtectedImage = ({
         src={src}
         alt={alt}
         className={`w-full h-full object-cover transition-all duration-300 ${
-          showFullImage || isMobile ? 'blur-none' : 'blur-sm'
+          showFullImage ? 'blur-none' : 'blur-sm'
         }`}
         onLoad={handleImageLoad}
         onError={handleImageError}
@@ -184,12 +171,12 @@ const ProtectedImage = ({
         onDrag={preventDrag}
         onSelectStart={preventSelection}
         style={{
-          filter: showFullImage || isMobile ? 'none' : 'blur(8px) brightness(0.7)',
+          filter: showFullImage ? 'none' : 'blur(8px) brightness(0.7)',
           userSelect: 'none',
           webkitUserSelect: 'none',
           mozUserSelect: 'none',
           msUserSelect: 'none',
-          pointerEvents: 'auto',
+          pointerEvents: 'none',
           draggable: false
         }}
         draggable={false}
@@ -239,17 +226,16 @@ const ProtectedImage = ({
         />
       )}
 
-      {/* Protection Overlay - Hidden on mobile */}
-      {!showFullImage && imageLoaded && !isMobile && (
-        <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-auto">
+      {/* Protection Overlay */}
+      {!showFullImage && imageLoaded && (
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
           <div className="text-center text-white">
             <Lock className="w-8 h-8 mx-auto mb-2 opacity-80" />
             <p className="text-sm font-medium mb-3">Protected Content</p>
             <div className="flex gap-2 justify-center">
               <button
                 onClick={toggleImageVisibility}
-                className="px-3 py-1 bg-white/20 hover:bg-white/30 border border-white/30 rounded-lg text-white text-xs transition-all duration-200 flex items-center gap-1 touch-manipulation"
-                style={{ touchAction: 'manipulation' }}
+                className="px-3 py-1 bg-white/20 hover:bg-white/30 border border-white/30 rounded-lg text-white text-xs transition-all duration-200 flex items-center gap-1"
               >
                 <Eye className="w-3 h-3" />
                 Preview
@@ -257,8 +243,7 @@ const ProtectedImage = ({
               {onUpgrade && (
                 <button
                   onClick={handleUpgrade}
-                  className="px-3 py-1 bg-buyprint-brand hover:bg-buyprint-600 text-white text-xs rounded-lg transition-all duration-200 touch-manipulation"
-                  style={{ touchAction: 'manipulation' }}
+                  className="px-3 py-1 bg-buyprint-brand hover:bg-buyprint-600 text-white text-xs rounded-lg transition-all duration-200"
                 >
                   Purchase
                 </button>
@@ -268,12 +253,11 @@ const ProtectedImage = ({
         </div>
       )}
 
-      {/* Hide Button - Hidden on mobile */}
-      {showFullImage && !isMobile && (
+      {/* Hide Button */}
+      {showFullImage && (
         <button
           onClick={toggleImageVisibility}
-          className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 touch-manipulation"
-          style={{ touchAction: 'manipulation' }}
+          className="absolute top-2 right-2 p-1 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200"
         >
           <EyeOff className="w-4 h-4" />
         </button>

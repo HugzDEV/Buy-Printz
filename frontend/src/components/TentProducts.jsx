@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Filter, Search, Star, Truck, Award, Clock, Sparkles, Package, Layers, ArrowLeft } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
-import { ProductCard3D } from './ui'
 
 const TentProducts = () => {
   const [selectedSize, setSelectedSize] = useState('all')
@@ -18,12 +17,11 @@ const TentProducts = () => {
     {
       id: 'tent-10x10',
       size: '10x10',
-      title: "10x10 Event Tent",
+      name: "10x10 Event Tent",
       price: "From $299",
       description: "Professional 10x10 event tent with heavy duty aluminum hex frame and custom dye sublimated graphics",
       image: "/assets/images/tent_complete-buyprintz.jpg",
       features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Dye sublimated graphics", "Carry bag included"],
-      link: "/product/tent-10x10",
       bestseller: true,
       specs: {
         material: "6oz Tent Fabric (600x600 denier)",
@@ -44,12 +42,11 @@ const TentProducts = () => {
     {
       id: 'tent-10x20',
       size: '10x20',
-      title: "10x20 Event Tent",
+      name: "10x20 Event Tent",
       price: "From $499",
       description: "Large 10x20 event tent perfect for major trade shows and outdoor events with maximum branding impact",
       image: "/assets/images/full_10x20_tent-buyprintz.jpg",
       features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Dye sublimated graphics", "Carry bag included"],
-      link: "/product/tent-10x20",
       premium: true,
       specs: {
         material: "6oz Tent Fabric (600x600 denier)",
@@ -73,7 +70,7 @@ const TentProducts = () => {
   const filteredProducts = tentProducts.filter(product => {
     const matchesSize = selectedSize === 'all' || product.size === selectedSize
     const matchesSearch = searchTerm === '' || 
-      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.features.some(feature => feature.toLowerCase().includes(searchTerm.toLowerCase()))
     
@@ -194,16 +191,87 @@ const TentProducts = () => {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="parent">
-                <ProductCard3D
-                  title={product.title}
-                  price={product.price}
-                  description={product.description}
-                  image={product.image}
-                  features={product.features}
-                  link={product.link}
-                  color="red"
-                />
+              <div key={product.id} className="group">
+                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:bg-white/80 h-full flex flex-col transform hover:scale-105 active:scale-95">
+                  {/* Product Image */}
+                  <div className="relative h-96">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${product.id}`
+                      }}
+                    />
+                    
+                    {/* Badges */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      <div className="bg-primary-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                        {product.price}
+                      </div>
+                      {product.bestseller && (
+                        <div className="bg-green-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Best Seller
+                        </div>
+                      )}
+                      {product.premium && (
+                        <div className="bg-purple-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Premium
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600 mb-4 text-sm flex-grow">
+                      {product.description}
+                    </p>
+                    
+                    {/* Key Features */}
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {product.features.slice(0, 3).map((feature, featureIndex) => (
+                          <span 
+                            key={featureIndex}
+                            className="inline-flex items-center bg-primary-50/80 backdrop-blur-sm text-primary-700 text-xs px-2 py-1 rounded-full border border-primary-200/50"
+                          >
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Specifications */}
+                    <div className="mb-6 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Specifications</h4>
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <div><strong>Material:</strong> {product.specs.material}</div>
+                        <div><strong>Weight:</strong> {product.specs.weight}</div>
+                        <div><strong>Dimensions:</strong> {product.specs.dimensions}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 mt-auto">
+                      <Link 
+                        to={`/product/${product.id}`}
+                        className="flex-1 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      >
+                        View Details
+                      </Link>
+                      <Link 
+                        to="/editor?product=tent"
+                        className="flex-1 bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:ring-offset-2"
+                      >
+                        Design Now
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

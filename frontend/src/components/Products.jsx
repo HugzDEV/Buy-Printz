@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Filter, Search, Star, Truck, Award, Clock, ArrowLeft } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
-import { ProductCard3D } from './ui'
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -19,12 +18,11 @@ const Products = () => {
     {
       id: 'vinyl-13oz',
       category: 'vinyl',
-      title: "13oz Vinyl Banner",
+      name: "13oz Vinyl Banner",
       price: "From $25",
       description: "Our most popular banner - perfect for outdoor use with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included", "UV resistant"],
-      link: "/product/vinyl-13oz",
       bestseller: true,
       specs: {
         material: "13oz Scrim Vinyl",
@@ -36,12 +34,11 @@ const Products = () => {
     {
       id: 'vinyl-18oz',
       category: 'vinyl',
-      title: "18oz Blocked Banner", 
+      name: "18oz Blocked Banner", 
       price: "From $35",
       description: "18 oz matte blockout banner - Full color UV printed, indoor and outdoor ready",
       image: "/assets/images/blockout Banner -BuyPrintz.jpg",
       features: ["Single or double sided printing", "Free hemming and grommets", "Additional finishing available", "Welded oversized banners available"],
-      link: "/product/vinyl-18oz",
       premium: true,
       specs: {
         material: "18oz Matte Blockout Vinyl",
@@ -53,12 +50,11 @@ const Products = () => {
     {
       id: 'mesh-banner',
       category: 'vinyl',
-      title: "Mesh Banner",
+      name: "Mesh Banner",
       price: "From $30",
       description: "Best seller for windy conditions with 70% air flow for reduced wind load",
       image: "/assets/images/Mesh Banner - BuyPrintz.jpg",
       features: ["Wind resistant", "70% air flow", "Fade resistant", "Lightweight"],
-      link: "/product/mesh-banner",
       popular: true,
       specs: {
         material: "Mesh Vinyl",
@@ -70,12 +66,11 @@ const Products = () => {
     {
       id: 'indoor-banner',
       category: 'vinyl',
-      title: "Indoor Banner", 
+      name: "Indoor Banner", 
       price: "From $20",
       description: "Full and smooth surface vinyl - great for indoor displays and presentations",
       image: "/assets/images/Indoor Banner - BuyPrintz.jpg",
       features: ["Smooth surface", "Vivid colors", "Easy to install", "Lightweight"],
-      link: "/product/indoor-banner",
       specs: {
         material: "Smooth Vinyl",
         finish: "Gloss/Matte",
@@ -86,12 +81,11 @@ const Products = () => {
     {
       id: 'pole-banner',
       category: 'specialty',
-      title: "Pole Banner",
+      name: "Pole Banner",
       price: "From $45", 
       description: "Durable fit banners ready to install with complete hardware kit included",
       image: "/assets/images/Pole Banner - BuyPrintz.jpg",
       features: ["Hardware included", "Easy installation", "Professional look", "Weather resistant"],
-      link: "/product/pole-banner",
       specs: {
         material: "18oz Vinyl",
         finish: "Pole pockets & hardware",
@@ -102,12 +96,11 @@ const Products = () => {
     {
       id: 'fabric-9oz',
       category: 'fabric',
-      title: "9oz Fabric Banner",
+      name: "9oz Fabric Banner",
       price: "From $35",
       description: "Lightweight fabric banner with vibrant dye sublimation printing for premium presentations",
       image: "/assets/images/9oz Fabric Banner - BuyPrintz.jpg",
       features: ["Lightweight fabric", "Vibrant colors", "Wrinkle resistant", "Professional finish"],
-      link: "/product/fabric-9oz",
       specs: {
         material: "9oz Polyester Fabric",
         finish: "Dye sublimation",
@@ -118,12 +111,11 @@ const Products = () => {
     {
       id: 'fabric-blockout',
       category: 'fabric',
-      title: "Fabric Banner (9.5oz Blockout)",
+      name: "Fabric Banner (9.5oz Blockout)",
       price: "From $45",
       description: "Premium blockout fabric with superior color blocking and professional finish",
       image: "/assets/images/Fabric Banner (9.5oz. Blockout) - BuyPrintz.jpg",
       features: ["Color blocking", "Premium fabric", "Professional finish", "Wrinkle resistant"],
-      link: "/product/fabric-blockout",
       premium: true,
       specs: {
         material: "9.5oz Blockout Fabric",
@@ -135,12 +127,11 @@ const Products = () => {
     {
       id: 'tension-fabric',
       category: 'fabric',
-      title: "Tension Fabric",
+      name: "Tension Fabric",
       price: "From $60",
       description: "3-way stretch material perfect for kiosks, displays, and modern installations",
       image: "/assets/images/Tension Fabric - Buy Printz.jpg",
       features: ["3-way stretch", "Kiosk ready", "Professional display", "Seamless fit"],
-      link: "/product/tension-fabric",
       premium: true,
       specs: {
         material: "Stretch Polyester",
@@ -152,12 +143,11 @@ const Products = () => {
     {
       id: 'backlit-banner',
       category: 'specialty',
-      title: "Backlit Banner", 
+      name: "Backlit Banner", 
       price: "From $45",
       description: "18oz translucent vinyl for illuminated signage with even light distribution",
       image: "/assets/images/Backlit Banner -BuyPrintz.jpg", 
       features: ["Translucent material", "LED compatible", "Even light distribution", "Durable"],
-      link: "/product/backlit-banner",
       specs: {
         material: "Translucent Vinyl",
         finish: "Backlit compatible",
@@ -171,7 +161,7 @@ const Products = () => {
   const filteredProducts = allProducts.filter(product => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory
     const matchesSearch = searchTerm === '' || 
-      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.features.some(feature => feature.toLowerCase().includes(searchTerm.toLowerCase()))
     
@@ -292,16 +282,91 @@ const Products = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="parent">
-                <ProductCard3D
-                  title={product.title}
-                  price={product.price}
-                  description={product.description}
-                  image={product.image}
-                  features={product.features}
-                  link={product.link}
-                  color="yellow"
-                />
+              <div key={product.id} className="group">
+                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:bg-white/80 h-full flex flex-col transform hover:scale-105 active:scale-95">
+                  {/* Product Image */}
+                  <div className="relative h-48">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${product.id}`
+                      }}
+                    />
+                    
+                    {/* Badges */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      <div className="bg-primary-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                        {product.price}
+                      </div>
+                      {product.bestseller && (
+                        <div className="bg-green-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Best Seller
+                        </div>
+                      )}
+                      {product.premium && (
+                        <div className="bg-purple-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Premium
+                        </div>
+                      )}
+                      {product.popular && (
+                        <div className="bg-orange-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          Popular
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600 mb-4 text-sm flex-grow">
+                      {product.description}
+                    </p>
+                    
+                    {/* Key Features */}
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {product.features.slice(0, 3).map((feature, featureIndex) => (
+                          <span 
+                            key={featureIndex}
+                            className="inline-flex items-center bg-primary-50/80 backdrop-blur-sm text-primary-700 text-xs px-2 py-1 rounded-full border border-primary-200/50"
+                          >
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Quick Specs */}
+                    <div className="mb-6 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Specifications</h4>
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <div><strong>Material:</strong> {product.specs.material}</div>
+                        <div><strong>Durability:</strong> {product.specs.durability}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 mt-auto">
+                      <Link 
+                        to={`/product/${product.id}`}
+                        className="flex-1 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      >
+                        View Details
+                      </Link>
+                      <Link 
+                        to={`/editor?product=${product.id}`}
+                        className="flex-1 bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:ring-offset-2"
+                      >
+                        Design Now
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

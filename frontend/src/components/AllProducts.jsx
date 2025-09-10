@@ -2,33 +2,38 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Package, Crown, Layers } from 'lucide-react'
 import SEOHead from './SEOHead'
-import { ProductCard3D } from './ui'
 
 const AllProducts = () => {
   const featuredProducts = [
     {
-      title: "Vinyl Banners",
+      name: "Vinyl Banners",
       price: "From $25",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
       link: "/banner-products",
-      features: ["Weather resistant", "Vibrant colors", "Professional quality", "Fast delivery"]
+      badge: "Best Seller",
+      badgeColor: "bg-red-500",
+      icon: <Package className="w-8 h-8" />
     },
     {
-      title: "Business Card Tins",
+      name: "Business Card Tins",
       price: "From $399.99",
       description: "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
       image: "/assets/images/Tins_BC_v2_new phone number.png",
       link: "/tin-products",
-      features: ["Premium aluminum", "Custom vinyl graphics", "Professional finish", "Memorable branding"]
+      badge: "New",
+      badgeColor: "bg-green-500",
+      icon: <Crown className="w-8 h-8" />
     },
     {
-      title: "Tradeshow Tents",
+      name: "Tradeshow Tents",
       price: "From $299.99",
       description: "Professional event tents with 360-degree branding coverage and heavy-duty aluminum frames",
       image: "/assets/images/tent_complete-buyprintz.jpg",
       link: "/tent-products",
-      features: ["Heavy duty frame", "360° branding", "Weather resistant", "Complete package"]
+      badge: "New",
+      badgeColor: "bg-purple-500",
+      icon: <Layers className="w-8 h-8" />
     }
   ]
 
@@ -70,16 +75,45 @@ const AllProducts = () => {
             
             <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
               {featuredProducts.map((product, index) => (
-                <div key={index} className="parent">
-                  <ProductCard3D
-                    title={product.title}
-                    price={product.price}
-                    description={product.description}
-                    image={product.image}
-                    features={product.features}
-                    link={product.link}
-                    color={index === 0 ? "yellow" : index === 1 ? "emerald" : "red"}
-                  />
+                <div key={index} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[550px]">
+                  <div className="relative overflow-hidden rounded-t-3xl">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <span className={`${product.badgeColor} text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg`}>
+                        {product.badge}
+                      </span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  <div className="p-8 flex flex-col flex-grow">
+                    <div className="flex items-center mb-4">
+                      <div className="text-blue-600 mr-3">
+                        {product.icon}
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900">{product.name}</h3>
+                    </div>
+                    
+                    <div className="text-3xl font-bold text-blue-600 mb-4">
+                      {product.price}
+                    </div>
+                    
+                    <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
+                      {product.description}
+                    </p>
+                    
+                    <Link
+                      to={product.link}
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 border border-green-500 hover:border-green-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
+                    >
+                      View Products
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
@@ -99,7 +133,7 @@ const AllProducts = () => {
               <Link
                 to="/editor"
                 onClick={() => sessionStorage.setItem('newDesign', 'true')}
-                className="bg-gradient-to-r from-buyprint-brand to-buyprint-600 hover:from-buyprint-600 hover:to-buyprint-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-2"
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-2"
               >
                 Start Designing
                 <ArrowRight className="w-5 h-5" />

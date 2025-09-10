@@ -215,8 +215,3 @@ export const NeumorphicButton = ({ children, onClick, className = "", variant = 
     </button>
   )
 }
-
-// Export the 3D Card components
-export { default as ProductCard3D } from './ProductCard3D'
-export { default as FeatureCard3D } from './FeatureCard3D'
-export { default as WideFeatureCard3D } from './WideFeatureCard3D'
