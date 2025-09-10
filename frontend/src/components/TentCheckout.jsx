@@ -138,7 +138,11 @@ const TentCheckout = () => {
         tent_material: '6oz Tent Fabric',
         tent_frame_type: '40mm Aluminum Hex',
         tent_print_method: 'Dye-Sublimation',
-        design_option: determineDesignOption(orderData), // Determine based on available surfaces
+        design_option: (() => {
+          const designOption = determineDesignOption(orderData)
+          console.log('🎨 TentCheckout - Final design option:', designOption)
+          return designOption
+        })(), // Determine based on available surfaces
         quantity: 1,
         canvas_data: null,
         dimensions: null,
@@ -198,15 +202,23 @@ const TentCheckout = () => {
     if (!orderData?.surface_elements) return 'canopy-only'
     
     const surfaceElements = orderData.surface_elements
+    console.log('🎨 TentCheckout - Surface elements:', surfaceElements)
+    
     const hasSidewalls = (surfaceElements.sidewall_left && surfaceElements.sidewall_left.length > 0) || 
                         (surfaceElements.sidewall_right && surfaceElements.sidewall_right.length > 0)
     const hasBackwall = surfaceElements.backwall && surfaceElements.backwall.length > 0
     
+    console.log('🎨 TentCheckout - Has sidewalls:', hasSidewalls)
+    console.log('🎨 TentCheckout - Has backwall:', hasBackwall)
+    
     if (hasSidewalls || hasBackwall) {
+      console.log('🎨 TentCheckout - Setting design option to: all-sides')
       return 'all-sides'
     } else if (hasBackwall) {
+      console.log('🎨 TentCheckout - Setting design option to: canopy-backwall')
       return 'canopy-backwall'
     } else {
+      console.log('🎨 TentCheckout - Setting design option to: canopy-only')
       return 'canopy-only'
     }
   }
