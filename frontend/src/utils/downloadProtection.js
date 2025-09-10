@@ -63,7 +63,7 @@ export const addGlobalDownloadProtection = () => {
 
   // Disable text selection on protected images
   document.addEventListener('selectstart', (e) => {
-    if (e.target.closest('.protected-image')) {
+    if (e.target && e.target.closest && e.target.closest('.protected-image')) {
       e.preventDefault()
       e.stopPropagation()
       return false

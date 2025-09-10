@@ -59,12 +59,20 @@ const PrintPreviewModal = ({
       
       // Filter surfaces based on design option
       const designOption = orderDetails?.design_option || 'canopy-only'
+      console.log('🎨 PrintPreviewModal - Design option:', designOption)
+      console.log('🎨 PrintPreviewModal - Available surface images:', Object.keys(orderDetails?.surface_images || {}))
+      
       if (designOption === 'canopy-only') {
         return allSurfaces.filter(s => s.key.startsWith('canopy_'))
       } else if (designOption === 'canopy-backwall') {
         return allSurfaces.filter(s => s.key.startsWith('canopy_') || s.key === 'backwall')
       } else {
-        return allSurfaces // all-sides
+        // For all-sides, return all surfaces that have images
+        const availableSurfaces = allSurfaces.filter(surface => 
+          orderDetails?.surface_images && orderDetails.surface_images[surface.key]
+        )
+        console.log('🎨 PrintPreviewModal - Returning surfaces:', availableSurfaces.map(s => s.key))
+        return availableSurfaces.length > 0 ? availableSurfaces : allSurfaces
       }
     }
     return [{ key: 'front', name: 'Design', description: 'Main design' }]
