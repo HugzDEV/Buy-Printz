@@ -1271,30 +1271,30 @@ const BannerSidebar = ({
                     6oz Tent Fabric (600x600 denier)
                   </div>
                 ) : (
-                  <select 
-                    value={productType === 'tin' ? tinSpecs.finish : (bannerSpecs?.id || '')}
-                    onChange={(e) => {
-                      if (productType === 'tin') {
-                        handleTinSpecChange('finish', e.target.value)
-                      } else {
-                        onChangeBannerType?.(e.target.value)
-                      }
-                    }}
-                    className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  >
-                    {productType === 'banner' && bannerTypes.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
-                      </option>
-                    ))}
-                    {productType === 'tin' && (
-                      <>
-                        <option value="silver">Silver</option>
-                        <option value="black">Black</option>
-                        <option value="gold">Gold</option>
-                      </>
-                    )}
-                  </select>
+                <select 
+                  value={productType === 'tin' ? tinSpecs.finish : (bannerSpecs?.id || '')}
+                  onChange={(e) => {
+                    if (productType === 'tin') {
+                      handleTinSpecChange('finish', e.target.value)
+                    } else {
+                      onChangeBannerType?.(e.target.value)
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                >
+                  {productType === 'banner' && bannerTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                  {productType === 'tin' && (
+                    <>
+                      <option value="silver">Silver</option>
+                      <option value="black">Black</option>
+                      <option value="gold">Gold</option>
+                    </>
+                  )}
+                </select>
                 )}
               </div>
 
@@ -1430,28 +1430,28 @@ const BannerSidebar = ({
                   <div className="text-sm font-medium text-gray-800 mb-3">Banner Size</div>
                 
                 {/* Size Category Tabs - Only show for banners */}
-                <div className="flex gap-1 mb-3">
-                  <button
-                    onClick={() => setSizeCategory('landscape')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                      sizeCategory === 'landscape' 
-                        ? 'bg-blue-500 text-white shadow-lg' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
-                    }`}
-                  >
-                    Landscape
-                  </button>
-                  <button
-                    onClick={() => setSizeCategory('portrait')}
-                    className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                      sizeCategory === 'portrait' 
-                        ? 'bg-blue-500 text-white shadow-lg' 
-                        : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
-                    }`}
-                  >
-                    Portrait
-                  </button>
-                  <button
+                  <div className="flex gap-1 mb-3">
+                    <button
+                      onClick={() => setSizeCategory('landscape')}
+                      className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        sizeCategory === 'landscape' 
+                          ? 'bg-blue-500 text-white shadow-lg' 
+                          : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
+                      }`}
+                    >
+                      Landscape
+                    </button>
+                    <button
+                      onClick={() => setSizeCategory('portrait')}
+                      className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        sizeCategory === 'portrait' 
+                          ? 'bg-blue-500 text-white shadow-lg' 
+                          : 'bg-white/20 text-gray-600 hover:bg-white/30 hover:shadow-md'
+                      }`}
+                    >
+                      Portrait
+                    </button>
+                    <button
                       onClick={() => setSizeCategory('custom')}
                       className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                         sizeCategory === 'custom' 
@@ -2830,7 +2830,7 @@ const BannerSidebar = ({
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-br from-green-400 to-green-600 rounded-lg shadow-lg">
                 <Store className="w-4 h-4 text-white" />
-              </div>
+      </div>
               <div className="text-left">
                 <h3 className="font-semibold text-gray-800">Marketplace</h3>
                 <p className="text-xs text-gray-500">Premium templates</p>

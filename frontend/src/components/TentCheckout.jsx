@@ -127,6 +127,7 @@ const TentCheckout = () => {
         // Determine design option based on the loaded data
         const designOption = determineDesignOption(parsed)
         parsed.design_option = designOption
+        console.log('🎨 TentCheckout - Updated design option for loaded data:', designOption)
         setOrderData(parsed)
         console.log('Loaded tent order data:', parsed)
       } catch (error) {
@@ -201,15 +202,23 @@ const TentCheckout = () => {
     if (!orderData?.surface_elements) return 'canopy-only'
     
     const surfaceElements = orderData.surface_elements
+    console.log('🎨 TentCheckout - Surface elements:', surfaceElements)
+    
     const hasSidewalls = (surfaceElements.sidewall_left && surfaceElements.sidewall_left.length > 0) || 
                         (surfaceElements.sidewall_right && surfaceElements.sidewall_right.length > 0)
     const hasBackwall = surfaceElements.backwall && surfaceElements.backwall.length > 0
     
+    console.log('🎨 TentCheckout - Has sidewalls:', hasSidewalls)
+    console.log('🎨 TentCheckout - Has backwall:', hasBackwall)
+    
     if (hasSidewalls || hasBackwall) {
+      console.log('🎨 TentCheckout - Setting design option to: all-sides')
       return 'all-sides'
     } else if (hasBackwall) {
+      console.log('🎨 TentCheckout - Setting design option to: canopy-backwall')
       return 'canopy-backwall'
     } else {
+      console.log('🎨 TentCheckout - Setting design option to: canopy-only')
       return 'canopy-only'
     }
   }
