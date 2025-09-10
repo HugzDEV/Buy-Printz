@@ -17,6 +17,7 @@ import {
 } from './ui/index.jsx'
 import { Download, Eye, FileText, Check, X, Printer, CheckCircle, AlertTriangle } from 'lucide-react'
 import jsPDF from 'jspdf'
+import SurfaceThumbnailViewer from './SurfaceThumbnailViewer'
 
 const PrintPreviewModal = ({ 
   isOpen, 
@@ -36,16 +37,53 @@ const PrintPreviewModal = ({
   const [selectedSurface, setSelectedSurface] = useState(currentSurface)
   const [approvedSurfaces, setApprovedSurfaces] = useState(new Set())
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
+  
+
+  // Initialize selected surface to first available surface when modal opens
+  useEffect(() => {
+    if (isOpen && hasMultipleSurfaces()) {
+      const surfaces = getAllSurfaces()
+      if (surfaces.length > 0) {
+        // For tents, prefer to start with the first canopy surface
+        const firstCanopySurface = surfaces.find(s => s.key.startsWith('canopy_'))
+        const initialSurface = firstCanopySurface || surfaces[0]
+        setSelectedSurface(initialSurface.key)
+        setCurrentSurfaceIndex(0)
+        console.log('🎨 PrintPreviewModal - Initialized to first surface:', initialSurface.key)
+      }
+    }
+  }, [isOpen, productType, orderDetails?.design_option])
 
   // Get surface names based on product type and design option
   const getSurfaceNames = () => {
     if (productType === 'tin') {
-      return [
+      // Use the specification data to determine which surfaces to show
+      const surfaceCoverage = orderDetails?.design_option || orderDetails?.tin_surface_coverage || 'front-back'
+      console.log('🎨 PrintPreviewModal - Tin surface coverage from specs:', surfaceCoverage)
+      
+      const allTinSurfaces = [
         { key: 'front', name: 'Front', description: 'Main front surface' },
         { key: 'back', name: 'Back', description: 'Back surface' },
         { key: 'inside', name: 'Inside', description: 'Inside surface' },
         { key: 'lid', name: 'Lid', description: 'Lid surface' }
       ]
+      
+      let filteredSurfaces = []
+      
+      if (surfaceCoverage === 'front-only') {
+        filteredSurfaces = allTinSurfaces.filter(s => s.key === 'front')
+      } else if (surfaceCoverage === 'front-back') {
+        filteredSurfaces = allTinSurfaces.filter(s => s.key === 'front' || s.key === 'back')
+      } else if (surfaceCoverage === 'all-surfaces') {
+        filteredSurfaces = allTinSurfaces
+      } else {
+        // Default to front-back
+        filteredSurfaces = allTinSurfaces.filter(s => s.key === 'front' || s.key === 'back')
+      }
+      
+      console.log('🎨 PrintPreviewModal - Tin surfaces based on specs:', filteredSurfaces.map(s => s.key))
+      return filteredSurfaces
+      
     } else if (productType === 'tent') {
       const allSurfaces = [
         { key: 'canopy_front', name: 'Canopy Front + Valence', description: 'Front canopy with valence' },
@@ -57,23 +95,26 @@ const PrintPreviewModal = ({
         { key: 'backwall', name: 'Back Wall', description: 'Back wall panel' }
       ]
       
-      // Filter surfaces based on design option
-      const designOption = orderDetails?.design_option || 'canopy-only'
-      console.log('🎨 PrintPreviewModal - Design option:', designOption)
-      console.log('🎨 PrintPreviewModal - Available surface images:', Object.keys(orderDetails?.surface_images || {}))
+      // Use the specification data to determine which surfaces to show
+      const designOption = orderDetails?.design_option || orderDetails?.tent_design_option || 'canopy-only'
+      console.log('🎨 PrintPreviewModal - Design option from specs:', designOption)
+      
+      let filteredSurfaces = []
       
       if (designOption === 'canopy-only') {
-        return allSurfaces.filter(s => s.key.startsWith('canopy_'))
+        filteredSurfaces = allSurfaces.filter(s => s.key.startsWith('canopy_'))
       } else if (designOption === 'canopy-backwall') {
-        return allSurfaces.filter(s => s.key.startsWith('canopy_') || s.key === 'backwall')
+        filteredSurfaces = allSurfaces.filter(s => s.key.startsWith('canopy_') || s.key === 'backwall')
+      } else if (designOption === 'all-sides') {
+        // For all-sides, return all surfaces
+        filteredSurfaces = allSurfaces
       } else {
-        // For all-sides, return all surfaces that have images
-        const availableSurfaces = allSurfaces.filter(surface => 
-          orderDetails?.surface_images && orderDetails.surface_images[surface.key]
-        )
-        console.log('🎨 PrintPreviewModal - Returning surfaces:', availableSurfaces.map(s => s.key))
-        return availableSurfaces.length > 0 ? availableSurfaces : allSurfaces
+        // Default to canopy-only
+        filteredSurfaces = allSurfaces.filter(s => s.key.startsWith('canopy_'))
       }
+      
+      console.log('🎨 PrintPreviewModal - Tent surfaces based on specs:', filteredSurfaces.map(s => s.key))
+      return filteredSurfaces
     }
     return [{ key: 'front', name: 'Design', description: 'Main design' }]
   }
@@ -95,6 +136,12 @@ const PrintPreviewModal = ({
   // Get current surface dimensions
   const getCurrentSurfaceDimensions = () => {
     if (productType === 'tent') {
+      // For tent canopies, always use the full canopy+valence dimensions (1160x1049)
+      // to maintain consistent viewport size for all canopy surfaces
+      if (selectedSurface && selectedSurface.startsWith('canopy_')) {
+        return getTentSurfaceDimensions('canopy_front') // Use canopy dimensions
+      }
+      // For sidewalls and backwall, use their specific dimensions
       return getTentSurfaceDimensions(selectedSurface)
     }
     return dimensions
@@ -149,6 +196,7 @@ const PrintPreviewModal = ({
     }
   }
 
+
   // Generate canvas image from canvas data when images are missing
   const generateCanvasImageFromData = async (targetSurface = null) => {
     try {
@@ -165,9 +213,10 @@ const PrintPreviewModal = ({
       console.log('🎨 Debug - canvasData keys:', Object.keys(canvasData || {}))
       console.log('🎨 Debug - surface_elements:', orderDetails?.surface_elements)
       
-      if (hasMultipleSurfaces() && targetSurface && orderDetails?.surface_elements) {
+      if (hasMultipleSurfaces() && targetSurface && (orderDetails?.surface_elements || surfaceElements)) {
         // For multi-surface products, get elements for the specific surface
-        elementsToRender = orderDetails.surface_elements[targetSurface] || []
+        const surfaceElementsData = orderDetails?.surface_elements || surfaceElements
+        elementsToRender = surfaceElementsData[targetSurface] || []
         console.log(`🎨 Rendering ${elementsToRender.length} elements for surface: ${targetSurface}`)
         console.log(`🎨 Surface elements for ${targetSurface}:`, elementsToRender)
       } else if (canvasData?.elements) {
@@ -189,6 +238,27 @@ const PrintPreviewModal = ({
       // Set background color
       ctx.fillStyle = canvasData?.backgroundColor || '#ffffff'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Apply tent canopy clipping for tent canopy surfaces
+      if (productType === 'tent' && targetSurface && targetSurface.startsWith('canopy_')) {
+        // Create the tent canopy + valence clipping path
+        ctx.beginPath()
+        
+        // Start with triangular canopy path
+        ctx.moveTo(canvasSize.width / 2, 0) // Top point (center top)
+        ctx.lineTo(0, 789)                  // Bottom left of triangle
+        ctx.lineTo(canvasSize.width, 789)   // Bottom right of triangle
+        
+        // Continue to rectangular valence path (no closePath between them)
+        ctx.lineTo(canvasSize.width, 809)   // Top right of valence
+        ctx.lineTo(0, 809)                  // Top left of valence
+        ctx.lineTo(0, 1009)                 // Bottom left of valence (789 + 20 + 200)
+        ctx.lineTo(canvasSize.width, 1009)  // Bottom right of valence
+        ctx.lineTo(canvasSize.width, 789)   // Back to bottom right of triangle
+        
+        ctx.closePath()
+        ctx.clip() // Apply the clipping path
+      }
       
       // Render elements
       for (const element of elementsToRender) {
@@ -239,61 +309,59 @@ const PrintPreviewModal = ({
   // Modified useEffect to handle missing surface images
   useEffect(() => {
     const loadPreviewImage = async () => {
+      console.log('🎨 loadPreviewImage called - isOpen:', isOpen, 'orderDetails:', !!orderDetails, 'canvasData:', !!canvasData, 'previewImage exists:', !!previewImage)
       if (isOpen && (orderDetails || canvasData)) {
         console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
         console.log('🎨 PrintPreviewModal - Canvas data:', canvasData)
         console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys((canvasData?.surface_images || orderDetails?.surface_images) || {}))
         console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails?.design_option)
         
-        // Get images from canvasData first (since that's where they're actually stored), fallback to orderDetails
-        const surfaceImages = canvasData?.surface_images || orderDetails?.surface_images
-        const canvasImage = canvasData?.canvas_image || orderDetails?.canvas_image
+        // Get images from orderDetails (where they're actually stored after capture)
+        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
+        const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+        
+        console.log('🎨 Debug - orderDetails.surface_images:', orderDetails?.surface_images)
+        console.log('🎨 Debug - canvasData.surface_images:', canvasData?.surface_images)
         
         console.log('🎨 Debug - hasMultipleSurfaces():', hasMultipleSurfaces())
         console.log('🎨 Debug - surfaceImages:', surfaceImages)
         console.log('🎨 Debug - canvasImage:', canvasImage)
         console.log('🎨 Debug - selectedSurface:', selectedSurface)
         
-        // For multi-surface products, use surface-specific images
-        if (hasMultipleSurfaces() && surfaceImages && Object.keys(surfaceImages).length > 0) {
+        // Simplified image loading logic
+        console.log('🎨 Image loading path check - hasMultipleSurfaces:', hasMultipleSurfaces(), 'surfaceImages keys:', Object.keys(surfaceImages || {}), 'surfaceImages length:', Object.keys(surfaceImages || {}).length)
+        
+        if (hasMultipleSurfaces() && surfaceImages && surfaceImages[selectedSurface]) {
+          console.log('🎨 Taking path: hasMultipleSurfaces with surface images')
           const surfaceImage = surfaceImages[selectedSurface]
           console.log(`🎨 Found surface image for ${selectedSurface}:`, typeof surfaceImage)
-          
-          if (typeof surfaceImage === 'string') {
-            setPreviewImage(surfaceImage)
-          } else {
-            // Fallback to main canvas image if specific surface image is missing
-            console.warn(`No specific image found for surface: ${selectedSurface}, generating from surface elements`)
-            // Generate image from surface-specific elements
-            const generatedImage = await generateCanvasImageFromData(selectedSurface)
-            setPreviewImage(generatedImage)
-          }
-        } else if (hasMultipleSurfaces() && (!surfaceImages || Object.keys(surfaceImages).length === 0)) {
-          // Fallback: Generate surface-specific images when surface_images is missing
-          console.warn(`No surface_images found for ${productType}, generating from surface elements for: ${selectedSurface}`)
+          setPreviewImage(surfaceImage)
+        } else if (hasMultipleSurfaces()) {
+          console.log('🎨 Taking path: multi-surface but no surface images, generating from surface elements')
+          // For multi-surface products, always generate from surface elements to ensure unique images
           const generatedImage = await generateCanvasImageFromData(selectedSurface)
+          console.log('🎨 Setting preview image (generated for surface):', generatedImage ? 'Generated successfully' : 'Failed to generate')
           setPreviewImage(generatedImage)
         } else if (canvasImage) {
-          // For single-surface products, use the main canvas image
-          if (typeof canvasImage === 'string') {
-            setPreviewImage(canvasImage)
-          } else {
-            // Generate image from canvas data
-            const generatedImage = await generateCanvasImageFromData()
-            setPreviewImage(generatedImage)
-          }
+          console.log('🎨 Taking path: has canvasImage')
+          setPreviewImage(canvasImage)
         } else {
-          // No images available, try to generate from canvas data
-          console.log('🎨 No images available, generating from canvas data...')
-          const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
-          setPreviewImage(generatedImage)
+          console.log('🎨 Taking path: no images available, generating from canvas data')
+          // Only generate if we don't already have a preview image
+          if (!previewImage) {
+            const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
+            console.log('🎨 Setting preview image (generated):', generatedImage ? 'Generated successfully' : 'Failed to generate')
+            setPreviewImage(generatedImage)
+          } else {
+            console.log('🎨 Preview image already exists, skipping generation')
+          }
         }
         setIsGenerating(false)
       }
     }
     
     loadPreviewImage()
-  }, [isOpen, orderDetails, canvasData, selectedSurface, hasMultipleSurfaces])
+  }, [isOpen, orderDetails, canvasData, selectedSurface])
 
   // Debug image dimensions when it loads
   const handleImageLoad = (event) => {
@@ -307,6 +375,16 @@ const PrintPreviewModal = ({
       offsetHeight: img.offsetHeight
     })
   }
+
+  // Debug previewImage state changes
+  useEffect(() => {
+    console.log('🎨 PreviewImage state changed:', previewImage ? 'Has image' : 'No image')
+    if (previewImage) {
+      console.log('🎨 PreviewImage type:', typeof previewImage)
+      console.log('🎨 PreviewImage length:', previewImage.length)
+      console.log('🎨 PreviewImage starts with:', previewImage.substring(0, 50))
+    }
+  }, [previewImage])
 
   // Set image scale based on screen size
   useEffect(() => {
@@ -426,14 +504,6 @@ const PrintPreviewModal = ({
               <Printer className="h-5 w-5" />
               Print Preview & Approval
             </div>
-            {hasMultipleSurfaces() && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-600">Progress:</span>
-                <span className="font-semibold text-blue-600">
-                  {getApprovalProgress().current}/{getApprovalProgress().total} Surfaces Approved
-                </span>
-              </div>
-            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -458,133 +528,16 @@ const PrintPreviewModal = ({
                  ) : previewImage ? (
                    <div className="space-y-3 sm:space-y-4">
                      {/* Multi-Surface Preview for Tins and Tents */}
-        {(productType === 'tin' || productType === 'tent') ? (
-          <div className="space-y-4">
-            {/* Surface Selection with Approval Status */}
-            <div className="space-y-3">
-              <h4 className="font-semibold text-gray-900">Review All Surfaces</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {getSurfaceNames().map((surface, index) => (
-                  <div key={surface.key} className="space-y-2">
-                    <button
-                      onClick={() => {
-                        setSelectedSurface(surface.key)
-                        setCurrentSurfaceIndex(index)
-                      }}
-                      className={`w-full px-3 py-2 rounded-lg text-sm transition-all duration-200 flex items-center justify-between ${
-                        selectedSurface === surface.key
-                          ? 'bg-blue-500 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                      title={surface.description}
-                    >
-                      <span>{surface.name}</span>
-                      {approvedSurfaces.has(surface.key) && (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => handleSurfaceApproval(surface.key)}
-                      className={`w-full px-2 py-1 rounded text-xs transition-all duration-200 ${
-                        approvedSurfaces.has(surface.key)
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                          : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      {approvedSurfaces.has(surface.key) ? '✓ Approved' : 'Approve'}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-                         
-                         {/* Surface Preview with Navigation */}
-                         <div className="space-y-3">
-                           <div className="flex items-center justify-between">
-                             <h5 className="font-medium text-gray-900">
-                               {getSurfaceNames().find(s => s.key === selectedSurface)?.name} Preview
-                             </h5>
-                             <div className="flex items-center gap-2">
-                               <button
-                                 onClick={() => navigateToSurface(currentSurfaceIndex - 1)}
-                                 disabled={currentSurfaceIndex === 0}
-                                 className="p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
-                               >
-                                 ←
-                               </button>
-                               <span className="text-sm text-gray-600">
-                                 {currentSurfaceIndex + 1} of {getSurfaceNames().length}
-                               </span>
-                               <button
-                                 onClick={() => navigateToSurface(currentSurfaceIndex + 1)}
-                                 disabled={currentSurfaceIndex === getSurfaceNames().length - 1}
-                                 className="p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
-                               >
-                                 →
-                               </button>
-                             </div>
-                           </div>
-                           
-                           <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center overflow-hidden">
-                             <div className="relative flex items-center justify-center w-full" style={{ 
-                               minHeight: window.innerWidth < 768 ? '200px' : '280px',
-                               maxHeight: window.innerWidth < 768 ? '240px' : '320px',
-                             }}>
-                               {previewImage ? (
-                                 <>
-                                   <img
-                                     src={previewImage}
-                                     alt={`${productType} ${selectedSurface} Preview`}
-                                     className={`border shadow-lg ${productType === 'tin' ? 'rounded-lg' : 'rounded'}`}
-                                     style={{
-                                       width: 'auto',
-                                       height: 'auto',
-                                       maxWidth: '100%',
-                                       maxHeight: window.innerWidth < 768 ? '180px' : '280px',
-                                       minHeight: window.innerWidth < 768 ? '120px' : '250px',
-                                       objectFit: 'contain',
-                                       transform: `scale(${imageScale})`,
-                                       transformOrigin: 'center center',
-                                       borderRadius: productType === 'tin' ? '2.3px' : undefined
-                                     }}
-                                     onLoad={handleImageLoad}
-                                     onError={(e) => {
-                                       console.error('Image failed to load:', e)
-                                       console.error('Image src:', typeof previewImage === 'string' ? previewImage.substring(0, 100) : previewImage)
-                                     }}
-                                   />
-                                 </>
-                               ) : (
-                                 <div className="text-center text-gray-500 p-8">
-                                   <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                                   <p className="text-sm">No preview available for {selectedSurface}</p>
-                                 </div>
-                               )}
-                             </div>
-                           </div>
-                           
-                           {/* Current Surface Approval */}
-                           <div className="flex items-center justify-center">
-                             <button
-                               onClick={() => handleSurfaceApproval(selectedSurface)}
-                               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                                 approvedSurfaces.has(selectedSurface)
-                                   ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                   : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                               }`}
-                             >
-                               {approvedSurfaces.has(selectedSurface) ? (
-                                 <>
-                                   <CheckCircle className="w-4 h-4 inline mr-2" />
-                                   Approved
-                                 </>
-                               ) : (
-                                 'Approve This Surface'
-                               )}
-                             </button>
-                           </div>
-                         </div>
-                       </div>
+                     {(productType === 'tin' || productType === 'tent') ? (
+                       <SurfaceThumbnailViewer
+                         productType={productType}
+                         orderDetails={orderDetails}
+                         canvasData={canvasData}
+                         surfaceElements={surfaceElements}
+                         designOption={orderDetails?.design_option}
+                         tentDesignOption={orderDetails?.tent_design_option}
+                         tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
+                       />
                      ) : (
                        /* Banner Preview */
                        <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
@@ -814,35 +767,25 @@ const PrintPreviewModal = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3 w-full pt-2 sm:pt-4 border-t mt-2 sm:mt-4 bg-gray-50">
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <X className="h-4 w-4" />
-              Cancel
-            </Button>
-            
-            {hasMultipleSurfaces() && !areAllSurfacesApproved() && (
-              <div className="flex-1 text-center py-2">
-                <p className="text-sm text-amber-600 font-medium">
-                  Please approve all {getApprovalProgress().total} surfaces before continuing
-                </p>
-              </div>
-            )}
-            
-            <Button
-              onClick={handleApprove}
-              disabled={!(canvasData?.canvas_image || orderDetails?.canvas_image) || (hasMultipleSurfaces() && !areAllSurfacesApproved())}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <Check className="h-4 w-4" />
-              {hasMultipleSurfaces() ? 'Approve All & Print' : 'Approve & Print'}
-            </Button>
-          </div>
-        </DialogFooter>
+        {/* Approval Buttons - Fixed Position */}
+        <div className="p-4 sm:p-6 border-t bg-gray-50 flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
+            <X className="h-4 w-4" />
+            Cancel
+          </Button>
+          
+          <Button
+            onClick={handleApprove}
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
+            <Check className="h-4 w-4" />
+            Approve & Print
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   )

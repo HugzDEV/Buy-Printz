@@ -35,6 +35,91 @@ const BannerEditorNew = () => {
     return 'banner' // default
   })
   
+  // All available banner types from products
+  const bannerTypes = [
+    {
+      id: 'vinyl-13oz',
+      name: '13oz. Vinyl Banner',
+      category: 'Vinyl Banners',
+      material: '13oz Vinyl',
+      finish: 'Matte',
+      specs: 'Our most popular banner',
+      description: 'Weather resistant, 4-color process',
+      uses: ['Outdoor Advertising', 'Events', 'Storefronts']
+    },
+    {
+      id: 'vinyl-18oz',
+      name: '18oz. Blockout Banner',
+      category: 'Vinyl Banners',
+      material: '18oz Blockout Vinyl',
+      finish: 'Blockout',
+      specs: 'Our most durable banner',
+      description: 'Premium heavyweight vinyl with complete opacity',
+      uses: ['Heavy-duty Outdoor', 'Construction Sites', 'Long-term Use']
+    },
+    {
+      id: 'mesh-banner',
+      name: 'Mesh Banner',
+      category: 'Mesh Banners',
+      material: 'Mesh Vinyl',
+      finish: 'Perforated',
+      specs: 'Wind resistant',
+      description: 'Allows wind to pass through, perfect for windy areas',
+      uses: ['Windy Locations', 'Fence Banners', 'Construction Sites']
+    },
+    {
+      id: 'fabric-banner',
+      name: 'Fabric Banner',
+      category: 'Fabric Banners',
+      material: '9oz Fabric',
+      finish: 'Matte',
+      specs: 'Eco-friendly option',
+      description: 'Made from recycled materials, wrinkle-resistant',
+      uses: ['Indoor Events', 'Trade Shows', 'Retail Displays']
+    },
+    {
+      id: 'backlit-banner',
+      name: 'Backlit Banner',
+      category: 'Backlit Banners',
+      material: 'Translucent Vinyl',
+      finish: 'Translucent',
+      specs: 'Illuminated display',
+      description: 'Designed for backlighting, vibrant colors when lit',
+      uses: ['Light Boxes', 'Illuminated Signs', 'Night Displays']
+    },
+    {
+      id: 'pole-banner',
+      name: 'Pole Banner',
+      category: 'Pole Banners',
+      material: '13oz Vinyl',
+      finish: 'Matte',
+      specs: 'Double-sided printing',
+      description: 'Perfect for street poles and flagpoles',
+      uses: ['Street Marketing', 'Events', 'Directional Signs']
+    }
+  ]
+
+  // Initialize product specs based on URL parameter (only if not already initialized)
+  useEffect(() => {
+    const urlProduct = searchParams.get('product')
+    console.log('🎨 Checking specs initialization for product:', urlProduct)
+    
+    if (urlProduct === 'tin' && !tinSpecs) {
+      setTinSpecs({
+        finish: 'silver',
+        surfaceCoverage: 'front-back',
+        printingMethod: 'premium-vinyl'
+      })
+      console.log('🎨 Initialized tin specs')
+    } else if (urlProduct === 'tent' && !tentDesignOption) {
+      setTentDesignOption('canopy-only')
+      console.log('🎨 Initialized tent design option')
+    } else if (urlProduct === 'banner' && !bannerSpecs) {
+      setBannerSpecs(bannerTypes[0])
+      console.log('🎨 Initialized banner specs')
+    }
+  }, []) // Only run once on mount
+  
   // Surface navigation state - Must be declared before elements
   const [currentSurface, setCurrentSurface] = useState(() => {
     const urlProduct = searchParams.get('product')
@@ -75,7 +160,9 @@ const BannerEditorNew = () => {
   }, [surfaceElements])
   
   // Current elements based on product type and surface
-  const elements = (productType === 'tin' || productType === 'tent') ? surfaceElements[currentSurface] : surfaceElements.front
+  const elements = (productType === 'tin' || productType === 'tent') 
+    ? (surfaceElements[currentSurface] || []) 
+    : (surfaceElements.front || [])
   const setElements = (productType === 'tin' || productType === 'tent')
     ? (newElements) => {
         setSurfaceElements(prev => ({
@@ -102,6 +189,15 @@ const BannerEditorNew = () => {
   // Marketplace templates tracking
   const [marketplaceTemplates, setMarketplaceTemplates] = useState([])
   const [showTour, setShowTour] = useState(false)
+  
+  // Specification state - this drives downstream components
+  const [tentDesignOption, setTentDesignOption] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'tent') {
+      return 'canopy-only'
+    }
+    return null // For non-tent products, return null
+  })
   
   
   // Save Modal state
@@ -168,10 +264,16 @@ const BannerEditorNew = () => {
   })
   
   // Tin specifications state
-  const [tinSpecs, setTinSpecs] = useState({
-    finish: 'silver',
-    surfaceCoverage: 'front-back',
-    printingMethod: 'premium-vinyl'
+  const [tinSpecs, setTinSpecs] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'tin') {
+      return {
+        finish: 'silver',
+        surfaceCoverage: 'front-back',
+        printingMethod: 'premium-vinyl'
+      }
+    }
+    return null // For non-tin products, return null
   })
   
   // Banner size presets - Standard banner dimensions (H x W format)
@@ -231,6 +333,8 @@ const BannerEditorNew = () => {
   
   // Handle product type change
   const handleProductTypeChange = useCallback((newProductType) => {
+    console.log('🎨 Product type changing from', productType, 'to', newProductType)
+    
     setProductType(newProductType)
     const config = productConfigs[newProductType]
     setCanvasSize(config.defaultSize)
@@ -239,12 +343,41 @@ const BannerEditorNew = () => {
     // Set appropriate default surface for each product type
     if (newProductType === 'tin') {
       setCurrentSurface('front')
+      // Initialize tin specs
+      setTinSpecs({
+        finish: 'silver',
+        surfaceCoverage: 'front-back',
+        printingMethod: 'premium-vinyl'
+      })
     } else if (newProductType === 'tent') {
       setCurrentSurface('canopy_front')
+      // Initialize tent design option
+      setTentDesignOption('canopy-only')
     } else {
       setCurrentSurface('front')
+      // Initialize banner specs for banner products
+      if (newProductType === 'banner') {
+        setBannerSpecs(bannerTypes[0]) // Default to first banner type
+      }
     }
-  }, [productConfigs])
+    
+    // Clear existing elements when switching product types
+    setSurfaceElements({
+      front: [],
+      back: [],
+      inside: [],
+      lid: [],
+      canopy_front: [],
+      canopy_back: [],
+      canopy_left: [],
+      canopy_right: [],
+      sidewall_left: [],
+      sidewall_right: [],
+      backwall: []
+    })
+    
+    console.log('🎨 Product type changed to:', newProductType)
+  }, [productType, productConfigs, bannerTypes])
 
   // Handle tin specification changes
   const handleTinSpecChange = useCallback((key, value) => {
@@ -252,7 +385,25 @@ const BannerEditorNew = () => {
       ...prev,
       [key]: value
     }))
+    console.log('🎨 BannerEditor - Tin spec changed:', key, 'to', value)
   }, [])
+  
+  // Handle tent design option changes
+  const handleTentDesignOptionChange = useCallback((value) => {
+    const previousOption = tentDesignOption
+    setTentDesignOption(value)
+    console.log('🎨 BannerEditor - Tent design option changed from', previousOption, 'to:', value)
+    
+    // When switching to "all-sides", ensure sidewalls start blank
+    if (value === 'all-sides' && previousOption !== 'all-sides') {
+      setSurfaceElements(prev => ({
+        ...prev,
+        sidewall_left: [],
+        sidewall_right: []
+      }))
+      console.log('🎨 BannerEditor - Initialized sidewalls as empty for all-sides mode')
+    }
+  }, [tentDesignOption])
 
   // Handle surface navigation
   const handleSurfaceChange = useCallback((surface) => {
@@ -317,118 +468,48 @@ const BannerEditorNew = () => {
     checkTourStatus()
   }, [])
   
-  // All available banner types from products
-  const bannerTypes = [
-    {
-      id: 'vinyl-13oz',
-      name: '13oz. Vinyl Banner',
-      category: 'Vinyl Banners',
-      material: '13oz Vinyl',
-      finish: 'Matte',
-      specs: 'Our most popular banner',
-      description: 'Weather resistant, 4-color process',
-      uses: ['Outdoor Advertising', 'Events', 'Storefronts']
-    },
-    {
-      id: 'vinyl-18oz',
-      name: '18oz. Blockout Banner',
-      category: 'Vinyl Banners',
-      material: '18oz Blockout Vinyl',
-      finish: 'Blockout',
-      specs: 'Our most durable banner',
-      description: 'Premium heavyweight vinyl with complete opacity',
-      uses: ['Heavy-duty Outdoor', 'Construction Sites', 'Long-term Use']
-    },
-    {
-      id: 'mesh-banner',
-      name: 'Mesh Banner',
-      category: 'Mesh Banners',
-      material: 'Mesh Vinyl',
-      finish: 'Perforated',
-      specs: 'Best option for windy conditions',
-      description: '70/30 mesh allows wind to pass through',
-      uses: ['Windy Locations', 'Fencing', 'Construction Barriers']
-    },
-    {
-      id: 'indoor-banner',
-      name: 'Indoor Banner',
-      category: 'Indoor Banners',
-      material: 'Indoor Vinyl',
-      finish: 'Smooth',
-      specs: 'Fast and smooth surface (UV)',
-      description: 'Cost-effective option for indoor use',
-      uses: ['Indoor Displays', 'Trade Shows', 'Retail']
-    },
-    {
-      id: 'pole-banner',
-      name: 'Pole Banner',
-      category: 'Pole Banners',
-      material: '13oz Vinyl',
-      finish: 'Reinforced',
-      specs: 'Durable 13 oz banners',
-      description: 'Ready to install hardware kit included',
-      uses: ['Street Poles', 'Lamp Posts', 'Municipal Displays']
-    },
-    {
-      id: 'fabric-9oz',
-      name: '9oz. Fabric Banner',
-      category: 'Fabric Banners',
-      material: '9oz Polyester Fabric',
-      finish: 'Fabric Weave',
-      specs: 'Dye sublimation print',
-      description: 'Wrinkle resistant and washable',
-      uses: ['Premium Indoor', 'Trade Shows', 'Events']
-    },
-    {
-      id: 'fabric-blockout',
-      name: 'Blockout Fabric Banner',
-      category: 'Fabric Banners',
-      material: 'Blockout Fabric',
-      finish: 'Opaque Fabric',
-      specs: 'Dye sublimation print',
-      description: 'Wrinkle resistant and washable with complete opacity',
-      uses: ['Double-sided Displays', 'Premium Indoor Signage']
-    },
-    {
-      id: 'tension-fabric',
-      name: 'Tension Fabric Banner',
-      category: 'Fabric Banners',
-      material: 'Tension Fabric',
-      finish: 'Stretch Fabric',
-      specs: 'Dye sublimation print',
-      description: 'Stretch material for wraps, wrinkle resistant',
-      uses: ['Trade Show Displays', 'Premium Presentations']
-    },
-    {
-      id: 'backlit-banner',
-      name: 'Backlit Banner',
-      category: 'Specialty Banners',
-      material: 'Translucent Vinyl',
-      finish: 'Backlit Compatible',
-      specs: '13 oz translucent vinyl for backlight',
-      description: 'Specially designed for backlighting applications',
-      uses: ['Light Boxes', 'Illuminated Signage', 'Displays']
-    }
-  ]
 
-  // Banner specifications - Updated to match actual product specifications
+  // Banner specifications - Only used for banner products
   const [bannerSpecs, setBannerSpecs] = useState(() => {
     // Get product type from URL parameter
     const productType = searchParams.get('product')
     
-    // Find the matching banner type
-    const selectedBannerType = bannerTypes.find(banner => banner.id === productType)
+    // Only set banner specs for banner products
+    if (productType === 'banner') {
+      // Find the matching banner type
+      const selectedBannerType = bannerTypes.find(banner => banner.id === productType)
+      return selectedBannerType || bannerTypes[0]
+    }
     
-    // Return the selected banner type or default to first one
-    return selectedBannerType || bannerTypes[0]
+    // For non-banner products, return null or a default structure
+    return null
   })
 
-  // Log banner specs once when component mounts
+  // Log product specs once when component mounts
   useEffect(() => {
     const productType = searchParams.get('product')
     console.log('URL product parameter:', productType)
-    console.log('Selected banner type:', bannerSpecs)
+    
+    if (productType === 'banner') {
+      console.log('Selected banner type:', bannerSpecs)
+    } else if (productType === 'tin') {
+      console.log('Tin specs:', tinSpecs)
+    } else if (productType === 'tent') {
+      console.log('Tent design option:', tentDesignOption)
+    }
   }, []) // Only run once on mount
+  
+  // Log specs when they change
+  useEffect(() => {
+    console.log('🎨 Current product type:', productType)
+    if (productType === 'tin') {
+      console.log('🎨 Current tin specs:', tinSpecs)
+    } else if (productType === 'tent') {
+      console.log('🎨 Current tent design option:', tentDesignOption)
+    } else if (productType === 'banner') {
+      console.log('🎨 Current banner specs:', bannerSpecs)
+    }
+  }, [productType, tinSpecs, tentDesignOption, bannerSpecs])
 
   // Utility functions
   const generateId = (type) => `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -2792,16 +2873,26 @@ const BannerEditorNew = () => {
         try {
           // Capture image for each surface
           for (const surface of allSurfaces) {
-            // Switch to the surface
-            setCurrentSurface(surface)
+            // Get elements for this surface directly from surfaceElements
+            const surfaceElementsForCapture = surfaceElements[surface] || []
             
-            // Wait for the canvas to update
-            await new Promise(resolve => setTimeout(resolve, 100))
-            
-            // Capture the canvas image for this surface
-            const surfaceImage = generateCanvasImage()
-            if (surfaceImage) {
-              surfaceImages[surface] = surfaceImage
+            if (surfaceElementsForCapture.length > 0) {
+              // Temporarily set current surface for canvas rendering
+              setCurrentSurface(surface)
+              
+              // Wait for the canvas to update
+              await new Promise(resolve => setTimeout(resolve, 300))
+              
+              // Capture the canvas image for this surface
+              const surfaceImage = generateCanvasImage()
+              if (surfaceImage) {
+                surfaceImages[surface] = surfaceImage
+                console.log(`🎨 Captured image for surface: ${surface} (${surfaceElementsForCapture.length} elements)`)
+              } else {
+                console.warn(`🎨 Failed to capture image for surface: ${surface}`)
+              }
+            } else {
+              console.log(`🎨 Skipping empty surface: ${surface}`)
             }
           }
           
@@ -2861,25 +2952,63 @@ const BannerEditorNew = () => {
           height: 4, // Default 4ft height
           orientation: canvasOrientation
         },
-      banner_type: bannerSpecs?.id || 'vinyl-13oz',
-      banner_material: bannerSpecs?.material || '13oz Vinyl',
-      banner_finish: bannerSpecs?.finish || 'Matte',
+      banner_type: bannerSpecs?.id || (productType === 'banner' ? 'vinyl-13oz' : null),
+      banner_material: bannerSpecs?.material || (productType === 'banner' ? '13oz Vinyl' : null),
+      banner_finish: bannerSpecs?.finish || (productType === 'banner' ? 'Matte' : null),
       banner_size: `${canvasSize.width}x${canvasSize.height}px (${canvasOrientation})`,
-      banner_category: bannerSpecs?.category || 'Vinyl Banners',
+      banner_category: bannerSpecs?.category || (productType === 'banner' ? 'Vinyl Banners' : null),
       background_color: backgroundColor,
-      print_options: {} // Will be populated by checkout component
+      print_options: {}, // Will be populated by checkout component
+      
+      // Specification data - drives downstream components
+      design_option: productType === 'tent' ? tentDesignOption : 
+                     productType === 'tin' ? (tinSpecs?.surfaceCoverage || 'front-back') : 'single-surface',
+      tent_design_option: tentDesignOption,
+      tin_surface_coverage: tinSpecs?.surfaceCoverage || 'front-back'
     }
     
     console.log('Creating order with elements count:', elements.length)
     console.log('Canvas size:', canvasSize)
     console.log('Banner specs:', bannerSpecs)
+    console.log('🎨 Order data specs - tentDesignOption:', tentDesignOption)
+    console.log('🎨 Order data specs - tinSpecs.surfaceCoverage:', tinSpecs?.surfaceCoverage)
+    console.log('🎨 Order data specs - design_option:', productType === 'tent' ? tentDesignOption : productType === 'tin' ? (tinSpecs?.surfaceCoverage || 'front-back') : 'single-surface')
     
     // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
-    // Remove large image data since images are stored in Supabase
+    // Create minimal restoration data without large image objects
     const orderDataForStorage = {
       ...orderData,
-      surface_images: {}, // Images are in Supabase, not needed in sessionStorage
-      canvas_image: null // Canvas image is in Supabase, not needed in sessionStorage
+      canvas_image: null, // Canvas image is in Supabase, not needed in sessionStorage
+      // Remove large image data that causes quota exceeded errors
+      surface_images: null, // Will be regenerated when needed
+      // Clean surface_elements to remove image objects but preserve structure
+      surface_elements: Object.keys(surfaceElements).reduce((acc, surfaceKey) => {
+        acc[surfaceKey] = (surfaceElements[surfaceKey] || []).map(element => {
+          if (element.type === 'image') {
+            return {
+              ...element,
+              image: null, // Remove the actual image object
+              imageDataUrl: element.imageDataUrl || (element.image?.src || null) // Keep data URL for restoration
+            }
+          }
+          return element
+        })
+        return acc
+      }, {}),
+      canvas_data: {
+        ...orderData.canvas_data,
+        // Remove image objects, keep only essential data for restoration
+        elements: orderData.canvas_data.elements.map(element => {
+          if (element.type === 'image') {
+            return {
+              ...element,
+              image: null, // Remove the actual image object
+              imageDataUrl: element.imageDataUrl || (element.image?.src || null) // Keep data URL for restoration
+            }
+          }
+          return element
+        })
+      }
     }
     sessionStorage.setItem('orderData', JSON.stringify(orderDataForStorage))
     
@@ -3113,7 +3242,10 @@ const BannerEditorNew = () => {
                 const img = new window.Image()
                 img.crossOrigin = 'anonymous'
                 await new Promise((resolve, reject) => {
-                  img.onload = resolve
+                  img.onload = () => {
+                    console.log('🎨 Successfully loaded image:', imageSrc)
+                    resolve()
+                  }
                   img.onerror = (error) => {
                     console.error('Failed to load image:', imageSrc, error)
                     reject(error)
@@ -3121,12 +3253,18 @@ const BannerEditorNew = () => {
                   img.src = imageSrc
                 })
                 
-                // Create the restored element
-                const restoredElement = {
-                  ...element,
-                  image: img
+                // Verify the image is valid before using it
+                if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                  // Create the restored element
+                  const restoredElement = {
+                    ...element,
+                    image: img
+                  }
+                  restoredElements.push(restoredElement)
+                  console.log('🎨 Successfully restored image element:', element.assetName || 'uploaded image')
+                } else {
+                  console.warn('Image loaded but has invalid dimensions:', imageSrc)
                 }
-                restoredElements.push(restoredElement)
               } else {
                 // Skip elements we can't restore
                 console.warn('Cannot restore image element - no valid image source found:', element)
@@ -3282,8 +3420,105 @@ const BannerEditorNew = () => {
         if (orderData.canvas_data) {
           // For multi-surface products, restore surface_elements if available
           if (orderData.surface_elements && (productType === 'tin' || productType === 'tent')) {
-            console.log('🎨 Restoring multi-surface elements:', orderData.surface_elements)
-            setSurfaceElements(orderData.surface_elements)
+            console.log('🎨 Restoring multi-surface elements from surface_elements')
+            
+            // Restore image elements properly for each surface
+            const restoredSurfaceElements = {}
+            const surfaceKeys = Object.keys(orderData.surface_elements)
+            
+            // Process each surface's elements
+            const restorePromises = surfaceKeys.map(async (surfaceKey) => {
+              const elements = orderData.surface_elements[surfaceKey] || []
+              try {
+                const restoredElements = await restoreImageElements(elements)
+                restoredSurfaceElements[surfaceKey] = restoredElements
+                console.log(`🎨 Restored ${restoredElements.length} elements for surface: ${surfaceKey}`)
+              } catch (error) {
+                console.error(`Failed to restore elements for surface ${surfaceKey}:`, error)
+                restoredSurfaceElements[surfaceKey] = elements // Fallback to original elements
+              }
+            })
+            
+            // Wait for all surfaces to be restored
+            Promise.all(restorePromises).then(() => {
+              // Ensure all surfaces are properly initialized with empty arrays
+              const completeSurfaceElements = {
+                // Tin surfaces
+                front: [],
+                back: [],
+                inside: [],
+                lid: [],
+                // Tent surfaces
+                canopy_front: [],
+                canopy_back: [],
+                canopy_left: [],
+                canopy_right: [],
+                sidewall_left: [],
+                sidewall_right: [],
+                backwall: [],
+                // Override with restored elements
+                ...restoredSurfaceElements
+              }
+              setSurfaceElements(completeSurfaceElements)
+            }).catch(error => {
+              console.error('Failed to restore surface elements:', error)
+              // Fallback: ensure all surfaces are empty
+              setSurfaceElements({
+                front: [],
+                back: [],
+                inside: [],
+                lid: [],
+                canopy_front: [],
+                canopy_back: [],
+                canopy_left: [],
+                canopy_right: [],
+                sidewall_left: [],
+                sidewall_right: [],
+                backwall: []
+              })
+            })
+          } else if ((productType === 'tin' || productType === 'tent')) {
+            console.log('🎨 Fallback: Restoring from canvas_data.elements (no surface_elements)')
+            
+            // Fallback: restore from canvas_data.elements and put on current surface
+            restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
+              const currentSurface = productType === 'tin' ? 'front' : 'canopy_front'
+              const restoredSurfaceElements = {
+                // Initialize all surfaces as empty
+                front: [],
+                back: [],
+                inside: [],
+                lid: [],
+                canopy_front: [],
+                canopy_back: [],
+                canopy_left: [],
+                canopy_right: [],
+                sidewall_left: [],
+                sidewall_right: [],
+                backwall: [],
+                // Override with restored elements for current surface
+                [currentSurface]: restoredElements
+              }
+              setSurfaceElements(restoredSurfaceElements)
+              console.log(`🎨 Restored ${restoredElements.length} elements for surface: ${currentSurface}`)
+            }).catch(error => {
+              console.error('Failed to restore image elements:', error)
+              // Fallback: create empty surface elements for all surfaces
+              setSurfaceElements({
+                front: [],
+                back: [],
+                inside: [],
+                lid: [],
+                canopy_front: [],
+                canopy_back: [],
+                canopy_left: [],
+                canopy_right: [],
+                sidewall_left: [],
+                sidewall_right: [],
+                backwall: []
+              })
+            })
+            
             setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
             if (orderData.canvas_data.bannerSpecs) {
               setBannerSpecs(orderData.canvas_data.bannerSpecs)
@@ -3291,6 +3526,11 @@ const BannerEditorNew = () => {
             if (orderData.canvas_data.canvasSize) {
               setCanvasSize(orderData.canvas_data.canvasSize)
               setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+            }
+            // Restore tent design option if available
+            if (orderData.tent_design_option) {
+              setTentDesignOption(orderData.tent_design_option)
+              console.log('🎨 Restored tent design option:', orderData.tent_design_option)
             }
           } else {
             // For single-surface products or fallback, restore image elements properly
@@ -3304,6 +3544,11 @@ const BannerEditorNew = () => {
                 setCanvasSize(orderData.canvas_data.canvasSize)
                 setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
               }
+              // Restore tent design option if available
+              if (orderData.tent_design_option) {
+                setTentDesignOption(orderData.tent_design_option)
+                console.log('🎨 Restored tent design option (fallback):', orderData.tent_design_option)
+              }
             }).catch(error => {
               console.error('Failed to restore image elements:', error)
               // Fallback to loading without images
@@ -3315,6 +3560,11 @@ const BannerEditorNew = () => {
               if (orderData.canvas_data.canvasSize) {
                 setCanvasSize(orderData.canvas_data.canvasSize)
                 setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+              }
+              // Restore tent design option if available
+              if (orderData.tent_design_option) {
+                setTentDesignOption(orderData.tent_design_option)
+                console.log('🎨 Restored tent design option (error fallback):', orderData.tent_design_option)
               }
             })
           }
@@ -3384,7 +3634,62 @@ const BannerEditorNew = () => {
           // For multi-surface products, restore surface_elements if available
           if (canvasData.surface_elements && (canvasData.productType === 'tin' || canvasData.productType === 'tent')) {
             console.log('🎨 Restoring multi-surface elements from sessionStorage:', canvasData.surface_elements)
-            setSurfaceElements(canvasData.surface_elements)
+            
+            // Restore image elements properly for each surface
+            const restoredSurfaceElements = {}
+            const surfaceKeys = Object.keys(canvasData.surface_elements)
+            
+            // Process each surface's elements
+            const restorePromises = surfaceKeys.map(async (surfaceKey) => {
+              const elements = canvasData.surface_elements[surfaceKey] || []
+              try {
+                const restoredElements = await restoreImageElements(elements)
+                restoredSurfaceElements[surfaceKey] = restoredElements
+                console.log(`🎨 Restored ${restoredElements.length} elements for surface: ${surfaceKey}`)
+              } catch (error) {
+                console.error(`Failed to restore elements for surface ${surfaceKey}:`, error)
+                restoredSurfaceElements[surfaceKey] = elements // Fallback to original elements
+              }
+            })
+            
+            // Wait for all surfaces to be restored
+            Promise.all(restorePromises).then(() => {
+              // Ensure all surfaces are properly initialized with empty arrays
+              const completeSurfaceElements = {
+                // Tin surfaces
+                front: [],
+                back: [],
+                inside: [],
+                lid: [],
+                // Tent surfaces
+                canopy_front: [],
+                canopy_back: [],
+                canopy_left: [],
+                canopy_right: [],
+                sidewall_left: [],
+                sidewall_right: [],
+                backwall: [],
+                // Override with restored elements
+                ...restoredSurfaceElements
+              }
+              setSurfaceElements(completeSurfaceElements)
+            }).catch(error => {
+              console.error('Failed to restore surface elements:', error)
+              // Fallback: ensure all surfaces are empty
+              setSurfaceElements({
+                front: [],
+                back: [],
+                inside: [],
+                lid: [],
+                canopy_front: [],
+                canopy_back: [],
+                canopy_left: [],
+                canopy_right: [],
+                sidewall_left: [],
+                sidewall_right: [],
+                backwall: []
+              })
+            })
           } else {
             // For single-surface products or fallback, restore image elements properly
             console.log('🎨 About to restore elements:', canvasData.elements)
@@ -3556,6 +3861,8 @@ const BannerEditorNew = () => {
             onSurfaceChange={handleSurfaceChange}
             onAvailableSurfacesChange={handleAvailableSurfacesChange}
             onCopyDesignToSurface={copyDesignToSurface}
+            tentDesignOption={tentDesignOption}
+            onTentDesignOptionChange={handleTentDesignOptionChange}
 
             onAddShape={addShape}
             onAddText={addText}

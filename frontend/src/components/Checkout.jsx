@@ -591,7 +591,17 @@ const Checkout = () => {
               onClick={() => {
                 // Save current order data to sessionStorage before going back
                 if (orderData) {
-                  sessionStorage.setItem('cancelledOrder', JSON.stringify(orderData))
+                  // Store only essential data for canvas restoration, not the large images
+                  const restorationData = {
+                    canvas_data: orderData.canvas_data,
+                    surface_elements: orderData.surface_elements,
+                    marketplace_templates: orderData.marketplace_templates,
+                    product_type: orderData.product_type,
+                    design_option: orderData.design_option,
+                    tent_design_option: orderData.tent_design_option,
+                    tin_surface_coverage: orderData.tin_surface_coverage
+                  }
+                  sessionStorage.setItem('cancelledOrder', JSON.stringify(restorationData))
                   console.log('Saved cancelled order data for restoration')
                 }
                 // Route back to banner editor with product parameter

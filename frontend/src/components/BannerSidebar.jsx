@@ -40,6 +40,8 @@ const BannerSidebar = ({
   onSurfaceChange,
   onAvailableSurfacesChange,
   onCopyDesignToSurface,
+  tentDesignOption = 'canopy-only',
+  onTentDesignOptionChange,
 
   onAddShape,
   onAddAsset,
@@ -73,7 +75,6 @@ const BannerSidebar = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [sizeCategory, setSizeCategory] = useState('landscape')
   const [uploadedImages, setUploadedImages] = useState([])
-  const [tentDesignOption, setTentDesignOption] = useState('canopy-only')
   
   // Marketplace state
   const [marketplaceTemplates, setMarketplaceTemplates] = useState([])
@@ -85,27 +86,27 @@ const BannerSidebar = ({
   // Stable callback for radio button changes
   const handleTentDesignOptionChange = useCallback((value) => {
     const previousOption = tentDesignOption
-    setTentDesignOption(value)
+    
+    // Call the parent handler
+    if (onTentDesignOptionChange) {
+      onTentDesignOptionChange(value)
+    }
     
     // Handle design transfer when new surfaces become available
     if (previousOption !== value) {
-      // If switching to "all-sides" from "canopy-only" or "canopy-backwall"
-      if (value === 'all-sides' && (previousOption === 'canopy-only' || previousOption === 'canopy-backwall')) {
-        // Copy canopy front design to sidewalls
-        setTimeout(() => {
-          onCopyDesignToSurface('canopy_front', 'sidewall_left')
-          onCopyDesignToSurface('canopy_front', 'sidewall_right')
-        }, 100)
-      }
       // If switching to "canopy-backwall" from "canopy-only"
-      else if (value === 'canopy-backwall' && previousOption === 'canopy-only') {
-        // Copy canopy front design to backwall
-        setTimeout(() => {
-          onCopyDesignToSurface('canopy_front', 'backwall')
-        }, 100)
+      if (value === 'canopy-backwall' && previousOption === 'canopy-only') {
+        // All 4 canopy sides keep their existing designs, backwall starts blank
+        // No copying needed - canopy sides already have their designs
+        console.log('🎨 Switching to canopy-backwall - canopy sides keep existing designs, backwall starts blank')
+      }
+      // If switching to "all-sides" from "canopy-only" or "canopy-backwall"
+      else if (value === 'all-sides' && (previousOption === 'canopy-only' || previousOption === 'canopy-backwall')) {
+        // All existing surfaces (4 canopy sides + backwall if applicable) keep their designs, sidewalls remain blank
+        console.log('🎨 Switching to all-sides - existing surfaces keep their designs, sidewalls remain blank')
       }
     }
-  }, [tentDesignOption, onCopyDesignToSurface])
+  }, [tentDesignOption, onTentDesignOptionChange, onCopyDesignToSurface])
 
   // Memoized available tent surfaces based on design option
   const availableTentSurfaces = useMemo(() => {
@@ -145,12 +146,17 @@ const BannerSidebar = ({
       { key: 'lid', name: 'Lid', group: 'secondary' }
     ]
 
+    // Return empty array if tinSpecs is null (not a tin product)
+    if (!tinSpecs) {
+      return []
+    }
+
     if (tinSpecs.surfaceCoverage === 'front-back') {
       return allSurfaces.filter(s => s.group === 'main')
     } else {
       return allSurfaces // all-sides
     }
-  }, [tinSpecs.surfaceCoverage])
+  }, [tinSpecs?.surfaceCoverage])
 
   // Update currentSurface if it's not available in the new filtered surfaces
   useEffect(() => {
@@ -1272,7 +1278,7 @@ const BannerSidebar = ({
                   </div>
                 ) : (
                 <select 
-                  value={productType === 'tin' ? tinSpecs.finish : (bannerSpecs?.id || '')}
+                  value={productType === 'tin' ? (tinSpecs?.finish || '') : (bannerSpecs?.id || '')}
                   onChange={(e) => {
                     if (productType === 'tin') {
                       handleTinSpecChange('finish', e.target.value)
@@ -1310,7 +1316,7 @@ const BannerSidebar = ({
                           type="radio" 
                           name="surface-coverage" 
                           value="front-back" 
-                          checked={tinSpecs.surfaceCoverage === 'front-back'}
+                          checked={tinSpecs?.surfaceCoverage === 'front-back'}
                           onChange={(e) => handleTinSpecChange('surfaceCoverage', e.target.value)}
                           className="text-blue-500" 
                         />
@@ -1321,7 +1327,7 @@ const BannerSidebar = ({
                           type="radio" 
                           name="surface-coverage" 
                           value="all-sides" 
-                          checked={tinSpecs.surfaceCoverage === 'all-sides'}
+                          checked={tinSpecs?.surfaceCoverage === 'all-sides'}
                           onChange={(e) => handleTinSpecChange('surfaceCoverage', e.target.value)}
                           className="text-blue-500" 
                         />
@@ -1334,7 +1340,7 @@ const BannerSidebar = ({
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                     <div className="text-sm font-medium text-gray-800 mb-3">Printing Method</div>
                     <select 
-                      value={tinSpecs.printingMethod}
+                      value={tinSpecs?.printingMethod || ''}
                       onChange={(e) => handleTinSpecChange('printingMethod', e.target.value)}
                       className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     >
@@ -1591,18 +1597,18 @@ const BannerSidebar = ({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Tin Finish:</span>
-                      <span className="font-medium text-gray-800 capitalize">{tinSpecs.finish}</span>
+                      <span className="font-medium text-gray-800 capitalize">{tinSpecs?.finish || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Surface Coverage:</span>
                       <span className="font-medium text-gray-800">
-                        {tinSpecs.surfaceCoverage === 'front-back' ? 'Front + Back' : 'All Sides'}
+                        {tinSpecs?.surfaceCoverage === 'front-back' ? 'Front + Back' : 'All Sides'}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Printing:</span>
                       <span className="font-medium text-gray-800">
-                        {tinSpecs.printingMethod === 'premium-vinyl' ? 'Premium Vinyl Stickers' : 'Premium Clear Vinyl Stickers'}
+                        {tinSpecs?.printingMethod === 'premium-vinyl' ? 'Premium Vinyl Stickers' : 'Premium Clear Vinyl Stickers'}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -1838,7 +1844,7 @@ const BannerSidebar = ({
                     >
                       Back
                     </button>
-                    {tinSpecs.surfaceCoverage === 'all-sides' && (
+                    {tinSpecs?.surfaceCoverage === 'all-sides' && (
                       <>
                         <button
                           onClick={() => handleSurfaceChange('inside')}
