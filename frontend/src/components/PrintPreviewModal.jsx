@@ -58,9 +58,7 @@ const PrintPreviewModal = ({
       ]
       
       // Filter surfaces based on design option
-      const designOption = orderDetails?.design_option || 'canopy-only'
-      console.log('🎨 PrintPreviewModal - Design option:', designOption)
-      console.log('🎨 PrintPreviewModal - Available surface images:', Object.keys(orderDetails?.surface_images || {}))
+    const designOption = orderDetails?.design_option || 'canopy-only'
       
       if (designOption === 'canopy-only') {
         return allSurfaces.filter(s => s.key.startsWith('canopy_'))
@@ -68,10 +66,9 @@ const PrintPreviewModal = ({
         return allSurfaces.filter(s => s.key.startsWith('canopy_') || s.key === 'backwall')
       } else {
         // For all-sides, return all surfaces that have images
-        const availableSurfaces = allSurfaces.filter(surface => 
+        const availableSurfaces = allSurfaces.filter(surface =>
           orderDetails?.surface_images && orderDetails.surface_images[surface.key]
         )
-        console.log('🎨 PrintPreviewModal - Returning surfaces:', availableSurfaces.map(s => s.key))
         return availableSurfaces.length > 0 ? availableSurfaces : allSurfaces
       }
     }
@@ -152,10 +149,6 @@ const PrintPreviewModal = ({
   // Modified useEffect to handle missing surface images
   useEffect(() => {
     if (isOpen && orderDetails) {
-      console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
-      console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys(orderDetails.surface_images || {}))
-      console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails.design_option)
-      
       // For multi-surface products, use surface-specific images
       if (hasMultipleSurfaces() && orderDetails.surface_images) {
         const surfaceImage = orderDetails.surface_images[selectedSurface]
