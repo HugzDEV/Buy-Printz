@@ -100,9 +100,7 @@ const TentCheckout = () => {
   const accessories = [
     { id: 'carrying-bag', name: 'Carrying Bag w/ Wheels', price: 49.99, description: 'Premium wheeled bag for easy transport' },
     { id: 'sandbags', name: 'Sandbags', price: 24.99, description: 'Heavy-duty sandbags for tent stability (sand not included)' },
-    { id: 'ropes-stakes', name: 'Reinforced Strip', price: 19.99, description: 'Professional tent ropes and stakes' },
-    { id: 'full-wall', name: 'Full Wall', price: 199.99, description: 'Complete wall coverage for privacy' },
-    { id: 'half-wall', name: 'Half Wall', price: 149.99, description: 'Partial wall for open feel' }
+    { id: 'ropes-stakes', name: 'Reinforced Strip', price: 19.99, description: 'Professional tent ropes and stakes' }
   ]
 
   // Shipping information
@@ -124,10 +122,8 @@ const TentCheckout = () => {
     if (savedOrderData) {
       try {
         const parsed = JSON.parse(savedOrderData)
-        // Determine design option based on the loaded data
-        const designOption = determineDesignOption(parsed)
-        parsed.design_option = designOption
-        console.log('🎨 TentCheckout - Updated design option for loaded data:', designOption)
+        // Use the design option from the order data (set in BannerSidebar)
+        console.log('🎨 TentCheckout - Using design option from order data:', parsed.design_option || parsed.tent_design_option)
         setOrderData(parsed)
         console.log('Loaded tent order data:', parsed)
       } catch (error) {
@@ -197,31 +193,6 @@ const TentCheckout = () => {
     }))
   }
 
-  // Determine design option based on available surfaces
-  const determineDesignOption = (orderData) => {
-    if (!orderData?.surface_elements) return 'canopy-only'
-    
-    const surfaceElements = orderData.surface_elements
-    console.log('🎨 TentCheckout - Surface elements:', surfaceElements)
-    
-    const hasSidewalls = (surfaceElements.sidewall_left && surfaceElements.sidewall_left.length > 0) || 
-                        (surfaceElements.sidewall_right && surfaceElements.sidewall_right.length > 0)
-    const hasBackwall = surfaceElements.backwall && surfaceElements.backwall.length > 0
-    
-    console.log('🎨 TentCheckout - Has sidewalls:', hasSidewalls)
-    console.log('🎨 TentCheckout - Has backwall:', hasBackwall)
-    
-    if (hasSidewalls || hasBackwall) {
-      console.log('🎨 TentCheckout - Setting design option to: all-sides')
-      return 'all-sides'
-    } else if (hasBackwall) {
-      console.log('🎨 TentCheckout - Setting design option to: canopy-backwall')
-      return 'canopy-backwall'
-    } else {
-      console.log('🎨 TentCheckout - Setting design option to: canopy-only')
-      return 'canopy-only'
-    }
-  }
 
   // Create order
   const createOrder = async () => {

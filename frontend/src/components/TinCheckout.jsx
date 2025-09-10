@@ -139,7 +139,6 @@ const TinCheckout = () => {
   // Tin Options State
   const [tinOptions, setTinOptions] = useState({
     quantity: 100,
-    surfaceCoverage: 'front-back',
     tinFinish: 'silver',
     printingMethod: 'premium-vinyl',
     jobName: '',
@@ -242,7 +241,7 @@ const TinCheckout = () => {
   // Calculate tin pricing
   const calculateTinPrice = () => {
     const baseQuantity = tinConfig.quantities.find(q => q.value === tinOptions.quantity)
-    const surfaceCoverage = tinConfig.surfaceCoverage.find(s => s.value === tinOptions.surfaceCoverage)
+    const surfaceCoverage = tinConfig.surfaceCoverage.find(s => s.value === (orderData?.tin_surface_coverage || 'front-back'))
     const tinFinish = tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)
     const printingMethod = tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)
     
@@ -527,7 +526,17 @@ const TinCheckout = () => {
             <button
               onClick={() => {
                 if (orderData) {
-                  sessionStorage.setItem('cancelledOrder', JSON.stringify(orderData))
+                  // Store only essential data for canvas restoration, not the large images
+                  const restorationData = {
+                    canvas_data: orderData.canvas_data,
+                    surface_elements: orderData.surface_elements,
+                    marketplace_templates: orderData.marketplace_templates,
+                    product_type: orderData.product_type,
+                    design_option: orderData.design_option,
+                    tent_design_option: orderData.tent_design_option,
+                    tin_surface_coverage: orderData.tin_surface_coverage
+                  }
+                  sessionStorage.setItem('cancelledOrder', JSON.stringify(restorationData))
                   console.log('Saved cancelled tin order data for restoration')
                 }
                 navigate('/editor?product=tin')
@@ -663,34 +672,6 @@ const TinCheckout = () => {
                 </div>
               </div>
 
-              {/* Surface Coverage */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-purple-600" />
-                  Surface Coverage
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {tinConfig.surfaceCoverage.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 active:bg-purple-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2">
-                      <input 
-                        type="radio" 
-                        name="surfaceCoverage" 
-                        value={option.value} 
-                        checked={tinOptions.surfaceCoverage === option.value} 
-                        onChange={(e) => setTinOptions(prev => ({ ...prev, surfaceCoverage: e.target.value }))} 
-                        className="mr-3 text-purple-600 focus:ring-purple-500" 
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className="text-sm text-gray-600">{option.description}</p>
-                        <p className={`text-sm ${option.priceModifier > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                          {option.priceModifier > 0 ? `+$${option.priceModifier}` : 'No additional cost'}
-                        </p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
 
               {/* Tin Finish */}
               <div className="space-y-3">
@@ -972,7 +953,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Surface Coverage:</span>
                     <span className="font-medium">
-                      {tinOptions.surfaceCoverage === 'all-sides' ? 'All Sides (Front + Back + Inside + Lid)' : 'Front + Back Only'}
+                      {orderData?.tin_surface_coverage === 'all-sides' ? 'All Sides (Front + Back + Inside + Lid)' : 'Front + Back Only'}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -1104,7 +1085,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Surface Coverage:</span>
                     <span className="font-medium">
-                      {tinOptions.surfaceCoverage === 'all-sides' ? 'All Sides' : 'Front + Back'}
+                      {orderData?.tin_surface_coverage === 'all-sides' ? 'All Sides' : 'Front + Back'}
                     </span>
                   </div>
                   
