@@ -2735,7 +2735,7 @@ const BannerEditorNew = () => {
   // Create order
   const createOrder = useCallback(async () => {
     // Generate canvas image data for preview
-    const generateCanvasImage = () => {
+    const generateCanvasImage = (quality = 0.8) => {
       try {
         // Try multiple selectors to find the Konva canvas
         const selectors = [
@@ -2755,14 +2755,14 @@ const BannerEditorNew = () => {
         }
         
         if (stageElement) {
-          // Use a higher quality export but limit size
-          const imageData = stageElement.toDataURL('image/png', 0.8)
+          // Use specified quality for export
+          const imageData = stageElement.toDataURL('image/jpeg', quality)
           console.log('Canvas image generated successfully, length:', imageData.length)
           
-          // Check if image is too large (limit to 5MB)
-          if (imageData.length > 5 * 1024 * 1024) {
-            console.warn('Canvas image too large, reducing quality')
-            return stageElement.toDataURL('image/png', 0.5)
+          // Check if image is too large (limit to 1MB for sessionStorage)
+          if (imageData.length > 1024 * 1024) {
+            console.warn('Canvas image too large, reducing quality further')
+            return stageElement.toDataURL('image/jpeg', quality * 0.5)
           }
           
           return imageData
@@ -2798,8 +2798,8 @@ const BannerEditorNew = () => {
             // Wait for the canvas to update
             await new Promise(resolve => setTimeout(resolve, 100))
             
-            // Capture the canvas image for this surface
-            const surfaceImage = generateCanvasImage()
+            // Capture the canvas image for this surface (compressed for storage)
+            const surfaceImage = generateCanvasImage(0.7) // Compress to 70% quality
             if (surfaceImage) {
               surfaceImages[surface] = surfaceImage
             }
@@ -2846,7 +2846,7 @@ const BannerEditorNew = () => {
         bannerSpecs,
         timestamp: new Date().toISOString()
       },
-      canvas_image: generateCanvasImage(),
+      canvas_image: generateCanvasImage(0.6), // Lower quality for sessionStorage
       surface_images: await captureAllSurfaceImages(),
       surface_elements: surfaceElements, // Include surface elements for restoration
       
@@ -2875,7 +2875,18 @@ const BannerEditorNew = () => {
     console.log('Banner specs:', bannerSpecs)
     
     // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
-    sessionStorage.setItem('orderData', JSON.stringify(orderData))
+    try {
+      sessionStorage.setItem('orderData', JSON.stringify(orderData))
+    } catch (error) {
+      console.warn('SessionStorage quota exceeded, storing minimal order data:', error)
+      // Store minimal order data without images
+      const minimalOrderData = {
+        ...orderData,
+        canvas_image: null,
+        surface_images: {}
+      }
+      sessionStorage.setItem('orderData', JSON.stringify(minimalOrderData))
+    }
     
     // Route to appropriate checkout based on product type
     if (orderData.product_type === 'business_card_tin') {
