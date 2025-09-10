@@ -124,6 +124,10 @@ const TentCheckout = () => {
     if (savedOrderData) {
       try {
         const parsed = JSON.parse(savedOrderData)
+        // Determine design option based on the loaded data
+        const designOption = determineDesignOption(parsed)
+        parsed.design_option = designOption
+        console.log('🎨 TentCheckout - Updated design option for loaded data:', designOption)
         setOrderData(parsed)
         console.log('Loaded tent order data:', parsed)
       } catch (error) {
@@ -138,11 +142,7 @@ const TentCheckout = () => {
         tent_material: '6oz Tent Fabric',
         tent_frame_type: '40mm Aluminum Hex',
         tent_print_method: 'Dye-Sublimation',
-        design_option: (() => {
-          const designOption = determineDesignOption(orderData)
-          console.log('🎨 TentCheckout - Final design option:', designOption)
-          return designOption
-        })(), // Determine based on available surfaces
+        design_option: 'canopy-only', // Default for empty state
         quantity: 1,
         canvas_data: null,
         dimensions: null,
