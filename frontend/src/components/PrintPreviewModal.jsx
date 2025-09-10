@@ -149,49 +149,126 @@ const PrintPreviewModal = ({
     }
   }
 
+  // Generate canvas image from canvas data when images are missing
+  const generateCanvasImageFromData = async () => {
+    try {
+      console.log('🎨 Generating canvas image from canvas data...')
+      
+      // Create a temporary canvas to render the design
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      
+      if (!canvasData?.elements || canvasData.elements.length === 0) {
+        console.warn('No elements found in canvas data')
+        return null
+      }
+      
+      // Set canvas size
+      const canvasSize = canvasData.canvasSize || { width: 800, height: 600 }
+      canvas.width = canvasSize.width
+      canvas.height = canvasSize.height
+      
+      // Set background color
+      ctx.fillStyle = canvasData.backgroundColor || '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Render elements
+      for (const element of canvasData.elements) {
+        if (element.type === 'image' && element.imageDataUrl) {
+          // Create image from data URL
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          
+          await new Promise((resolve, reject) => {
+            img.onload = () => {
+              ctx.drawImage(img, element.x, element.y, element.width, element.height)
+              resolve()
+            }
+            img.onerror = reject
+            img.src = element.imageDataUrl
+          })
+        } else if (element.type === 'text') {
+          // Render text
+          ctx.font = `${element.fontSize}px ${element.fontFamily}`
+          ctx.fillStyle = element.color
+          ctx.textAlign = element.textAlign || 'left'
+          ctx.fillText(element.text, element.x, element.y)
+        }
+        // Add more element types as needed
+      }
+      
+      // Convert to data URL
+      const imageDataUrl = canvas.toDataURL('image/png', 0.8)
+      console.log('🎨 Generated canvas image successfully')
+      return imageDataUrl
+      
+    } catch (error) {
+      console.error('Error generating canvas image:', error)
+      return null
+    }
+  }
+
   // Modified useEffect to handle missing surface images
   useEffect(() => {
-    if (isOpen && orderDetails) {
-      console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
-      console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys(orderDetails.surface_images || {}))
-      console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails.design_option)
-      
-      // For multi-surface products, use surface-specific images
-      if (hasMultipleSurfaces() && orderDetails.surface_images) {
-        const surfaceImage = orderDetails.surface_images[selectedSurface]
+    const loadPreviewImage = async () => {
+      if (isOpen && (orderDetails || canvasData)) {
+        console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
+        console.log('🎨 PrintPreviewModal - Canvas data:', canvasData)
+        console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys((canvasData?.surface_images || orderDetails?.surface_images) || {}))
+        console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails?.design_option)
         
-        if (typeof surfaceImage === 'string') {
-          setPreviewImage(surfaceImage)
-        } else {
-          // Fallback to main canvas image if specific surface image is missing
-          console.warn(`No specific image found for surface: ${selectedSurface}, using main canvas image as fallback`)
-          if (typeof orderDetails.canvas_image === 'string') {
-            setPreviewImage(orderDetails.canvas_image)
+        // Get images from canvasData first (since that's where they're actually stored), fallback to orderDetails
+        const surfaceImages = canvasData?.surface_images || orderDetails?.surface_images
+        const canvasImage = canvasData?.canvas_image || orderDetails?.canvas_image
+        
+        // For multi-surface products, use surface-specific images
+        if (hasMultipleSurfaces() && surfaceImages && Object.keys(surfaceImages).length > 0) {
+          const surfaceImage = surfaceImages[selectedSurface]
+          
+          if (typeof surfaceImage === 'string') {
+            setPreviewImage(surfaceImage)
           } else {
-            setPreviewImage(null)
+            // Fallback to main canvas image if specific surface image is missing
+            console.warn(`No specific image found for surface: ${selectedSurface}, using main canvas image as fallback`)
+            if (typeof canvasImage === 'string') {
+              setPreviewImage(canvasImage)
+            } else {
+              // Generate image from canvas data
+              const generatedImage = await generateCanvasImageFromData()
+              setPreviewImage(generatedImage)
+            }
           }
-        }
-      } else if (hasMultipleSurfaces() && !orderDetails.surface_images && orderDetails?.canvas_image) {
-        // Fallback: Use main canvas image for all surfaces when surface_images is missing
-        console.warn(`No surface_images found for ${productType}, using main canvas image for all surfaces`)
-        if (typeof orderDetails.canvas_image === 'string') {
-          setPreviewImage(orderDetails.canvas_image)
+        } else if (hasMultipleSurfaces() && (!surfaceImages || Object.keys(surfaceImages).length === 0) && canvasImage) {
+          // Fallback: Use main canvas image for all surfaces when surface_images is missing
+          console.warn(`No surface_images found for ${productType}, using main canvas image for all surfaces`)
+          if (typeof canvasImage === 'string') {
+            setPreviewImage(canvasImage)
+          } else {
+            // Generate image from canvas data
+            const generatedImage = await generateCanvasImageFromData()
+            setPreviewImage(generatedImage)
+          }
+        } else if (canvasImage) {
+          // For single-surface products, use the main canvas image
+          if (typeof canvasImage === 'string') {
+            setPreviewImage(canvasImage)
+          } else {
+            // Generate image from canvas data
+            const generatedImage = await generateCanvasImageFromData()
+            setPreviewImage(generatedImage)
+          }
         } else {
-          setPreviewImage(null)
+          // No images available, try to generate from canvas data
+          console.log('🎨 No images available, generating from canvas data...')
+          const generatedImage = await generateCanvasImageFromData()
+          setPreviewImage(generatedImage)
         }
-      } else if (orderDetails?.canvas_image) {
-        // For single-surface products, use the main canvas image
-        if (typeof orderDetails.canvas_image === 'string') {
-          setPreviewImage(orderDetails.canvas_image)
-        } else {
-          setPreviewImage(null)
-        }
-      } else {
-        setPreviewImage(null)
+        setIsGenerating(false)
       }
-      setIsGenerating(false)
     }
-  }, [isOpen, orderDetails, selectedSurface, hasMultipleSurfaces])
+    
+    loadPreviewImage()
+  }, [isOpen, orderDetails, canvasData, selectedSurface, hasMultipleSurfaces])
 
   // Debug image dimensions when it loads
   const handleImageLoad = (event) => {
@@ -226,9 +303,18 @@ const PrintPreviewModal = ({
     try {
       setIsGenerating(true)
       
-      if (orderDetails?.canvas_image) {
+      // Get canvas image from canvasData first, fallback to orderDetails
+      let canvasImage = canvasData?.canvas_image || orderDetails?.canvas_image
+      
+      // If no canvas image available, generate one from canvas data
+      if (!canvasImage) {
+        console.log('No canvas image available, generating from canvas data for PDF...')
+        canvasImage = await generateCanvasImageFromData()
+      }
+      
+      if (canvasImage) {
         console.log('Generating production PDF from high-quality canvas image...')
-        const pdfBlob = await createPDFFromImage(orderDetails.canvas_image)
+        const pdfBlob = await createPDFFromImage(canvasImage)
         return pdfBlob // Return the PDF blob
       } else {
         console.error('No canvas image available for PDF generation!')
@@ -722,7 +808,7 @@ const PrintPreviewModal = ({
             
             <Button
               onClick={handleApprove}
-              disabled={!orderDetails?.canvas_image || (hasMultipleSurfaces() && !areAllSurfacesApproved())}
+              disabled={!(canvasData?.canvas_image || orderDetails?.canvas_image) || (hasMultipleSurfaces() && !areAllSurfacesApproved())}
               className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <Check className="h-4 w-4" />
