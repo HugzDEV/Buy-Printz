@@ -1,0 +1,19 @@
+{
+  "partners": {
+    "partner_1": {
+      "name": "Print Partner 1",
+      "base_url": "https://example-print-partner.com",
+      "login_url": "https://example-print-partner.com/login",
+      "quote_url": "https://example-print-partner.com/quote",
+      "credentials": {
+        "username": "your_username",
+        "password": "your_password"
+      },
+      "site_map_file": "backend/shipping_automation/site_maps/partner_1_map.json",
+      "enabled": true
+    }
+  },
+  "default_timeout": 15,
+  "headless_mode": true,
+  "cache_duration_hours": 1
+}

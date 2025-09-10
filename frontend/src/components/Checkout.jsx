@@ -35,6 +35,7 @@ import {
   Check
 } from 'lucide-react'
 import authService from '../services/auth'
+import shippingService from '../services/shippingService'
 import PrintPreviewModal from './PrintPreviewModal'
 import { GlassCard } from './ui'
 
@@ -180,6 +181,9 @@ const Checkout = () => {
   
   // Shipping Options State
   const [shippingOption, setShippingOption] = useState('standard')
+  const [shippingQuotes, setShippingQuotes] = useState([])
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingError, setShippingError] = useState(null)
   
   // Collapsible sections state - Progressive user journey
   const [expandedSections, setExpandedSections] = useState({
@@ -322,6 +326,13 @@ const Checkout = () => {
     }
   }, [orderData, isAuthenticated, authLoading])
 
+  // Get shipping quotes when shipping section is expanded
+  useEffect(() => {
+    if (expandedSections.shipping && orderData && !shippingQuotes.length && !shippingLoading) {
+      getShippingQuotes()
+    }
+  }, [expandedSections.shipping, orderData])
+
   const createOrder = async () => {
     try {
       console.log('Creating order with data:', orderData)
@@ -397,6 +408,64 @@ const Checkout = () => {
       ...prev,
       [option]: value
     }))
+  }
+
+  // Get real-time shipping quotes from B2Sign
+  const getShippingQuotes = async () => {
+    if (!orderData) return
+
+    setShippingLoading(true)
+    setShippingError(null)
+
+    try {
+      console.log('🚚 Getting real-time shipping quotes from B2Sign...')
+      
+      // Prepare order data for shipping quote
+      const shippingOrderData = {
+        product_type: orderData.product_type || 'banner',
+        material: bannerOptions.material,
+        dimensions: orderData.dimensions,
+        quantity: bannerOptions.quantity,
+        zip_code: customerInfo.zipCode || '10001',
+        job_name: bannerOptions.jobName || `BuyPrintz Order ${Date.now()}`,
+        print_options: {
+          sides: bannerOptions.sides,
+          grommets: bannerOptions.grommets,
+          hem: bannerOptions.hem,
+          polePockets: bannerOptions.polePockets,
+          webbing: bannerOptions.webbing,
+          corners: bannerOptions.corners,
+          rope: bannerOptions.rope,
+          windslits: bannerOptions.windslits,
+          turnaround: bannerOptions.turnaround
+        },
+        customer_info: customerInfo
+      }
+
+      // Get shipping quote from B2Sign
+      const quote = await shippingService.getShippingQuote(shippingOrderData)
+      
+      if (quote.success && quote.shipping_options) {
+        setShippingQuotes(quote.shipping_options)
+        console.log('✅ Real-time shipping quotes received:', quote.shipping_options)
+      } else {
+        setShippingError('No shipping options available from B2Sign')
+        console.warn('⚠️ No shipping options received from B2Sign')
+      }
+
+    } catch (error) {
+      console.error('❌ Error getting shipping quotes:', error)
+      setShippingError(`Failed to get shipping quotes: ${error.message}`)
+      
+      // Fallback to default shipping options
+      setShippingQuotes([
+        { name: 'Standard Shipping (5-7 days)', type: 'standard', cost: 'Free', estimated_days: 5 },
+        { name: 'Express Shipping (2-3 days)', type: 'expedited', cost: '$25.00', estimated_days: 2 },
+        { name: 'Overnight Shipping (1 day)', type: 'overnight', cost: '$45.00', estimated_days: 1 }
+      ])
+    } finally {
+      setShippingLoading(false)
+    }
   }
 
   const handleShowPreview = () => {
@@ -1066,36 +1135,81 @@ const Checkout = () => {
 
               {/* Shipping Options */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-green-600" />
-                  Shipping Method
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {shippingOptions.map((option) => {
-                    const Icon = option.icon
-                    return (
-                      <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          value={option.value}
-                          checked={shippingOption === option.value}
-                          onChange={(e) => setShippingOption(e.target.value)}
-                          className="mr-3 text-green-600 focus:ring-green-500"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Icon className="w-4 h-4 text-green-600" />
-                            <p className="font-medium text-gray-900">{option.label}</p>
-                          </div>
-                          <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                            {option.price > 0 ? `+$${option.price}` : 'Free shipping'}
-                          </p>
-                        </div>
-                      </label>
-                    )
-                  })}
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-green-600" />
+                    Shipping Method
+                  </h4>
+                  <button
+                    onClick={getShippingQuotes}
+                    disabled={shippingLoading}
+                    className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {shippingLoading ? 'Getting Quotes...' : 'Refresh Quotes'}
+                  </button>
                 </div>
+
+                {shippingError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <p className="text-sm text-red-700">{shippingError}</p>
+                    </div>
+                  </div>
+                )}
+
+                {shippingLoading && (
+                  <div className="flex items-center justify-center p-6">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                    <span className="ml-3 text-gray-600">Getting real-time shipping quotes from B2Sign...</span>
+                  </div>
+                )}
+
+                {!shippingLoading && shippingQuotes.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {shippingQuotes.map((option, index) => {
+                      const Icon = option.type === 'standard' ? Truck : 
+                                  option.type === 'expedited' ? Zap : Package
+                      const optionValue = option.type || `option_${index}`
+                      const optionLabel = option.name || option.description || `${option.type} shipping`
+                      const optionCost = option.cost || 'Free'
+                      
+                      return (
+                        <label key={optionValue} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
+                          <input
+                            type="radio"
+                            name="shipping"
+                            value={optionValue}
+                            checked={shippingOption === optionValue}
+                            onChange={(e) => setShippingOption(e.target.value)}
+                            className="mr-3 text-green-600 focus:ring-green-500"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className="w-4 h-4 text-green-600" />
+                              <p className="font-medium text-gray-900">{optionLabel}</p>
+                            </div>
+                            <p className={`text-sm ${optionCost !== 'Free' ? 'text-green-600' : 'text-gray-500'}`}>
+                              {optionCost}
+                            </p>
+                            {option.estimated_days && (
+                              <p className="text-xs text-gray-500">
+                                Est. {option.estimated_days} day{option.estimated_days !== 1 ? 's' : ''}
+                              </p>
+                            )}
+                          </div>
+                        </label>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {!shippingLoading && !shippingQuotes.length && !shippingError && (
+                  <div className="text-center p-6 text-gray-500">
+                    <Truck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>Click "Refresh Quotes" to get real-time shipping options from B2Sign</p>
+                  </div>
+                )}
               </div>
 
               {/* Navigation */}

@@ -1,0 +1,240 @@
+{
+  "base_url": "https://b2sign.com",
+  "discovered_urls": [
+    "https://www.b2sign.com/files/2024_catelog.pdf",
+    "https://b2sign.com/user/register",
+    "https://b2sign.com/vinyl-banner-backlit",
+    "https://b2sign.com/reflective-products",
+    "https://b2sign.com/contact-us",
+    "https://b2sign.com/vinyl-banner-18oz-blockout",
+    "https://b2sign.com/posters",
+    "https://b2sign.com/13oz-vinyl-banner",
+    "https://b2sign.com/hand-banner",
+    "https://b2sign.com/wall-murals",
+    "https://b2sign.com/fabric-block-out",
+    "https://b2sign.com/banner-stands",
+    "https://b2sign.com/advertising-flags",
+    "mailto:info@b2sign.com",
+    "https://b2sign.com/about-us",
+    "https://b2sign.com/wall-art",
+    "https://b2sign.com/user/forgot",
+    "https://b2sign.com/request-sample-kit",
+    "https://b2sign.com/seg-products",
+    "https://b2sign.com/backlit-film",
+    "https://b2sign.com/help-center",
+    "https://b2sign.com/material",
+    "https://b2sign.com/channel-letter",
+    "https://b2sign.com/banners",
+    "https://b2sign.com/adhesive-products",
+    "https://b2sign.com/hardware-only",
+    "https://b2sign.com/terms-and-conditions",
+    "https://b2sign.com/step-repeat-backdrop",
+    "https://b2sign.com/table-throw",
+    "https://b2sign.com/design-templates",
+    "https://b2sign.com/signicade-a-frame",
+    "https://b2sign.com/trade-show-products",
+    "https://b2sign.com/real-estate",
+    "https://b2sign.com/mesh-banners",
+    "https://b2sign.com/super-smooth-indoor-banner",
+    "https://b2sign.com/rigid-signs-and-magnets",
+    "https://b2sign.com/custom-event-tents",
+    "https://b2sign.com/dry-erase-products",
+    "https://b2sign.com/a-frame-and-sign-holders",
+    "https://b2sign.com/styrene",
+    "https://b2sign.com/holiday_schedule",
+    "https://b2sign.com/pole-banner-set",
+    "https://b2sign.com/tension-fabric",
+    "https://b2sign.com/premium-window-cling",
+    "https://b2sign.com/direct-to-film",
+    "https://b2sign.com/canvas-roll",
+    "https://b2sign.com/popup",
+    "https://b2sign.com/",
+    "https://b2sign.com/fabric-banner-9oz-wrinkle-free"
+  ],
+  "forms": [
+    {
+      "page_url": "https://b2sign.com",
+      "action": "",
+      "method": "post",
+      "fields": [
+        {
+          "name": "",
+          "type": "text",
+          "id": "",
+          "placeholder": "Email",
+          "required": false
+        },
+        {
+          "name": "",
+          "type": "password",
+          "id": "",
+          "placeholder": "Password",
+          "required": false
+        }
+      ],
+      "type": "unknown",
+      "action_url": "https://b2sign.com"
+    },
+    {
+      "page_url": "https://b2sign.com",
+      "action": "",
+      "method": "post",
+      "fields": [
+        {
+          "name": "email",
+          "type": "text",
+          "id": ":Rb969:",
+          "placeholder": "Email Address",
+          "required": false
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "id": ":Rj969:",
+          "placeholder": "Password",
+          "required": false
+        }
+      ],
+      "type": "login",
+      "action_url": "https://b2sign.com"
+    },
+    {
+      "page_url": "https://b2sign.com/user/login",
+      "action": "",
+      "method": "post",
+      "fields": [
+        {
+          "name": "",
+          "type": "text",
+          "id": "",
+          "placeholder": "Email",
+          "required": false
+        },
+        {
+          "name": "",
+          "type": "password",
+          "id": "",
+          "placeholder": "Password",
+          "required": false
+        }
+      ],
+      "type": "unknown",
+      "action_url": "https://b2sign.com/user/login"
+    },
+    {
+      "page_url": "https://b2sign.com/user/login",
+      "action": "",
+      "method": "post",
+      "fields": [
+        {
+          "name": "",
+          "type": "text",
+          "id": ":R2v9:",
+          "placeholder": "Email Address",
+          "required": false
+        },
+        {
+          "name": "",
+          "type": "password",
+          "id": ":R4v9:",
+          "placeholder": "Password",
+          "required": false
+        }
+      ],
+      "type": "unknown",
+      "action_url": "https://b2sign.com/user/login"
+    },
+    {
+      "page_url": "https://b2sign.com/estimate",
+      "action": "",
+      "method": "post",
+      "fields": [
+        {
+          "name": "",
+          "type": "text",
+          "id": "",
+          "placeholder": "Email",
+          "required": false
+        },
+        {
+          "name": "",
+          "type": "password",
+          "id": "",
+          "placeholder": "Password",
+          "required": false
+        }
+      ],
+      "type": "unknown",
+      "action_url": "https://b2sign.com/estimate"
+    },
+    {
+      "page_url": "https://b2sign.com/estimate",
+      "action": "",
+      "method": "post",
+      "fields": [
+        {
+          "name": "",
+          "type": "text",
+          "id": ":R2v9:",
+          "placeholder": "Email Address",
+          "required": false
+        },
+        {
+          "name": "",
+          "type": "password",
+          "id": ":R4v9:",
+          "placeholder": "Password",
+          "required": false
+        }
+      ],
+      "type": "unknown",
+      "action_url": "https://b2sign.com/estimate"
+    }
+  ],
+  "login_indicators": [
+    {
+      "url": "https://b2sign.com/user/register",
+      "text": "create a reseller account",
+      "element": "<a class=\"MuiButton-root MuiButton-fullWidth MuiButton-variantSolid MuiButton-colorNeutral MuiButton-sizeMd _form-register_11exs_297 css-10h2hss-JoyButton-root\" href=\"/user/register\">Create a Reseller Account</a>"
+    },
+    {
+      "url": "https://b2sign.com/user/register",
+      "text": "create a reseller account",
+      "element": "<a class=\"MuiButton-root MuiButton-fullWidth MuiButton-variantSolid MuiButton-colorNeutral MuiButton-sizeLg _form-register_86pgt_112 css-1jg0hol-JoyButton-root\" href=\"/user/register\">Create a Reseller Account</a>"
+    },
+    {
+      "url": "https://b2sign.com/user/register",
+      "text": "create a reseller account",
+      "element": "<a class=\"MuiButton-root MuiButton-fullWidth MuiButton-variantSolid MuiButton-colorNeutral MuiButton-sizeLg _form-register_86pgt_112 css-1jg0hol-JoyButton-root\" href=\"/user/register\">Create a Reseller Account</a>"
+    }
+  ],
+  "quote_indicators": [],
+  "recommendations": {
+    "login_url": "https://b2sign.com",
+    "quote_url": null,
+    "login_form": {
+      "page_url": "https://b2sign.com",
+      "action": "",
+      "method": "post",
+      "fields": [
+        {
+          "name": "email",
+          "type": "text",
+          "id": ":Rb969:",
+          "placeholder": "Email Address",
+          "required": false
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "id": ":Rj969:",
+          "placeholder": "Password",
+          "required": false
+        }
+      ],
+      "type": "login",
+      "action_url": "https://b2sign.com"
+    },
+    "quote_form": null
+  }
+}

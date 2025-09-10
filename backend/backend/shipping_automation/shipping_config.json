@@ -1,0 +1,26 @@
+{
+  "partners": {
+    "b2sign": {
+      "name": "B2Sign Print Partner",
+      "api_url": "https://b2sign.com/api",
+      "quote_endpoint": "/shipping/quote",
+      "credentials": {
+        "api_key": "your_b2sign_api_key",
+        "username": "your_b2sign_username"
+      },
+      "enabled": true,
+      "fallback_shipping": {
+        "banner": {
+          "small": 15,
+          "medium": 25,
+          "large": 45
+        },
+        "tent": {
+          "10x10": 75,
+          "10x20": 95
+        }
+      }
+    }
+  },
+  "cache_duration_hours": 1
+}

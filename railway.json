@@ -1,9 +1,26 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "nixpacks"
+    "builder": "NIXPACKS",
+    "buildCommand": "pip install -r requirements.txt"
   },
   "deploy": {
-    "startCommand": "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    "startCommand": "python -m uvicorn main:app --host 0.0.0.0 --port $PORT",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 100,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "ENVIRONMENT": "production",
+        "CHROME_BINARY_PATH": "/usr/bin/google-chrome",
+        "CHROMEDRIVER_PATH": "/usr/bin/chromedriver",
+        "CHROME_HEADLESS": "true",
+        "CHROME_NO_SANDBOX": "true",
+        "CHROME_DISABLE_DEV_SHM": "true"
+      }
+    }
   }
 }

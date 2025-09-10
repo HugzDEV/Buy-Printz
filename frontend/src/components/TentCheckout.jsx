@@ -38,6 +38,7 @@ import {
   Triangle
 } from 'lucide-react'
 import authService from '../services/auth'
+import shippingService from '../services/shippingService'
 import PrintPreviewModal from './PrintPreviewModal'
 import { GlassCard } from './ui'
 
@@ -85,6 +86,12 @@ const TentCheckout = () => {
     shipping: false,
     payment: false
   })
+  
+  // Shipping state
+  const [shippingQuotes, setShippingQuotes] = useState([])
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingError, setShippingError] = useState(null)
+  const [selectedShippingOption, setSelectedShippingOption] = useState('standard')
 
   // Tent specifications
   const [tentSpecs, setTentSpecs] = useState({
@@ -150,6 +157,13 @@ const TentCheckout = () => {
     }
   }, [])
 
+  // Get shipping quotes when shipping section is expanded
+  useEffect(() => {
+    if (expandedSections.shipping && orderData && !shippingQuotes.length && !shippingLoading) {
+      getTentShippingQuotes()
+    }
+  }, [expandedSections.shipping, orderData])
+
   // Calculate tent pricing
   const calculateTentPrice = () => {
     const basePrice = tentSpecs.tentSize === '10x10' ? 299.99 : 499.99
@@ -191,6 +205,57 @@ const TentCheckout = () => {
       ...prev,
       [field]: value
     }))
+  }
+
+  // Get real-time shipping quotes from B2Sign for tents
+  const getTentShippingQuotes = async () => {
+    if (!orderData) return
+
+    setShippingLoading(true)
+    setShippingError(null)
+
+    try {
+      console.log('🚚 Getting real-time shipping quotes for tent from B2Sign...')
+      
+      // Prepare tent order data for shipping quote
+      const shippingOrderData = {
+        product_type: 'tent',
+        dimensions: { width: 10, height: 10 }, // Tent dimensions
+        quantity: 1,
+        zip_code: shippingInfo.zipCode || '10001',
+        job_name: `Tent Order ${Date.now()}`,
+        print_options: {
+          tent_size: tentSpecs.tentSize,
+          tent_design_option: orderData.tent_design_option || 'canopy-only'
+        },
+        accessories: selectedAccessories,
+        customer_info: shippingInfo
+      }
+
+      // Get shipping quote from B2Sign
+      const quote = await shippingService.getShippingQuote(shippingOrderData)
+      
+      if (quote.success && quote.shipping_options) {
+        setShippingQuotes(quote.shipping_options)
+        console.log('✅ Real-time tent shipping quotes received:', quote.shipping_options)
+      } else {
+        setShippingError('No shipping options available from B2Sign')
+        console.warn('⚠️ No shipping options received from B2Sign for tent')
+      }
+
+    } catch (error) {
+      console.error('❌ Error getting tent shipping quotes:', error)
+      setShippingError(`Failed to get shipping quotes: ${error.message}`)
+      
+      // Fallback to default shipping options for tents
+      setShippingQuotes([
+        { name: 'Standard Shipping (5-7 days)', type: 'standard', cost: 'Free', estimated_days: 5 },
+        { name: 'Express Shipping (2-3 days)', type: 'expedited', cost: '$35.00', estimated_days: 2 },
+        { name: 'Overnight Shipping (1 day)', type: 'overnight', cost: '$65.00', estimated_days: 1 }
+      ])
+    } finally {
+      setShippingLoading(false)
+    }
   }
 
 
@@ -480,6 +545,84 @@ const TentCheckout = () => {
               onToggle={() => toggleSection('shipping')}
             >
               <div className="space-y-4">
+                {/* Shipping Options */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-green-600" />
+                      Shipping Method
+                    </h4>
+                    <button
+                      onClick={getTentShippingQuotes}
+                      disabled={shippingLoading}
+                      className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {shippingLoading ? 'Getting Quotes...' : 'Refresh Quotes'}
+                    </button>
+                  </div>
+
+                  {shippingError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-red-600" />
+                        <p className="text-sm text-red-700">{shippingError}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {shippingLoading && (
+                    <div className="flex items-center justify-center p-6">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                      <span className="ml-3 text-gray-600">Getting real-time shipping quotes from B2Sign...</span>
+                    </div>
+                  )}
+
+                  {!shippingLoading && shippingQuotes.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {shippingQuotes.map((option, index) => {
+                        const Icon = option.type === 'standard' ? Truck : 
+                                    option.type === 'expedited' ? Zap : Package
+                        const optionValue = option.type || `option_${index}`
+                        const optionLabel = option.name || option.description || `${option.type} shipping`
+                        const optionCost = option.cost || 'Free'
+                        
+                        return (
+                          <label key={optionValue} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
+                            <input
+                              type="radio"
+                              name="shipping"
+                              value={optionValue}
+                              checked={selectedShippingOption === optionValue}
+                              onChange={(e) => setSelectedShippingOption(e.target.value)}
+                              className="mr-3 text-green-600 focus:ring-green-500"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Icon className="w-4 h-4 text-green-600" />
+                                <p className="font-medium text-gray-900">{optionLabel}</p>
+                              </div>
+                              <p className={`text-sm ${optionCost !== 'Free' ? 'text-green-600' : 'text-gray-500'}`}>
+                                {optionCost}
+                              </p>
+                              {option.estimated_days && (
+                                <p className="text-xs text-gray-500">
+                                  Est. {option.estimated_days} day{option.estimated_days !== 1 ? 's' : ''}
+                                </p>
+                              )}
+                            </div>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {!shippingLoading && !shippingQuotes.length && !shippingError && (
+                    <div className="text-center p-6 text-gray-500">
+                      <Truck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                      <p>Click "Refresh Quotes" to get real-time shipping options from B2Sign</p>
+                    </div>
+                  )}
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

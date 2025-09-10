@@ -1,0 +1,43 @@
+{
+  "partner": "b2sign",
+  "product_type": "banner",
+  "product_details": {
+    "product_type": "banner",
+    "material": "vinyl",
+    "width": 24,
+    "height": 36,
+    "quantity": 1,
+    "zip_code": "10001",
+    "job_name": "BuyPrintz Test Quote"
+  },
+  "shipping_costs": {
+    "standard_shipping": null,
+    "expedited_shipping": null,
+    "overnight_shipping": null,
+    "shipping_options": [
+      {
+        "selector": "[class*=\"shipping\"]",
+        "text": "Shipping\nBlind Drop Ship\nStore Pickup( CA Facility Only )",
+        "class": "_shipping-wrapper_hve8l_85",
+        "id": "shipping_0"
+      },
+      {
+        "selector": "[class*=\"shipping\"]",
+        "text": "Shipping\nBlind Drop Ship\nStore Pickup( CA Facility Only )",
+        "class": "_item_hve8l_189 _shipping-method_hve8l_368",
+        "id": ""
+      },
+      {
+        "selector": "[id*=\"shipping\"]",
+        "text": "Shipping\nBlind Drop Ship\nStore Pickup( CA Facility Only )",
+        "class": "_shipping-wrapper_hve8l_85",
+        "id": "shipping_0"
+      }
+    ]
+  },
+  "total_costs": {},
+  "success": true,
+  "errors": [
+    "Could not find or click Add to Cart button"
+  ]
+}

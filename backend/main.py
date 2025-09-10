@@ -27,6 +27,14 @@ except ImportError:
     CREATOR_MARKETPLACE_AVAILABLE = False
     print("Warning: Creator marketplace module not available")
 
+# Import shipping API routes
+try:
+    from shipping_api_integration import router as shipping_router
+    SHIPPING_API_AVAILABLE = True
+except ImportError:
+    SHIPPING_API_AVAILABLE = False
+    print("Warning: Shipping API module not available")
+
 # Simple in-memory cache
 class SimpleCache:
     def __init__(self, default_ttl=300):  # 5 minutes default
@@ -158,6 +166,13 @@ if CREATOR_MARKETPLACE_AVAILABLE:
     logger.info("Creator marketplace routes loaded successfully")
 else:
     logger.warning("Creator marketplace routes not available - module not found")
+
+# Include shipping API routes if available
+if SHIPPING_API_AVAILABLE:
+    app.include_router(shipping_router)
+    logger.info("Shipping API routes loaded successfully")
+else:
+    logger.warning("Shipping API routes not available - module not found")
 
 # Mount static files - create uploads directory if it doesn't exist
 uploads_dir = "uploads"

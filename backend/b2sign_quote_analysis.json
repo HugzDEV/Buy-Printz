@@ -1,0 +1,79 @@
+{
+  "url": "https://b2sign.com/estimate",
+  "title": "New Estimate - B2Sign",
+  "forms": [
+    {
+      "index": 0,
+      "action": "https://www.b2sign.com/estimate",
+      "method": "get",
+      "id": "",
+      "class": "_step-flow_i8e6y_85",
+      "fields": [],
+      "type": "unknown"
+    }
+  ],
+  "input_fields": [],
+  "select_fields": [],
+  "product_options": [
+    {
+      "keyword": "banner",
+      "context": "><div class=\"_items_1u92i_102\"><div class=\"_item_1u92i_102\"><div class=\"_title_1u92i_127\"><a href=\"/banners\">banners</a></div></div><div class=\"_item_1u92i_102\"><div class=\"_title_1u92i_127\"><a href=\"/adver"
+    },
+    {
+      "keyword": "material",
+      "context": "ol class=\"ml-lg\"><li>you order contains 50+ sheets of rigid substrates, 1000+ square feet of banner material, or 500+ square feet of another material.</li><li>you\u2019re ordering a quantity of at least 100 of any"
+    },
+    {
+      "keyword": "size",
+      "context": "content=\"#e8e8e8\">\n    <meta name=\"theme-color\" content=\"#ffffff\">\n    <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-icon-180x180.png\">\n    <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href"
+    },
+    {
+      "keyword": "width",
+      "context": "lipiehdhcvfobmdiys6lr6og==\"></script>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n    <meta name=\"msapplication-tilecolor\" content=\"#e8e8e8\">\n    <met"
+    },
+    {
+      "keyword": "height",
+      "context": "osawo-joychip-root{--chip-decoratorchildoffset:min(calc(var(--chip-paddinginline) - (var(--_chip-minheight) - 2 * var(--variant-borderwidth, 0px) - var(--chip-decoratorchildheight)) / 2), var(--chip-padding"
+    },
+    {
+      "keyword": "quantity",
+      "context": "square feet of banner material, or 500+ square feet of another material.</li><li>you\u2019re ordering a quantity of at least 100 of any item.</li><li>your order exceeds $250 and you have a special finishing reque"
+    },
+    {
+      "keyword": "finish",
+      "context": "ring a quantity of at least 100 of any item.</li><li>your order exceeds $250 and you have a special finishing request.</li></ol></div></div><form class=\"_step-flow_i8e6y_85\" autocomplete=\"off\" siq_id=\"autop"
+    },
+    {
+      "keyword": "product",
+      "context": "ww.b2sign.com/build/assets/b2logo_s64-31e7c94b.png\" alt=\"logo\"></a><div class=\"_item_1u92i_102 _all-products_1u92i_124\"><div class=\"_title_1u92i_127\">all products<span class=\"_icon_1u92i_149\"><svg stroke=\"cu"
+    },
+    {
+      "keyword": "type",
+      "context": "<html lang=\"en\"><head><script type=\"text/javascript\" async=\"\" defer=\"\" src=\"https://ma.b2sign.com/matomo.js\"></script><script type=\"te"
+    },
+    {
+      "keyword": "category",
+      "context": "em_xnnm1_145 _active_xnnm1_203\"><span class=\"_num_xnnm1_189\">1</span><span class=\"_label_xnnm1_285\">category</span><span><svg stroke=\"currentcolor\" fill=\"currentcolor\" stroke-width=\"0\" viewbox=\"0 0 16 16\" cla"
+    },
+    {
+      "keyword": "option",
+      "context": "p8zt\" style=\"position: fixed; top: 0px; left: 0px; display: none;\"><li tabindex=\"0\" id=\":r3:\" role=\"option\" aria-selected=\"false\" data-first-child=\"\" class=\"muioption-root muioption-highlighted css-1uu6db3\""
+    }
+  ],
+  "pricing_elements": [
+    {
+      "pattern": "quote",
+      "context": "stimate?</div><div class=\"mb-sm\">if your order does not meet these criteria, please use the instant quote system located on each product page for your convenience.</div><ol class=\"ml-lg\"><li>you order cont"
+    },
+    {
+      "pattern": "estimate",
+      "context": "://www.b2sign.com/build/assets/app-d4e35343.js\"></script>    <meta name=\"origin:title\" content=\"new estimate\" inertia=\"\">\n<meta name=\"origin:page\" content=\"estimate\" inertia=\"\">\n<title inertia=\"\">new estimate"
+    }
+  ],
+  "page_structure": {
+    "sections": 3,
+    "has_sidebar": false,
+    "has_navigation": false,
+    "has_footer": true
+  }
+}
