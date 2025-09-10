@@ -152,6 +152,10 @@ const PrintPreviewModal = ({
   // Modified useEffect to handle missing surface images
   useEffect(() => {
     if (isOpen && orderDetails) {
+      console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
+      console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys(orderDetails.surface_images || {}))
+      console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails.design_option)
+      
       // For multi-surface products, use surface-specific images
       if (hasMultipleSurfaces() && orderDetails.surface_images) {
         const surfaceImage = orderDetails.surface_images[selectedSurface]
