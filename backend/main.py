@@ -15,13 +15,13 @@ from dotenv import load_dotenv
 import time
 
 # Import our modules
-from database import db_manager
-from auth import auth_manager, get_current_user
-from ai_agent_adapter import ai_agent_adapter
+from backend.database import db_manager
+from backend.auth import auth_manager, get_current_user
+from backend.ai_agent_adapter import ai_agent_adapter
 
 # Import creator marketplace routes
 try:
-    from creator_marketplace import router as creator_marketplace_router
+    from backend.creator_marketplace import router as creator_marketplace_router
     CREATOR_MARKETPLACE_AVAILABLE = True
 except ImportError:
     CREATOR_MARKETPLACE_AVAILABLE = False
@@ -29,7 +29,7 @@ except ImportError:
 
 # Import shipping API routes
 try:
-    from shipping_api_integration import router as shipping_router
+    from backend.shipping_api_integration import router as shipping_router
     SHIPPING_API_AVAILABLE = True
 except ImportError:
     SHIPPING_API_AVAILABLE = False
@@ -37,7 +37,7 @@ except ImportError:
 
 # Import live shipping API routes
 try:
-    from live_shipping_api import router as live_shipping_router
+    from backend.live_shipping_api import router as live_shipping_router
     LIVE_SHIPPING_API_AVAILABLE = True
 except ImportError as e:
     LIVE_SHIPPING_API_AVAILABLE = False
@@ -45,7 +45,7 @@ except ImportError as e:
 
 # Import shipping costs API routes - REQUIRED for production
 try:
-    from shipping_costs_api import router as shipping_costs_router
+    from backend.shipping_costs_api import router as shipping_costs_router
     SHIPPING_COSTS_API_AVAILABLE = True
     print("✅ B2Sign Shipping Costs API loaded successfully")
 except ImportError as e:
