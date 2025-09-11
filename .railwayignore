@@ -1,0 +1,7 @@
+# Force Railway to use Dockerfile instead of Nixpacks
+# This ensures Chrome/ChromeDriver and B2Sign integration are available
+
+# Ignore Python files that might trigger Nixpacks detection
+requirements.txt
+*.py
+backend/
