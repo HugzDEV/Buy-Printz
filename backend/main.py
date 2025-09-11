@@ -39,17 +39,20 @@ except ImportError:
 try:
     from live_shipping_api import router as live_shipping_router
     LIVE_SHIPPING_API_AVAILABLE = True
-except ImportError:
+except ImportError as e:
     LIVE_SHIPPING_API_AVAILABLE = False
-    print("Warning: Live Shipping API module not available")
+    print(f"Warning: Live Shipping API module not available: {e}")
 
-# Import shipping costs API routes
+# Import shipping costs API routes - REQUIRED for production
 try:
     from shipping_costs_api import router as shipping_costs_router
     SHIPPING_COSTS_API_AVAILABLE = True
-except ImportError:
+    print("✅ B2Sign Shipping Costs API loaded successfully")
+except ImportError as e:
     SHIPPING_COSTS_API_AVAILABLE = False
-    print("Warning: Shipping Costs API module not available")
+    print(f"❌ CRITICAL: B2Sign Shipping Costs API failed to load: {e}")
+    print("❌ Cannot deploy without real shipping costs - would cause financial losses")
+    raise ImportError(f"B2Sign shipping integration is required: {e}")
 
 # Simple in-memory cache
 class SimpleCache:

@@ -1,11 +1,11 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "pip install -r requirements.txt"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "python -m uvicorn main:app --host 0.0.0.0 --port $PORT",
+    "startCommand": "python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
@@ -16,10 +16,12 @@
       "variables": {
         "ENVIRONMENT": "production",
         "CHROME_BINARY_PATH": "/usr/bin/google-chrome",
-        "CHROMEDRIVER_PATH": "/usr/bin/chromedriver",
+        "CHROMEDRIVER_PATH": "/usr/local/bin/chromedriver",
         "CHROME_HEADLESS": "true",
         "CHROME_NO_SANDBOX": "true",
-        "CHROME_DISABLE_DEV_SHM": "true"
+        "CHROME_DISABLE_DEV_SHM": "true",
+        "B2SIGN_USERNAME": "order@buyprintz.com",
+        "B2SIGN_PASSWORD": "$AG@BuyPr!n1z"
       }
     }
   }
