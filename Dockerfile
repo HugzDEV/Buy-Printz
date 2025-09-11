@@ -71,19 +71,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 COPY . .
 
-# Set environment variables for Chrome
+# Set environment variables for Chrome and Python
 ENV CHROME_BINARY_PATH=/usr/bin/google-chrome
 ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
 ENV CHROME_HEADLESS=true
 ENV CHROME_NO_SANDBOX=true
 ENV CHROME_DISABLE_DEV_SHM=true
+ENV PYTHONPATH=/app
 
 # Set default port and expose it
 ENV PORT=8080
 EXPOSE 8080
 
-# Create startup script
-RUN echo '#!/bin/sh\npython -m uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}' > /start.sh && chmod +x /start.sh
+# Create startup script with proper Python path
+RUN echo '#!/bin/sh\nexport PYTHONPATH=/app:$PYTHONPATH\npython -m uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}' > /start.sh && chmod +x /start.sh
 
 # Start the application
 CMD ["/start.sh"]
