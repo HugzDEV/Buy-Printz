@@ -43,6 +43,14 @@ except ImportError:
     LIVE_SHIPPING_API_AVAILABLE = False
     print("Warning: Live Shipping API module not available")
 
+# Import shipping costs API routes
+try:
+    from shipping_costs_api import router as shipping_costs_router
+    SHIPPING_COSTS_API_AVAILABLE = True
+except ImportError:
+    SHIPPING_COSTS_API_AVAILABLE = False
+    print("Warning: Shipping Costs API module not available")
+
 # Simple in-memory cache
 class SimpleCache:
     def __init__(self, default_ttl=300):  # 5 minutes default
@@ -188,6 +196,13 @@ if LIVE_SHIPPING_API_AVAILABLE:
     logger.info("Live Shipping API routes loaded successfully")
 else:
     logger.warning("Live Shipping API routes not available - module not found")
+
+# Include shipping costs API routes if available
+if SHIPPING_COSTS_API_AVAILABLE:
+    app.include_router(shipping_costs_router)
+    logger.info("Shipping Costs API routes loaded successfully")
+else:
+    logger.warning("Shipping Costs API routes not available - module not found")
 
 # Mount static files - create uploads directory if it doesn't exist
 uploads_dir = "uploads"

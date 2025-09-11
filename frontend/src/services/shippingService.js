@@ -11,30 +11,31 @@ class ShippingService {
   }
 
   /**
-   * Get live shipping quote for a single product (requires user shipping info)
+   * Get shipping costs from B2Sign (requires user shipping info)
+   * Uses Supabase pricing for base costs, B2Sign for shipping only
    */
-  async getLiveShippingQuote(orderData, customerInfo) {
+  async getShippingCosts(orderData, customerInfo) {
     try {
-      console.log('🚚 Getting live shipping quote for:', orderData.product_type, 'to:', customerInfo.zipCode)
+      console.log('🚚 Getting shipping costs for:', orderData.product_type, 'to:', customerInfo.zipCode)
       
       // Validate required customer info
       if (!customerInfo.zipCode) {
-        throw new Error('Zip code is required for live shipping quotes')
+        throw new Error('Zip code is required for shipping costs')
       }
       
       // Check cache first
-      const cacheKey = this.generateLiveCacheKey(orderData, customerInfo)
-      const cachedQuote = this.getCachedQuote(cacheKey)
-      if (cachedQuote) {
-        console.log('📦 Using cached live shipping quote')
-        return { ...cachedQuote, cache_hit: true }
+      const cacheKey = this.generateShippingCostsCacheKey(orderData, customerInfo)
+      const cachedCosts = this.getCachedQuote(cacheKey)
+      if (cachedCosts) {
+        console.log('📦 Using cached shipping costs')
+        return { ...cachedCosts, cache_hit: true }
       }
 
-      // Prepare request data for live shipping
-      const requestData = this.prepareLiveShippingRequest(orderData, customerInfo)
+      // Prepare request data for shipping costs
+      const requestData = this.prepareShippingCostsRequest(orderData, customerInfo)
       
-      // Make API request to live shipping endpoint
-      const response = await fetch(`${this.baseURL}/api/live-shipping/quote`, {
+      // Make API request to shipping costs endpoint
+      const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,19 +46,19 @@ class ShippingService {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.detail || 'Failed to get live shipping quote')
+        throw new Error(errorData.detail || 'Failed to get shipping costs')
       }
 
-      const quote = await response.json()
+      const shippingCosts = await response.json()
       
       // Cache the result
-      this.cacheQuote(cacheKey, quote)
+      this.cacheQuote(cacheKey, shippingCosts)
       
-      console.log('✅ Live shipping quote received:', quote)
-      return quote
+      console.log('✅ Shipping costs received:', shippingCosts)
+      return shippingCosts
 
     } catch (error) {
-      console.error('❌ Error getting live shipping quote:', error)
+      console.error('❌ Error getting shipping costs:', error)
       throw error
     }
   }
@@ -215,9 +216,9 @@ class ShippingService {
   }
 
   /**
-   * Generate cache key for live shipping (includes customer info)
+   * Generate cache key for shipping costs (includes customer info)
    */
-  generateLiveCacheKey(orderData, customerInfo) {
+  generateShippingCostsCacheKey(orderData, customerInfo) {
     const keyData = {
       product_type: orderData.product_type,
       material: orderData.material,
@@ -233,15 +234,15 @@ class ShippingService {
   }
 
   /**
-   * Prepare live shipping request data
+   * Prepare shipping costs request data
    */
-  prepareLiveShippingRequest(orderData, customerInfo) {
+  prepareShippingCostsRequest(orderData, customerInfo) {
     const request = {
       product_type: orderData.product_type || 'banner',
       dimensions: orderData.dimensions || { width: 2, height: 4 },
       quantity: orderData.quantity || 1,
       zip_code: customerInfo.zipCode,
-      job_name: orderData.job_name || `Live Quote ${Date.now()}`,
+      job_name: orderData.job_name || `Shipping Costs ${Date.now()}`,
       print_options: {},
       accessories: [],
       customer_info: customerInfo

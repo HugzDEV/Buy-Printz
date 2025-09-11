@@ -329,9 +329,9 @@ const Checkout = () => {
   // Get shipping quotes when shipping section is expanded
   useEffect(() => {
     if (expandedSections.shipping && orderData && !shippingQuotes.length && !shippingLoading) {
-      // If customer has entered shipping info, get live quotes
+      // If customer has entered shipping info, get shipping costs from B2Sign
       if (customerInfo.zipCode) {
-        getLiveShippingQuotes()
+        getShippingCosts()
       } else {
         // Otherwise get base quotes for preview
         getBaseShippingQuotes()
@@ -339,11 +339,11 @@ const Checkout = () => {
     }
   }, [expandedSections.shipping, orderData])
 
-  // Get live quotes when customer enters shipping info
+  // Get shipping costs when customer enters shipping info
   useEffect(() => {
     if (customerInfo.zipCode && expandedSections.shipping && shippingQuotes.length > 0) {
-      // Refresh with live quotes when zip code is entered
-      getLiveShippingQuotes()
+      // Refresh with shipping costs when zip code is entered
+      getShippingCosts()
     }
   }, [customerInfo.zipCode])
 
@@ -424,10 +424,10 @@ const Checkout = () => {
     }))
   }
 
-  // Get live shipping quotes from B2Sign (requires customer shipping info)
-  const getLiveShippingQuotes = async () => {
+  // Get shipping costs from B2Sign (requires customer shipping info)
+  const getShippingCosts = async () => {
     if (!orderData || !customerInfo.zipCode) {
-      setShippingError('Please enter your shipping information to get live quotes')
+      setShippingError('Please enter your shipping information to get shipping costs')
       return
     }
 
@@ -435,9 +435,9 @@ const Checkout = () => {
     setShippingError(null)
 
     try {
-      console.log('🚚 Getting live shipping quotes from B2Sign...')
+      console.log('🚚 Getting shipping costs from B2Sign...')
       
-      // Prepare order data for live shipping quote
+      // Prepare order data for shipping costs
       const shippingOrderData = {
         product_type: orderData.product_type || 'banner',
         material: bannerOptions.material,
@@ -457,20 +457,20 @@ const Checkout = () => {
         }
       }
 
-      // Get live shipping quote from B2Sign
-      const quote = await shippingService.getLiveShippingQuote(shippingOrderData, customerInfo)
+      // Get shipping costs from B2Sign
+      const shippingCosts = await shippingService.getShippingCosts(shippingOrderData, customerInfo)
       
-      if (quote.success && quote.shipping_options) {
-        setShippingQuotes(quote.shipping_options)
-        console.log('✅ Live shipping quotes received:', quote.shipping_options)
+      if (shippingCosts.success && shippingCosts.shipping_options) {
+        setShippingQuotes(shippingCosts.shipping_options)
+        console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
       } else {
         setShippingError('No shipping options available from B2Sign')
         console.warn('⚠️ No shipping options received from B2Sign')
       }
 
     } catch (error) {
-      console.error('❌ Error getting live shipping quotes:', error)
-      setShippingError(`Failed to get live shipping quotes: ${error.message}`)
+      console.error('❌ Error getting shipping costs:', error)
+      setShippingError(`Failed to get shipping costs: ${error.message}`)
       
       // Fallback to default shipping options
       setShippingQuotes([
@@ -1213,16 +1213,16 @@ const Checkout = () => {
                     Shipping Method
                     {customerInfo.zipCode && (
                       <span className="ml-2 text-sm text-green-600 font-normal">
-                        (Live quotes for {customerInfo.zipCode})
+                        (B2Sign shipping costs for {customerInfo.zipCode})
                       </span>
                     )}
                   </h4>
                   <button
-                    onClick={customerInfo.zipCode ? getLiveShippingQuotes : getBaseShippingQuotes}
+                    onClick={customerInfo.zipCode ? getShippingCosts : getBaseShippingQuotes}
                     disabled={shippingLoading}
                     className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
                   >
-                    {shippingLoading ? 'Getting Quotes...' : 'Refresh Quotes'}
+                    {shippingLoading ? 'Getting Shipping Costs...' : 'Refresh Shipping Costs'}
                   </button>
                 </div>
 
