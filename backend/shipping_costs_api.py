@@ -88,8 +88,6 @@ async def get_shipping_costs(request: ShippingCostsRequest):
 async def health_check():
     """Health check for shipping costs system"""
     try:
-        extractor = await get_shipping_extractor()
-        
         return {
             "status": "healthy",
             "b2sign_available": True,
@@ -127,7 +125,7 @@ async def test_shipping_costs():
         }
         
         # Get shipping costs
-        shipping_result = await get_shipping_costs_api(test_request)
+        shipping_result = await get_shipping_costs_playwright(test_request)
         
         return {
             "success": True,

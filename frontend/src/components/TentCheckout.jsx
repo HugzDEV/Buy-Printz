@@ -256,7 +256,7 @@ const TentCheckout = () => {
       }
 
       // Get shipping quote from B2Sign
-      const quote = await shippingService.getShippingQuote(shippingOrderData)
+      const quote = await shippingService.getShippingCosts(shippingOrderData, customerInfo)
       
       if (quote.success && quote.shipping_options) {
         setShippingQuotes(quote.shipping_options)
