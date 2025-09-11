@@ -188,7 +188,7 @@ const TinCheckout = () => {
 
   // Progressive navigation functions
   const continueToNextSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'tinOptions', 'shipping', 'customerInfo', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'tinOptions', 'customerInfo', 'shipping', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const nextSection = sectionOrder[currentIndex + 1]
     
@@ -212,7 +212,7 @@ const TinCheckout = () => {
   }
 
   const goToPreviousSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'tinOptions', 'shipping', 'customerInfo', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'tinOptions', 'customerInfo', 'shipping', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const prevSection = sectionOrder[currentIndex - 1]
     
@@ -740,80 +740,13 @@ const TinCheckout = () => {
                   onClick={() => continueToNextSection('tinOptions')}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 active:scale-95 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
                 >
-                  Continue to Shipping →
-                </button>
-              </div>
-            </div>
-          </CollapsibleSection>
-
-          {/* Shipping - Step 3 */}
-          <CollapsibleSection
-            title="Shipping Options"
-            icon={Truck}
-            isExpanded={expandedSections.shipping}
-            onToggle={() => toggleSection('shipping')}
-            defaultExpanded={false}
-            data-section="shipping"
-          >
-            <div className="space-y-6">
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <Truck className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-green-700">Choose your preferred shipping method</p>
-              </div>
-
-              {/* Shipping Options */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-green-600" />
-                  Shipping Method
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {shippingOptions.map((option) => {
-                    const Icon = option.icon
-                    return (
-                      <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          value={option.value}
-                          checked={shippingOption === option.value}
-                          onChange={(e) => setShippingOption(e.target.value)}
-                          className="mr-3 text-green-600 focus:ring-green-500"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Icon className="w-4 h-4 text-green-600" />
-                            <p className="font-medium text-gray-900">{option.label}</p>
-                          </div>
-                          <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                            {option.price > 0 ? `+$${option.price}` : 'Free shipping'}
-                          </p>
-                        </div>
-                      </label>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Navigation */}
-              <div className="flex justify-between pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => goToPreviousSection('shipping')}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
-                >
-                  ← Back to Tin Options
-                </button>
-                <button
-                  onClick={() => continueToNextSection('shipping')}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-                >
                   Continue to Customer Info →
                 </button>
               </div>
             </div>
           </CollapsibleSection>
 
-          {/* Customer Information - Step 4 */}
+          {/* Customer Information - Step 3 */}
           <CollapsibleSection
             title="Customer Information"
             icon={User}
@@ -913,12 +846,89 @@ const TinCheckout = () => {
                   onClick={() => goToPreviousSection('customerInfo')}
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
                 >
-                  ← Back to Shipping
+                  ← Back to Tin Options
                 </button>
                 <button
                   onClick={() => continueToNextSection('customerInfo')}
                   disabled={!customerInfo.name || !customerInfo.email}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
+                >
+                  Continue to Shipping →
+                </button>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* Shipping - Step 4 */}
+          <CollapsibleSection
+            title="Shipping Options"
+            icon={Truck}
+            isExpanded={expandedSections.shipping}
+            onToggle={() => toggleSection('shipping')}
+            defaultExpanded={false}
+            data-section="shipping"
+          >
+            <div className="space-y-6">
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                <Truck className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <p className="text-green-700">
+                  {customerInfo.zipCode ? 'Choose your preferred shipping method' : 'Enter your shipping address to see shipping options'}
+                </p>
+              </div>
+
+              {/* Shipping Options */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Truck className="w-4 h-4 text-green-600" />
+                  Shipping Method
+                </h4>
+                {!customerInfo.zipCode ? (
+                  <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <Truck className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-2">Shipping options will appear here</p>
+                    <p className="text-sm text-gray-500">Please enter your shipping address above to see available shipping methods and costs</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {shippingOptions.map((option) => {
+                      const Icon = option.icon
+                      return (
+                        <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
+                          <input
+                            type="radio"
+                            name="shipping"
+                            value={option.value}
+                            checked={shippingOption === option.value}
+                            onChange={(e) => setShippingOption(e.target.value)}
+                            className="mr-3 text-green-600 focus:ring-green-500"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className="w-4 h-4 text-green-600" />
+                              <p className="font-medium text-gray-900">{option.label}</p>
+                            </div>
+                            <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                              {option.price > 0 ? `+$${option.price}` : 'Free shipping'}
+                            </p>
+                          </div>
+                        </label>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Navigation */}
+              <div className="flex justify-between pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => goToPreviousSection('shipping')}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
+                >
+                  ← Back to Customer Information
+                </button>
+                <button
+                  onClick={() => continueToNextSection('shipping')}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
                 >
                   Continue to Review & Payment →
                 </button>
@@ -1034,7 +1044,7 @@ const TinCheckout = () => {
                   onClick={() => goToPreviousSection('reviewPayment')}
                   className="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100 active:scale-95 font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-sm hover:shadow-md"
                 >
-                  ← Back to Customer Info
+                  ← Back to Shipping
                 </button>
                 
                 <button

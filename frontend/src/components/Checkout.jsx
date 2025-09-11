@@ -225,7 +225,7 @@ const Checkout = () => {
 
   // Progressive navigation functions
   const continueToNextSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'bannerOptions', 'shipping', 'customerInfo', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'bannerOptions', 'customerInfo', 'shipping', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const nextSection = sectionOrder[currentIndex + 1]
     
@@ -249,7 +249,7 @@ const Checkout = () => {
   }
 
   const goToPreviousSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'bannerOptions', 'shipping', 'customerInfo', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'bannerOptions', 'customerInfo', 'shipping', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const prevSection = sectionOrder[currentIndex - 1]
     
@@ -330,8 +330,8 @@ const Checkout = () => {
       if (customerInfo.zipCode) {
         getShippingCosts()
       } else {
-        // Otherwise get base quotes for preview
-        getBaseShippingQuotes()
+        // Shipping quotes only available after user enters shipping information
+        setShippingError(null)
       }
     }
   }, [expandedSections.shipping, orderData])
@@ -461,13 +461,13 @@ const Checkout = () => {
         setShippingQuotes(shippingCosts.shipping_options)
         console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
       } else {
-        setShippingError('No shipping options available from B2Sign')
+        setShippingError('No shipping options available at this time')
         console.warn('⚠️ No shipping options received from B2Sign')
       }
 
     } catch (error) {
       console.error('❌ Error getting shipping costs:', error)
-      setShippingError(`Failed to get shipping costs: ${error.message}`)
+      setShippingError('Unable to get shipping costs at this time. Please try again.')
       
       // NO FALLBACK - System must get real shipping costs from B2Sign
       setShippingQuotes([])
@@ -477,57 +477,7 @@ const Checkout = () => {
   }
 
   // Get base shipping quotes (for preview before customer info)
-  const getBaseShippingQuotes = async () => {
-    if (!orderData) return
-
-    setShippingLoading(true)
-    setShippingError(null)
-
-    try {
-      console.log('🚚 Getting base shipping quotes from B2Sign...')
-      
-      // Prepare order data for base shipping quote
-      const shippingOrderData = {
-        product_type: orderData.product_type || 'banner',
-        material: bannerOptions.material,
-        dimensions: orderData.dimensions,
-        quantity: bannerOptions.quantity,
-        zip_code: '10001', // Use default zip for base pricing
-        job_name: bannerOptions.jobName || `BuyPrintz Base Quote ${Date.now()}`,
-        print_options: {
-          sides: bannerOptions.sides,
-          grommets: bannerOptions.grommets,
-          hem: bannerOptions.hem,
-          polePockets: bannerOptions.polePockets,
-          webbing: bannerOptions.webbing,
-          corners: bannerOptions.corners,
-          rope: bannerOptions.rope,
-          windslits: bannerOptions.windslits,
-          turnaround: bannerOptions.turnaround
-        }
-      }
-
-      // Get base shipping quote from B2Sign
-      const quote = await shippingService.getShippingQuote(shippingOrderData)
-      
-      if (quote.success && quote.shipping_options) {
-        setShippingQuotes(quote.shipping_options)
-        console.log('✅ Base shipping quotes received:', quote.shipping_options)
-      } else {
-        setShippingError('No shipping options available from B2Sign')
-        console.warn('⚠️ No shipping options received from B2Sign')
-      }
-
-    } catch (error) {
-      console.error('❌ Error getting base shipping quotes:', error)
-      setShippingError(`Failed to get base shipping quotes: ${error.message}`)
-      
-      // NO FALLBACK - System must get real shipping costs from B2Sign
-      setShippingQuotes([])
-    } finally {
-      setShippingLoading(false)
-    }
-  }
+  // Base shipping quotes removed - shipping quotes only available after user enters shipping info
 
   const handleShowPreview = () => {
     setShowPreviewModal(true)
@@ -1173,130 +1123,13 @@ const Checkout = () => {
                   onClick={() => continueToNextSection('bannerOptions')}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 active:scale-95 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
                 >
-                  Continue to Shipping →
-                </button>
-              </div>
-            </div>
-          </CollapsibleSection>
-
-          {/* Shipping - Step 3 */}
-          <CollapsibleSection
-            title="Shipping Options"
-            icon={Truck}
-            isExpanded={expandedSections.shipping}
-            onToggle={() => toggleSection('shipping')}
-            defaultExpanded={false}
-            data-section="shipping"
-          >
-            <div className="space-y-6">
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <Truck className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-green-700">Choose your preferred shipping method</p>
-              </div>
-
-              {/* Shipping Options */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-green-600" />
-                    Shipping Method
-                    {customerInfo.zipCode && (
-                      <span className="ml-2 text-sm text-green-600 font-normal">
-                        (B2Sign shipping costs for {customerInfo.zipCode})
-                      </span>
-                    )}
-                  </h4>
-                  <button
-                    onClick={customerInfo.zipCode ? getShippingCosts : getBaseShippingQuotes}
-                    disabled={shippingLoading}
-                    className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    {shippingLoading ? 'Getting Shipping Costs...' : 'Refresh Shipping Costs'}
-                  </button>
-                </div>
-
-                {shippingError && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600" />
-                      <p className="text-sm text-red-700">{shippingError}</p>
-                    </div>
-                  </div>
-                )}
-
-                {shippingLoading && (
-                  <div className="flex items-center justify-center p-6">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                    <span className="ml-3 text-gray-600">Getting real-time shipping quotes from B2Sign...</span>
-                  </div>
-                )}
-
-                {!shippingLoading && shippingQuotes.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {shippingQuotes.map((option, index) => {
-                      const Icon = option.type === 'standard' ? Truck : 
-                                  option.type === 'expedited' ? Zap : Package
-                      const optionValue = option.type || `option_${index}`
-                      const optionLabel = option.name || option.description || `${option.type} shipping`
-                      const optionCost = option.cost || 'Free'
-                      
-                      return (
-                        <label key={optionValue} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
-                          <input
-                            type="radio"
-                            name="shipping"
-                            value={optionValue}
-                            checked={shippingOption === optionValue}
-                            onChange={(e) => setShippingOption(e.target.value)}
-                            className="mr-3 text-green-600 focus:ring-green-500"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Icon className="w-4 h-4 text-green-600" />
-                              <p className="font-medium text-gray-900">{optionLabel}</p>
-                            </div>
-                            <p className={`text-sm ${optionCost !== 'Free' ? 'text-green-600' : 'text-gray-500'}`}>
-                              {optionCost}
-                            </p>
-                            {option.estimated_days && (
-                              <p className="text-xs text-gray-500">
-                                Est. {option.estimated_days} day{option.estimated_days !== 1 ? 's' : ''}
-                              </p>
-                            )}
-                          </div>
-                        </label>
-                      )
-                    })}
-                  </div>
-                )}
-
-                {!shippingLoading && !shippingQuotes.length && !shippingError && (
-                  <div className="text-center p-6 text-gray-500">
-                    <Truck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p>Click "Refresh Quotes" to get real-time shipping options from B2Sign</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Navigation */}
-              <div className="flex justify-between pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => goToPreviousSection('shipping')}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
-                >
-                  ← Back to Banner Options
-                </button>
-                <button
-                  onClick={() => continueToNextSection('shipping')}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-                >
                   Continue to Customer Info →
                 </button>
               </div>
             </div>
           </CollapsibleSection>
 
-          {/* Customer Information - Step 4 */}
+          {/* Customer Information - Step 3 */}
           <CollapsibleSection
             title="Customer Information"
             icon={User}
@@ -1396,10 +1229,135 @@ const Checkout = () => {
                   onClick={() => goToPreviousSection('customerInfo')}
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
                 >
-                  ← Back to Shipping
+                  ← Back to Banner Options
                 </button>
                 <button
                   onClick={() => continueToNextSection('customerInfo')}
+                  disabled={!customerInfo.name || !customerInfo.email}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
+                >
+                  Continue to Shipping →
+                </button>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* Shipping - Step 4 */}
+          <CollapsibleSection
+            title="Shipping Options"
+            icon={Truck}
+            isExpanded={expandedSections.shipping}
+            onToggle={() => toggleSection('shipping')}
+            defaultExpanded={false}
+            data-section="shipping"
+          >
+            <div className="space-y-6">
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                <Truck className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <p className="text-green-700">
+                  {customerInfo.zipCode ? 'Choose your preferred shipping method' : 'Enter your shipping address to see shipping options'}
+                </p>
+              </div>
+
+              {/* Shipping Options */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-green-600" />
+                    Shipping Method
+                  </h4>
+                  {customerInfo.zipCode && (
+                    <button
+                      onClick={getShippingCosts}
+                      disabled={shippingLoading}
+                      className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {shippingLoading ? 'Getting Shipping Costs...' : 'Refresh Shipping Costs'}
+                    </button>
+                  )}
+                </div>
+
+                {shippingError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <p className="text-sm text-red-700">{shippingError}</p>
+                    </div>
+                  </div>
+                )}
+
+                {shippingLoading && (
+                  <div className="flex items-center justify-center p-6">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                    <span className="ml-3 text-gray-600">Getting shipping quotes...</span>
+                  </div>
+                )}
+
+                {!customerInfo.zipCode && !shippingLoading && (
+                  <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <Truck className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-2">Shipping options will appear here</p>
+                    <p className="text-sm text-gray-500">Please enter your shipping address above to see available shipping methods and costs</p>
+                  </div>
+                )}
+
+                {!shippingLoading && shippingQuotes.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {shippingQuotes.map((option, index) => {
+                      const Icon = option.type === 'standard' ? Truck : 
+                                  option.type === 'expedited' ? Zap : Package
+                      const optionValue = option.type || `option_${index}`
+                      const optionLabel = option.name || option.description || `${option.type} shipping`
+                      const optionCost = option.cost || 'Free'
+                      
+                      return (
+                        <label key={optionValue} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
+                          <input
+                            type="radio"
+                            name="shipping"
+                            value={optionValue}
+                            checked={shippingOption === optionValue}
+                            onChange={(e) => setShippingOption(e.target.value)}
+                            className="mr-3 text-green-600 focus:ring-green-500"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className="w-4 h-4 text-green-600" />
+                              <p className="font-medium text-gray-900">{optionLabel}</p>
+                            </div>
+                            <p className={`text-sm ${optionCost !== 'Free' ? 'text-green-600' : 'text-gray-500'}`}>
+                              {optionCost}
+                            </p>
+                            {option.estimated_days && (
+                              <p className="text-xs text-gray-500">
+                                Est. {option.estimated_days} day{option.estimated_days !== 1 ? 's' : ''}
+                              </p>
+                            )}
+                          </div>
+                        </label>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {!shippingLoading && !shippingQuotes.length && !shippingError && (
+                  <div className="text-center p-6 text-gray-500">
+                    <Truck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>Click "Refresh Quotes" to get real-time shipping options from B2Sign</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Navigation */}
+              <div className="flex justify-between pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => goToPreviousSection('shipping')}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
+                >
+                  ← Back to Customer Information
+                </button>
+                <button
+                  onClick={() => continueToNextSection('shipping')}
                   disabled={!customerInfo.name || !customerInfo.email}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
                 >
@@ -1548,7 +1506,7 @@ const Checkout = () => {
                   onClick={() => goToPreviousSection('reviewPayment')}
                   className="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100 active:scale-95 font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-sm hover:shadow-md"
                 >
-                  ← Back to Customer Info
+                  ← Back to Shipping
                 </button>
                 
                 <button

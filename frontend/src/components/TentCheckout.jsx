@@ -83,6 +83,7 @@ const TentCheckout = () => {
   const [expandedSections, setExpandedSections] = useState({
     tentDetails: true,
     accessories: false,
+    customerInfo: false,
     shipping: false,
     payment: false
   })
@@ -110,7 +111,18 @@ const TentCheckout = () => {
     { id: 'ropes-stakes', name: 'Reinforced Strip', price: 19.99, description: 'Professional tent ropes and stakes' }
   ]
 
-  // Shipping information
+  // Customer information
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: ''
+  })
+
+  // Shipping information (legacy - keeping for compatibility)
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
@@ -157,12 +169,15 @@ const TentCheckout = () => {
     }
   }, [])
 
-  // Get shipping quotes when shipping section is expanded
+  // Get shipping quotes when shipping section is expanded and customer info is available
   useEffect(() => {
     if (expandedSections.shipping && orderData && !shippingQuotes.length && !shippingLoading) {
-      getTentShippingQuotes()
+      // Only get shipping quotes if customer has entered shipping info
+      if (customerInfo.zipCode) {
+        getTentShippingQuotes()
+      }
     }
-  }, [expandedSections.shipping, orderData])
+  }, [expandedSections.shipping, orderData, customerInfo.zipCode])
 
   // Calculate tent pricing
   const calculateTentPrice = () => {
@@ -207,6 +222,14 @@ const TentCheckout = () => {
     }))
   }
 
+  // Handle customer info changes
+  const handleCustomerInfoChange = (field, value) => {
+    setCustomerInfo(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
   // Get real-time shipping quotes from B2Sign for tents
   const getTentShippingQuotes = async () => {
     if (!orderData) return
@@ -222,14 +245,14 @@ const TentCheckout = () => {
         product_type: 'tent',
         dimensions: { width: 10, height: 10 }, // Tent dimensions
         quantity: 1,
-        zip_code: shippingInfo.zipCode || '10001',
+        zip_code: customerInfo.zipCode || '10001',
         job_name: `Tent Order ${Date.now()}`,
         print_options: {
           tent_size: tentSpecs.tentSize,
           tent_design_option: orderData.tent_design_option || 'canopy-only'
         },
         accessories: selectedAccessories,
-        customer_info: shippingInfo
+        customer_info: customerInfo
       }
 
       // Get shipping quote from B2Sign
@@ -239,13 +262,13 @@ const TentCheckout = () => {
         setShippingQuotes(quote.shipping_options)
         console.log('✅ Real-time tent shipping quotes received:', quote.shipping_options)
       } else {
-        setShippingError('No shipping options available from B2Sign')
+        setShippingError('No shipping options available at this time')
         console.warn('⚠️ No shipping options received from B2Sign for tent')
       }
 
     } catch (error) {
       console.error('❌ Error getting tent shipping quotes:', error)
-      setShippingError(`Failed to get shipping quotes: ${error.message}`)
+      setShippingError('Unable to get shipping costs at this time. Please try again.')
       
       // NO FALLBACK - System must get real shipping costs from B2Sign
       setShippingQuotes([])
@@ -281,7 +304,7 @@ const TentCheckout = () => {
             frame_type: tentSpecs.frameType,
             print_method: tentSpecs.printMethod,
             accessories: JSON.stringify(selectedAccessories),
-            shipping_info: JSON.stringify(shippingInfo)
+            shipping_info: JSON.stringify(customerInfo)
           }
         })
       })
@@ -293,15 +316,15 @@ const TentCheckout = () => {
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
-            email: shippingInfo.email,
-            phone: shippingInfo.phone,
+            name: customerInfo.name,
+            email: customerInfo.email,
+            phone: customerInfo.phone,
             address: {
-              line1: shippingInfo.address,
-              city: shippingInfo.city,
-              state: shippingInfo.state,
-              postal_code: shippingInfo.zipCode,
-              country: shippingInfo.country
+              line1: customerInfo.address,
+              city: customerInfo.city,
+              state: customerInfo.state,
+              postal_code: customerInfo.zipCode,
+              country: 'US'
             }
           }
         }
@@ -328,14 +351,13 @@ const TentCheckout = () => {
 
   // Validate form
   const isFormValid = () => {
-    return shippingInfo.firstName && 
-           shippingInfo.lastName && 
-           shippingInfo.email && 
-           shippingInfo.phone && 
-           shippingInfo.address && 
-           shippingInfo.city && 
-           shippingInfo.state && 
-           shippingInfo.zipCode
+    return customerInfo.name && 
+           customerInfo.email && 
+           customerInfo.phone && 
+           customerInfo.address && 
+           customerInfo.city && 
+           customerInfo.state && 
+           customerInfo.zipCode
   }
 
   // Modal handlers
@@ -533,14 +555,115 @@ const TentCheckout = () => {
               </div>
             </CollapsibleSection>
 
+            {/* Customer Information */}
+            <CollapsibleSection
+              title="Customer Information"
+              icon={User}
+              isExpanded={expandedSections.customerInfo}
+              onToggle={() => toggleSection('customerInfo')}
+            >
+              <div className="space-y-4">
+                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <User className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                  <p className="text-blue-700">Please provide your contact and shipping information</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input
+                      type="text"
+                      value={customerInfo.name}
+                      onChange={(e) => handleCustomerInfoChange('name', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={customerInfo.email}
+                      onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <input
+                      type="tel"
+                      value={customerInfo.phone}
+                      onChange={(e) => handleCustomerInfoChange('phone', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                    <input
+                      type="text"
+                      value={customerInfo.address}
+                      onChange={(e) => handleCustomerInfoChange('address', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                      placeholder="Enter your street address"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                    <input
+                      type="text"
+                      value={customerInfo.city}
+                      onChange={(e) => handleCustomerInfoChange('city', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                      placeholder="City"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+                    <input
+                      type="text"
+                      value={customerInfo.state}
+                      onChange={(e) => handleCustomerInfoChange('state', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                      placeholder="State"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
+                    <input
+                      type="text"
+                      value={customerInfo.zipCode}
+                      onChange={(e) => handleCustomerInfoChange('zipCode', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                      placeholder="ZIP Code"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleSection>
+
             {/* Shipping Information */}
             <CollapsibleSection
-              title="Shipping Information"
+              title="Shipping Options"
               icon={Truck}
               isExpanded={expandedSections.shipping}
               onToggle={() => toggleSection('shipping')}
             >
-              <div className="space-y-4">
+              <div className="space-y-6">
+                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                  <Truck className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                  <p className="text-green-700">
+                    {customerInfo.zipCode ? 'Choose your preferred shipping method' : 'Enter your shipping address to see shipping options'}
+                  </p>
+                </div>
+
                 {/* Shipping Options */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -548,13 +671,15 @@ const TentCheckout = () => {
                       <Truck className="w-4 h-4 text-green-600" />
                       Shipping Method
                     </h4>
-                    <button
-                      onClick={getTentShippingQuotes}
-                      disabled={shippingLoading}
-                      className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      {shippingLoading ? 'Getting Quotes...' : 'Refresh Quotes'}
-                    </button>
+                    {customerInfo.zipCode && (
+                      <button
+                        onClick={getTentShippingQuotes}
+                        disabled={shippingLoading}
+                        className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {shippingLoading ? 'Getting Shipping Costs...' : 'Refresh Shipping Costs'}
+                      </button>
+                    )}
                   </div>
 
                   {shippingError && (
@@ -569,7 +694,15 @@ const TentCheckout = () => {
                   {shippingLoading && (
                     <div className="flex items-center justify-center p-6">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                      <span className="ml-3 text-gray-600">Getting real-time shipping quotes from B2Sign...</span>
+                      <span className="ml-3 text-gray-600">Getting shipping quotes...</span>
+                    </div>
+                  )}
+
+                  {!customerInfo.zipCode && !shippingLoading && (
+                    <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <Truck className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-600 mb-2">Shipping options will appear here</p>
+                      <p className="text-sm text-gray-500">Please enter your shipping address above to see available shipping methods and costs</p>
                     </div>
                   )}
 
@@ -618,111 +751,6 @@ const TentCheckout = () => {
                       <p>Click "Refresh Quotes" to get real-time shipping options from B2Sign</p>
                     </div>
                   )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingInfo.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingInfo.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      value={shippingInfo.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone *
-                    </label>
-                    <input
-                      type="tel"
-                      value={shippingInfo.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Address *
-                  </label>
-                  <input
-                    type="text"
-                    value={shippingInfo.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingInfo.city}
-                      onChange={(e) => handleInputChange('city', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingInfo.state}
-                      onChange={(e) => handleInputChange('state', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      ZIP Code *
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingInfo.zipCode}
-                      onChange={(e) => handleInputChange('zipCode', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
                 </div>
               </div>
             </CollapsibleSection>

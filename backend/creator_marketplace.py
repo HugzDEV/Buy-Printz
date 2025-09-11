@@ -11,9 +11,9 @@ import json
 import uuid
 import os
 import stripe
-from backend.database import DatabaseManager
-from backend.auth import get_current_user
-from backend.generate_thumbnails import process_single_image, validate_image_file
+from .database import DatabaseManager
+from .auth import get_current_user
+from .generate_thumbnails import process_single_image, validate_image_file
 from dotenv import load_dotenv
 
 # Load environment variables
