@@ -11,11 +11,63 @@ class ShippingService {
   }
 
   /**
-   * Get shipping quote for a single product
+   * Get live shipping quote for a single product (requires user shipping info)
+   */
+  async getLiveShippingQuote(orderData, customerInfo) {
+    try {
+      console.log('🚚 Getting live shipping quote for:', orderData.product_type, 'to:', customerInfo.zipCode)
+      
+      // Validate required customer info
+      if (!customerInfo.zipCode) {
+        throw new Error('Zip code is required for live shipping quotes')
+      }
+      
+      // Check cache first
+      const cacheKey = this.generateLiveCacheKey(orderData, customerInfo)
+      const cachedQuote = this.getCachedQuote(cacheKey)
+      if (cachedQuote) {
+        console.log('📦 Using cached live shipping quote')
+        return { ...cachedQuote, cache_hit: true }
+      }
+
+      // Prepare request data for live shipping
+      const requestData = this.prepareLiveShippingRequest(orderData, customerInfo)
+      
+      // Make API request to live shipping endpoint
+      const response = await fetch(`${this.baseURL}/api/live-shipping/quote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        },
+        body: JSON.stringify(requestData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to get live shipping quote')
+      }
+
+      const quote = await response.json()
+      
+      // Cache the result
+      this.cacheQuote(cacheKey, quote)
+      
+      console.log('✅ Live shipping quote received:', quote)
+      return quote
+
+    } catch (error) {
+      console.error('❌ Error getting live shipping quote:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get shipping quote for a single product (legacy method for base pricing)
    */
   async getShippingQuote(orderData) {
     try {
-      console.log('🚚 Getting shipping quote for:', orderData.product_type)
+      console.log('🚚 Getting base shipping quote for:', orderData.product_type)
       
       // Check cache first
       const cacheKey = this.generateCacheKey(orderData)
@@ -160,6 +212,72 @@ class ShippingService {
       print_options: orderData.print_options
     }
     return JSON.stringify(keyData)
+  }
+
+  /**
+   * Generate cache key for live shipping (includes customer info)
+   */
+  generateLiveCacheKey(orderData, customerInfo) {
+    const keyData = {
+      product_type: orderData.product_type,
+      material: orderData.material,
+      dimensions: orderData.dimensions,
+      quantity: orderData.quantity,
+      print_options: orderData.print_options,
+      accessories: orderData.accessories,
+      zip_code: customerInfo.zipCode,
+      city: customerInfo.city,
+      state: customerInfo.state
+    }
+    return JSON.stringify(keyData)
+  }
+
+  /**
+   * Prepare live shipping request data
+   */
+  prepareLiveShippingRequest(orderData, customerInfo) {
+    const request = {
+      product_type: orderData.product_type || 'banner',
+      dimensions: orderData.dimensions || { width: 2, height: 4 },
+      quantity: orderData.quantity || 1,
+      zip_code: customerInfo.zipCode,
+      job_name: orderData.job_name || `Live Quote ${Date.now()}`,
+      print_options: {},
+      accessories: [],
+      customer_info: customerInfo
+    }
+
+    // Add material for banners
+    if (orderData.product_type === 'banner' && orderData.material) {
+      request.material = orderData.material
+    }
+
+    // Add print options from banner options
+    if (orderData.print_options) {
+      request.print_options = { ...orderData.print_options }
+    }
+
+    // Add tent-specific options
+    if (orderData.product_type === 'tent' || orderData.product_type === 'tradeshow_tent') {
+      if (orderData.tent_design_option) {
+        request.print_options.tent_design_option = orderData.tent_design_option
+      }
+      if (orderData.tent_size) {
+        request.print_options.tent_size = orderData.tent_size
+      }
+      if (orderData.accessories) {
+        request.accessories = orderData.accessories
+      }
+    }
+
+    // Add tin-specific options
+    if (orderData.product_type === 'tin') {
+      if (orderData.tin_surface_coverage) {
+        request.print_options.tin_surface_coverage = orderData.tin_surface_coverage
+      }
+    }
+
+    return request
   }
 
   /**

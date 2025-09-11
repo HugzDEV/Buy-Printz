@@ -329,9 +329,23 @@ const Checkout = () => {
   // Get shipping quotes when shipping section is expanded
   useEffect(() => {
     if (expandedSections.shipping && orderData && !shippingQuotes.length && !shippingLoading) {
-      getShippingQuotes()
+      // If customer has entered shipping info, get live quotes
+      if (customerInfo.zipCode) {
+        getLiveShippingQuotes()
+      } else {
+        // Otherwise get base quotes for preview
+        getBaseShippingQuotes()
+      }
     }
   }, [expandedSections.shipping, orderData])
+
+  // Get live quotes when customer enters shipping info
+  useEffect(() => {
+    if (customerInfo.zipCode && expandedSections.shipping && shippingQuotes.length > 0) {
+      // Refresh with live quotes when zip code is entered
+      getLiveShippingQuotes()
+    }
+  }, [customerInfo.zipCode])
 
   const createOrder = async () => {
     try {
@@ -410,23 +424,25 @@ const Checkout = () => {
     }))
   }
 
-  // Get real-time shipping quotes from B2Sign
-  const getShippingQuotes = async () => {
-    if (!orderData) return
+  // Get live shipping quotes from B2Sign (requires customer shipping info)
+  const getLiveShippingQuotes = async () => {
+    if (!orderData || !customerInfo.zipCode) {
+      setShippingError('Please enter your shipping information to get live quotes')
+      return
+    }
 
     setShippingLoading(true)
     setShippingError(null)
 
     try {
-      console.log('🚚 Getting real-time shipping quotes from B2Sign...')
+      console.log('🚚 Getting live shipping quotes from B2Sign...')
       
-      // Prepare order data for shipping quote
+      // Prepare order data for live shipping quote
       const shippingOrderData = {
         product_type: orderData.product_type || 'banner',
         material: bannerOptions.material,
         dimensions: orderData.dimensions,
         quantity: bannerOptions.quantity,
-        zip_code: customerInfo.zipCode || '10001',
         job_name: bannerOptions.jobName || `BuyPrintz Order ${Date.now()}`,
         print_options: {
           sides: bannerOptions.sides,
@@ -438,24 +454,80 @@ const Checkout = () => {
           rope: bannerOptions.rope,
           windslits: bannerOptions.windslits,
           turnaround: bannerOptions.turnaround
-        },
-        customer_info: customerInfo
+        }
       }
 
-      // Get shipping quote from B2Sign
-      const quote = await shippingService.getShippingQuote(shippingOrderData)
+      // Get live shipping quote from B2Sign
+      const quote = await shippingService.getLiveShippingQuote(shippingOrderData, customerInfo)
       
       if (quote.success && quote.shipping_options) {
         setShippingQuotes(quote.shipping_options)
-        console.log('✅ Real-time shipping quotes received:', quote.shipping_options)
+        console.log('✅ Live shipping quotes received:', quote.shipping_options)
       } else {
         setShippingError('No shipping options available from B2Sign')
         console.warn('⚠️ No shipping options received from B2Sign')
       }
 
     } catch (error) {
-      console.error('❌ Error getting shipping quotes:', error)
-      setShippingError(`Failed to get shipping quotes: ${error.message}`)
+      console.error('❌ Error getting live shipping quotes:', error)
+      setShippingError(`Failed to get live shipping quotes: ${error.message}`)
+      
+      // Fallback to default shipping options
+      setShippingQuotes([
+        { name: 'Standard Shipping (5-7 days)', type: 'standard', cost: 'Free', estimated_days: 5 },
+        { name: 'Express Shipping (2-3 days)', type: 'expedited', cost: '$25.00', estimated_days: 2 },
+        { name: 'Overnight Shipping (1 day)', type: 'overnight', cost: '$45.00', estimated_days: 1 }
+      ])
+    } finally {
+      setShippingLoading(false)
+    }
+  }
+
+  // Get base shipping quotes (for preview before customer info)
+  const getBaseShippingQuotes = async () => {
+    if (!orderData) return
+
+    setShippingLoading(true)
+    setShippingError(null)
+
+    try {
+      console.log('🚚 Getting base shipping quotes from B2Sign...')
+      
+      // Prepare order data for base shipping quote
+      const shippingOrderData = {
+        product_type: orderData.product_type || 'banner',
+        material: bannerOptions.material,
+        dimensions: orderData.dimensions,
+        quantity: bannerOptions.quantity,
+        zip_code: '10001', // Use default zip for base pricing
+        job_name: bannerOptions.jobName || `BuyPrintz Base Quote ${Date.now()}`,
+        print_options: {
+          sides: bannerOptions.sides,
+          grommets: bannerOptions.grommets,
+          hem: bannerOptions.hem,
+          polePockets: bannerOptions.polePockets,
+          webbing: bannerOptions.webbing,
+          corners: bannerOptions.corners,
+          rope: bannerOptions.rope,
+          windslits: bannerOptions.windslits,
+          turnaround: bannerOptions.turnaround
+        }
+      }
+
+      // Get base shipping quote from B2Sign
+      const quote = await shippingService.getShippingQuote(shippingOrderData)
+      
+      if (quote.success && quote.shipping_options) {
+        setShippingQuotes(quote.shipping_options)
+        console.log('✅ Base shipping quotes received:', quote.shipping_options)
+      } else {
+        setShippingError('No shipping options available from B2Sign')
+        console.warn('⚠️ No shipping options received from B2Sign')
+      }
+
+    } catch (error) {
+      console.error('❌ Error getting base shipping quotes:', error)
+      setShippingError(`Failed to get base shipping quotes: ${error.message}`)
       
       // Fallback to default shipping options
       setShippingQuotes([
@@ -1139,9 +1211,14 @@ const Checkout = () => {
                   <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                     <Truck className="w-4 h-4 text-green-600" />
                     Shipping Method
+                    {customerInfo.zipCode && (
+                      <span className="ml-2 text-sm text-green-600 font-normal">
+                        (Live quotes for {customerInfo.zipCode})
+                      </span>
+                    )}
                   </h4>
                   <button
-                    onClick={getShippingQuotes}
+                    onClick={customerInfo.zipCode ? getLiveShippingQuotes : getBaseShippingQuotes}
                     disabled={shippingLoading}
                     className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
                   >

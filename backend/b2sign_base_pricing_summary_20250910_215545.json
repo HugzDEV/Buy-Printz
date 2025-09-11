@@ -1,0 +1,665 @@
+{
+  "scraped_at": "2025-09-10T19:29:53.374125",
+  "total_combinations": 162,
+  "successful_quotes": 144,
+  "failed_quotes": 18,
+  "success_rate": 88.88888888888889,
+  "banner_summary": {
+    "13oz-vinyl": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 12.8,
+          "price_per_sqft": 1.6
+        },
+        "3x6": {
+          "base_price": 28.8,
+          "price_per_sqft": 1.6
+        },
+        "4x8": {
+          "base_price": 51.2,
+          "price_per_sqft": 1.6
+        },
+        "6x12": {
+          "base_price": 115.2,
+          "price_per_sqft": 1.6
+        },
+        "8x16": {
+          "base_price": 204.8,
+          "price_per_sqft": 1.6
+        },
+        "10x20": {
+          "base_price": 320.0,
+          "price_per_sqft": 1.6
+        },
+        "16x32": {
+          "base_price": 819.2,
+          "price_per_sqft": 1.6
+        },
+        "20x40": {
+          "base_price": 1280.0,
+          "price_per_sqft": 1.6
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 12.8,
+          "price_per_sqft": 1.6
+        },
+        "3x6": {
+          "base_price": 28.8,
+          "price_per_sqft": 1.6
+        },
+        "4x8": {
+          "base_price": 51.2,
+          "price_per_sqft": 1.6
+        },
+        "6x12": {
+          "base_price": 115.2,
+          "price_per_sqft": 1.6
+        },
+        "8x16": {
+          "base_price": 204.8,
+          "price_per_sqft": 1.6
+        },
+        "10x20": {
+          "base_price": 320.0,
+          "price_per_sqft": 1.6
+        },
+        "16x32": {
+          "base_price": 819.2,
+          "price_per_sqft": 1.6
+        },
+        "20x40": {
+          "base_price": 1280.0,
+          "price_per_sqft": 1.6
+        }
+      }
+    },
+    "18oz-blackout": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 20.0,
+          "price_per_sqft": 2.5
+        },
+        "3x6": {
+          "base_price": 45.0,
+          "price_per_sqft": 2.5
+        },
+        "4x8": {
+          "base_price": 80.0,
+          "price_per_sqft": 2.5
+        },
+        "6x12": {
+          "base_price": 180.0,
+          "price_per_sqft": 2.5
+        },
+        "8x16": {
+          "base_price": 320.0,
+          "price_per_sqft": 2.5
+        },
+        "10x20": {
+          "base_price": 500.0,
+          "price_per_sqft": 2.5
+        },
+        "16x32": {
+          "base_price": 1280.0,
+          "price_per_sqft": 2.5
+        },
+        "20x40": {
+          "base_price": 2000.0,
+          "price_per_sqft": 2.5
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 20.0,
+          "price_per_sqft": 2.5
+        },
+        "3x6": {
+          "base_price": 45.0,
+          "price_per_sqft": 2.5
+        },
+        "4x8": {
+          "base_price": 80.0,
+          "price_per_sqft": 2.5
+        },
+        "6x12": {
+          "base_price": 180.0,
+          "price_per_sqft": 2.5
+        },
+        "8x16": {
+          "base_price": 320.0,
+          "price_per_sqft": 2.5
+        },
+        "10x20": {
+          "base_price": 500.0,
+          "price_per_sqft": 2.5
+        },
+        "16x32": {
+          "base_price": 1280.0,
+          "price_per_sqft": 2.5
+        },
+        "20x40": {
+          "base_price": 2000.0,
+          "price_per_sqft": 2.5
+        }
+      }
+    },
+    "mesh": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 14.4,
+          "price_per_sqft": 1.8
+        },
+        "3x6": {
+          "base_price": 32.4,
+          "price_per_sqft": 1.7999999999999998
+        },
+        "4x8": {
+          "base_price": 57.6,
+          "price_per_sqft": 1.8
+        },
+        "6x12": {
+          "base_price": 129.6,
+          "price_per_sqft": 1.7999999999999998
+        },
+        "8x16": {
+          "base_price": 230.4,
+          "price_per_sqft": 1.8
+        },
+        "10x20": {
+          "base_price": 360.0,
+          "price_per_sqft": 1.8
+        },
+        "16x32": {
+          "base_price": 921.6,
+          "price_per_sqft": 1.8
+        },
+        "20x40": {
+          "base_price": 1440.0,
+          "price_per_sqft": 1.8
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 14.4,
+          "price_per_sqft": 1.8
+        },
+        "3x6": {
+          "base_price": 32.4,
+          "price_per_sqft": 1.7999999999999998
+        },
+        "4x8": {
+          "base_price": 57.6,
+          "price_per_sqft": 1.8
+        },
+        "6x12": {
+          "base_price": 129.6,
+          "price_per_sqft": 1.7999999999999998
+        },
+        "8x16": {
+          "base_price": 230.4,
+          "price_per_sqft": 1.8
+        },
+        "10x20": {
+          "base_price": 360.0,
+          "price_per_sqft": 1.8
+        },
+        "16x32": {
+          "base_price": 921.6,
+          "price_per_sqft": 1.8
+        },
+        "20x40": {
+          "base_price": 1440.0,
+          "price_per_sqft": 1.8
+        }
+      }
+    },
+    "indoor": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 20.0,
+          "price_per_sqft": 2.5
+        },
+        "3x6": {
+          "base_price": 45.0,
+          "price_per_sqft": 2.5
+        },
+        "4x8": {
+          "base_price": 80.0,
+          "price_per_sqft": 2.5
+        },
+        "6x12": {
+          "base_price": 180.0,
+          "price_per_sqft": 2.5
+        },
+        "8x16": {
+          "base_price": 320.0,
+          "price_per_sqft": 2.5
+        },
+        "10x20": {
+          "base_price": 500.0,
+          "price_per_sqft": 2.5
+        },
+        "16x32": {
+          "base_price": 1280.0,
+          "price_per_sqft": 2.5
+        },
+        "20x40": {
+          "base_price": 2000.0,
+          "price_per_sqft": 2.5
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 20.0,
+          "price_per_sqft": 2.5
+        },
+        "3x6": {
+          "base_price": 45.0,
+          "price_per_sqft": 2.5
+        },
+        "4x8": {
+          "base_price": 80.0,
+          "price_per_sqft": 2.5
+        },
+        "6x12": {
+          "base_price": 180.0,
+          "price_per_sqft": 2.5
+        },
+        "8x16": {
+          "base_price": 320.0,
+          "price_per_sqft": 2.5
+        },
+        "10x20": {
+          "base_price": 500.0,
+          "price_per_sqft": 2.5
+        },
+        "16x32": {
+          "base_price": 1280.0,
+          "price_per_sqft": 2.5
+        },
+        "20x40": {
+          "base_price": 2000.0,
+          "price_per_sqft": 2.5
+        }
+      }
+    },
+    "pole": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 24.0,
+          "price_per_sqft": 3.0
+        },
+        "3x6": {
+          "base_price": 54.0,
+          "price_per_sqft": 3.0
+        },
+        "4x8": {
+          "base_price": 96.0,
+          "price_per_sqft": 3.0
+        },
+        "6x12": {
+          "base_price": 216.0,
+          "price_per_sqft": 3.0
+        },
+        "8x16": {
+          "base_price": 384.0,
+          "price_per_sqft": 3.0
+        },
+        "10x20": {
+          "base_price": 600.0,
+          "price_per_sqft": 3.0
+        },
+        "16x32": {
+          "base_price": 1536.0,
+          "price_per_sqft": 3.0
+        },
+        "20x40": {
+          "base_price": 2400.0,
+          "price_per_sqft": 3.0
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 24.0,
+          "price_per_sqft": 3.0
+        },
+        "3x6": {
+          "base_price": 54.0,
+          "price_per_sqft": 3.0
+        },
+        "4x8": {
+          "base_price": 96.0,
+          "price_per_sqft": 3.0
+        },
+        "6x12": {
+          "base_price": 216.0,
+          "price_per_sqft": 3.0
+        },
+        "8x16": {
+          "base_price": 384.0,
+          "price_per_sqft": 3.0
+        },
+        "10x20": {
+          "base_price": 600.0,
+          "price_per_sqft": 3.0
+        },
+        "16x32": {
+          "base_price": 1536.0,
+          "price_per_sqft": 3.0
+        },
+        "20x40": {
+          "base_price": 2400.0,
+          "price_per_sqft": 3.0
+        }
+      }
+    },
+    "9oz-fabric": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 22.0,
+          "price_per_sqft": 2.75
+        },
+        "3x6": {
+          "base_price": 49.5,
+          "price_per_sqft": 2.75
+        },
+        "4x8": {
+          "base_price": 88.0,
+          "price_per_sqft": 2.75
+        },
+        "6x12": {
+          "base_price": 198.0,
+          "price_per_sqft": 2.75
+        },
+        "8x16": {
+          "base_price": 352.0,
+          "price_per_sqft": 2.75
+        },
+        "10x20": {
+          "base_price": 550.0,
+          "price_per_sqft": 2.75
+        },
+        "16x32": {
+          "base_price": 1408.0,
+          "price_per_sqft": 2.75
+        },
+        "20x40": {
+          "base_price": 2200.0,
+          "price_per_sqft": 2.75
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 22.0,
+          "price_per_sqft": 2.75
+        },
+        "3x6": {
+          "base_price": 49.5,
+          "price_per_sqft": 2.75
+        },
+        "4x8": {
+          "base_price": 88.0,
+          "price_per_sqft": 2.75
+        },
+        "6x12": {
+          "base_price": 198.0,
+          "price_per_sqft": 2.75
+        },
+        "8x16": {
+          "base_price": 352.0,
+          "price_per_sqft": 2.75
+        },
+        "10x20": {
+          "base_price": 550.0,
+          "price_per_sqft": 2.75
+        },
+        "16x32": {
+          "base_price": 1408.0,
+          "price_per_sqft": 2.75
+        },
+        "20x40": {
+          "base_price": 2200.0,
+          "price_per_sqft": 2.75
+        }
+      }
+    },
+    "blockout-fabric": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 20.0,
+          "price_per_sqft": 2.5
+        },
+        "3x6": {
+          "base_price": 45.0,
+          "price_per_sqft": 2.5
+        },
+        "4x8": {
+          "base_price": 80.0,
+          "price_per_sqft": 2.5
+        },
+        "6x12": {
+          "base_price": 180.0,
+          "price_per_sqft": 2.5
+        },
+        "8x16": {
+          "base_price": 320.0,
+          "price_per_sqft": 2.5
+        },
+        "10x20": {
+          "base_price": 500.0,
+          "price_per_sqft": 2.5
+        },
+        "16x32": {
+          "base_price": 1280.0,
+          "price_per_sqft": 2.5
+        },
+        "20x40": {
+          "base_price": 2000.0,
+          "price_per_sqft": 2.5
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 20.0,
+          "price_per_sqft": 2.5
+        },
+        "3x6": {
+          "base_price": 45.0,
+          "price_per_sqft": 2.5
+        },
+        "4x8": {
+          "base_price": 80.0,
+          "price_per_sqft": 2.5
+        },
+        "6x12": {
+          "base_price": 180.0,
+          "price_per_sqft": 2.5
+        },
+        "8x16": {
+          "base_price": 320.0,
+          "price_per_sqft": 2.5
+        },
+        "10x20": {
+          "base_price": 500.0,
+          "price_per_sqft": 2.5
+        },
+        "16x32": {
+          "base_price": 1280.0,
+          "price_per_sqft": 2.5
+        },
+        "20x40": {
+          "base_price": 2000.0,
+          "price_per_sqft": 2.5
+        }
+      }
+    },
+    "tension-fabric": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 22.0,
+          "price_per_sqft": 2.75
+        },
+        "3x6": {
+          "base_price": 49.5,
+          "price_per_sqft": 2.75
+        },
+        "4x8": {
+          "base_price": 88.0,
+          "price_per_sqft": 2.75
+        },
+        "6x12": {
+          "base_price": 198.0,
+          "price_per_sqft": 2.75
+        },
+        "8x16": {
+          "base_price": 352.0,
+          "price_per_sqft": 2.75
+        },
+        "10x20": {
+          "base_price": 550.0,
+          "price_per_sqft": 2.75
+        },
+        "16x32": {
+          "base_price": 1408.0,
+          "price_per_sqft": 2.75
+        },
+        "20x40": {
+          "base_price": 2200.0,
+          "price_per_sqft": 2.75
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 22.0,
+          "price_per_sqft": 2.75
+        },
+        "3x6": {
+          "base_price": 49.5,
+          "price_per_sqft": 2.75
+        },
+        "4x8": {
+          "base_price": 88.0,
+          "price_per_sqft": 2.75
+        },
+        "6x12": {
+          "base_price": 198.0,
+          "price_per_sqft": 2.75
+        },
+        "8x16": {
+          "base_price": 352.0,
+          "price_per_sqft": 2.75
+        },
+        "10x20": {
+          "base_price": 550.0,
+          "price_per_sqft": 2.75
+        },
+        "16x32": {
+          "base_price": 1408.0,
+          "price_per_sqft": 2.75
+        },
+        "20x40": {
+          "base_price": 2200.0,
+          "price_per_sqft": 2.75
+        }
+      }
+    },
+    "backlit": {
+      "sizes_tested": 8,
+      "base_pricing": {
+        "2x4": {
+          "base_price": 56.0,
+          "price_per_sqft": 7.0
+        },
+        "3x6": {
+          "base_price": 126.0,
+          "price_per_sqft": 7.0
+        },
+        "4x8": {
+          "base_price": 224.0,
+          "price_per_sqft": 7.0
+        },
+        "6x12": {
+          "base_price": 504.0,
+          "price_per_sqft": 7.0
+        },
+        "8x16": {
+          "base_price": 896.0,
+          "price_per_sqft": 7.0
+        },
+        "10x20": {
+          "base_price": 1400.0,
+          "price_per_sqft": 7.0
+        },
+        "16x32": {
+          "base_price": 3584.0,
+          "price_per_sqft": 7.0
+        },
+        "20x40": {
+          "base_price": 5600.0,
+          "price_per_sqft": 7.0
+        }
+      },
+      "premium_pricing": {
+        "2x4": {
+          "base_price": 56.0,
+          "price_per_sqft": 7.0
+        },
+        "3x6": {
+          "base_price": 126.0,
+          "price_per_sqft": 7.0
+        },
+        "4x8": {
+          "base_price": 224.0,
+          "price_per_sqft": 7.0
+        },
+        "6x12": {
+          "base_price": 504.0,
+          "price_per_sqft": 7.0
+        },
+        "8x16": {
+          "base_price": 896.0,
+          "price_per_sqft": 7.0
+        },
+        "10x20": {
+          "base_price": 1400.0,
+          "price_per_sqft": 7.0
+        },
+        "16x32": {
+          "base_price": 3584.0,
+          "price_per_sqft": 7.0
+        },
+        "20x40": {
+          "base_price": 5600.0,
+          "price_per_sqft": 7.0
+        }
+      }
+    }
+  },
+  "tent_summary": {
+    "10x10": {
+      "designs_tested": 3,
+      "base_pricing": {},
+      "premium_pricing": {}
+    },
+    "10x15": {
+      "designs_tested": 3,
+      "base_pricing": {},
+      "premium_pricing": {}
+    },
+    "10x20": {
+      "designs_tested": 3,
+      "base_pricing": {},
+      "premium_pricing": {}
+    }
+  }
+}
