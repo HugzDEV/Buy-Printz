@@ -202,12 +202,9 @@ const Checkout = () => {
   const [approvedPDF, setApprovedPDF] = useState(null)
   const [previewApproved, setPreviewApproved] = useState(false)
 
-  // Shipping Options Configuration
-  const shippingOptions = [
-    { value: 'standard', label: 'Standard Shipping (5-7 days)', price: 0, icon: Truck },
-    { value: 'express', label: 'Express Shipping (2-3 days)', price: 25, icon: Zap },
-    { value: 'overnight', label: 'Overnight Shipping (1 day)', price: 45, icon: Package }
-  ]
+  // Shipping Options Configuration - REMOVED HARDCODED PRICES
+  // All shipping options now come from B2Sign integration
+  const shippingOptions = []
 
   // Toggle section expansion
   const toggleSection = (section) => {
@@ -472,12 +469,8 @@ const Checkout = () => {
       console.error('❌ Error getting shipping costs:', error)
       setShippingError(`Failed to get shipping costs: ${error.message}`)
       
-      // Fallback to default shipping options
-      setShippingQuotes([
-        { name: 'Standard Shipping (5-7 days)', type: 'standard', cost: 'Free', estimated_days: 5 },
-        { name: 'Express Shipping (2-3 days)', type: 'expedited', cost: '$25.00', estimated_days: 2 },
-        { name: 'Overnight Shipping (1 day)', type: 'overnight', cost: '$45.00', estimated_days: 1 }
-      ])
+      // NO FALLBACK - System must get real shipping costs from B2Sign
+      setShippingQuotes([])
     } finally {
       setShippingLoading(false)
     }
@@ -529,12 +522,8 @@ const Checkout = () => {
       console.error('❌ Error getting base shipping quotes:', error)
       setShippingError(`Failed to get base shipping quotes: ${error.message}`)
       
-      // Fallback to default shipping options
-      setShippingQuotes([
-        { name: 'Standard Shipping (5-7 days)', type: 'standard', cost: 'Free', estimated_days: 5 },
-        { name: 'Express Shipping (2-3 days)', type: 'expedited', cost: '$25.00', estimated_days: 2 },
-        { name: 'Overnight Shipping (1 day)', type: 'overnight', cost: '$45.00', estimated_days: 1 }
-      ])
+      // NO FALLBACK - System must get real shipping costs from B2Sign
+      setShippingQuotes([])
     } finally {
       setShippingLoading(false)
     }
@@ -1511,8 +1500,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingOption === 'standard' ? 'Free' : 
-                       shippingOption === 'express' ? '+$25' : '+$45'}
+                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -1648,8 +1636,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingOption === 'standard' ? 'Free' : 
-                       shippingOption === 'express' ? '+$25' : '+$45'}
+                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
                     </span>
                   </div>
                   

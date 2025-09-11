@@ -165,12 +165,9 @@ const TinCheckout = () => {
   const [approvedPDF, setApprovedPDF] = useState(null)
   const [previewApproved, setPreviewApproved] = useState(false)
 
-  // Shipping Options Configuration
-  const shippingOptions = [
-    { value: 'standard', label: 'Standard Shipping (5-7 days)', price: 0, icon: Truck },
-    { value: 'express', label: 'Express Shipping (2-3 days)', price: 25, icon: Zap },
-    { value: 'overnight', label: 'Overnight Shipping (1 day)', price: 45, icon: Package }
-  ]
+  // Shipping Options Configuration - REMOVED HARDCODED PRICES
+  // All shipping options now come from B2Sign integration
+  const shippingOptions = []
 
   // Toggle section expansion
   const toggleSection = (section) => {
@@ -989,8 +986,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingOption === 'standard' ? 'Free' : 
-                       shippingOption === 'express' ? '+$25' : '+$45'}
+                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -1116,8 +1112,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingOption === 'standard' ? 'Free' : 
-                       shippingOption === 'express' ? '+$25' : '+$45'}
+                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
                     </span>
                   </div>
                   

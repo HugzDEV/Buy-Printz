@@ -247,12 +247,8 @@ const TentCheckout = () => {
       console.error('❌ Error getting tent shipping quotes:', error)
       setShippingError(`Failed to get shipping quotes: ${error.message}`)
       
-      // Fallback to default shipping options for tents
-      setShippingQuotes([
-        { name: 'Standard Shipping (5-7 days)', type: 'standard', cost: 'Free', estimated_days: 5 },
-        { name: 'Express Shipping (2-3 days)', type: 'expedited', cost: '$35.00', estimated_days: 2 },
-        { name: 'Overnight Shipping (1 day)', type: 'overnight', cost: '$65.00', estimated_days: 1 }
-      ])
+      // NO FALLBACK - System must get real shipping costs from B2Sign
+      setShippingQuotes([])
     } finally {
       setShippingLoading(false)
     }
