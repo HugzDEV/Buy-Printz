@@ -5,7 +5,7 @@
 
 class ShippingService {
   constructor() {
-    this.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000'
+    this.baseURL = import.meta.env.VITE_API_URL || 'https://buyprintz-backend-production.up.railway.app'
     this.cache = new Map()
     this.cacheTimeout = 5 * 60 * 1000 // 5 minutes
   }
