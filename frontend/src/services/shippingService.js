@@ -82,7 +82,7 @@ class ShippingService {
       const requestData = this.prepareShippingRequest(orderData)
       
       // Make API request
-      const response = await fetch(`${this.baseURL}/api/shipping/quote`, {
+      const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ class ShippingService {
       }
       
       // Make API request
-      const response = await fetch(`${this.baseURL}/api/shipping/quote/bulk`, {
+      const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ class ShippingService {
    */
   async getShippingPartners() {
     try {
-      const response = await fetch(`${this.baseURL}/api/shipping/partners`)
+      const response = await fetch(`${this.baseURL}/api/shipping-costs/health`)
       if (!response.ok) {
         throw new Error('Failed to get shipping partners')
       }
@@ -326,7 +326,7 @@ class ShippingService {
    */
   async checkHealth() {
     try {
-      const response = await fetch(`${this.baseURL}/api/shipping/health`)
+      const response = await fetch(`${this.baseURL}/api/shipping-costs/health`)
       if (!response.ok) {
         throw new Error('Shipping service unhealthy')
       }
@@ -342,7 +342,7 @@ class ShippingService {
    */
   async testIntegration() {
     try {
-      const response = await fetch(`${this.baseURL}/api/shipping/test`, {
+      const response = await fetch(`${this.baseURL}/api/shipping-costs/test`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
