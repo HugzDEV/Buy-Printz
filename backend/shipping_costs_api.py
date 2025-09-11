@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Any
 import asyncio
 from datetime import datetime
 
-from shipping_cost_extractor import get_shipping_costs_api, get_shipping_extractor
+from b2sign_playwright_integration import get_shipping_costs_playwright
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -57,8 +57,8 @@ async def get_shipping_costs(request: ShippingCostsRequest):
         # Convert request to dict
         request_data = request.dict()
         
-        # Get shipping costs from B2Sign
-        shipping_result = await get_shipping_costs_api(request_data)
+        # Get shipping costs from B2Sign using Playwright
+        shipping_result = await get_shipping_costs_playwright(request_data)
         
         # Create response
         response = ShippingCostsResponse(
