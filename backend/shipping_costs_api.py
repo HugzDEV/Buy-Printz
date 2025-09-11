@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Any
 import asyncio
 from datetime import datetime
 
-from backend.b2sign_playwright_integration import get_shipping_costs_playwright
+from backend.b2sign_playwright_integration import B2SignPlaywrightIntegration
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class ShippingCostsResponse(BaseModel):
 
 @router.post("/get", response_model=ShippingCostsResponse)
 async def get_shipping_costs(request: ShippingCostsRequest):
-    """Get shipping costs from B2Sign based on product configuration"""
+    """Get shipping costs from B2Sign using our complete workflow"""
     try:
         logger.info(f"🚚 Getting shipping costs for {request.product_type} to {request.zip_code}")
         
@@ -54,34 +54,69 @@ async def get_shipping_costs(request: ShippingCostsRequest):
         if not request.product_type:
             raise HTTPException(status_code=400, detail="Product type is required")
         
-        # Convert request to dict
-        request_data = request.dict()
+        # Initialize B2Sign integration
+        integration = B2SignPlaywrightIntegration()
+        await integration.initialize()
+        await integration.login()
         
-        # Get shipping costs from B2Sign using Playwright
-        shipping_result = await get_shipping_costs_playwright(request_data)
-        
-        # Create response
-        response = ShippingCostsResponse(
-            success=shipping_result.get('success', False),
-            shipping_options=shipping_result.get('shipping_options', []),
-            total_shipping_cost=shipping_result.get('total_shipping_cost'),
-            estimated_delivery=shipping_result.get('estimated_delivery'),
-            errors=shipping_result.get('errors', []),
-            b2sign_product_url=shipping_result.get('b2sign_product_url'),
-            extracted_at=shipping_result.get('extracted_at')
-        )
-        
-        if response.success:
-            logger.info(f"✅ Shipping costs extracted successfully")
-        else:
-            logger.warning(f"⚠️ Failed to extract shipping costs: {response.errors}")
-        
-        return response
+        try:
+            # Convert request to order data format for our workflow
+            order_data = {
+                "product_type": request.product_type,
+                "material": request.material or "13oz-vinyl",
+                "dimensions": request.dimensions or {"width": 3.0, "height": 6.0},
+                "quantity": request.quantity,
+                "print_options": request.print_options or {
+                    "sides": 2,
+                    "pole_pockets": "No Pole Pockets",
+                    "hem": "All Sides",
+                    "grommets": "Every 2' All Sides"
+                },
+                "customer_info": {
+                    "zipCode": request.zip_code,
+                    "name": request.customer_info.get("name", "John Doe") if request.customer_info else "John Doe",
+                    "company": request.customer_info.get("company", "BuyPrintz Inc") if request.customer_info else "BuyPrintz Inc",
+                    "phone": request.customer_info.get("phone", "555-123-4567") if request.customer_info else "555-123-4567",
+                    "address": request.customer_info.get("address", "123 Main St") if request.customer_info else "123 Main St",
+                    "city": request.customer_info.get("city", "Beverly Hills") if request.customer_info else "Beverly Hills",
+                    "state": request.customer_info.get("state", "CA") if request.customer_info else "CA"
+                }
+            }
+            
+            # Get shipping costs using our complete workflow
+            if request.product_type in ['banner', 'banners']:
+                result = await integration.get_banner_shipping_costs(order_data)
+            elif request.product_type in ['tent', 'tents']:
+                result = await integration.get_tent_shipping_costs(order_data)
+            else:
+                raise HTTPException(status_code=400, detail="Unsupported product type")
+            
+            # Create response
+            response = ShippingCostsResponse(
+                success=result.get('success', False),
+                shipping_options=result.get('shipping_options', []),
+                total_shipping_cost=result.get('total_shipping_cost'),
+                estimated_delivery=result.get('estimated_delivery'),
+                errors=result.get('errors', []),
+                b2sign_product_url=result.get('b2sign_product_url'),
+                extracted_at=result.get('extracted_at')
+            )
+            
+            if response.success:
+                logger.info(f"✅ B2Sign shipping costs extracted successfully: {len(response.shipping_options)} options")
+            else:
+                logger.warning(f"⚠️ Failed to extract B2Sign shipping costs: {response.errors}")
+            
+            return response
+            
+        finally:
+            # Always cleanup the integration
+            await integration.cleanup()
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error getting shipping costs: {e}")
+        logger.error(f"❌ Error getting B2Sign shipping costs: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @router.get("/health")

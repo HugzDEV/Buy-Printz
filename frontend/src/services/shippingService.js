@@ -12,11 +12,11 @@ class ShippingService {
 
   /**
    * Get shipping costs from B2Sign (requires user shipping info)
-   * Uses Supabase pricing for base costs, B2Sign for shipping only
+   * Uses our new B2Sign integration for real-time shipping costs
    */
   async getShippingCosts(orderData, customerInfo) {
     try {
-      console.log('🚚 Getting shipping costs for:', orderData.product_type, 'to:', customerInfo.zipCode)
+      console.log('🚀 Getting B2Sign shipping costs for:', orderData.product_type, 'to:', customerInfo.zipCode)
       
       // Validate required customer info
       if (!customerInfo.zipCode) {
@@ -27,14 +27,15 @@ class ShippingService {
       const cacheKey = this.generateShippingCostsCacheKey(orderData, customerInfo)
       const cachedCosts = this.getCachedQuote(cacheKey)
       if (cachedCosts) {
-        console.log('📦 Using cached shipping costs')
+        console.log('📦 Using cached B2Sign shipping costs')
         return { ...cachedCosts, cache_hit: true }
       }
 
-      // Prepare request data for shipping costs
+      // Prepare request data for our new B2Sign API
       const requestData = this.prepareShippingCostsRequest(orderData, customerInfo)
+      console.log('📋 B2Sign request data:', requestData)
       
-      // Make API request to shipping costs endpoint
+      // Make API request to our enhanced B2Sign shipping costs endpoint
       const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
         method: 'POST',
         headers: {
@@ -46,7 +47,8 @@ class ShippingService {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.detail || 'Failed to get shipping costs')
+        console.error('❌ B2Sign API error:', errorData)
+        throw new Error(errorData.detail || 'Failed to get B2Sign shipping costs')
       }
 
       const shippingCosts = await response.json()
@@ -54,11 +56,17 @@ class ShippingService {
       // Cache the result
       this.cacheQuote(cacheKey, shippingCosts)
       
-      console.log('✅ Shipping costs received:', shippingCosts)
+      if (shippingCosts.success && shippingCosts.shipping_options) {
+        console.log('✅ B2Sign shipping costs received:', shippingCosts.shipping_options.length, 'options')
+        console.log('📊 Shipping options:', shippingCosts.shipping_options.map(opt => `${opt.name}: ${opt.cost}`))
+      } else {
+        console.warn('⚠️ B2Sign returned no shipping options:', shippingCosts.errors)
+      }
+      
       return shippingCosts
 
     } catch (error) {
-      console.error('❌ Error getting shipping costs:', error)
+      console.error('❌ Error getting B2Sign shipping costs:', error)
       throw error
     }
   }
@@ -338,7 +346,60 @@ class ShippingService {
   }
 
   /**
-   * Test shipping integration
+   * Test B2Sign integration with sample data
+   */
+  async testB2SignIntegration() {
+    try {
+      console.log('🧪 Testing B2Sign integration...')
+      
+      const testData = {
+        product_type: 'banner',
+        material: '13oz-vinyl',
+        dimensions: { width: 3.0, height: 6.0 },
+        quantity: 1,
+        print_options: {
+          sides: 2,
+          pole_pockets: 'No Pole Pockets',
+          hem: 'All Sides',
+          grommets: 'Every 2\' All Sides'
+        },
+        customer_info: {
+          name: 'Test User',
+          company: 'BuyPrintz Test',
+          phone: '555-123-4567',
+          address: '123 Test St',
+          city: 'Beverly Hills',
+          state: 'CA'
+        },
+        zip_code: '90210'
+      }
+      
+      const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        },
+        body: JSON.stringify(testData)
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'B2Sign integration test failed')
+      }
+      
+      const result = await response.json()
+      console.log('✅ B2Sign integration test successful:', result)
+      return result
+      
+    } catch (error) {
+      console.error('❌ B2Sign integration test failed:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Test shipping integration (legacy method)
    */
   async testIntegration() {
     try {

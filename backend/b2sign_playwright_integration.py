@@ -48,7 +48,7 @@ class B2SignPlaywrightIntegration:
             
             # Launch browser with proper settings for Railway
             self.browser = await self.playwright.chromium.launch(
-                headless=True,
+                headless=False,
                 args=[
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
@@ -73,125 +73,32 @@ class B2SignPlaywrightIntegration:
             return False
     
     async def login(self):
-        """Login to B2Sign"""
+        """Login to B2Sign using the proven method from test_navigation.py"""
         try:
             logger.info("🔐 Logging into B2Sign...")
             
-            # Navigate to main page (login is on the main page)
-            await self.page.goto(f"{self.base_url}", wait_until='networkidle')
-            
-            # Wait for page to fully load (React/Inertia.js)
+            # Navigate to main page
+            await self.page.goto("https://www.b2sign.com", wait_until='networkidle')
             await self.page.wait_for_timeout(3000)
             
-            # Look for "Member Sign In" button and click it
-            logger.info("🔍 Looking for Member Sign In button...")
-            member_signin_selectors = [
-                'button:has-text("Member Sign In")',
-                'a:has-text("Member Sign In")',
-                'button:has-text("Sign In")',
-                'a:has-text("Sign In")',
-                'button:has-text("Login")',
-                'a:has-text("Login")',
-                '[data-testid*="signin"]',
-                '[data-testid*="login"]'
-            ]
-            
-            signin_clicked = False
-            for selector in member_signin_selectors:
-                try:
-                    await self.page.wait_for_selector(selector, timeout=5000)
-                    await self.page.click(selector)
-                    signin_clicked = True
-                    logger.info(f"✅ Member Sign In button clicked using selector: {selector}")
-                    break
-                except:
-                    continue
-            
-            if not signin_clicked:
-                logger.error("❌ Could not find Member Sign In button")
-                return False
-            
-            # Wait for login form to appear
+            # Click Member Sign In (proven method from test_navigation.py)
+            logger.info("🔍 Clicking Member Sign In button...")
+            await self.page.click('button:has-text("Member Sign In")')
             await self.page.wait_for_timeout(2000)
             
-            # Try multiple selectors for email field (using placeholder since name is None)
-            email_selectors = [
-                'input[placeholder="Email"]',
-                'input[placeholder="Email Address"]',
-                'input[type="email"]',
-                'input[name="email"]'
-            ]
+            # Fill login form (proven method from test_navigation.py)
+            logger.info("📝 Filling login form...")
+            await self.page.fill('input[placeholder="Email"]', self.username)
+            await self.page.fill('input[placeholder="Password"]', self.password)
+            await self.page.click('button[type="submit"]')
+            await self.page.wait_for_timeout(5000)
             
-            email_filled = False
-            for selector in email_selectors:
-                try:
-                    await self.page.wait_for_selector(selector, timeout=5000)
-                    await self.page.fill(selector, self.username)
-                    email_filled = True
-                    logger.info(f"✅ Email filled using selector: {selector}")
-                    break
-                except:
-                    continue
-            
-            if not email_filled:
-                logger.error("❌ Could not find email input field")
-                return False
-            
-            # Try multiple selectors for password field (using placeholder since name is None)
-            password_selectors = [
-                'input[placeholder="Password"]',
-                'input[type="password"]',
-                'input[name="password"]'
-            ]
-            
-            password_filled = False
-            for selector in password_selectors:
-                try:
-                    await self.page.wait_for_selector(selector, timeout=5000)
-                    await self.page.fill(selector, self.password)
-                    password_filled = True
-                    logger.info(f"✅ Password filled using selector: {selector}")
-                    break
-                except:
-                    continue
-            
-            if not password_filled:
-                logger.error("❌ Could not find password input field")
-                return False
-            
-            # Try to submit form
-            submit_selectors = [
-                'button[type="submit"]',
-                'input[type="submit"]',
-                'button:has-text("Login")',
-                'button:has-text("Sign In")',
-                'button:has-text("Log In")'
-            ]
-            
-            form_submitted = False
-            for selector in submit_selectors:
-                try:
-                    await self.page.click(selector)
-                    form_submitted = True
-                    logger.info(f"✅ Form submitted using selector: {selector}")
-                    break
-                except:
-                    continue
-            
-            if not form_submitted:
-                logger.error("❌ Could not find submit button")
-                return False
-            
-            # Wait for redirect or success
-            await self.page.wait_for_load_state('networkidle', timeout=15000)
-            
-            # Check if login was successful
+            # Check if login was successful (proven method from test_navigation.py)
             current_url = self.page.url
             logger.info(f"🔗 Current URL after login: {current_url}")
             
-            # Login is successful if we're not on a login page or if we're redirected to main page
-            if 'login' not in current_url or current_url == f"{self.base_url}/" or current_url == f"{self.base_url}":
-                logger.info("✅ Successfully logged into B2Sign")
+            if 'login' not in current_url:
+                logger.info("✅ Login successful!")
                 return True
             else:
                 logger.error("❌ Login failed - still on login page")
@@ -271,11 +178,9 @@ class B2SignPlaywrightIntegration:
             # Navigate to specific banner product page
             logger.info(f"🌐 Navigating to {product_url}")
             await self.page.goto(product_url, wait_until='networkidle')
+            await self.page.wait_for_timeout(3000)
             
-            # Wait for product page to load
-            await self.page.wait_for_selector('form, .quote-form, [data-testid*="quote"]', timeout=10000)
-            
-            # Fill out the quote form based on order data
+            # Use the complete proven banner workflow
             shipping_options = await self._fill_banner_quote_form(order_data)
             
             return {
@@ -325,50 +230,43 @@ class B2SignPlaywrightIntegration:
             }
     
     async def _fill_banner_quote_form(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Fill out banner quote form and extract shipping options"""
+        """Fill out banner quote form using the complete proven workflow"""
         try:
-            # Map BuyPrintz data to B2Sign form fields
-            material = order_data.get('material', '13oz Vinyl')
+            logger.info("🎨 Starting complete banner workflow...")
+            
+            # Extract order specifications
             dimensions = order_data.get('dimensions', {})
+            width = dimensions.get('width', 3)
+            height = dimensions.get('height', 6)
             quantity = order_data.get('quantity', 1)
             print_options = order_data.get('print_options', {})
+            customer_info = order_data.get('customer_info', {})
+            zip_code = customer_info.get('zipCode', customer_info.get('zip_code', '90210'))
             
-            # Fill material selection
-            if 'material' in order_data:
-                await self.page.select_option('select[name*="material"], select[name*="type"]', 
-                                            label=material, timeout=5000)
+            logger.info(f"📋 Banner specs: {width}x{height}, qty: {quantity}, zip: {zip_code}")
             
-            # Fill dimensions
-            if dimensions:
-                width = dimensions.get('width', 2)
-                height = dimensions.get('height', 4)
-                await self.page.fill('input[name*="width"], input[name*="size"]', str(width))
-                await self.page.fill('input[name*="height"], input[name*="length"]', str(height))
+            # Step 1: Fill dimensions using MUI selectors
+            await self._fill_banner_dimensions(width, height)
             
-            # Fill quantity
-            await self.page.fill('input[name*="quantity"], input[name*="qty"]', str(quantity))
+            # Step 2: Fill job details
+            await self._fill_banner_job_details(width, height, quantity)
             
-            # Fill print options
-            if print_options.get('sides') == 'double':
-                await self.page.check('input[name*="double"], input[name*="two-sided"]')
+            # Step 3: Fill banner options (2 Sides, No Pole Pockets, etc.)
+            await self._fill_banner_options_workflow(print_options)
             
-            if print_options.get('grommets'):
-                await self.page.check('input[name*="grommet"]')
+            # Step 4: Select Blind Drop Ship
+            await self._select_blind_drop_ship()
             
-            # Submit form to get quote
-            await self.page.click('button[type="submit"], input[type="submit"], .submit-btn')
+            # Step 5: Open address modal and fill customer address
+            await self._open_and_fill_address_modal(zip_code)
             
-            # Wait for quote results
-            await self.page.wait_for_selector('.shipping-options, .quote-results, [data-testid*="shipping"]', 
-                                            timeout=15000)
-            
-            # Extract shipping options
-            shipping_options = await self._extract_shipping_options()
+            # Step 6: Extract all shipping options
+            shipping_options = await self._extract_all_shipping_options_workflow()
             
             return shipping_options
             
         except Exception as e:
-            logger.error(f"❌ Error filling banner form: {e}")
+            logger.error(f"❌ Error in complete banner workflow: {e}")
             return []
     
     async def _fill_tent_quote_form(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -484,6 +382,1241 @@ class B2SignPlaywrightIntegration:
         except:
             return 5
     
+    async def _create_mock_order_and_get_shipping(self, page, product_type, dimensions, quantity, print_options, accessories, zip_code):
+        """Create a mock order on B2Sign and extract the calculated shipping cost"""
+        try:
+            logger.info("🛒 Creating mock order on B2Sign...")
+            
+            # Fill dimensions
+            width = dimensions.get('width', 2)
+            height = dimensions.get('height', 4)
+            
+            # Fill dimensions in feet and inches format
+            await self._fill_dimensions(page, width, height)
+            
+            # Fill job details
+            await self._fill_job_details(page, product_type, width, height, quantity)
+            
+            # Handle product-specific options first
+            if product_type in ['banner', 'banners']:
+                await self._fill_banner_options(page, print_options, accessories)
+            elif product_type in ['tent', 'tents', 'tradeshow_tent']:
+                await self._fill_tent_options(page, print_options, accessories)
+            
+            # Wait for shipping section to appear after filling form
+            logger.info("⏳ Waiting for shipping section to appear...")
+            await page.wait_for_timeout(3000)
+            
+            # Set shipping to Blind Drop Ship (this triggers shipping options to appear)
+            await self._set_shipping_options(page, zip_code)
+            
+            # Wait for shipping options to appear after Blind Drop Ship is selected
+            logger.info("⏳ Waiting for shipping options dropdown to appear...")
+            await page.wait_for_timeout(5000)
+            
+            # Look for the shipping method dropdown (should show "Ground $14.04" initially)
+            shipping_dropdown = None
+            dropdown_selectors = [
+                'button:has-text("Ground")',
+                'button:has-text("$")',
+                '.MuiSelect-button',
+                'button[class*="select"]',
+                'button[role="button"]'
+            ]
+            
+            for selector in dropdown_selectors:
+                try:
+                    dropdown = await page.query_selector(selector)
+                    if dropdown:
+                        dropdown_text = await dropdown.inner_text()
+                        if '$' in dropdown_text and ('ground' in dropdown_text.lower() or 'shipping' in dropdown_text.lower()):
+                            shipping_dropdown = dropdown
+                            logger.info(f"✅ Found shipping dropdown: {dropdown_text}")
+                            break
+                except:
+                    continue
+            
+            if shipping_dropdown:
+                # Click the dropdown to reveal all 7 options
+                await shipping_dropdown.click()
+                logger.info("✅ Clicked shipping dropdown to reveal all options")
+                await page.wait_for_timeout(2000)
+            
+            # Extract all available shipping options
+            shipping_options = await self._extract_all_shipping_options(page)
+            
+            if shipping_options:
+                logger.info(f"✅ Extracted {len(shipping_options)} shipping options")
+                return shipping_options
+            else:
+                logger.warning("⚠️ Could not extract shipping options from order")
+                return None
+                
+        except Exception as e:
+            logger.error(f"❌ Error creating mock order: {e}")
+            return None
+    
+    async def _fill_dimensions(self, page, width, height):
+        """Fill width and height in feet and inches format"""
+        try:
+            logger.info(f"📏 Filling dimensions: {width}ft x {height}ft")
+            
+            # Convert to feet and inches
+            width_ft = int(width)
+            width_in = int((width - width_ft) * 12) if width > width_ft else 0
+            
+            height_ft = int(height)
+            height_in = int((height - height_ft) * 12) if height > height_ft else 0
+            
+            # Use exact MUI selectors from page analysis
+            mui_inputs = await page.query_selector_all('.MuiInput-input')
+            logger.info(f"Found {len(mui_inputs)} MUI input fields for dimensions")
+            
+            # Fill dimension inputs using MUI selectors (skip login inputs at index 0-1)
+            width_filled = False
+            for i, input_elem in enumerate(mui_inputs[2:6]):  # Skip login inputs, use dimension inputs
+                try:
+                    # Try to fill width in feet
+                    if i == 0:
+                        await input_elem.fill(str(width_ft))
+                        logger.info(f"✅ Filled width feet: {width_ft}")
+                    # Try to fill width in inches
+                    elif i == 1:
+                        await input_elem.fill(str(width_in))
+                        logger.info(f"✅ Filled width inches: {width_in}")
+                        width_filled = True
+                        break
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not fill width input {i}: {e}")
+                    continue
+            
+            # Look for height inputs (should be next two inputs)
+            height_filled = False
+            for i, input_elem in enumerate(mui_inputs[2:6]):  # Check mui_inputs 2-5
+                try:
+                    # Try to fill height in feet
+                    if i == 0:
+                        await input_elem.fill(str(height_ft))
+                        logger.info(f"✅ Filled height feet: {height_ft}")
+                    # Try to fill height in inches
+                    elif i == 1:
+                        await input_elem.fill(str(height_in))
+                        logger.info(f"✅ Filled height inches: {height_in}")
+                        height_filled = True
+                        break
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not fill height input {i}: {e}")
+                    continue
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling dimensions: {e}")
+    
+    async def _fill_job_details(self, page, product_type, width, height, quantity):
+        """Fill job name and quantity"""
+        try:
+            logger.info("📝 Filling job details...")
+            
+            # Fill job name
+            job_name_input = await page.query_selector('input[placeholder*="Job Name"]')
+            if job_name_input:
+                job_name = f"BuyPrintz-{product_type}-{width}x{height}"
+                await job_name_input.fill(job_name)
+                logger.info(f"✅ Filled job name: {job_name}")
+            
+            # Fill quantity
+            inputs = await page.query_selector_all('input')
+            for input_elem in inputs:
+                try:
+                    placeholder = await input_elem.get_attribute('placeholder')
+                    if placeholder and 'qty' in placeholder.lower():
+                        await input_elem.fill(str(quantity))
+                        logger.info(f"✅ Filled quantity: {quantity}")
+                        break
+                except:
+                    continue
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling job details: {e}")
+    
+    async def _set_shipping_options(self, page, zip_code):
+        """Set shipping to Blind Drop Ship and configure customer address"""
+        try:
+            logger.info("🚚 Setting up shipping workflow...")
+            
+            # Step 1: Select "Blind Drop Ship" radio button
+            blind_drop_selected = False
+            
+            # Look for MUI radio buttons in the shipping section
+            # Try different MUI radio button selectors
+            radio_selectors = [
+                'input[type="radio"]',
+                '.MuiRadio-input',
+                '.MuiRadio-root input',
+                '[role="radio"]',
+                'input[name*="shipping"]',
+                'input[name*="ship"]'
+            ]
+            
+            radio_buttons = []
+            for selector in radio_selectors:
+                buttons = await page.query_selector_all(selector)
+                radio_buttons.extend(buttons)
+                if buttons:
+                    logger.info(f"Found {len(buttons)} radio buttons with selector: {selector}")
+            
+            # Remove duplicates
+            radio_buttons = list(set(radio_buttons))
+            logger.info(f"Total unique radio buttons found: {len(radio_buttons)}")
+            
+            for radio in radio_buttons:
+                try:
+                    # Look for text in MUI radio button structure
+                    # Try different ways to find the associated text
+                    text_found = False
+                    
+                    # Method 1: Check parent element
+                    parent = await radio.query_selector('xpath=..')
+                    if parent:
+                        text = await parent.inner_text()
+                        if text.strip():
+                            logger.info(f"Checking radio button with parent text: '{text.strip()}'")
+                            if 'blind drop' in text.lower():
+                                await radio.click()
+                                logger.info("✅ Selected Blind Drop Ship radio button (parent text)")
+                                blind_drop_selected = True
+                                text_found = True
+                                await page.wait_for_timeout(2000)
+                                break
+                    
+                    # Method 2: Check grandparent element
+                    if not text_found and parent:
+                        grandparent = await parent.query_selector('xpath=..')
+                        if grandparent:
+                            text = await grandparent.inner_text()
+                            if text.strip():
+                                logger.info(f"Checking radio button with grandparent text: '{text.strip()}'")
+                                if 'blind drop' in text.lower():
+                                    await radio.click()
+                                    logger.info("✅ Selected Blind Drop Ship radio button (grandparent text)")
+                                    blind_drop_selected = True
+                                    text_found = True
+                                    await page.wait_for_timeout(2000)
+                                    break
+                    
+                    # Method 3: Look for sibling elements with text
+                    if not text_found and parent:
+                        siblings = await parent.query_selector_all('*')
+                        for sibling in siblings:
+                            try:
+                                text = await sibling.inner_text()
+                                if text.strip() and 'blind drop' in text.lower():
+                                    await radio.click()
+                                    logger.info("✅ Selected Blind Drop Ship radio button (sibling text)")
+                                    blind_drop_selected = True
+                                    text_found = True
+                                    await page.wait_for_timeout(2000)
+                                    break
+                            except:
+                                continue
+                        if text_found:
+                            break
+                            
+                except:
+                    continue
+            
+            # If still not found, try clicking by text content
+            if not blind_drop_selected:
+                logger.info("Trying to find Blind Drop Ship by text content...")
+                try:
+                    # Try different text selectors
+                    text_selectors = [
+                        'text="Blind Drop Ship"',
+                        'text*="Blind Drop"',
+                        'text*="blind drop"',
+                        '[data-testid*="blind"]',
+                        '[aria-label*="blind"]'
+                    ]
+                    
+                    for selector in text_selectors:
+                        try:
+                            element = await page.query_selector(selector)
+                            if element:
+                                await element.click()
+                                logger.info(f"✅ Clicked Blind Drop Ship with selector: {selector}")
+                                blind_drop_selected = True
+                                await page.wait_for_timeout(2000)
+                                break
+                        except:
+                            continue
+                    
+                    # If still not found, try clicking on any element containing the text
+                    if not blind_drop_selected:
+                        all_elements = await page.query_selector_all('*')
+                        for element in all_elements:
+                            try:
+                                text = await element.inner_text()
+                                if 'blind drop' in text.lower() and 'ship' in text.lower():
+                                    await element.click()
+                                    logger.info("✅ Clicked Blind Drop Ship by element text")
+                                    blind_drop_selected = True
+                                    await page.wait_for_timeout(2000)
+                                    break
+                            except:
+                                continue
+                except:
+                    pass
+            
+            if not blind_drop_selected:
+                logger.warning("⚠️ Could not find Blind Drop Ship radio button")
+                logger.info("Available radio button texts:")
+                for radio in radio_buttons:
+                    try:
+                        parent = await radio.query_selector('xpath=..')
+                        if parent:
+                            text = await parent.inner_text()
+                            logger.info(f"  - '{text.strip()}'")
+                    except:
+                        pass
+                return
+            
+            # Step 2: Wait for shipping section to appear and find pencil edit button
+            logger.info("📝 Looking for Ship to edit button (pencil icon)...")
+            modal_opened = False
+            
+            # Wait for shipping section to appear after Blind Drop Ship selection
+            await page.wait_for_timeout(3000)
+            
+            # Look for pencil icon in Ship to section - try multiple approaches
+            edit_button_selectors = [
+                'button[aria-label*="edit"]',
+                'button[title*="edit"]',
+                'button[class*="edit"]',
+                'button svg',
+                '[role="button"] svg',
+                'button[class*="MuiIconButton"]',
+                'button[class*="icon"]'
+            ]
+            
+            for selector in edit_button_selectors:
+                try:
+                    buttons = await page.query_selector_all(selector)
+                    for button in buttons:
+                        try:
+                            # Check if this button is in the Ship to section
+                            parent = await button.query_selector('xpath=..')
+                            if parent:
+                                parent_text = await parent.inner_text()
+                                # Look for buttons near "Ship to" text
+                                if 'ship to' in parent_text.lower():
+                                    await button.click()
+                                    logger.info("✅ Clicked Ship to edit button (pencil icon)")
+                                    modal_opened = True
+                                    await page.wait_for_timeout(2000)
+                                    break
+                        except:
+                            continue
+                    if modal_opened:
+                        break
+                except:
+                    continue
+            
+            # Fallback: Look for any button with empty text near "Ship to"
+            if not modal_opened:
+                try:
+                    buttons = await page.query_selector_all('button')
+                    for button in buttons:
+                        try:
+                            button_text = await button.inner_text()
+                            if button_text.strip() == '':  # Empty button (likely an icon)
+                                parent = await button.query_selector('xpath=..')
+                                if parent:
+                                    parent_text = await parent.inner_text()
+                                    if 'ship to' in parent_text.lower():
+                                        await button.click()
+                                        logger.info("✅ Clicked Ship to edit button (empty button)")
+                                        modal_opened = True
+                                        await page.wait_for_timeout(2000)
+                                        break
+                        except:
+                            continue
+                except:
+                    pass
+            
+            if not modal_opened:
+                logger.warning("⚠️ Could not find Ship to edit button (pencil icon)")
+                return
+            
+            # Step 3: Fill customer address in the modal
+            logger.info("📝 Filling customer address in modal...")
+            await self._fill_customer_address_modal(page, zip_code)
+            
+            # Step 4: Click "Use this address" button
+            logger.info("✅ Clicking Use this address button...")
+            use_address_clicked = False
+            
+            modal_buttons = await page.query_selector_all('button')
+            for modal_button in modal_buttons:
+                try:
+                    modal_button_text = await modal_button.inner_text()
+                    if 'use this address' in modal_button_text.lower():
+                        await modal_button.click()
+                        logger.info("✅ Clicked Use this address button")
+                        use_address_clicked = True
+                        await page.wait_for_timeout(3000)  # Wait for modal to close and shipping options to appear
+                        break
+                except:
+                    continue
+            
+            if not use_address_clicked:
+                logger.warning("⚠️ Could not find Use this address button")
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Error setting shipping options: {e}")
+    
+    async def _fill_customer_address_modal(self, page, zip_code):
+        """Fill customer address information in the modal"""
+        try:
+            logger.info("📝 Filling customer address modal...")
+            
+            # Fill required fields in the modal
+            inputs = await page.query_selector_all('input')
+            
+            for input_elem in inputs:
+                try:
+                    placeholder = await input_elem.get_attribute('placeholder')
+                    if placeholder:
+                        if 'first and last name' in placeholder.lower():
+                            await input_elem.fill('BuyPrintz Customer')
+                            logger.info("✅ Filled customer name")
+                        elif 'telephone' in placeholder.lower():
+                            await input_elem.fill('555-123-4567')
+                            logger.info("✅ Filled customer phone")
+                        elif 'street address' in placeholder.lower():
+                            await input_elem.fill('123 Main Street')
+                            logger.info("✅ Filled street address")
+                        elif 'city' in placeholder.lower():
+                            await input_elem.fill('Los Angeles')
+                            logger.info("✅ Filled city")
+                        elif 'zip' in placeholder.lower():
+                            await input_elem.fill(str(zip_code))
+                            logger.info(f"✅ Filled zip code: {zip_code}")
+                            
+                except Exception as e:
+                    logger.warning(f"⚠️ Error filling input: {e}")
+                    continue
+            
+            # Handle state dropdown if present
+            try:
+                state_dropdowns = await page.query_selector_all('select')
+                for dropdown in state_dropdowns:
+                    try:
+                        # Try to select a state (CA for zip codes starting with 9, NY for 1, IL for 6)
+                        if str(zip_code).startswith('9'):
+                            await dropdown.select_option('CA')
+                            logger.info("✅ Selected CA state")
+                        elif str(zip_code).startswith('1'):
+                            await dropdown.select_option('NY')
+                            logger.info("✅ Selected NY state")
+                        elif str(zip_code).startswith('6'):
+                            await dropdown.select_option('IL')
+                            logger.info("✅ Selected IL state")
+                        else:
+                            await dropdown.select_option('CA')  # Default to CA
+                            logger.info("✅ Selected default CA state")
+                        break
+                    except:
+                        continue
+            except Exception as e:
+                logger.warning(f"⚠️ Error selecting state: {e}")
+                
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling customer address modal: {e}")
+
+    async def _fill_banner_dimensions(self, width, height):
+        """Fill banner dimensions using proven MUI selectors"""
+        try:
+            logger.info(f"📏 Filling banner dimensions: {width}ft x {height}ft")
+            
+            # Convert to feet and inches
+            width_ft = int(width)
+            width_in = int((width - width_ft) * 12) if width > width_ft else 0
+            
+            height_ft = int(height)
+            height_in = int((height - height_ft) * 12) if height > height_ft else 0
+            
+            # Use exact MUI selectors from proven workflow
+            mui_inputs = await self.page.query_selector_all('.MuiInput-input')
+            logger.info(f"Found {len(mui_inputs)} MUI input fields for dimensions")
+            
+            # Fill dimension inputs using MUI selectors (skip login inputs at index 0-1)
+            for i, input_elem in enumerate(mui_inputs[2:6]):  # Skip login inputs, use dimension inputs
+                try:
+                    if i == 0: 
+                        await input_elem.fill(str(width_ft))
+                        logger.info(f"✅ Filled width feet: {width_ft}")
+                    elif i == 1: 
+                        await input_elem.fill(str(width_in))
+                        logger.info(f"✅ Filled width inches: {width_in}")
+                    elif i == 2: 
+                        await input_elem.fill(str(height_ft))
+                        logger.info(f"✅ Filled height feet: {height_ft}")
+                    elif i == 3: 
+                        await input_elem.fill(str(height_in))
+                        logger.info(f"✅ Filled height inches: {height_in}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not fill dimension input {i}: {e}")
+                    continue
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling banner dimensions: {e}")
+    
+    async def _fill_banner_job_details(self, width, height, quantity):
+        """Fill job name and quantity"""
+        try:
+            logger.info("📝 Filling banner job details...")
+            
+            # Fill job name
+            job_name_input = await self.page.query_selector('input[placeholder*="Job Name"]')
+            if job_name_input:
+                job_name = f"BuyPrintz-Banner-{width}x{height}"
+                await job_name_input.fill(job_name)
+                logger.info(f"✅ Filled job name: {job_name}")
+            
+            # Fill quantity
+            inputs = await self.page.query_selector_all('input')
+            for input_elem in inputs:
+                try:
+                    placeholder = await input_elem.get_attribute('placeholder')
+                    if placeholder and 'qty' in placeholder.lower():
+                        await input_elem.fill(str(quantity))
+                        logger.info(f"✅ Filled quantity: {quantity}")
+                        break
+                except:
+                    continue
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling banner job details: {e}")
+    
+    async def _fill_banner_options_workflow(self, print_options):
+        """Fill banner options using proven workflow"""
+        try:
+            logger.info("🎨 Filling banner options...")
+            
+            # Select 2 Sides (proven workflow)
+            dropdowns = await self.page.query_selector_all('.MuiSelect-button')
+            if len(dropdowns) > 0:
+                await dropdowns[0].click()
+                await self.page.wait_for_timeout(1000)
+                two_sides_option = await self.page.query_selector('text="2 Sides"')
+                if two_sides_option:
+                    await two_sides_option.click()
+                    logger.info("✅ Selected dropdown option: 2 Sides")
+                    await self.page.wait_for_timeout(2000)
+                        
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling banner options: {e}")
+    
+    async def _select_blind_drop_ship(self):
+        """Select Blind Drop Ship using proven workflow"""
+        try:
+            logger.info("🚚 Selecting Blind Drop Ship...")
+            
+            # Use proven method from test_complete_banner_workflow.py
+            all_elements = await self.page.query_selector_all('*')
+            for element in all_elements:
+                try:
+                    text = await element.inner_text()
+                    if 'blind drop' in text.lower() and 'ship' in text.lower():
+                        await element.click()
+                        logger.info("✅ Clicked Blind Drop Ship")
+                        await self.page.wait_for_timeout(3000)
+                        break
+                except:
+                    continue
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Error selecting Blind Drop Ship: {e}")
+    
+    async def _open_and_fill_address_modal(self, zip_code):
+        """Open address modal and fill customer address using proven workflow"""
+        try:
+            logger.info("📝 Opening and filling address modal...")
+            
+            # Step 1: Click pencil icon to open modal
+            svgs = await self.page.query_selector_all('svg')
+            for i, svg in enumerate(svgs):
+                try:
+                    parent = await svg.query_selector('xpath=..')
+                    parent_text = await parent.inner_text() if parent else ""
+                    
+                    if 'ship to different location' in parent_text.lower():
+                        await svg.click()
+                        logger.info("✅ Clicked pencil icon to open modal")
+                        await self.page.wait_for_timeout(2000)
+                        break
+                except:
+                    continue
+            
+            # Step 2: Fill address fields using exact selectors
+            address_fields = [
+                ('input[name="fullname"]', 'John Doe'),
+                ('input[name="company"]', 'BuyPrintz Inc'),
+                ('input[name="telephone"]', '555-123-4567'),
+                ('input[placeholder="Street address"]', '123 Main St'),
+                ('input[name="suburb"]', 'Suite 100'),
+                ('input[name="city"]', 'Beverly Hills'),
+                ('input[name="postcode"]', str(zip_code))
+            ]
+            
+            for selector, value in address_fields:
+                try:
+                    field = await self.page.query_selector(selector)
+                    if field:
+                        await field.fill(value)
+                        logger.info(f"✅ Filled {selector}: {value}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not fill {selector}: {e}")
+                    continue
+            
+            # Step 3: Select state using MuiAutocomplete
+            try:
+                autocomplete_selectors = [
+                    '.MuiAutocomplete-root',
+                    '.MuiAutocomplete-root[class*="hasPopupIcon"]',
+                    '.MuiAutocomplete-root[class*="hasClearIcon"]'
+                ]
+                
+                state_selected = False
+                for selector in autocomplete_selectors:
+                    try:
+                        autocomplete_elements = await self.page.query_selector_all(selector)
+                        for i, element in enumerate(autocomplete_elements):
+                            input_field = await element.query_selector('input')
+                            if input_field:
+                                await element.click()
+                                await self.page.wait_for_timeout(1000)
+                                await input_field.fill('CA')
+                                await self.page.wait_for_timeout(1000)
+                                
+                                ca_options = await self.page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
+                                for option in ca_options:
+                                    try:
+                                        option_text = await option.inner_text()
+                                        if 'california' in option_text.lower() or 'ca' in option_text.lower():
+                                            await option.click()
+                                            logger.info(f"✅ Selected state: CA (using autocomplete {i+1})")
+                                            state_selected = True
+                                            break
+                                    except:
+                                        continue
+                                
+                                if state_selected:
+                                    break
+                        
+                        if state_selected:
+                            break
+                            
+                    except Exception as e:
+                        logger.warning(f"⚠️ Error with autocomplete selector {selector}: {e}")
+                        continue
+                
+                if not state_selected:
+                    logger.warning("⚠️ Could not select state using autocomplete")
+                    
+            except Exception as e:
+                logger.warning(f"⚠️ Could not select state: {e}")
+                pass
+            
+            # Step 4: Click "Use this address" button
+            try:
+                use_button = await self.page.query_selector('button:has-text("Use this address")')
+                if use_button:
+                    await use_button.click()
+                    logger.info("✅ Clicked 'Use this address' button")
+                    await self.page.wait_for_timeout(3000)
+                else:
+                    logger.warning("⚠️ Could not find 'Use this address' button")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not click 'Use this address' button: {e}")
+                pass
+                
+        except Exception as e:
+            logger.warning(f"⚠️ Error opening and filling address modal: {e}")
+    
+    async def _extract_all_shipping_options_workflow(self):
+        """Extract all shipping options using proven workflow"""
+        try:
+            logger.info("🚚 Extracting all shipping options...")
+            
+            # Wait for shipping dropdown to appear
+            await self.page.wait_for_timeout(3000)
+            
+            # Look for shipping method dropdown
+            shipping_dropdown = None
+            dropdown_selectors = [
+                'button:has-text("Ground")',
+                'button:has-text("$")',
+                '.MuiSelect-button',
+                'button[class*="select"]',
+                'button[role="button"]'
+            ]
+            
+            for selector in dropdown_selectors:
+                try:
+                    dropdown = await self.page.query_selector(selector)
+                    if dropdown:
+                        dropdown_text = await dropdown.inner_text()
+                        if '$' in dropdown_text and ('ground' in dropdown_text.lower() or 'shipping' in dropdown_text.lower()):
+                            shipping_dropdown = dropdown
+                            logger.info(f"✅ Found shipping dropdown: {dropdown_text}")
+                            break
+                except:
+                    continue
+            
+            if shipping_dropdown:
+                # Click the dropdown to reveal all options
+                await shipping_dropdown.click()
+                logger.info("✅ Clicked shipping dropdown to reveal all options")
+                await self.page.wait_for_timeout(2000)
+                
+                # Extract all shipping options
+                shipping_options = []
+                option_selectors = [
+                    '.MuiOption-root',
+                    '[role="option"]',
+                    'li[role="option"]',
+                    '.MuiSelect-listbox li'
+                ]
+                
+                for selector in option_selectors:
+                    try:
+                        options = await self.page.query_selector_all(selector)
+                        if options:
+                            logger.info(f"🔍 Found {len(options)} options with selector: {selector}")
+                            
+                            for i, option in enumerate(options):
+                                try:
+                                    option_text = await option.inner_text()
+                                    if option_text.strip() and '$' in option_text:
+                                        parsed_option = self._parse_shipping_option_text(option_text)
+                                        if parsed_option:
+                                            shipping_options.append(parsed_option)
+                                            logger.info(f"  Option {i+1}: {option_text.strip()}")
+                                except:
+                                    continue
+                            
+                            if shipping_options:
+                                break
+                    except:
+                        continue
+                
+                if shipping_options:
+                    logger.info(f"🎉 SUCCESS! Found {len(shipping_options)} shipping options")
+                    return shipping_options
+                else:
+                    logger.warning("❌ No shipping options found in dropdown")
+                    return []
+            else:
+                logger.warning("❌ Could not find shipping dropdown")
+                return []
+                
+        except Exception as e:
+            logger.warning(f"⚠️ Error extracting shipping options: {e}")
+            return []
+
+    async def _fill_banner_options(self, page, print_options, accessories):
+        """Fill banner-specific options on B2Sign form using MUI selectors"""
+        try:
+            logger.info("🎨 Filling banner options...")
+            
+            # Handle number of sides dropdown
+            sides = print_options.get('sides', 1)
+            await self._select_dropdown_option(page, f"{sides} Side" if sides == 1 else f"{sides} Sides")
+            
+            # Handle pole pockets dropdown
+            pole_pockets = print_options.get('pole_pockets', 'No Pole Pockets')
+            await self._select_dropdown_option(page, pole_pockets)
+            
+            # Handle hem dropdown
+            hem = print_options.get('hem', 'All Sides')
+            await self._select_dropdown_option(page, hem)
+            
+            # Handle grommet dropdown
+            grommets = print_options.get('grommets', 'Every 2\' All Sides')
+            await self._select_dropdown_option(page, grommets)
+            
+            # Select turnaround time (default to Next Day for free shipping)
+            await self._select_turnaround(page, 'Next Day')
+                        
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling banner options: {e}")
+    
+    async def _select_dropdown_option(self, page, option_text):
+        """Select an option from a dropdown by text"""
+        try:
+            # Use exact MUI selector from page analysis
+            dropdowns = await page.query_selector_all('.MuiSelect-button')
+            
+            for dropdown in dropdowns:
+                try:
+                    # Try to click the dropdown to open it
+                    await dropdown.click()
+                    await page.wait_for_timeout(1000)
+                    
+                    # Look for the option in the dropdown
+                    options = await page.query_selector_all('option, [role="option"], .MuiMenuItem-root')
+                    for option in options:
+                        try:
+                            option_text_content = await option.inner_text()
+                            if option_text.lower() in option_text_content.lower():
+                                await option.click()
+                                logger.info(f"✅ Selected dropdown option: {option_text}")
+                                await page.wait_for_timeout(1000)
+                                return True
+                        except:
+                            continue
+                except:
+                    continue
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Could not select dropdown option '{option_text}': {e}")
+            return False
+    
+    async def _handle_more_options(self, page, accessories):
+        """Handle more options button and accessories"""
+        try:
+            # Look for "MORE OPTIONS" button
+            buttons = await page.query_selector_all('button')
+            for button in buttons:
+                try:
+                    button_text = await button.inner_text()
+                    if 'more options' in button_text.lower():
+                        await button.click()
+                        logger.info("✅ Clicked MORE OPTIONS button")
+                        await page.wait_for_timeout(2000)
+                        break
+                except:
+                    continue
+            
+            # Handle accessories in the expanded options
+            for accessory in accessories:
+                await self._select_dropdown_option(page, accessory)
+                
+        except Exception as e:
+            logger.warning(f"⚠️ Error handling more options: {e}")
+    
+    async def _select_turnaround(self, page, turnaround_type):
+        """Select turnaround time (Next Day or Same Day)"""
+        try:
+            radio_buttons = await page.query_selector_all('input[type="radio"]')
+            for radio in radio_buttons:
+                try:
+                    # Look for radio button near turnaround text
+                    parent = await radio.query_selector('xpath=..')
+                    if parent:
+                        text = await parent.inner_text()
+                        if turnaround_type.lower() in text.lower():
+                            await radio.click()
+                            logger.info(f"✅ Selected turnaround: {turnaround_type}")
+                            break
+                except:
+                    continue
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Could not select turnaround: {e}")
+    
+    async def _select_shipping_option(self, page):
+        """Select the first available shipping option (usually Ground)"""
+        try:
+            logger.info("🚚 Selecting shipping option...")
+            
+            # Look for shipping method dropdown
+            dropdowns = await page.query_selector_all('select, [role="button"], .MuiSelect-select')
+            
+            for dropdown in dropdowns:
+                try:
+                    # Check if this dropdown is for shipping method
+                    parent = await dropdown.query_selector('xpath=..')
+                    if parent:
+                        parent_text = await parent.inner_text()
+                        if 'ground' in parent_text.lower() or 'shipping' in parent_text.lower():
+                            # Click to open dropdown
+                            await dropdown.click()
+                            await page.wait_for_timeout(1000)
+                            
+                            # Look for Ground option
+                            options = await page.query_selector_all('option, [role="option"], .MuiMenuItem-root')
+                            for option in options:
+                                try:
+                                    option_text = await option.inner_text()
+                                    if 'ground' in option_text.lower():
+                                        await option.click()
+                                        logger.info(f"✅ Selected shipping option: {option_text}")
+                                        await page.wait_for_timeout(1000)
+                                        return True
+                                except:
+                                    continue
+                except:
+                    continue
+            
+            # If no dropdown found, look for buttons that might be shipping options
+            buttons = await page.query_selector_all('button')
+            for button in buttons:
+                try:
+                    button_text = await button.inner_text()
+                    if 'ground' in button_text.lower() and 'shipping' in button_text.lower():
+                        await button.click()
+                        logger.info(f"✅ Selected shipping button: {button_text}")
+                        return True
+                except:
+                    continue
+                    
+            logger.warning("⚠️ Could not find shipping option to select")
+            return False
+                    
+        except Exception as e:
+            logger.warning(f"⚠️ Error selecting shipping option: {e}")
+            return False
+    
+    async def _fill_tent_options(self, page, print_options, accessories):
+        """Fill tent-specific options on B2Sign form using MUI selectors"""
+        try:
+            logger.info("🎨 Filling tent options...")
+            
+            # Handle tent size - look for buttons or selectors
+            tent_size = print_options.get('tent_size', '10x10')
+            try:
+                buttons = await page.query_selector_all('button')
+                for button in buttons:
+                    try:
+                        button_text = await button.inner_text()
+                        if tent_size in button_text or '10x10' in button_text:
+                            await button.click()
+                            logger.info(f"✅ Clicked tent size button: {button_text}")
+                            break
+                    except:
+                        continue
+            except Exception as e:
+                logger.warning(f"⚠️ Could not handle tent size: {e}")
+            
+            # Handle design option - look for radio buttons or buttons
+            design_option = print_options.get('tent_design_option', 'canopy-only')
+            try:
+                if design_option == 'canopy-only':
+                    buttons = await page.query_selector_all('button')
+                    for button in buttons:
+                        try:
+                            button_text = await button.inner_text()
+                            if 'canopy' in button_text.lower():
+                                await button.click()
+                                logger.info(f"✅ Clicked canopy button: {button_text}")
+                                break
+                        except:
+                            continue
+                elif design_option == 'all-sides':
+                    buttons = await page.query_selector_all('button')
+                    for button in buttons:
+                        try:
+                            button_text = await button.inner_text()
+                            if 'all' in button_text.lower() or 'sides' in button_text.lower():
+                                await button.click()
+                                logger.info(f"✅ Clicked all-sides button: {button_text}")
+                                break
+                        except:
+                            continue
+            except Exception as e:
+                logger.warning(f"⚠️ Could not handle design option: {e}")
+            
+            # Handle accessories
+            for accessory in accessories:
+                try:
+                    buttons = await page.query_selector_all('button')
+                    for button in buttons:
+                        try:
+                            button_text = await button.inner_text()
+                            if accessory.lower() in button_text.lower():
+                                await button.click()
+                                logger.info(f"✅ Clicked accessory button: {button_text}")
+                                break
+                        except:
+                            continue
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not handle accessory {accessory}: {e}")
+                        
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling tent options: {e}")
+    
+    async def _extract_all_shipping_options(self, page):
+        """Extract all available shipping options from B2Sign dropdown"""
+        try:
+            logger.info("💰 Extracting all shipping options from dropdown...")
+            
+            shipping_options = []
+            
+            # Look for the shipping method dropdown (should show "Ground $14.04" as default)
+            dropdowns = await page.query_selector_all('select, [role="button"], .MuiSelect-select, button')
+            logger.info(f"Found {len(dropdowns)} potential dropdowns/buttons")
+            
+            for dropdown in dropdowns:
+                try:
+                    # Check if this dropdown contains shipping options
+                    dropdown_text = await dropdown.inner_text()
+                    logger.info(f"Checking element with text: '{dropdown_text}'")
+                    
+                    # Look for dropdown that shows "Ground" with price or shipping-related text
+                    if ('ground' in dropdown_text.lower() and '$' in dropdown_text) or 'shipping' in dropdown_text.lower():
+                        logger.info("✅ Found shipping dropdown, clicking to open all options...")
+                        
+                        # Click to open dropdown and see all options
+                        await dropdown.click()
+                        await page.wait_for_timeout(3000)  # Wait longer for dropdown to open
+                        
+                        # Get all available options from the opened dropdown
+                        # Try different selectors for dropdown options
+                        option_selectors = [
+                            'option',
+                            '[role="option"]', 
+                            '.MuiMenuItem-root',
+                            '.MuiListItem-root',
+                            '[data-value]',
+                            'li',
+                            '.dropdown-item'
+                        ]
+                        
+                        all_options = []
+                        for selector in option_selectors:
+                            options = await page.query_selector_all(selector)
+                            all_options.extend(options)
+                        
+                        logger.info(f"Found {len(all_options)} total options in dropdown")
+                        
+                        for option in all_options:
+                            try:
+                                option_text = await option.inner_text()
+                                if option_text and option_text.strip() and '$' in option_text:
+                                    # Parse the option text to extract name, cost, and date
+                                    parsed_option = self._parse_shipping_option_text(option_text)
+                                    if parsed_option:
+                                        shipping_options.append(parsed_option)
+                                        logger.info(f"✅ Found shipping option: {parsed_option['name']} - {parsed_option['cost']}")
+                                        
+                            except Exception as e:
+                                logger.warning(f"⚠️ Error processing option: {e}")
+                                continue
+                        
+                        # Close dropdown by clicking outside or pressing escape
+                        try:
+                            await page.keyboard.press('Escape')
+                            await page.wait_for_timeout(1000)
+                        except:
+                            # Try clicking outside the dropdown
+                            await page.click('body')
+                            await page.wait_for_timeout(1000)
+                        
+                        break
+                        
+                except Exception as e:
+                    logger.warning(f"⚠️ Error processing dropdown: {e}")
+                    continue
+            
+            # If no dropdown options found, look for shipping costs displayed on the page
+            if not shipping_options:
+                logger.info("No dropdown options found, looking for displayed shipping costs...")
+                shipping_options = await self._extract_shipping_costs_from_display(page)
+            
+            # Remove duplicates based on name and cost
+            unique_options = []
+            seen = set()
+            for option in shipping_options:
+                key = (option['name'], option['cost'])
+                if key not in seen:
+                    seen.add(key)
+                    unique_options.append(option)
+            
+            logger.info(f"✅ Returning {len(unique_options)} unique shipping options")
+            return unique_options if unique_options else None
+            
+        except Exception as e:
+            logger.error(f"❌ Error extracting shipping options: {e}")
+            return None
+    
+    def _parse_shipping_option_text(self, option_text):
+        """Parse shipping option text to extract name, cost, and delivery date"""
+        try:
+            import re
+            
+            # Extract price (e.g., $14.04)
+            price_matches = re.findall(r'\$[\d,]+\.?\d*', option_text)
+            cost = price_matches[0] if price_matches else "Contact for Quote"
+            
+            # Extract delivery date (e.g., Sep 14)
+            date_matches = re.findall(r'[A-Za-z]{3}\s+\d{1,2}', option_text)
+            delivery_date = date_matches[0] if date_matches else None
+            
+            # Extract shipping method name (everything before the price)
+            name_part = option_text.split('$')[0].strip()
+            if not name_part:
+                name_part = option_text.split('Sep')[0].strip() if 'Sep' in option_text else option_text.strip()
+            
+            # Clean up the name
+            name = name_part.replace('\n', ' ').strip()
+            
+            # Determine estimated days based on shipping method
+            estimated_days = self._estimate_delivery_days(name)
+            
+            return {
+                "name": name,
+                "type": "standard",
+                "cost": cost,
+                "estimated_days": estimated_days,
+                "delivery_date": delivery_date,
+                "description": f"B2Sign {name.lower()}: {cost}" + (f" (delivery: {delivery_date})" if delivery_date else "")
+            }
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Error parsing shipping option text '{option_text}': {e}")
+            return None
+    
+    def _estimate_delivery_days(self, shipping_name):
+        """Estimate delivery days based on shipping method name"""
+        name_lower = shipping_name.lower()
+        
+        if 'next day' in name_lower and 'early am' in name_lower:
+            return 1
+        elif 'next day' in name_lower:
+            return 1
+        elif '2nd day' in name_lower or 'second day' in name_lower:
+            return 2
+        elif '3 day' in name_lower or 'third day' in name_lower:
+            return 3
+        elif 'ground' in name_lower:
+            return 5
+        else:
+            return 5  # Default
+    
+    async def _extract_shipping_costs_from_display(self, page):
+        """Extract shipping costs from displayed prices on the page"""
+        try:
+            logger.info("💰 Looking for displayed shipping costs...")
+            
+            shipping_options = []
+            all_elements = await page.query_selector_all('*')
+            
+            for element in all_elements:
+                try:
+                    text = await element.inner_text()
+                    # Look for price patterns like $14.04
+                    import re
+                    price_matches = re.findall(r'\$[\d,]+\.?\d*', text)
+                    
+                    if price_matches:
+                        # Check if this element is in the shipping section
+                        parent_text = ""
+                        try:
+                            parent = await element.query_selector('xpath=..')
+                            if parent:
+                                parent_text = await parent.inner_text()
+                        except:
+                            pass
+                        
+                        # If we see shipping-related text, it's likely a shipping cost
+                        if any(keyword in (text + parent_text).lower() for keyword in ['ground', 'shipping', 'delivery']):
+                            shipping_cost = price_matches[0]
+                            
+                            # Try to determine shipping method name
+                            shipping_name = "Ground Shipping"
+                            if 'ground' in (text + parent_text).lower():
+                                shipping_name = "Ground Shipping"
+                            elif 'express' in (text + parent_text).lower():
+                                shipping_name = "Express Shipping"
+                            elif 'overnight' in (text + parent_text).lower():
+                                shipping_name = "Overnight Shipping"
+                            
+                            shipping_option = {
+                                "name": shipping_name,
+                                "type": "standard",
+                                "cost": shipping_cost,
+                                "estimated_days": 5,
+                                "description": f"B2Sign {shipping_name.lower()}: {shipping_cost}"
+                            }
+                            
+                            shipping_options.append(shipping_option)
+                            logger.info(f"✅ Found displayed shipping cost: {shipping_name} - {shipping_cost}")
+                            
+                except:
+                    continue
+            
+            return shipping_options
+            
+        except Exception as e:
+            logger.error(f"❌ Error extracting displayed shipping costs: {e}")
+            return []
+
+    async def _extract_shipping_cost_from_order(self, page):
+        """Extract shipping cost from B2Sign order results"""
+        try:
+            logger.info("💰 Extracting shipping cost...")
+            
+            # Look for shipping cost in the shipping section
+            # Based on the form, we should look for "$14.04" near "Ground" dropdown
+            all_elements = await page.query_selector_all('*')
+            
+            for element in all_elements:
+                try:
+                    text = await element.inner_text()
+                    # Look for price patterns like $14.04
+                    import re
+                    price_matches = re.findall(r'\$[\d,]+\.?\d*', text)
+                    
+                    if price_matches:
+                        # Check if this element is in the shipping section
+                        parent_text = ""
+                        try:
+                            parent = await element.query_selector('xpath=..')
+                            if parent:
+                                parent_text = await parent.inner_text()
+                        except:
+                            pass
+                        
+                        # If we see shipping-related text or price near "Ground", it's likely shipping cost
+                        if any(keyword in (text + parent_text).lower() for keyword in ['ground', 'shipping', 'delivery']):
+                            shipping_cost = price_matches[0]
+                            logger.info(f"✅ Found shipping cost: {shipping_cost}")
+                            return shipping_cost
+                            
+                except:
+                    continue
+            
+            # If not found in shipping section, look for any price that might be shipping
+            for element in all_elements:
+                try:
+                    text = await element.inner_text()
+                    import re
+                    price_matches = re.findall(r'\$[\d,]+\.?\d*', text)
+                    
+                    if price_matches and len(text.strip()) < 20:  # Short text likely to be just a price
+                        # Check if it's near shipping-related elements
+                        try:
+                            parent = await element.query_selector('xpath=..')
+                            if parent:
+                                parent_text = await parent.inner_text()
+                                if any(keyword in parent_text.lower() for keyword in ['shipping', 'ground', 'delivery']):
+                                    shipping_cost = price_matches[0]
+                                    logger.info(f"✅ Found shipping cost in parent: {shipping_cost}")
+                                    return shipping_cost
+                        except:
+                            pass
+                            
+                except:
+                    continue
+            
+            logger.warning("⚠️ Could not find shipping cost")
+            return None
+            
+        except Exception as e:
+            logger.error(f"❌ Error extracting shipping cost: {e}")
+            return None
+    
     async def close(self):
         """Close browser and cleanup"""
         try:
@@ -521,7 +1654,7 @@ async def get_shipping_costs_playwright(order_data: Dict[str, Any]) -> Dict[str,
         async with async_playwright() as p:
             # Launch browser
             browser = await p.chromium.launch(
-                headless=True,
+                headless=False,
                 args=[
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
@@ -620,45 +1753,43 @@ async def get_shipping_costs_playwright(order_data: Dict[str, Any]) -> Dict[str,
                     'shipping_options': []
                 }
             
-            # Step 4: Fill out the quote form (simplified for now)
-            logger.info("📝 Step 4: Filling out quote form...")
+            # Step 4: Create mock order with customer's exact specifications
+            logger.info("📝 Step 4: Creating mock order with customer specifications...")
             
-            # Basic form filling - this would need to be expanded based on actual B2Sign form structure
+            # Extract customer specifications from order data
             dimensions = order_data.get('dimensions', {})
             width = dimensions.get('width', 2)
             height = dimensions.get('height', 4)
             quantity = order_data.get('quantity', 1)
+            print_options = order_data.get('print_options', {})
+            accessories = order_data.get('accessories', [])
+            customer_info = order_data.get('customer_info', {})
+            zip_code = customer_info.get('zipCode', customer_info.get('zip_code', '10001'))
             
-            # Try to fill common form fields
-            try:
-                await page.fill('input[name*="width"], input[placeholder*="width" i]', str(width))
-                await page.fill('input[name*="height"], input[placeholder*="height" i]', str(height))
-                await page.fill('input[name*="quantity"], input[placeholder*="quantity" i]', str(quantity))
-            except:
-                logger.warning("⚠️ Could not fill all form fields - form structure may be different")
+            logger.info(f"📋 Order specs: {width}x{height}, qty: {quantity}, zip: {zip_code}")
+            logger.info(f"🎨 Print options: {print_options}")
+            logger.info(f"🎁 Accessories: {accessories}")
             
-            # Try to submit form
-            try:
-                await page.click('button[type="submit"], input[type="submit"], button:has-text("Get Quote"), button:has-text("Calculate")')
-                await page.wait_for_timeout(5000)
-            except:
-                logger.warning("⚠️ Could not find submit button - form may be different")
+            # Fill out the B2Sign order form with customer's exact specifications
+            # Create an instance of the integration class to use its methods
+            integration = B2SignPlaywrightIntegration()
+            shipping_options = await integration._create_mock_order_and_get_shipping(
+                page, product_type, dimensions, quantity, print_options, accessories, zip_code
+            )
             
-            # For now, return a mock shipping option since we need to analyze the actual form structure
-            shipping_options = [{
-                "name": "B2Sign Standard Shipping",
-                "type": "standard",
-                "cost": "Contact for Quote",
-                "estimated_days": 5,
-                "description": "B2Sign shipping quote - form analysis needed"
-            }]
-            
-            return {
-                'success': True,
-                'shipping_options': shipping_options,
-                'b2sign_product_url': page.url,
-                'extracted_at': datetime.now().isoformat()
-            }
+            if shipping_options:
+                return {
+                    'success': True,
+                    'shipping_options': shipping_options,
+                    'b2sign_product_url': page.url,
+                    'extracted_at': datetime.now().isoformat()
+                }
+            else:
+                return {
+                    'success': False,
+                    'errors': ['Could not extract shipping options from B2Sign mock order'],
+                    'shipping_options': []
+                }
             
     except Exception as e:
         logger.error(f"❌ Error in Playwright shipping costs: {e}")

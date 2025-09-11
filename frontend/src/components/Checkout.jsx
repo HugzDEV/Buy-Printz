@@ -344,6 +344,19 @@ const Checkout = () => {
     }
   }, [customerInfo.zipCode])
 
+  // Real-time shipping updates when banner options change
+  useEffect(() => {
+    if (expandedSections.shipping && customerInfo.zipCode && bannerOptions) {
+      // Debounce shipping cost updates to avoid too many API calls
+      const timeoutId = setTimeout(() => {
+        console.log('🔄 Banner options changed, updating shipping costs...')
+        getShippingCosts()
+      }, 1000)
+      
+      return () => clearTimeout(timeoutId)
+    }
+  }, [bannerOptions.material, bannerOptions.sides, bannerOptions.quantity, bannerOptions.grommets, bannerOptions.hem, bannerOptions.polePockets])
+
   const createOrder = async () => {
     try {
       console.log('Creating order with data:', orderData)
@@ -1254,8 +1267,11 @@ const Checkout = () => {
             <div className="space-y-6">
               <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                 <Truck className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-green-700">
+                <p className="text-green-700 font-medium">
                   {customerInfo.zipCode ? 'Choose your preferred shipping method' : 'Enter your shipping address to see shipping options'}
+                </p>
+                <p className="text-sm text-green-600 mt-1">
+                  🚀 Powered by B2Sign - Real-time shipping costs
                 </p>
               </div>
 
@@ -1289,7 +1305,7 @@ const Checkout = () => {
                 {shippingLoading && (
                   <div className="flex items-center justify-center p-6">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                    <span className="ml-3 text-gray-600">Getting shipping quotes...</span>
+                    <span className="ml-3 text-gray-600">🚀 Getting real-time shipping costs from B2Sign...</span>
                   </div>
                 )}
 
@@ -1325,12 +1341,17 @@ const Checkout = () => {
                               <Icon className="w-4 h-4 text-green-600" />
                               <p className="font-medium text-gray-900">{optionLabel}</p>
                             </div>
-                            <p className={`text-sm ${optionCost !== 'Free' ? 'text-green-600' : 'text-gray-500'}`}>
+                            <p className={`text-sm font-semibold ${optionCost !== 'Free' ? 'text-green-600' : 'text-gray-500'}`}>
                               {optionCost}
                             </p>
                             {option.estimated_days && (
                               <p className="text-xs text-gray-500">
                                 Est. {option.estimated_days} day{option.estimated_days !== 1 ? 's' : ''}
+                              </p>
+                            )}
+                            {option.delivery_date && (
+                              <p className="text-xs text-blue-600 font-medium">
+                                📅 Delivers by {option.delivery_date}
                               </p>
                             )}
                           </div>
