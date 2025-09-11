@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Any
 import asyncio
 from datetime import datetime
 
-from b2sign_playwright_integration import get_shipping_costs_playwright
+from backend.b2sign_playwright_integration import get_shipping_costs_playwright
 
 # Setup logging
 logger = logging.getLogger(__name__)
