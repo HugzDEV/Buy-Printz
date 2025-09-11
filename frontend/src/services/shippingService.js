@@ -5,7 +5,7 @@
 
 class ShippingService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || 'https://buyprintz-backend-production.up.railway.app'
+    this.baseURL = import.meta.env.VITE_API_URL || 'https://api.buyprintz.com'
     this.cache = new Map()
     this.cacheTimeout = 5 * 60 * 1000 // 5 minutes
   }
