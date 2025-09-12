@@ -16,7 +16,7 @@ class ShippingService {
    */
   async getShippingCosts(orderData, customerInfo) {
     try {
-      console.log('🚀 Getting B2Sign shipping costs for:', orderData.product_type, 'to:', customerInfo.zipCode)
+      console.log('🚀 Getting shipping costs from print partners for:', orderData.product_type, 'to:', customerInfo.zipCode)
       
       // Validate required customer info
       if (!customerInfo.zipCode) {
@@ -33,14 +33,14 @@ class ShippingService {
 
       // Prepare request data for our new B2Sign API
       const requestData = this.prepareShippingCostsRequest(orderData, customerInfo)
-      console.log('📋 B2Sign request data:', requestData)
+      console.log('📋 Print partner request data:', requestData)
       console.log('📋 Dimensions object:', JSON.stringify(requestData.dimensions))
       console.log('📋 Customer info:', JSON.stringify(requestData.customer_info))
       
       // Make API request to our enhanced B2Sign shipping costs endpoint
-      // B2Sign integration takes 15-20 seconds, so we need a longer timeout
+      // Print partner integration takes 15-60 seconds, so we need a longer timeout
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 second timeout
       
       const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
         method: 'POST',
@@ -75,21 +75,21 @@ class ShippingService {
       this.cacheQuote(cacheKey, shippingCosts)
       
       if (shippingCosts.success && shippingCosts.shipping_options) {
-        console.log('✅ B2Sign shipping costs received:', shippingCosts.shipping_options.length, 'options')
+        console.log('✅ Print partner shipping costs received:', shippingCosts.shipping_options.length, 'options')
         console.log('📊 Shipping options:', shippingCosts.shipping_options.map(opt => `${opt.name}: ${opt.cost}`))
       } else {
-        console.warn('⚠️ B2Sign returned no shipping options:', shippingCosts.errors)
+        console.warn('⚠️ Print partners returned no shipping options:', shippingCosts.errors)
       }
       
       return shippingCosts
 
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.error('⏰ B2Sign API request timed out after 30 seconds')
-        throw new Error('Shipping cost request timed out. B2Sign integration can take 15-20 seconds. Please try again.')
+        console.error('⏰ Print partner API request timed out after 60 seconds')
+        throw new Error('Shipping cost request timed out. Please try again.')
       }
       
-      console.error('❌ Error getting B2Sign shipping costs:', error)
+      console.error('❌ Error getting print partner shipping costs:', error)
       throw error
     }
   }

@@ -468,9 +468,9 @@ const Checkout = () => {
         }
       }
 
-      console.log('🔄 Getting shipping costs from B2Sign... This may take 15-20 seconds.')
+      console.log('🔄 Checking with our print partners for shipping costs...')
       
-      // Get shipping costs from B2Sign
+      // Get shipping costs from print partners
       const shippingCosts = await shippingService.getShippingCosts(shippingOrderData, customerInfo)
       
       if (shippingCosts.success && shippingCosts.shipping_options) {
@@ -478,7 +478,7 @@ const Checkout = () => {
         console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
       } else {
         setShippingError('No shipping options available at this time')
-        console.warn('⚠️ No shipping options received from B2Sign')
+        console.warn('⚠️ No shipping options received from print partners')
       }
 
     } catch (error) {
@@ -486,12 +486,12 @@ const Checkout = () => {
       
       // Handle timeout specifically
       if (error.message.includes('timed out')) {
-        setShippingError('Shipping cost request timed out. B2Sign integration can take 15-20 seconds. Please try again.')
+        setShippingError('Request timed out. Please try again.')
       } else {
         setShippingError('Unable to get shipping costs at this time. Please try again.')
       }
       
-      // NO FALLBACK - System must get real shipping costs from B2Sign
+      // NO FALLBACK - System must get real shipping costs from print partners
       setShippingQuotes([])
     } finally {
       setShippingLoading(false)
@@ -1310,7 +1310,7 @@ const Checkout = () => {
                       disabled={shippingLoading}
                       className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
                     >
-                      {shippingLoading ? 'Getting Shipping Costs (15-20s)...' : 'Get Shipping Costs (15-20s)'}
+                      {shippingLoading ? 'Checking with Print Partners...' : 'Get Shipping Costs'}
                     </button>
                   )}
                 </div>
@@ -1327,8 +1327,8 @@ const Checkout = () => {
                 {shippingLoading && (
                   <div className="flex flex-col items-center justify-center p-6 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
-                    <span className="text-blue-700 font-medium mb-2">🚀 Getting real-time shipping costs from B2Sign...</span>
-                    <span className="text-blue-600 text-sm">This may take 15-20 seconds. Please wait...</span>
+                    <span className="text-blue-700 font-medium mb-2">🔄 Checking with our print partners...</span>
+                    <span className="text-blue-600 text-sm">Getting real-time shipping costs. Please wait...</span>
                   </div>
                 )}
 
@@ -1387,7 +1387,7 @@ const Checkout = () => {
                 {!shippingLoading && !shippingQuotes.length && !shippingError && (
                   <div className="text-center p-6 text-gray-500">
                     <Truck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p>Click "Refresh Quotes" to get real-time shipping options from B2Sign</p>
+                    <p>Click "Get Shipping Costs" to check with our print partners</p>
                   </div>
                 )}
               </div>

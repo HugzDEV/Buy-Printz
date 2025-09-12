@@ -810,6 +810,7 @@ class B2SignPlaywrightIntegration:
         """Fill customer address information in the modal using proven selectors"""
         try:
             logger.info("📝 Filling customer address modal...")
+            logger.info(f"📋 Customer info received: {customer_info}")
             
             # Use customer info if provided, otherwise use defaults
             if customer_info:
@@ -817,6 +818,7 @@ class B2SignPlaywrightIntegration:
                 company = customer_info.get('company', 'BuyPrintz Inc')
                 phone = customer_info.get('phone', '555-123-4567')
                 address = customer_info.get('address', '123 Main St')
+                suburb = customer_info.get('suburb', '')  # Get suburb from customer info
                 city = customer_info.get('city', 'Beverly Hills')
                 state = customer_info.get('state', 'CA')
             else:
@@ -824,6 +826,7 @@ class B2SignPlaywrightIntegration:
                 company = 'BuyPrintz Inc'
                 phone = '555-123-4567'
                 address = '123 Main St'
+                suburb = ''  # Default to empty
                 city = 'Beverly Hills'
                 state = 'CA'
             
@@ -833,7 +836,7 @@ class B2SignPlaywrightIntegration:
                 ('input[name="company"]', company),
                 ('input[name="telephone"]', phone),
                 ('input[placeholder="Street address"]', address),
-                ('input[name="suburb"]', ''),
+                ('input[name="suburb"]', suburb),  # Use dynamic suburb value
                 ('input[name="city"]', city),
                 ('input[name="postcode"]', str(zip_code))
             ]
