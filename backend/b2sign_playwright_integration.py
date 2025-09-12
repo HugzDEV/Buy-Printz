@@ -256,7 +256,7 @@ class B2SignPlaywrightIntegration:
             await self._select_blind_drop_ship()
             
             # Step 5: Open address modal and fill customer address
-            await self._open_and_fill_address_modal(zip_code)
+            await self._open_and_fill_address_modal(zip_code, customer_info)
             
             # Step 6: Extract all shipping options
             shipping_options = await self._extract_all_shipping_options_workflow()
@@ -746,7 +746,7 @@ class B2SignPlaywrightIntegration:
             
             # Step 3: Fill customer address in the modal
             logger.info("📝 Filling customer address in modal...")
-            await self._fill_customer_address_modal(page, zip_code)
+            await self._fill_customer_address_modal(page, zip_code, customer_info)
             
             # Step 4: Click "Use this address" button
             logger.info("✅ Clicking Use this address button...")
@@ -771,20 +771,35 @@ class B2SignPlaywrightIntegration:
         except Exception as e:
             logger.warning(f"⚠️ Error setting shipping options: {e}")
     
-    async def _fill_customer_address_modal(self, page, zip_code):
+    async def _fill_customer_address_modal(self, page, zip_code, customer_info=None):
         """Fill customer address information in the modal using proven selectors"""
         try:
             logger.info("📝 Filling customer address modal...")
             
+            # Use customer info if provided, otherwise use defaults
+            if customer_info:
+                name = customer_info.get('name', 'John Doe')
+                company = customer_info.get('company', 'BuyPrintz Inc')
+                phone = customer_info.get('phone', '555-123-4567')
+                address = customer_info.get('address', '123 Main St')
+                city = customer_info.get('city', 'Beverly Hills')
+                state = customer_info.get('state', 'CA')
+            else:
+                name = 'John Doe'
+                company = 'BuyPrintz Inc'
+                phone = '555-123-4567'
+                address = '123 Main St'
+                city = 'Beverly Hills'
+                state = 'CA'
+            
             # Fill address fields using exact selectors from proven workflow
-            # Using real address: 816 Morton Street, Apt 1, Boston, MA 02124
             address_fields = [
-                ('input[name="fullname"]', 'John Doe'),
-                ('input[name="company"]', 'BuyPrintz Inc'),
-                ('input[name="telephone"]', '555-123-4567'),
-                ('input[placeholder="Street address"]', '816 Morton Street'),  # REAL STREET ADDRESS
-                ('input[name="suburb"]', 'Apt 1'),
-                ('input[name="city"]', 'Boston'),
+                ('input[name="fullname"]', name),
+                ('input[name="company"]', company),
+                ('input[name="telephone"]', phone),
+                ('input[placeholder="Street address"]', address),
+                ('input[name="suburb"]', ''),
+                ('input[name="city"]', city),
                 ('input[name="postcode"]', str(zip_code))
             ]
             
@@ -818,7 +833,7 @@ class B2SignPlaywrightIntegration:
                 if hidden_state_select:
                     logger.info("✅ Found hidden state select element")
                     try:
-                        # Try to make the element visible and select MA
+                        # Try to make the element visible and select the customer's state
                         await page.evaluate('''(element) => {
                             element.style.display = 'block';
                             element.style.visibility = 'visible';
@@ -826,32 +841,32 @@ class B2SignPlaywrightIntegration:
                         }''', hidden_state_select)
                         
                         await page.wait_for_timeout(1000)
-                        await hidden_state_select.select_option('MA')
-                        logger.info("✅ Selected MA state using hidden select")
+                        await hidden_state_select.select_option(state)
+                        logger.info(f"✅ Selected {state} state using hidden select")
                         state_selected = True
                     except Exception as e:
-                        logger.warning(f"Could not select MA from hidden select: {e}")
+                        logger.warning(f"Could not select {state} from hidden select: {e}")
                         # Try JavaScript approach as fallback
                         try:
                             # Try multiple JavaScript approaches
-                            await page.evaluate('''(element) => {
-                                element.value = 'MA';
-                                element.dispatchEvent(new Event('change', { bubbles: true }));
-                                element.dispatchEvent(new Event('input', { bubbles: true }));
-                            }''', hidden_state_select)
+                            await page.evaluate(f'''(element) => {{
+                                element.value = '{state}';
+                                element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                element.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                            }}''', hidden_state_select)
                             
                             # Also try setting the selectedIndex
-                            await page.evaluate('''(element) => {
-                                for (let i = 0; i < element.options.length; i++) {
-                                    if (element.options[i].value === 'MA' || element.options[i].text.includes('Massachusetts')) {
+                            await page.evaluate(f'''(element) => {{
+                                for (let i = 0; i < element.options.length; i++) {{
+                                    if (element.options[i].value === '{state}' || element.options[i].text.toLowerCase().includes('{state.lower()}')) {{
                                         element.selectedIndex = i;
                                         break;
-                                    }
-                                }
-                                element.dispatchEvent(new Event('change', { bubbles: true }));
-                            }''', hidden_state_select)
+                                    }}
+                                }}
+                                element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                            }}''', hidden_state_select)
                             
-                            logger.info("✅ Set MA state using JavaScript")
+                            logger.info(f"✅ Set {state} state using JavaScript")
                             state_selected = True
                         except Exception as e2:
                             logger.warning(f"JavaScript approach also failed: {e2}")
@@ -882,16 +897,16 @@ class B2SignPlaywrightIntegration:
                                         
                                         await element.click()
                                         await page.wait_for_timeout(1000)
-                                        await input_field.fill('MA')
+                                        await input_field.fill(state)
                                         await page.wait_for_timeout(1000)
                                         
-                                        ma_options = await page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
-                                        for option in ma_options:
+                                        state_options = await page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
+                                        for option in state_options:
                                             try:
                                                 option_text = await option.inner_text()
-                                                if 'massachusetts' in option_text.lower() or 'ma' in option_text.lower():
+                                                if state.lower() in option_text.lower() or any(state_name in option_text.lower() for state_name in self._get_state_names(state)):
                                                     await option.click()
-                                                    logger.info(f"✅ Selected state: MA (using autocomplete {i+1})")
+                                                    logger.info(f"✅ Selected state: {state} (using autocomplete {i+1})")
                                                     state_selected = True
                                                     break
                                             except:
@@ -919,6 +934,62 @@ class B2SignPlaywrightIntegration:
                 
         except Exception as e:
             logger.warning(f"⚠️ Error filling customer address modal: {e}")
+    
+    def _get_state_names(self, state_code):
+        """Get possible state names for a given state code"""
+        state_mapping = {
+            'CA': ['california'],
+            'NY': ['new york'],
+            'TX': ['texas'],
+            'FL': ['florida'],
+            'IL': ['illinois'],
+            'PA': ['pennsylvania'],
+            'OH': ['ohio'],
+            'GA': ['georgia'],
+            'NC': ['north carolina'],
+            'MI': ['michigan'],
+            'NJ': ['new jersey'],
+            'VA': ['virginia'],
+            'WA': ['washington'],
+            'AZ': ['arizona'],
+            'MA': ['massachusetts'],
+            'TN': ['tennessee'],
+            'IN': ['indiana'],
+            'MO': ['missouri'],
+            'MD': ['maryland'],
+            'WI': ['wisconsin'],
+            'CO': ['colorado'],
+            'MN': ['minnesota'],
+            'SC': ['south carolina'],
+            'AL': ['alabama'],
+            'LA': ['louisiana'],
+            'KY': ['kentucky'],
+            'OR': ['oregon'],
+            'OK': ['oklahoma'],
+            'CT': ['connecticut'],
+            'UT': ['utah'],
+            'IA': ['iowa'],
+            'NV': ['nevada'],
+            'AR': ['arkansas'],
+            'MS': ['mississippi'],
+            'KS': ['kansas'],
+            'NM': ['new mexico'],
+            'NE': ['nebraska'],
+            'WV': ['west virginia'],
+            'ID': ['idaho'],
+            'HI': ['hawaii'],
+            'NH': ['new hampshire'],
+            'ME': ['maine'],
+            'RI': ['rhode island'],
+            'MT': ['montana'],
+            'DE': ['delaware'],
+            'SD': ['south dakota'],
+            'ND': ['north dakota'],
+            'AK': ['alaska'],
+            'VT': ['vermont'],
+            'WY': ['wyoming']
+        }
+        return state_mapping.get(state_code.upper(), [state_code.lower()])
 
     async def _fill_banner_dimensions(self, width, height):
         """Fill banner dimensions using improved precision field detection"""
@@ -1073,7 +1144,7 @@ class B2SignPlaywrightIntegration:
         except Exception as e:
             logger.warning(f"⚠️ Error selecting Blind Drop Ship: {e}")
     
-    async def _open_and_fill_address_modal(self, zip_code):
+    async def _open_and_fill_address_modal(self, zip_code, customer_info=None):
         """Open address modal and fill customer address using proven workflow"""
         try:
             logger.info("📝 Opening and filling address modal...")
