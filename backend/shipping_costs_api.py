@@ -175,6 +175,38 @@ async def health_check():
             "timestamp": datetime.now().isoformat()
         }
 
+@router.get("/playwright-status")
+async def playwright_status():
+    """Check Playwright browser installation status"""
+    try:
+        from playwright.async_api import async_playwright
+        
+        # Try to initialize Playwright
+        playwright = await async_playwright().start()
+        
+        # Try to launch a browser
+        browser = await playwright.chromium.launch(headless=True)
+        
+        # Clean up
+        await browser.close()
+        await playwright.stop()
+        
+        return {
+            "status": "healthy",
+            "playwright": "installed",
+            "browsers": "available",
+            "message": "Playwright browsers are properly installed and working"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "playwright": "error",
+            "browsers": "missing",
+            "error": str(e),
+            "message": "Playwright browsers are not properly installed. Run: python -m playwright install chromium"
+        }
+
 @router.post("/test")
 async def test_shipping_costs():
     """Test endpoint for shipping costs system"""
