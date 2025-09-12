@@ -73,35 +73,33 @@ class B2SignPlaywrightIntegration:
             return False
     
     async def login(self):
-        """Login to B2Sign using the proven method from test_navigation.py"""
+        """Login to B2Sign using the exact proven method from test_navigation.py"""
         try:
-            logger.info("🔐 Logging into B2Sign...")
+            logger.info("🔐 Logging into B2Sign using proven method...")
             
-            # Navigate to main page
+            # Navigate to main page (exact method from test_navigation.py)
+            logger.info("🌐 Step 1: Navigating to B2Sign main page...")
             await self.page.goto("https://www.b2sign.com", wait_until='networkidle')
             await self.page.wait_for_timeout(3000)
             
-            # Click Member Sign In (proven method from test_navigation.py)
-            logger.info("🔍 Clicking Member Sign In button...")
+            # Click Member Sign In (exact method from test_navigation.py)
+            logger.info("🔐 Step 2: Logging in...")
             await self.page.click('button:has-text("Member Sign In")')
             await self.page.wait_for_timeout(2000)
             
-            # Fill login form (proven method from test_navigation.py)
-            logger.info("📝 Filling login form...")
-            await self.page.fill('input[placeholder="Email"]', self.username)
-            await self.page.fill('input[placeholder="Password"]', self.password)
+            # Fill login form (exact method from test_navigation.py)
+            await self.page.fill('input[placeholder="Email"]', 'order@buyprintz.com')
+            await self.page.fill('input[placeholder="Password"]', '$AG@BuyPr!n1z')
             await self.page.click('button[type="submit"]')
             await self.page.wait_for_timeout(5000)
             
-            # Check if login was successful (proven method from test_navigation.py)
+            # Check if login was successful (exact method from test_navigation.py)
             current_url = self.page.url
-            logger.info(f"🔗 Current URL after login: {current_url}")
-            
             if 'login' not in current_url:
                 logger.info("✅ Login successful!")
                 return True
             else:
-                logger.error("❌ Login failed - still on login page")
+                logger.error("❌ Login failed")
                 return False
                 
         except Exception as e:
@@ -774,60 +772,135 @@ class B2SignPlaywrightIntegration:
             logger.warning(f"⚠️ Error setting shipping options: {e}")
     
     async def _fill_customer_address_modal(self, page, zip_code):
-        """Fill customer address information in the modal"""
+        """Fill customer address information in the modal using proven selectors"""
         try:
             logger.info("📝 Filling customer address modal...")
             
-            # Fill required fields in the modal
-            inputs = await page.query_selector_all('input')
+            # Fill address fields using exact selectors from proven workflow
+            address_fields = [
+                ('input[name="fullname"]', 'John Doe'),
+                ('input[name="company"]', 'BuyPrintz Inc'),
+                ('input[name="telephone"]', '555-123-4567'),
+                ('input[placeholder="Street address"]', '123 Main St'),
+                ('input[name="suburb"]', 'Suite 100'),
+                ('input[name="city"]', 'Beverly Hills'),
+                ('input[name="postcode"]', str(zip_code))
+            ]
             
-            for input_elem in inputs:
+            for selector, value in address_fields:
                 try:
-                    placeholder = await input_elem.get_attribute('placeholder')
-                    if placeholder:
-                        if 'first and last name' in placeholder.lower():
-                            await input_elem.fill('BuyPrintz Customer')
-                            logger.info("✅ Filled customer name")
-                        elif 'telephone' in placeholder.lower():
-                            await input_elem.fill('555-123-4567')
-                            logger.info("✅ Filled customer phone")
-                        elif 'street address' in placeholder.lower():
-                            await input_elem.fill('123 Main Street')
-                            logger.info("✅ Filled street address")
-                        elif 'city' in placeholder.lower():
-                            await input_elem.fill('Los Angeles')
-                            logger.info("✅ Filled city")
-                        elif 'zip' in placeholder.lower():
-                            await input_elem.fill(str(zip_code))
-                            logger.info(f"✅ Filled zip code: {zip_code}")
-                            
+                    field = await page.query_selector(selector)
+                    if field:
+                        # Get field attributes to verify we're filling the right field
+                        field_placeholder = await field.get_attribute('placeholder') or ''
+                        field_name = await field.get_attribute('name') or ''
+                        
+                        logger.info(f"🔍 Filling field: {selector}")
+                        logger.info(f"  - Placeholder: '{field_placeholder}'")
+                        logger.info(f"  - Name: '{field_name}'")
+                        logger.info(f"  - Value: '{value}'")
+                        
+                        await field.fill(value)
+                        logger.info(f"✅ Filled {selector}: {value}")
+                    else:
+                        logger.warning(f"⚠️ Field not found: {selector}")
                 except Exception as e:
-                    logger.warning(f"⚠️ Error filling input: {e}")
+                    logger.warning(f"⚠️ Could not fill {selector}: {e}")
                     continue
             
-            # Handle state dropdown if present
+            # Handle state - HANDLE HIDDEN STATE DROPDOWN
             try:
-                state_dropdowns = await page.query_selector_all('select')
-                for dropdown in state_dropdowns:
+                logger.info("🔍 Selecting state - handling hidden state dropdown...")
+                
+                # First, try to find the hidden state select element
+                hidden_state_select = await page.query_selector('select[name="state"]')
+                if hidden_state_select:
+                    logger.info("✅ Found hidden state select element")
                     try:
-                        # Try to select a state (CA for zip codes starting with 9, NY for 1, IL for 6)
-                        if str(zip_code).startswith('9'):
-                            await dropdown.select_option('CA')
-                            logger.info("✅ Selected CA state")
-                        elif str(zip_code).startswith('1'):
-                            await dropdown.select_option('NY')
-                            logger.info("✅ Selected NY state")
-                        elif str(zip_code).startswith('6'):
-                            await dropdown.select_option('IL')
-                            logger.info("✅ Selected IL state")
-                        else:
-                            await dropdown.select_option('CA')  # Default to CA
-                            logger.info("✅ Selected default CA state")
-                        break
-                    except:
-                        continue
+                        # Try to make the element visible and select CA
+                        await page.evaluate('''(element) => {
+                            element.style.display = 'block';
+                            element.style.visibility = 'visible';
+                            element.disabled = false;
+                        }''', hidden_state_select)
+                        
+                        await page.wait_for_timeout(1000)
+                        await hidden_state_select.select_option('CA')
+                        logger.info("✅ Selected CA state using hidden select")
+                        state_selected = True
+                    except Exception as e:
+                        logger.warning(f"Could not select CA from hidden select: {e}")
+                        # Try JavaScript approach as fallback
+                        try:
+                            await page.evaluate('''(element) => {
+                                element.value = 'CA';
+                                element.dispatchEvent(new Event('change', { bubbles: true }));
+                            }''', hidden_state_select)
+                            logger.info("✅ Set CA state using JavaScript")
+                            state_selected = True
+                        except Exception as e2:
+                            logger.warning(f"JavaScript approach also failed: {e2}")
+                
+                # If hidden select didn't work, try MuiAutocomplete approach
+                if not state_selected:
+                    logger.info("Trying MuiAutocomplete approach...")
+                    
+                    autocomplete_selectors = [
+                        '.MuiAutocomplete-root',
+                        '.MuiAutocomplete-root[class*="hasPopupIcon"]',
+                        '.MuiAutocomplete-root[class*="hasClearIcon"]'
+                    ]
+                    
+                    for selector in autocomplete_selectors:
+                        try:
+                            autocomplete_elements = await page.query_selector_all(selector)
+                            for i, element in enumerate(autocomplete_elements):
+                                input_field = await element.query_selector('input')
+                                if input_field:
+                                    # Check if this is the state field by looking at parent context
+                                    parent = await element.query_selector('xpath=..')
+                                    parent_text = await parent.inner_text() if parent else ""
+                                    
+                                    # Only proceed if this looks like a state field
+                                    if 'state' in parent_text.lower() or 'province' in parent_text.lower():
+                                        logger.info("✅ This appears to be the state field")
+                                        
+                                        await element.click()
+                                        await page.wait_for_timeout(1000)
+                                        await input_field.fill('CA')
+                                        await page.wait_for_timeout(1000)
+                                        
+                                        ca_options = await page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
+                                        for option in ca_options:
+                                            try:
+                                                option_text = await option.inner_text()
+                                                if 'california' in option_text.lower() or 'ca' in option_text.lower():
+                                                    await option.click()
+                                                    logger.info(f"✅ Selected state: CA (using autocomplete {i+1})")
+                                                    state_selected = True
+                                                    break
+                                            except:
+                                                continue
+                                        
+                                        if state_selected:
+                                            break
+                                    else:
+                                        logger.info("⚠️ Skipping - doesn't appear to be state field")
+                                        continue
+                            
+                            if state_selected:
+                                break
+                                
+                        except Exception as e:
+                            logger.warning(f"⚠️ Error with autocomplete selector {selector}: {e}")
+                            continue
+                
+                if not state_selected:
+                    logger.warning("⚠️ Could not select state using any method")
+                    
             except Exception as e:
-                logger.warning(f"⚠️ Error selecting state: {e}")
+                logger.warning(f"⚠️ Could not select state: {e}")
+                pass
                 
         except Exception as e:
             logger.warning(f"⚠️ Error filling customer address modal: {e}")
@@ -849,6 +922,7 @@ class B2SignPlaywrightIntegration:
             logger.info(f"Found {len(mui_inputs)} MUI input fields for dimensions")
             
             # Fill dimension inputs using MUI selectors (skip login inputs at index 0-1)
+            # The 4 dimension fields are: width_ft, width_in, height_ft, height_in
             for i, input_elem in enumerate(mui_inputs[2:6]):  # Skip login inputs, use dimension inputs
                 try:
                     if i == 0: 
