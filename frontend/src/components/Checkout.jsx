@@ -494,6 +494,7 @@ const Checkout = () => {
         // Auto-select Ground shipping option (first option is typically Ground)
         if (shippingCosts.shipping_options.length > 0) {
           console.log('🔄 Available shipping options:', shippingCosts.shipping_options.map(opt => ({ type: opt.type, name: opt.name, cost: opt.cost })))
+          console.log('🔄 All shipping option types:', shippingCosts.shipping_options.map(opt => opt.type))
           
           // Look for Ground shipping option
           const groundOption = shippingCosts.shipping_options.find(opt => 
@@ -1456,6 +1457,15 @@ const Checkout = () => {
                       const optionValue = option.type || `option_${index}`
                       const optionLabel = option.name || option.description || `${option.type} shipping`
                       const optionCost = option.cost || 'Free'
+                      
+                      console.log('🔄 Rendering shipping option:', { 
+                        index, 
+                        type: option.type, 
+                        name: option.name, 
+                        optionValue, 
+                        currentShippingOption: shippingOption,
+                        isSelected: shippingOption === optionValue
+                      })
                       
                       return (
                         <label key={optionValue} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
