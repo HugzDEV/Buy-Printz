@@ -181,7 +181,7 @@ const Checkout = () => {
   })
   
   // Shipping Options State
-  const [shippingOption, setShippingOption] = useState('standard')
+  const [shippingOption, setShippingOption] = useState('')
   const [shippingQuotes, setShippingQuotes] = useState([])
   const [shippingLoading, setShippingLoading] = useState(false)
   const [shippingError, setShippingError] = useState(null)
@@ -358,6 +358,12 @@ const Checkout = () => {
     }
   }, [bannerOptions.material, bannerOptions.sides, bannerOptions.quantity, bannerOptions.grommets, bannerOptions.hem, bannerOptions.polePockets])
 
+  // Force re-render when shipping option changes to update total
+  useEffect(() => {
+    console.log('🔄 Shipping option changed to:', shippingOption)
+    console.log('🔄 Current shipping cost:', shippingQuotes.find(q => q.type === shippingOption)?.cost)
+  }, [shippingOption, shippingQuotes])
+
   const createOrder = async () => {
     try {
       console.log('Creating order with data:', orderData)
@@ -475,9 +481,12 @@ const Checkout = () => {
       
       if (shippingCosts.success && shippingCosts.shipping_options) {
         setShippingQuotes(shippingCosts.shipping_options)
-        // Auto-select the first shipping option
+        // Auto-select Ground shipping option (first option is typically Ground)
         if (shippingCosts.shipping_options.length > 0) {
-          setShippingOption(shippingCosts.shipping_options[0].type)
+          const groundOption = shippingCosts.shipping_options.find(opt => 
+            opt.type.toLowerCase().includes('ground') || opt.name.toLowerCase().includes('ground')
+          ) || shippingCosts.shipping_options[0]
+          setShippingOption(groundOption.type)
         }
         console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
       } else {
@@ -687,7 +696,9 @@ const Checkout = () => {
   const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
   const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
-  const shippingCost = parseFloat(shippingQuotes.find(q => q.type === shippingOption)?.cost) || 0
+  const selectedShippingQuote = shippingQuotes.find(q => q.type === shippingOption)
+  const shippingCost = parseFloat(selectedShippingQuote?.cost) || 0
+  console.log('🔄 Shipping cost calculation:', { shippingOption, selectedShippingQuote, shippingCost })
   
   // Calculate base price from material and dimensions
   const getBasePrice = () => {
@@ -1414,7 +1425,10 @@ const Checkout = () => {
                             name="shipping"
                             value={optionValue}
                             checked={shippingOption === optionValue}
-                            onChange={(e) => setShippingOption(e.target.value)}
+                            onChange={(e) => {
+                              console.log('🔄 Shipping option changed to:', e.target.value)
+                              setShippingOption(e.target.value)
+                            }}
                             className="mr-3 text-green-600 focus:ring-green-500"
                           />
                           <div className="flex-1">
@@ -1739,23 +1753,6 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleSubmitOrder}
-                  disabled={loading || !customerInfo.name || !customerInfo.email}
-                  className="w-full bg-gradient-to-r from-buyprint-brand to-buyprint-600 hover:from-buyprint-600 hover:to-buyprint-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      Complete Order - ${(Number(totalAmount) || 0).toFixed(2)}
-                    </>
-                  )}
-                </button>
 
                 <div className="mt-4 text-xs text-gray-500 text-center">
                   By completing this order, you agree to our Terms of Service and Privacy Policy
