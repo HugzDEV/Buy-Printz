@@ -720,10 +720,11 @@ const Checkout = () => {
   const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const selectedShippingQuote = shippingQuotes.find(q => q.type === shippingOption)
-  const shippingCost = parseFloat(selectedShippingQuote?.cost) || 0
+  const shippingCost = parseFloat(selectedShippingQuote?.cost?.replace('$', '') || '0') || 0
   console.log('🔄 Shipping cost calculation:', { 
     shippingOption, 
     selectedShippingQuote, 
+    rawCost: selectedShippingQuote?.cost,
     shippingCost, 
     shippingUpdateTrigger,
     allQuotes: shippingQuotes 
