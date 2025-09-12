@@ -812,23 +812,29 @@ class B2SignPlaywrightIntegration:
             logger.info("📝 Filling customer address modal...")
             logger.info(f"📋 Customer info received: {customer_info}")
             
-            # Use customer info if provided, otherwise use defaults
-            if customer_info:
-                name = customer_info.get('name', 'John Doe')
-                company = customer_info.get('company', 'BuyPrintz Inc')
-                phone = customer_info.get('phone', '555-123-4567')
-                address = customer_info.get('address', '123 Main St')
-                suburb = customer_info.get('suburb', '')  # Get suburb from customer info
-                city = customer_info.get('city', 'Beverly Hills')
-                state = customer_info.get('state', 'CA')
-            else:
-                name = 'John Doe'
-                company = 'BuyPrintz Inc'
-                phone = '555-123-4567'
-                address = '123 Main St'
-                suburb = ''  # Default to empty
-                city = 'Beverly Hills'
-                state = 'CA'
+            # Use customer info - all fields are required from checkout
+            if not customer_info:
+                raise ValueError("Customer information is required for shipping address")
+            
+            name = customer_info.get('name')
+            company = customer_info.get('company', '')
+            phone = customer_info.get('phone')
+            address = customer_info.get('address')
+            suburb = customer_info.get('suburb', '')
+            city = customer_info.get('city')
+            state = customer_info.get('state')
+            
+            # Validate required fields
+            if not name:
+                raise ValueError("Customer name is required")
+            if not phone:
+                raise ValueError("Customer phone is required")
+            if not address:
+                raise ValueError("Customer address is required")
+            if not city:
+                raise ValueError("Customer city is required")
+            if not state:
+                raise ValueError("Customer state is required")
             
             # Fill address fields using exact selectors from proven workflow
             address_fields = [
@@ -1202,14 +1208,29 @@ class B2SignPlaywrightIntegration:
                 except:
                     continue
             
-            # Step 2: Fill address fields using exact selectors
+            # Step 2: Fill address fields using customer info
+            if not customer_info:
+                raise ValueError("Customer information is required for shipping address")
+            
+            name = customer_info.get('name')
+            company = customer_info.get('company', '')
+            phone = customer_info.get('phone')
+            address = customer_info.get('address')
+            suburb = customer_info.get('suburb', '')
+            city = customer_info.get('city')
+            state = customer_info.get('state')
+            
+            # Validate required fields
+            if not all([name, phone, address, city, state]):
+                raise ValueError("All customer address fields are required")
+            
             address_fields = [
-                ('input[name="fullname"]', 'John Doe'),
-                ('input[name="company"]', 'BuyPrintz Inc'),
-                ('input[name="telephone"]', '555-123-4567'),
-                ('input[placeholder="Street address"]', '123 Main St'),
-                ('input[name="suburb"]', 'Suite 100'),
-                ('input[name="city"]', 'Beverly Hills'),
+                ('input[name="fullname"]', name),
+                ('input[name="company"]', company),
+                ('input[name="telephone"]', phone),
+                ('input[placeholder="Street address"]', address),
+                ('input[name="suburb"]', suburb),
+                ('input[name="city"]', city),
                 ('input[name="postcode"]', str(zip_code))
             ]
             

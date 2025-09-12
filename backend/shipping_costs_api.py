@@ -68,6 +68,16 @@ async def get_shipping_costs(request: ShippingCostsRequest):
         if not request.product_type:
             raise HTTPException(status_code=400, detail="Product type is required")
         
+        # Validate customer info is provided
+        if not request.customer_info:
+            raise HTTPException(status_code=400, detail="Customer information is required for shipping costs")
+        
+        # Validate required customer fields
+        required_fields = ['name', 'phone', 'address', 'city', 'state']
+        missing_fields = [field for field in required_fields if not request.customer_info.get(field)]
+        if missing_fields:
+            raise HTTPException(status_code=400, detail=f"Missing required customer fields: {', '.join(missing_fields)}")
+        
         # Initialize B2Sign integration
         integration = B2SignPlaywrightIntegration()
         init_success = await integration.initialize()
@@ -93,12 +103,12 @@ async def get_shipping_costs(request: ShippingCostsRequest):
                 },
                 "customer_info": {
                     "zipCode": request.zip_code,
-                    "name": request.customer_info.get("name", "John Doe") if request.customer_info else "John Doe",
-                    "company": request.customer_info.get("company", "BuyPrintz Inc") if request.customer_info else "BuyPrintz Inc",
-                    "phone": request.customer_info.get("phone", "555-123-4567") if request.customer_info else "555-123-4567",
-                    "address": _validate_address(request.customer_info.get("address", "123 Main St") if request.customer_info else "123 Main St"),
-                    "city": request.customer_info.get("city", "Beverly Hills") if request.customer_info else "Beverly Hills",
-                    "state": request.customer_info.get("state", "CA") if request.customer_info else "CA"
+                    "name": request.customer_info.get("name") if request.customer_info else None,
+                    "company": request.customer_info.get("company", "") if request.customer_info else "",
+                    "phone": request.customer_info.get("phone") if request.customer_info else None,
+                    "address": request.customer_info.get("address") if request.customer_info else None,
+                    "city": request.customer_info.get("city") if request.customer_info else None,
+                    "state": request.customer_info.get("state") if request.customer_info else None
                 }
             }
             
@@ -283,19 +293,17 @@ async def debug_shipping_request(request_data: dict):
         }
 
 def _validate_address(address: str) -> str:
-    """Validate and fix address field - handle cases where email is in address field"""
+    """Validate address field - no hardcoded fallbacks"""
     if not address:
-        return "123 Main St"
+        raise ValueError("Address is required")
     
     # Check if address looks like an email (contains @)
     if "@" in address and "." in address:
-        logger.warning(f"⚠️ Address field contains email: {address}, using default address")
-        return "123 Main St"
+        raise ValueError("Address field contains email instead of street address")
     
     # Check if address is too short to be a real address
     if len(address.strip()) < 5:
-        logger.warning(f"⚠️ Address field too short: {address}, using default address")
-        return "123 Main St"
+        raise ValueError("Address is too short to be valid")
     
     return address
 
