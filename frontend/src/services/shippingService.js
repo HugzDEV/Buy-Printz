@@ -34,6 +34,8 @@ class ShippingService {
       // Prepare request data for our new B2Sign API
       const requestData = this.prepareShippingCostsRequest(orderData, customerInfo)
       console.log('📋 B2Sign request data:', requestData)
+      console.log('📋 Dimensions object:', JSON.stringify(requestData.dimensions))
+      console.log('📋 Customer info:', JSON.stringify(requestData.customer_info))
       
       // Make API request to our enhanced B2Sign shipping costs endpoint
       const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
@@ -48,7 +50,16 @@ class ShippingService {
       if (!response.ok) {
         const errorData = await response.json()
         console.error('❌ B2Sign API error:', errorData)
-        throw new Error(errorData.detail || 'Failed to get B2Sign shipping costs')
+        
+        // Log detailed error information for debugging
+        if (errorData.detail && Array.isArray(errorData.detail)) {
+          console.error('❌ Validation errors:', errorData.detail)
+          errorData.detail.forEach((error, index) => {
+            console.error(`  Error ${index + 1}:`, error)
+          })
+        }
+        
+        throw new Error(JSON.stringify(errorData.detail) || 'Failed to get B2Sign shipping costs')
       }
 
       const shippingCosts = await response.json()

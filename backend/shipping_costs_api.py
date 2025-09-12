@@ -24,7 +24,7 @@ router = APIRouter(prefix="/api/shipping-costs", tags=["shipping-costs"])
 class ShippingCostsRequest(BaseModel):
     product_type: str
     material: Optional[str] = None
-    dimensions: Optional[Dict[str, float]] = None
+    dimensions: Optional[Dict[str, Any]] = None
     quantity: int = 1
     print_options: Optional[Dict[str, Any]] = {}
     accessories: Optional[List[str]] = []
