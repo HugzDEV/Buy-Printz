@@ -633,7 +633,7 @@ const Checkout = () => {
   const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
   const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
-  const shippingCost = shippingQuotes.find(q => q.type === shippingOption)?.cost || 0
+  const shippingCost = parseFloat(shippingQuotes.find(q => q.type === shippingOption)?.cost) || 0
   
   // Calculate base price from material and dimensions
   const getBasePrice = () => {
@@ -1649,7 +1649,7 @@ const Checkout = () => {
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between text-lg font-semibold">
                       <span>Total</span>
-                      <span>${totalAmount.toFixed(2)}</span>
+                      <span>${(Number(totalAmount) || 0).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -1667,7 +1667,7 @@ const Checkout = () => {
                   ) : (
                     <>
                       <Lock className="w-4 h-4" />
-                      Complete Order - ${totalAmount.toFixed(2)}
+                      Complete Order - ${(Number(totalAmount) || 0).toFixed(2)}
                     </>
                   )}
                 </button>
