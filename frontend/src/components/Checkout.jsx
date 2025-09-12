@@ -475,6 +475,10 @@ const Checkout = () => {
       
       if (shippingCosts.success && shippingCosts.shipping_options) {
         setShippingQuotes(shippingCosts.shipping_options)
+        // Auto-select the first shipping option
+        if (shippingCosts.shipping_options.length > 0) {
+          setShippingOption(shippingCosts.shipping_options[0].type)
+        }
         console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
       } else {
         setShippingError('No shipping options available at this time')
@@ -629,7 +633,7 @@ const Checkout = () => {
   const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
   const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
-  const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
+  const shippingCost = shippingQuotes.find(q => q.type === shippingOption)?.cost || 0
   
   // Calculate base price from material and dimensions
   const getBasePrice = () => {
@@ -1502,7 +1506,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
+                      {shippingQuotes.find(q => q.type === shippingOption)?.cost ? `$${shippingQuotes.find(q => q.type === shippingOption).cost}` : 'Calculating...'}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -1638,7 +1642,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
+                      {shippingQuotes.find(q => q.type === shippingOption)?.cost ? `$${shippingQuotes.find(q => q.type === shippingOption).cost}` : 'Calculating...'}
                     </span>
                   </div>
                   
