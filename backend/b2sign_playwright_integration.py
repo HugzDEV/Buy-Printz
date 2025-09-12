@@ -48,7 +48,7 @@ class B2SignPlaywrightIntegration:
             
             # Launch browser with proper settings for Railway
             self.browser = await self.playwright.chromium.launch(
-                headless=False,
+                headless=True,  # Changed to headless for production
                 args=[
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
@@ -65,11 +65,18 @@ class B2SignPlaywrightIntegration:
             )
             
             self.page = await self.context.new_page()
+            
+            # Verify initialization
+            if not self.page:
+                raise Exception("Failed to create browser page")
+            
             logger.info("✅ Playwright browser initialized successfully")
             return True
             
         except Exception as e:
             logger.error(f"❌ Failed to initialize Playwright: {e}")
+            import traceback
+            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             return False
     
     async def login(self):
@@ -149,6 +156,15 @@ class B2SignPlaywrightIntegration:
         """Get shipping costs for banner products"""
         try:
             logger.info(f"🚚 Getting banner shipping costs for {order_data.get('material', 'banner')}")
+            
+            # Check if browser is properly initialized
+            if not self.page:
+                logger.error("❌ Browser page is not initialized")
+                return {
+                    'success': False,
+                    'errors': ['Browser not properly initialized'],
+                    'shipping_options': []
+                }
             
             # Map BuyPrintz material to specific B2Sign product page
             material = order_data.get('material', '13oz-vinyl')

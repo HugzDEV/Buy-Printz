@@ -61,8 +61,13 @@ async def get_shipping_costs(request: ShippingCostsRequest):
         
         # Initialize B2Sign integration
         integration = B2SignPlaywrightIntegration()
-        await integration.initialize()
-        await integration.login()
+        init_success = await integration.initialize()
+        if not init_success:
+            raise HTTPException(status_code=500, detail="Failed to initialize browser for B2Sign integration")
+        
+        login_success = await integration.login()
+        if not login_success:
+            raise HTTPException(status_code=500, detail="Failed to login to B2Sign")
         
         try:
             # Convert request to order data format for our workflow
@@ -82,7 +87,7 @@ async def get_shipping_costs(request: ShippingCostsRequest):
                     "name": request.customer_info.get("name", "John Doe") if request.customer_info else "John Doe",
                     "company": request.customer_info.get("company", "BuyPrintz Inc") if request.customer_info else "BuyPrintz Inc",
                     "phone": request.customer_info.get("phone", "555-123-4567") if request.customer_info else "555-123-4567",
-                    "address": request.customer_info.get("address", "123 Main St") if request.customer_info else "123 Main St",
+                    "address": _validate_address(request.customer_info.get("address", "123 Main St") if request.customer_info else "123 Main St"),
                     "city": request.customer_info.get("city", "Beverly Hills") if request.customer_info else "Beverly Hills",
                     "state": request.customer_info.get("state", "CA") if request.customer_info else "CA"
                 }
@@ -235,6 +240,23 @@ async def debug_shipping_request(request_data: dict):
             "error": str(e),
             "original_data": request_data
         }
+
+def _validate_address(address: str) -> str:
+    """Validate and fix address field - handle cases where email is in address field"""
+    if not address:
+        return "123 Main St"
+    
+    # Check if address looks like an email (contains @)
+    if "@" in address and "." in address:
+        logger.warning(f"⚠️ Address field contains email: {address}, using default address")
+        return "123 Main St"
+    
+    # Check if address is too short to be a real address
+    if len(address.strip()) < 5:
+        logger.warning(f"⚠️ Address field too short: {address}, using default address")
+        return "123 Main St"
+    
+    return address
 
 if __name__ == "__main__":
     import uvicorn
