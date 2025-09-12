@@ -1,0 +1,673 @@
+{
+  "dimension_inputs": [
+    {
+      "selector": ".MuiInput-input",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 0,
+        "tag": "INPUT",
+        "type": null,
+        "name": null,
+        "id": null,
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": "Email",
+        "value": "",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    },
+    {
+      "selector": ".MuiInput-input",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 1,
+        "tag": "INPUT",
+        "type": "password",
+        "name": null,
+        "id": null,
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": "Password",
+        "value": "",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    },
+    {
+      "selector": ".MuiInput-input",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 2,
+        "tag": "INPUT",
+        "type": null,
+        "name": null,
+        "id": null,
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": null,
+        "value": "0",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    },
+    {
+      "selector": ".MuiInput-input",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 3,
+        "tag": "INPUT",
+        "type": null,
+        "name": null,
+        "id": null,
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": null,
+        "value": "0",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    },
+    {
+      "selector": ".MuiInput-input",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 4,
+        "tag": "INPUT",
+        "type": null,
+        "name": null,
+        "id": null,
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": null,
+        "value": "0",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    },
+    {
+      "selector": ".MuiInput-input",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 5,
+        "tag": "INPUT",
+        "type": null,
+        "name": null,
+        "id": null,
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": null,
+        "value": "0",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    },
+    {
+      "selector": "#:r7:",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 10,
+        "tag": "INPUT",
+        "type": null,
+        "name": null,
+        "id": ":r7:",
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": "Email Address",
+        "value": "",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    },
+    {
+      "selector": "#:r8:",
+      "description": "Unknown input",
+      "element_info": {
+        "index": 11,
+        "tag": "INPUT",
+        "type": "password",
+        "name": null,
+        "id": ":r8:",
+        "class": "MuiInput-input css-1u0jcuo",
+        "placeholder": "Password",
+        "value": "",
+        "visible": true,
+        "enabled": true,
+        "label_text": null,
+        "parent_text": null
+      }
+    }
+  ],
+  "radio_buttons": [],
+  "dropdowns": [],
+  "buttons": [
+    {
+      "selector": ".MuiButton-root",
+      "description": "Sign In",
+      "element_info": {
+        "index": 0,
+        "tag": "BUTTON",
+        "type": "submit",
+        "text": "Sign In",
+        "class": "MuiButton-root MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeMd _button_13vy6_29 css-iylbxw",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "Register",
+      "element_info": {
+        "index": 1,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Register",
+        "class": "MuiButton-root MuiButton-variantOutlined MuiButton-colorNeutral MuiButton-sizeMd _button_13vy6_29 _btn-register_1u92i_199 css-1pxbeyb",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiSelect-button",
+      "description": "1 Side",
+      "element_info": {
+        "index": 2,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "1 Side",
+        "class": "MuiSelect-button css-1qmzz5g",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiSelect-button",
+      "description": "No Pole Pockets",
+      "element_info": {
+        "index": 3,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "No Pole Pockets",
+        "class": "MuiSelect-button css-1qmzz5g",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiSelect-button",
+      "description": "All Sides",
+      "element_info": {
+        "index": 4,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "All Sides",
+        "class": "MuiSelect-button css-1qmzz5g",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiSelect-button",
+      "description": "Every 2' All Sides",
+      "element_info": {
+        "index": 5,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Every 2' All Sides",
+        "class": "MuiSelect-button css-1qmzz5g",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "MORE OPTIONS",
+      "element_info": {
+        "index": 6,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "MORE OPTIONS",
+        "class": "MuiButton-root MuiButton-variantOutlined MuiButton-colorNeutral MuiButton-sizeMd _button_13vy6_29 css-1pxbeyb",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "Member Sign In",
+      "element_info": {
+        "index": 7,
+        "tag": "BUTTON",
+        "type": "submit",
+        "text": "Member Sign In",
+        "class": "MuiButton-root MuiButton-fullWidth MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeLg css-m7670r",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "Copy Address",
+      "element_info": {
+        "index": 8,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Copy Address",
+        "class": "MuiButton-root MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeMd _button_13vy6_29 _default-btn_gbrt0_74 css-iylbxw",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "Copy Address",
+      "element_info": {
+        "index": 9,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Copy Address",
+        "class": "MuiButton-root MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeMd _button_13vy6_29 _default-btn_gbrt0_74 css-iylbxw",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "Request Callback",
+      "element_info": {
+        "index": 10,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Request Callback",
+        "class": "MuiButton-root MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeMd _button_13vy6_29 _default-btn_gbrt0_74 css-iylbxw",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "Start Chat",
+      "element_info": {
+        "index": 11,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Start Chat",
+        "class": "MuiButton-root MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeMd _button_13vy6_29 _success-btn_gbrt0_108 css-iylbxw",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": ".MuiButton-root",
+      "description": "Leave Feedback",
+      "element_info": {
+        "index": 12,
+        "tag": "BUTTON",
+        "type": "button",
+        "text": "Leave Feedback",
+        "class": "MuiButton-root MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeMd _button_13vy6_29 _default-btn_gbrt0_74 css-iylbxw",
+        "id": null,
+        "name": null,
+        "visible": true,
+        "enabled": true
+      }
+    }
+  ],
+  "shipping_elements": [
+    {
+      "selector": "text='All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions'",
+      "description": "All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+      "element_info": {
+        "tag": "HTML",
+        "text": "All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions'",
+      "description": "All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+      "element_info": {
+        "tag": "BODY",
+        "text": "All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "#app",
+      "description": "All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+      "element_info": {
+        "tag": "DIV",
+        "text": "All Products\nBanners\nFlags\nBanner Stands\nTrade Show\nTents\nTable Throws\nRigids\nAdhesives\nWall Art\nChannel Letters\nSEG Products\nWall Murals\nNew\nForgot?\nSign In\nRegister\n13oz Vinyl Banner\n13 oz Matte Scrim Banner\nFull color UV printed - Indoor and outdoor ready\nFree hemming and grommets\nAdditional finishing available\nWelded oversized banners available\nWidth\nHeight\n0\" x 0\" = 0 ft2\n# of Sides\n1 Side\nMaterial\n13oz. Matte Vinyl Banner\nPole Pocket\nNo Pole Pockets\nHem\nAll Sides\nGrommet\nEvery 2' All Sides\nMORE OPTIONS\nB2Sign is a Trade-only Printer\nWe sell exclusively to our resellers\nPlease sign in to see prices\nForgot?\nMember Sign In\nDon't have an account?\nCreate a Reseller Account\nDescription\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order. \nOrders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST\n\nSHOP ALL BANNERS\n\nStore Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+        "class": null,
+        "id": "app",
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Description\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.'",
+      "description": "Description\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Description\nSpec\nFile Setup\nFAQ\nNext Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+        "class": "container _full-description_1jrtc_274",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.'",
+      "description": "Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.\nSpec\n\nFeatures:\n\nSingle-Sided single piece maximum size 10\u2019 x 145\u2019 w/o pocket and 9.5\u2019 x 145\u2019 w/ pocket ; Double-Sided banners maximum size 9.5\u2019 x 145\u2018\nOversized banners will be welded together (Double-Sided Banners are not available oversized)\nIndoor and outdoor use, waterproof and UV safe\nDouble sided banners are single-ply banner printed front and back\n\nMaterial:\n\nUV Printed 13 oz. Matte Vinyl Banner\n\nPrint Options:\n\nSingle or Double Sided\n\nOptional Materials:\n\nNumber 2 brass grommets (Stimpson)\nWhite double stitched thread\n1\" White Velcro (Loop side attached to banner)\n1\" White nylon webbing and silver d-rings\nClear plastic Banner-ups banner tabs for reinforced corners\n3/16\" and 5/16\" Sewn in nylon rope\n\nOptional Finishing:\n\nHems and Grommets\nPole Pockets\nVelcro\nWebbing and D-rings\nSewn-in Rope\nWindslits\nReinforced Corners\nWelded oversized banners\nFile Setup\nAccepted File Formats: JPEG or PDF (single page only)\nColor Space: CMYK\nResolution: 150dpi for raster images (More than enough for large format)\nMax File Upload Size: 300MB\nSubmit artwork built to ordered size - Scaled artwork is automatically detected and fit to order\nDo not include crop marks or bleeds\nDouble sided products will be uploaded as two separate files unless otherwise specified in the artwork template\n\n\n\nAdditional Tips\n\nDo not submit with Pantones/Spot Colors - Convert to CMYK\nConvert live fonts to outlines\nUse provided design templates when available\n\n\nFrequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+        "class": "_wrapper_1jrtc_323",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.'",
+      "description": "Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.",
+        "class": "_content_1jrtc_263",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.'",
+      "description": "Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Next Day Turnaround and Cut-off Time:\n\nOrder and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.\n\n\n\nSame Day Turnaround:\n\nOrder and submit artwork before 12pm PST ships same day.\n\n\nAvailable Production Facility\n\nYour orders are dispatched from the closest facility to your ship-to address for speed and savings\n\nCA Headquarters\nCA Sign Department\nTX Print Facility\nPA Print Facility\n\n\n\n\nStore pickup only available in our California locations\n\nDescription\n\nWe use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n\nAll banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.",
+        "class": "_rich-text_1by3u_30",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Order and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.'",
+      "description": "Order and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.",
+      "element_info": {
+        "tag": "P",
+        "text": "Order and submit artwork before 4pm PST ships next business day. Order after 4pm add 1 business day.\nOrders over 100 qty require 2 extra business days.",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Order and submit artwork before 12pm PST ships same day.'",
+      "description": "Order and submit artwork before 12pm PST ships same day.",
+      "element_info": {
+        "tag": "P",
+        "text": "Order and submit artwork before 12pm PST ships same day.",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Your orders are dispatched from the closest facility to your ship-to address for speed and savings'",
+      "description": "Your orders are dispatched from the closest facility to your ship-to address for speed and savings",
+      "element_info": {
+        "tag": "P",
+        "text": "Your orders are dispatched from the closest facility to your ship-to address for speed and savings",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store pickup only available in our California locations'",
+      "description": "Store pickup only available in our California locations",
+      "element_info": {
+        "tag": "P",
+        "text": "Store pickup only available in our California locations",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='All banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.'",
+      "description": "All banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.",
+      "element_info": {
+        "tag": "UL",
+        "text": "All banners 89\" or larger on their shortest side will be shipped folded.\nAll banners 88\" and under on their shortest side will be shipped rolled.",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='All banners 89\" or larger on their shortest side will be shipped folded.'",
+      "description": "All banners 89\" or larger on their shortest side will be shipped folded.",
+      "element_info": {
+        "tag": "LI",
+        "text": "All banners 89\" or larger on their shortest side will be shipped folded.",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='All banners 88\" and under on their shortest side will be shipped rolled.'",
+      "description": "All banners 88\" and under on their shortest side will be shipped rolled.",
+      "element_info": {
+        "tag": "LI",
+        "text": "All banners 88\" and under on their shortest side will be shipped rolled.",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Frequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.'",
+      "description": "Frequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Frequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+        "class": "_content_1jrtc_263",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Frequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.'",
+      "description": "Frequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Frequently asked questions\nQ: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+        "class": "_rich-text_1by3u_30",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Q: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.'",
+      "description": "Q: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+      "element_info": {
+        "tag": "DL",
+        "text": "Q: What\u00a0optional finishings do you offer for this material?\nA: We offer 9 optional finishings for your needs: \u00a0 \u00a0\nHem (free)\nGrommet (free)\nPole pocket\u00a0\nWindslit\u00a0\nWebbing\u00a0\nD-ring\u00a0\nReinforced corner using Banner Tabs \u00a0\u00a0\u00a0 \u00a0 \u00a0 \u00a0\u00a0\nRope\u00a0\nVelcro (Not available on Double-Sided Banners) \u00a0\u00a0\nQ: Do I need special Banner finishing?\nA: Whether you are ordering a street banner, large banner, or a long time use banner it is suggested to have the following additional finishing options selected:\u00a0\nWebbing\nReinforced corner using Banner Tabs \u00a0\u00a0\nIn addition to the finishing options it is suggested all grommets to be used upon installation.\nQ: Do you have any installation tips?\nA: We suggest all grommets be used during installation to prevent damages to the banner.\nQ: What size of banner could I do store pickup?\nA: You can store pickup any size of your banner order. Sizes up to 96\" will be rolled and sizes over 96\" will be folded.\nQ: What are suggested pole dimensions for optional pole pocket(s)?\nA: Please see our recommendation below:\u00a0 \u00a0\n2\u201d pole pocket accommodates 1\u201d diameter pole and under\n3\u201d pole pocket accommodates 1.5\u201d diameter pole and under\n4\u201d pole pocket accommodates 2\u201d diameter pole and under\nQ: How to setup artwork files for pole pockets?\nA: Your submitted graphic should fit the dimensions of the print you ordered. There is no additional bleed required. There will be a hemline across the graphic, it will be 2\", 3\", or 4\" from the edge of the graphic depending on what sized pole pocket you order.",
+        "class": "collapse",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Q: What size of banner could I do store pickup?'",
+      "description": "Q: What size of banner could I do store pickup?",
+      "element_info": {
+        "tag": "DT",
+        "text": "Q: What size of banner could I do store pickup?",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Orders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST'",
+      "description": "Orders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Orders placed by 4pm PST will be shipped the next business day\nSame-day service is also available if ordered by 12pm PST",
+        "class": "_cutofftime_14iqf_52 mobile-hide",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Orders placed by 4pm PST will be shipped the next business day'",
+      "description": "Orders placed by 4pm PST will be shipped the next business day",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Orders placed by 4pm PST will be shipped the next business day",
+        "class": null,
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions'",
+      "description": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+      "element_info": {
+        "tag": "FOOTER",
+        "text": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule\nCopyright \u00a9 2023-2025 B2Sign, Inc.\nAll Rights Reserved.\nTerms & Conditions",
+        "class": "_footer_gbrt0_29",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule'",
+      "description": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule",
+        "class": "_footer-main_gbrt0_35",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule'",
+      "description": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload\nAbout Us\nContact Us\nHelp Center\nDesign Templates\nRequest Sample Kit\nHoliday Schedule",
+        "class": "container",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload'",
+      "description": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To\nContact\nCustomer Service Office Hour:\nMon - Fri: 8:00am - 5:00pm PST\nToll Free:\n1(888)739-8501\nCall\nRequest Callback\nLive Chat:\nOnline\nStart Chat\nEmail:\ninfo@b2sign.com\nShare Your Thoughts\nWe value your input. If you have suggestions or feedback, let us know. Your message is important to us.\nLeave Feedback\nCatalog\nDownload",
+        "class": "_actions_gbrt0_46",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To'",
+      "description": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To",
+        "class": "_action_gbrt0_46",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To'",
+      "description": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Store Pickup\nB2Sign Headquarters\n462 Humane Way\nPomona, CA 91766\nPick Up Hours:\n8:00am - 5:00pm\nCopy Address\nGo To\nSign Department\n1260 E Grand Ave\nPomona, CA 91766\nPick Up Hours:\n8:30am - 5:30pm\nCopy Address\nGo To",
+        "class": "_action-cont_gbrt0_207",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    },
+    {
+      "selector": "text='Store Pickup'",
+      "description": "Store Pickup",
+      "element_info": {
+        "tag": "DIV",
+        "text": "Store Pickup",
+        "class": "_sub-title_gbrt0_39",
+        "id": null,
+        "visible": true,
+        "enabled": true
+      }
+    }
+  ]
+}

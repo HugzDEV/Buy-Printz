@@ -447,15 +447,25 @@ async def test_complete_banner_workflow():
                         print("📝 Step 9: Filling address modal...")
                         
                         # Fill customer address fields using exact selectors from modal mapping
-                        # IMPORTANT: Make sure we're filling the correct fields, not mixing up street and state
+                        # Using dynamic customer data instead of hardcoded values
+                        customer_info = {
+                            'name': 'John Doe',
+                            'company': 'BuyPrintz Inc',
+                            'phone': '555-123-4567',
+                            'address': '123 Main St',
+                            'city': 'Beverly Hills',
+                            'state': 'CA',
+                            'zipCode': '90210'
+                        }
+                    
                         address_fields = [
-                            ('input[name="fullname"]', 'John Doe'),
-                            ('input[name="company"]', 'BuyPrintz Inc'),
-                            ('input[name="telephone"]', '555-123-4567'),
-                            ('input[placeholder="Street address"]', '816 Morton Street'),  # REAL STREET ADDRESS
-                            ('input[name="suburb"]', 'Apt 1'),
-                            ('input[name="city"]', 'Boston'),
-                            ('input[name="postcode"]', '02124')
+                            ('input[name="fullname"]', customer_info['name']),
+                            ('input[name="company"]', customer_info['company']),
+                            ('input[name="telephone"]', customer_info['phone']),
+                            ('input[placeholder="Street address"]', customer_info['address']),
+                            ('input[name="suburb"]', ''),
+                            ('input[name="city"]', customer_info['city']),
+                            ('input[name="postcode"]', customer_info['zipCode'])
                             # NOTE: State is handled separately with MuiAutocomplete below
                         ]
                         
@@ -499,34 +509,34 @@ async def test_complete_banner_workflow():
                                     }''', hidden_state_select)
                                     
                                     await page.wait_for_timeout(1000)
-                                    await hidden_state_select.select_option('MA')
-                                    logger.info("✅ Selected MA state using hidden select")
-                                    print("✅ Selected MA state using hidden select")
+                                    await hidden_state_select.select_option(customer_info['state'])
+                                    logger.info(f"✅ Selected {customer_info['state']} state using hidden select")
+                                    print(f"✅ Selected {customer_info['state']} state using hidden select")
                                     state_selected = True
                                 except Exception as e:
-                                    logger.warning(f"Could not select CA from hidden select: {e}")
+                                    logger.warning(f"Could not select {customer_info['state']} from hidden select: {e}")
                                     # Try JavaScript approach as fallback
                                     try:
                                         # Try multiple JavaScript approaches
-                                        await page.evaluate('''(element) => {
-                                            element.value = 'MA';
-                                            element.dispatchEvent(new Event('change', { bubbles: true }));
-                                            element.dispatchEvent(new Event('input', { bubbles: true }));
-                                        }''', hidden_state_select)
+                                        await page.evaluate(f'''(element) => {{
+                                            element.value = '{customer_info['state']}';
+                                            element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                            element.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                                        }}''', hidden_state_select)
                                         
                                         # Also try setting the selectedIndex
-                                        await page.evaluate('''(element) => {
-                                            for (let i = 0; i < element.options.length; i++) {
-                                                if (element.options[i].value === 'MA' || element.options[i].text.includes('Massachusetts')) {
+                                        await page.evaluate(f'''(element) => {{
+                                            for (let i = 0; i < element.options.length; i++) {{
+                                                if (element.options[i].value === '{customer_info['state']}' || element.options[i].text.toLowerCase().includes('{customer_info['state'].lower()}')) {{
                                                     element.selectedIndex = i;
                                                     break;
-                                                }
-                                            }
-                                            element.dispatchEvent(new Event('change', { bubbles: true }));
-                                        }''', hidden_state_select)
+                                                }}
+                                            }}
+                                            element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                        }}''', hidden_state_select)
                                         
-                                        logger.info("✅ Set MA state using JavaScript")
-                                        print("✅ Set MA state using JavaScript")
+                                        logger.info(f"✅ Set {customer_info['state']} state using JavaScript")
+                                        print(f"✅ Set {customer_info['state']} state using JavaScript")
                                         state_selected = True
                                     except Exception as e2:
                                         logger.warning(f"JavaScript approach also failed: {e2}")
@@ -566,23 +576,23 @@ async def test_complete_banner_workflow():
                                                     await element.click()
                                                     await page.wait_for_timeout(1000)
                                                     
-                                                    # Type "MA" to filter options
-                                                    await input_field.fill('MA')
+                                                    # Type customer state to filter options
+                                                    await input_field.fill(customer_info['state'])
                                                     await page.wait_for_timeout(1000)
                                                     
-                                                    # Look for Massachusetts option in dropdown
-                                                    ma_options = await page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
-                                                    logger.info(f"Found {len(ma_options)} state options")
+                                                    # Look for customer state option in dropdown
+                                                    state_options = await page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
+                                                    logger.info(f"Found {len(state_options)} state options")
                                                     
-                                                    for option in ma_options:
+                                                    for option in state_options:
                                                         try:
                                                             option_text = await option.inner_text()
                                                             logger.info(f"Checking option: '{option_text}'")
                                                             
-                                                            if 'massachusetts' in option_text.lower() or 'ma' in option_text.lower():
+                                                            if customer_info['state'].lower() in option_text.lower() or any(state_name in option_text.lower() for state_name in ['california'] if customer_info['state'] == 'CA'):
                                                                 await option.click()
-                                                                logger.info(f"✅ Selected state: MA (using autocomplete {i+1})")
-                                                                print(f"✅ Selected state: MA (using autocomplete {i+1})")
+                                                                logger.info(f"✅ Selected state: {customer_info['state']} (using autocomplete {i+1})")
+                                                                print(f"✅ Selected state: {customer_info['state']} (using autocomplete {i+1})")
                                                                 state_selected = True
                                                                 break
                                                         except Exception as e:
