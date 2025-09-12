@@ -230,7 +230,7 @@ const TentCheckout = () => {
     }))
   }
 
-  // Get real-time shipping quotes from B2Sign for tents
+  // Get real-time shipping quotes from our print partners for tents
   const getTentShippingQuotes = async () => {
     if (!orderData) return
 
@@ -238,7 +238,7 @@ const TentCheckout = () => {
     setShippingError(null)
 
     try {
-      console.log('🚚 Getting real-time shipping quotes for tent from B2Sign...')
+      console.log('🚚 Getting real-time shipping quotes for tent from our print partners...')
       
       // Prepare tent order data for shipping quote
       const shippingOrderData = {
@@ -255,7 +255,7 @@ const TentCheckout = () => {
         customer_info: customerInfo
       }
 
-      // Get shipping quote from B2Sign
+      // Get shipping quote from our print partners
       const quote = await shippingService.getShippingCosts(shippingOrderData, customerInfo)
       
       if (quote.success && quote.shipping_options) {
@@ -263,14 +263,14 @@ const TentCheckout = () => {
         console.log('✅ Real-time tent shipping quotes received:', quote.shipping_options)
       } else {
         setShippingError('No shipping options available at this time')
-        console.warn('⚠️ No shipping options received from B2Sign for tent')
+        console.warn('⚠️ No shipping options received from our print partners for tent')
       }
 
     } catch (error) {
       console.error('❌ Error getting tent shipping quotes:', error)
       setShippingError('Unable to get shipping costs at this time. Please try again.')
       
-      // NO FALLBACK - System must get real shipping costs from B2Sign
+      // NO FALLBACK - System must get real shipping costs from our print partners
       setShippingQuotes([])
     } finally {
       setShippingLoading(false)
@@ -748,7 +748,7 @@ const TentCheckout = () => {
                   {!shippingLoading && !shippingQuotes.length && !shippingError && (
                     <div className="text-center p-6 text-gray-500">
                       <Truck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                      <p>Click "Refresh Quotes" to get real-time shipping options from B2Sign</p>
+                      <p>Click "Refresh Quotes" to get real-time shipping options from our print partners</p>
                     </div>
                   )}
                 </div>

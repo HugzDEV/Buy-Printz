@@ -204,7 +204,7 @@ const Checkout = () => {
   const [previewApproved, setPreviewApproved] = useState(false)
 
   // Shipping Options Configuration - REMOVED HARDCODED PRICES
-  // All shipping options now come from B2Sign integration
+  // All shipping options now come from our print partners
   const shippingOptions = []
 
   // Toggle section expansion
@@ -327,7 +327,7 @@ const Checkout = () => {
   // Get shipping quotes when shipping section is expanded
   useEffect(() => {
     if (expandedSections.shipping && orderData && !shippingQuotes.length && !shippingLoading) {
-      // If customer has entered shipping info, get shipping costs from B2Sign
+      // If customer has entered shipping info, get shipping costs from our print partners
       if (customerInfo.zipCode) {
         getShippingCosts()
       } else {
@@ -435,7 +435,7 @@ const Checkout = () => {
     }))
   }
 
-  // Get shipping costs from B2Sign (requires customer shipping info)
+  // Get shipping costs from our print partners (requires customer shipping info)
   const getShippingCosts = async () => {
     if (!orderData || !customerInfo.zipCode) {
       setShippingError('Please enter your shipping information to get shipping costs')
@@ -446,7 +446,7 @@ const Checkout = () => {
     setShippingError(null)
 
     try {
-      console.log('🚚 Getting shipping costs from B2Sign...')
+      console.log('🚚 Getting shipping costs from our print partners...')
       
       // Prepare order data for shipping costs
       const shippingOrderData = {
@@ -1247,7 +1247,7 @@ const Checkout = () => {
 
               {/* Job Name Field */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Job Name (Required for B2Sign)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Job Name (Required)</label>
                 <input
                   type="text"
                   value={customerInfo.jobName}
@@ -1293,7 +1293,7 @@ const Checkout = () => {
                   {customerInfo.zipCode ? 'Choose your preferred shipping method' : 'Enter your shipping address to see shipping options'}
                 </p>
                 <p className="text-sm text-green-600 mt-1">
-                  🚀 Powered by B2Sign - Real-time shipping costs
+                  🚀 Real-time shipping costs from our print partners
                 </p>
               </div>
 

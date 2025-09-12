@@ -1,6 +1,6 @@
 /**
  * Shipping Service
- * Handles real-time shipping quotes from B2Sign and other partners
+ * Handles real-time shipping quotes from our print partners
  */
 
 class ShippingService {
@@ -11,8 +11,8 @@ class ShippingService {
   }
 
   /**
-   * Get shipping costs from B2Sign (requires user shipping info)
-   * Uses our new B2Sign integration for real-time shipping costs
+   * Get shipping costs from our print partners (requires user shipping info)
+   * Uses our print partner integration for real-time shipping costs
    */
   async getShippingCosts(orderData, customerInfo) {
     try {
@@ -27,17 +27,17 @@ class ShippingService {
       const cacheKey = this.generateShippingCostsCacheKey(orderData, customerInfo)
       const cachedCosts = this.getCachedQuote(cacheKey)
       if (cachedCosts) {
-        console.log('📦 Using cached B2Sign shipping costs')
+        console.log('📦 Using cached shipping costs')
         return { ...cachedCosts, cache_hit: true }
       }
 
-      // Prepare request data for our new B2Sign API
+      // Prepare request data for our print partner API
       const requestData = this.prepareShippingCostsRequest(orderData, customerInfo)
       console.log('📋 Print partner request data:', requestData)
       console.log('📋 Dimensions object:', JSON.stringify(requestData.dimensions))
       console.log('📋 Customer info:', JSON.stringify(requestData.customer_info))
       
-      // Make API request to our enhanced B2Sign shipping costs endpoint
+      // Make API request to our print partner shipping costs endpoint
       // Print partner integration takes 15-60 seconds, so we need a longer timeout
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 second timeout
@@ -56,7 +56,7 @@ class ShippingService {
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error('❌ B2Sign API error:', errorData)
+        console.error('❌ Print partner API error:', errorData)
         
         // Log detailed error information for debugging
         if (errorData.detail && Array.isArray(errorData.detail)) {
@@ -66,7 +66,7 @@ class ShippingService {
           })
         }
         
-        throw new Error(JSON.stringify(errorData.detail) || 'Failed to get B2Sign shipping costs')
+        throw new Error(JSON.stringify(errorData.detail) || 'Failed to get print partner shipping costs')
       }
 
       const shippingCosts = await response.json()
@@ -369,11 +369,11 @@ class ShippingService {
   }
 
   /**
-   * Test B2Sign integration with sample data
+   * Test print partner integration with sample data
    */
-  async testB2SignIntegration() {
+  async testPrintPartnerIntegration() {
     try {
-      console.log('🧪 Testing B2Sign integration...')
+      console.log('🧪 Testing print partner integration...')
       
       const testData = {
         product_type: 'banner',
@@ -408,15 +408,15 @@ class ShippingService {
       
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.detail || 'B2Sign integration test failed')
+        throw new Error(errorData.detail || 'Print partner integration test failed')
       }
       
       const result = await response.json()
-      console.log('✅ B2Sign integration test successful:', result)
+      console.log('✅ Print partner integration test successful:', result)
       return result
       
     } catch (error) {
-      console.error('❌ B2Sign integration test failed:', error)
+      console.error('❌ Print partner integration test failed:', error)
       throw error
     }
   }
