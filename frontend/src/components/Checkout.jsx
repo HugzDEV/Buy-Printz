@@ -362,7 +362,17 @@ const Checkout = () => {
   useEffect(() => {
     console.log('🔄 Shipping option changed to:', shippingOption)
     console.log('🔄 Current shipping cost:', shippingQuotes.find(q => q.type === shippingOption)?.cost)
+    console.log('🔄 All shipping quotes:', shippingQuotes)
   }, [shippingOption, shippingQuotes])
+
+  // Add a state variable to force re-render when shipping option changes
+  const [shippingUpdateTrigger, setShippingUpdateTrigger] = useState(0)
+  
+  useEffect(() => {
+    if (shippingOption) {
+      setShippingUpdateTrigger(prev => prev + 1)
+    }
+  }, [shippingOption])
 
   const createOrder = async () => {
     try {
@@ -483,10 +493,23 @@ const Checkout = () => {
         setShippingQuotes(shippingCosts.shipping_options)
         // Auto-select Ground shipping option (first option is typically Ground)
         if (shippingCosts.shipping_options.length > 0) {
+          console.log('🔄 Available shipping options:', shippingCosts.shipping_options.map(opt => ({ type: opt.type, name: opt.name, cost: opt.cost })))
+          
+          // Look for Ground shipping option
           const groundOption = shippingCosts.shipping_options.find(opt => 
-            opt.type.toLowerCase().includes('ground') || opt.name.toLowerCase().includes('ground')
-          ) || shippingCosts.shipping_options[0]
-          setShippingOption(groundOption.type)
+            opt.type.toLowerCase().includes('ground') || 
+            opt.name.toLowerCase().includes('ground') ||
+            opt.type.toLowerCase() === 'ground'
+          )
+          
+          if (groundOption) {
+            console.log('✅ Found Ground option:', groundOption)
+            setShippingOption(groundOption.type)
+          } else {
+            // If no Ground found, select the first option (which should be Ground based on your logs)
+            console.log('⚠️ Ground option not found, selecting first option:', shippingCosts.shipping_options[0])
+            setShippingOption(shippingCosts.shipping_options[0].type)
+          }
         }
         console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
       } else {
@@ -698,7 +721,13 @@ const Checkout = () => {
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const selectedShippingQuote = shippingQuotes.find(q => q.type === shippingOption)
   const shippingCost = parseFloat(selectedShippingQuote?.cost) || 0
-  console.log('🔄 Shipping cost calculation:', { shippingOption, selectedShippingQuote, shippingCost })
+  console.log('🔄 Shipping cost calculation:', { 
+    shippingOption, 
+    selectedShippingQuote, 
+    shippingCost, 
+    shippingUpdateTrigger,
+    allQuotes: shippingQuotes 
+  })
   
   // Calculate base price from material and dimensions
   const getBasePrice = () => {
@@ -737,6 +766,15 @@ const Checkout = () => {
   const optionsTotal = sidesCost + polePocketCost + grommetCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
   const subtotal = basePrice * bannerOptions.quantity + optionsTotal + marketplaceCost
   const totalAmount = subtotal + shippingCost
+  
+  // Force recalculation when shipping changes
+  console.log('🔄 Total calculation:', { 
+    subtotal, 
+    shippingCost, 
+    totalAmount, 
+    shippingUpdateTrigger,
+    shippingOption 
+  })
 
   const getStepIcon = (step, currentStep) => {
     if (step === 'error') return <XCircle className="w-5 h-5 text-red-500" />
