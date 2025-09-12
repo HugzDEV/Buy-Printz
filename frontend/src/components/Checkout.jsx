@@ -538,10 +538,15 @@ const Checkout = () => {
     }
   }
 
-  // Handle order submission
+  // Handle order submission with Stripe payment
   const handleSubmitOrder = async () => {
     if (!customerInfo.name || !customerInfo.email) {
       toast.error('Please fill in your name and email')
+      return
+    }
+
+    if (!stripe || !elements) {
+      toast.error('Payment system not ready. Please try again.')
       return
     }
 
@@ -549,25 +554,74 @@ const Checkout = () => {
     setCheckoutStep('processing')
 
     try {
-      // Save customer information first
-      await saveCustomerInfo()
-
-      // Simulate order processing
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      // Order successful
-      setCheckoutStep('completed')
-      toast.success('Order submitted successfully!')
+      // Create order first
+      await createOrder()
       
-      // Navigate to confirmation or show success message
-      setTimeout(() => {
-        navigate('/confirmation')
-      }, 1500)
+      if (!orderId) {
+        throw new Error('Order creation failed')
+      }
+
+      // Get card element
+      const cardElement = elements.getElement(CardElement)
+      if (!cardElement) {
+        throw new Error('Payment form not found')
+      }
+
+      // Create payment intent
+      const response = await authService.authenticatedRequest('/api/payments/create-intent', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          order_id: orderId,
+          amount: Math.round((Number(totalAmount) || 0) * 100) // Convert to cents
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to create payment intent')
+      }
+
+      const { client_secret } = await response.json()
+
+      // Confirm payment with Stripe
+      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: customerInfo.name,
+            email: customerInfo.email,
+            phone: customerInfo.phone,
+            address: {
+              line1: customerInfo.address,
+              city: customerInfo.city,
+              state: customerInfo.state,
+              postal_code: customerInfo.zipCode,
+              country: 'US'
+            }
+          }
+        }
+      })
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      if (paymentIntent.status === 'succeeded') {
+        setCheckoutStep('completed')
+        toast.success('Payment successful! Order submitted successfully!')
+        
+        // Navigate to confirmation
+        setTimeout(() => {
+          navigate('/confirmation')
+        }, 1500)
+      } else {
+        throw new Error('Payment was not successful')
+      }
 
     } catch (error) {
       console.error('Order submission error:', error)
       setCheckoutStep('error')
-      toast.error('Order submission failed. Please try again.')
+      toast.error(`Order submission failed: ${error.message}`)
     } finally {
       setLoading(false)
     }
@@ -1406,7 +1460,7 @@ const Checkout = () => {
                 </button>
                 <button
                   onClick={() => continueToNextSection('shipping')}
-                  disabled={!customerInfo.name || !customerInfo.email || !customerInfo.jobName}
+                  disabled={!customerInfo.name || !customerInfo.email || !customerInfo.jobName || !shippingOption || !shippingQuotes.length}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
                 >
                   Continue to Review & Payment →
@@ -1513,7 +1567,7 @@ const Checkout = () => {
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total:</span>
                       <span className="text-blue-600">
-                        ${totalAmount}
+                        ${(Number(totalAmount) || 0).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -1545,6 +1599,37 @@ const Checkout = () => {
                       {customerInfo.address ? `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.state} ${customerInfo.zipCode}` : 'Not provided'}
                     </p>
                   </div>
+                </div>
+              </div>
+
+              {/* Payment Form */}
+              <div className="p-4 bg-white rounded-lg border border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <CreditCardIcon className="w-5 h-5 text-green-600" />
+                  Payment Information
+                </h4>
+                <div className="space-y-4">
+                  <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
+                    <CardElement
+                      options={{
+                        style: {
+                          base: {
+                            fontSize: '16px',
+                            color: '#424770',
+                            '::placeholder': {
+                              color: '#aab7c4',
+                            },
+                          },
+                          invalid: {
+                            color: '#9e2146',
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Your payment information is secure and encrypted. We accept all major credit cards.
+                  </p>
                 </div>
               </div>
 
