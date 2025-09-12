@@ -468,6 +468,8 @@ const Checkout = () => {
         }
       }
 
+      console.log('🔄 Getting shipping costs from B2Sign... This may take 15-20 seconds.')
+      
       // Get shipping costs from B2Sign
       const shippingCosts = await shippingService.getShippingCosts(shippingOrderData, customerInfo)
       
@@ -481,7 +483,13 @@ const Checkout = () => {
 
     } catch (error) {
       console.error('❌ Error getting shipping costs:', error)
-      setShippingError('Unable to get shipping costs at this time. Please try again.')
+      
+      // Handle timeout specifically
+      if (error.message.includes('timed out')) {
+        setShippingError('Shipping cost request timed out. B2Sign integration can take 15-20 seconds. Please try again.')
+      } else {
+        setShippingError('Unable to get shipping costs at this time. Please try again.')
+      }
       
       // NO FALLBACK - System must get real shipping costs from B2Sign
       setShippingQuotes([])
@@ -1302,7 +1310,7 @@ const Checkout = () => {
                       disabled={shippingLoading}
                       className="px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors disabled:opacity-50"
                     >
-                      {shippingLoading ? 'Getting Shipping Costs...' : 'Refresh Shipping Costs'}
+                      {shippingLoading ? 'Getting Shipping Costs (15-20s)...' : 'Get Shipping Costs (15-20s)'}
                     </button>
                   )}
                 </div>
@@ -1317,9 +1325,10 @@ const Checkout = () => {
                 )}
 
                 {shippingLoading && (
-                  <div className="flex items-center justify-center p-6">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                    <span className="ml-3 text-gray-600">🚀 Getting real-time shipping costs from B2Sign...</span>
+                  <div className="flex flex-col items-center justify-center p-6 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
+                    <span className="text-blue-700 font-medium mb-2">🚀 Getting real-time shipping costs from B2Sign...</span>
+                    <span className="text-blue-600 text-sm">This may take 15-20 seconds. Please wait...</span>
                   </div>
                 )}
 

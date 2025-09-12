@@ -47,7 +47,16 @@ class ShippingCostsResponse(BaseModel):
 
 @router.post("/get", response_model=ShippingCostsResponse)
 async def get_shipping_costs(request: ShippingCostsRequest):
-    """Get shipping costs from B2Sign using our complete workflow"""
+    """Get shipping costs from B2Sign using our complete workflow
+    
+    Note: This endpoint can take 15-20 seconds to complete as it:
+    1. Initializes a headless browser
+    2. Logs into B2Sign
+    3. Fills out the complete quote form
+    4. Extracts shipping options
+    
+    Frontend should handle this with appropriate timeout and loading states.
+    """
     try:
         logger.info(f"🚚 Getting shipping costs for {request.product_type} to {request.zip_code}")
         logger.info(f"📋 Request data: {request.dict()}")

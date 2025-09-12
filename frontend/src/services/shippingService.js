@@ -38,14 +38,21 @@ class ShippingService {
       console.log('📋 Customer info:', JSON.stringify(requestData.customer_info))
       
       // Make API request to our enhanced B2Sign shipping costs endpoint
+      // B2Sign integration takes 15-20 seconds, so we need a longer timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+      
       const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.getAuthToken()}`
         },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestData),
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -77,6 +84,11 @@ class ShippingService {
       return shippingCosts
 
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.error('⏰ B2Sign API request timed out after 30 seconds')
+        throw new Error('Shipping cost request timed out. B2Sign integration can take 15-20 seconds. Please try again.')
+      }
+      
       console.error('❌ Error getting B2Sign shipping costs:', error)
       throw error
     }
