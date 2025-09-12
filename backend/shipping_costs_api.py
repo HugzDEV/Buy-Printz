@@ -31,6 +31,10 @@ class ShippingCostsRequest(BaseModel):
     customer_info: Optional[Dict[str, Any]] = {}
     zip_code: str
     job_name: Optional[str] = None
+    
+    class Config:
+        # Allow extra fields to be more flexible
+        extra = "allow"
 
 class ShippingCostsResponse(BaseModel):
     success: bool
@@ -46,6 +50,7 @@ async def get_shipping_costs(request: ShippingCostsRequest):
     """Get shipping costs from B2Sign using our complete workflow"""
     try:
         logger.info(f"🚚 Getting shipping costs for {request.product_type} to {request.zip_code}")
+        logger.info(f"📋 Request data: {request.dict()}")
         
         # Validate required fields
         if not request.zip_code:
@@ -117,7 +122,28 @@ async def get_shipping_costs(request: ShippingCostsRequest):
         raise
     except Exception as e:
         logger.error(f"❌ Error getting B2Sign shipping costs: {e}")
+        import traceback
+        logger.error(f"❌ Full traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.post("/validate")
+async def validate_shipping_request(request_data: dict):
+    """Validate shipping request data to help debug 422 errors"""
+    try:
+        # Try to create the request model
+        request = ShippingCostsRequest(**request_data)
+        return {
+            "valid": True,
+            "message": "Request data is valid",
+            "parsed_data": request.dict()
+        }
+    except Exception as e:
+        return {
+            "valid": False,
+            "error": str(e),
+            "error_type": type(e).__name__,
+            "received_data": request_data
+        }
 
 @router.get("/health")
 async def health_check():
@@ -159,8 +185,9 @@ async def test_shipping_costs():
             'job_name': 'Test Shipping Costs'
         }
         
-        # Get shipping costs
-        shipping_result = await get_shipping_costs_playwright(test_request)
+        # Create request object and get shipping costs
+        request = ShippingCostsRequest(**test_request)
+        shipping_result = await get_shipping_costs(request)
         
         return {
             "success": True,
@@ -174,6 +201,39 @@ async def test_shipping_costs():
             "success": False,
             "error": str(e),
             "timestamp": datetime.now().isoformat()
+        }
+
+@router.post("/debug")
+async def debug_shipping_request(request_data: dict):
+    """Debug endpoint to see exactly what data is being received"""
+    try:
+        logger.info(f"🔍 Debug request received: {request_data}")
+        
+        # Try to parse the request
+        try:
+            request = ShippingCostsRequest(**request_data)
+            logger.info(f"✅ Request parsed successfully: {request.dict()}")
+            return {
+                "status": "success",
+                "message": "Request parsed successfully",
+                "parsed_data": request.dict(),
+                "original_data": request_data
+            }
+        except Exception as parse_error:
+            logger.error(f"❌ Request parsing failed: {parse_error}")
+            return {
+                "status": "parse_error",
+                "error": str(parse_error),
+                "error_type": type(parse_error).__name__,
+                "original_data": request_data
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Debug endpoint error: {e}")
+        return {
+            "status": "error",
+            "error": str(e),
+            "original_data": request_data
         }
 
 if __name__ == "__main__":
