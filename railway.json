@@ -5,7 +5,7 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "healthcheckPath": "/health",
+    "healthcheckPath": "/api/shipping-costs/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
@@ -14,11 +14,7 @@
     "production": {
       "variables": {
         "ENVIRONMENT": "production",
-        "CHROME_BINARY_PATH": "/usr/bin/google-chrome",
-        "CHROMEDRIVER_PATH": "/usr/local/bin/chromedriver",
-        "CHROME_HEADLESS": "true",
-        "CHROME_NO_SANDBOX": "true",
-        "CHROME_DISABLE_DEV_SHM": "true",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
         "B2SIGN_USERNAME": "order@buyprintz.com",
         "B2SIGN_PASSWORD": "$AG@BuyPr!n1z"
       }
