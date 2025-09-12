@@ -29,7 +29,7 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Create startup script with proper Python path
-RUN echo '#!/bin/sh\nexport PYTHONPATH=/app:$PYTHONPATH\npython -m uvicorn backend.shipping_costs_api:router --host 0.0.0.0 --port ${PORT:-8080}' > /start.sh && chmod +x /start.sh
+RUN echo '#!/bin/sh\nexport PYTHONPATH=/app:$PYTHONPATH\npython -m uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}' > /start.sh && chmod +x /start.sh
 
 # Start the application
 CMD ["/start.sh"]
