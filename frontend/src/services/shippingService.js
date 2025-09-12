@@ -261,7 +261,7 @@ class ShippingService {
       dimensions: orderData.dimensions || { width: 2, height: 4 },
       quantity: orderData.quantity || 1,
       zip_code: customerInfo?.zipCode || customerInfo?.zip_code || '',
-      job_name: orderData.job_name || `Shipping Costs ${Date.now()}`,
+      job_name: customerInfo?.jobName || orderData.job_name || `Shipping Costs ${Date.now()}`,
       print_options: {},
       accessories: [],
       customer_info: customerInfo

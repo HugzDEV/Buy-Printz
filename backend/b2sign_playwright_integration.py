@@ -41,27 +41,46 @@ class B2SignPlaywrightIntegration:
         }
         
     async def initialize(self):
-        """Initialize Playwright browser"""
+        """Initialize Playwright browser for production (headless only)"""
         try:
-            logger.info("🚀 Initializing Playwright browser...")
+            logger.info("🚀 Initializing Playwright browser (headless mode)...")
             self.playwright = await async_playwright().start()
             
-            # Launch browser with proper settings for Railway
+            # Production browser configuration - ALWAYS headless for security
             self.browser = await self.playwright.chromium.launch(
-                headless=True,  # Changed to headless for production
+                headless=True,  # ALWAYS headless - never show browser to users
                 args=[
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
                     '--disable-gpu',
                     '--disable-web-security',
-                    '--disable-features=VizDisplayCompositor'
+                    '--disable-features=VizDisplayCompositor',
+                    '--disable-background-timer-throttling',
+                    '--disable-backgrounding-occluded-windows',
+                    '--disable-renderer-backgrounding',
+                    '--disable-extensions',
+                    '--disable-plugins',
+                    '--disable-images',  # Faster loading
+                    '--disable-javascript',  # We'll enable it per page if needed
+                    '--no-first-run',
+                    '--no-default-browser-check',
+                    '--disable-default-apps',
+                    '--disable-sync',
+                    '--disable-translate',
+                    '--hide-scrollbars',
+                    '--mute-audio',
+                    '--no-zygote',
+                    '--single-process'  # Better for containerized environments
                 ]
             )
             
-            # Create context with proper settings
+            # Create context with production settings
             self.context = await self.browser.new_context(
                 viewport={'width': 1920, 'height': 1080},
-                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                java_script_enabled=True,  # Enable JS for B2Sign
+                accept_downloads=False,
+                ignore_https_errors=True
             )
             
             self.page = await self.context.new_page()
@@ -70,7 +89,7 @@ class B2SignPlaywrightIntegration:
             if not self.page:
                 raise Exception("Failed to create browser page")
             
-            logger.info("✅ Playwright browser initialized successfully")
+            logger.info("✅ Playwright browser initialized successfully (headless mode)")
             return True
             
         except Exception as e:

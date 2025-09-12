@@ -79,7 +79,8 @@ const Checkout = () => {
     address: '',
     city: '',
     state: '',
-    zipCode: ''
+    zipCode: '',
+    jobName: ''
   })
   
   // Add authentication state
@@ -1236,6 +1237,19 @@ const Checkout = () => {
                 </div>
               </div>
 
+              {/* Job Name Field */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Job Name (Required for B2Sign)</label>
+                <input
+                  type="text"
+                  value={customerInfo.jobName}
+                  onChange={(e) => handleInputChange('jobName', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 active:border-blue-500 focus:outline-none focus:shadow-lg"
+                  placeholder="Enter a name for this order (e.g., 'Company Banner - Q1 2024')"
+                />
+                <p className="text-sm text-gray-500 mt-1">This helps identify your order in our system and with our printing partner.</p>
+              </div>
+
               {/* Navigation */}
               <div className="flex justify-between pt-4 border-t border-gray-200">
                 <button
@@ -1246,7 +1260,7 @@ const Checkout = () => {
                 </button>
                 <button
                   onClick={() => continueToNextSection('customerInfo')}
-                  disabled={!customerInfo.name || !customerInfo.email}
+                  disabled={!customerInfo.name || !customerInfo.email || !customerInfo.jobName}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
                 >
                   Continue to Shipping →
@@ -1379,7 +1393,7 @@ const Checkout = () => {
                 </button>
                 <button
                   onClick={() => continueToNextSection('shipping')}
-                  disabled={!customerInfo.name || !customerInfo.email}
+                  disabled={!customerInfo.name || !customerInfo.email || !customerInfo.jobName}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
                 >
                   Continue to Review & Payment →
