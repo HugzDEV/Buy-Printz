@@ -777,13 +777,14 @@ class B2SignPlaywrightIntegration:
             logger.info("📝 Filling customer address modal...")
             
             # Fill address fields using exact selectors from proven workflow
+            # Using real address: 816 Morton Street, Apt 1, Boston, MA 02124
             address_fields = [
                 ('input[name="fullname"]', 'John Doe'),
                 ('input[name="company"]', 'BuyPrintz Inc'),
                 ('input[name="telephone"]', '555-123-4567'),
-                ('input[placeholder="Street address"]', '123 Main St'),
-                ('input[name="suburb"]', 'Suite 100'),
-                ('input[name="city"]', 'Beverly Hills'),
+                ('input[placeholder="Street address"]', '816 Morton Street'),  # REAL STREET ADDRESS
+                ('input[name="suburb"]', 'Apt 1'),
+                ('input[name="city"]', 'Boston'),
                 ('input[name="postcode"]', str(zip_code))
             ]
             
@@ -817,7 +818,7 @@ class B2SignPlaywrightIntegration:
                 if hidden_state_select:
                     logger.info("✅ Found hidden state select element")
                     try:
-                        # Try to make the element visible and select CA
+                        # Try to make the element visible and select MA
                         await page.evaluate('''(element) => {
                             element.style.display = 'block';
                             element.style.visibility = 'visible';
@@ -825,18 +826,32 @@ class B2SignPlaywrightIntegration:
                         }''', hidden_state_select)
                         
                         await page.wait_for_timeout(1000)
-                        await hidden_state_select.select_option('CA')
-                        logger.info("✅ Selected CA state using hidden select")
+                        await hidden_state_select.select_option('MA')
+                        logger.info("✅ Selected MA state using hidden select")
                         state_selected = True
                     except Exception as e:
-                        logger.warning(f"Could not select CA from hidden select: {e}")
+                        logger.warning(f"Could not select MA from hidden select: {e}")
                         # Try JavaScript approach as fallback
                         try:
+                            # Try multiple JavaScript approaches
                             await page.evaluate('''(element) => {
-                                element.value = 'CA';
+                                element.value = 'MA';
+                                element.dispatchEvent(new Event('change', { bubbles: true }));
+                                element.dispatchEvent(new Event('input', { bubbles: true }));
+                            }''', hidden_state_select)
+                            
+                            # Also try setting the selectedIndex
+                            await page.evaluate('''(element) => {
+                                for (let i = 0; i < element.options.length; i++) {
+                                    if (element.options[i].value === 'MA' || element.options[i].text.includes('Massachusetts')) {
+                                        element.selectedIndex = i;
+                                        break;
+                                    }
+                                }
                                 element.dispatchEvent(new Event('change', { bubbles: true }));
                             }''', hidden_state_select)
-                            logger.info("✅ Set CA state using JavaScript")
+                            
+                            logger.info("✅ Set MA state using JavaScript")
                             state_selected = True
                         except Exception as e2:
                             logger.warning(f"JavaScript approach also failed: {e2}")
@@ -867,16 +882,16 @@ class B2SignPlaywrightIntegration:
                                         
                                         await element.click()
                                         await page.wait_for_timeout(1000)
-                                        await input_field.fill('CA')
+                                        await input_field.fill('MA')
                                         await page.wait_for_timeout(1000)
                                         
-                                        ca_options = await page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
-                                        for option in ca_options:
+                                        ma_options = await page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
+                                        for option in ma_options:
                                             try:
                                                 option_text = await option.inner_text()
-                                                if 'california' in option_text.lower() or 'ca' in option_text.lower():
+                                                if 'massachusetts' in option_text.lower() or 'ma' in option_text.lower():
                                                     await option.click()
-                                                    logger.info(f"✅ Selected state: CA (using autocomplete {i+1})")
+                                                    logger.info(f"✅ Selected state: MA (using autocomplete {i+1})")
                                                     state_selected = True
                                                     break
                                             except:
@@ -906,7 +921,7 @@ class B2SignPlaywrightIntegration:
             logger.warning(f"⚠️ Error filling customer address modal: {e}")
 
     async def _fill_banner_dimensions(self, width, height):
-        """Fill banner dimensions using proven MUI selectors"""
+        """Fill banner dimensions using improved precision field detection"""
         try:
             logger.info(f"📏 Filling banner dimensions: {width}ft x {height}ft")
             
@@ -917,28 +932,75 @@ class B2SignPlaywrightIntegration:
             height_ft = int(height)
             height_in = int((height - height_ft) * 12) if height > height_ft else 0
             
-            # Use exact MUI selectors from proven workflow
+            # Look for MUI input fields for dimensions
             mui_inputs = await self.page.query_selector_all('.MuiInput-input')
-            logger.info(f"Found {len(mui_inputs)} MUI input fields for dimensions")
+            logger.info(f"Found {len(mui_inputs)} MUI input fields total")
             
-            # Fill dimension inputs using MUI selectors (skip login inputs at index 0-1)
-            # The 4 dimension fields are: width_ft, width_in, height_ft, height_in
-            for i, input_elem in enumerate(mui_inputs[2:6]):  # Skip login inputs, use dimension inputs
+            # Look for dimension-specific input fields - BE MORE SPECIFIC
+            dimension_inputs = []
+            
+            # Method 1: Look for inputs with specific attributes that suggest dimensions
+            all_inputs = await self.page.query_selector_all('input')
+            logger.info(f"🔍 Found {len(all_inputs)} total input elements")
+            
+            for i, input_elem in enumerate(all_inputs):
                 try:
-                    if i == 0: 
-                        await input_elem.fill(str(width_ft))
-                        logger.info(f"✅ Filled width feet: {width_ft}")
-                    elif i == 1: 
-                        await input_elem.fill(str(width_in))
-                        logger.info(f"✅ Filled width inches: {width_in}")
-                    elif i == 2: 
-                        await input_elem.fill(str(height_ft))
-                        logger.info(f"✅ Filled height feet: {height_ft}")
-                    elif i == 3: 
-                        await input_elem.fill(str(height_in))
-                        logger.info(f"✅ Filled height inches: {height_in}")
+                    # Check if this input is visible and editable
+                    is_visible = await input_elem.is_visible()
+                    is_editable = await input_elem.is_editable()
+                    
+                    if is_visible and is_editable:
+                        # Get input attributes
+                        placeholder = await input_elem.get_attribute('placeholder') or ''
+                        name = await input_elem.get_attribute('name') or ''
+                        input_type = await input_elem.get_attribute('type') or ''
+                        value = await input_elem.get_attribute('value') or ''
+                        
+                        # Look for dimension-related attributes
+                        if (input_type in ['number', 'text'] and 
+                            (any(keyword in (placeholder + name + value).lower() for keyword in ['width', 'height', 'feet', 'inches', 'dimension']) or
+                             placeholder == '' or value == '0')):
+                            
+                            dimension_inputs.append(input_elem)
+                            logger.info(f"🔍 Found potential dimension input {len(dimension_inputs)}: placeholder='{placeholder}', name='{name}', type='{input_type}', value='{value}'")
+                            
+                            # Stop when we have 4 dimension inputs
+                            if len(dimension_inputs) >= 4:
+                                break
                 except Exception as e:
-                    logger.warning(f"⚠️ Could not fill dimension input {i}: {e}")
+                    logger.warning(f"  Error checking input {i}: {e}")
+                    continue
+            
+            # Method 2: If we didn't find enough, use the MUI inputs approach with better filtering
+            if len(dimension_inputs) < 4:
+                logger.info("🔍 Using MUI inputs approach for dimensions...")
+                # Look for MUI inputs that are visible and editable
+                for input_elem in mui_inputs:
+                    try:
+                        is_visible = await input_elem.is_visible()
+                        is_editable = await input_elem.is_editable()
+                        
+                        if is_visible and is_editable and input_elem not in dimension_inputs:
+                            dimension_inputs.append(input_elem)
+                            logger.info(f"🔍 Added MUI input {len(dimension_inputs)} to dimensions")
+                            
+                            if len(dimension_inputs) >= 4:
+                                break
+                    except:
+                        continue
+            
+            logger.info(f"🔍 Using {len(dimension_inputs)} inputs for dimensions")
+            
+            # Fill the 4 dimension fields: width_ft, width_in, height_ft, height_in
+            dimension_values = [str(width_ft), str(width_in), str(height_ft), str(height_in)]
+            dimension_names = ['width feet', 'width inches', 'height feet', 'height inches']
+            
+            for i, (input_elem, value, name) in enumerate(zip(dimension_inputs, dimension_values, dimension_names)):
+                try:
+                    await input_elem.fill(value)
+                    logger.info(f"✅ Filled {name}: {value}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not fill {name}: {e}")
                     continue
                     
         except Exception as e:
