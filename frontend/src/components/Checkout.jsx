@@ -361,9 +361,17 @@ const Checkout = () => {
   // Force re-render when shipping option changes to update total
   useEffect(() => {
     console.log('🔄 Shipping option changed to:', shippingOption)
-    console.log('🔄 Current shipping cost:', shippingQuotes.find(q => q.type === shippingOption)?.cost)
+    console.log('🔄 Current shipping cost:', shippingQuotes.find(q => q.name === shippingOption)?.cost)
     console.log('🔄 All shipping quotes:', shippingQuotes)
   }, [shippingOption, shippingQuotes])
+
+  // Create payment intent when we have order ID and shipping costs loaded
+  useEffect(() => {
+    if (orderId && shippingQuotes.length > 0 && shippingOption && !paymentIntent) {
+      console.log('🔄 Creating payment intent with final total including shipping')
+      createPaymentIntent(orderId)
+    }
+  }, [orderId, shippingQuotes, shippingOption, paymentIntent])
 
   // Add a state variable to force re-render when shipping option changes
   const [shippingUpdateTrigger, setShippingUpdateTrigger] = useState(0)
@@ -401,7 +409,7 @@ const Checkout = () => {
       
       if (data.success) {
         setOrderId(data.order_id)
-        createPaymentIntent(data.order_id)
+        // Don't create payment intent yet - wait until shipping costs are loaded
         setCheckoutStep('preview') // Show preview before payment
         toast.success('Order created successfully!')
       } else {
@@ -513,6 +521,8 @@ const Checkout = () => {
           }
         }
         console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
+        
+        // Payment intent will be created in useEffect when totalAmount is calculated
       } else {
         setShippingError('No shipping options available at this time')
         console.warn('⚠️ No shipping options received from print partners')
@@ -600,21 +610,12 @@ const Checkout = () => {
         throw new Error('Payment form not found')
       }
 
-      // Create payment intent
-      const response = await authService.authenticatedRequest('/api/payments/create-intent', {
-        method: 'POST',
-        body: JSON.stringify({ 
-          order_id: orderId,
-          amount: Math.round((Number(totalAmount) || 0) * 100) // Convert to cents
-        })
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Failed to create payment intent')
+      // Payment intent should already be created with correct amount
+      if (!paymentIntent) {
+        throw new Error('Payment intent not ready. Please wait for shipping costs to load.')
       }
 
-      const { client_secret } = await response.json()
+      const { client_secret } = paymentIntent
 
       // Confirm payment with Stripe
       const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
