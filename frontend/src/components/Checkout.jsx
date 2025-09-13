@@ -377,6 +377,7 @@ const Checkout = () => {
   useEffect(() => {
     if (orderId && paymentIntent && shippingQuotes.length > 0 && shippingOption) {
       console.log('🔄 Updating payment intent with final total including shipping')
+      console.log('🔄 Current state:', { orderId, paymentIntent: !!paymentIntent, shippingQuotes: shippingQuotes.length, shippingOption })
       createPaymentIntent(orderId) // This will update the existing payment intent
     }
   }, [shippingQuotes, shippingOption])
@@ -640,7 +641,7 @@ const Checkout = () => {
       const { client_secret } = paymentIntent
 
       // Confirm payment with Stripe
-      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+      const { error, paymentIntent: stripePaymentIntent } = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
           card: cardElement,
           billing_details: {
@@ -662,7 +663,7 @@ const Checkout = () => {
         throw new Error(error.message)
       }
 
-      if (paymentIntent.status === 'succeeded') {
+      if (stripePaymentIntent.status === 'succeeded') {
         setCheckoutStep('completed')
         toast.success('Payment successful! Order submitted successfully!')
         
