@@ -1575,7 +1575,7 @@ const Checkout = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Banner Design:</span>
-                    <span className="font-medium">${basePrice * bannerOptions.quantity}</span>
+                    <span className="font-medium">${(basePrice * bannerOptions.quantity).toFixed(2)}</span>
                   </div>
                   
                   {/* Marketplace Templates */}
@@ -1647,7 +1647,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingQuotes.find(q => q.name === shippingOption)?.cost ? `$${shippingQuotes.find(q => q.name === shippingOption).cost}` : 'Calculating...'}
+                      {shippingQuotes.find(q => q.name === shippingOption)?.cost || 'Calculating...'}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -1814,7 +1814,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingQuotes.find(q => q.name === shippingOption)?.cost ? `$${shippingQuotes.find(q => q.name === shippingOption).cost}` : 'Calculating...'}
+                      {shippingQuotes.find(q => q.name === shippingOption)?.cost || 'Calculating...'}
                     </span>
                   </div>
                   
