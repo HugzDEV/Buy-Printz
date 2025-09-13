@@ -698,6 +698,7 @@ async def save_order_customer_info(
 # Payment request model
 class PaymentIntentRequest(BaseModel):
     order_id: str
+    amount: Optional[float] = None  # Optional: if provided, use this amount instead of order total
 
 # Customer information model
 class CustomerInfoRequest(BaseModel):
@@ -724,9 +725,12 @@ async def create_payment_intent(
         if not order or order["user_id"] != current_user["user_id"]:
             raise HTTPException(status_code=404, detail="Order not found")
         
+        # Use provided amount if available, otherwise use order total
+        amount = request.amount if request.amount is not None else order["total_amount"]
+        
         # Create payment intent
         payment_intent = stripe.PaymentIntent.create(
-            amount=int(order["total_amount"] * 100),  # Convert to cents
+            amount=int(amount * 100),  # Convert to cents
             currency="usd",
             metadata={
                 "order_id": request.order_id,

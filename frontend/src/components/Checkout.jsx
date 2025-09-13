@@ -433,9 +433,20 @@ const Checkout = () => {
 
   const createPaymentIntent = async (orderId) => {
     try {
+      // Calculate current total including shipping
+      const selectedShippingQuote = shippingQuotes.find(q => q.name === shippingOption)
+      const shippingCost = parseFloat(selectedShippingQuote?.cost?.replace('$', '') || '0') || 0
+      const currentTotal = subtotal + shippingCost
+      
+      console.log('🔄 Creating payment intent with amount:', currentTotal)
+      console.log('🔄 Breakdown:', { subtotal, shippingCost, currentTotal })
+      
       const response = await authService.authenticatedRequest('/api/payments/create-intent', {
         method: 'POST',
-        body: JSON.stringify({ order_id: orderId })
+        body: JSON.stringify({ 
+          order_id: orderId,
+          amount: currentTotal
+        })
       })
       
       if (!response.ok) {
@@ -626,7 +637,7 @@ const Checkout = () => {
       const { client_secret } = paymentIntent
 
       // Confirm payment with Stripe
-      const { error, paymentIntent: confirmedPaymentIntent } = await stripe.confirmCardPayment(client_secret, {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
           card: cardElement,
           billing_details: {
@@ -648,7 +659,7 @@ const Checkout = () => {
         throw new Error(error.message)
       }
 
-      if (confirmedPaymentIntent.status === 'succeeded') {
+      if (paymentIntent.status === 'succeeded') {
         setCheckoutStep('completed')
         toast.success('Payment successful! Order submitted successfully!')
         
