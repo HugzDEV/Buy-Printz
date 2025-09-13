@@ -100,15 +100,20 @@ const TentCheckout = () => {
     tentType: 'event-tent',
     material: '6oz-tent-fabric',
     frameType: '40mm-aluminum-hex',
-    printMethod: 'dye-sublimation'
+    printMethod: 'dye-sublimation',
+    reinforcedStripColor: 'white', // Default included option: white or black
+    tentPackage: 'complete-tent', // complete-tent or canopy-graphic-only
+    wallOption: 'no-walls' // no-walls, half-walls, full-walls
   })
 
-  // Accessories
+  // Accessories - conditional based on tent package
   const [selectedAccessories, setSelectedAccessories] = useState([])
   const accessories = [
-    { id: 'carrying-bag', name: 'Carrying Bag w/ Wheels', price: 49.99, description: 'Premium wheeled bag for easy transport' },
-    { id: 'sandbags', name: 'Sandbags', price: 24.99, description: 'Heavy-duty sandbags for tent stability (sand not included)' },
-    { id: 'ropes-stakes', name: 'Reinforced Strip', price: 19.99, description: 'Professional tent ropes and stakes' }
+    { id: 'carrying-bag-wheels', name: 'Carrying Bag w/ Wheels', price: 74.99, description: 'Premium wheeled bag for easy transport (upgrade from standard bag)' },
+    // Sandbags only available for canopy-only orders (included free in complete tent)
+    ...(tentSpecs.tentPackage === 'canopy-graphic-only' ? [
+      { id: 'sandbags', name: 'Sandbags', price: 74.99, description: 'Heavy-duty sandbags for tent stability (sand not included)' }
+    ] : [])
   ]
 
   // Customer information
@@ -462,6 +467,20 @@ const TentCheckout = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tent Package
+                    </label>
+                    <select
+                      value={tentSpecs.tentPackage}
+                      onChange={(e) => setTentSpecs(prev => ({ ...prev, tentPackage: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="complete-tent">Complete Tent (Frame + Canopy)</option>
+                      <option value="canopy-graphic-only">Canopy Graphic Only (You Have Frame)</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Tent Size
                     </label>
                     <select
@@ -469,11 +488,13 @@ const TentCheckout = () => {
                       onChange={(e) => setTentSpecs(prev => ({ ...prev, tentSize: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
-                      <option value="10x10">10x10 Event Tent - $299.99</option>
-                      <option value="10x20">10x20 Event Tent - $499.99</option>
+                      <option value="10x10">10x10 Event Tent - $599.99</option>
+                      <option value="10x20">10x20 Event Tent - $599.99</option>
                     </select>
                   </div>
-                  
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Material
@@ -481,6 +502,10 @@ const TentCheckout = () => {
                     <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-600">
                       6oz Tent Fabric (600x600 denier)
                     </div>
+                  </div>
+                  
+                  <div>
+                    {/* Empty div for grid alignment */}
                   </div>
                 </div>
 
@@ -504,6 +529,37 @@ const TentCheckout = () => {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Reinforced Strip Color
+                    </label>
+                    <select
+                      value={tentSpecs.reinforcedStripColor}
+                      onChange={(e) => setTentSpecs(prev => ({ ...prev, reinforcedStripColor: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="white">White</option>
+                      <option value="black">Black</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Wall Options
+                    </label>
+                    <select
+                      value={tentSpecs.wallOption}
+                      onChange={(e) => setTentSpecs(prev => ({ ...prev, wallOption: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="no-walls">No Walls (Canopy Only)</option>
+                      <option value="half-walls">Half Walls - $175.00</option>
+                      <option value="full-walls">Full Walls - $230.00</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div className="bg-blue-50 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-blue-600 mt-0.5" />
@@ -515,6 +571,8 @@ const TentCheckout = () => {
                         <li>• Telescopic legs with height adjustment</li>
                         <li>• Interior lattice expansion system</li>
                         <li>• Heavy duty aluminum hardware</li>
+                        <li>• Standard carrying bag included (FREE)</li>
+                        <li>• Ropes & stakes included (FREE)</li>
                       </ul>
                     </div>
                   </div>

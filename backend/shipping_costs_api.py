@@ -13,6 +13,7 @@ import asyncio
 from datetime import datetime
 
 from backend.b2sign_playwright_integration import B2SignPlaywrightIntegration
+from backend.tent_shipping_service import get_tent_shipping_costs
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -34,6 +35,19 @@ class ShippingCostsRequest(BaseModel):
     
     class Config:
         # Allow extra fields to be more flexible
+        extra = "allow"
+
+class TentShippingCostsRequest(BaseModel):
+    """Request model for tent shipping costs from TentCheckout.jsx"""
+    tentSize: str  # '10x10' or '10x20'
+    tentPackage: str  # 'complete-tent' or 'canopy-graphic-only'
+    reinforcedStripColor: str  # 'white' or 'black'
+    wallOption: str  # 'no-walls', 'half-walls', or 'full-walls'
+    selectedAccessories: List[str]  # List of accessory IDs
+    quantity: int = 1
+    customer_info: Dict[str, Any]  # Customer information from TentCheckout.jsx
+    
+    class Config:
         extra = "allow"
 
 class ShippingCostsResponse(BaseModel):
@@ -258,6 +272,69 @@ async def test_shipping_costs():
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
+
+@router.post("/tent", response_model=ShippingCostsResponse)
+async def get_tent_shipping_costs(request: TentShippingCostsRequest):
+    """Get shipping costs for tent products using the proven B2Sign workflow
+    
+    This endpoint accepts data directly from TentCheckout.jsx and maps it to B2Sign format.
+    """
+    try:
+        logger.info("🏕️ Getting tent shipping costs from TentCheckout.jsx data...")
+        logger.info(f"📋 Tent order data: {request.dict()}")
+        
+        # Extract order data and customer info
+        order_data = {
+            'tentSize': request.tentSize,
+            'tentPackage': request.tentPackage,
+            'reinforcedStripColor': request.reinforcedStripColor,
+            'wallOption': request.wallOption,
+            'selectedAccessories': request.selectedAccessories,
+            'quantity': request.quantity
+        }
+        
+        customer_info = request.customer_info
+        
+        # Validate required customer info
+        required_fields = ['name', 'email', 'phone', 'address', 'city', 'state', 'zipCode']
+        for field in required_fields:
+            if not customer_info.get(field):
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Missing required customer field: {field}"
+                )
+        
+        # Get shipping costs using the tent shipping service
+        result = await get_tent_shipping_costs(order_data, customer_info)
+        
+        if result['success']:
+            logger.info(f"✅ Tent shipping costs retrieved successfully: {len(result['shipping_options'])} options")
+            return ShippingCostsResponse(
+                success=True,
+                shipping_options=result['shipping_options'],
+                errors=result.get('errors', []),
+                b2sign_product_url=result.get('b2sign_product_url'),
+                extracted_at=result.get('extracted_at')
+            )
+        else:
+            logger.error(f"❌ Failed to get tent shipping costs: {result.get('errors', [])}")
+            return ShippingCostsResponse(
+                success=False,
+                shipping_options=[],
+                errors=result.get('errors', ['Unknown error occurred']),
+                extracted_at=datetime.now().isoformat()
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error in tent shipping endpoint: {e}")
+        return ShippingCostsResponse(
+            success=False,
+            shipping_options=[],
+            errors=[str(e)],
+            extracted_at=datetime.now().isoformat()
+        )
 
 @router.post("/debug")
 async def debug_shipping_request(request_data: dict):
