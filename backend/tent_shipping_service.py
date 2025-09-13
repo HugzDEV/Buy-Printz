@@ -9,8 +9,8 @@ import asyncio
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from b2sign_playwright_integration import B2SignPlaywrightIntegration
-from tent_workflow import TentWorkflow
+from backend.b2sign_playwright_integration import B2SignPlaywrightIntegration
+from backend.tent_workflow import TentWorkflow
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
