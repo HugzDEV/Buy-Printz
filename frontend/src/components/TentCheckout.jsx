@@ -94,16 +94,16 @@ const TentCheckout = () => {
   const [shippingError, setShippingError] = useState(null)
   const [selectedShippingOption, setSelectedShippingOption] = useState('standard')
 
-  // Tent specifications
+  // Tent specifications - should come from order data, not be selectable
   const [tentSpecs, setTentSpecs] = useState({
     tentSize: '10x10',
     tentType: 'event-tent',
     material: '6oz-tent-fabric',
     frameType: '40mm-aluminum-hex',
     printMethod: 'dye-sublimation',
-    reinforcedStripColor: 'white', // Default included option: white or black
-    tentPackage: 'complete-tent', // complete-tent or canopy-graphic-only
-    wallOption: 'no-walls' // no-walls, half-walls, full-walls
+    reinforcedStripColor: 'white',
+    tentPackage: 'complete-tent',
+    wallOption: 'no-walls'
   })
 
   // Accessories - conditional based on tent package
@@ -149,6 +149,24 @@ const TentCheckout = () => {
         // Use the design option from the order data (set in BannerSidebar)
         console.log('🎨 TentCheckout - Using design option from order data:', parsed.design_option || parsed.tent_design_option)
         setOrderData(parsed)
+        
+        // Load tent specs from order data instead of using defaults
+        if (parsed.tent_specs) {
+          setTentSpecs(parsed.tent_specs)
+        } else {
+          // Fallback to extracting from order data fields
+          setTentSpecs({
+            tentSize: parsed.tent_size || '10x10',
+            tentType: parsed.tent_type || 'event-tent',
+            material: parsed.tent_material || '6oz-tent-fabric',
+            frameType: parsed.tent_frame_type || '40mm-aluminum-hex',
+            printMethod: parsed.tent_print_method || 'dye-sublimation',
+            reinforcedStripColor: parsed.reinforced_strip_color || 'white',
+            tentPackage: parsed.tent_package || 'complete-tent',
+            wallOption: parsed.wall_option || 'no-walls'
+          })
+        }
+        
         console.log('Loaded tent order data:', parsed)
       } catch (error) {
         console.error('Error parsing tent order data:', error)
@@ -184,14 +202,34 @@ const TentCheckout = () => {
     }
   }, [expandedSections.shipping, orderData, customerInfo.zipCode])
 
-  // Calculate tent pricing
+  // Calculate tent pricing based on actual tent specifications
   const calculateTentPrice = () => {
-    const basePrice = tentSpecs.tentSize === '10x10' ? 299.99 : 499.99
+    // Base tent pricing (from order data or default)
+    let basePrice = 0
+    
+    // Get pricing from order data if available
+    if (orderData?.tent_pricing) {
+      basePrice = orderData.tent_pricing.base_price || 0
+    } else {
+      // Fallback pricing based on tent size
+      basePrice = tentSpecs.tentSize === '10x10' ? 599.99 : 899.99
+    }
+    
+    // Add wall option pricing
+    let wallPrice = 0
+    if (tentSpecs.wallOption === 'half-walls') {
+      wallPrice = 175.00
+    } else if (tentSpecs.wallOption === 'full-walls') {
+      wallPrice = 230.00
+    }
+    
+    // Add accessories
     const accessoriesTotal = selectedAccessories.reduce((total, accessoryId) => {
       const accessory = accessories.find(a => a.id === accessoryId)
       return total + (accessory ? accessory.price : 0)
     }, 0)
-    return basePrice + accessoriesTotal
+    
+    return basePrice + wallPrice + accessoriesTotal
   }
 
   const totalPrice = calculateTentPrice()
@@ -456,7 +494,7 @@ const TentCheckout = () => {
               </div>
             </CollapsibleSection>
 
-            {/* Tent Details */}
+            {/* Tent Details - Display Only (from editor specs) */}
             <CollapsibleSection
               title="Tent Specifications"
               icon={Layers}
@@ -464,33 +502,28 @@ const TentCheckout = () => {
               onToggle={() => toggleSection('accessories')}
             >
               <div className="space-y-4">
+                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <Layers className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                  <p className="text-blue-700">Tent specifications are configured in the editor</p>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Tent Package
                     </label>
-                    <select
-                      value={tentSpecs.tentPackage}
-                      onChange={(e) => setTentSpecs(prev => ({ ...prev, tentPackage: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="complete-tent">Complete Tent (Frame + Canopy)</option>
-                      <option value="canopy-graphic-only">Canopy Graphic Only (You Have Frame)</option>
-                    </select>
+                    <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-600">
+                      {tentSpecs.tentPackage === 'complete-tent' ? 'Complete Tent (Frame + Canopy)' : 'Canopy Graphic Only (You Have Frame)'}
+                    </div>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Tent Size
                     </label>
-                    <select
-                      value={tentSpecs.tentSize}
-                      onChange={(e) => setTentSpecs(prev => ({ ...prev, tentSize: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="10x10">10x10 Event Tent - $599.99</option>
-                      <option value="10x20">10x20 Event Tent - $599.99</option>
-                    </select>
+                    <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-600">
+                      {tentSpecs.tentSize} Event Tent
+                    </div>
                   </div>
                 </div>
 
@@ -505,12 +538,6 @@ const TentCheckout = () => {
                   </div>
                   
                   <div>
-                    {/* Empty div for grid alignment */}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Frame Type
                     </label>
@@ -518,7 +545,9 @@ const TentCheckout = () => {
                       40mm Aluminum Hex Hardware
                     </div>
                   </div>
-                  
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Print Method
@@ -527,36 +556,27 @@ const TentCheckout = () => {
                       Dye-Sublimation Graphic
                     </div>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Reinforced Strip Color
                     </label>
-                    <select
-                      value={tentSpecs.reinforcedStripColor}
-                      onChange={(e) => setTentSpecs(prev => ({ ...prev, reinforcedStripColor: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="white">White</option>
-                      <option value="black">Black</option>
-                    </select>
+                    <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-600">
+                      {tentSpecs.reinforcedStripColor.charAt(0).toUpperCase() + tentSpecs.reinforcedStripColor.slice(1)}
+                    </div>
                   </div>
-                  
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Wall Options
                     </label>
-                    <select
-                      value={tentSpecs.wallOption}
-                      onChange={(e) => setTentSpecs(prev => ({ ...prev, wallOption: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="no-walls">No Walls (Canopy Only)</option>
-                      <option value="half-walls">Half Walls - $175.00</option>
-                      <option value="full-walls">Full Walls - $230.00</option>
-                    </select>
+                    <div className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-600">
+                      {tentSpecs.wallOption === 'no-walls' ? 'No Walls (Canopy Only)' :
+                       tentSpecs.wallOption === 'half-walls' ? 'Half Walls' :
+                       tentSpecs.wallOption === 'full-walls' ? 'Full Walls' : tentSpecs.wallOption}
+                    </div>
                   </div>
                 </div>
 
@@ -863,9 +883,21 @@ const TentCheckout = () => {
                       {tentSpecs.tentSize} Event Tent
                     </span>
                     <span className="font-medium">
-                      ${tentSpecs.tentSize === '10x10' ? '299.99' : '499.99'}
+                      ${(tentSpecs.tentSize === '10x10' ? 599.99 : 899.99).toFixed(2)}
                     </span>
                   </div>
+                  
+                  {/* Wall Options */}
+                  {tentSpecs.wallOption !== 'no-walls' && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">
+                        {tentSpecs.wallOption === 'half-walls' ? 'Half Walls' : 'Full Walls'}
+                      </span>
+                      <span className="font-medium">
+                        ${tentSpecs.wallOption === 'half-walls' ? '175.00' : '230.00'}
+                      </span>
+                    </div>
+                  )}
                   
                   {selectedAccessories.map(accessoryId => {
                     const accessory = accessories.find(a => a.id === accessoryId)

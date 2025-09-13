@@ -479,7 +479,7 @@ const PrintPreviewModal = ({
             console.log('🎨 Preview image already exists, skipping generation')
           }
         }
-        setIsGenerating(false)
+      setIsGenerating(false)
       }
     }
     
@@ -568,8 +568,8 @@ const PrintPreviewModal = ({
         pdfHeightInches = surfaceDims.height / 150
       } else {
         // For banners and tins, convert feet to inches for printing
-        const printWidthFeet = parseFloat(dimensions.width) || 2
-        const printHeightFeet = parseFloat(dimensions.height) || 4
+      const printWidthFeet = parseFloat(dimensions.width) || 2
+      const printHeightFeet = parseFloat(dimensions.height) || 4
         pdfWidthInches = printWidthFeet * 12
         pdfHeightInches = printHeightFeet * 12
       }
@@ -624,8 +624,8 @@ const PrintPreviewModal = ({
         <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Printer className="h-5 w-5" />
-              Print Preview & Approval
+            <Printer className="h-5 w-5" />
+            Print Preview & Approval
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -670,22 +670,22 @@ const PrintPreviewModal = ({
                          }}>
                            {previewImage ? (
                              <div className="relative">
-                               <img
-                                 src={previewImage}
-                                 alt="Banner Design Preview"
-                                 className="rounded border shadow-lg"
-                                 style={{
-                                   width: 'auto',
-                                   height: 'auto',
-                                   maxWidth: '100%',
+                             <img
+                               src={previewImage}
+                               alt="Banner Design Preview"
+                               className="rounded border shadow-lg"
+                               style={{
+                                 width: 'auto',
+                                 height: 'auto',
+                                 maxWidth: '100%',
                                    maxHeight: window.innerWidth < 768 ? '200px' : '280px',
                                    minHeight: window.innerWidth < 768 ? '150px' : '250px',
-                                   objectFit: 'contain',
+                                 objectFit: 'contain',
                                    transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
-                                 }}
-                                 onLoad={handleImageLoad}
-                               />
+                                 transformOrigin: 'center center'
+                               }}
+                               onLoad={handleImageLoad}
+                             />
                                
                                {/* BuyPrintz Watermark Overlay - IP Protection - Properly positioned */}
                                <div 
@@ -759,7 +759,7 @@ const PrintPreviewModal = ({
                            
                            try {
                              // Create a temporary link element for download
-                             const link = document.createElement('a')
+                           const link = document.createElement('a')
                              let filename = 'design'
                              
                              if (productType === 'tent') {
@@ -772,12 +772,12 @@ const PrintPreviewModal = ({
                              
                              // Set download attributes
                              link.download = `${filename}.png`
-                             link.href = previewImage
+                           link.href = previewImage
                              link.target = '_blank'
                              
                              // Append to body, click, and remove (for mobile compatibility)
                              document.body.appendChild(link)
-                             link.click()
+                           link.click()
                              document.body.removeChild(link)
                              
                              console.log('Download initiated for:', filename)
@@ -921,23 +921,23 @@ const PrintPreviewModal = ({
 
         {/* Approval Buttons - Fixed Position */}
         <div className="p-4 sm:p-6 border-t bg-gray-50 flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto"
-          >
-            <X className="h-4 w-4" />
-            Cancel
-          </Button>
-          
-          <Button
-            onClick={handleApprove}
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
-          >
-            <Check className="h-4 w-4" />
-            Approve & Print
-          </Button>
-        </div>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <X className="h-4 w-4" />
+              Cancel
+            </Button>
+            
+            <Button
+              onClick={handleApprove}
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <Check className="h-4 w-4" />
+              Approve & Print
+            </Button>
+          </div>
       </DialogContent>
     </Dialog>
   )
