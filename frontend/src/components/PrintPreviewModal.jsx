@@ -33,7 +33,6 @@ const PrintPreviewModal = ({
   const [pdfBlob, setPdfBlob] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [previewImage, setPreviewImage] = useState(null)
-  const [imageScale, setImageScale] = useState(1.5)
   const [selectedSurface, setSelectedSurface] = useState(currentSurface)
   const [approvedSurfaces, setApprovedSurfaces] = useState(new Set())
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
@@ -291,8 +290,131 @@ const PrintPreviewModal = ({
           ctx.arc(element.x + element.radius, element.y + element.radius, element.radius, 0, 2 * Math.PI)
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+        } else if (element.type === 'star') {
+          // Render star
+          ctx.beginPath()
+          const numPoints = element.numPoints || 5
+          const innerRadius = element.innerRadius || 40
+          const outerRadius = element.outerRadius || 80
+          const centerX = element.x + outerRadius
+          const centerY = element.y + outerRadius
+          
+          for (let i = 0; i < numPoints * 2; i++) {
+            const angle = (i * Math.PI) / numPoints
+            const radius = i % 2 === 0 ? outerRadius : innerRadius
+            const x = centerX + Math.cos(angle) * radius
+            const y = centerY + Math.sin(angle) * radius
+            
+            if (i === 0) {
+              ctx.moveTo(x, y)
+            } else {
+              ctx.lineTo(x, y)
+            }
+          }
+          ctx.closePath()
+          ctx.fillStyle = element.fill || '#000000'
+          ctx.fill()
+        } else if (element.type === 'triangle') {
+          // Render triangle
+          ctx.beginPath()
+          const radius = element.radius || 60
+          const centerX = element.x + radius
+          const centerY = element.y + radius
+          
+          for (let i = 0; i < 3; i++) {
+            const angle = (i * 2 * Math.PI) / 3 - Math.PI / 2
+            const x = centerX + Math.cos(angle) * radius
+            const y = centerY + Math.sin(angle) * radius
+            
+            if (i === 0) {
+              ctx.moveTo(x, y)
+            } else {
+              ctx.lineTo(x, y)
+            }
+          }
+          ctx.closePath()
+          ctx.fillStyle = element.fill || '#000000'
+          ctx.fill()
+        } else if (element.type === 'hexagon') {
+          // Render hexagon
+          ctx.beginPath()
+          const radius = element.radius || 60
+          const centerX = element.x + radius
+          const centerY = element.y + radius
+          
+          for (let i = 0; i < 6; i++) {
+            const angle = (i * 2 * Math.PI) / 6
+            const x = centerX + Math.cos(angle) * radius
+            const y = centerY + Math.sin(angle) * radius
+            
+            if (i === 0) {
+              ctx.moveTo(x, y)
+            } else {
+              ctx.lineTo(x, y)
+            }
+          }
+          ctx.closePath()
+          ctx.fillStyle = element.fill || '#000000'
+          ctx.fill()
+        } else if (element.type === 'octagon') {
+          // Render octagon
+          ctx.beginPath()
+          const radius = element.radius || 60
+          const centerX = element.x + radius
+          const centerY = element.y + radius
+          
+          for (let i = 0; i < 8; i++) {
+            const angle = (i * 2 * Math.PI) / 8
+            const x = centerX + Math.cos(angle) * radius
+            const y = centerY + Math.sin(angle) * radius
+            
+            if (i === 0) {
+              ctx.moveTo(x, y)
+            } else {
+              ctx.lineTo(x, y)
+            }
+          }
+          ctx.closePath()
+          ctx.fillStyle = element.fill || '#000000'
+          ctx.fill()
+        } else if (element.type === 'line') {
+          // Render line-based shapes (heart, diamond, arrows, etc.)
+          if (element.points && element.points.length > 0) {
+            ctx.beginPath()
+            
+            // Apply scaling if present
+            const scaleX = element.scaleX || 1
+            const scaleY = element.scaleY || 1
+            
+            for (let i = 0; i < element.points.length; i += 2) {
+              const x = element.x + (element.points[i] * scaleX)
+              const y = element.y + (element.points[i + 1] * scaleY)
+              
+              if (i === 0) {
+                ctx.moveTo(x, y)
+              } else {
+                ctx.lineTo(x, y)
+              }
+            }
+            
+            if (element.closed !== false) {
+              ctx.closePath()
+            }
+            
+            // Set stroke properties
+            ctx.strokeStyle = element.stroke || element.fill || '#000000'
+            ctx.lineWidth = element.strokeWidth || 2
+            ctx.lineCap = 'round'
+            ctx.lineJoin = 'round'
+            
+            // Fill or stroke based on shape type
+            if (element.closed !== false) {
+              ctx.fillStyle = element.fill || '#000000'
+              ctx.fill()
+            }
+            ctx.stroke()
+          }
         }
-        // Add more element types as needed
       }
       
       // Convert to data URL
@@ -386,22 +508,6 @@ const PrintPreviewModal = ({
     }
   }, [previewImage])
 
-  // Set image scale based on screen size
-  useEffect(() => {
-    const updateScale = () => {
-      if (window.innerWidth < 480) {
-        setImageScale(1.2) // Small mobile screens
-      } else if (window.innerWidth < 768) {
-        setImageScale(1.5) // Medium mobile screens
-      } else {
-        setImageScale(1.0) // Desktop - no scaling
-      }
-    }
-    
-    updateScale()
-    window.addEventListener('resize', updateScale)
-    return () => window.removeEventListener('resize', updateScale)
-  }, [])
 
   // Generate PDF only when user approves (for production)
   const generatePDFForProduction = async () => {
@@ -557,11 +663,9 @@ const PrintPreviewModal = ({
                                    width: 'auto',
                                    height: 'auto',
                                    maxWidth: '100%',
-                                   maxHeight: window.innerWidth < 768 ? '180px' : '280px',
-                                   minHeight: window.innerWidth < 768 ? '120px' : '250px',
-                                   objectFit: 'contain',
-                                   transform: `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
+                                   maxHeight: window.innerWidth < 768 ? '200px' : '280px',
+                                   minHeight: window.innerWidth < 768 ? '150px' : '250px',
+                                   objectFit: 'contain'
                                  }}
                                  onLoad={handleImageLoad}
                                />
@@ -570,9 +674,7 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute inset-0 pointer-events-none" 
                                  style={{ 
-                                   zIndex: 10,
-                                   transform: `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
+                                   zIndex: 10
                                  }}
                                >
                                  <img
@@ -592,9 +694,7 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
                                  style={{ 
-                                   zIndex: 20,
-                                   transform: `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
+                                   zIndex: 20
                                  }}
                                >
                                  Preview
