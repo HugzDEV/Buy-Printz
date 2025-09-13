@@ -498,18 +498,18 @@ const Checkout = () => {
           
           // Look for Ground shipping option
           const groundOption = shippingCosts.shipping_options.find(opt => 
-            opt.type.toLowerCase().includes('ground') || 
             opt.name.toLowerCase().includes('ground') ||
+            opt.type.toLowerCase().includes('ground') || 
             opt.type.toLowerCase() === 'ground'
           )
           
           if (groundOption) {
             console.log('✅ Found Ground option:', groundOption)
-            setShippingOption(groundOption.type)
+            setShippingOption(groundOption.name)
           } else {
             // If no Ground found, select the first option (which should be Ground based on your logs)
             console.log('⚠️ Ground option not found, selecting first option:', shippingCosts.shipping_options[0])
-            setShippingOption(shippingCosts.shipping_options[0].type)
+            setShippingOption(shippingCosts.shipping_options[0].name)
           }
         }
         console.log('✅ Shipping costs received:', shippingCosts.shipping_options)
@@ -720,7 +720,7 @@ const Checkout = () => {
   const grommetCost = bannerOptionsConfig.grommets.find(opt => opt.value === bannerOptions.grommets)?.price || 0
   const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
-  const selectedShippingQuote = shippingQuotes.find(q => q.type === shippingOption)
+  const selectedShippingQuote = shippingQuotes.find(q => q.name === shippingOption)
   const shippingCost = parseFloat(selectedShippingQuote?.cost?.replace('$', '') || '0') || 0
   console.log('🔄 Shipping cost calculation:', { 
     shippingOption, 
@@ -1454,7 +1454,7 @@ const Checkout = () => {
                     {shippingQuotes.map((option, index) => {
                       const Icon = option.type === 'standard' ? Truck : 
                                   option.type === 'expedited' ? Zap : Package
-                      const optionValue = option.type || `option_${index}`
+                      const optionValue = option.name || `option_${index}`
                       const optionLabel = option.name || option.description || `${option.type} shipping`
                       const optionCost = option.cost || 'Free'
                       
