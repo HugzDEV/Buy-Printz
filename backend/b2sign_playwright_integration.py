@@ -1272,50 +1272,123 @@ class B2SignPlaywrightIntegration:
                     logger.warning(f"⚠️ Could not fill {selector}: {e}")
                     continue
             
-            # Step 3: Select state using MuiAutocomplete
+            # Step 3: Select state using proven method (hidden state select first, then MuiAutocomplete)
             try:
-                autocomplete_selectors = [
-                    '.MuiAutocomplete-root',
-                    '.MuiAutocomplete-root[class*="hasPopupIcon"]',
-                    '.MuiAutocomplete-root[class*="hasClearIcon"]'
-                ]
-                
+                logger.info("🔍 Selecting state - handling hidden state dropdown...")
                 state_selected = False
-                for selector in autocomplete_selectors:
+                
+                # First, try to find the hidden state select element (proven banner workflow method)
+                hidden_state_select = await self.page.query_selector('select[name="state"]')
+                if hidden_state_select:
+                    logger.info("✅ Found hidden state select element")
                     try:
-                        autocomplete_elements = await self.page.query_selector_all(selector)
-                        for i, element in enumerate(autocomplete_elements):
-                            input_field = await element.query_selector('input')
-                            if input_field:
-                                await element.click()
-                                await self.page.wait_for_timeout(1000)
-                                await input_field.fill(state)
-                                await self.page.wait_for_timeout(1000)
-                                
-                                state_options = await self.page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
-                                for option in state_options:
-                                    try:
-                                        option_text = await option.inner_text()
-                                        if state.lower() in option_text.lower() or any(state_name in option_text.lower() for state_name in self._get_state_names(state)):
-                                            await option.click()
-                                            logger.info(f"✅ Selected state: {state} (using autocomplete {i+1})")
-                                            state_selected = True
-                                            break
-                                    except:
-                                        continue
-                                
-                                if state_selected:
-                                    break
+                        # Try to make the element visible and select the customer's state
+                        await self.page.evaluate('''(element) => {
+                            element.style.display = 'block';
+                            element.style.visibility = 'visible';
+                            element.disabled = false;
+                        }''', hidden_state_select)
                         
-                        if state_selected:
-                            break
-                            
+                        await self.page.wait_for_timeout(1000)
+                        await hidden_state_select.select_option(state)
+                        logger.info(f"✅ Selected {state} state using hidden select")
+                        state_selected = True
                     except Exception as e:
-                        logger.warning(f"⚠️ Error with autocomplete selector {selector}: {e}")
-                        continue
+                        logger.warning(f"Could not select {state} from hidden select: {e}")
+                        # Try JavaScript approach as fallback
+                        try:
+                            # Try multiple JavaScript approaches
+                            await self.page.evaluate(f'''(element) => {{
+                                element.value = '{state}';
+                                element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                element.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                            }}''', hidden_state_select)
+                            
+                            # Also try setting the selectedIndex with more precise matching
+                            state_names = self._get_state_names(state)
+                            await self.page.evaluate(f'''(element) => {{
+                                for (let i = 0; i < element.options.length; i++) {{
+                                    const option = element.options[i];
+                                    const optionText = option.text.toLowerCase();
+                                    const optionValue = option.value.toLowerCase();
+                                    
+                                    // Check exact value match first
+                                    if (optionValue === '{state.lower()}') {{
+                                        element.selectedIndex = i;
+                                        break;
+                                    }}
+                                    
+                                    // Check for state name matches (e.g., "massachusetts" for "MA")
+                                    const stateNames = {state_names};
+                                    let found = false;
+                                    for (const stateName of stateNames) {{
+                                        if (optionText.includes(stateName.toLowerCase())) {{
+                                            element.selectedIndex = i;
+                                            found = true;
+                                            break;
+                                        }}
+                                    }}
+                                    if (found) break;
+                                }}
+                                element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                            }}''', hidden_state_select)
+                            
+                            logger.info(f"✅ Set {state} state using JavaScript")
+                            state_selected = True
+                        except Exception as e2:
+                            logger.warning(f"JavaScript approach also failed: {e2}")
+                
+                # If hidden select didn't work, try MuiAutocomplete approach (fallback)
+                if not state_selected:
+                    logger.info("Trying MuiAutocomplete approach...")
+                    autocomplete_selectors = [
+                        '.MuiAutocomplete-root',
+                        '.MuiAutocomplete-root[class*="hasPopupIcon"]',
+                        '.MuiAutocomplete-root[class*="hasClearIcon"]'
+                    ]
+                    for selector in autocomplete_selectors:
+                        try:
+                            autocomplete_elements = await self.page.query_selector_all(selector)
+                            for i, element in enumerate(autocomplete_elements):
+                                input_field = await element.query_selector('input')
+                                if input_field:
+                                    # Check if this is the state field by looking at parent context
+                                    parent = await element.query_selector('xpath=..')
+                                    parent_text = await parent.inner_text() if parent else ""
+                                    
+                                    # Only proceed if this looks like a state field
+                                    if 'state' in parent_text.lower() or 'province' in parent_text.lower():
+                                        logger.info("✅ This appears to be the state field")
+                                        
+                                        await element.click()
+                                        await self.page.wait_for_timeout(1000)
+                                        await input_field.fill(state)
+                                        await self.page.wait_for_timeout(1000)
+                                        
+                                        state_options = await self.page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
+                                        for option in state_options:
+                                            try:
+                                                option_text = await option.inner_text()
+                                                if state.lower() in option_text.lower() or any(state_name in option_text.lower() for state_name in self._get_state_names(state)):
+                                                    await option.click()
+                                                    logger.info(f"✅ Selected state: {state} (using autocomplete {i+1})")
+                                                    state_selected = True
+                                                    break
+                                            except:
+                                                continue
+                                        if state_selected:
+                                            break
+                                    else:
+                                        logger.info("⚠️ Skipping - doesn't appear to be state field")
+                                        continue
+                            if state_selected:
+                                break
+                        except Exception as e:
+                            logger.warning(f"⚠️ Error with autocomplete selector {selector}: {e}")
+                            continue
                 
                 if not state_selected:
-                    logger.warning("⚠️ Could not select state using autocomplete")
+                    logger.warning("⚠️ Could not select state using any method")
                     
             except Exception as e:
                 logger.warning(f"⚠️ Could not select state: {e}")
