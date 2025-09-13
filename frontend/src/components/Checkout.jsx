@@ -626,7 +626,7 @@ const Checkout = () => {
       const { client_secret } = paymentIntent
 
       // Confirm payment with Stripe
-      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+      const { error, paymentIntent: confirmedPaymentIntent } = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
           card: cardElement,
           billing_details: {
@@ -648,7 +648,7 @@ const Checkout = () => {
         throw new Error(error.message)
       }
 
-      if (paymentIntent.status === 'succeeded') {
+      if (confirmedPaymentIntent.status === 'succeeded') {
         setCheckoutStep('completed')
         toast.success('Payment successful! Order submitted successfully!')
         

@@ -274,7 +274,9 @@ class B2SignPlaywrightIntegration:
             quantity = order_data.get('quantity', 1)
             print_options = order_data.get('print_options', {})
             customer_info = order_data.get('customer_info', {})
-            zip_code = customer_info.get('zipCode', customer_info.get('zip_code', '90210'))
+            zip_code = customer_info.get('zipCode') or customer_info.get('zip_code')
+            if not zip_code:
+                raise ValueError("Customer zip code is required - no fallback address allowed")
             
             logger.info(f"📋 Banner specs: {width}x{height}, qty: {quantity}, zip: {zip_code}")
             
@@ -1261,16 +1263,20 @@ class B2SignPlaywrightIntegration:
                             if input_field:
                                 await element.click()
                                 await self.page.wait_for_timeout(1000)
-                                await input_field.fill('CA')
+                                # Use customer's actual state - no fallback allowed
+                                if not customer_info or not customer_info.get('state'):
+                                    raise ValueError("Customer state is required - no fallback address allowed")
+                                customer_state = customer_info.get('state')
+                                await input_field.fill(customer_state)
                                 await self.page.wait_for_timeout(1000)
                                 
-                                ca_options = await self.page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
-                                for option in ca_options:
+                                state_options = await self.page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
+                                for option in state_options:
                                     try:
                                         option_text = await option.inner_text()
-                                        if 'california' in option_text.lower() or 'ca' in option_text.lower():
+                                        if customer_state.lower() in option_text.lower() or option_text.lower() in customer_state.lower():
                                             await option.click()
-                                            logger.info(f"✅ Selected state: CA (using autocomplete {i+1})")
+                                            logger.info(f"✅ Selected state: {customer_state} (using autocomplete {i+1})")
                                             state_selected = True
                                             break
                                     except:
