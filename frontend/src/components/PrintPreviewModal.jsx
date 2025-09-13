@@ -389,10 +389,12 @@ const PrintPreviewModal = ({
   // Set image scale based on screen size
   useEffect(() => {
     const updateScale = () => {
-      if (window.innerWidth < 768) {
-        setImageScale(2.0) // Moderate scaling on mobile for better fit
+      if (window.innerWidth < 480) {
+        setImageScale(1.2) // Small mobile screens
+      } else if (window.innerWidth < 768) {
+        setImageScale(1.5) // Medium mobile screens
       } else {
-        setImageScale(1.0) // No scaling on desktop to maintain original behavior
+        setImageScale(1.0) // Desktop - no scaling
       }
     }
     
@@ -543,58 +545,67 @@ const PrintPreviewModal = ({
                        <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
                          <div className="relative flex items-center justify-center w-full" style={{ 
                            minHeight: window.innerWidth < 768 ? '200px' : '280px',
-                           maxHeight: window.innerWidth < 768 ? '240px' : '320px',
-                           transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
+                           maxHeight: window.innerWidth < 768 ? '240px' : '320px'
                          }}>
                            {previewImage ? (
-                             <img
-                               src={previewImage}
-                               alt="Banner Design Preview"
-                               className="rounded border shadow-lg"
-                               style={{
-                                 width: 'auto',
-                                 height: 'auto',
-                                 maxWidth: '100%',
-                                 maxHeight: window.innerWidth < 768 ? '180px' : '280px',
-                                 minHeight: window.innerWidth < 768 ? '120px' : '250px',
-                                 objectFit: 'contain',
-                                 transform: `scale(${imageScale})`,
-                                 transformOrigin: 'center center'
-                               }}
-                               onLoad={handleImageLoad}
-                             />
+                             <div className="relative">
+                               <img
+                                 src={previewImage}
+                                 alt="Banner Design Preview"
+                                 className="rounded border shadow-lg"
+                                 style={{
+                                   width: 'auto',
+                                   height: 'auto',
+                                   maxWidth: '100%',
+                                   maxHeight: window.innerWidth < 768 ? '180px' : '280px',
+                                   minHeight: window.innerWidth < 768 ? '120px' : '250px',
+                                   objectFit: 'contain',
+                                   transform: `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
+                                 }}
+                                 onLoad={handleImageLoad}
+                               />
+                               
+                               {/* BuyPrintz Watermark Overlay - IP Protection - Properly positioned */}
+                               <div 
+                                 className="absolute inset-0 pointer-events-none" 
+                                 style={{ 
+                                   zIndex: 10,
+                                   transform: `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
+                                 }}
+                               >
+                                 <img
+                                   src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
+                                   alt="BuyPrintz Watermark"
+                                   className="w-full h-full object-cover"
+                                   style={{
+                                     position: 'absolute',
+                                     top: 0,
+                                     left: 0,
+                                     opacity: 0.3
+                                   }}
+                                 />
+                               </div>
+                               
+                               {/* Preview label */}
+                               <div 
+                                 className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
+                                 style={{ 
+                                   zIndex: 20,
+                                   transform: `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
+                                 }}
+                               >
+                                 Preview
+                               </div>
+                             </div>
                            ) : (
                              <div className="text-center text-gray-500 p-8">
                                <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
                                <p className="text-sm">No preview available</p>
                              </div>
                            )}
-                           
-                           {/* BuyPrintz Watermark Overlay - IP Protection - Aligned with canvas */}
-                           <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
-                             <img
-                               src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                               alt="BuyPrintz Watermark"
-                               className="w-full h-full object-cover opacity-30"
-                               style={{
-                                 position: 'absolute',
-                                 top: 0,
-                                 left: 0,
-                                 zIndex: 10,
-                                 opacity: 0.3,
-                                 // Mobile positioning to match canvas transform
-                                 transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
-                               }}
-                             />
-                           </div>
-                          
-                          <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" style={{ 
-                            zIndex: 20,
-                            // Mobile positioning to match canvas transform
-                            transform: window.innerWidth < 768 ? 'translate(74%, 65%) scale(1.25)' : 'none'
-                          }}>
-                            Preview
-                          </div>
                          </div>
                        </div>
                      )}
@@ -620,22 +631,42 @@ const PrintPreviewModal = ({
                        <Button
                          variant="outline"
                          onClick={() => {
-                           const link = document.createElement('a')
-                           let filename = 'design'
-                           
-                           if (productType === 'tent') {
-                             filename = `tent-${orderDetails?.tent_size || '10x10'}-${selectedSurface.replace('_', '-')}`
-                           } else if (productType === 'tin') {
-                             filename = `tin-${selectedSurface}`
-                           } else {
-                             filename = `banner-${orderDetails?.banner_type || 'custom'}`
+                           if (!previewImage) {
+                             alert('No preview image available for download')
+                             return
                            }
                            
-                           link.download = `${filename}.png`
-                           link.href = previewImage
-                           link.click()
+                           try {
+                             // Create a temporary link element for download
+                             const link = document.createElement('a')
+                             let filename = 'design'
+                             
+                             if (productType === 'tent') {
+                               filename = `tent-${orderDetails?.tent_size || '10x10'}-${selectedSurface.replace('_', '-')}`
+                             } else if (productType === 'tin') {
+                               filename = `tin-${selectedSurface}`
+                             } else {
+                               filename = `banner-${orderDetails?.banner_type || 'custom'}`
+                             }
+                             
+                             // Set download attributes
+                             link.download = `${filename}.png`
+                             link.href = previewImage
+                             link.target = '_blank'
+                             
+                             // Append to body, click, and remove (for mobile compatibility)
+                             document.body.appendChild(link)
+                             link.click()
+                             document.body.removeChild(link)
+                             
+                             console.log('Download initiated for:', filename)
+                           } catch (error) {
+                             console.error('Download failed:', error)
+                             alert('Download failed. Please try again.')
+                           }
                          }}
                          className="flex items-center gap-2"
+                         disabled={!previewImage}
                        >
                          <Download className="h-4 w-4" />
                          Download Production Image
