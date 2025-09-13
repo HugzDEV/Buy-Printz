@@ -33,6 +33,7 @@ const PrintPreviewModal = ({
   const [pdfBlob, setPdfBlob] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [previewImage, setPreviewImage] = useState(null)
+  const [imageScale, setImageScale] = useState(1.0)
   const [selectedSurface, setSelectedSurface] = useState(currentSurface)
   const [approvedSurfaces, setApprovedSurfaces] = useState(new Set())
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
@@ -508,6 +509,20 @@ const PrintPreviewModal = ({
     }
   }, [previewImage])
 
+  // Set image scale based on screen size - restore desktop functionality
+  useEffect(() => {
+    const updateScale = () => {
+      if (window.innerWidth < 768) {
+        setImageScale(1.0) // No scaling on mobile to preserve element positioning
+      } else {
+        setImageScale(1.0) // Desktop - no scaling to maintain original behavior
+      }
+    }
+    
+    updateScale()
+    window.addEventListener('resize', updateScale)
+    return () => window.removeEventListener('resize', updateScale)
+  }, [])
 
   // Generate PDF only when user approves (for production)
   const generatePDFForProduction = async () => {
@@ -665,7 +680,9 @@ const PrintPreviewModal = ({
                                    maxWidth: '100%',
                                    maxHeight: window.innerWidth < 768 ? '200px' : '280px',
                                    minHeight: window.innerWidth < 768 ? '150px' : '250px',
-                                   objectFit: 'contain'
+                                   objectFit: 'contain',
+                                   transform: `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
                                  }}
                                  onLoad={handleImageLoad}
                                />
@@ -674,7 +691,9 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute inset-0 pointer-events-none" 
                                  style={{ 
-                                   zIndex: 10
+                                   zIndex: 10,
+                                   transform: `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
                                  }}
                                >
                                  <img
@@ -694,7 +713,9 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
                                  style={{ 
-                                   zIndex: 20
+                                   zIndex: 20,
+                                   transform: `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
                                  }}
                                >
                                  Preview
