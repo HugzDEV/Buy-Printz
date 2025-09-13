@@ -38,9 +38,9 @@ class ShippingService {
       console.log('📋 Customer info:', JSON.stringify(requestData.customer_info))
       
       // Make API request to our print partner shipping costs endpoint
-      // Print partner integration takes 60-120 seconds, so we need a longer timeout
+      // Print partner integration takes 60-300 seconds, so we need a longer timeout
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 120000) // 120 second timeout (2 minutes)
+      const timeoutId = setTimeout(() => controller.abort(), 300000) // 300 second timeout (5 minutes)
       
       const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
         method: 'POST',
@@ -85,7 +85,7 @@ class ShippingService {
 
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.error('⏰ Print partner API request timed out after 120 seconds')
+        console.error('⏰ Print partner API request timed out after 300 seconds')
         throw new Error('Shipping cost request timed out. Please try again.')
       }
       
