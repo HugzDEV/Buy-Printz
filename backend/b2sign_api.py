@@ -38,12 +38,12 @@ class PrintOptions(BaseModel):
 
 class CustomerInfo(BaseModel):
     zipCode: str = Field(..., description="Customer zip code", example="90210")
-    name: str = Field(..., description="Customer name")
-    company: Optional[str] = Field(default=None, description="Company name")
-    phone: str = Field(..., description="Phone number")
-    address: str = Field(..., description="Street address")
-    city: str = Field(..., description="City")
-    state: str = Field(..., description="State")
+    name: str = Field(..., description="Customer name - REQUIRED")
+    company: Optional[str] = Field(None, description="Company name - optional")
+    phone: str = Field(..., description="Phone number - REQUIRED")
+    address: str = Field(..., description="Street address - REQUIRED")
+    city: str = Field(..., description="City - REQUIRED")
+    state: str = Field(..., description="State - REQUIRED")
 
 class BannerOrderRequest(BaseModel):
     product_type: str = Field(default="banner", description="Product type")
