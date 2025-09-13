@@ -1,0 +1,71 @@
+{
+  "test_completed": true,
+  "login_successful": true,
+  "tent_specs_configured": {
+    "dimensions": {
+      "width": 10,
+      "height": 10
+    },
+    "quantity": 1,
+    "print_options": {
+      "tent_size": "10x10",
+      "tent_design_option": "canopy-only"
+    },
+    "customer_info": {
+      "name": "John Doe",
+      "company": "BuyPrintz Test",
+      "phone": "555-123-4567",
+      "address": "816 Morton Street",
+      "suburb": "Unit 1",
+      "city": "Boston",
+      "state": "MA",
+      "zipCode": "02124"
+    }
+  },
+  "shipping_options_found": 5,
+  "shipping_options": [
+    {
+      "name": "Ground",
+      "type": "standard",
+      "cost": "$38.38",
+      "estimated_days": 5,
+      "delivery_date": "Sep 18",
+      "description": "B2Sign ground: $38.38 (delivery: Sep 18)"
+    },
+    {
+      "name": "3 Day Select",
+      "type": "standard",
+      "cost": "$77.59",
+      "estimated_days": 3,
+      "delivery_date": "Sep 19",
+      "description": "B2Sign 3 day select: $77.59 (delivery: Sep 19)"
+    },
+    {
+      "name": "2nd Day Air",
+      "type": "standard",
+      "cost": "$81.19",
+      "estimated_days": 2,
+      "delivery_date": "Sep 18",
+      "description": "B2Sign 2nd day air: $81.19 (delivery: Sep 18)"
+    },
+    {
+      "name": "Next Day",
+      "type": "standard",
+      "cost": "$84.89",
+      "estimated_days": 1,
+      "delivery_date": "Sep 17",
+      "description": "B2Sign next day: $84.89 (delivery: Sep 17)"
+    },
+    {
+      "name": "Next Day (Early AM)",
+      "type": "standard",
+      "cost": "$460.52",
+      "estimated_days": 1,
+      "delivery_date": "Sep 17",
+      "description": "B2Sign next day (early am): $460.52 (delivery: Sep 17)"
+    }
+  ],
+  "screenshots_taken": [
+    "tent_workflow_final.png"
+  ]
+}

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-B2Sign Playwright Integration
-This module uses Playwright to interact with B2Sign.com for shipping cost extraction.
-Playwright is more reliable than Selenium for React/Inertia.js applications.
+Tent Playwright Integration - DUPLICATED FROM WORKING BANNER INTEGRATION
+This module uses Playwright to interact with B2Sign.com for TENT shipping cost extraction.
+Uses the EXACT SAME proven methods as the banner workflow, just with tent URLs and tent-specific fields.
 """
 
 import asyncio
@@ -16,7 +16,7 @@ from playwright.async_api import async_playwright, Browser, Page, BrowserContext
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class B2SignPlaywrightIntegration:
+class TentPlaywrightIntegration:
     def __init__(self):
         self.browser: Optional[Browser] = None
         self.context: Optional[BrowserContext] = None
@@ -25,16 +25,8 @@ class B2SignPlaywrightIntegration:
         self.password = "$AG@BuyPr!n1z"
         self.base_url = "https://www.b2sign.com"
         
-        # Product page mappings from existing Selenium intelligence
+        # Tent product page mappings - using the same tent page for all sizes
         self.product_pages = {
-            'banner_13oz_vinyl': 'https://www.b2sign.com/13oz-vinyl-banner',
-            'banner_fabric_9oz': 'https://www.b2sign.com/fabric-banner-9oz-wrinkle-free',
-            'banner_mesh': 'https://www.b2sign.com/mesh-banners',
-            'banner_backlit': 'https://www.b2sign.com/vinyl-banner-backlit',
-            'banner_blockout': 'https://www.b2sign.com/vinyl-banner-18oz-blockout',
-            'banner_indoor': 'https://www.b2sign.com/super-smooth-indoor-banner',
-            'banner_pole': 'https://www.b2sign.com/pole-banner-set',
-            'banner_hand': 'https://www.b2sign.com/hand-banner',
             'tent_10x10': 'https://www.b2sign.com/custom-event-tents',
             'tent_10x15': 'https://www.b2sign.com/custom-event-tents',
             'tent_10x20': 'https://www.b2sign.com/custom-event-tents'
@@ -171,10 +163,10 @@ class B2SignPlaywrightIntegration:
         except Exception as e:
             logger.error(f"❌ Error during cleanup: {e}")
     
-    async def get_banner_shipping_costs(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Get shipping costs for banner products"""
+    async def get_tent_shipping_costs(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Get shipping costs for tent products using the EXACT SAME proven banner workflow"""
         try:
-            logger.info(f"🚚 Getting banner shipping costs for {order_data.get('material', 'banner')}")
+            logger.info(f"🏕️ Getting tent shipping costs for {order_data.get('tent_size', 'tent')}")
             
             # Check if browser is properly initialized
             if not self.page:
@@ -185,72 +177,36 @@ class B2SignPlaywrightIntegration:
                     'shipping_options': []
                 }
             
-            # Map BuyPrintz material to specific B2Sign product page
-            material = order_data.get('material', '13oz-vinyl')
-            material_mapping = {
-                '13oz-vinyl': 'banner_13oz_vinyl',
-                'fabric-9oz': 'banner_fabric_9oz',
-                'mesh': 'banner_mesh',
-                'backlit': 'banner_backlit',
-                'blockout': 'banner_blockout',
-                'indoor': 'banner_indoor',
-                'pole': 'banner_pole',
-                'hand': 'banner_hand'
+            # Map BuyPrintz tent size to B2Sign product page
+            tent_size = order_data.get('print_options', {}).get('tent_size', '10x10')
+            tent_mapping = {
+                '10x10': 'tent_10x10',
+                '10x15': 'tent_10x15', 
+                '10x20': 'tent_10x20'
             }
             
-            product_key = material_mapping.get(material, 'banner_13oz_vinyl')
+            product_key = tent_mapping.get(tent_size, 'tent_10x10')
             product_url = self.product_pages.get(product_key)
             
             if not product_url:
                 return {
                     'success': False,
-                    'errors': [f'No product page mapping found for material: {material}'],
+                    'errors': [f'No product page mapping found for tent size: {tent_size}'],
                     'shipping_options': []
                 }
             
-            # Navigate to specific banner product page
+            # Navigate to tent product page
             logger.info(f"🌐 Navigating to {product_url}")
             await self.page.goto(product_url, wait_until='networkidle')
             await self.page.wait_for_timeout(3000)
             
-            # Use the complete proven banner workflow
+            # Use the EXACT SAME proven banner workflow (just with tent-specific field mappings)
             shipping_options = await self._fill_banner_quote_form(order_data)
             
             return {
                 'success': True,
                 'shipping_options': shipping_options,
                 'b2sign_product_url': product_url,
-                'extracted_at': datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"❌ Error getting banner shipping costs: {e}")
-            return {
-                'success': False,
-                'errors': [str(e)],
-                'shipping_options': []
-            }
-    
-    async def get_tent_shipping_costs(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Get shipping costs for tent products"""
-        try:
-            logger.info(f"🚚 Getting tent shipping costs for {order_data.get('tent_size', 'tent')}")
-            
-            # Navigate to tent product page (all tent sizes use the same page)
-            tent_url = self.product_pages.get('tent_10x10')
-            logger.info(f"🌐 Navigating to {tent_url}")
-            await self.page.goto(tent_url, wait_until='networkidle')
-            
-            # Wait for product page to load
-            await self.page.wait_for_selector('form, .quote-form, [data-testid*="quote"]', timeout=10000)
-            
-            # Fill out the quote form based on order data
-            shipping_options = await self._fill_tent_quote_form(order_data)
-            
-            return {
-                'success': True,
-                'shipping_options': shipping_options,
-                'b2sign_product_url': tent_url,
                 'extracted_at': datetime.now().isoformat()
             }
             
@@ -262,44 +218,45 @@ class B2SignPlaywrightIntegration:
                 'shipping_options': []
             }
     
+    
     async def _fill_banner_quote_form(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Fill out banner quote form using the complete proven workflow"""
+        """Fill out tent quote form using the EXACT SAME proven banner workflow structure"""
         try:
-            logger.info("🎨 Starting complete banner workflow...")
+            logger.info("🏕️ Starting complete tent workflow (using proven banner workflow structure)...")
             
             # Extract order specifications
             dimensions = order_data.get('dimensions', {})
-            width = dimensions.get('width', 3)
-            height = dimensions.get('height', 6)
+            width = dimensions.get('width', 10)
+            height = dimensions.get('height', 10)
             quantity = order_data.get('quantity', 1)
             print_options = order_data.get('print_options', {})
             customer_info = order_data.get('customer_info', {})
             zip_code = customer_info.get('zipCode', customer_info.get('zip_code', '90210'))
             
-            logger.info(f"📋 Banner specs: {width}x{height}, qty: {quantity}, zip: {zip_code}")
+            logger.info(f"📋 Tent specs: {width}x{height}, qty: {quantity}, zip: {zip_code}")
             
-            # Step 1: Fill dimensions using MUI selectors
+            # Step 1: Fill dimensions using MUI selectors (SAME AS BANNER)
             await self._fill_banner_dimensions(width, height)
             
-            # Step 2: Fill job details
+            # Step 2: Fill job details (SAME AS BANNER)
             await self._fill_banner_job_details(width, height, quantity)
             
-            # Step 3: Fill banner options (2 Sides, No Pole Pockets, etc.)
-            await self._fill_banner_options_workflow(print_options)
+            # Step 3: Fill tent options (TENT-SPECIFIC - but using same structure)
+            await self._fill_tent_options_workflow(print_options)
             
-            # Step 4: Select Blind Drop Ship
+            # Step 4: Select Blind Drop Ship (EXACT SAME AS BANNER)
             await self._select_blind_drop_ship()
             
-            # Step 5: Open address modal and fill customer address
+            # Step 5: Open address modal and fill customer address (EXACT SAME AS BANNER)
             await self._open_and_fill_address_modal(zip_code, customer_info)
             
-            # Step 6: Extract all shipping options
+            # Step 6: Extract all shipping options (EXACT SAME AS BANNER)
             shipping_options = await self._extract_all_shipping_options_workflow()
             
             return shipping_options
             
         except Exception as e:
-            logger.error(f"❌ Error in complete banner workflow: {e}")
+            logger.error(f"❌ Error in complete tent workflow: {e}")
             return []
     
     async def _fill_tent_quote_form(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -1195,6 +1152,63 @@ class B2SignPlaywrightIntegration:
         except Exception as e:
             logger.warning(f"⚠️ Error filling banner options: {e}")
     
+    async def _fill_tent_options_workflow(self, print_options):
+        """Fill tent options using the same proven workflow structure as banners"""
+        try:
+            logger.info("🏕️ Filling tent options...")
+            
+            # Handle tent design option (Canopy Graphic Only vs Canopy Graphic + Frame)
+            design_option = print_options.get('tent_design_option', 'canopy-graphic-only')
+            
+            if design_option == 'canopy-graphic-only':
+                # Look for "Canopy Graphic Only" button
+                buttons = await self.page.query_selector_all('button')
+                for button in buttons:
+                    try:
+                        button_text = await button.inner_text()
+                        if 'canopy graphic only' in button_text.lower():
+                            await button.click()
+                            logger.info("✅ Selected Canopy Graphic Only")
+                            await self.page.wait_for_timeout(2000)
+                            break
+                    except:
+                        continue
+            elif design_option == 'canopy-graphic-plus-frame':
+                # Look for "Canopy Graphic + Frame" button
+                buttons = await self.page.query_selector_all('button')
+                for button in buttons:
+                    try:
+                        button_text = await button.inner_text()
+                        if 'canopy graphic' in button_text.lower() and 'frame' in button_text.lower():
+                            await button.click()
+                            logger.info("✅ Selected Canopy Graphic + Frame")
+                            await self.page.wait_for_timeout(2000)
+                            break
+                    except:
+                        continue
+            
+            # Handle tent accessories if any
+            accessories = print_options.get('accessories', [])
+            for accessory in accessories:
+                try:
+                    buttons = await self.page.query_selector_all('button')
+                    for button in buttons:
+                        try:
+                            button_text = await button.inner_text()
+                            if accessory.lower() in button_text.lower():
+                                await button.click()
+                                logger.info(f"✅ Selected accessory: {accessory}")
+                                await self.page.wait_for_timeout(1000)
+                                break
+                        except:
+                            continue
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not select accessory {accessory}: {e}")
+                    continue
+                        
+        except Exception as e:
+            logger.warning(f"⚠️ Error filling tent options: {e}")
+    
     async def _select_blind_drop_ship(self):
         """Select Blind Drop Ship using proven workflow"""
         try:
@@ -1272,50 +1286,75 @@ class B2SignPlaywrightIntegration:
                     logger.warning(f"⚠️ Could not fill {selector}: {e}")
                     continue
             
-            # Step 3: Select state using MuiAutocomplete
+            # Step 3: Select state using proven method
             try:
-                autocomplete_selectors = [
-                    '.MuiAutocomplete-root',
-                    '.MuiAutocomplete-root[class*="hasPopupIcon"]',
-                    '.MuiAutocomplete-root[class*="hasClearIcon"]'
-                ]
+                logger.info("🔍 Selecting state - handling hidden state dropdown...")
                 
                 state_selected = False
-                for selector in autocomplete_selectors:
+                
+                # First, try to find the hidden state select element (proven banner workflow method)
+                hidden_state_select = await self.page.query_selector('select[name="state"]')
+                if hidden_state_select:
+                    logger.info("✅ Found hidden state select element")
                     try:
-                        autocomplete_elements = await self.page.query_selector_all(selector)
-                        for i, element in enumerate(autocomplete_elements):
-                            input_field = await element.query_selector('input')
-                            if input_field:
-                                await element.click()
-                                await self.page.wait_for_timeout(1000)
-                                await input_field.fill(state)
-                                await self.page.wait_for_timeout(1000)
-                                
-                                state_options = await self.page.query_selector_all('[role="option"], .MuiOption-root, li[role="option"]')
-                                for option in state_options:
-                                    try:
-                                        option_text = await option.inner_text()
-                                        if state.lower() in option_text.lower() or any(state_name in option_text.lower() for state_name in self._get_state_names(state)):
-                                            await option.click()
-                                            logger.info(f"✅ Selected state: {state} (using autocomplete {i+1})")
-                                            state_selected = True
-                                            break
-                                    except:
-                                        continue
-                                
-                                if state_selected:
-                                    break
+                        # Try to make the element visible and select the customer's state
+                        await self.page.evaluate('''(element) => {
+                            element.style.display = 'block';
+                            element.style.visibility = 'visible';
+                            element.disabled = false;
+                        }''', hidden_state_select)
                         
-                        if state_selected:
-                            break
-                            
+                        await self.page.wait_for_timeout(1000)
+                        await hidden_state_select.select_option(state)
+                        logger.info(f"✅ Selected {state} state using hidden select")
+                        state_selected = True
                     except Exception as e:
-                        logger.warning(f"⚠️ Error with autocomplete selector {selector}: {e}")
-                        continue
+                        logger.warning(f"Could not select {state} from hidden select: {e}")
+                        # Try JavaScript approach as fallback
+                        try:
+                            # Try multiple JavaScript approaches
+                            await self.page.evaluate(f'''(element) => {{
+                                element.value = '{state}';
+                                element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                element.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                            }}''', hidden_state_select)
+                            
+                            # Also try setting the selectedIndex with more precise matching
+                            state_names = self._get_state_names(state)
+                            await self.page.evaluate(f'''(element) => {{
+                                for (let i = 0; i < element.options.length; i++) {{
+                                    const option = element.options[i];
+                                    const optionText = option.text.toLowerCase();
+                                    const optionValue = option.value.toLowerCase();
+                                    
+                                    // Check exact value match first
+                                    if (optionValue === '{state.lower()}') {{
+                                        element.selectedIndex = i;
+                                        break;
+                                    }}
+                                    
+                                    // Check for state name matches (e.g., "massachusetts" for "MA")
+                                    const stateNames = {state_names};
+                                    let found = false;
+                                    for (const stateName of stateNames) {{
+                                        if (optionText.includes(stateName.toLowerCase())) {{
+                                            element.selectedIndex = i;
+                                            found = true;
+                                            break;
+                                        }}
+                                    }}
+                                    if (found) break;
+                                }}
+                                element.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                            }}''', hidden_state_select)
+                            
+                            logger.info(f"✅ Set {state} state using JavaScript")
+                            state_selected = True
+                        except Exception as e2:
+                            logger.warning(f"JavaScript approach also failed: {e2}")
                 
                 if not state_selected:
-                    logger.warning("⚠️ Could not select state using autocomplete")
+                    logger.warning("⚠️ Could not select state using any method")
                     
             except Exception as e:
                 logger.warning(f"⚠️ Could not select state: {e}")
@@ -1788,6 +1827,62 @@ class B2SignPlaywrightIntegration:
         else:
             return 5  # Default
     
+    def _get_state_names(self, state_code):
+        """Get possible state names for a given state code"""
+        state_mapping = {
+            'CA': ['california'],
+            'NY': ['new york'],
+            'TX': ['texas'],
+            'FL': ['florida'],
+            'IL': ['illinois'],
+            'PA': ['pennsylvania'],
+            'OH': ['ohio'],
+            'GA': ['georgia'],
+            'NC': ['north carolina'],
+            'MI': ['michigan'],
+            'NJ': ['new jersey'],
+            'VA': ['virginia'],
+            'WA': ['washington'],
+            'AZ': ['arizona'],
+            'MA': ['massachusetts'],
+            'TN': ['tennessee'],
+            'IN': ['indiana'],
+            'MO': ['missouri'],
+            'MD': ['maryland'],
+            'WI': ['wisconsin'],
+            'CO': ['colorado'],
+            'MN': ['minnesota'],
+            'SC': ['south carolina'],
+            'AL': ['alabama'],
+            'LA': ['louisiana'],
+            'KY': ['kentucky'],
+            'OR': ['oregon'],
+            'OK': ['oklahoma'],
+            'CT': ['connecticut'],
+            'UT': ['utah'],
+            'IA': ['iowa'],
+            'NV': ['nevada'],
+            'AR': ['arkansas'],
+            'MS': ['mississippi'],
+            'KS': ['kansas'],
+            'NM': ['new mexico'],
+            'NE': ['nebraska'],
+            'WV': ['west virginia'],
+            'ID': ['idaho'],
+            'HI': ['hawaii'],
+            'NH': ['new hampshire'],
+            'ME': ['maine'],
+            'RI': ['rhode island'],
+            'MT': ['montana'],
+            'DE': ['delaware'],
+            'SD': ['south dakota'],
+            'ND': ['north dakota'],
+            'AK': ['alaska'],
+            'VT': ['vermont'],
+            'WY': ['wyoming']
+        }
+        return state_mapping.get(state_code.upper(), [state_code.lower()])
+    
     async def _extract_shipping_costs_from_display(self, page):
         """Extract shipping costs from displayed prices on the page"""
         try:
@@ -1927,18 +2022,18 @@ class B2SignPlaywrightIntegration:
             logger.error(f"❌ Error closing browser: {e}")
 
 # Global instance
-b2sign_playwright = None
+tent_playwright = None
 
-async def get_b2sign_playwright():
-    """Get or create B2Sign Playwright instance"""
-    global b2sign_playwright
+async def get_tent_playwright():
+    """Get or create Tent Playwright instance"""
+    global tent_playwright
     
-    if b2sign_playwright is None:
-        b2sign_playwright = B2SignPlaywrightIntegration()
-        await b2sign_playwright.initialize()
-        await b2sign_playwright.login()
+    if tent_playwright is None:
+        tent_playwright = TentPlaywrightIntegration()
+        await tent_playwright.initialize()
+        await tent_playwright.login()
     
-    return b2sign_playwright
+    return tent_playwright
 
 async def get_shipping_costs_playwright(order_data: Dict[str, Any]) -> Dict[str, Any]:
     """Get shipping costs using Playwright with proper context management (like test_navigation.py)"""

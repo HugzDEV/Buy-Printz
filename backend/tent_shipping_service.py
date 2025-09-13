@@ -9,8 +9,7 @@ import asyncio
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from backend.b2sign_playwright_integration import B2SignPlaywrightIntegration
-from backend.tent_workflow import TentWorkflow
+from backend.tent_playwright_integration import TentPlaywrightIntegration
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,16 +20,16 @@ class TentShippingService:
         self.b2sign_integration = None
         
     async def initialize(self):
-        """Initialize the B2Sign integration"""
+        """Initialize the Tent integration"""
         try:
-            self.b2sign_integration = B2SignPlaywrightIntegration()
-            success = await self.b2sign_integration.initialize()
+            self.tent_integration = TentPlaywrightIntegration()
+            success = await self.tent_integration.initialize()
             if success:
-                await self.b2sign_integration.login()
+                await self.tent_integration.login()
                 logger.info("✅ TentShippingService initialized successfully")
                 return True
             else:
-                logger.error("❌ Failed to initialize B2Sign integration")
+                logger.error("❌ Failed to initialize Tent integration")
                 return False
         except Exception as e:
             logger.error(f"❌ Error initializing TentShippingService: {e}")
@@ -57,46 +56,14 @@ class TentShippingService:
         try:
             logger.info("🚚 Getting tent shipping costs using proven B2Sign workflow...")
             
-            # Create a fresh B2Sign integration instance for each request
-            b2sign_integration = B2SignPlaywrightIntegration()
-            # Override headless mode for testing (production should use headless=True)
-            b2sign_integration.headless_mode = False
-            success = await b2sign_integration.initialize()
-            
-            if not success:
-                return {
-                    'success': False,
-                    'errors': ['Failed to initialize B2Sign integration'],
-                    'shipping_options': []
-                }
-            
-            # Login
-            login_success = await b2sign_integration.login()
-            if not login_success:
-                await b2sign_integration.cleanup()
-                return {
-                    'success': False,
-                    'errors': ['Failed to login to B2Sign'],
-                    'shipping_options': []
-                }
-            
             # Map TentCheckout.jsx data to B2Sign format
             b2sign_order_data = self._map_tent_data_to_b2sign(order_data, customer_info)
             
-            # Navigate to tent product page
-            tent_url = b2sign_integration.product_pages.get('tent_10x10')
-            logger.info(f"🌐 Navigating to {tent_url}")
-            await b2sign_integration.page.goto(tent_url, wait_until='networkidle')
-            await b2sign_integration.page.wait_for_timeout(3000)
+            # Use the proven tent integration (duplicated from working banner integration)
+            tent_integration = TentPlaywrightIntegration()
+            result = await tent_integration.get_tent_shipping_costs(b2sign_order_data)
             
-            # Use the modular tent workflow that follows the exact same structure as the banner workflow
-            tent_workflow = TentWorkflow(b2sign_integration.page)
-            shipping_options = await tent_workflow.fill_tent_quote_form_workflow(b2sign_order_data)
-            
-            # Clean up
-            await b2sign_integration.cleanup()
-            
-            return shipping_options
+            return result
             
         except Exception as e:
             logger.error(f"❌ Error getting tent shipping costs: {e}")
@@ -178,8 +145,8 @@ class TentShippingService:
     async def cleanup(self):
         """Clean up resources"""
         try:
-            if self.b2sign_integration:
-                await self.b2sign_integration.cleanup()
+            if self.tent_integration:
+                await self.tent_integration.cleanup()
             logger.info("✅ TentShippingService cleaned up")
         except Exception as e:
             logger.error(f"❌ Error during cleanup: {e}")
