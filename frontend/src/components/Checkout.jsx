@@ -440,6 +440,9 @@ const Checkout = () => {
       
       console.log('🔄 Creating payment intent with amount:', currentTotal)
       console.log('🔄 Breakdown:', { subtotal, shippingCost, currentTotal })
+      console.log('🔄 Shipping quotes:', shippingQuotes)
+      console.log('🔄 Selected shipping option:', shippingOption)
+      console.log('🔄 Selected shipping quote:', selectedShippingQuote)
       
       const response = await authService.authenticatedRequest('/api/payments/create-intent', {
         method: 'POST',

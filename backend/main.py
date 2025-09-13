@@ -728,6 +728,12 @@ async def create_payment_intent(
         # Use provided amount if available, otherwise use order total
         amount = request.amount if request.amount is not None else order["total_amount"]
         
+        print(f"🔄 Payment Intent Debug:")
+        print(f"  - Order total from DB: {order['total_amount']}")
+        print(f"  - Provided amount: {request.amount}")
+        print(f"  - Using amount: {amount}")
+        print(f"  - Amount in cents: {int(amount * 100)}")
+        
         # Create payment intent
         payment_intent = stripe.PaymentIntent.create(
             amount=int(amount * 100),  # Convert to cents
