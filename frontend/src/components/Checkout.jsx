@@ -376,10 +376,10 @@ const Checkout = () => {
   // Update payment intent when shipping costs change
   useEffect(() => {
     if (orderId && paymentIntent && shippingQuotes.length > 0 && shippingOption) {
-      console.log('🔄 Updating payment intent with final total including shipping:', totalAmount)
+      console.log('🔄 Updating payment intent with final total including shipping')
       createPaymentIntent(orderId) // This will update the existing payment intent
     }
-  }, [shippingQuotes, shippingOption, totalAmount])
+  }, [shippingQuotes, shippingOption])
 
   // Add a state variable to force re-render when shipping option changes
   const [shippingUpdateTrigger, setShippingUpdateTrigger] = useState(0)
