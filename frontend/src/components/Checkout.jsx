@@ -365,13 +365,21 @@ const Checkout = () => {
     console.log('🔄 All shipping quotes:', shippingQuotes)
   }, [shippingOption, shippingQuotes])
 
-  // Create payment intent when we have order ID and shipping costs loaded
+  // Create payment intent when we have order ID (will be updated when shipping costs are loaded)
   useEffect(() => {
-    if (orderId && shippingQuotes.length > 0 && shippingOption && !paymentIntent) {
-      console.log('🔄 Creating payment intent with final total including shipping')
+    if (orderId && !paymentIntent) {
+      console.log('🔄 Creating initial payment intent (will be updated with shipping costs)')
       createPaymentIntent(orderId)
     }
-  }, [orderId, shippingQuotes, shippingOption, paymentIntent])
+  }, [orderId, paymentIntent])
+
+  // Update payment intent when shipping costs change
+  useEffect(() => {
+    if (orderId && paymentIntent && shippingQuotes.length > 0 && shippingOption) {
+      console.log('🔄 Updating payment intent with final total including shipping:', totalAmount)
+      createPaymentIntent(orderId) // This will update the existing payment intent
+    }
+  }, [shippingQuotes, shippingOption, totalAmount])
 
   // Add a state variable to force re-render when shipping option changes
   const [shippingUpdateTrigger, setShippingUpdateTrigger] = useState(0)
@@ -694,7 +702,7 @@ const Checkout = () => {
     )
   }
 
-  if (!orderData || !paymentIntent) {
+  if (!orderData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-8 border border-white/30 shadow-xl">
