@@ -96,13 +96,13 @@ class TentPlaywrightIntegration(B2SignPlaywrightIntegration):
             # Go directly to the shipping section which is identical for both
             
             # Step 1: Select Blind Drop Ship (USE PROVEN BANNER METHOD)
-            await self._select_blind_drop_ship()
+            await super()._select_blind_drop_ship()
             
             # Step 2: Open address modal and fill customer address (USE PROVEN BANNER METHOD)
-            await self._open_and_fill_address_modal(zip_code, customer_info)
+            await super()._open_and_fill_address_modal(zip_code, customer_info)
             
             # Step 3: Extract all shipping options (USE PROVEN BANNER METHOD)
-            shipping_options = await self._extract_all_shipping_options_workflow()
+            shipping_options = await super()._extract_all_shipping_options_workflow()
             
             return shipping_options
             
