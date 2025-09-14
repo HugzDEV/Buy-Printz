@@ -60,8 +60,9 @@ class TentPlaywrightIntegration(B2SignPlaywrightIntegration):
             await self.page.goto(product_url, wait_until='networkidle')
             await self.page.wait_for_timeout(3000)
             
-            # Use the EXACT SAME proven banner workflow (call parent's proven method)
-            shipping_options = await super()._fill_banner_quote_form(order_data)
+            # Use the EXACT SAME proven banner workflow for shipping section only
+            # Skip banner-specific form filling, go directly to shipping section
+            shipping_options = await self._fill_tent_quote_form_shipping_only(order_data)
             
             return {
                 'success': True,
@@ -79,6 +80,35 @@ class TentPlaywrightIntegration(B2SignPlaywrightIntegration):
             }
     
     # Uses parent's proven _fill_banner_quote_form method - no override needed
+    
+    async def _fill_tent_quote_form_shipping_only(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Fill tent form - skip banner-specific fields, use proven banner methods for shipping section only"""
+        try:
+            logger.info("🏕️ Starting tent workflow - using proven banner methods for shipping section only...")
+            
+            # Extract customer info for shipping
+            customer_info = order_data.get('customer_info', {})
+            zip_code = customer_info.get('zipCode', customer_info.get('zip_code', '90210'))
+            
+            logger.info(f"📋 Tent shipping workflow - zip: {zip_code}")
+            
+            # Skip banner-specific form filling (dimensions, job details, options)
+            # Go directly to the shipping section which is identical for both
+            
+            # Step 1: Select Blind Drop Ship (USE PROVEN BANNER METHOD)
+            await self._select_blind_drop_ship()
+            
+            # Step 2: Open address modal and fill customer address (USE PROVEN BANNER METHOD)
+            await self._open_and_fill_address_modal(zip_code, customer_info)
+            
+            # Step 3: Extract all shipping options (USE PROVEN BANNER METHOD)
+            shipping_options = await self._extract_all_shipping_options_workflow()
+            
+            return shipping_options
+            
+        except Exception as e:
+            logger.error(f"❌ Error in tent shipping workflow: {e}")
+            return []
     
     async def _fill_banner_options_workflow(self, print_options: Dict[str, Any]):
         """Override to use tent-specific options instead of banner options"""
