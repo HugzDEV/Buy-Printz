@@ -168,14 +168,7 @@ class TentPlaywrightIntegration:
         try:
             logger.info(f"🏕️ Getting tent shipping costs for {order_data.get('tent_size', 'tent')}")
             
-            # Check if browser is properly initialized
-            if not self.page:
-                logger.error("❌ Browser page is not initialized")
-                return {
-                    'success': False,
-                    'errors': ['Browser not properly initialized'],
-                    'shipping_options': []
-                }
+            # Browser should be properly initialized by the calling service
             
             # Map BuyPrintz tent size to B2Sign product page
             tent_size = order_data.get('print_options', {}).get('tent_size', '10x10')
