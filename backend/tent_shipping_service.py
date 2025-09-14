@@ -9,7 +9,7 @@ import asyncio
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from backend.tent_playwright_integration import TentPlaywrightIntegration
+from tent_playwright_integration import TentPlaywrightIntegration
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -61,30 +61,7 @@ class TentShippingService:
             
             # Use the proven tent integration (duplicated from working banner integration)
             tent_integration = TentPlaywrightIntegration()
-            
-            # Initialize the tent integration properly
-            init_success = await tent_integration.initialize()
-            if not init_success:
-                return {
-                    'success': False,
-                    'errors': ['Failed to initialize browser for tent integration'],
-                    'shipping_options': []
-                }
-            
-            # Login to B2Sign
-            login_success = await tent_integration.login()
-            if not login_success:
-                return {
-                    'success': False,
-                    'errors': ['Failed to login to B2Sign for tent integration'],
-                    'shipping_options': []
-                }
-            
-            try:
-                result = await tent_integration.get_tent_shipping_costs(b2sign_order_data)
-            finally:
-                # Always cleanup
-                await tent_integration.cleanup()
+            result = await tent_integration.get_tent_shipping_costs(b2sign_order_data)
             
             return result
             

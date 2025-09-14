@@ -13,7 +13,7 @@ from datetime import datetime
 from playwright.async_api import async_playwright, Browser, Page, BrowserContext
 
 # Import the proven banner integration
-from backend.b2sign_playwright_integration import B2SignPlaywrightIntegration
+from b2sign_playwright_integration import B2SignPlaywrightIntegration
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

@@ -131,19 +131,38 @@ const SurfaceThumbnailViewer = ({
     }
   }, [productType, orderDetails, canvasData, surfaceElements])
 
-  // Generate all surface thumbnails
+  // Generate all surface thumbnails - prioritize Supabase-stored images
   const generateAllThumbnails = useCallback(async () => {
     setIsGenerating(true)
     const thumbnails = {}
     
     try {
       const surfaces = getAvailableSurfaces()
-      console.log('🎨 Generating thumbnails for surfaces:', surfaces.map(s => s.key))
+      console.log('🎨 Loading thumbnails for surfaces:', surfaces.map(s => s.key))
+      
+      // Check if we have Supabase-stored surface images
+      const supabaseSurfaceImages = orderDetails?.surface_images || canvasData?.surface_images
+      console.log('🎨 Supabase surface images available:', !!supabaseSurfaceImages)
+      console.log('🎨 Supabase surface images keys:', Object.keys(supabaseSurfaceImages || {}))
       
       for (const surface of surfaces) {
-        const thumbnail = await generateSurfaceThumbnail(surface)
-        thumbnails[surface.key] = thumbnail
-        console.log(`🎨 Generated thumbnail for ${surface.key}: ${thumbnail.dimensions.width}x${thumbnail.dimensions.height}`)
+        // Prioritize Supabase-stored images over regenerated ones
+        if (supabaseSurfaceImages && supabaseSurfaceImages[surface.key]) {
+          console.log(`🎨 Using Supabase-stored image for ${surface.key}`)
+          thumbnails[surface.key] = {
+            imageDataUrl: supabaseSurfaceImages[surface.key],
+            dimensions: surface.dimensions,
+            source: 'supabase'
+          }
+        } else {
+          console.log(`🎨 Generating thumbnail for ${surface.key} (no Supabase image found)`)
+          const thumbnail = await generateSurfaceThumbnail(surface)
+          thumbnails[surface.key] = {
+            ...thumbnail,
+            source: 'generated'
+          }
+        }
+        console.log(`🎨 Loaded thumbnail for ${surface.key}: ${thumbnails[surface.key].dimensions.width}x${thumbnails[surface.key].dimensions.height} (${thumbnails[surface.key].source})`)
       }
       
       setSurfaceThumbnails(thumbnails)
@@ -155,11 +174,11 @@ const SurfaceThumbnailViewer = ({
       }
       
     } catch (error) {
-      console.error('Error generating thumbnails:', error)
+      console.error('Error loading thumbnails:', error)
     } finally {
       setIsGenerating(false)
     }
-  }, [getAvailableSurfaces, generateSurfaceThumbnail])
+  }, [getAvailableSurfaces, generateSurfaceThumbnail, orderDetails, canvasData])
 
   // Generate thumbnails when component mounts or dependencies change
   useEffect(() => {
@@ -235,7 +254,7 @@ const SurfaceThumbnailViewer = ({
       {/* Surface Preview */}
       <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center overflow-hidden">
         <img
-          src={currentThumbnail.dataUrl}
+          src={currentThumbnail.imageDataUrl || currentThumbnail.dataUrl}
           alt={`${currentSurface?.name} preview`}
           className="max-w-full max-h-96 object-contain"
           style={{

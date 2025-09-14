@@ -168,6 +168,14 @@ const TentCheckout = () => {
         }
         
         console.log('Loaded tent order data:', parsed)
+        console.log('🎨 TentCheckout - canvas_image available:', !!parsed.canvas_image)
+        console.log('🎨 TentCheckout - surface_images available:', !!parsed.surface_images)
+        console.log('🎨 TentCheckout - surface_images keys:', Object.keys(parsed.surface_images || {}))
+        
+        // If we have canvas images, create a Supabase order to store them
+        if (parsed.canvas_image || parsed.surface_images) {
+          createSupabaseOrder(parsed)
+        }
       } catch (error) {
         console.error('Error parsing tent order data:', error)
       }
@@ -191,6 +199,44 @@ const TentCheckout = () => {
       console.log('Set default tent order data:', defaultOrderData)
     }
   }, [])
+
+  // Create Supabase order to store canvas images
+  const createSupabaseOrder = async (orderData) => {
+    try {
+      console.log('🎨 Creating Supabase order to store canvas images...')
+      
+      // Get authenticated headers with automatic token refresh
+      const authHeaders = await authService.getAuthHeaders()
+      
+      const response = await fetch('/api/orders/create-with-images', {
+        method: 'POST',
+        headers: {
+          ...authHeaders,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('🎨 Supabase order created successfully:', result.order_id)
+        
+        // Store the order ID for later use
+        setOrderData(prev => ({
+          ...prev,
+          supabase_order_id: result.order_id
+        }))
+        
+        return result.order_id
+      } else {
+        console.error('🎨 Failed to create Supabase order:', response.statusText)
+        return null
+      }
+    } catch (error) {
+      console.error('🎨 Error creating Supabase order:', error)
+      return null
+    }
+  }
 
   // Get shipping quotes when shipping section is expanded and customer info is available
   useEffect(() => {

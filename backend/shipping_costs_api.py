@@ -12,8 +12,8 @@ from typing import Dict, List, Optional, Any
 import asyncio
 from datetime import datetime
 
-from backend.b2sign_playwright_integration import B2SignPlaywrightIntegration
-from backend.tent_shipping_service import get_tent_shipping_costs
+from b2sign_playwright_integration import B2SignPlaywrightIntegration
+from tent_shipping_service import get_tent_shipping_costs
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -130,9 +130,7 @@ async def get_shipping_costs(request: ShippingCostsRequest):
             if request.product_type in ['banner', 'banners']:
                 result = await integration.get_banner_shipping_costs(order_data)
             elif request.product_type in ['tent', 'tents']:
-                # Use the tent shipping service for tent products
-                from backend.tent_shipping_service import get_tent_shipping_costs
-                result = await get_tent_shipping_costs(order_data, request.customer_info)
+                result = await integration.get_tent_shipping_costs(order_data)
             else:
                 raise HTTPException(status_code=400, detail="Unsupported product type")
             

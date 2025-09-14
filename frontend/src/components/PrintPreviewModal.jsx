@@ -18,6 +18,7 @@ import {
 import { Download, Eye, FileText, Check, X, Printer, CheckCircle, AlertTriangle } from 'lucide-react'
 import jsPDF from 'jspdf'
 import SurfaceThumbnailViewer from './SurfaceThumbnailViewer'
+import authService from '../services/auth'
 
 const PrintPreviewModal = ({ 
   isOpen, 
@@ -230,19 +231,10 @@ const PrintPreviewModal = ({
         return null
       }
       
-      // Set canvas size - use actual surface dimensions for accurate rendering
-      let canvasSize
-      if (productType === 'tent' && targetSurface) {
-        const surfaceDims = getTentSurfaceDimensions(targetSurface)
-        canvasSize = { width: surfaceDims.width, height: surfaceDims.height }
-      } else {
-        // For banners and other products, use the actual canvas size from the editor
-        canvasSize = canvasData?.canvasSize || orderDetails?.canvasSize || { width: 800, height: 600 }
-      }
+      // Set canvas size
+      const canvasSize = canvasData?.canvasSize || { width: 800, height: 600 }
       canvas.width = canvasSize.width
       canvas.height = canvasSize.height
-      
-      console.log('🎨 Canvas size for rendering:', canvasSize)
       
       // Set background color
       ctx.fillStyle = canvasData?.backgroundColor || '#ffffff'
@@ -250,32 +242,49 @@ const PrintPreviewModal = ({
       
       // Apply tent canopy clipping for tent canopy surfaces
       if (productType === 'tent' && targetSurface && targetSurface.startsWith('canopy_')) {
-        // Create the tent canopy + valence clipping path using actual dimensions
+        // Create the tent canopy + valence clipping path
         ctx.beginPath()
         
-        // Calculate clipping path based on actual canvas dimensions
-        const triangleHeight = Math.floor(canvasSize.height * 0.75) // 75% for triangle
-        const valenceHeight = canvasSize.height - triangleHeight    // 25% for valence
-        
         // Start with triangular canopy path
-        ctx.moveTo(canvasSize.width / 2, 0)                    // Top point (center top)
-        ctx.lineTo(0, triangleHeight)                          // Bottom left of triangle
-        ctx.lineTo(canvasSize.width, triangleHeight)           // Bottom right of triangle
+        ctx.moveTo(canvasSize.width / 2, 0) // Top point (center top)
+        ctx.lineTo(0, 789)                  // Bottom left of triangle
+        ctx.lineTo(canvasSize.width, 789)   // Bottom right of triangle
         
         // Continue to rectangular valence path (no closePath between them)
-        ctx.lineTo(canvasSize.width, triangleHeight)           // Top right of valence
-        ctx.lineTo(0, triangleHeight)                          // Top left of valence
-        ctx.lineTo(0, canvasSize.height)                       // Bottom left of valence
-        ctx.lineTo(canvasSize.width, canvasSize.height)        // Bottom right of valence
-        ctx.lineTo(canvasSize.width, triangleHeight)           // Back to bottom right of triangle
+        ctx.lineTo(canvasSize.width, 809)   // Top right of valence
+        ctx.lineTo(0, 809)                  // Top left of valence
+        ctx.lineTo(0, 1009)                 // Bottom left of valence (789 + 20 + 200)
+        ctx.lineTo(canvasSize.width, 1009)  // Bottom right of valence
+        ctx.lineTo(canvasSize.width, 789)   // Back to bottom right of triangle
         
         ctx.closePath()
         ctx.clip() // Apply the clipping path
       }
       
-      // Render elements
+      // Render elements with proper transformations
       for (const element of elementsToRender) {
-        console.log('🎨 Rendering element:', element.type, 'at position:', element.x, element.y, 'size:', element.width, element.height)
+        // Save the current context state
+        ctx.save()
+        
+        // Apply transformations (rotation, scaling, positioning)
+        const centerX = element.x + (element.width || element.radius * 2 || 100) / 2
+        const centerY = element.y + (element.height || element.radius * 2 || 100) / 2
+        
+        // Apply rotation if present
+        if (element.rotation) {
+          ctx.translate(centerX, centerY)
+          ctx.rotate((element.rotation * Math.PI) / 180)
+          ctx.translate(-centerX, -centerY)
+        }
+        
+        // Apply scaling if present
+        if (element.scaleX || element.scaleY) {
+          const scaleX = element.scaleX || 1
+          const scaleY = element.scaleY || 1
+          ctx.translate(centerX, centerY)
+          ctx.scale(scaleX, scaleY)
+          ctx.translate(-centerX, -centerY)
+        }
         
         if (element.type === 'image' && element.imageDataUrl) {
           // Create image from data URL
@@ -284,37 +293,84 @@ const PrintPreviewModal = ({
           
           await new Promise((resolve, reject) => {
             img.onload = () => {
-              // Use exact element coordinates and dimensions
               ctx.drawImage(img, element.x, element.y, element.width, element.height)
-              console.log('🎨 Image rendered at:', element.x, element.y, 'with size:', element.width, element.height)
               resolve()
             }
             img.onerror = reject
             img.src = element.imageDataUrl
           })
         } else if (element.type === 'text') {
-          // Render text with exact positioning
-          ctx.font = `${element.fontSize}px ${element.fontFamily}`
+          // Render text with proper positioning and alignment
+          ctx.font = `${element.fontSize || 24}px ${element.fontFamily || 'Arial'}`
           ctx.fillStyle = element.fill || element.color || '#000000'
-          ctx.textAlign = element.align || element.textAlign || 'left'
-          ctx.fillText(element.text, element.x, element.y)
-          console.log('🎨 Text rendered at:', element.x, element.y, 'text:', element.text)
+          
+          // Handle text alignment properly
+          const textAlign = element.align || element.textAlign || 'left'
+          const verticalAlign = element.verticalAlign || 'top'
+          
+          // Calculate text position based on alignment
+          let textX = element.x
+          let textY = element.y
+          
+          if (textAlign === 'center') {
+            ctx.textAlign = 'center'
+            textX = element.x + (element.width || 200) / 2
+          } else if (textAlign === 'right') {
+            ctx.textAlign = 'right'
+            textX = element.x + (element.width || 200)
+          } else {
+            ctx.textAlign = 'left'
+          }
+          
+          // Handle vertical alignment
+          if (verticalAlign === 'middle') {
+            ctx.textBaseline = 'middle'
+            textY = element.y + (element.height || 30) / 2
+          } else if (verticalAlign === 'bottom') {
+            ctx.textBaseline = 'bottom'
+            textY = element.y + (element.height || 30)
+          } else {
+            ctx.textBaseline = 'top'
+          }
+          
+          // Handle stroke if present
+          if (element.stroke && element.strokeWidth) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.strokeText(element.text, textX, textY)
+          }
+          
+          ctx.fillText(element.text, textX, textY)
         } else if (element.type === 'rect') {
           // Render rectangle
           ctx.fillStyle = element.fill || '#000000'
           ctx.fillRect(element.x, element.y, element.width, element.height)
+          
+          // Add stroke if present
+          if (element.stroke && element.strokeWidth) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.strokeRect(element.x, element.y, element.width, element.height)
+          }
         } else if (element.type === 'circle') {
           // Render circle
           ctx.beginPath()
           ctx.arc(element.x + element.radius, element.y + element.radius, element.radius, 0, 2 * Math.PI)
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if present
+          if (element.stroke && element.strokeWidth) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'star') {
           // Render star
           ctx.beginPath()
           const numPoints = element.numPoints || 5
-          const innerRadius = element.innerRadius || 40
-          const outerRadius = element.outerRadius || 80
+          const innerRadius = element.innerRadius || 30
+          const outerRadius = element.outerRadius || 50
           const centerX = element.x + outerRadius
           const centerY = element.y + outerRadius
           
@@ -333,10 +389,17 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if present
+          if (element.stroke && element.strokeWidth) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'triangle') {
           // Render triangle
           ctx.beginPath()
-          const radius = element.radius || 60
+          const radius = element.radius || 50
           const centerX = element.x + radius
           const centerY = element.y + radius
           
@@ -354,10 +417,17 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if present
+          if (element.stroke && element.strokeWidth) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'hexagon') {
           // Render hexagon
           ctx.beginPath()
-          const radius = element.radius || 60
+          const radius = element.radius || 50
           const centerX = element.x + radius
           const centerY = element.y + radius
           
@@ -375,10 +445,17 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if present
+          if (element.stroke && element.strokeWidth) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'octagon') {
           // Render octagon
           ctx.beginPath()
-          const radius = element.radius || 60
+          const radius = element.radius || 50
           const centerX = element.x + radius
           const centerY = element.y + radius
           
@@ -396,18 +473,21 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if present
+          if (element.stroke && element.strokeWidth) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'line') {
           // Render line-based shapes (heart, diamond, arrows, etc.)
           if (element.points && element.points.length > 0) {
             ctx.beginPath()
             
-            // Apply scaling if present
-            const scaleX = element.scaleX || 1
-            const scaleY = element.scaleY || 1
-            
             for (let i = 0; i < element.points.length; i += 2) {
-              const x = element.x + (element.points[i] * scaleX)
-              const y = element.y + (element.points[i + 1] * scaleY)
+              const x = element.x + element.points[i]
+              const y = element.y + element.points[i + 1]
               
               if (i === 0) {
                 ctx.moveTo(x, y)
@@ -434,6 +514,9 @@ const PrintPreviewModal = ({
             ctx.stroke()
           }
         }
+        
+        // Restore the context state
+        ctx.restore()
       }
       
       // Convert to data URL
@@ -457,6 +540,40 @@ const PrintPreviewModal = ({
         console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys((canvasData?.surface_images || orderDetails?.surface_images) || {}))
         console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails?.design_option)
         
+        // Check if we have a Supabase order ID to fetch images from
+        if (orderDetails?.supabase_order_id) {
+          console.log('🎨 Fetching images from Supabase order:', orderDetails.supabase_order_id)
+          try {
+            // Get authenticated headers with automatic token refresh
+            const authHeaders = await authService.getAuthHeaders()
+            
+            const response = await fetch(`/api/orders/${orderDetails.supabase_order_id}/images`, {
+              headers: authHeaders
+            })
+            
+            if (response.ok) {
+              const imageData = await response.json()
+              console.log('🎨 Retrieved images from Supabase:', imageData)
+              
+              // Use Supabase-stored images
+              if (hasMultipleSurfaces() && imageData.surface_images && imageData.surface_images[selectedSurface]) {
+                console.log('🎨 Using Supabase surface image for:', selectedSurface)
+                setPreviewImage(imageData.surface_images[selectedSurface])
+                return
+              } else if (imageData.canvas_image) {
+                console.log('🎨 Using Supabase canvas image')
+                setPreviewImage(imageData.canvas_image)
+                return
+              }
+            } else {
+              console.error('🎨 Failed to fetch images from Supabase:', response.statusText)
+            }
+          } catch (error) {
+            console.error('🎨 Error fetching images from Supabase:', error)
+          }
+        }
+        
+        // Fallback to existing logic for orders without Supabase storage
         // Get images from orderDetails (where they're actually stored after capture)
         const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
         const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
@@ -469,23 +586,33 @@ const PrintPreviewModal = ({
         console.log('🎨 Debug - canvasImage:', canvasImage)
         console.log('🎨 Debug - selectedSurface:', selectedSurface)
         
-        // PRIORITY: Use captured canvas images first (exact as designed)
+        // Prioritize pre-captured canvas images over regenerated ones for consistency
         console.log('🎨 Image loading path check - hasMultipleSurfaces:', hasMultipleSurfaces(), 'surfaceImages keys:', Object.keys(surfaceImages || {}), 'surfaceImages length:', Object.keys(surfaceImages || {}).length)
         
         if (hasMultipleSurfaces() && surfaceImages && surfaceImages[selectedSurface]) {
-          console.log('🎨 ✅ Using captured surface image (exact as designed)')
+          console.log('🎨 Taking path: hasMultipleSurfaces with pre-captured surface images')
           const surfaceImage = surfaceImages[selectedSurface]
-          console.log(`🎨 Found captured surface image for ${selectedSurface}:`, typeof surfaceImage)
+          console.log(`🎨 Found pre-captured surface image for ${selectedSurface}:`, typeof surfaceImage)
           setPreviewImage(surfaceImage)
         } else if (canvasImage) {
-          console.log('🎨 ✅ Using captured canvas image (exact as designed)')
+          console.log('🎨 Taking path: has pre-captured canvasImage')
           setPreviewImage(canvasImage)
-        } else {
-          console.log('🎨 ⚠️ No captured images found, falling back to generation from elements')
-          // Only generate if we don't have captured images
-          const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
-          console.log('🎨 Setting preview image (generated fallback):', generatedImage ? 'Generated successfully' : 'Failed to generate')
+        } else if (hasMultipleSurfaces()) {
+          console.log('🎨 Taking path: multi-surface but no pre-captured images, generating from surface elements')
+          // For multi-surface products, generate from surface elements as fallback
+          const generatedImage = await generateCanvasImageFromData(selectedSurface)
+          console.log('🎨 Setting preview image (generated for surface):', generatedImage ? 'Generated successfully' : 'Failed to generate')
           setPreviewImage(generatedImage)
+        } else {
+          console.log('🎨 Taking path: no pre-captured images available, generating from canvas data')
+          // Only generate if we don't already have a preview image
+          if (!previewImage) {
+            const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
+            console.log('🎨 Setting preview image (generated):', generatedImage ? 'Generated successfully' : 'Failed to generate')
+            setPreviewImage(generatedImage)
+          } else {
+            console.log('🎨 Preview image already exists, skipping generation')
+          }
         }
       setIsGenerating(false)
       }
@@ -517,10 +644,15 @@ const PrintPreviewModal = ({
     }
   }, [previewImage])
 
-  // Set consistent image scale across all devices
+  // Set image scale based on screen size - consistent behavior to prevent element movement
   useEffect(() => {
     const updateScale = () => {
-      setImageScale(1.0) // Use consistent 1:1 scaling to preserve element positioning
+      // Use consistent scaling to prevent element positioning issues
+      if (window.innerWidth < 768) {
+        setImageScale(1.0) // No scaling on mobile to preserve element positioning
+      } else {
+        setImageScale(1.0) // Use 1.0 for desktop too to prevent element movement
+      }
     }
     
     updateScale()
@@ -533,37 +665,40 @@ const PrintPreviewModal = ({
     try {
       setIsGenerating(true)
       
-      // PRIORITY: Use captured canvas images first (exact as designed)
+      // Prioritize pre-captured images for consistency with canvas
       let canvasImage = null
       
       if (hasMultipleSurfaces()) {
-        // For multi-surface products, use captured surface image
+        // For multi-surface products, use the pre-captured surface image
         const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
         canvasImage = surfaceImages?.[selectedSurface]
-        console.log('🎨 PDF: Using captured surface image for', selectedSurface, ':', !!canvasImage)
-      } else {
-        // For single-surface products, use captured canvas image
-        canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
-        console.log('🎨 PDF: Using captured canvas image:', !!canvasImage)
+        console.log(`🎨 PDF Generation - Using pre-captured surface image for ${selectedSurface}:`, canvasImage ? 'Found' : 'Not found')
       }
       
-      // Only fallback to generation if no captured image available
+      // Fallback to main canvas image
       if (!canvasImage) {
-        console.log('🎨 PDF: No captured image available, generating from canvas data...')
+        canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+        console.log('🎨 PDF Generation - Using main canvas image:', canvasImage ? 'Found' : 'Not found')
+      }
+      
+      // If no pre-captured image available, generate one from canvas data
+      if (!canvasImage) {
+        console.log('🎨 PDF Generation - No pre-captured image available, generating from canvas data...')
+        // For multi-surface products, generate image for the current surface
         const targetSurface = hasMultipleSurfaces() ? selectedSurface : null
         canvasImage = await generateCanvasImageFromData(targetSurface)
       }
       
       if (canvasImage) {
-        console.log('🎨 PDF: Generating production PDF from canvas image...')
+        console.log('🎨 PDF Generation - Generating production PDF from canvas image...')
         const pdfBlob = await createPDFFromImage(canvasImage)
         return pdfBlob // Return the PDF blob
       } else {
-        console.error('❌ PDF: No canvas image available for PDF generation!')
+        console.error('🎨 PDF Generation - No canvas image available for PDF generation!')
         throw new Error('No canvas image available')
       }
     } catch (error) {
-      console.error('❌ PDF: Error generating production PDF:', error)
+      console.error('Error generating production PDF:', error)
       throw error
     } finally {
       setIsGenerating(false)
@@ -694,16 +829,22 @@ const PrintPreviewModal = ({
                                  maxWidth: '100%',
                                  maxHeight: window.innerWidth < 768 ? '200px' : '280px',
                                  minHeight: window.innerWidth < 768 ? '150px' : '250px',
-                                 objectFit: 'contain'
+                                 objectFit: 'contain',
+                                 // Remove scaling to prevent element positioning issues
+                                 transform: 'none',
+                                 transformOrigin: 'center center'
                                }}
                                onLoad={handleImageLoad}
                              />
                                
-                               {/* BuyPrintz Watermark Overlay - IP Protection - Properly positioned */}
+                               {/* BuyPrintz Watermark Overlay - IP Protection - Fixed positioning */}
                                <div 
                                  className="absolute inset-0 pointer-events-none" 
                                  style={{ 
-                                   zIndex: 10
+                                   zIndex: 10,
+                                   // Remove scaling to prevent element positioning issues
+                                   transform: 'none',
+                                   transformOrigin: 'center center'
                                  }}
                                >
                                  <img
@@ -714,7 +855,8 @@ const PrintPreviewModal = ({
                                      position: 'absolute',
                                      top: 0,
                                      left: 0,
-                                     opacity: 0.3
+                                     opacity: 0.2, // Reduced opacity to be less intrusive
+                                     mixBlendMode: 'multiply' // Better blending with design
                                    }}
                                  />
                                </div>
@@ -723,7 +865,10 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
                                  style={{ 
-                                   zIndex: 20
+                                   zIndex: 20,
+                                   // Remove scaling to prevent positioning issues
+                                   transform: 'none',
+                                   transformOrigin: 'center center'
                                  }}
                                >
                                  Preview
@@ -788,7 +933,7 @@ const PrintPreviewModal = ({
                            link.click()
                              document.body.removeChild(link)
                              
-                             console.log('🎨 Download initiated for:', filename, 'using captured canvas image')
+                             console.log('Download initiated for:', filename)
                            } catch (error) {
                              console.error('Download failed:', error)
                              alert('Download failed. Please try again.')

@@ -2940,6 +2940,7 @@ const BannerEditorNew = () => {
         bannerSpecs,
         timestamp: new Date().toISOString()
       },
+      // Store canvas images for Supabase - these will be uploaded to Supabase storage
       canvas_image: generateCanvasImage(),
       surface_images: await captureAllSurfaceImages(),
       surface_elements: surfaceElements, // Include surface elements for restoration
@@ -2978,12 +2979,12 @@ const BannerEditorNew = () => {
     console.log('🎨 Order data specs - design_option:', productType === 'tent' ? tentDesignOption : productType === 'tin' ? (tinSpecs?.surfaceCoverage || 'front-back') : 'single-surface')
     
     // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
-    // Create minimal restoration data without large image objects
+    // Create minimal restoration data - images will be stored in Supabase
     const orderDataForStorage = {
       ...orderData,
-      canvas_image: null, // Canvas image is in Supabase, not needed in sessionStorage
-      // Remove large image data that causes quota exceeded errors
-      surface_images: null, // Will be regenerated when needed
+      // Store image data for Supabase upload - these will be uploaded to Supabase storage
+      canvas_image: orderData.canvas_image, // Will be uploaded to Supabase
+      surface_images: orderData.surface_images, // Will be uploaded to Supabase
       // Clean surface_elements to remove image objects but preserve structure
       surface_elements: Object.keys(surfaceElements).reduce((acc, surfaceKey) => {
         acc[surfaceKey] = (surfaceElements[surfaceKey] || []).map(element => {
