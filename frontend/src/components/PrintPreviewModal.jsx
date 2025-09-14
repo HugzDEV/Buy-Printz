@@ -469,33 +469,23 @@ const PrintPreviewModal = ({
         console.log('🎨 Debug - canvasImage:', canvasImage)
         console.log('🎨 Debug - selectedSurface:', selectedSurface)
         
-        // Simplified image loading logic
+        // PRIORITY: Use captured canvas images first (exact as designed)
         console.log('🎨 Image loading path check - hasMultipleSurfaces:', hasMultipleSurfaces(), 'surfaceImages keys:', Object.keys(surfaceImages || {}), 'surfaceImages length:', Object.keys(surfaceImages || {}).length)
         
         if (hasMultipleSurfaces() && surfaceImages && surfaceImages[selectedSurface]) {
-          console.log('🎨 Taking path: hasMultipleSurfaces with surface images')
+          console.log('🎨 ✅ Using captured surface image (exact as designed)')
           const surfaceImage = surfaceImages[selectedSurface]
-          console.log(`🎨 Found surface image for ${selectedSurface}:`, typeof surfaceImage)
+          console.log(`🎨 Found captured surface image for ${selectedSurface}:`, typeof surfaceImage)
           setPreviewImage(surfaceImage)
-        } else if (hasMultipleSurfaces()) {
-          console.log('🎨 Taking path: multi-surface but no surface images, generating from surface elements')
-          // For multi-surface products, always generate from surface elements to ensure unique images
-          const generatedImage = await generateCanvasImageFromData(selectedSurface)
-          console.log('🎨 Setting preview image (generated for surface):', generatedImage ? 'Generated successfully' : 'Failed to generate')
-          setPreviewImage(generatedImage)
         } else if (canvasImage) {
-          console.log('🎨 Taking path: has canvasImage')
+          console.log('🎨 ✅ Using captured canvas image (exact as designed)')
           setPreviewImage(canvasImage)
         } else {
-          console.log('🎨 Taking path: no images available, generating from canvas data')
-          // Only generate if we don't already have a preview image
-          if (!previewImage) {
-            const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
-            console.log('🎨 Setting preview image (generated):', generatedImage ? 'Generated successfully' : 'Failed to generate')
-            setPreviewImage(generatedImage)
-          } else {
-            console.log('🎨 Preview image already exists, skipping generation')
-          }
+          console.log('🎨 ⚠️ No captured images found, falling back to generation from elements')
+          // Only generate if we don't have captured images
+          const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
+          console.log('🎨 Setting preview image (generated fallback):', generatedImage ? 'Generated successfully' : 'Failed to generate')
+          setPreviewImage(generatedImage)
         }
       setIsGenerating(false)
       }
@@ -543,27 +533,37 @@ const PrintPreviewModal = ({
     try {
       setIsGenerating(true)
       
-      // Get canvas image from canvasData first, fallback to orderDetails
-      let canvasImage = canvasData?.canvas_image || orderDetails?.canvas_image
+      // PRIORITY: Use captured canvas images first (exact as designed)
+      let canvasImage = null
       
-      // If no canvas image available, generate one from canvas data
+      if (hasMultipleSurfaces()) {
+        // For multi-surface products, use captured surface image
+        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
+        canvasImage = surfaceImages?.[selectedSurface]
+        console.log('🎨 PDF: Using captured surface image for', selectedSurface, ':', !!canvasImage)
+      } else {
+        // For single-surface products, use captured canvas image
+        canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+        console.log('🎨 PDF: Using captured canvas image:', !!canvasImage)
+      }
+      
+      // Only fallback to generation if no captured image available
       if (!canvasImage) {
-        console.log('No canvas image available, generating from canvas data for PDF...')
-        // For multi-surface products, generate image for the current surface
+        console.log('🎨 PDF: No captured image available, generating from canvas data...')
         const targetSurface = hasMultipleSurfaces() ? selectedSurface : null
         canvasImage = await generateCanvasImageFromData(targetSurface)
       }
       
       if (canvasImage) {
-        console.log('Generating production PDF from high-quality canvas image...')
+        console.log('🎨 PDF: Generating production PDF from canvas image...')
         const pdfBlob = await createPDFFromImage(canvasImage)
         return pdfBlob // Return the PDF blob
       } else {
-        console.error('No canvas image available for PDF generation!')
+        console.error('❌ PDF: No canvas image available for PDF generation!')
         throw new Error('No canvas image available')
       }
     } catch (error) {
-      console.error('Error generating production PDF:', error)
+      console.error('❌ PDF: Error generating production PDF:', error)
       throw error
     } finally {
       setIsGenerating(false)
@@ -788,7 +788,7 @@ const PrintPreviewModal = ({
                            link.click()
                              document.body.removeChild(link)
                              
-                             console.log('Download initiated for:', filename)
+                             console.log('🎨 Download initiated for:', filename, 'using captured canvas image')
                            } catch (error) {
                              console.error('Download failed:', error)
                              alert('Download failed. Please try again.')
