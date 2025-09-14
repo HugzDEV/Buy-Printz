@@ -230,10 +230,19 @@ const PrintPreviewModal = ({
         return null
       }
       
-      // Set canvas size
-      const canvasSize = canvasData?.canvasSize || { width: 800, height: 600 }
+      // Set canvas size - use actual surface dimensions for accurate rendering
+      let canvasSize
+      if (productType === 'tent' && targetSurface) {
+        const surfaceDims = getTentSurfaceDimensions(targetSurface)
+        canvasSize = { width: surfaceDims.width, height: surfaceDims.height }
+      } else {
+        // For banners and other products, use the actual canvas size from the editor
+        canvasSize = canvasData?.canvasSize || orderDetails?.canvasSize || { width: 800, height: 600 }
+      }
       canvas.width = canvasSize.width
       canvas.height = canvasSize.height
+      
+      console.log('🎨 Canvas size for rendering:', canvasSize)
       
       // Set background color
       ctx.fillStyle = canvasData?.backgroundColor || '#ffffff'
@@ -241,20 +250,24 @@ const PrintPreviewModal = ({
       
       // Apply tent canopy clipping for tent canopy surfaces
       if (productType === 'tent' && targetSurface && targetSurface.startsWith('canopy_')) {
-        // Create the tent canopy + valence clipping path
+        // Create the tent canopy + valence clipping path using actual dimensions
         ctx.beginPath()
         
+        // Calculate clipping path based on actual canvas dimensions
+        const triangleHeight = Math.floor(canvasSize.height * 0.75) // 75% for triangle
+        const valenceHeight = canvasSize.height - triangleHeight    // 25% for valence
+        
         // Start with triangular canopy path
-        ctx.moveTo(canvasSize.width / 2, 0) // Top point (center top)
-        ctx.lineTo(0, 789)                  // Bottom left of triangle
-        ctx.lineTo(canvasSize.width, 789)   // Bottom right of triangle
+        ctx.moveTo(canvasSize.width / 2, 0)                    // Top point (center top)
+        ctx.lineTo(0, triangleHeight)                          // Bottom left of triangle
+        ctx.lineTo(canvasSize.width, triangleHeight)           // Bottom right of triangle
         
         // Continue to rectangular valence path (no closePath between them)
-        ctx.lineTo(canvasSize.width, 809)   // Top right of valence
-        ctx.lineTo(0, 809)                  // Top left of valence
-        ctx.lineTo(0, 1009)                 // Bottom left of valence (789 + 20 + 200)
-        ctx.lineTo(canvasSize.width, 1009)  // Bottom right of valence
-        ctx.lineTo(canvasSize.width, 789)   // Back to bottom right of triangle
+        ctx.lineTo(canvasSize.width, triangleHeight)           // Top right of valence
+        ctx.lineTo(0, triangleHeight)                          // Top left of valence
+        ctx.lineTo(0, canvasSize.height)                       // Bottom left of valence
+        ctx.lineTo(canvasSize.width, canvasSize.height)        // Bottom right of valence
+        ctx.lineTo(canvasSize.width, triangleHeight)           // Back to bottom right of triangle
         
         ctx.closePath()
         ctx.clip() // Apply the clipping path
@@ -262,6 +275,8 @@ const PrintPreviewModal = ({
       
       // Render elements
       for (const element of elementsToRender) {
+        console.log('🎨 Rendering element:', element.type, 'at position:', element.x, element.y, 'size:', element.width, element.height)
+        
         if (element.type === 'image' && element.imageDataUrl) {
           // Create image from data URL
           const img = new Image()
@@ -269,18 +284,21 @@ const PrintPreviewModal = ({
           
           await new Promise((resolve, reject) => {
             img.onload = () => {
+              // Use exact element coordinates and dimensions
               ctx.drawImage(img, element.x, element.y, element.width, element.height)
+              console.log('🎨 Image rendered at:', element.x, element.y, 'with size:', element.width, element.height)
               resolve()
             }
             img.onerror = reject
             img.src = element.imageDataUrl
           })
         } else if (element.type === 'text') {
-          // Render text
+          // Render text with exact positioning
           ctx.font = `${element.fontSize}px ${element.fontFamily}`
           ctx.fillStyle = element.fill || element.color || '#000000'
           ctx.textAlign = element.align || element.textAlign || 'left'
           ctx.fillText(element.text, element.x, element.y)
+          console.log('🎨 Text rendered at:', element.x, element.y, 'text:', element.text)
         } else if (element.type === 'rect') {
           // Render rectangle
           ctx.fillStyle = element.fill || '#000000'
@@ -509,14 +527,10 @@ const PrintPreviewModal = ({
     }
   }, [previewImage])
 
-  // Set image scale based on screen size - different behavior for desktop vs mobile
+  // Set consistent image scale across all devices
   useEffect(() => {
     const updateScale = () => {
-      if (window.innerWidth < 768) {
-        setImageScale(1.0) // No scaling on mobile to preserve element positioning
-      } else {
-        setImageScale(1.5) // Restore desktop scaling for better preview
-      }
+      setImageScale(1.0) // Use consistent 1:1 scaling to preserve element positioning
     }
     
     updateScale()
@@ -678,11 +692,9 @@ const PrintPreviewModal = ({
                                  width: 'auto',
                                  height: 'auto',
                                  maxWidth: '100%',
-                                   maxHeight: window.innerWidth < 768 ? '200px' : '280px',
-                                   minHeight: window.innerWidth < 768 ? '150px' : '250px',
-                                 objectFit: 'contain',
-                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
-                                 transformOrigin: 'center center'
+                                 maxHeight: window.innerWidth < 768 ? '200px' : '280px',
+                                 minHeight: window.innerWidth < 768 ? '150px' : '250px',
+                                 objectFit: 'contain'
                                }}
                                onLoad={handleImageLoad}
                              />
@@ -691,9 +703,7 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute inset-0 pointer-events-none" 
                                  style={{ 
-                                   zIndex: 10,
-                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
+                                   zIndex: 10
                                  }}
                                >
                                  <img
@@ -713,9 +723,7 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
                                  style={{ 
-                                   zIndex: 20,
-                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
+                                   zIndex: 20
                                  }}
                                >
                                  Preview
