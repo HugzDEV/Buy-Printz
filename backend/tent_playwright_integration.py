@@ -60,8 +60,8 @@ class TentPlaywrightIntegration(B2SignPlaywrightIntegration):
             await self.page.goto(product_url, wait_until='networkidle')
             await self.page.wait_for_timeout(3000)
             
-            # Use the EXACT SAME proven banner workflow (just with tent-specific field mappings)
-            shipping_options = await self._fill_banner_quote_form(order_data)
+            # Use the EXACT SAME proven banner workflow (call parent's proven method)
+            shipping_options = await super()._fill_banner_quote_form(order_data)
             
             return {
                 'success': True,
@@ -78,45 +78,11 @@ class TentPlaywrightIntegration(B2SignPlaywrightIntegration):
                 'shipping_options': []
             }
     
-    async def _fill_banner_quote_form(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Fill out tent quote form using the EXACT SAME proven banner workflow structure"""
-        try:
-            logger.info("🏕️ Starting complete tent workflow (using proven banner workflow structure)...")
-            
-            # Extract order specifications
-            dimensions = order_data.get('dimensions', {})
-            width = dimensions.get('width', 10)
-            height = dimensions.get('height', 10)
-            quantity = order_data.get('quantity', 1)
-            print_options = order_data.get('print_options', {})
-            customer_info = order_data.get('customer_info', {})
-            zip_code = customer_info.get('zipCode', customer_info.get('zip_code', '90210'))
-            
-            logger.info(f"📋 Tent specs: {width}x{height}, qty: {quantity}, zip: {zip_code}")
-            
-            # Step 1: Fill dimensions using MUI selectors (SAME AS BANNER)
-            await self._fill_banner_dimensions(width, height)
-            
-            # Step 2: Fill job details (SAME AS BANNER)
-            await self._fill_banner_job_details(width, height, quantity)
-            
-            # Step 3: Fill tent options (TENT-SPECIFIC - but using same structure)
-            await self._fill_tent_options_workflow(print_options)
-            
-            # Step 4: Select Blind Drop Ship (USE PROVEN BANNER METHOD - INHERITED)
-            await self._select_blind_drop_ship()
-            
-            # Step 5: Open address modal and fill customer address (USE PROVEN BANNER METHOD - INHERITED)
-            await self._open_and_fill_address_modal(zip_code, customer_info)
-            
-            # Step 6: Extract all shipping options (USE PROVEN BANNER METHOD - INHERITED)
-            shipping_options = await self._extract_all_shipping_options_workflow()
-            
-            return shipping_options
-            
-        except Exception as e:
-            logger.error(f"❌ Error in complete tent workflow: {e}")
-            return []
+    # Uses parent's proven _fill_banner_quote_form method - no override needed
+    
+    async def _fill_banner_options_workflow(self, print_options: Dict[str, Any]):
+        """Override to use tent-specific options instead of banner options"""
+        await self._fill_tent_options_workflow(print_options)
     
     async def _fill_tent_options_workflow(self, print_options: Dict[str, Any]):
         """Fill tent-specific design options (tent-specific method)"""
