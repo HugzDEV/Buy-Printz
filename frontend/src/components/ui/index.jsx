@@ -8,7 +8,7 @@ export const Dialog = ({ open, onOpenChange, children }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4">
       <div 
-        className="bg-white rounded-lg shadow-xl w-full max-h-[98vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-white rounded-lg shadow-xl w-full max-h-[90vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
