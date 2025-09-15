@@ -252,11 +252,17 @@ const SurfaceThumbnailViewer = ({
       </div>
 
       {/* Surface Preview */}
-      <div className="bg-gray-100 rounded-lg p-2 sm:p-4 flex items-center justify-center overflow-hidden h-[500px] sm:h-[400px]">
+      <div className="bg-gray-100 rounded-lg p-2 sm:p-4 flex items-center justify-center overflow-hidden h-[400px] sm:h-[400px]">
         <img
           src={currentThumbnail.imageDataUrl || currentThumbnail.dataUrl}
           alt={`${currentSurface?.name} preview`}
-          className="w-full h-full max-w-full max-h-[480px] sm:max-h-[400px] object-contain"
+          className="rounded border shadow-lg"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            objectPosition: 'center'
+          }}
         />
       </div>
 

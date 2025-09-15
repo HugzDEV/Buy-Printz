@@ -813,14 +813,18 @@ const PrintPreviewModal = ({
                      ) : (
                        /* Banner Preview */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
-                         <div className="relative flex items-center justify-center w-full h-[500px] sm:h-[280px]">
+                         <div className="relative flex items-center justify-center w-full h-[400px] sm:h-[280px]">
                            {previewImage ? (
                              <div className="relative w-full h-full flex items-center justify-center">
                              <img
                                src={previewImage}
                                alt="Banner Design Preview"
-                               className="rounded border shadow-lg w-full h-full max-w-full max-h-[480px] sm:max-h-[280px] object-contain"
+                               className="rounded border shadow-lg"
                                style={{
+                                 width: '100%',
+                                 height: '100%',
+                                 objectFit: 'contain',
+                                 objectPosition: 'center',
                                  // Remove scaling to prevent element positioning issues
                                  transform: 'none',
                                  transformOrigin: 'center center'
