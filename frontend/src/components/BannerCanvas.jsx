@@ -49,6 +49,10 @@ Konva.hitOnDragEnabled = true
 // Enable touch event capture for better mobile support
 Konva.captureTouchEventsEnabled = true
 
+// Optimize performance on mobile devices by setting pixel ratio to 1
+// This reduces scaling work Konva has to do on retina devices
+Konva.pixelRatio = 1
+
 
 const BannerCanvas = ({
   elements,
