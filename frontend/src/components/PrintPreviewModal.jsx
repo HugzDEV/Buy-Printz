@@ -810,7 +810,7 @@ const PrintPreviewModal = ({
                      ) : (
                        /* Banner Preview - MOBILE OPTIMIZED WITH DEBUG */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
-                         <div className="w-full h-[400px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
+                         <div className="w-full h-[600px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
                            {/* Debug info - remove this after fixing */}
                            {console.log('🎨 Preview Debug:', {
                              previewImage: previewImage ? 'exists' : 'null/undefined',
@@ -834,7 +834,7 @@ const PrintPreviewModal = ({
                                <img
                                  src={previewImage}
                                  alt="Banner Design Preview"
-                                 className="max-w-full max-h-full object-contain rounded"
+                                 className="w-full h-full object-cover rounded"
                                  onLoad={(e) => {
                                    console.log('🎨 Image loaded successfully:', {
                                      naturalWidth: e.target.naturalWidth,
@@ -847,7 +847,10 @@ const PrintPreviewModal = ({
                                    console.error('🎨 Image failed to load:', e);
                                    console.error('🎨 Image src:', previewImage?.substring(0, 100));
                                  }}
-                                 style={{ imageRendering: 'high-quality' }}
+                                 style={{ 
+                                   imageRendering: 'high-quality',
+                                   objectPosition: 'center center'
+                                 }}
                                />
                                
                                {/* BuyPrintz Watermark Overlay - IP Protection */}
