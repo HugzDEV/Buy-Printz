@@ -813,7 +813,7 @@ const PrintPreviewModal = ({
                      ) : (
                        /* Banner Preview */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
-                         <div className="w-full max-w-full h-64 sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                         <div className="w-full max-w-full h-[500px] sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                            {previewImage ? (
                              <div className="relative w-full h-full">
                              <img
@@ -823,40 +823,17 @@ const PrintPreviewModal = ({
                                onLoad={handleImageLoad}
                              />
                                
-                               {/* BuyPrintz Watermark Overlay - IP Protection - Fixed positioning */}
-                               <div 
-                                 className="absolute inset-0 pointer-events-none" 
-                                 style={{ 
-                                   zIndex: 10,
-                                   // Remove scaling to prevent element positioning issues
-                                   transform: 'none',
-                                   transformOrigin: 'center center'
-                                 }}
-                               >
+                               {/* BuyPrintz Watermark Overlay - IP Protection */}
+                               <div className="absolute inset-0 pointer-events-none z-10">
                                  <img
                                    src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
                                    alt="BuyPrintz Watermark"
-                                   className="w-full h-full object-cover"
-                                   style={{
-                                     position: 'absolute',
-                                     top: 0,
-                                     left: 0,
-                                     opacity: 0.2, // Reduced opacity to be less intrusive
-                                     mixBlendMode: 'multiply' // Better blending with design
-                                   }}
+                                   className="w-full h-full object-cover opacity-20 mix-blend-multiply"
                                  />
                                </div>
                                
                                {/* Preview label */}
-                               <div 
-                                 className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
-                                 style={{ 
-                                   zIndex: 20,
-                                   // Remove scaling to prevent positioning issues
-                                   transform: 'none',
-                                   transformOrigin: 'center center'
-                                 }}
-                               >
+                               <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs z-20">
                                  Preview
                                </div>
                              </div>
