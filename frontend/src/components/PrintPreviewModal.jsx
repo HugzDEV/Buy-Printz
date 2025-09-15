@@ -769,7 +769,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-4 sm:p-4">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[90vh] sm:h-full overflow-y-auto p-2 sm:p-4">
         <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -779,7 +779,7 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 pb-3 sm:pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
           {/* Left Column - Preview */}
           <div className="space-y-2 sm:space-y-4">
             <Card>
@@ -789,7 +789,7 @@ const PrintPreviewModal = ({
                   Design Preview
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 sm:space-y-4 p-4 sm:p-6">
+              <CardContent className="space-y-2 sm:space-y-4 p-2 sm:p-6">
                  {isGenerating ? (
                    <div className="flex items-center justify-center p-4 sm:p-12">
                      <div className="text-center space-y-2">
@@ -812,14 +812,14 @@ const PrintPreviewModal = ({
                        />
                      ) : (
                        /* Banner Preview */
-                       <div className="bg-gray-100 rounded-lg p-4 sm:p-6 flex items-center justify-center overflow-hidden">
-                         <div className="relative flex items-center justify-center w-full h-[400px] sm:h-[280px]">
+                       <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
+                         <div className="relative flex items-center justify-center w-full h-[500px] sm:h-[280px]">
                            {previewImage ? (
                              <div className="relative w-full h-full flex items-center justify-center">
                              <img
                                src={previewImage}
                                alt="Banner Design Preview"
-                               className="rounded border shadow-lg w-auto h-auto max-w-full max-h-[450px] sm:max-h-[280px] min-h-[350px] sm:min-h-[250px] object-contain"
+                               className="rounded border shadow-lg w-auto h-auto max-w-full max-h-[480px] sm:max-h-[280px] min-h-[400px] sm:min-h-[250px] object-contain"
                                style={{
                                  // Remove scaling to prevent element positioning issues
                                  transform: 'none',
