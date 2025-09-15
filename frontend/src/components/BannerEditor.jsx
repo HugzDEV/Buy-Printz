@@ -2839,14 +2839,31 @@ const BannerEditorNew = () => {
         }
         
         if (stageElement) {
-          // Use a higher quality export but limit size
-          const imageData = stageElement.toDataURL('image/png', 0.8)
-          console.log('Canvas image generated successfully, length:', imageData.length)
+          // Generate high-resolution image regardless of display scale
+          // This ensures mobile users get full-quality images
+          const originalWidth = stageElement.width
+          const originalHeight = stageElement.height
           
-          // Check if image is too large (limit to 5MB)
-          if (imageData.length > 5 * 1024 * 1024) {
+          // Create a temporary canvas at full resolution
+          const tempCanvas = document.createElement('canvas')
+          const tempCtx = tempCanvas.getContext('2d')
+          
+          // Set canvas to original size (not scaled)
+          tempCanvas.width = canvasSize.width
+          tempCanvas.height = canvasSize.height
+          
+          // Draw the scaled canvas content at full resolution
+          tempCtx.drawImage(stageElement, 0, 0, canvasSize.width, canvasSize.height)
+          
+          // Generate high-quality image data
+          const imageData = tempCanvas.toDataURL('image/png', 0.9)
+          console.log('High-resolution canvas image generated successfully, length:', imageData.length)
+          console.log('Generated at full resolution:', canvasSize.width, 'x', canvasSize.height)
+          
+          // Check if image is too large (limit to 8MB for high-res)
+          if (imageData.length > 8 * 1024 * 1024) {
             console.warn('Canvas image too large, reducing quality')
-            return stageElement.toDataURL('image/png', 0.5)
+            return tempCanvas.toDataURL('image/png', 0.7)
           }
           
           return imageData
