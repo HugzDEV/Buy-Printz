@@ -252,7 +252,7 @@ const SurfaceThumbnailViewer = ({
       </div>
 
       {/* Surface Preview */}
-      <div className="bg-gray-100 rounded-lg p-3 sm:p-4 flex items-center justify-center overflow-hidden">
+      <div className="bg-gray-100 rounded-lg p-4 sm:p-4 flex items-center justify-center overflow-hidden">
         <img
           src={currentThumbnail.imageDataUrl || currentThumbnail.dataUrl}
           alt={`${currentSurface?.name} preview`}
@@ -261,8 +261,8 @@ const SurfaceThumbnailViewer = ({
             width: 'auto',
             height: 'auto',
             maxWidth: '100%',
-            maxHeight: window.innerWidth < 768 ? '350px' : '400px',
-            minHeight: window.innerWidth < 768 ? '250px' : '300px'
+            maxHeight: window.innerWidth < 768 ? '450px' : '400px',
+            minHeight: window.innerWidth < 768 ? '350px' : '300px'
           }}
         />
       </div>

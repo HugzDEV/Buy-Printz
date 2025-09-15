@@ -769,7 +769,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-2 sm:p-4">
+      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-3 sm:p-4">
         <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -812,10 +812,10 @@ const PrintPreviewModal = ({
                        />
                      ) : (
                        /* Banner Preview */
-                       <div className="bg-gray-100 rounded-lg p-3 sm:p-6 flex items-center justify-center overflow-hidden">
+                       <div className="bg-gray-100 rounded-lg p-4 sm:p-6 flex items-center justify-center overflow-hidden">
                          <div className="relative flex items-center justify-center w-full" style={{ 
-                           minHeight: window.innerWidth < 768 ? '300px' : '280px',
-                           maxHeight: window.innerWidth < 768 ? '400px' : '320px'
+                           minHeight: window.innerWidth < 768 ? '400px' : '280px',
+                           maxHeight: window.innerWidth < 768 ? '500px' : '320px'
                          }}>
                            {previewImage ? (
                              <div className="relative w-full h-full flex items-center justify-center">
@@ -827,8 +827,8 @@ const PrintPreviewModal = ({
                                  width: 'auto',
                                  height: 'auto',
                                  maxWidth: '100%',
-                                 maxHeight: window.innerWidth < 768 ? '350px' : '280px',
-                                 minHeight: window.innerWidth < 768 ? '250px' : '250px',
+                                 maxHeight: window.innerWidth < 768 ? '450px' : '280px',
+                                 minHeight: window.innerWidth < 768 ? '350px' : '250px',
                                  objectFit: 'contain',
                                  // Remove scaling to prevent element positioning issues
                                  transform: 'none',
