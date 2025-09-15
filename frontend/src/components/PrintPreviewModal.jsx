@@ -769,7 +769,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-1 sm:p-4">
+      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-2 sm:p-4">
         <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -779,7 +779,7 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 pb-3 sm:pb-6">
           {/* Left Column - Preview */}
           <div className="space-y-2 sm:space-y-4">
             <Card>
@@ -812,13 +812,13 @@ const PrintPreviewModal = ({
                        />
                      ) : (
                        /* Banner Preview */
-                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
+                       <div className="bg-gray-100 rounded-lg p-3 sm:p-6 flex items-center justify-center overflow-hidden">
                          <div className="relative flex items-center justify-center w-full" style={{ 
-                           minHeight: window.innerWidth < 768 ? '200px' : '280px',
-                           maxHeight: window.innerWidth < 768 ? '240px' : '320px'
+                           minHeight: window.innerWidth < 768 ? '300px' : '280px',
+                           maxHeight: window.innerWidth < 768 ? '400px' : '320px'
                          }}>
                            {previewImage ? (
-                             <div className="relative">
+                             <div className="relative w-full h-full flex items-center justify-center">
                              <img
                                src={previewImage}
                                alt="Banner Design Preview"
@@ -827,8 +827,8 @@ const PrintPreviewModal = ({
                                  width: 'auto',
                                  height: 'auto',
                                  maxWidth: '100%',
-                                 maxHeight: window.innerWidth < 768 ? '200px' : '280px',
-                                 minHeight: window.innerWidth < 768 ? '150px' : '250px',
+                                 maxHeight: window.innerWidth < 768 ? '350px' : '280px',
+                                 minHeight: window.innerWidth < 768 ? '250px' : '250px',
                                  objectFit: 'contain',
                                  // Remove scaling to prevent element positioning issues
                                  transform: 'none',
