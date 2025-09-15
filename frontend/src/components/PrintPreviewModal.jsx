@@ -769,12 +769,12 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[95vh] sm:h-full overflow-y-auto p-2 sm:p-4 mx-auto">
-        <DialogHeader className="pb-4 sm:pb-4">
-          <DialogTitle className="flex items-center justify-between">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[95vh] sm:h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
+        <DialogHeader className="pb-3 sm:pb-4">
+          <DialogTitle className="flex items-center justify-between text-base sm:text-lg">
             <div className="flex items-center gap-2">
-            <Printer className="h-5 w-5" />
-            Print Preview & Approval
+              <Printer className="h-4 w-4 sm:h-5 sm:w-5" />
+              Print Preview & Approval
             </div>
           </DialogTitle>
         </DialogHeader>
