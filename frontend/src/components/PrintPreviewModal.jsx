@@ -813,22 +813,13 @@ const PrintPreviewModal = ({
                      ) : (
                        /* Banner Preview */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
-                         <div className="relative flex items-center justify-center w-full h-[400px] sm:h-[280px]">
+                         <div className="aspect-video w-full max-w-full">
                            {previewImage ? (
-                             <div className="relative w-full h-full flex items-center justify-center">
+                             <div className="relative w-full h-full">
                              <img
                                src={previewImage}
                                alt="Banner Design Preview"
-                               className="rounded border shadow-lg"
-                               style={{
-                                 width: '100%',
-                                 height: '100%',
-                                 objectFit: 'contain',
-                                 objectPosition: 'center',
-                                 // Remove scaling to prevent element positioning issues
-                                 transform: 'none',
-                                 transformOrigin: 'center center'
-                               }}
+                               className="w-full h-full object-cover rounded border shadow-lg"
                                onLoad={handleImageLoad}
                              />
                                
