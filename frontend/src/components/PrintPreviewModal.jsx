@@ -830,11 +830,11 @@ const PrintPreviewModal = ({
                                </div>
                              </div>
                            ) : previewImage ? (
-                             <div className="relative w-full h-full flex items-center justify-center p-2">
+                             <div className="relative w-full h-full p-2">
                                <img
                                  src={previewImage}
                                  alt="Banner Design Preview"
-                                 className="w-full h-full object-cover rounded"
+                                 className="rounded"
                                  onLoad={(e) => {
                                    console.log('🎨 Image loaded successfully:', {
                                      naturalWidth: e.target.naturalWidth,
@@ -848,7 +848,11 @@ const PrintPreviewModal = ({
                                    console.error('🎨 Image src:', previewImage?.substring(0, 100));
                                  }}
                                  style={{ 
+                                   width: '100%',
+                                   height: 'auto',
+                                   maxHeight: '100%',
                                    imageRendering: 'high-quality',
+                                   objectFit: 'contain',
                                    objectPosition: 'center center'
                                  }}
                                />
