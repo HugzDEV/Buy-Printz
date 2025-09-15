@@ -256,7 +256,7 @@ const SurfaceThumbnailViewer = ({
         <img
           src={currentThumbnail.imageDataUrl || currentThumbnail.dataUrl}
           alt={`${currentSurface?.name} preview`}
-          className="w-auto h-auto max-w-full max-h-[480px] sm:max-h-[400px] min-h-[400px] sm:min-h-[300px] object-contain"
+          className="w-full h-full max-w-full max-h-[480px] sm:max-h-[400px] object-contain"
         />
       </div>
 

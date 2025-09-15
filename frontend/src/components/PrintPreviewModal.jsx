@@ -819,7 +819,7 @@ const PrintPreviewModal = ({
                              <img
                                src={previewImage}
                                alt="Banner Design Preview"
-                               className="rounded border shadow-lg w-auto h-auto max-w-full max-h-[480px] sm:max-h-[280px] min-h-[400px] sm:min-h-[250px] object-contain"
+                               className="rounded border shadow-lg w-full h-full max-w-full max-h-[480px] sm:max-h-[280px] object-contain"
                                style={{
                                  // Remove scaling to prevent element positioning issues
                                  transform: 'none',
