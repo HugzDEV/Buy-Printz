@@ -375,71 +375,81 @@ Implemented a multi-stage scroll preservation system:
 ---
 
 ### 8. **B2Sign Shipping Integration System**
-**Problem:** Need real-time shipping costs from print partners for banners and tents, with dynamic customer information handling.
+**Problem:** Need real-time shipping costs from print partner B2Sign for banners and tents.
 
 **Challenges:**
 - B2Sign requires browser automation (Playwright) for shipping quotes
-- Complex form interactions with state selection, address modals, and shipping extraction
+- Complex form filling with dynamic customer information
+- State selection issues in address modals
 - Frontend timeout issues with long-running automation
-- Tent integration using wrong B2Sign product page URL
+- Wrong product page URLs causing form interaction failures
 
 **Solution Architecture:**
 1. **Modular Playwright Integration:**
    ```python
-   # Separate integrations for banners and tents
-   backend/b2sign_playwright_integration.py  # Banner workflow
-   backend/tent_playwright_integration.py    # Tent workflow (duplicated from banner)
+   # Banner Integration (b2sign_playwright_integration.py)
+   class B2SignPlaywrightIntegration:
+       async def get_banner_shipping_costs(self, order_data)
+       async def _fill_banner_quote_form(self, order_data)
+       async def _open_and_fill_address_modal(self, customer_info)
+       async def _extract_all_shipping_options_workflow(self)
+   
+   # Tent Integration (tent_playwright_integration.py) 
+   class TentPlaywrightIntegration:
+       # Duplicated from banner integration with tent-specific URLs
+       async def get_tent_shipping_costs(self, order_data)
    ```
 
-2. **Proven Workflow Methods:**
-   - Login to B2Sign with credentials
-   - Navigate to correct product pages
-   - Fill product specifications (dimensions, options, accessories)
-   - Select "Blind Drop Ship" shipping method
-   - Open and fill address modal with customer info
-   - Extract all available shipping options
-
-3. **Robust State Selection:**
+2. **Robust State Selection Logic:**
    ```python
-   # Hidden state select approach (primary)
-   hidden_state_select = await page.query_selector('select[name="state"]')
-   await page.evaluate('''(element) => {
+   # Hidden state select approach (proven method)
+   hidden_state_select = await self.page.query_selector('select[name="state"]')
+   await self.page.evaluate('''(element) => {
        element.style.display = 'block';
        element.style.visibility = 'visible';
        element.disabled = false;
    }''', hidden_state_select)
+   await hidden_state_select.select_option(state)
    
-   # MuiAutocomplete fallback
-   autocomplete_elements = await page.query_selector_all('.MuiAutocomplete-root')
+   # JavaScript fallback with state name mapping
+   state_names = self._get_state_names(state)  # MA -> ['massachusetts']
    ```
 
-4. **Frontend Timeout Management:**
+3. **Production API Endpoints:**
+   ```python
+   # FastAPI endpoints
+   @router.post("/api/shipping-costs/get")  # Banner shipping
+   @router.post("/api/shipping-costs/tent") # Tent shipping
+   ```
+
+4. **Frontend Integration:**
    ```javascript
-   // 5-minute timeout for Playwright automation
-   const timeoutId = setTimeout(() => controller.abort(), 300000)
+   // Extended timeout for Playwright automation
+   const timeoutId = setTimeout(() => controller.abort(), 300000) // 5 minutes
+   
+   // Dynamic customer info mapping
+   const requestData = this.prepareShippingCostsRequest(orderData, customerInfo)
    ```
 
-**Key Fixes:**
-- **Correct Tent URL**: Changed from `custom-event-tents` to `event-tent-canopy-graphic`
-- **Dynamic State Handling**: Removed hardcoded 'CA' values, use customer state
-- **State Name Mapping**: Added `_get_state_names()` helper for robust state matching
-- **Frontend Timeout**: Increased from 60s to 300s (5 minutes)
+**Key Discoveries:**
+- **Correct B2Sign URLs**: 
+  - Banners: `https://www.b2sign.com/13oz-vinyl-banner`
+  - Tents: `https://www.b2sign.com/event-tent-canopy-graphic` (NOT custom-event-tents)
+- **Identical Shipping Process**: Blind Drop Ship → Address Modal → Shipping Extraction works the same for both products
+- **State Selection**: Hidden select element approach is most reliable, with JavaScript fallbacks
+- **Timeout Requirements**: Playwright automation takes 60-300 seconds, requiring 5-minute frontend timeout
 
-**Production API Endpoints:**
-- `POST /api/shipping-costs/get` - Banner shipping costs
-- `POST /api/shipping-costs/tent` - Tent shipping costs
-
-**Results:**
-- ✅ Banner workflow: Successfully extracts 5 shipping options
-- ✅ Tent workflow: Now uses correct B2Sign product page
+**Implementation Results:**
+- ✅ Banner shipping: 5 shipping options extracted successfully
+- ✅ Tent shipping: Fixed URL and form interaction issues
 - ✅ Dynamic customer info: No hardcoded addresses or states
-- ✅ Frontend timeout: Handles 60-120 second automation time
-- ✅ Modular design: Separate banner/tent integrations
+- ✅ Production ready: Headless browser automation with proper error handling
+- ✅ Modular design: Separate integrations for banners and tents
 
 ---
 
 *Last Updated: January 2025*
 *Total Issues Resolved: 8 major categories*
-*Lines of Code: 2,000+ across frontend components*
+*Lines of Code: 2,000+ across frontend components + 3,000+ backend automation*
 *User Experience Improvements: 15+ enhancements*
-*Shipping Integration: Complete B2Sign automation system*
+*Shipping Integration: Real-time B2Sign quotes for banners and tents*

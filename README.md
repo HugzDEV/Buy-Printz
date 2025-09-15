@@ -28,8 +28,14 @@
 - **Banner Checkout**: Material selection, options, pricing
 - **Tin Checkout**: Quantity, finish, surface coverage
 - **Tent Checkout**: Size, accessories, specifications
-- **Real-time Shipping**: B2Sign integration for live shipping quotes
 - Stripe payment integration with marketplace template pricing
+
+### Shipping Integration
+- **Real-time Shipping Costs**: B2Sign print partner integration via Playwright automation
+- **Banner Shipping**: Dynamic quotes for all banner materials and options
+- **Tent Shipping**: Real-time quotes for tent sizes and accessories
+- **Customer Info Integration**: Dynamic address and state handling
+- **Production Ready**: Headless browser automation with 5-minute timeout handling
 
 ## Product Types
 
@@ -71,16 +77,16 @@
 - `GET /api/templates/user`: Get user templates
 - `POST /api/templates/save`: Save user template
 
-### Shipping Integration
-- `POST /api/shipping-costs/get`: Get real-time shipping costs for banners
-- `POST /api/shipping-costs/tent`: Get real-time shipping costs for tents
-- `GET /api/shipping-costs/health`: Health check for shipping system
-- `GET /api/shipping-costs/playwright-status`: Check Playwright browser status
-
 ### Marketplace
 - `GET /api/creator-marketplace/templates/marketplace`: Get marketplace templates
 - `POST /api/creator-marketplace/templates/{id}/purchase`: Purchase template
 - `GET /api/creator-marketplace/templates/{id}/download`: Download template
+
+### Shipping
+- `POST /api/shipping-costs/get`: Get banner shipping costs from B2Sign
+- `POST /api/shipping-costs/tent`: Get tent shipping costs from B2Sign
+- `GET /api/shipping-costs/health`: Shipping system health check
+- `GET /api/shipping-costs/playwright-status`: Playwright browser status
 
 ## Environment Variables
 
@@ -120,42 +126,16 @@ npm install
 npm run dev
 ```
 
-## Shipping Integration System
-
-### B2Sign Print Partner Integration
-- **Real-time Shipping Quotes**: Live shipping costs from B2Sign print partners
-- **Browser Automation**: Playwright-based automation for form interaction
-- **Modular Design**: Separate integrations for banners and tents
-- **Dynamic Customer Info**: No hardcoded addresses or states
-
-### Workflow Process
-1. **Login**: Authenticate with B2Sign using production credentials
-2. **Navigate**: Go to correct product pages (banner-specific or tent-specific)
-3. **Fill Forms**: Input product specifications, dimensions, and options
-4. **Shipping Method**: Select "Blind Drop Ship" for customer delivery
-5. **Address Modal**: Fill customer shipping information dynamically
-6. **Extract Options**: Retrieve all available shipping methods and costs
-
-### Technical Implementation
-- **Frontend Timeout**: 5-minute timeout for automation completion
-- **State Selection**: Robust hidden select + MuiAutocomplete fallback
-- **Error Handling**: Comprehensive error handling and logging
-- **Production Ready**: Headless browser automation for security
-
-### Supported Products
-- **Banners**: All materials and sizes with shipping options
-- **Tents**: 10x10, 10x15, 10x20 with accessories and wall options
-
 ## Key Features
 
 - **Multi-surface Canvas Editor**: Support for banners, tins, and tents
 - **Template System**: User templates and marketplace templates
 - **IP Protection**: Watermarking and download controls
 - **Integrated Checkout**: Seamless payment flow with marketplace pricing
-- **Real-time Shipping**: Live shipping quotes from B2Sign print partners
-- **Browser Automation**: Playwright integration for shipping cost extraction
+- **Real-time Shipping**: B2Sign print partner integration with live shipping quotes
 - **Responsive Design**: Mobile-optimized interface
 - **Real-time Preview**: Live design preview and export
+- **Production Automation**: Headless browser automation for shipping cost extraction
 
 ## License
 
