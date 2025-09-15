@@ -260,9 +260,9 @@ const SurfaceThumbnailViewer = ({
             className="rounded"
             style={{ 
               width: '100%',
-              height: 'auto',
+              height: '100%',
               imageRendering: 'high-quality',
-              objectFit: 'contain',
+              objectFit: 'cover',
               objectPosition: 'center center'
             }}
           />
