@@ -766,7 +766,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[85vh] sm:h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[95vh] sm:h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
         <DialogHeader className="pb-3 sm:pb-4">
           <DialogTitle className="flex items-center justify-between text-base sm:text-lg">
             <div className="flex items-center gap-2">
@@ -810,7 +810,7 @@ const PrintPreviewModal = ({
                      ) : (
                        /* Banner Preview - MOBILE OPTIMIZED WITH DEBUG */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
-                         <div className="w-full h-[300px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
+                         <div className="w-full h-[600px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
                            {/* Debug info - remove this after fixing */}
                            {console.log('🎨 Preview Debug:', {
                              previewImage: previewImage ? 'exists' : 'null/undefined',
@@ -851,7 +851,7 @@ const PrintPreviewModal = ({
                                    width: '100%',
                                    height: '100%',
                                    imageRendering: 'high-quality',
-                                   objectFit: 'cover',
+                                   objectFit: 'contain',
                                    objectPosition: 'center center'
                                  }}
                                />
