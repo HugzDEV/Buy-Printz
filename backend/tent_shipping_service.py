@@ -9,7 +9,7 @@ import asyncio
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from tent_playwright_integration import TentPlaywrightIntegration
+from backend.tent_playwright_integration import TentPlaywrightIntegration
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

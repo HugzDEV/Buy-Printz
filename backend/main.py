@@ -15,13 +15,13 @@ from dotenv import load_dotenv
 import time
 
 # Import our modules
-from database import db_manager
-from auth import auth_manager, get_current_user
-from ai_agent_adapter import ai_agent_adapter
+from backend.database import db_manager
+from backend.auth import auth_manager, get_current_user
+from backend.ai_agent_adapter import ai_agent_adapter
 
 # Import creator marketplace routes
 try:
-    from creator_marketplace import router as creator_marketplace_router
+    from backend.creator_marketplace import router as creator_marketplace_router
     CREATOR_MARKETPLACE_AVAILABLE = True
 except ImportError:
     CREATOR_MARKETPLACE_AVAILABLE = False
@@ -31,7 +31,7 @@ except ImportError:
 
 # Import shipping costs API routes - B2Sign integration with Playwright
 try:
-    from shipping_costs_api import router as shipping_costs_router
+    from backend.shipping_costs_api import router as shipping_costs_router
     SHIPPING_COSTS_API_AVAILABLE = True
     print("✅ B2Sign Shipping Costs API (Playwright) loaded successfully")
 except ImportError as e:
