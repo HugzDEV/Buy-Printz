@@ -769,7 +769,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full sm:w-full h-[90vh] sm:h-full overflow-y-auto p-2 sm:p-4">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[95vh] sm:h-full overflow-y-auto p-2 sm:p-4 mx-auto">
         <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -812,38 +812,36 @@ const PrintPreviewModal = ({
                        />
                      ) : (
                        /* Banner Preview */
-                       <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
-                         <div className="w-full max-w-full h-[500px] sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                           {previewImage ? (
-                             <div className="relative w-full h-full">
+                       <div className="w-full h-[300px] sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                         {previewImage ? (
+                           <div className="relative w-full h-full flex items-center justify-center">
                              <img
                                src={previewImage}
                                alt="Banner Design Preview"
-                               className="w-full h-full object-cover"
+                               className="max-w-full max-h-full object-contain"
                                onLoad={handleImageLoad}
                              />
                                
-                               {/* BuyPrintz Watermark Overlay - IP Protection */}
-                               <div className="absolute inset-0 pointer-events-none z-10">
-                                 <img
-                                   src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                                   alt="BuyPrintz Watermark"
-                                   className="w-full h-full object-cover opacity-20 mix-blend-multiply"
-                                 />
-                               </div>
-                               
-                               {/* Preview label */}
-                               <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs z-20">
-                                 Preview
-                               </div>
+                             {/* BuyPrintz Watermark Overlay - IP Protection */}
+                             <div className="absolute inset-0 pointer-events-none z-10">
+                               <img
+                                 src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
+                                 alt="BuyPrintz Watermark"
+                                 className="w-full h-full object-cover opacity-20 mix-blend-multiply"
+                               />
                              </div>
-                           ) : (
-                             <div className="text-center text-gray-500 p-8">
-                               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                               <p className="text-sm">No preview available</p>
+                             
+                             {/* Preview label */}
+                             <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs z-20">
+                               Preview
                              </div>
-                           )}
-                         </div>
+                           </div>
+                         ) : (
+                           <div className="text-center text-gray-500 p-8">
+                             <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                             <p className="text-sm">No preview available</p>
+                           </div>
+                         )}
                        </div>
                      )}
                      
@@ -1036,24 +1034,24 @@ const PrintPreviewModal = ({
         </div>
 
         {/* Approval Buttons - Fixed Position */}
-        <div className="p-4 sm:p-6 border-t bg-gray-50 flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <X className="h-4 w-4" />
-              Cancel
-            </Button>
-            
-            <Button
-              onClick={handleApprove}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <Check className="h-4 w-4" />
-              Approve & Print
-            </Button>
-          </div>
+        <div className="p-3 sm:p-6 border-t bg-gray-50 flex flex-col gap-3 sm:flex-row sm:gap-3 w-full">
+          <Button
+            onClick={handleApprove}
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto order-1"
+          >
+            <Check className="h-4 w-4" />
+            Approve & Print
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 w-full sm:w-auto order-2"
+          >
+            <X className="h-4 w-4" />
+            Cancel
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   )
