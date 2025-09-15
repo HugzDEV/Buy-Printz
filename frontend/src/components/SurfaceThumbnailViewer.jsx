@@ -251,13 +251,14 @@ const SurfaceThumbnailViewer = ({
         </div>
       </div>
 
-      {/* Surface Preview */}
+      {/* Surface Preview - MOBILE OPTIMIZED */}
       <div className="bg-gray-100 rounded-lg p-2 sm:p-4 flex items-center justify-center overflow-hidden">
-        <div className="w-full h-64 sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+        <div className="w-full h-[400px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
           <img
             src={currentThumbnail.imageDataUrl || currentThumbnail.dataUrl}
             alt={`${currentSurface?.name} preview`}
-            className="w-full h-full object-cover"
+            className="max-w-full max-h-full object-contain rounded"
+            style={{ imageRendering: 'high-quality' }}
           />
         </div>
       </div>
