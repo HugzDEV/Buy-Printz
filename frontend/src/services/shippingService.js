@@ -42,7 +42,9 @@ class ShippingService {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 300000) // 300 second timeout (5 minutes)
       
-      const response = await fetch(`${this.baseURL}/api/shipping-costs/get`, {
+      // Use dedicated tent endpoint for tent products, general endpoint for banners
+      const endpoint = orderData.product_type === 'tent' ? '/api/shipping-costs/tent' : '/api/shipping-costs/get'
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -268,6 +270,20 @@ class ShippingService {
    * Prepare shipping costs request data
    */
   prepareShippingCostsRequest(orderData, customerInfo) {
+    // For tent requests, use the dedicated tent endpoint format
+    if (orderData.product_type === 'tent' || orderData.product_type === 'tradeshow_tent') {
+      return {
+        tentSize: orderData.print_options?.tent_size || '10x10',
+        tentPackage: orderData.print_options?.tent_design_option === 'canopy-graphic-plus-frame' ? 'complete-tent' : 'canopy-graphic-only',
+        reinforcedStripColor: orderData.print_options?.reinforcedStripColor || 'white',
+        wallOption: orderData.print_options?.wallOption || 'no-walls',
+        selectedAccessories: orderData.accessories || [],
+        quantity: orderData.quantity || 1,
+        customer_info: customerInfo
+      }
+    }
+
+    // For banner and other requests, use the general format
     const request = {
       product_type: orderData.product_type || 'banner',
       dimensions: orderData.dimensions || { width: 2, height: 4 },
@@ -287,19 +303,6 @@ class ShippingService {
     // Add print options from banner options
     if (orderData.print_options) {
       request.print_options = { ...orderData.print_options }
-    }
-
-    // Add tent-specific options
-    if (orderData.product_type === 'tent' || orderData.product_type === 'tradeshow_tent') {
-      if (orderData.tent_design_option) {
-        request.print_options.tent_design_option = orderData.tent_design_option
-      }
-      if (orderData.tent_size) {
-        request.print_options.tent_size = orderData.tent_size
-      }
-      if (orderData.accessories) {
-        request.accessories = orderData.accessories
-      }
     }
 
     // Add tin-specific options
