@@ -811,37 +811,40 @@ const PrintPreviewModal = ({
                          tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
                        />
                      ) : (
-                       /* Banner Preview */
-                       <div className="w-full h-[300px] sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-                         {previewImage ? (
-                           <div className="relative w-full h-full flex items-center justify-center">
-                             <img
-                               src={previewImage}
-                               alt="Banner Design Preview"
-                               className="max-w-full max-h-full object-contain"
-                               onLoad={handleImageLoad}
-                             />
-                               
-                             {/* BuyPrintz Watermark Overlay - IP Protection */}
-                             <div className="absolute inset-0 pointer-events-none z-10">
+                       /* Banner Preview - MOBILE OPTIMIZED */
+                       <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
+                         <div className="w-full h-[250px] xs:h-[300px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
+                           {previewImage ? (
+                             <div className="relative w-full h-full flex items-center justify-center p-2">
                                <img
-                                 src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                                 alt="BuyPrintz Watermark"
-                                 className="w-full h-full object-cover opacity-20 mix-blend-multiply"
+                                 src={previewImage}
+                                 alt="Banner Design Preview"
+                                 className="max-w-full max-h-full object-contain rounded"
+                                 onLoad={handleImageLoad}
+                                 style={{ imageRendering: 'high-quality' }}
                                />
+                               
+                               {/* BuyPrintz Watermark Overlay - IP Protection */}
+                               <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center p-2">
+                                 <img
+                                   src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
+                                   alt="BuyPrintz Watermark"
+                                   className="max-w-full max-h-full object-contain opacity-20 mix-blend-multiply"
+                                 />
+                               </div>
+                               
+                               {/* Preview label */}
+                               <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs z-20">
+                                 Preview
+                               </div>
                              </div>
-                             
-                             {/* Preview label */}
-                             <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs z-20">
-                               Preview
+                           ) : (
+                             <div className="text-center text-gray-500 p-4 sm:p-8">
+                               <FileText className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
+                               <p className="text-xs sm:text-sm">No preview available</p>
                              </div>
-                           </div>
-                         ) : (
-                           <div className="text-center text-gray-500 p-8">
-                             <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                             <p className="text-sm">No preview available</p>
-                           </div>
-                         )}
+                           )}
+                         </div>
                        </div>
                      )}
                      
