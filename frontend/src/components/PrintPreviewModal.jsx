@@ -530,95 +530,92 @@ const PrintPreviewModal = ({
     }
   }
 
-  // Modified useEffect to handle missing surface images
+  // Enhanced useEffect with comprehensive debug logging
   useEffect(() => {
     const loadPreviewImage = async () => {
-      console.log('🎨 loadPreviewImage called - isOpen:', isOpen, 'orderDetails:', !!orderDetails, 'canvasData:', !!canvasData, 'previewImage exists:', !!previewImage)
-      if (isOpen && (orderDetails || canvasData)) {
-        console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
-        console.log('🎨 PrintPreviewModal - Canvas data:', canvasData)
-        console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys((canvasData?.surface_images || orderDetails?.surface_images) || {}))
-        console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails?.design_option)
-        
+      console.log('🎨 loadPreviewImage ENTRY:', {
+        isOpen,
+        hasOrderDetails: !!orderDetails,
+        hasCanvasData: !!canvasData,
+        selectedSurface,
+        currentPreviewImage: previewImage ? 'exists' : 'null'
+      });
+
+      if (!isOpen || (!orderDetails && !canvasData)) {
+        console.log('🎨 Early exit - modal not open or no data');
+        return;
+      }
+
+      // Set loading state
+      setIsGenerating(true);
+
+      try {
         // Check if we have a Supabase order ID to fetch images from
         if (orderDetails?.supabase_order_id) {
-          console.log('🎨 Fetching images from Supabase order:', orderDetails.supabase_order_id)
+          console.log('🎨 Attempting Supabase fetch for order:', orderDetails.supabase_order_id);
           try {
-            // Get authenticated headers with automatic token refresh
-            const authHeaders = await authService.getAuthHeaders()
-            
+            const authHeaders = await authService.getAuthHeaders();
             const response = await fetch(`/api/orders/${orderDetails.supabase_order_id}/images`, {
               headers: authHeaders
-            })
+            });
             
             if (response.ok) {
-              const imageData = await response.json()
-              console.log('🎨 Retrieved images from Supabase:', imageData)
+              const imageData = await response.json();
+              console.log('🎨 Retrieved Supabase images:', Object.keys(imageData));
               
-              // Use Supabase-stored images
               if (hasMultipleSurfaces() && imageData.surface_images && imageData.surface_images[selectedSurface]) {
-                console.log('🎨 Using Supabase surface image for:', selectedSurface)
-                setPreviewImage(imageData.surface_images[selectedSurface])
-                return
+                console.log('🎨 Using Supabase surface image for:', selectedSurface);
+                setPreviewImage(imageData.surface_images[selectedSurface]);
+                setIsGenerating(false);
+                return;
               } else if (imageData.canvas_image) {
-                console.log('🎨 Using Supabase canvas image')
-                setPreviewImage(imageData.canvas_image)
-                return
+                console.log('🎨 Using Supabase canvas image');
+                setPreviewImage(imageData.canvas_image);
+                setIsGenerating(false);
+                return;
               }
             } else {
-              console.error('🎨 Failed to fetch images from Supabase:', response.statusText)
+              console.warn('🎨 Supabase fetch failed:', response.status, response.statusText);
             }
           } catch (error) {
-            console.error('🎨 Error fetching images from Supabase:', error)
+            console.error('🎨 Supabase fetch error:', error);
           }
         }
         
-        // Fallback to existing logic for orders without Supabase storage
-        // Get images from orderDetails (where they're actually stored after capture)
-        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
-        const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+        // Fallback to local data
+        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images;
+        const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image;
         
-        console.log('🎨 Debug - orderDetails.surface_images:', orderDetails?.surface_images)
-        console.log('🎨 Debug - canvasData.surface_images:', canvasData?.surface_images)
-        
-        console.log('🎨 Debug - hasMultipleSurfaces():', hasMultipleSurfaces())
-        console.log('🎨 Debug - surfaceImages:', surfaceImages)
-        console.log('🎨 Debug - canvasImage:', canvasImage)
-        console.log('🎨 Debug - selectedSurface:', selectedSurface)
-        
-        // Prioritize pre-captured canvas images over regenerated ones for consistency
-        console.log('🎨 Image loading path check - hasMultipleSurfaces:', hasMultipleSurfaces(), 'surfaceImages keys:', Object.keys(surfaceImages || {}), 'surfaceImages length:', Object.keys(surfaceImages || {}).length)
-        
+        console.log('🎨 Local image check:', {
+          hasSurfaceImages: !!surfaceImages,
+          surfaceImageKeys: Object.keys(surfaceImages || {}),
+          hasCanvasImage: !!canvasImage,
+          hasMultipleSurfaces: hasMultipleSurfaces(),
+          selectedSurface
+        });
+
         if (hasMultipleSurfaces() && surfaceImages && surfaceImages[selectedSurface]) {
-          console.log('🎨 Taking path: hasMultipleSurfaces with pre-captured surface images')
-          const surfaceImage = surfaceImages[selectedSurface]
-          console.log(`🎨 Found pre-captured surface image for ${selectedSurface}:`, typeof surfaceImage)
-          setPreviewImage(surfaceImage)
+          console.log('🎨 Using local surface image for:', selectedSurface);
+          setPreviewImage(surfaceImages[selectedSurface]);
         } else if (canvasImage) {
-          console.log('🎨 Taking path: has pre-captured canvasImage')
-          setPreviewImage(canvasImage)
-        } else if (hasMultipleSurfaces()) {
-          console.log('🎨 Taking path: multi-surface but no pre-captured images, generating from surface elements')
-          // For multi-surface products, generate from surface elements as fallback
-          const generatedImage = await generateCanvasImageFromData(selectedSurface)
-          console.log('🎨 Setting preview image (generated for surface):', generatedImage ? 'Generated successfully' : 'Failed to generate')
-          setPreviewImage(generatedImage)
+          console.log('🎨 Using local canvas image');
+          setPreviewImage(canvasImage);
         } else {
-          console.log('🎨 Taking path: no pre-captured images available, generating from canvas data')
-          // Only generate if we don't already have a preview image
-          if (!previewImage) {
-            const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
-            console.log('🎨 Setting preview image (generated):', generatedImage ? 'Generated successfully' : 'Failed to generate')
-            setPreviewImage(generatedImage)
-          } else {
-            console.log('🎨 Preview image already exists, skipping generation')
-          }
+          console.log('🎨 No pre-captured images, generating from canvas data...');
+          const targetSurface = hasMultipleSurfaces() ? selectedSurface : null;
+          const generatedImage = await generateCanvasImageFromData(targetSurface);
+          
+          console.log('🎨 Generated image result:', generatedImage ? 'Success' : 'Failed');
+          setPreviewImage(generatedImage);
         }
-      setIsGenerating(false)
+      } catch (error) {
+        console.error('🎨 Error in loadPreviewImage:', error);
+      } finally {
+        setIsGenerating(false);
       }
-    }
+    };
     
-    loadPreviewImage()
+    loadPreviewImage();
   }, [isOpen, orderDetails, canvasData, selectedSurface])
 
   // Debug image dimensions when it loads
@@ -811,16 +808,45 @@ const PrintPreviewModal = ({
                          tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
                        />
                      ) : (
-                       /* Banner Preview - MOBILE OPTIMIZED */
+                       /* Banner Preview - MOBILE OPTIMIZED WITH DEBUG */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
                          <div className="w-full h-[250px] xs:h-[300px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
-                           {previewImage ? (
+                           {/* Debug info - remove this after fixing */}
+                           {console.log('🎨 Preview Debug:', {
+                             previewImage: previewImage ? 'exists' : 'null/undefined',
+                             previewImageLength: previewImage?.length,
+                             isGenerating,
+                             isOpen,
+                             hasOrderDetails: !!orderDetails,
+                             hasCanvasData: !!canvasData,
+                             selectedSurface
+                           })}
+                           
+                           {isGenerating ? (
+                             <div className="flex items-center justify-center p-4">
+                               <div className="text-center space-y-2">
+                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                                 <p className="text-sm text-gray-600">Generating preview...</p>
+                               </div>
+                             </div>
+                           ) : previewImage ? (
                              <div className="relative w-full h-full flex items-center justify-center p-2">
                                <img
                                  src={previewImage}
                                  alt="Banner Design Preview"
                                  className="max-w-full max-h-full object-contain rounded"
-                                 onLoad={handleImageLoad}
+                                 onLoad={(e) => {
+                                   console.log('🎨 Image loaded successfully:', {
+                                     naturalWidth: e.target.naturalWidth,
+                                     naturalHeight: e.target.naturalHeight,
+                                     src: previewImage.substring(0, 50) + '...'
+                                   });
+                                   handleImageLoad(e);
+                                 }}
+                                 onError={(e) => {
+                                   console.error('🎨 Image failed to load:', e);
+                                   console.error('🎨 Image src:', previewImage?.substring(0, 100));
+                                 }}
                                  style={{ imageRendering: 'high-quality' }}
                                />
                                
@@ -842,6 +868,13 @@ const PrintPreviewModal = ({
                              <div className="text-center text-gray-500 p-4 sm:p-8">
                                <FileText className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
                                <p className="text-xs sm:text-sm">No preview available</p>
+                               {/* Debug info - remove after fixing */}
+                               <div className="mt-2 text-xs text-red-500 bg-red-50 p-2 rounded">
+                                 Debug: isGenerating={String(isGenerating)}, 
+                                 hasOrderDetails={String(!!orderDetails)}, 
+                                 hasCanvasData={String(!!canvasData)},
+                                 selectedSurface={selectedSurface}
+                               </div>
                              </div>
                            )}
                          </div>
