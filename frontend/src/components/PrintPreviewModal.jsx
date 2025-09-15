@@ -776,7 +776,7 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6 justify-items-center lg:justify-items-stretch">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
           {/* Left Column - Preview */}
           <div className="space-y-2 sm:space-y-4 w-full max-w-full">
             <Card className="w-full">
@@ -810,7 +810,7 @@ const PrintPreviewModal = ({
                      ) : (
                        /* Banner Preview - MOBILE OPTIMIZED WITH DEBUG */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
-                         <div className="w-full h-[250px] xs:h-[300px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
+                         <div className="w-full h-[400px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
                            {/* Debug info - remove this after fixing */}
                            {console.log('🎨 Preview Debug:', {
                              previewImage: previewImage ? 'exists' : 'null/undefined',
