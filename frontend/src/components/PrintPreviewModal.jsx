@@ -777,8 +777,8 @@ const PrintPreviewModal = ({
         </DialogHeader>
 
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
-          {/* Left Column - Preview */}
-          <div className="space-y-2 sm:space-y-4 w-full max-w-full">
+          {/* Preview Section - Full width on mobile, left column on desktop */}
+          <div className="space-y-2 sm:space-y-4 w-full order-1 lg:order-none">
             <Card className="w-full">
               <CardHeader className="pb-3 sm:pb-4">
                 <CardTitle className="flex items-center gap-2">
@@ -956,8 +956,8 @@ const PrintPreviewModal = ({
             </Card>
           </div>
 
-          {/* Right Column - Specifications */}
-          <div className="space-y-2 sm:space-y-4 w-full max-w-full">
+          {/* Specifications Section - Full width on mobile, right column on desktop */}
+          <div className="space-y-2 sm:space-y-4 w-full order-2 lg:order-none">
             {/* Print Specifications */}
             <Card>
               <CardHeader className="pb-3 sm:pb-4">
