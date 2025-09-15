@@ -810,7 +810,7 @@ const PrintPreviewModal = ({
                      ) : (
                        /* Banner Preview - MOBILE OPTIMIZED WITH DEBUG */
                        <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
-                         <div className="w-full h-[600px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
+                         <div className="w-full h-[320px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
                            {/* Debug info - remove this after fixing */}
                            {console.log('🎨 Preview Debug:', {
                              previewImage: previewImage ? 'exists' : 'null/undefined',
@@ -848,8 +848,8 @@ const PrintPreviewModal = ({
                                    console.error('🎨 Image src:', previewImage?.substring(0, 100));
                                  }}
                                  style={{ 
-                                   width: '100%',
-                                   height: '100%',
+                                   width: '400px',
+                                   height: '300px',
                                    imageRendering: 'high-quality',
                                    objectFit: 'contain',
                                    objectPosition: 'center center'
