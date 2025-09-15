@@ -769,7 +769,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[90vh] sm:h-full overflow-y-auto p-2 sm:p-4">
+      <DialogContent className="max-w-4xl w-full sm:w-full h-[90vh] sm:h-full overflow-y-auto p-2 sm:p-4">
         <DialogHeader className="pb-4 sm:pb-4">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -779,10 +779,10 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6 justify-items-center lg:justify-items-stretch">
           {/* Left Column - Preview */}
-          <div className="space-y-2 sm:space-y-4">
-            <Card>
+          <div className="space-y-2 sm:space-y-4 w-full max-w-full">
+            <Card className="w-full">
               <CardHeader className="pb-3 sm:pb-4">
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
@@ -812,8 +812,8 @@ const PrintPreviewModal = ({
                        />
                      ) : (
                        /* Banner Preview */
-                       <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden">
-                         <div className="w-full h-64 sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                       <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
+                         <div className="w-full max-w-full h-64 sm:h-80 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                            {previewImage ? (
                              <div className="relative w-full h-full">
                              <img
@@ -946,7 +946,7 @@ const PrintPreviewModal = ({
           </div>
 
           {/* Right Column - Specifications */}
-          <div className="space-y-2 sm:space-y-4">
+          <div className="space-y-2 sm:space-y-4 w-full max-w-full">
             {/* Print Specifications */}
             <Card>
               <CardHeader className="pb-3 sm:pb-4">
