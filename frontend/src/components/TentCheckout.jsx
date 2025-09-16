@@ -146,15 +146,31 @@ const TentCheckout = () => {
     if (savedOrderData) {
       try {
         const parsed = JSON.parse(savedOrderData)
-        // Use the design option from the order data (set in BannerSidebar)
+        // Use the design option from the order data (set in BannerEditor)
         console.log('🎨 TentCheckout - Using design option from order data:', parsed.design_option || parsed.tent_design_option)
         setOrderData(parsed)
         
-        // Load tent specs from order data instead of using defaults
+        // Map tent design option to tent package and wall options
+        const designOption = parsed.tent_design_option || parsed.design_option
+        let tentPackage = 'complete-tent'
+        let wallOption = 'no-walls'
+        
+        if (designOption === 'canopy-only') {
+          tentPackage = 'canopy-graphic-only'
+          wallOption = 'no-walls'
+        } else if (designOption === 'canopy-backwall') {
+          tentPackage = 'complete-tent'
+          wallOption = 'half-walls'
+        } else if (designOption === 'all-sides') {
+          tentPackage = 'complete-tent'
+          wallOption = 'full-walls'
+        }
+        
+        // Load tent specs from order data with proper mapping
         if (parsed.tent_specs) {
           setTentSpecs(parsed.tent_specs)
         } else {
-          // Fallback to extracting from order data fields
+          // Build tent specs from design option and order data
           setTentSpecs({
             tentSize: parsed.tent_size || '10x10',
             tentType: parsed.tent_type || 'event-tent',
@@ -162,12 +178,13 @@ const TentCheckout = () => {
             frameType: parsed.tent_frame_type || '40mm-aluminum-hex',
             printMethod: parsed.tent_print_method || 'dye-sublimation',
             reinforcedStripColor: parsed.reinforced_strip_color || 'white',
-            tentPackage: parsed.tent_package || 'complete-tent',
-            wallOption: parsed.wall_option || 'no-walls'
+            tentPackage: tentPackage,
+            wallOption: wallOption
           })
         }
         
-        console.log('Loaded tent order data:', parsed)
+        console.log('🏕️ Loaded tent order data:', parsed)
+        console.log('🏕️ Mapped tent specs from design option:', { designOption, tentPackage, wallOption })
       } catch (error) {
         console.error('Error parsing tent order data:', error)
       }
@@ -204,24 +221,35 @@ const TentCheckout = () => {
 
   // Calculate tent pricing based on actual tent specifications
   const calculateTentPrice = () => {
-    // Base tent pricing (from order data or default)
+    // Base tent pricing based on tent package and size
     let basePrice = 0
     
     // Get pricing from order data if available
     if (orderData?.tent_pricing) {
       basePrice = orderData.tent_pricing.base_price || 0
     } else {
-      // Fallback pricing based on tent size
-      basePrice = tentSpecs.tentSize === '10x10' ? 599.99 : 899.99
+      // Pricing based on tent size and package type (from TentProducts.jsx)
+      if (tentSpecs.tentSize === '10x10') {
+        basePrice = tentSpecs.tentPackage === 'canopy-graphic-only' ? 299.99 : 599.99
+      } else if (tentSpecs.tentSize === '10x20') {
+        basePrice = tentSpecs.tentPackage === 'canopy-graphic-only' ? 499.99 : 899.99
+      } else {
+        // Default fallback
+        basePrice = 599.99
+      }
     }
     
-    // Add wall option pricing
+    // Add wall option pricing (only if not already included in complete tent package)
     let wallPrice = 0
-    if (tentSpecs.wallOption === 'half-walls') {
-      wallPrice = 175.00
-    } else if (tentSpecs.wallOption === 'full-walls') {
-      wallPrice = 230.00
+    if (tentSpecs.tentPackage === 'canopy-graphic-only') {
+      // For canopy-only orders, walls are additional
+      if (tentSpecs.wallOption === 'half-walls') {
+        wallPrice = 175.00
+      } else if (tentSpecs.wallOption === 'full-walls') {
+        wallPrice = 230.00
+      }
     }
+    // For complete tent packages, walls are included in base price
     
     // Add accessories
     const accessoriesTotal = selectedAccessories.reduce((total, accessoryId) => {
@@ -238,7 +266,14 @@ const TentCheckout = () => {
   const marketplaceCost = orderData?.marketplace_templates ? 
     orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
   
-  const finalTotalPrice = totalPrice + marketplaceCost
+  // Calculate shipping cost from selected shipping option
+  const selectedShippingQuote = shippingQuotes.find(quote => {
+    const optionValue = quote.type || `option_${shippingQuotes.indexOf(quote)}`
+    return optionValue === selectedShippingOption
+  })
+  const shippingCost = selectedShippingQuote ? parseFloat(selectedShippingQuote.cost?.replace('$', '') || '0') : 0
+  
+  const finalTotalPrice = totalPrice + marketplaceCost + shippingCost
 
   // Handle accessory selection
   const handleAccessoryToggle = (accessoryId) => {
@@ -880,15 +915,26 @@ const TentCheckout = () => {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
                     <span className="text-gray-600">
-                      {tentSpecs.tentSize} Event Tent
+                      {tentSpecs.tentSize} {tentSpecs.tentPackage === 'canopy-graphic-only' ? 'Canopy Graphic Only' : 'Complete Event Tent'}
                     </span>
                     <span className="font-medium">
-                      ${(tentSpecs.tentSize === '10x10' ? 599.99 : 899.99).toFixed(2)}
+                      ${(() => {
+                        if (orderData?.tent_pricing) {
+                          return (orderData.tent_pricing.base_price || 0).toFixed(2)
+                        }
+                        // Calculate base price from tent specs
+                        if (tentSpecs.tentSize === '10x10') {
+                          return (tentSpecs.tentPackage === 'canopy-graphic-only' ? 299.99 : 599.99).toFixed(2)
+                        } else if (tentSpecs.tentSize === '10x20') {
+                          return (tentSpecs.tentPackage === 'canopy-graphic-only' ? 499.99 : 899.99).toFixed(2)
+                        }
+                        return '599.99'
+                      })()}
                     </span>
                   </div>
                   
-                  {/* Wall Options */}
-                  {tentSpecs.wallOption !== 'no-walls' && (
+                  {/* Wall Options - only show if canopy-only and walls selected */}
+                  {tentSpecs.tentPackage === 'canopy-graphic-only' && tentSpecs.wallOption !== 'no-walls' && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">
                         {tentSpecs.wallOption === 'half-walls' ? 'Half Walls' : 'Full Walls'}
@@ -918,6 +964,14 @@ const TentCheckout = () => {
                       </span>
                     </div>
                   )}
+                  
+                  {/* Shipping Cost */}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Shipping:</span>
+                    <span className="font-medium">
+                      {selectedShippingQuote ? selectedShippingQuote.cost : 'Calculating...'}
+                    </span>
+                  </div>
                   
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between text-lg font-semibold">
