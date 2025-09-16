@@ -121,6 +121,34 @@ const SurfaceThumbnailViewer = ({
         ctx.arc(element.x + element.radius, element.y + element.radius, element.radius, 0, 2 * Math.PI)
         ctx.fillStyle = element.fill || '#000000'
         ctx.fill()
+      } else if (element.type === 'icon') {
+        // Render icons (missing from original code!)
+        if (element.imagePath) {
+          // Image-based icons
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          
+          await new Promise((resolve, reject) => {
+            img.onload = () => {
+              ctx.drawImage(img, element.x, element.y, element.width || 60, element.height || 60)
+              resolve()
+            }
+            img.onerror = reject
+            img.src = element.imagePath
+          })
+        } else if (element.symbol) {
+          // Symbol-based icons (render as text)
+          const fontSize = Math.max(12, Math.min(element.width || 60, element.height || 60) * 0.6)
+          ctx.font = `${fontSize}px Arial`
+          ctx.fillStyle = element.fill || '#000000'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(
+            element.symbol, 
+            element.x + (element.width || 60) / 2, 
+            element.y + (element.height || 60) / 2
+          )
+        }
       }
     }
     

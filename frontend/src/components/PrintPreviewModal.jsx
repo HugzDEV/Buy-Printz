@@ -415,7 +415,74 @@ const PrintPreviewModal = ({
             }
             ctx.stroke()
           }
+        } else if (element.type === 'icon') {
+          // Render icons (missing from original code!)
+          if (element.imagePath) {
+            // Image-based icons
+            const img = new Image()
+            img.crossOrigin = 'anonymous'
+            
+            await new Promise((resolve, reject) => {
+              img.onload = () => {
+                ctx.drawImage(img, element.x, element.y, element.width || 60, element.height || 60)
+                resolve()
+              }
+              img.onerror = reject
+              img.src = element.imagePath
+            })
+          } else if (element.symbol) {
+            // Symbol-based icons (render as text)
+            const fontSize = Math.max(12, Math.min(element.width || 60, element.height || 60) * 0.6)
+            ctx.font = `${fontSize}px Arial`
+            ctx.fillStyle = element.fill || '#000000'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText(
+              element.symbol, 
+              element.x + (element.width || 60) / 2, 
+              element.y + (element.height || 60) / 2
+            )
+          }
         }
+      }
+      
+      // Add BuyPrintz watermark to production image
+      try {
+        console.log('🎨 Adding BuyPrintz watermark to production image...')
+        const watermarkImg = new Image()
+        watermarkImg.crossOrigin = 'anonymous'
+        
+        await new Promise((resolve, reject) => {
+          watermarkImg.onload = () => {
+            // Calculate watermark size and position
+            const watermarkWidth = canvas.width * 0.8  // 80% of canvas width
+            const watermarkHeight = (watermarkImg.height / watermarkImg.width) * watermarkWidth
+            const watermarkX = (canvas.width - watermarkWidth) / 2
+            const watermarkY = (canvas.height - watermarkHeight) / 2
+            
+            // Set transparency and blend mode for watermark
+            ctx.globalAlpha = 0.15  // 15% opacity for subtle watermark
+            ctx.globalCompositeOperation = 'multiply'  // Blend with underlying content
+            
+            // Draw watermark
+            ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight)
+            
+            // Reset canvas properties
+            ctx.globalAlpha = 1.0
+            ctx.globalCompositeOperation = 'source-over'
+            
+            console.log('✅ BuyPrintz watermark added to production image')
+            resolve()
+          }
+          watermarkImg.onerror = (error) => {
+            console.warn('⚠️ Could not load watermark image:', error)
+            resolve() // Continue without watermark rather than failing
+          }
+          watermarkImg.src = '/assets/images/BuyPrintz_Watermark_1200px_72dpi.png'
+        })
+      } catch (error) {
+        console.warn('⚠️ Error adding watermark:', error)
+        // Continue without watermark rather than failing
       }
       
       // Convert to data URL
