@@ -2542,14 +2542,46 @@ const BannerEditorNew = () => {
   ]
 
   // Scale template elements to fit current canvas size
-  const scaleTemplateElements = useCallback((templateElements, targetWidth, targetHeight) => {
-    // Original template dimensions (hardcoded in templates)
-    const originalWidth = 800
-    const originalHeight = 400
+  const scaleTemplateElements = useCallback((templateElements, targetWidth, targetHeight, originalCanvasSize = null) => {
+    // Determine original template dimensions
+    let originalWidth, originalHeight
+    
+    if (originalCanvasSize) {
+      // Use provided original dimensions
+      originalWidth = originalCanvasSize.width
+      originalHeight = originalCanvasSize.height
+    } else {
+      // Try to detect original dimensions from template elements
+      // Find the maximum x+width and y+height to estimate original canvas size
+      let maxX = 0, maxY = 0
+      templateElements.forEach(element => {
+        if (element.x !== undefined && element.width !== undefined) {
+          maxX = Math.max(maxX, element.x + element.width)
+        }
+        if (element.y !== undefined && element.height !== undefined) {
+          maxY = Math.max(maxY, element.y + element.height)
+        }
+      })
+      
+      // Use detected dimensions if reasonable, otherwise fallback to banner defaults
+      if (maxX > 0 && maxY > 0) {
+        originalWidth = Math.max(maxX, 800) // Ensure minimum width
+        originalHeight = Math.max(maxY, 400) // Ensure minimum height
+        console.log('🎨 Detected template dimensions:', originalWidth, 'x', originalHeight)
+      } else {
+        // Fallback to banner dimensions for legacy templates
+        originalWidth = 800
+        originalHeight = 400
+        console.log('🎨 Using fallback banner dimensions for template scaling')
+      }
+    }
     
     // Calculate scaling factors
     const scaleX = targetWidth / originalWidth
     const scaleY = targetHeight / originalHeight
+    
+    console.log('🎨 Scaling template from', originalWidth, 'x', originalHeight, 'to', targetWidth, 'x', targetHeight)
+    console.log('🎨 Scale factors: X =', scaleX.toFixed(3), ', Y =', scaleY.toFixed(3))
     
     return templateElements.map(element => {
       const scaledElement = { ...element }
@@ -2700,7 +2732,8 @@ const BannerEditorNew = () => {
               const scaledElements = scaleTemplateElements(
                 templateData.elements, 
                 canvasSize.width, 
-                canvasSize.height
+                canvasSize.height,
+                templateData.canvasSize || null // Pass original canvas size if available
               ).map(element => ({
                 ...element,
                 id: generateId(element.type)
@@ -2737,7 +2770,8 @@ const BannerEditorNew = () => {
         const scaledElements = scaleTemplateElements(
           selectedTemplate.elements, 
           canvasSize.width, 
-          canvasSize.height
+          canvasSize.height,
+          selectedTemplate.canvasSize || { width: 800, height: 400 } // Banner templates use 800x400
         ).map(element => ({
           ...element,
           id: generateId(element.type)
@@ -3603,14 +3637,38 @@ const BannerEditorNew = () => {
             console.log('🎨 Restoring multi-surface elements from template:', canvasData.surface_elements)
             setSurfaceElements(canvasData.surface_elements)
           } else {
-            // For single-surface products or fallback, restore image elements properly
-            restoreImageElements(canvasData.elements || []).then(restoredElements => {
+          // For single-surface products or fallback, restore image elements properly
+          const elementsToRestore = canvasData.elements || []
+          
+          // Check if we need to scale elements (template loaded on different product type)
+          if (canvasData.canvasSize && 
+              (canvasData.canvasSize.width !== canvasSize.width || canvasData.canvasSize.height !== canvasSize.height)) {
+            console.log('🎨 Template canvas size differs from current canvas, scaling elements')
+            console.log('🎨 Template canvas:', canvasData.canvasSize, '-> Current canvas:', canvasSize)
+            
+            // Scale elements to fit current canvas
+            const scaledElements = scaleTemplateElements(
+              elementsToRestore,
+              canvasSize.width,
+              canvasSize.height,
+              canvasData.canvasSize
+            )
+            
+            restoreImageElements(scaledElements).then(restoredElements => {
+              setElements(restoredElements)
+            }).catch(error => {
+              console.error('Failed to restore scaled image elements:', error)
+              setElements(scaledElements)
+            })
+          } else {
+            // No scaling needed, restore elements as-is
+            restoreImageElements(elementsToRestore).then(restoredElements => {
               setElements(restoredElements)
             }).catch(error => {
               console.error('Failed to restore image elements:', error)
-              // Fallback to loading without images
-              setElements(canvasData.elements || [])
+              setElements(elementsToRestore)
             })
+          }
           }
           
           // Restore design options from template

@@ -261,10 +261,15 @@ const PrintPreviewModal = ({
         return null
       }
       
-      // Set canvas size - use proper dimensions based on product type and surface
+      // Set canvas size - PRIORITIZE canvasData.canvasSize for consistency with editor
       let canvasSize
-      if (hasMultipleSurfaces() && targetSurface) {
-        // For multi-surface products, use surface-specific dimensions
+      
+      // First priority: Use canvasData.canvasSize if available (maintains consistency with editor)
+      if (canvasData?.canvasSize) {
+        canvasSize = canvasData.canvasSize
+        console.log('🎨 Using canvasData.canvasSize:', canvasSize)
+      } else if (hasMultipleSurfaces() && targetSurface) {
+        // Second priority: For multi-surface products, use surface-specific dimensions
         if (productType === 'tent') {
           const tentDimensions = {
             'canopy_front': { width: 1160, height: 1049 },
@@ -279,17 +284,19 @@ const PrintPreviewModal = ({
         } else if (productType === 'tin') {
           canvasSize = { width: 374, height: 225 }
         } else {
-          canvasSize = canvasData?.canvasSize || { width: 800, height: 400 }
+          canvasSize = { width: 800, height: 400 } // Banner fallback
         }
+        console.log('🎨 Using surface-specific dimensions:', canvasSize, 'for surface:', targetSurface)
       } else {
-        // For single-surface products, use canvasData or defaults
+        // Last priority: Product type defaults
         if (productType === 'tent') {
           canvasSize = { width: 1160, height: 1049 } // Default tent canopy
         } else if (productType === 'tin') {
           canvasSize = { width: 374, height: 225 }
         } else {
-          canvasSize = canvasData?.canvasSize || { width: 800, height: 400 }
+          canvasSize = { width: 800, height: 400 } // Banner default
         }
+        console.log('🎨 Using product type defaults:', canvasSize)
       }
       
       console.log('🎨 Using canvas dimensions:', canvasSize, 'for surface:', targetSurface || 'default')
@@ -323,16 +330,39 @@ const PrintPreviewModal = ({
       
       // Render elements
       for (const element of elementsToRender) {
+        // Apply rotation if element has rotation property
+        const hasRotation = element.rotation && element.rotation !== 0
+        if (hasRotation) {
+          ctx.save()
+          // Calculate rotation center based on element type
+          let centerX, centerY
+          if (element.type === 'circle' || element.type === 'star' || element.type === 'triangle' || element.type === 'hexagon') {
+            // For center-positioned shapes, use x,y as center
+            centerX = element.x
+            centerY = element.y
+          } else {
+            // For top-left positioned shapes (rect, text, image), calculate center
+            centerX = element.x + (element.width || 0) / 2
+            centerY = element.y + (element.height || 0) / 2
+          }
+          ctx.translate(centerX, centerY)
+          ctx.rotate((element.rotation * Math.PI) / 180) // Convert degrees to radians
+          ctx.translate(-centerX, -centerY)
+        }
+        
         if (element.type === 'image' && (element.imageDataUrl || element.image)) {
           // Create image from data URL or image object
           const img = new Image()
           img.crossOrigin = 'anonymous'
           
-          await new Promise((resolve, reject) => {
-            img.onload = () => {
-              ctx.drawImage(img, element.x, element.y, element.width, element.height)
-              resolve()
-            }
+            await new Promise((resolve, reject) => {
+              img.onload = () => {
+                // Improve image quality for crisp rendering
+                ctx.imageSmoothingEnabled = false // Disable smoothing for pixel-perfect images like QR codes
+                ctx.drawImage(img, element.x, element.y, element.width, element.height)
+                ctx.imageSmoothingEnabled = true // Re-enable for other elements
+                resolve()
+              }
             img.onerror = (error) => {
               console.warn('⚠️ Error loading image element:', error, element)
               resolve() // Continue rendering other elements
@@ -351,30 +381,146 @@ const PrintPreviewModal = ({
             }
           })
         } else if (element.type === 'text') {
-          // Render text
-          ctx.font = `${element.fontSize}px ${element.fontFamily}`
+          // Render text - Match Konva's text positioning and wrapping exactly
+          const fontSize = element.fontSize || 24
+          const fontFamily = element.fontFamily || 'Arial'
+          const lineHeight = element.lineHeight || 1.2
+          const textWidth = element.width || 200
+          const align = element.align || 'left'
+          const padding = element.padding || 0
+          
+          // Use exact same font specification as Konva for consistent rendering
+          ctx.font = `${fontSize}px "${fontFamily}"`
           ctx.fillStyle = element.fill || element.color || '#000000'
-          ctx.textAlign = element.align || element.textAlign || 'left'
-          ctx.fillText(element.text, element.x, element.y)
+          ctx.textRenderingOptimization = 'optimizeQuality'
+          ctx.textAlign = 'left' // Always left for consistent positioning
+          ctx.textBaseline = 'top'
+          
+          // Split text into lines (handle both manual line breaks and word wrapping)
+          const text = element.text || 'Text'
+          const lines = []
+          
+          // First, split by manual line breaks (\n)
+          const manualLines = text.split('\n')
+          
+          // Then, handle word wrapping for each line
+          for (const line of manualLines) {
+            if (line.trim() === '') {
+              lines.push('') // Preserve empty lines
+              continue
+            }
+            
+            // Check if line fits within width
+            const lineWidth = ctx.measureText(line).width
+            if (lineWidth <= textWidth - padding * 2) {
+              lines.push(line)
+            } else {
+              // Word wrap this line
+              const words = line.split(' ')
+              let currentLine = ''
+              
+              for (const word of words) {
+                const testLine = currentLine ? `${currentLine} ${word}` : word
+                const testWidth = ctx.measureText(testLine).width
+                
+                if (testWidth <= textWidth - padding * 2) {
+                  currentLine = testLine
+                } else {
+                  if (currentLine) {
+                    lines.push(currentLine)
+                    currentLine = word
+                  } else {
+                    // Single word is too long, force it
+                    lines.push(word)
+                  }
+                }
+              }
+              if (currentLine) {
+                lines.push(currentLine)
+              }
+            }
+          }
+          
+          // Calculate starting position
+          let startX = element.x + padding
+          const startY = element.y + padding
+          
+          // Render each line
+          lines.forEach((line, lineIndex) => {
+            const lineY = startY + (lineIndex * fontSize * lineHeight)
+            let lineX = startX
+            
+            // Handle alignment for each line
+            if (align === 'center' || align === 'right') {
+              const actualLineWidth = ctx.measureText(line).width
+              const availableWidth = textWidth - padding * 2
+              
+              if (align === 'center') {
+                lineX += (availableWidth - actualLineWidth) / 2
+              } else if (align === 'right') {
+                lineX += (availableWidth - actualLineWidth)
+              }
+            }
+            
+            // Render text with stroke if specified (like Konva)
+            if (element.stroke && element.strokeWidth > 0) {
+              ctx.strokeStyle = element.stroke
+              ctx.lineWidth = element.strokeWidth
+              ctx.strokeText(line, lineX, lineY)
+            }
+            ctx.fillText(line, lineX, lineY)
+          })
+          
+          // Debug logging
+          console.log(`🎨 Rendered text "${text}" as ${lines.length} lines:`, lines)
         } else if (element.type === 'rect') {
           // Render rectangle
+          const width = element.width || 100
+          const height = element.height || 100
+          // console.log(`🎨 Rendering rectangle at (${element.x}, ${element.y}), size: ${width}x${height}`)
+          
           ctx.fillStyle = element.fill || '#000000'
-          ctx.fillRect(element.x, element.y, element.width, element.height)
+          ctx.fillRect(element.x, element.y, width, height)
+          
+          // Add stroke if specified (match Konva)
+          if (element.stroke && element.strokeWidth > 0) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.strokeRect(element.x, element.y, width, height)
+          }
         } else if (element.type === 'circle') {
           // Render circle - position (x,y) is the CENTER in Konva
+          const radius = element.radius || 50
+          const strokeWidth = element.strokeWidth || 0
+          
+          // Adjust radius to account for stroke (Konva draws stroke centered on path)
+          // Canvas2D draws stroke centered too, but visual appearance might differ
+          const adjustedRadius = strokeWidth > 0 ? radius - strokeWidth / 2 : radius
+          
+          // console.log(`🎨 Circle: original radius ${radius}, stroke ${strokeWidth}, adjusted ${adjustedRadius}`)
+          
           ctx.beginPath()
-          ctx.arc(element.x, element.y, element.radius || 50, 0, 2 * Math.PI)
+          ctx.arc(element.x, element.y, adjustedRadius, 0, 2 * Math.PI)
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if specified (match Konva)
+          if (element.stroke && strokeWidth > 0) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'star') {
           // Render star - position (x,y) is the CENTER in Konva
-          ctx.beginPath()
           const numPoints = element.numPoints || 5
           const innerRadius = element.innerRadius || 40
           const outerRadius = element.outerRadius || 80
           const centerX = element.x  // x,y is already the center in Konva
           const centerY = element.y
           
+          // console.log(`🎨 Rendering star at (${centerX}, ${centerY}), inner: ${innerRadius}, outer: ${outerRadius}, points: ${numPoints}`)
+          
+          ctx.beginPath()
           for (let i = 0; i < numPoints * 2; i++) {
             const angle = (i * Math.PI) / numPoints
             const radius = i % 2 === 0 ? outerRadius : innerRadius
@@ -390,6 +536,13 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if specified (match Konva)
+          if (element.stroke && element.strokeWidth > 0) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'triangle') {
           // Render triangle - position (x,y) is the CENTER in Konva
           ctx.beginPath()
@@ -509,12 +662,13 @@ const PrintPreviewModal = ({
               img.src = element.imagePath
             })
           } else if (element.symbol) {
-            // Symbol-based icons (render as text)
+            // Symbol-based icons (render as text) - Match Konva's icon text positioning
             const fontSize = Math.max(12, Math.min(element.width || 60, element.height || 60) * 0.6)
             ctx.font = `${fontSize}px Arial`
             ctx.fillStyle = element.fill || '#000000'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
+            // Konva icon text uses center/middle alignment, so we calculate center
             ctx.fillText(
               element.symbol, 
               element.x + (element.width || 60) / 2, 
@@ -530,7 +684,10 @@ const PrintPreviewModal = ({
             
             await new Promise((resolve, reject) => {
               img.onload = () => {
+                // Improve QR code rendering quality
+                ctx.imageSmoothingEnabled = false // Disable smoothing for crisp QR codes
                 ctx.drawImage(img, element.x, element.y, element.width || 200, element.height || 200)
+                ctx.imageSmoothingEnabled = true // Re-enable for other elements
                 resolve()
               }
               img.onerror = (error) => {
@@ -597,6 +754,11 @@ const PrintPreviewModal = ({
             ctx.fillText('QR', element.x + (element.width || 200) / 2, element.y + (element.height || 200) / 2)
           }
         }
+        
+        // Restore canvas state if rotation was applied
+        if (hasRotation) {
+          ctx.restore()
+        }
       }
       
       // Add BuyPrintz watermark to production image
@@ -628,8 +790,14 @@ const PrintPreviewModal = ({
             resolve()
           }
           watermarkImg.onerror = (error) => {
-            console.warn('⚠️ Could not load watermark image:', error)
-            resolve() // Continue without watermark rather than failing
+            console.warn('⚠️ Could not load watermark image from /assets/images/BuyPrintz_Watermark_1200px_72dpi.png:', error)
+            console.warn('⚠️ Trying alternative watermark path...')
+            // Try alternative path
+            watermarkImg.src = '/BuyPrintz_Watermark_1200px_72dpi.png'
+            watermarkImg.onerror = (altError) => {
+              console.error('⚠️ Could not load watermark from any path:', altError)
+              resolve() // Continue without watermark rather than failing
+            }
           }
           watermarkImg.src = '/assets/images/BuyPrintz_Watermark_1200px_72dpi.png'
         })
