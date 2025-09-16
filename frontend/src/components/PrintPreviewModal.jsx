@@ -230,8 +230,38 @@ const PrintPreviewModal = ({
         return null
       }
       
-      // Set canvas size
-      const canvasSize = canvasData?.canvasSize || { width: 800, height: 600 }
+      // Set canvas size - use proper dimensions based on product type and surface
+      let canvasSize
+      if (hasMultipleSurfaces() && targetSurface) {
+        // For multi-surface products, use surface-specific dimensions
+        if (productType === 'tent') {
+          const tentDimensions = {
+            'canopy_front': { width: 1160, height: 1049 },
+            'canopy_back': { width: 1160, height: 1049 },
+            'canopy_left': { width: 1160, height: 1049 },
+            'canopy_right': { width: 1160, height: 1049 },
+            'sidewall_left': { width: 1110, height: 390 },
+            'sidewall_right': { width: 1110, height: 390 },
+            'backwall': { width: 1110, height: 780 }
+          }
+          canvasSize = tentDimensions[targetSurface] || { width: 1160, height: 1049 }
+        } else if (productType === 'tin') {
+          canvasSize = { width: 374, height: 225 }
+        } else {
+          canvasSize = canvasData?.canvasSize || { width: 800, height: 400 }
+        }
+      } else {
+        // For single-surface products, use canvasData or defaults
+        if (productType === 'tent') {
+          canvasSize = { width: 1160, height: 1049 } // Default tent canopy
+        } else if (productType === 'tin') {
+          canvasSize = { width: 374, height: 225 }
+        } else {
+          canvasSize = canvasData?.canvasSize || { width: 800, height: 400 }
+        }
+      }
+      
+      console.log('🎨 Using canvas dimensions:', canvasSize, 'for surface:', targetSurface || 'default')
       canvas.width = canvasSize.width
       canvas.height = canvasSize.height
       
@@ -576,14 +606,11 @@ const PrintPreviewModal = ({
     }
   }, [previewImage])
 
-  // Set image scale based on screen size - different behavior for desktop vs mobile
+  // Set image scale consistently across all devices to preserve element positioning
   useEffect(() => {
     const updateScale = () => {
-      if (window.innerWidth < 768) {
-        setImageScale(1.0) // No scaling on mobile to preserve element positioning
-      } else {
-        setImageScale(1.5) // Restore desktop scaling for better preview
-      }
+      // Use consistent scaling across all devices to prevent element positioning issues
+      setImageScale(1.0)
     }
     
     updateScale()
@@ -748,19 +775,17 @@ const PrintPreviewModal = ({
                                    maxHeight: window.innerWidth < 768 ? '200px' : '280px',
                                    minHeight: window.innerWidth < 768 ? '150px' : '250px',
                                  objectFit: 'contain',
-                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
+                                   transform: 'scale(1.0)',
                                  transformOrigin: 'center center'
                                }}
                                onLoad={handleImageLoad}
                              />
                                
-                               {/* BuyPrintz Watermark Overlay - IP Protection - Properly positioned */}
+                               {/* BuyPrintz Watermark Overlay - IP Protection - Consistent across all devices */}
                                <div 
                                  className="absolute inset-0 pointer-events-none" 
                                  style={{ 
-                                   zIndex: 10,
-                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
+                                   zIndex: 10
                                  }}
                                >
                                  <img
@@ -780,9 +805,7 @@ const PrintPreviewModal = ({
                                <div 
                                  className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
                                  style={{ 
-                                   zIndex: 20,
-                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
-                                   transformOrigin: 'center center'
+                                   zIndex: 20
                                  }}
                                >
                                  Preview
