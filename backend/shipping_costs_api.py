@@ -13,7 +13,7 @@ import asyncio
 from datetime import datetime
 
 from backend.b2sign_playwright_integration import B2SignPlaywrightIntegration
-from backend.tent_shipping_service import get_tent_shipping_costs
+from backend.tent_shipping_service import get_tent_shipping_costs_service
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -305,7 +305,7 @@ async def get_tent_shipping_costs(request: TentShippingCostsRequest):
                 )
         
         # Get shipping costs using the tent shipping service
-        result = await get_tent_shipping_costs(order_data, customer_info)
+        result = await get_tent_shipping_costs_service(order_data, customer_info)
         
         if result['success']:
             logger.info(f"✅ Tent shipping costs retrieved successfully: {len(result['shipping_options'])} options")

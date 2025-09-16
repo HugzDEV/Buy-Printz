@@ -164,7 +164,7 @@ async def get_tent_shipping_service():
     
     return tent_shipping_service
 
-async def get_tent_shipping_costs(order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
+async def get_tent_shipping_costs_service(order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
     """
     Get shipping costs for tent products using EXACT SAME proven banner workflow
     
