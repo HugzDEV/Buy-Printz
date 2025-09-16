@@ -42,6 +42,8 @@ const BannerSidebar = ({
   onCopyDesignToSurface,
   tentDesignOption = 'canopy-only',
   onTentDesignOptionChange,
+  tentSpecs = null,
+  onTentSpecChange,
 
   onAddShape,
   onAddAsset,
@@ -108,34 +110,42 @@ const BannerSidebar = ({
     }
   }, [tentDesignOption, onTentDesignOptionChange, onCopyDesignToSurface])
 
-  // Memoized available tent surfaces based on design option
+  // Memoized available tent surfaces based on tent specs surfaces
   const availableTentSurfaces = useMemo(() => {
     const allSurfaces = [
       { key: 'canopy_front', name: 'Canopy Front + Valence', group: 'canopy' },
       { key: 'canopy_back', name: 'Canopy Back + Valence', group: 'canopy' },
       { key: 'canopy_left', name: 'Canopy Left + Valence', group: 'canopy' },
       { key: 'canopy_right', name: 'Canopy Right + Valence', group: 'canopy' },
-      { key: 'backwall', name: 'Back Wall', group: 'wall' }, // Moved backwall right after canopy
+      { key: 'backwall', name: 'Back Wall', group: 'wall' },
       { key: 'sidewall_left', name: 'Left Sidewall', group: 'wall' },
       { key: 'sidewall_right', name: 'Right Sidewall', group: 'wall' }
     ]
 
-    let filteredSurfaces = []
-    if (tentDesignOption === 'canopy-only') {
-      // Include canopy surfaces (now with integrated valence)
-      filteredSurfaces = allSurfaces.filter(s => s.group === 'canopy')
-    } else if (tentDesignOption === 'canopy-backwall') {
-      // For canopy + backwall, return canopy surfaces + backwall in order
-      filteredSurfaces = [
-        ...allSurfaces.filter(s => s.group === 'canopy'),
-        ...allSurfaces.filter(s => s.key === 'backwall')
-      ]
-    } else {
-      filteredSurfaces = allSurfaces // all-sides
+    // Always include canopy surfaces
+    let filteredSurfaces = allSurfaces.filter(s => s.group === 'canopy')
+    
+    // Add surfaces based on tent specs selections
+    if (tentSpecs?.surfaces?.backwall) {
+      filteredSurfaces.push(...allSurfaces.filter(s => s.key === 'backwall'))
     }
     
+    if (tentSpecs?.surfaces?.sidewalls) {
+      filteredSurfaces.push(...allSurfaces.filter(s => s.key === 'sidewall_left' || s.key === 'sidewall_right'))
+    }
+    
+    console.log('🎨 BannerSidebar - Available tent surfaces:', filteredSurfaces.map(s => s.key))
     return filteredSurfaces
-  }, [tentDesignOption])
+  }, [tentSpecs?.surfaces])
+  
+  // Sync available surfaces with parent when tent surfaces change
+  useEffect(() => {
+    if (productType === 'tent' && onAvailableSurfacesChange) {
+      const surfaceKeys = availableTentSurfaces.map(s => s.key)
+      console.log('🎨 BannerSidebar - Syncing available surfaces with parent:', surfaceKeys)
+      onAvailableSurfacesChange(surfaceKeys)
+    }
+  }, [productType, availableTentSurfaces, onAvailableSurfacesChange])
 
   // Memoized available tin surfaces based on surface coverage
   const availableTinSurfaces = useMemo(() => {
@@ -1354,45 +1364,121 @@ const BannerSidebar = ({
               {/* Tent-Specific Options */}
               {productType === 'tent' && (
                 <>
-                  {/* Design Coverage */}
+                  {/* Tent Size */}
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                    <div className="text-sm font-medium text-gray-800 mb-3">Design Coverage</div>
+                    <div className="text-sm font-medium text-gray-800 mb-3">Tent Size</div>
+                    <select 
+                      value={tentSpecs?.tentSize || '10x10'}
+                      onChange={(e) => onTentSpecChange?.('tentSize', e.target.value)}
+                      className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    >
+                      <option value="10x10">10×10 ft Event Tent</option>
+                      <option value="10x20">10×20 ft Event Tent</option>
+                    </select>
+                  </div>
+
+                  {/* Frame Option */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Frame Option</div>
                     <div className="space-y-2">
                       <label className="flex items-center space-x-2">
                         <input 
                           type="radio" 
-                          name="tentDesignOption" 
-                          value="canopy-only"
-                          checked={tentDesignOption === 'canopy-only'}
+                          name="withFrame" 
+                          value={true}
+                          checked={tentSpecs?.withFrame === true}
                           className="text-blue-500"
-                          onChange={(e) => handleTentDesignOptionChange(e.target.value)}
+                          onChange={(e) => onTentSpecChange?.('withFrame', true)}
                         />
-                        <span className="text-sm text-gray-700">Canopy Only (4 surfaces)</span>
+                        <span className="text-sm text-gray-700">With Frame (Complete Tent)</span>
                       </label>
                       <label className="flex items-center space-x-2">
                         <input 
                           type="radio" 
-                          name="tentDesignOption" 
-                          value="canopy-backwall"
-                          checked={tentDesignOption === 'canopy-backwall'}
+                          name="withFrame" 
+                          value={false}
+                          checked={tentSpecs?.withFrame === false}
                           className="text-blue-500"
-                          onChange={(e) => handleTentDesignOptionChange(e.target.value)}
+                          onChange={(e) => onTentSpecChange?.('withFrame', false)}
                         />
-                        <span className="text-sm text-gray-700">Canopy + Back Wall (5 surfaces)</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input 
-                          type="radio" 
-                          name="tentDesignOption" 
-                          value="all-sides"
-                          checked={tentDesignOption === 'all-sides'}
-                          className="text-blue-500"
-                          onChange={(e) => handleTentDesignOptionChange(e.target.value)}
-                        />
-                        <span className="text-sm text-gray-700">All Sides (7 surfaces)</span>
+                        <span className="text-sm text-gray-700">Graphic Only (You Have Frame)</span>
                       </label>
                     </div>
                   </div>
+
+                  {/* Surface Selection */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Surfaces to Print</div>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="checkbox" 
+                          checked={tentSpecs?.surfaces?.canopy || true}
+                          disabled={true}
+                          className="text-blue-500 opacity-50"
+                        />
+                        <span className="text-sm text-gray-700">Canopy (Always Included)</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="checkbox" 
+                          checked={tentSpecs?.surfaces?.backwall || false}
+                          className="text-blue-500"
+                          onChange={(e) => {
+                            onTentSpecChange?.('surfaces.backwall', e.target.checked)
+                            // Update tent design option based on surface selection
+                            const newBackwall = e.target.checked
+                            const currentSidewalls = tentSpecs?.surfaces?.sidewalls || false
+                            if (newBackwall && currentSidewalls) {
+                              onTentDesignOptionChange?.('all-sides')
+                            } else if (newBackwall && !currentSidewalls) {
+                              onTentDesignOptionChange?.('canopy-backwall')
+                            } else if (!newBackwall && !currentSidewalls) {
+                              onTentDesignOptionChange?.('canopy-only')
+                            }
+                          }}
+                        />
+                        <span className="text-sm text-gray-700">Backwall</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input 
+                          type="checkbox" 
+                          checked={tentSpecs?.surfaces?.sidewalls || false}
+                          className="text-blue-500"
+                          onChange={(e) => {
+                            onTentSpecChange?.('surfaces.sidewalls', e.target.checked)
+                            // Update tent design option based on surface selection
+                            const newSidewalls = e.target.checked
+                            const currentBackwall = tentSpecs?.surfaces?.backwall || false
+                            if (newSidewalls && currentBackwall) {
+                              onTentDesignOptionChange?.('all-sides')
+                            } else if (newSidewalls && !currentBackwall) {
+                              onTentDesignOptionChange?.('canopy-only') // Sidewalls only isn't a standard option, default to canopy-only
+                            } else if (!newSidewalls && currentBackwall) {
+                              onTentDesignOptionChange?.('canopy-backwall')
+                            } else if (!newSidewalls && !currentBackwall) {
+                              onTentDesignOptionChange?.('canopy-only')
+                            }
+                          }}
+                        />
+                        <span className="text-sm text-gray-700">Sidewalls (Left & Right)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Reinforced Strip Color */}
+                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                    <div className="text-sm font-medium text-gray-800 mb-3">Reinforced Strip Color</div>
+                    <select 
+                      value={tentSpecs?.reinforcedStripColor || 'white'}
+                      onChange={(e) => onTentSpecChange?.('reinforcedStripColor', e.target.value)}
+                      className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    >
+                      <option value="white">White</option>
+                      <option value="black">Black</option>
+                    </select>
+                  </div>
+
 
                   {/* Surface Selector */}
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
@@ -1626,7 +1712,19 @@ const BannerSidebar = ({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Tent Size:</span>
-                      <span className="font-medium text-gray-800">10×10 ft</span>
+                      <span className="font-medium text-gray-800">{tentSpecs?.tentSize || '10x10'} ft</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Frame:</span>
+                      <span className="font-medium text-gray-800">
+                        {tentSpecs?.withFrame ? 'With Frame' : 'Graphic Only'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Surfaces:</span>
+                      <span className="font-medium text-gray-800">
+                        Canopy{tentSpecs?.surfaces?.backwall ? ' + Backwall' : ''}{tentSpecs?.surfaces?.sidewalls ? ' + Sidewalls' : ''}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Material:</span>

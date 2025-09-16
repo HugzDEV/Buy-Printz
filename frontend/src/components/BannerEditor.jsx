@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import jsPDF from 'jspdf'
 import { QRCodeCanvas } from 'qrcode.react'
 import { createRoot } from 'react-dom/client'
@@ -112,8 +113,26 @@ const BannerEditorNew = () => {
       })
       console.log('🎨 Initialized tin specs')
     } else if (urlProduct === 'tent' && !tentDesignOption) {
+      console.log('🎨 useEffect tent initialization - tentDesignOption was null, setting to canopy-only')
       setTentDesignOption('canopy-only')
-      console.log('🎨 Initialized tent design option')
+      if (!tentSpecs) {
+        console.log('🎨 useEffect tent initialization - tentSpecs was null, initializing')
+        const newTentSpecs = {
+          tentSize: '10x10',
+          surfaces: {
+            canopy: true,
+            sidewalls: false,
+            backwall: false
+          },
+          withFrame: true,
+          reinforcedStripColor: 'white'
+        }
+        setTentSpecs(newTentSpecs)
+        console.log('🎨 useEffect tent initialization - set tentSpecs to:', newTentSpecs)
+      } else {
+        console.log('🎨 useEffect tent initialization - tentSpecs already exists:', tentSpecs)
+      }
+      console.log('🎨 Initialized tent design option and specs')
     } else if (urlProduct === 'banner' && !bannerSpecs) {
       setBannerSpecs(bannerTypes[0])
       console.log('🎨 Initialized banner specs')
@@ -198,6 +217,93 @@ const BannerEditorNew = () => {
     }
     return null // For non-tent products, return null
   })
+
+  // Tent specifications state - surface-based configuration
+  const [tentSpecs, setTentSpecsOriginal] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    console.log('🎨 TentSpecs useState init - urlProduct:', urlProduct)
+    if (urlProduct === 'tent') {
+      const defaultSpecs = {
+        tentSize: '10x10',
+        surfaces: {
+          canopy: true, // Always true - canopy is always included
+          sidewalls: false,
+          backwall: false
+        },
+        withFrame: true, // Default to with frame (complete tent)
+        reinforcedStripColor: 'white'
+      }
+      console.log('🎨 TentSpecs useState init - returning default specs:', defaultSpecs)
+      return defaultSpecs
+    }
+    console.log('🎨 TentSpecs useState init - returning null for non-tent product')
+    return null
+  })
+  
+  // Wrapped setTentSpecs to debug when it's called with null
+  const setTentSpecs = useCallback((value) => {
+    if (value === null) {
+      console.log('🚨 setTentSpecs called with null! Stack trace:')
+      console.trace()
+    } else {
+      console.log('✅ setTentSpecs called with value:', value)
+    }
+    setTentSpecsOriginal(value)
+  }, [])
+  
+  // Ref to store latest tent specs for immediate access
+  const tentSpecsRef = useRef(tentSpecs)
+  
+  // Initialize tentSpecs when product type changes to tent and tentSpecs is null
+  useEffect(() => {
+    if (productType === 'tent' && tentSpecs === null) {
+      console.log('🎨 Product type is tent but tentSpecs is null - initializing default specs')
+      const defaultSpecs = {
+        tentSize: '10x10',
+        surfaces: {
+          canopy: true,
+          sidewalls: false,
+          backwall: false
+        },
+        withFrame: true,
+        reinforcedStripColor: 'white'
+      }
+      setTentSpecs(defaultSpecs)
+    }
+  }, [productType, tentSpecs])
+
+  // Debug tentSpecs changes and update ref
+  useEffect(() => {
+    console.log('🎨 TentSpecs state changed to:', tentSpecs)
+    tentSpecsRef.current = tentSpecs
+    
+    // Update available surfaces when tent specs change
+    if (productType === 'tent' && tentSpecs) {
+      const baseSurfaces = ['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right']
+      const additionalSurfaces = []
+      
+      if (tentSpecs.surfaces?.sidewalls) {
+        additionalSurfaces.push('sidewall_left', 'sidewall_right')
+      }
+      
+      if (tentSpecs.surfaces?.backwall) {
+        additionalSurfaces.push('backwall')
+      }
+      
+      const updatedAvailableSurfaces = [...baseSurfaces, ...additionalSurfaces]
+      console.log('🎨 TentSpecs useEffect - Updating available surfaces:', updatedAvailableSurfaces)
+      setAvailableSurfaces(updatedAvailableSurfaces)
+    } else if (productType === 'tent' && tentSpecs === null) {
+      // Reset to base surfaces when tentSpecs is null
+      console.log('🎨 TentSpecs is null - resetting to base surfaces only')
+      setAvailableSurfaces(['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right'])
+    }
+    
+    if (tentSpecs === null && productType === 'tent') {
+      console.log('🚨 TentSpecs is null for tent product! Stack trace:')
+      console.trace()
+    }
+  }, [tentSpecs, productType])
   
   
   // Save Modal state
@@ -351,8 +457,18 @@ const BannerEditorNew = () => {
       })
     } else if (newProductType === 'tent') {
       setCurrentSurface('canopy_front')
-      // Initialize tent design option
+      // Initialize tent design option and specs
       setTentDesignOption('canopy-only')
+      setTentSpecs({
+        tentSize: '10x10',
+        surfaces: {
+          canopy: true,
+          sidewalls: false,
+          backwall: false
+        },
+        withFrame: true,
+        reinforcedStripColor: 'white'
+      })
     } else {
       setCurrentSurface('front')
       // Initialize banner specs for banner products
@@ -404,6 +520,66 @@ const BannerEditorNew = () => {
       console.log('🎨 BannerEditor - Initialized sidewalls as empty for all-sides mode')
     }
   }, [tentDesignOption])
+
+  // Handle tent specification changes
+  const handleTentSpecChange = useCallback((key, value) => {
+    setTentSpecs(prev => {
+      // Handle case where prev might be null
+      const currentSpecs = prev || {
+        tentSize: '10x10',
+        surfaces: {
+          canopy: true,
+          sidewalls: false,
+          backwall: false
+        },
+        withFrame: true,
+        reinforcedStripColor: 'white'
+      }
+      
+      let newSpecs
+      
+      // Handle nested surface changes
+      if (key.startsWith('surfaces.')) {
+        const surfaceKey = key.split('.')[1]
+        newSpecs = {
+          ...currentSpecs,
+          surfaces: {
+            ...currentSpecs.surfaces,
+            [surfaceKey]: value
+          }
+        }
+      } else {
+        // Handle direct property changes
+        newSpecs = {
+          ...currentSpecs,
+          [key]: value
+        }
+      }
+      
+      console.log('🎨 BannerEditor - Tent spec changed:', key, 'from', key.includes('.') ? currentSpecs.surfaces?.[key.split('.')[1]] : currentSpecs[key], 'to', value)
+      console.log('🎨 BannerEditor - New tent specs:', newSpecs)
+      
+      // Update available surfaces based on tent specs
+      if (productType === 'tent') {
+        const baseSurfaces = ['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right']
+        const additionalSurfaces = []
+        
+        if (newSpecs.surfaces.sidewalls) {
+          additionalSurfaces.push('sidewall_left', 'sidewall_right')
+        }
+        
+        if (newSpecs.surfaces.backwall) {
+          additionalSurfaces.push('backwall')
+        }
+        
+        const updatedAvailableSurfaces = [...baseSurfaces, ...additionalSurfaces]
+        console.log('🎨 BannerEditor - Updating available surfaces:', updatedAvailableSurfaces)
+        setAvailableSurfaces(updatedAvailableSurfaces)
+      }
+      
+      return newSpecs
+    })
+  }, [productType])
 
   // Handle surface navigation
   const handleSurfaceChange = useCallback((surface) => {
@@ -2967,6 +3143,7 @@ const BannerEditorNew = () => {
       design_option: productType === 'tent' ? tentDesignOption : 
                      productType === 'tin' ? (tinSpecs?.surfaceCoverage || 'front-back') : 'single-surface',
       tent_design_option: tentDesignOption,
+      tent_specs: tentSpecs,
       tin_surface_coverage: tinSpecs?.surfaceCoverage || 'front-back'
     }
     
@@ -2974,8 +3151,39 @@ const BannerEditorNew = () => {
     console.log('Canvas size:', canvasSize)
     console.log('Banner specs:', bannerSpecs)
     console.log('🎨 Order data specs - tentDesignOption:', tentDesignOption)
+    console.log('🎨 Order data specs - tentSpecs:', tentSpecs)
     console.log('🎨 Order data specs - tinSpecs.surfaceCoverage:', tinSpecs?.surfaceCoverage)
     console.log('🎨 Order data specs - design_option:', productType === 'tent' ? tentDesignOption : productType === 'tin' ? (tinSpecs?.surfaceCoverage || 'front-back') : 'single-surface')
+    console.log('🎨 Order data being created:', orderData)
+    console.log('🎨 About to save orderDataForStorage with tent_specs:', tentSpecs)
+    console.log('🎨 DEBUG: productType:', productType, 'tentSpecs is null?', tentSpecs === null)
+    console.log('🎨 DEBUG: tentSpecsRef.current:', tentSpecsRef.current)
+    
+    // For tent products, ensure tent specs are properly set
+    let finalTentSpecs = tentSpecs || tentSpecsRef.current
+    if (productType === 'tent' && !finalTentSpecs) {
+      console.error('🚨 Tent specs are null in both state and ref! Initializing default tent specifications.')
+      
+      // Initialize default tent specs if they're missing
+      const defaultTentSpecs = {
+        tentSize: '10x10',
+        surfaces: {
+          canopy: true,
+          sidewalls: false,
+          backwall: false
+        },
+        withFrame: true,
+        reinforcedStripColor: 'white'
+      }
+      
+      setTentSpecs(defaultTentSpecs)
+      finalTentSpecs = defaultTentSpecs // Use immediately for order data
+      console.log('🎨 Initialized default tent specs:', defaultTentSpecs)
+      
+      toast.success('Tent specifications initialized with defaults.')
+    } else if (productType === 'tent' && tentSpecs !== finalTentSpecs) {
+      console.log('🎨 Using tent specs from ref instead of state:', finalTentSpecs)
+    }
     
     // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
     // Create minimal restoration data without large image objects
@@ -2984,6 +3192,8 @@ const BannerEditorNew = () => {
       canvas_image: null, // Canvas image is in Supabase, not needed in sessionStorage
       // Remove large image data that causes quota exceeded errors
       surface_images: null, // Will be regenerated when needed
+      // Ensure tent_specs is properly included
+      tent_specs: finalTentSpecs,
       // Clean surface_elements to remove image objects but preserve structure
       surface_elements: Object.keys(surfaceElements).reduce((acc, surfaceKey) => {
         acc[surfaceKey] = (surfaceElements[surfaceKey] || []).map(element => {
@@ -3013,6 +3223,12 @@ const BannerEditorNew = () => {
         })
       }
     }
+    
+    console.log('🎨 Final orderDataForStorage being saved:', orderDataForStorage)
+    console.log('🎨 tent_specs in orderDataForStorage:', orderDataForStorage.tent_specs)
+    console.log('🎨 Current tentSpecs state when saving:', tentSpecs)
+    console.log('🎨 finalTentSpecs used in order:', finalTentSpecs)
+    console.log('🎨 Current tentDesignOption when saving:', tentDesignOption)
     sessionStorage.setItem('orderData', JSON.stringify(orderDataForStorage))
     
     // Route to appropriate checkout based on product type
@@ -3548,6 +3764,11 @@ const BannerEditorNew = () => {
               setTentDesignOption(orderData.tent_design_option)
               console.log('🎨 Restored tent design option:', orderData.tent_design_option)
             }
+            // Restore tent specs if available
+            if (orderData.tent_specs) {
+              setTentSpecs(orderData.tent_specs)
+              console.log('🎨 Restored tent specs:', orderData.tent_specs)
+            }
           } else {
             // For single-surface products or fallback, restore image elements properly
             restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
@@ -3564,6 +3785,11 @@ const BannerEditorNew = () => {
               if (orderData.tent_design_option) {
                 setTentDesignOption(orderData.tent_design_option)
                 console.log('🎨 Restored tent design option (fallback):', orderData.tent_design_option)
+              }
+              // Restore tent specs if available
+              if (orderData.tent_specs) {
+                setTentSpecs(orderData.tent_specs)
+                console.log('🎨 Restored tent specs (fallback):', orderData.tent_specs)
               }
             }).catch(error => {
               console.error('Failed to restore image elements:', error)
@@ -3725,6 +3951,10 @@ const BannerEditorNew = () => {
           if (canvasData.tent_design_option) {
             console.log('🎨 Restoring tent design option from sessionStorage template:', canvasData.tent_design_option)
             setTentDesignOption(canvasData.tent_design_option)
+          }
+          if (canvasData.tent_specs) {
+            console.log('🎨 Restoring tent specs from sessionStorage template:', canvasData.tent_specs)
+            setTentSpecs(canvasData.tent_specs)
           }
           if (canvasData.tin_surface_coverage) {
             console.log('🎨 Restoring tin surface coverage from sessionStorage template:', canvasData.tin_surface_coverage)
@@ -3892,6 +4122,8 @@ const BannerEditorNew = () => {
             onCopyDesignToSurface={copyDesignToSurface}
             tentDesignOption={tentDesignOption}
             onTentDesignOptionChange={handleTentDesignOptionChange}
+            tentSpecs={tentSpecs}
+            onTentSpecChange={handleTentSpecChange}
 
             onAddShape={addShape}
             onAddText={addText}
