@@ -248,12 +248,13 @@ const PrintPreviewModal = ({
         // For multi-surface products, get elements for the specific surface
         const surfaceElementsData = orderDetails?.surface_elements || surfaceElements
         elementsToRender = surfaceElementsData[targetSurface] || []
-        console.log(`🎨 Rendering ${elementsToRender.length} elements for surface: ${targetSurface}`)
-        console.log(`🎨 Surface elements for ${targetSurface}:`, elementsToRender)
+      console.log(`🎨 Rendering ${elementsToRender.length} elements for surface: ${targetSurface}`)
+      
       } else if (canvasData?.elements) {
         // For single-surface products or fallback, use main canvas elements
         elementsToRender = canvasData.elements
         console.log(`🎨 Rendering ${elementsToRender.length} elements from main canvas`)
+        
       }
       
       if (elementsToRender.length === 0) {
@@ -261,15 +262,16 @@ const PrintPreviewModal = ({
         return null
       }
       
-      // Set canvas size - PRIORITIZE canvasData.canvasSize for consistency with editor
+      // Set canvas size - ALWAYS PRIORITIZE canvasData.canvasSize for ALL product types
       let canvasSize
       
-      // First priority: Use canvasData.canvasSize if available (maintains consistency with editor)
+      // CRITICAL: Always use canvasData.canvasSize first for consistency with editor
+      // This ensures tent, banner, and tin all use the same dimensions as the editor
       if (canvasData?.canvasSize) {
         canvasSize = canvasData.canvasSize
-        console.log('🎨 Using canvasData.canvasSize:', canvasSize)
+        console.log('🎨 Using canvasData.canvasSize (PRIORITY):', canvasSize, 'for product:', productType)
       } else if (hasMultipleSurfaces() && targetSurface) {
-        // Second priority: For multi-surface products, use surface-specific dimensions
+        // Second priority: For multi-surface products without canvasData, use surface-specific dimensions
         if (productType === 'tent') {
           const tentDimensions = {
             'canopy_front': { width: 1160, height: 1049 },
@@ -281,14 +283,16 @@ const PrintPreviewModal = ({
             'backwall': { width: 1110, height: 780 }
           }
           canvasSize = tentDimensions[targetSurface] || { width: 1160, height: 1049 }
+          console.log('🎨 Using tent fallback dimensions:', canvasSize, 'for surface:', targetSurface)
         } else if (productType === 'tin') {
           canvasSize = { width: 374, height: 225 }
+          console.log('🎨 Using tin fallback dimensions:', canvasSize)
         } else {
           canvasSize = { width: 800, height: 400 } // Banner fallback
+          console.log('🎨 Using banner fallback dimensions:', canvasSize)
         }
-        console.log('🎨 Using surface-specific dimensions:', canvasSize, 'for surface:', targetSurface)
       } else {
-        // Last priority: Product type defaults
+        // Last priority: Product type defaults (only when no canvasData available)
         if (productType === 'tent') {
           canvasSize = { width: 1160, height: 1049 } // Default tent canopy
         } else if (productType === 'tin') {
@@ -296,16 +300,17 @@ const PrintPreviewModal = ({
         } else {
           canvasSize = { width: 800, height: 400 } // Banner default
         }
-        console.log('🎨 Using product type defaults:', canvasSize)
+        console.log('🎨 Using product type defaults (FALLBACK):', canvasSize)
       }
       
       console.log('🎨 Using canvas dimensions:', canvasSize, 'for surface:', targetSurface || 'default')
       canvas.width = canvasSize.width
       canvas.height = canvasSize.height
       
+      
       // Set background color
       ctx.fillStyle = canvasData?.backgroundColor || '#ffffff'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, canvasSize.width, canvasSize.height)
       
       // Apply tent canopy clipping for tent canopy surfaces
       if (productType === 'tent' && targetSurface && targetSurface.startsWith('canopy_')) {
@@ -336,7 +341,7 @@ const PrintPreviewModal = ({
           ctx.save()
           // Calculate rotation center based on element type
           let centerX, centerY
-          if (element.type === 'circle' || element.type === 'star' || element.type === 'triangle' || element.type === 'hexagon') {
+          if (element.type === 'circle' || element.type === 'star' || element.type === 'triangle' || element.type === 'hexagon' || element.type === 'octagon') {
             // For center-positioned shapes, use x,y as center
             centerX = element.x
             centerY = element.y
@@ -471,8 +476,8 @@ const PrintPreviewModal = ({
             ctx.fillText(line, lineX, lineY)
           })
           
-          // Debug logging
-          console.log(`🎨 Rendered text "${text}" as ${lines.length} lines:`, lines)
+          // Debug logging (remove in production)
+          // console.log(`🎨 Rendered text "${text}" as ${lines.length} lines:`, lines)
         } else if (element.type === 'rect') {
           // Render rectangle
           const width = element.width || 100
@@ -493,18 +498,16 @@ const PrintPreviewModal = ({
           const radius = element.radius || 50
           const strokeWidth = element.strokeWidth || 0
           
-          // Adjust radius to account for stroke (Konva draws stroke centered on path)
-          // Canvas2D draws stroke centered too, but visual appearance might differ
-          const adjustedRadius = strokeWidth > 0 ? radius - strokeWidth / 2 : radius
+          // Apply scaling factor to match Konva visual rendering
           
-          // console.log(`🎨 Circle: original radius ${radius}, stroke ${strokeWidth}, adjusted ${adjustedRadius}`)
-          
+          // Fine-tuned radius scaling to match Konva visual size
+          const adjustedRadius = radius * 0.48  // Reduce by 52%
           ctx.beginPath()
           ctx.arc(element.x, element.y, adjustedRadius, 0, 2 * Math.PI)
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
           
-          // Add stroke if specified (match Konva)
+          // Add stroke if specified (exact same as Konva)
           if (element.stroke && strokeWidth > 0) {
             ctx.strokeStyle = element.stroke
             ctx.lineWidth = strokeWidth
@@ -522,7 +525,8 @@ const PrintPreviewModal = ({
           
           ctx.beginPath()
           for (let i = 0; i < numPoints * 2; i++) {
-            const angle = (i * Math.PI) / numPoints
+            // Adjust angle to match Konva's star orientation (rotate by -90 degrees)
+            const angle = (i * Math.PI) / numPoints - Math.PI / 2
             const radius = i % 2 === 0 ? outerRadius : innerRadius
             const x = centerX + Math.cos(angle) * radius
             const y = centerY + Math.sin(angle) * radius
@@ -564,6 +568,13 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if specified (match Konva)
+          if (element.stroke && element.strokeWidth > 0) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'hexagon') {
           // Render hexagon - position (x,y) is the CENTER in Konva
           ctx.beginPath()
@@ -585,12 +596,19 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if specified (match Konva)
+          if (element.stroke && element.strokeWidth > 0) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'octagon') {
-          // Render octagon
+          // Render octagon - position (x,y) is the CENTER in Konva
           ctx.beginPath()
           const radius = element.radius || 60
-          const centerX = element.x + radius
-          const centerY = element.y + radius
+          const centerX = element.x  // x,y is already the center in Konva
+          const centerY = element.y
           
           for (let i = 0; i < 8; i++) {
             const angle = (i * 2 * Math.PI) / 8
@@ -606,6 +624,13 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
+          
+          // Add stroke if specified (match Konva)
+          if (element.stroke && element.strokeWidth > 0) {
+            ctx.strokeStyle = element.stroke
+            ctx.lineWidth = element.strokeWidth
+            ctx.stroke()
+          }
         } else if (element.type === 'line') {
           // Render line-based shapes (heart, diamond, arrows, etc.)
           if (element.points && element.points.length > 0) {

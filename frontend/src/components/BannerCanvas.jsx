@@ -525,7 +525,7 @@ const BannerCanvas = ({
       // Reset scale to 1
       node.scaleX(1)
       node.scaleY(1)
-    } else if (element.type === 'triangle' || element.type === 'hexagon') {
+    } else if (element.type === 'triangle' || element.type === 'hexagon' || element.type === 'octagon') {
       // For regular polygons, update radius based on scale
       if (autoScaling) {
         // Auto-scaling: use the smaller scale to maintain polygon shape
@@ -811,6 +811,12 @@ const BannerCanvas = ({
           radius: 50,
           fill: '#800080'
         }
+      case 'octagon':
+        return {
+          ...baseElement,
+          radius: 50,
+          fill: '#ff6600'
+        }
       case 'line':
         return {
           ...baseElement,
@@ -879,6 +885,7 @@ const BannerCanvas = ({
         }
       case 'triangle':
       case 'hexagon':
+      case 'octagon':
         const polyRadius = element.radius || 50
         return {
           x: x - polyRadius,
@@ -1054,6 +1061,7 @@ const BannerCanvas = ({
         break
       case 'triangle':
       case 'hexagon':
+      case 'octagon':
         if (!element.radius) element.radius = 50
         break
       case 'line':
@@ -1244,11 +1252,12 @@ const BannerCanvas = ({
       
       case 'triangle':
       case 'hexagon':
+      case 'octagon':
         return (
           <RegularPolygon
             key={safeElement.id}
             {...commonProps}
-            sides={safeElement.type === 'triangle' ? 3 : 6}
+            sides={safeElement.type === 'triangle' ? 3 : (safeElement.type === 'hexagon' ? 6 : 8)}
             radius={safeElement.radius || 50}
             fill={safeElement.fill || '#0000ff'}
             stroke={safeElement.stroke || '#000000'}
