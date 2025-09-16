@@ -746,6 +746,7 @@ const Checkout = () => {
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const selectedShippingQuote = shippingQuotes.find(q => q.name === shippingOption)
   const shippingCost = parseFloat(selectedShippingQuote?.cost?.replace('$', '') || '0') || 0
+  const taxAmount = parseFloat(selectedShippingQuote?.tax?.replace('$', '') || '0') || 0
   console.log('🔄 Shipping cost calculation:', { 
     shippingOption, 
     selectedShippingQuote, 
@@ -791,7 +792,7 @@ const Checkout = () => {
   // Calculate total options cost including all percentage-based options
   const optionsTotal = sidesCost + polePocketCost + grommetCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
   const subtotal = basePrice * bannerOptions.quantity + optionsTotal + marketplaceCost
-  const totalAmount = subtotal + shippingCost
+  const totalAmount = subtotal + shippingCost + taxAmount
   
   // Force recalculation when shipping changes
   console.log('🔄 Total calculation:', { 
@@ -1650,6 +1651,12 @@ const Checkout = () => {
                       {shippingQuotes.find(q => q.name === shippingOption)?.cost || 'Calculating...'}
                     </span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax:</span>
+                    <span className="font-medium">
+                      {selectedShippingQuote && selectedShippingQuote.tax ? selectedShippingQuote.tax : '$0.00'}
+                    </span>
+                  </div>
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total:</span>
@@ -1815,6 +1822,13 @@ const Checkout = () => {
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
                       {shippingQuotes.find(q => q.name === shippingOption)?.cost || 'Calculating...'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax:</span>
+                    <span className="font-medium">
+                      {selectedShippingQuote && selectedShippingQuote.tax ? selectedShippingQuote.tax : '$0.00'}
                     </span>
                   </div>
                   

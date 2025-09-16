@@ -298,11 +298,12 @@ const TentCheckout = () => {
   const marketplaceCost = orderData?.marketplace_templates ? 
     orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
   
-  // Calculate shipping cost from selected shipping option
+  // Calculate shipping cost and tax from selected shipping option
   const selectedShippingQuote = shippingQuotes.find(quote => {
     return quote.name === selectedShippingOption || quote.type === selectedShippingOption
   })
   const shippingCost = selectedShippingQuote ? parseFloat(selectedShippingQuote.cost?.replace('$', '') || '0') : 0
+  const taxAmount = selectedShippingQuote ? parseFloat(selectedShippingQuote.tax?.replace('$', '') || '0') : 0
   
   // Add a state variable to force re-render when shipping option changes
   const [shippingUpdateTrigger, setShippingUpdateTrigger] = useState(0)
@@ -316,13 +317,14 @@ const TentCheckout = () => {
     }
   }, [selectedShippingOption, selectedShippingQuote, shippingCost])
   
-  const finalTotalPrice = totalPrice + marketplaceCost + shippingCost
+  const finalTotalPrice = totalPrice + marketplaceCost + shippingCost + taxAmount
   
   // Force recalculation when shipping changes
   console.log('🔄 Tent total calculation:', { 
     totalPrice, 
     marketplaceCost, 
     shippingCost, 
+    taxAmount,
     finalTotalPrice, 
     shippingUpdateTrigger,
     selectedShippingOption 
@@ -1091,6 +1093,14 @@ const TentCheckout = () => {
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
                       {selectedShippingQuote ? selectedShippingQuote.cost : 'Calculating...'}
+                    </span>
+                  </div>
+                  
+                  {/* Tax */}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax:</span>
+                    <span className="font-medium">
+                      {selectedShippingQuote && selectedShippingQuote.tax ? selectedShippingQuote.tax : '$0.00'}
                     </span>
                   </div>
                   

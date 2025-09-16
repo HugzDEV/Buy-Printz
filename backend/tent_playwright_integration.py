@@ -250,8 +250,15 @@ class TentPlaywrightIntegration:
             # Step 5: Open address modal and fill customer address (EXACT SAME AS BANNER)
             await self._open_and_fill_address_modal(zip_code, customer_info)
             
-            # Step 6: Extract all shipping options (EXACT SAME AS BANNER)
+            # Step 6: Extract all shipping options and tax (EXACT SAME AS BANNER)
             shipping_options = await self._extract_all_shipping_options_workflow()
+            
+            # Step 7: Extract tax from subtotal box
+            tax_amount = await self._extract_tax_from_subtotal_box()
+            
+            # Add tax to each shipping option
+            for option in shipping_options:
+                option['tax'] = tax_amount
             
             return shipping_options
             
@@ -1456,7 +1463,122 @@ class TentPlaywrightIntegration:
         except Exception as e:
             logger.warning(f"⚠️ Error extracting shipping options: {e}")
             return []
-
+    
+    async def _extract_tax_from_subtotal_box(self):
+        """Extract tax amount from the subtotal box at the bottom of the page"""
+        try:
+            logger.info("💰 Extracting tax from subtotal box...")
+            
+            # Wait a moment for the subtotal box to update
+            await self.page.wait_for_timeout(2000)
+            
+            # Look for tax-related elements in the subtotal section
+            tax_selectors = [
+                # Direct tax field selectors
+                'input[name*="tax"]',
+                'input[placeholder*="tax"]',
+                '[data-testid*="tax"]',
+                # Text elements containing tax
+                'text*="Tax"',
+                'text*="tax"',
+                # Elements near "Tax" or "Sales Tax" text
+                '*:has-text("Tax") + *',
+                '*:has-text("Sales Tax") + *',
+                '*:has-text("tax") + *',
+                # Generic subtotal area elements
+                '.subtotal *',
+                '.total-box *',
+                '.summary *',
+                '[class*="subtotal"] *',
+                '[class*="total"] *'
+            ]
+            
+            tax_amount = None
+            
+            # Try each selector to find tax amount
+            for selector in tax_selectors:
+                try:
+                    elements = await self.page.query_selector_all(selector)
+                    for element in elements:
+                        try:
+                            # Check if it's an input field
+                            tag_name = await element.evaluate('el => el.tagName.toLowerCase()')
+                            
+                            if tag_name == 'input':
+                                # Get value from input field
+                                value = await element.get_attribute('value')
+                                if value and ('$' in value or value.replace('.', '').replace(',', '').isdigit()):
+                                    logger.info(f"🔍 Found tax input field with value: {value}")
+                                    tax_amount = value
+                                    break
+                            else:
+                                # Get text content
+                                text = await element.inner_text()
+                                if text and text.strip():
+                                    # Look for price patterns like $12.34
+                                    import re
+                                    price_matches = re.findall(r'\$[\d,]+\.?\d*', text)
+                                    if price_matches:
+                                        # Check if this element is related to tax
+                                        parent_text = ""
+                                        try:
+                                            parent = await element.query_selector('xpath=..')
+                                            if parent:
+                                                parent_text = await parent.inner_text()
+                                        except:
+                                            pass
+                                        
+                                        combined_text = (text + " " + parent_text).lower()
+                                        if any(tax_keyword in combined_text for tax_keyword in ['tax', 'sales tax', 'state tax']):
+                                            tax_amount = price_matches[0]
+                                            logger.info(f"🔍 Found tax in text element: {tax_amount} (context: {text})")
+                                            break
+                        except:
+                            continue
+                    
+                    if tax_amount:
+                        break
+                        
+                except Exception as e:
+                    logger.debug(f"Selector {selector} failed: {e}")
+                    continue
+            
+            # If still not found, look for any element containing both "tax" and a dollar amount
+            if not tax_amount:
+                logger.info("🔍 Fallback: Looking for any element with 'tax' and dollar amount...")
+                all_elements = await self.page.query_selector_all('*')
+                
+                for element in all_elements:
+                    try:
+                        text = await element.inner_text()
+                        if text and 'tax' in text.lower():
+                            import re
+                            price_matches = re.findall(r'\$[\d,]+\.?\d*', text)
+                            if price_matches:
+                                tax_amount = price_matches[0]
+                                logger.info(f"🔍 Found tax in fallback search: {tax_amount} (text: {text})")
+                                break
+                    except:
+                        continue
+            
+            if tax_amount:
+                # Clean up the tax amount
+                clean_tax = tax_amount.replace('$', '').replace(',', '').strip()
+                try:
+                    float(clean_tax)  # Validate it's a number
+                    logger.info(f"✅ Successfully extracted tax amount: {tax_amount}")
+                    return tax_amount
+                except ValueError:
+                    logger.warning(f"⚠️ Invalid tax amount format: {tax_amount}")
+                    return "$0.00"
+            else:
+                logger.warning("⚠️ Could not find tax amount, defaulting to $0.00")
+                return "$0.00"
+                
+        except Exception as e:
+            logger.warning(f"⚠️ Error extracting tax: {e}")
+            return "$0.00"
+    
     async def _fill_banner_options(self, page, print_options, accessories):
         """Fill banner-specific options on B2Sign form using MUI selectors"""
         try:
