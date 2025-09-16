@@ -1072,6 +1072,7 @@ const BannerEditorNew = () => {
             width: 200,
             height: 200,
             image: img,
+            imageDataUrl: qrDataUrl, // Store the data URL for serialization and print preview
             rotation: 0,
             assetName: 'QR Code',
             qrData: {
@@ -3425,7 +3426,8 @@ const BannerEditorNew = () => {
                     img.onload = () => {
                       const restoredElement = {
                         ...element,
-                        image: img
+                        image: img,
+                        imageDataUrl: qrDataUrl // Preserve the data URL for serialization and print preview
                       }
                       restoredElements.push(restoredElement)
                       resolve()

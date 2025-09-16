@@ -213,6 +213,37 @@ const PrintPreviewModal = ({
       console.log('🎨 Debug - canvasData keys:', Object.keys(canvasData || {}))
       console.log('🎨 Debug - surface_elements:', orderDetails?.surface_elements)
       
+      // Debug elements to understand data structure
+      if (hasMultipleSurfaces() && targetSurface && (orderDetails?.surface_elements || surfaceElements)) {
+        const surfaceElementsData = orderDetails?.surface_elements || surfaceElements
+        const elements = surfaceElementsData[targetSurface] || []
+        console.log(`🎨 Debug - Elements for ${targetSurface}:`, elements.map(el => ({
+          id: el.id,
+          type: el.type,
+          assetName: el.assetName,
+          hasImageDataUrl: !!el.imageDataUrl,
+          hasImage: !!el.image,
+          hasQrData: !!el.qrData,
+          x: el.x,
+          y: el.y,
+          width: el.width,
+          height: el.height
+        })))
+      } else if (canvasData?.elements) {
+        console.log('🎨 Debug - Main canvas elements:', canvasData.elements.map(el => ({
+          id: el.id,
+          type: el.type,
+          assetName: el.assetName,
+          hasImageDataUrl: !!el.imageDataUrl,
+          hasImage: !!el.image,
+          hasQrData: !!el.qrData,
+          x: el.x,
+          y: el.y,
+          width: el.width,
+          height: el.height
+        })))
+      }
+      
       if (hasMultipleSurfaces() && targetSurface && (orderDetails?.surface_elements || surfaceElements)) {
         // For multi-surface products, get elements for the specific surface
         const surfaceElementsData = orderDetails?.surface_elements || surfaceElements
@@ -292,8 +323,8 @@ const PrintPreviewModal = ({
       
       // Render elements
       for (const element of elementsToRender) {
-        if (element.type === 'image' && element.imageDataUrl) {
-          // Create image from data URL
+        if (element.type === 'image' && (element.imageDataUrl || element.image)) {
+          // Create image from data URL or image object
           const img = new Image()
           img.crossOrigin = 'anonymous'
           
@@ -302,8 +333,22 @@ const PrintPreviewModal = ({
               ctx.drawImage(img, element.x, element.y, element.width, element.height)
               resolve()
             }
-            img.onerror = reject
-            img.src = element.imageDataUrl
+            img.onerror = (error) => {
+              console.warn('⚠️ Error loading image element:', error, element)
+              resolve() // Continue rendering other elements
+            }
+            
+            // Handle both imageDataUrl (string) and image object
+            if (element.imageDataUrl) {
+              img.src = element.imageDataUrl
+            } else if (element.image && element.image.src) {
+              img.src = element.image.src
+            } else if (element.image && typeof element.image === 'string') {
+              img.src = element.image
+            } else {
+              console.warn('⚠️ Image element has no valid source:', element)
+              resolve()
+            }
           })
         } else if (element.type === 'text') {
           // Render text
@@ -316,19 +361,19 @@ const PrintPreviewModal = ({
           ctx.fillStyle = element.fill || '#000000'
           ctx.fillRect(element.x, element.y, element.width, element.height)
         } else if (element.type === 'circle') {
-          // Render circle
+          // Render circle - position (x,y) is the CENTER in Konva
           ctx.beginPath()
-          ctx.arc(element.x + element.radius, element.y + element.radius, element.radius, 0, 2 * Math.PI)
+          ctx.arc(element.x, element.y, element.radius || 50, 0, 2 * Math.PI)
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
         } else if (element.type === 'star') {
-          // Render star
+          // Render star - position (x,y) is the CENTER in Konva
           ctx.beginPath()
           const numPoints = element.numPoints || 5
           const innerRadius = element.innerRadius || 40
           const outerRadius = element.outerRadius || 80
-          const centerX = element.x + outerRadius
-          const centerY = element.y + outerRadius
+          const centerX = element.x  // x,y is already the center in Konva
+          const centerY = element.y
           
           for (let i = 0; i < numPoints * 2; i++) {
             const angle = (i * Math.PI) / numPoints
@@ -346,11 +391,11 @@ const PrintPreviewModal = ({
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
         } else if (element.type === 'triangle') {
-          // Render triangle
+          // Render triangle - position (x,y) is the CENTER in Konva
           ctx.beginPath()
           const radius = element.radius || 60
-          const centerX = element.x + radius
-          const centerY = element.y + radius
+          const centerX = element.x  // x,y is already the center in Konva
+          const centerY = element.y
           
           for (let i = 0; i < 3; i++) {
             const angle = (i * 2 * Math.PI) / 3 - Math.PI / 2
@@ -367,11 +412,11 @@ const PrintPreviewModal = ({
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
         } else if (element.type === 'hexagon') {
-          // Render hexagon
+          // Render hexagon - position (x,y) is the CENTER in Konva
           ctx.beginPath()
           const radius = element.radius || 60
-          const centerX = element.x + radius
-          const centerY = element.y + radius
+          const centerX = element.x  // x,y is already the center in Konva
+          const centerY = element.y
           
           for (let i = 0; i < 6; i++) {
             const angle = (i * 2 * Math.PI) / 6
@@ -457,7 +502,10 @@ const PrintPreviewModal = ({
                 ctx.drawImage(img, element.x, element.y, element.width || 60, element.height || 60)
                 resolve()
               }
-              img.onerror = reject
+              img.onerror = (error) => {
+                console.warn('⚠️ Error loading icon:', error, element)
+                resolve()
+              }
               img.src = element.imagePath
             })
           } else if (element.symbol) {
@@ -472,6 +520,81 @@ const PrintPreviewModal = ({
               element.x + (element.width || 60) / 2, 
               element.y + (element.height || 60) / 2
             )
+          }
+        } else if (element.type === 'qrcode' || (element.type === 'image' && element.assetName === 'QR Code')) {
+          // Handle QR codes - both explicit qrcode type and QR images
+          if (element.imageDataUrl || (element.image && element.image.src)) {
+            // QR code with image data
+            const img = new Image()
+            img.crossOrigin = 'anonymous'
+            
+            await new Promise((resolve, reject) => {
+              img.onload = () => {
+                ctx.drawImage(img, element.x, element.y, element.width || 200, element.height || 200)
+                resolve()
+              }
+              img.onerror = (error) => {
+                console.warn('⚠️ Error loading QR code image, attempting to regenerate:', error, element)
+                // Fallback: try to regenerate QR code if we have qrData
+                if (element.qrData) {
+                  try {
+                    // Generate QR code on the fly using canvas 2D API
+                    // This is a simplified fallback - in production you'd want a proper QR library
+                    ctx.fillStyle = element.qrData.backgroundColor || '#ffffff'
+                    ctx.fillRect(element.x, element.y, element.width || 200, element.height || 200)
+                    ctx.strokeStyle = element.qrData.color || '#000000'
+                    ctx.strokeRect(element.x, element.y, element.width || 200, element.height || 200)
+                    
+                    // Add "QR" text as placeholder
+                    ctx.fillStyle = element.qrData.color || '#000000'
+                    ctx.font = '24px Arial'
+                    ctx.textAlign = 'center'
+                    ctx.textBaseline = 'middle'
+                    ctx.fillText('QR', element.x + (element.width || 200) / 2, element.y + (element.height || 200) / 2)
+                  } catch (fallbackError) {
+                    console.error('⚠️ QR code fallback rendering failed:', fallbackError)
+                  }
+                }
+                resolve()
+              }
+              
+              // Use imageDataUrl or image.src
+              if (element.imageDataUrl) {
+                img.src = element.imageDataUrl
+              } else if (element.image && element.image.src) {
+                img.src = element.image.src
+              } else {
+                console.warn('⚠️ QR code has no image data, using fallback')
+                // Fallback rendering
+                if (element.qrData) {
+                  ctx.fillStyle = element.qrData.backgroundColor || '#ffffff'
+                  ctx.fillRect(element.x, element.y, element.width || 200, element.height || 200)
+                  ctx.strokeStyle = element.qrData.color || '#000000'
+                  ctx.strokeRect(element.x, element.y, element.width || 200, element.height || 200)
+                  
+                  // Add "QR" text as placeholder
+                  ctx.fillStyle = element.qrData.color || '#000000'
+                  ctx.font = '24px Arial'
+                  ctx.textAlign = 'center'
+                  ctx.textBaseline = 'middle'
+                  ctx.fillText('QR', element.x + (element.width || 200) / 2, element.y + (element.height || 200) / 2)
+                }
+                resolve()
+              }
+            })
+          } else if (element.qrData) {
+            // QR code without image data - render fallback
+            ctx.fillStyle = element.qrData.backgroundColor || '#ffffff'
+            ctx.fillRect(element.x, element.y, element.width || 200, element.height || 200)
+            ctx.strokeStyle = element.qrData.color || '#000000'
+            ctx.strokeRect(element.x, element.y, element.width || 200, element.height || 200)
+            
+            // Add "QR" text as placeholder
+            ctx.fillStyle = element.qrData.color || '#000000'
+            ctx.font = '24px Arial'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText('QR', element.x + (element.width || 200) / 2, element.y + (element.height || 200) / 2)
           }
         }
       }

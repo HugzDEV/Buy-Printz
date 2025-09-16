@@ -117,8 +117,75 @@ const SurfaceThumbnailViewer = ({
         ctx.fillStyle = element.fill || '#000000'
         ctx.fillRect(element.x, element.y, element.width, element.height)
       } else if (element.type === 'circle') {
+        // Render circle - position (x,y) is the CENTER in Konva
         ctx.beginPath()
-        ctx.arc(element.x + element.radius, element.y + element.radius, element.radius, 0, 2 * Math.PI)
+        ctx.arc(element.x, element.y, element.radius || 50, 0, 2 * Math.PI)
+        ctx.fillStyle = element.fill || '#000000'
+        ctx.fill()
+      } else if (element.type === 'star') {
+        // Render star - position (x,y) is the CENTER in Konva
+        ctx.beginPath()
+        const numPoints = element.numPoints || 5
+        const innerRadius = element.innerRadius || 40
+        const outerRadius = element.outerRadius || 80
+        const centerX = element.x  // x,y is already the center in Konva
+        const centerY = element.y
+        
+        for (let i = 0; i < numPoints * 2; i++) {
+          const angle = (i * Math.PI) / numPoints
+          const radius = i % 2 === 0 ? outerRadius : innerRadius
+          const x = centerX + Math.cos(angle) * radius
+          const y = centerY + Math.sin(angle) * radius
+          
+          if (i === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+        ctx.closePath()
+        ctx.fillStyle = element.fill || '#000000'
+        ctx.fill()
+      } else if (element.type === 'triangle') {
+        // Render triangle - position (x,y) is the CENTER in Konva
+        ctx.beginPath()
+        const radius = element.radius || 60
+        const centerX = element.x  // x,y is already the center in Konva
+        const centerY = element.y
+        
+        for (let i = 0; i < 3; i++) {
+          const angle = (i * 2 * Math.PI) / 3 - Math.PI / 2
+          const x = centerX + Math.cos(angle) * radius
+          const y = centerY + Math.sin(angle) * radius
+          
+          if (i === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+        ctx.closePath()
+        ctx.fillStyle = element.fill || '#000000'
+        ctx.fill()
+      } else if (element.type === 'hexagon') {
+        // Render hexagon - position (x,y) is the CENTER in Konva
+        ctx.beginPath()
+        const radius = element.radius || 60
+        const centerX = element.x  // x,y is already the center in Konva
+        const centerY = element.y
+        
+        for (let i = 0; i < 6; i++) {
+          const angle = (i * 2 * Math.PI) / 6
+          const x = centerX + Math.cos(angle) * radius
+          const y = centerY + Math.sin(angle) * radius
+          
+          if (i === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+        ctx.closePath()
         ctx.fillStyle = element.fill || '#000000'
         ctx.fill()
       } else if (element.type === 'icon') {
