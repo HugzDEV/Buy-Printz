@@ -150,11 +150,9 @@ class DatabaseManager:
     async def create_order(self, user_id: str, order_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new order"""
         try:
-            # Create order_details that includes canvas_image and all design data
+            # Create order_details that includes canvas_image
             order_details = {
                 "canvas_image": order_data.get("canvas_image"),
-                "surface_images": order_data.get("surface_images"),
-                "surface_elements": order_data.get("surface_elements"),
                 "banner_size": order_data.get("banner_size"),
                 "banner_type": order_data.get("banner_type"),
                 "banner_material": order_data.get("banner_material"),
@@ -162,61 +160,28 @@ class DatabaseManager:
                 "banner_category": order_data.get("banner_category"),
                 "background_color": order_data.get("background_color"),
                 "print_options": order_data.get("print_options", {}),
-                "dimensions": order_data.get("dimensions"),
-                "canvas_data": order_data.get("canvas_data"),
-                "design_option": order_data.get("design_option"),
-                "tent_design_option": order_data.get("tent_design_option"),
-                "tin_surface_coverage": order_data.get("tin_surface_coverage"),
-                "marketplace_templates": order_data.get("marketplace_templates", [])
+                "dimensions": order_data["dimensions"],
+                "canvas_data": order_data["canvas_data"]
             }
             
-            # Create order record with only fields that exist in the original schema
-            # All additional data is stored in order_details JSONB field
             order_record = {
                 "user_id": user_id,
-                "product_type": order_data.get("product_type"),
-                "quantity": order_data.get("quantity", 1),
-                "dimensions": json.dumps(order_data.get("dimensions", {})),
-                "canvas_data": json.dumps(order_data.get("canvas_data", {})),
-                "total_amount": order_data.get("total_amount", 0),
-                "status": "pending"
+                "product_type": order_data["product_type"],
+                "quantity": order_data["quantity"],
+                "dimensions": json.dumps(order_data["dimensions"]),
+                "canvas_data": json.dumps(order_data["canvas_data"]),
+                "order_details": json.dumps(order_details),  # Store comprehensive order details
+                "total_amount": order_data["total_amount"],
+                "status": "pending",
+                "banner_type": order_data.get("banner_type"),
+                "banner_material": order_data.get("banner_material"),
+                "banner_finish": order_data.get("banner_finish"),
+                "banner_size": order_data.get("banner_size"),
+                "banner_category": order_data.get("banner_category"),
+                "print_options": json.dumps(order_data.get("print_options", {})),
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
             }
-            
-            # Add tent_size for tradeshow tent orders (required by database trigger)
-            if order_data.get("product_type") == "tradeshow_tent":
-                # Try to extract tent size from dimensions or use default
-                dimensions = order_data.get("dimensions", {})
-                tent_size = None
-                
-                # Check if tent_size is explicitly provided
-                if "tent_size" in dimensions:
-                    tent_size = dimensions["tent_size"]
-                # Check if we can derive from width/height
-                elif "width" in dimensions and "height" in dimensions:
-                    width = dimensions.get("width", 0)
-                    height = dimensions.get("height", 0)
-                    if width == 10 and height == 10:
-                        tent_size = "10x10"
-                    elif width == 10 and height == 20:
-                        tent_size = "10x20"
-                    elif width == 20 and height == 10:
-                        tent_size = "10x20"
-                
-                # Default to 10x10 if we can't determine
-                if not tent_size:
-                    tent_size = "10x10"
-                    print(f"🎨 Warning: Could not determine tent size, defaulting to {tent_size}")
-                
-                order_record["tent_size"] = tent_size
-                print(f"🎨 Setting tent_size: {tent_size}")
-            
-            # Add order_details if the column exists (it was added in a later migration)
-            # This contains all the canvas images and additional metadata
-            try:
-                order_record["order_details"] = json.dumps(order_details)
-            except Exception as e:
-                print(f"Warning: Could not add order_details column: {e}")
-                # Continue without order_details - the data is still in canvas_data
             
             response = self.supabase.table("orders").insert(order_record).execute()
             

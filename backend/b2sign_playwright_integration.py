@@ -25,7 +25,7 @@ class B2SignPlaywrightIntegration:
         self.password = "$AG@BuyPr!n1z"
         self.base_url = "https://www.b2sign.com"
         
-        # Product page mappings from existing Selenium intelligence
+        # Product page mappings for banners only
         self.product_pages = {
             'banner_13oz_vinyl': 'https://www.b2sign.com/13oz-vinyl-banner',
             'banner_fabric_9oz': 'https://www.b2sign.com/fabric-banner-9oz-wrinkle-free',
@@ -34,10 +34,7 @@ class B2SignPlaywrightIntegration:
             'banner_blockout': 'https://www.b2sign.com/vinyl-banner-18oz-blockout',
             'banner_indoor': 'https://www.b2sign.com/super-smooth-indoor-banner',
             'banner_pole': 'https://www.b2sign.com/pole-banner-set',
-            'banner_hand': 'https://www.b2sign.com/hand-banner',
-            'tent_10x10': 'https://www.b2sign.com/custom-event-tents',
-            'tent_10x15': 'https://www.b2sign.com/custom-event-tents',
-            'tent_10x20': 'https://www.b2sign.com/custom-event-tents'
+            'banner_hand': 'https://www.b2sign.com/hand-banner'
         }
         
     async def initialize(self):
@@ -147,10 +144,10 @@ class B2SignPlaywrightIntegration:
     async def navigate_to_tents_page(self):
         """Navigate to the custom event tents product page"""
         try:
-            logger.info("🌐 Navigating to B2Sign custom event tents page...")
-            await self.page.goto("https://www.b2sign.com/custom-event-tents", wait_until='networkidle')
+            logger.info("🌐 Navigating to B2Sign event tent canopy graphic page...")
+            await self.page.goto("https://www.b2sign.com/event-tent-canopy-graphic", wait_until='networkidle')
             await self.page.wait_for_timeout(2000)
-            logger.info("✅ Successfully navigated to custom event tents page")
+            logger.info("✅ Successfully navigated to event tent canopy graphic page")
             return True
         except Exception as e:
             logger.error(f"❌ Failed to navigate to tents page: {e}")
@@ -231,36 +228,6 @@ class B2SignPlaywrightIntegration:
                 'shipping_options': []
             }
     
-    async def get_tent_shipping_costs(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Get shipping costs for tent products"""
-        try:
-            logger.info(f"🚚 Getting tent shipping costs for {order_data.get('tent_size', 'tent')}")
-            
-            # Navigate to tent product page (all tent sizes use the same page)
-            tent_url = self.product_pages.get('tent_10x10')
-            logger.info(f"🌐 Navigating to {tent_url}")
-            await self.page.goto(tent_url, wait_until='networkidle')
-            
-            # Wait for product page to load
-            await self.page.wait_for_selector('form, .quote-form, [data-testid*="quote"]', timeout=10000)
-            
-            # Fill out the quote form based on order data
-            shipping_options = await self._fill_tent_quote_form(order_data)
-            
-            return {
-                'success': True,
-                'shipping_options': shipping_options,
-                'b2sign_product_url': tent_url,
-                'extracted_at': datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"❌ Error getting tent shipping costs: {e}")
-            return {
-                'success': False,
-                'errors': [str(e)],
-                'shipping_options': []
-            }
     
     async def _fill_banner_quote_form(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Fill out banner quote form using the complete proven workflow"""
@@ -302,107 +269,7 @@ class B2SignPlaywrightIntegration:
             logger.error(f"❌ Error in complete banner workflow: {e}")
             return []
     
-    async def _fill_tent_quote_form(self, order_data: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Fill out tent quote form and extract shipping options"""
-        try:
-            # Map BuyPrintz data to B2Sign form fields
-            tent_size = order_data.get('print_options', {}).get('tent_size', '10x10')
-            quantity = order_data.get('quantity', 1)
-            design_option = order_data.get('print_options', {}).get('tent_design_option', 'canopy-only')
-            
-            # Fill tent size
-            await self.page.select_option('select[name*="size"], select[name*="tent"]', 
-                                        label=tent_size, timeout=5000)
-            
-            # Fill quantity
-            await self.page.fill('input[name*="quantity"], input[name*="qty"]', str(quantity))
-            
-            # Fill design option
-            if design_option == 'canopy-only':
-                await self.page.check('input[name*="canopy"], input[value*="canopy"]')
-            elif design_option == 'all-sides':
-                await self.page.check('input[name*="all"], input[value*="all"]')
-            
-            # Submit form to get quote
-            await self.page.click('button[type="submit"], input[type="submit"], .submit-btn')
-            
-            # Wait for quote results
-            await self.page.wait_for_selector('.shipping-options, .quote-results, [data-testid*="shipping"]', 
-                                            timeout=15000)
-            
-            # Extract shipping options
-            shipping_options = await self._extract_shipping_options()
-            
-            return shipping_options
-            
-        except Exception as e:
-            logger.error(f"❌ Error filling tent form: {e}")
-            return []
     
-    async def _extract_shipping_options(self) -> List[Dict[str, Any]]:
-        """Extract shipping options from the quote results"""
-        try:
-            shipping_options = []
-            
-            # Look for shipping option elements
-            shipping_elements = await self.page.query_selector_all(
-                '.shipping-option, .shipping-method, [data-testid*="shipping"]'
-            )
-            
-            for element in shipping_elements:
-                try:
-                    # Extract shipping option details
-                    name_elem = await element.query_selector('.name, .title, h3, h4')
-                    cost_elem = await element.query_selector('.cost, .price, .amount')
-                    days_elem = await element.query_selector('.days, .delivery, .time')
-                    
-                    name = await name_elem.inner_text() if name_elem else "Standard Shipping"
-                    cost = await cost_elem.inner_text() if cost_elem else "Contact for Quote"
-                    days = await days_elem.inner_text() if days_elem else "5-7 days"
-                    
-                    # Clean up the text
-                    name = name.strip()
-                    cost = cost.strip()
-                    days = days.strip()
-                    
-                    # Determine shipping type
-                    shipping_type = "standard"
-                    if "express" in name.lower() or "expedited" in name.lower():
-                        shipping_type = "expedited"
-                    elif "overnight" in name.lower() or "next day" in name.lower():
-                        shipping_type = "overnight"
-                    
-                    shipping_options.append({
-                        "name": name,
-                        "type": shipping_type,
-                        "cost": cost,
-                        "estimated_days": self._parse_days(days),
-                        "description": f"B2Sign {name}"
-                    })
-                    
-                except Exception as e:
-                    logger.warning(f"⚠️ Error extracting shipping option: {e}")
-                    continue
-            
-            # If no specific shipping options found, look for general quote info
-            if not shipping_options:
-                quote_elem = await self.page.query_selector('.quote, .estimate, .total')
-                if quote_elem:
-                    quote_text = await quote_elem.inner_text()
-                    shipping_options.append({
-                        "name": "B2Sign Quote",
-                        "type": "standard",
-                        "cost": quote_text.strip(),
-                        "estimated_days": 5,
-                        "description": "B2Sign shipping quote"
-                    })
-            
-            logger.info(f"✅ Extracted {len(shipping_options)} shipping options")
-            return shipping_options
-            
-        except Exception as e:
-            logger.error(f"❌ Error extracting shipping options: {e}")
-            return []
     
     def _parse_days(self, days_text: str) -> int:
         """Parse estimated days from text"""
@@ -1645,73 +1512,6 @@ class B2SignPlaywrightIntegration:
             logger.warning(f"⚠️ Error selecting shipping option: {e}")
             return False
     
-    async def _fill_tent_options(self, page, print_options, accessories):
-        """Fill tent-specific options on B2Sign form using MUI selectors"""
-        try:
-            logger.info("🎨 Filling tent options...")
-            
-            # Handle tent size - look for buttons or selectors
-            tent_size = print_options.get('tent_size', '10x10')
-            try:
-                buttons = await page.query_selector_all('button')
-                for button in buttons:
-                    try:
-                        button_text = await button.inner_text()
-                        if tent_size in button_text or '10x10' in button_text:
-                            await button.click()
-                            logger.info(f"✅ Clicked tent size button: {button_text}")
-                            break
-                    except:
-                        continue
-            except Exception as e:
-                logger.warning(f"⚠️ Could not handle tent size: {e}")
-            
-            # Handle design option - look for radio buttons or buttons
-            design_option = print_options.get('tent_design_option', 'canopy-only')
-            try:
-                if design_option == 'canopy-only':
-                    buttons = await page.query_selector_all('button')
-                    for button in buttons:
-                        try:
-                            button_text = await button.inner_text()
-                            if 'canopy' in button_text.lower():
-                                await button.click()
-                                logger.info(f"✅ Clicked canopy button: {button_text}")
-                                break
-                        except:
-                            continue
-                elif design_option == 'all-sides':
-                    buttons = await page.query_selector_all('button')
-                    for button in buttons:
-                        try:
-                            button_text = await button.inner_text()
-                            if 'all' in button_text.lower() or 'sides' in button_text.lower():
-                                await button.click()
-                                logger.info(f"✅ Clicked all-sides button: {button_text}")
-                                break
-                        except:
-                            continue
-            except Exception as e:
-                logger.warning(f"⚠️ Could not handle design option: {e}")
-            
-            # Handle accessories
-            for accessory in accessories:
-                try:
-                    buttons = await page.query_selector_all('button')
-                    for button in buttons:
-                        try:
-                            button_text = await button.inner_text()
-                            if accessory.lower() in button_text.lower():
-                                await button.click()
-                                logger.info(f"✅ Clicked accessory button: {button_text}")
-                                break
-                        except:
-                            continue
-                except Exception as e:
-                    logger.warning(f"⚠️ Could not handle accessory {accessory}: {e}")
-                        
-        except Exception as e:
-            logger.warning(f"⚠️ Error filling tent options: {e}")
     
     async def _extract_all_shipping_options(self, page):
         """Extract all available shipping options from B2Sign dropdown"""
@@ -2110,8 +1910,8 @@ async def get_shipping_costs_playwright(order_data: Dict[str, Any]) -> Dict[str,
                 await page.wait_for_timeout(3000)
                 
             elif product_type in ['tent', 'tents', 'tradeshow_tent']:
-                logger.info("🌐 Step 3: Navigating to custom event tents page...")
-                await page.goto("https://www.b2sign.com/custom-event-tents", wait_until='networkidle')
+                logger.info("🌐 Step 3: Navigating to event tent canopy graphic page...")
+                await page.goto("https://www.b2sign.com/event-tent-canopy-graphic", wait_until='networkidle')
                 await page.wait_for_timeout(3000)
             else:
                 return {

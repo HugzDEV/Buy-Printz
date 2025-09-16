@@ -166,7 +166,7 @@ async def get_tent_shipping_service():
 
 async def get_tent_shipping_costs(order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get shipping costs for tent products (production API)
+    Get shipping costs for tent products using EXACT SAME proven banner workflow
     
     Args:
         order_data: Order data from TentCheckout.jsx
@@ -176,22 +176,25 @@ async def get_tent_shipping_costs(order_data: Dict[str, Any], customer_info: Dic
         Dict with success status and shipping options
     """
     try:
-        logger.info("🏕️ Getting tent shipping costs from TentCheckout.jsx data...")
+        logger.info("🏕️ Getting tent shipping costs using proven banner workflow...")
         logger.info(f"📋 Tent order data: {order_data}")
         
-        # Map TentCheckout.jsx data to B2Sign format
+        # Map TentCheckout.jsx data to B2Sign format (same as banner service does)
         service = TentShippingService()
         b2sign_order_data = service._map_tent_data_to_b2sign(order_data, customer_info)
+        logger.info(f"📋 Mapped B2Sign order data: {b2sign_order_data}")
         
-        # Create tent integration instance and initialize it
+        # Use the EXACT SAME proven workflow as banners, just with tent integration
         tent_integration = TentPlaywrightIntegration()
+        
+        # Initialize and login (same as banner workflow)
         await tent_integration.initialize()
         await tent_integration.login()
         
-        # Get shipping costs using the tent integration
+        # Get shipping costs using proven tent integration (identical to banner flow)
         result = await tent_integration.get_tent_shipping_costs(b2sign_order_data)
         
-        # Clean up
+        # Clean up (same as banner workflow)
         await tent_integration.cleanup()
         
         return result

@@ -18,7 +18,6 @@ import {
 import { Download, Eye, FileText, Check, X, Printer, CheckCircle, AlertTriangle } from 'lucide-react'
 import jsPDF from 'jspdf'
 import SurfaceThumbnailViewer from './SurfaceThumbnailViewer'
-import authService from '../services/auth'
 
 const PrintPreviewModal = ({ 
   isOpen, 
@@ -261,31 +260,8 @@ const PrintPreviewModal = ({
         ctx.clip() // Apply the clipping path
       }
       
-      // Render elements with proper transformations
+      // Render elements
       for (const element of elementsToRender) {
-        // Save the current context state
-        ctx.save()
-        
-        // Apply transformations (rotation, scaling, positioning)
-        const centerX = element.x + (element.width || element.radius * 2 || 100) / 2
-        const centerY = element.y + (element.height || element.radius * 2 || 100) / 2
-        
-        // Apply rotation if present
-        if (element.rotation) {
-          ctx.translate(centerX, centerY)
-          ctx.rotate((element.rotation * Math.PI) / 180)
-          ctx.translate(-centerX, -centerY)
-        }
-        
-        // Apply scaling if present
-        if (element.scaleX || element.scaleY) {
-          const scaleX = element.scaleX || 1
-          const scaleY = element.scaleY || 1
-          ctx.translate(centerX, centerY)
-          ctx.scale(scaleX, scaleY)
-          ctx.translate(-centerX, -centerY)
-        }
-        
         if (element.type === 'image' && element.imageDataUrl) {
           // Create image from data URL
           const img = new Image()
@@ -300,77 +276,27 @@ const PrintPreviewModal = ({
             img.src = element.imageDataUrl
           })
         } else if (element.type === 'text') {
-          // Render text with proper positioning and alignment
-          ctx.font = `${element.fontSize || 24}px ${element.fontFamily || 'Arial'}`
+          // Render text
+          ctx.font = `${element.fontSize}px ${element.fontFamily}`
           ctx.fillStyle = element.fill || element.color || '#000000'
-          
-          // Handle text alignment properly
-          const textAlign = element.align || element.textAlign || 'left'
-          const verticalAlign = element.verticalAlign || 'top'
-          
-          // Calculate text position based on alignment
-          let textX = element.x
-          let textY = element.y
-          
-          if (textAlign === 'center') {
-            ctx.textAlign = 'center'
-            textX = element.x + (element.width || 200) / 2
-          } else if (textAlign === 'right') {
-            ctx.textAlign = 'right'
-            textX = element.x + (element.width || 200)
-          } else {
-            ctx.textAlign = 'left'
-          }
-          
-          // Handle vertical alignment
-          if (verticalAlign === 'middle') {
-            ctx.textBaseline = 'middle'
-            textY = element.y + (element.height || 30) / 2
-          } else if (verticalAlign === 'bottom') {
-            ctx.textBaseline = 'bottom'
-            textY = element.y + (element.height || 30)
-          } else {
-            ctx.textBaseline = 'top'
-          }
-          
-          // Handle stroke if present
-          if (element.stroke && element.strokeWidth) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.strokeText(element.text, textX, textY)
-          }
-          
-          ctx.fillText(element.text, textX, textY)
+          ctx.textAlign = element.align || element.textAlign || 'left'
+          ctx.fillText(element.text, element.x, element.y)
         } else if (element.type === 'rect') {
           // Render rectangle
           ctx.fillStyle = element.fill || '#000000'
           ctx.fillRect(element.x, element.y, element.width, element.height)
-          
-          // Add stroke if present
-          if (element.stroke && element.strokeWidth) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.strokeRect(element.x, element.y, element.width, element.height)
-          }
         } else if (element.type === 'circle') {
           // Render circle
           ctx.beginPath()
           ctx.arc(element.x + element.radius, element.y + element.radius, element.radius, 0, 2 * Math.PI)
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
-          
-          // Add stroke if present
-          if (element.stroke && element.strokeWidth) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
         } else if (element.type === 'star') {
           // Render star
           ctx.beginPath()
           const numPoints = element.numPoints || 5
-          const innerRadius = element.innerRadius || 30
-          const outerRadius = element.outerRadius || 50
+          const innerRadius = element.innerRadius || 40
+          const outerRadius = element.outerRadius || 80
           const centerX = element.x + outerRadius
           const centerY = element.y + outerRadius
           
@@ -389,17 +315,10 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
-          
-          // Add stroke if present
-          if (element.stroke && element.strokeWidth) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
         } else if (element.type === 'triangle') {
           // Render triangle
           ctx.beginPath()
-          const radius = element.radius || 50
+          const radius = element.radius || 60
           const centerX = element.x + radius
           const centerY = element.y + radius
           
@@ -417,17 +336,10 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
-          
-          // Add stroke if present
-          if (element.stroke && element.strokeWidth) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
         } else if (element.type === 'hexagon') {
           // Render hexagon
           ctx.beginPath()
-          const radius = element.radius || 50
+          const radius = element.radius || 60
           const centerX = element.x + radius
           const centerY = element.y + radius
           
@@ -445,17 +357,10 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
-          
-          // Add stroke if present
-          if (element.stroke && element.strokeWidth) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
         } else if (element.type === 'octagon') {
           // Render octagon
           ctx.beginPath()
-          const radius = element.radius || 50
+          const radius = element.radius || 60
           const centerX = element.x + radius
           const centerY = element.y + radius
           
@@ -473,21 +378,18 @@ const PrintPreviewModal = ({
           ctx.closePath()
           ctx.fillStyle = element.fill || '#000000'
           ctx.fill()
-          
-          // Add stroke if present
-          if (element.stroke && element.strokeWidth) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
         } else if (element.type === 'line') {
           // Render line-based shapes (heart, diamond, arrows, etc.)
           if (element.points && element.points.length > 0) {
             ctx.beginPath()
             
+            // Apply scaling if present
+            const scaleX = element.scaleX || 1
+            const scaleY = element.scaleY || 1
+            
             for (let i = 0; i < element.points.length; i += 2) {
-              const x = element.x + element.points[i]
-              const y = element.y + element.points[i + 1]
+              const x = element.x + (element.points[i] * scaleX)
+              const y = element.y + (element.points[i + 1] * scaleY)
               
               if (i === 0) {
                 ctx.moveTo(x, y)
@@ -514,9 +416,6 @@ const PrintPreviewModal = ({
             ctx.stroke()
           }
         }
-        
-        // Restore the context state
-        ctx.restore()
       }
       
       // Convert to data URL
@@ -530,92 +429,61 @@ const PrintPreviewModal = ({
     }
   }
 
-  // Enhanced useEffect with comprehensive debug logging
+  // Modified useEffect to handle missing surface images
   useEffect(() => {
     const loadPreviewImage = async () => {
-      console.log('🎨 loadPreviewImage ENTRY:', {
-        isOpen,
-        hasOrderDetails: !!orderDetails,
-        hasCanvasData: !!canvasData,
-        selectedSurface,
-        currentPreviewImage: previewImage ? 'exists' : 'null'
-      });
-
-      if (!isOpen || (!orderDetails && !canvasData)) {
-        console.log('🎨 Early exit - modal not open or no data');
-        return;
-      }
-
-      // Set loading state
-      setIsGenerating(true);
-
-      try {
-        // Check if we have a Supabase order ID to fetch images from
-        if (orderDetails?.supabase_order_id) {
-          console.log('🎨 Attempting Supabase fetch for order:', orderDetails.supabase_order_id);
-          try {
-            const authHeaders = await authService.getAuthHeaders();
-            const response = await fetch(`/api/orders/${orderDetails.supabase_order_id}/images`, {
-              headers: authHeaders
-            });
-            
-            if (response.ok) {
-              const imageData = await response.json();
-              console.log('🎨 Retrieved Supabase images:', Object.keys(imageData));
-              
-              if (hasMultipleSurfaces() && imageData.surface_images && imageData.surface_images[selectedSurface]) {
-                console.log('🎨 Using Supabase surface image for:', selectedSurface);
-                setPreviewImage(imageData.surface_images[selectedSurface]);
-                setIsGenerating(false);
-                return;
-              } else if (imageData.canvas_image) {
-                console.log('🎨 Using Supabase canvas image');
-                setPreviewImage(imageData.canvas_image);
-                setIsGenerating(false);
-                return;
-              }
-            } else {
-              console.warn('🎨 Supabase fetch failed:', response.status, response.statusText);
-            }
-          } catch (error) {
-            console.error('🎨 Supabase fetch error:', error);
+      console.log('🎨 loadPreviewImage called - isOpen:', isOpen, 'orderDetails:', !!orderDetails, 'canvasData:', !!canvasData, 'previewImage exists:', !!previewImage)
+      if (isOpen && (orderDetails || canvasData)) {
+        console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
+        console.log('🎨 PrintPreviewModal - Canvas data:', canvasData)
+        console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys((canvasData?.surface_images || orderDetails?.surface_images) || {}))
+        console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails?.design_option)
+        
+        // Get images from orderDetails (where they're actually stored after capture)
+        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
+        const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+        
+        console.log('🎨 Debug - orderDetails.surface_images:', orderDetails?.surface_images)
+        console.log('🎨 Debug - canvasData.surface_images:', canvasData?.surface_images)
+        
+        console.log('🎨 Debug - hasMultipleSurfaces():', hasMultipleSurfaces())
+        console.log('🎨 Debug - surfaceImages:', surfaceImages)
+        console.log('🎨 Debug - canvasImage:', canvasImage)
+        console.log('🎨 Debug - selectedSurface:', selectedSurface)
+        
+        // Simplified image loading logic
+        console.log('🎨 Image loading path check - hasMultipleSurfaces:', hasMultipleSurfaces(), 'surfaceImages keys:', Object.keys(surfaceImages || {}), 'surfaceImages length:', Object.keys(surfaceImages || {}).length)
+        
+        if (hasMultipleSurfaces() && surfaceImages && surfaceImages[selectedSurface]) {
+          console.log('🎨 Taking path: hasMultipleSurfaces with surface images')
+          const surfaceImage = surfaceImages[selectedSurface]
+          console.log(`🎨 Found surface image for ${selectedSurface}:`, typeof surfaceImage)
+          setPreviewImage(surfaceImage)
+        } else if (hasMultipleSurfaces()) {
+          console.log('🎨 Taking path: multi-surface but no surface images, generating from surface elements')
+          // For multi-surface products, always generate from surface elements to ensure unique images
+          const generatedImage = await generateCanvasImageFromData(selectedSurface)
+          console.log('🎨 Setting preview image (generated for surface):', generatedImage ? 'Generated successfully' : 'Failed to generate')
+          setPreviewImage(generatedImage)
+        } else if (canvasImage) {
+          console.log('🎨 Taking path: has canvasImage')
+          setPreviewImage(canvasImage)
+        } else {
+          console.log('🎨 Taking path: no images available, generating from canvas data')
+          // Only generate if we don't already have a preview image
+          if (!previewImage) {
+            const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
+            console.log('🎨 Setting preview image (generated):', generatedImage ? 'Generated successfully' : 'Failed to generate')
+            setPreviewImage(generatedImage)
+          } else {
+            console.log('🎨 Preview image already exists, skipping generation')
           }
         }
-        
-        // Fallback to local data
-        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images;
-        const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image;
-        
-        console.log('🎨 Local image check:', {
-          hasSurfaceImages: !!surfaceImages,
-          surfaceImageKeys: Object.keys(surfaceImages || {}),
-          hasCanvasImage: !!canvasImage,
-          hasMultipleSurfaces: hasMultipleSurfaces(),
-          selectedSurface
-        });
-
-        if (hasMultipleSurfaces() && surfaceImages && surfaceImages[selectedSurface]) {
-          console.log('🎨 Using local surface image for:', selectedSurface);
-          setPreviewImage(surfaceImages[selectedSurface]);
-        } else if (canvasImage) {
-          console.log('🎨 Using local canvas image');
-          setPreviewImage(canvasImage);
-        } else {
-          console.log('🎨 No pre-captured images, generating from canvas data...');
-          const targetSurface = hasMultipleSurfaces() ? selectedSurface : null;
-          const generatedImage = await generateCanvasImageFromData(targetSurface);
-          
-          console.log('🎨 Generated image result:', generatedImage ? 'Success' : 'Failed');
-          setPreviewImage(generatedImage);
-        }
-      } catch (error) {
-        console.error('🎨 Error in loadPreviewImage:', error);
-      } finally {
-        setIsGenerating(false);
+      setIsGenerating(false)
       }
-    };
+    }
     
-    loadPreviewImage();
+    loadPreviewImage()
   }, [isOpen, orderDetails, canvasData, selectedSurface])
 
   // Debug image dimensions when it loads
@@ -641,14 +509,13 @@ const PrintPreviewModal = ({
     }
   }, [previewImage])
 
-  // Set image scale based on screen size - consistent behavior to prevent element movement
+  // Set image scale based on screen size - different behavior for desktop vs mobile
   useEffect(() => {
     const updateScale = () => {
-      // Use consistent scaling to prevent element positioning issues
       if (window.innerWidth < 768) {
         setImageScale(1.0) // No scaling on mobile to preserve element positioning
       } else {
-        setImageScale(1.0) // Use 1.0 for desktop too to prevent element movement
+        setImageScale(1.5) // Restore desktop scaling for better preview
       }
     }
     
@@ -662,36 +529,23 @@ const PrintPreviewModal = ({
     try {
       setIsGenerating(true)
       
-      // Prioritize pre-captured images for consistency with canvas
-      let canvasImage = null
+      // Get canvas image from canvasData first, fallback to orderDetails
+      let canvasImage = canvasData?.canvas_image || orderDetails?.canvas_image
       
-      if (hasMultipleSurfaces()) {
-        // For multi-surface products, use the pre-captured surface image
-        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
-        canvasImage = surfaceImages?.[selectedSurface]
-        console.log(`🎨 PDF Generation - Using pre-captured surface image for ${selectedSurface}:`, canvasImage ? 'Found' : 'Not found')
-      }
-      
-      // Fallback to main canvas image
+      // If no canvas image available, generate one from canvas data
       if (!canvasImage) {
-        canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
-        console.log('🎨 PDF Generation - Using main canvas image:', canvasImage ? 'Found' : 'Not found')
-      }
-      
-      // If no pre-captured image available, generate one from canvas data
-      if (!canvasImage) {
-        console.log('🎨 PDF Generation - No pre-captured image available, generating from canvas data...')
+        console.log('No canvas image available, generating from canvas data for PDF...')
         // For multi-surface products, generate image for the current surface
         const targetSurface = hasMultipleSurfaces() ? selectedSurface : null
         canvasImage = await generateCanvasImageFromData(targetSurface)
       }
       
       if (canvasImage) {
-        console.log('🎨 PDF Generation - Generating production PDF from canvas image...')
+        console.log('Generating production PDF from high-quality canvas image...')
         const pdfBlob = await createPDFFromImage(canvasImage)
         return pdfBlob // Return the PDF blob
       } else {
-        console.error('🎨 PDF Generation - No canvas image available for PDF generation!')
+        console.error('No canvas image available for PDF generation!')
         throw new Error('No canvas image available')
       }
     } catch (error) {
@@ -766,27 +620,27 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[95vh] sm:h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
-        <DialogHeader className="pb-3 sm:pb-4">
-          <DialogTitle className="flex items-center justify-between text-base sm:text-lg">
+      <DialogContent className="max-w-4xl w-full h-full overflow-y-auto p-1 sm:p-4">
+        <DialogHeader className="pb-4 sm:pb-4">
+          <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Printer className="h-4 w-4 sm:h-5 sm:w-5" />
-              Print Preview & Approval
+            <Printer className="h-5 w-5" />
+            Print Preview & Approval
             </div>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
-          {/* Preview Section - Full width on mobile, left column on desktop */}
-          <div className="space-y-2 sm:space-y-4 w-full order-1 lg:order-none">
-            <Card className="w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-6 pb-2 sm:pb-6">
+          {/* Left Column - Preview */}
+          <div className="space-y-2 sm:space-y-4">
+            <Card>
               <CardHeader className="pb-3 sm:pb-4">
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
                   Design Preview
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-4 p-2 sm:p-6">
+              <CardContent className="space-y-3 sm:space-y-4">
                  {isGenerating ? (
                    <div className="flex items-center justify-center p-4 sm:p-12">
                      <div className="text-center space-y-2">
@@ -808,83 +662,69 @@ const PrintPreviewModal = ({
                          tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
                        />
                      ) : (
-                       /* Banner Preview - MOBILE OPTIMIZED WITH DEBUG */
-                       <div className="bg-gray-100 rounded-lg p-2 sm:p-6 flex items-center justify-center overflow-hidden w-full">
-                         <div className="w-full h-[320px] sm:h-80 bg-white rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
-                           {/* Debug info - remove this after fixing */}
-                           {console.log('🎨 Preview Debug:', {
-                             previewImage: previewImage ? 'exists' : 'null/undefined',
-                             previewImageLength: previewImage?.length,
-                             isGenerating,
-                             isOpen,
-                             hasOrderDetails: !!orderDetails,
-                             hasCanvasData: !!canvasData,
-                             selectedSurface
-                           })}
-                           
-                           {isGenerating ? (
-                             <div className="flex items-center justify-center p-4">
-                               <div className="text-center space-y-2">
-                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                                 <p className="text-sm text-gray-600">Generating preview...</p>
-                               </div>
-                             </div>
-                           ) : previewImage ? (
-                             <div className="relative w-full h-full p-2">
-                               <img
-                                 src={previewImage}
-                                 alt="Banner Design Preview"
-                                 className=""
-                                 onLoad={(e) => {
-                                   console.log('🎨 Image loaded successfully:', {
-                                     naturalWidth: e.target.naturalWidth,
-                                     naturalHeight: e.target.naturalHeight,
-                                     src: previewImage.substring(0, 50) + '...'
-                                   });
-                                   handleImageLoad(e);
-                                 }}
-                                 onError={(e) => {
-                                   console.error('🎨 Image failed to load:', e);
-                                   console.error('🎨 Image src:', previewImage?.substring(0, 100));
-                                 }}
-                                 style={{ 
-                                   width: '400px !important',
-                                   height: '300px !important',
-                                   minWidth: '400px !important',
-                                   minHeight: '300px !important',
-                                   maxWidth: '400px !important',
-                                   maxHeight: '300px !important',
-                                   imageRendering: 'high-quality',
-                                   objectFit: 'contain',
-                                   objectPosition: 'center center'
-                                 }}
-                               />
+                       /* Banner Preview */
+                       <div className="bg-gray-100 rounded-lg p-1 sm:p-6 flex items-center justify-center overflow-hidden">
+                         <div className="relative flex items-center justify-center w-full" style={{ 
+                           minHeight: window.innerWidth < 768 ? '200px' : '280px',
+                           maxHeight: window.innerWidth < 768 ? '240px' : '320px'
+                         }}>
+                           {previewImage ? (
+                             <div className="relative">
+                             <img
+                               src={previewImage}
+                               alt="Banner Design Preview"
+                               className="rounded border shadow-lg"
+                               style={{
+                                 width: 'auto',
+                                 height: 'auto',
+                                 maxWidth: '100%',
+                                   maxHeight: window.innerWidth < 768 ? '200px' : '280px',
+                                   minHeight: window.innerWidth < 768 ? '150px' : '250px',
+                                 objectFit: 'contain',
+                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
+                                 transformOrigin: 'center center'
+                               }}
+                               onLoad={handleImageLoad}
+                             />
                                
-                               {/* BuyPrintz Watermark Overlay - IP Protection */}
-                               <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center p-2">
+                               {/* BuyPrintz Watermark Overlay - IP Protection - Properly positioned */}
+                               <div 
+                                 className="absolute inset-0 pointer-events-none" 
+                                 style={{ 
+                                   zIndex: 10,
+                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
+                                 }}
+                               >
                                  <img
                                    src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
                                    alt="BuyPrintz Watermark"
-                                   className="max-w-full max-h-full object-contain opacity-20 mix-blend-multiply"
+                                   className="w-full h-full object-cover"
+                                   style={{
+                                     position: 'absolute',
+                                     top: 0,
+                                     left: 0,
+                                     opacity: 0.3
+                                   }}
                                  />
                                </div>
                                
                                {/* Preview label */}
-                               <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs z-20">
+                               <div 
+                                 className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
+                                 style={{ 
+                                   zIndex: 20,
+                                   transform: window.innerWidth < 768 ? 'none' : `scale(${imageScale})`,
+                                   transformOrigin: 'center center'
+                                 }}
+                               >
                                  Preview
                                </div>
                              </div>
                            ) : (
-                             <div className="text-center text-gray-500 p-4 sm:p-8">
-                               <FileText className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
-                               <p className="text-xs sm:text-sm">No preview available</p>
-                               {/* Debug info - remove after fixing */}
-                               <div className="mt-2 text-xs text-red-500 bg-red-50 p-2 rounded">
-                                 Debug: isGenerating={String(isGenerating)}, 
-                                 hasOrderDetails={String(!!orderDetails)}, 
-                                 hasCanvasData={String(!!canvasData)},
-                                 selectedSurface={selectedSurface}
-                               </div>
+                             <div className="text-center text-gray-500 p-8">
+                               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                               <p className="text-sm">No preview available</p>
                              </div>
                            )}
                          </div>
@@ -966,8 +806,8 @@ const PrintPreviewModal = ({
             </Card>
           </div>
 
-          {/* Specifications Section - Full width on mobile, right column on desktop */}
-          <div className="space-y-2 sm:space-y-4 w-full order-2 lg:order-none">
+          {/* Right Column - Specifications */}
+          <div className="space-y-2 sm:space-y-4">
             {/* Print Specifications */}
             <Card>
               <CardHeader className="pb-3 sm:pb-4">
@@ -1080,24 +920,24 @@ const PrintPreviewModal = ({
         </div>
 
         {/* Approval Buttons - Fixed Position */}
-        <div className="p-3 sm:p-6 border-t bg-gray-50 flex flex-col gap-3 sm:flex-row sm:gap-3 w-full">
-          <Button
-            onClick={handleApprove}
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto order-1"
-          >
-            <Check className="h-4 w-4" />
-            Approve & Print
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto order-2"
-          >
-            <X className="h-4 w-4" />
-            Cancel
-          </Button>
-        </div>
+        <div className="p-4 sm:p-6 border-t bg-gray-50 flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <X className="h-4 w-4" />
+              Cancel
+            </Button>
+            
+            <Button
+              onClick={handleApprove}
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <Check className="h-4 w-4" />
+              Approve & Print
+            </Button>
+          </div>
       </DialogContent>
     </Dialog>
   )

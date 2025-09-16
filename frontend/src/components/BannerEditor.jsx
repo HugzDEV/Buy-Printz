@@ -2839,31 +2839,14 @@ const BannerEditorNew = () => {
         }
         
         if (stageElement) {
-          // Generate high-resolution image regardless of display scale
-          // This ensures mobile users get full-quality images
-          const originalWidth = stageElement.width
-          const originalHeight = stageElement.height
+          // Use a higher quality export but limit size
+          const imageData = stageElement.toDataURL('image/png', 0.8)
+          console.log('Canvas image generated successfully, length:', imageData.length)
           
-          // Create a temporary canvas at full resolution
-          const tempCanvas = document.createElement('canvas')
-          const tempCtx = tempCanvas.getContext('2d')
-          
-          // Set canvas to original size (not scaled)
-          tempCanvas.width = canvasSize.width
-          tempCanvas.height = canvasSize.height
-          
-          // Draw the scaled canvas content at full resolution
-          tempCtx.drawImage(stageElement, 0, 0, canvasSize.width, canvasSize.height)
-          
-          // Generate high-quality image data
-          const imageData = tempCanvas.toDataURL('image/png', 0.9)
-          console.log('High-resolution canvas image generated successfully, length:', imageData.length)
-          console.log('Generated at full resolution:', canvasSize.width, 'x', canvasSize.height)
-          
-          // Check if image is too large (limit to 8MB for high-res)
-          if (imageData.length > 8 * 1024 * 1024) {
+          // Check if image is too large (limit to 5MB)
+          if (imageData.length > 5 * 1024 * 1024) {
             console.warn('Canvas image too large, reducing quality')
-            return tempCanvas.toDataURL('image/png', 0.7)
+            return stageElement.toDataURL('image/png', 0.5)
           }
           
           return imageData
@@ -2957,7 +2940,6 @@ const BannerEditorNew = () => {
         bannerSpecs,
         timestamp: new Date().toISOString()
       },
-      // Store canvas images for Supabase - these will be uploaded to Supabase storage
       canvas_image: generateCanvasImage(),
       surface_images: await captureAllSurfaceImages(),
       surface_elements: surfaceElements, // Include surface elements for restoration
@@ -2996,12 +2978,12 @@ const BannerEditorNew = () => {
     console.log('🎨 Order data specs - design_option:', productType === 'tent' ? tentDesignOption : productType === 'tin' ? (tinSpecs?.surfaceCoverage || 'front-back') : 'single-surface')
     
     // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
-    // Create minimal restoration data - images will be stored in Supabase
+    // Create minimal restoration data without large image objects
     const orderDataForStorage = {
       ...orderData,
-      // Store image data for Supabase upload - these will be uploaded to Supabase storage
-      canvas_image: orderData.canvas_image, // Will be uploaded to Supabase
-      surface_images: orderData.surface_images, // Will be uploaded to Supabase
+      canvas_image: null, // Canvas image is in Supabase, not needed in sessionStorage
+      // Remove large image data that causes quota exceeded errors
+      surface_images: null, // Will be regenerated when needed
       // Clean surface_elements to remove image objects but preserve structure
       surface_elements: Object.keys(surfaceElements).reduce((acc, surfaceKey) => {
         acc[surfaceKey] = (surfaceElements[surfaceKey] || []).map(element => {

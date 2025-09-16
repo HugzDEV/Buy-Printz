@@ -279,58 +279,12 @@ const TinCheckout = () => {
     try {
       const parsedOrderData = JSON.parse(savedOrderData)
       console.log('Loading tin order data from sessionStorage:', parsedOrderData)
-      console.log('🎨 TinCheckout - canvas_image available:', !!parsedOrderData.canvas_image)
-      console.log('🎨 TinCheckout - surface_images available:', !!parsedOrderData.surface_images)
-      console.log('🎨 TinCheckout - surface_images keys:', Object.keys(parsedOrderData.surface_images || {}))
       setOrderData(parsedOrderData)
-      
-      // If we have canvas images, create a Supabase order to store them
-      if (parsedOrderData.canvas_image || parsedOrderData.surface_images) {
-        createSupabaseOrder(parsedOrderData)
-      }
     } catch (error) {
       console.error('Failed to parse order data:', error)
       navigate('/editor')
     }
   }, [navigate])
-
-  // Create Supabase order to store canvas images
-  const createSupabaseOrder = async (orderData) => {
-    try {
-      console.log('🎨 Creating Supabase order to store tin canvas images...')
-      
-      // Get authenticated headers with automatic token refresh
-      const authHeaders = await authService.getAuthHeaders()
-      
-      const response = await fetch('/api/orders/create-with-images', {
-        method: 'POST',
-        headers: {
-          ...authHeaders,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
-      })
-      
-      if (response.ok) {
-        const result = await response.json()
-        console.log('🎨 Supabase tin order created successfully:', result.order_id)
-        
-        // Store the order ID for later use
-        setOrderData(prev => ({
-          ...prev,
-          supabase_order_id: result.order_id
-        }))
-        
-        return result.order_id
-      } else {
-        console.error('🎨 Failed to create Supabase tin order:', response.statusText)
-        return null
-      }
-    } catch (error) {
-      console.error('🎨 Error creating Supabase tin order:', error)
-      return null
-    }
-  }
 
   // Check authentication status
   useEffect(() => {

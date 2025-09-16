@@ -29,40 +29,40 @@
       "type": "standard",
       "cost": "$38.38",
       "estimated_days": 5,
-      "delivery_date": "Sep 18",
-      "description": "B2Sign ground: $38.38 (delivery: Sep 18)"
+      "delivery_date": "Sep 19",
+      "description": "B2Sign ground: $38.38 (delivery: Sep 19)"
     },
     {
       "name": "3 Day Select",
       "type": "standard",
       "cost": "$77.59",
       "estimated_days": 3,
-      "delivery_date": "Sep 19",
-      "description": "B2Sign 3 day select: $77.59 (delivery: Sep 19)"
+      "delivery_date": "Sep 22",
+      "description": "B2Sign 3 day select: $77.59 (delivery: Sep 22)"
     },
     {
       "name": "2nd Day Air",
       "type": "standard",
       "cost": "$81.19",
       "estimated_days": 2,
-      "delivery_date": "Sep 18",
-      "description": "B2Sign 2nd day air: $81.19 (delivery: Sep 18)"
+      "delivery_date": "Sep 19",
+      "description": "B2Sign 2nd day air: $81.19 (delivery: Sep 19)"
     },
     {
       "name": "Next Day",
       "type": "standard",
       "cost": "$84.89",
       "estimated_days": 1,
-      "delivery_date": "Sep 17",
-      "description": "B2Sign next day: $84.89 (delivery: Sep 17)"
+      "delivery_date": "Sep 18",
+      "description": "B2Sign next day: $84.89 (delivery: Sep 18)"
     },
     {
       "name": "Next Day (Early AM)",
       "type": "standard",
       "cost": "$460.52",
       "estimated_days": 1,
-      "delivery_date": "Sep 17",
-      "description": "B2Sign next day (early am): $460.52 (delivery: Sep 17)"
+      "delivery_date": "Sep 18",
+      "description": "B2Sign next day (early am): $460.52 (delivery: Sep 18)"
     }
   ],
   "screenshots_taken": [

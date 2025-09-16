@@ -131,38 +131,19 @@ const SurfaceThumbnailViewer = ({
     }
   }, [productType, orderDetails, canvasData, surfaceElements])
 
-  // Generate all surface thumbnails - prioritize Supabase-stored images
+  // Generate all surface thumbnails
   const generateAllThumbnails = useCallback(async () => {
     setIsGenerating(true)
     const thumbnails = {}
     
     try {
       const surfaces = getAvailableSurfaces()
-      console.log('🎨 Loading thumbnails for surfaces:', surfaces.map(s => s.key))
-      
-      // Check if we have Supabase-stored surface images
-      const supabaseSurfaceImages = orderDetails?.surface_images || canvasData?.surface_images
-      console.log('🎨 Supabase surface images available:', !!supabaseSurfaceImages)
-      console.log('🎨 Supabase surface images keys:', Object.keys(supabaseSurfaceImages || {}))
+      console.log('🎨 Generating thumbnails for surfaces:', surfaces.map(s => s.key))
       
       for (const surface of surfaces) {
-        // Prioritize Supabase-stored images over regenerated ones
-        if (supabaseSurfaceImages && supabaseSurfaceImages[surface.key]) {
-          console.log(`🎨 Using Supabase-stored image for ${surface.key}`)
-          thumbnails[surface.key] = {
-            imageDataUrl: supabaseSurfaceImages[surface.key],
-            dimensions: surface.dimensions,
-            source: 'supabase'
-          }
-        } else {
-          console.log(`🎨 Generating thumbnail for ${surface.key} (no Supabase image found)`)
-          const thumbnail = await generateSurfaceThumbnail(surface)
-          thumbnails[surface.key] = {
-            ...thumbnail,
-            source: 'generated'
-          }
-        }
-        console.log(`🎨 Loaded thumbnail for ${surface.key}: ${thumbnails[surface.key].dimensions.width}x${thumbnails[surface.key].dimensions.height} (${thumbnails[surface.key].source})`)
+        const thumbnail = await generateSurfaceThumbnail(surface)
+        thumbnails[surface.key] = thumbnail
+        console.log(`🎨 Generated thumbnail for ${surface.key}: ${thumbnail.dimensions.width}x${thumbnail.dimensions.height}`)
       }
       
       setSurfaceThumbnails(thumbnails)
@@ -174,11 +155,11 @@ const SurfaceThumbnailViewer = ({
       }
       
     } catch (error) {
-      console.error('Error loading thumbnails:', error)
+      console.error('Error generating thumbnails:', error)
     } finally {
       setIsGenerating(false)
     }
-  }, [getAvailableSurfaces, generateSurfaceThumbnail, orderDetails, canvasData])
+  }, [getAvailableSurfaces, generateSurfaceThumbnail])
 
   // Generate thumbnails when component mounts or dependencies change
   useEffect(() => {
@@ -251,26 +232,19 @@ const SurfaceThumbnailViewer = ({
         </div>
       </div>
 
-      {/* Surface Preview - MOBILE OPTIMIZED */}
-      <div className="bg-gray-100 rounded-lg p-2 sm:p-4 flex items-center justify-center overflow-hidden">
-        <div className="w-full h-[320px] sm:h-80 bg-white rounded-lg overflow-hidden shadow-inner">
-          <img
-            src={currentThumbnail.imageDataUrl || currentThumbnail.dataUrl}
-            alt={`${currentSurface?.name} preview`}
-            className=""
-            style={{ 
-              width: '400px !important',
-              height: '300px !important',
-              minWidth: '400px !important',
-              minHeight: '300px !important',
-              maxWidth: '400px !important',
-              maxHeight: '300px !important',
-              imageRendering: 'high-quality',
-              objectFit: 'contain',
-              objectPosition: 'center center'
-            }}
-          />
-        </div>
+      {/* Surface Preview */}
+      <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center overflow-hidden">
+        <img
+          src={currentThumbnail.dataUrl}
+          alt={`${currentSurface?.name} preview`}
+          className="max-w-full max-h-96 object-contain"
+          style={{
+            width: 'auto',
+            height: 'auto',
+            maxWidth: '100%',
+            maxHeight: '400px'
+          }}
+        />
       </div>
 
       {/* Surface Info */}

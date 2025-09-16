@@ -195,21 +195,12 @@ class TentPlaywrightIntegration:
                     'shipping_options': []
                 }
             
-            # Step 1: Login to B2Sign first (required for tent page access)
-            login_success = await self.login()
-            if not login_success:
-                return {
-                    'success': False,
-                    'errors': ['Failed to login to B2Sign'],
-                    'shipping_options': []
-                }
-            
-            # Step 2: Navigate to tent product page
+            # Navigate to tent product page
             logger.info(f"🌐 Navigating to {product_url}")
             await self.page.goto(product_url, wait_until='networkidle')
             await self.page.wait_for_timeout(3000)
             
-            # Step 3: Use the EXACT SAME proven banner workflow (just with tent-specific field mappings)
+            # Use the EXACT SAME proven banner workflow (just with tent-specific field mappings)
             shipping_options = await self._fill_banner_quote_form(order_data)
             
             return {
@@ -2169,8 +2160,8 @@ async def get_shipping_costs_playwright(order_data: Dict[str, Any]) -> Dict[str,
             logger.info(f"🎁 Accessories: {accessories}")
             
             # Fill out the B2Sign order form with customer's exact specifications
-            # Create an instance of the integration class to use its methods
-            integration = B2SignPlaywrightIntegration()
+            # Create an instance of the TENT integration class to use its methods
+            integration = TentPlaywrightIntegration()
             shipping_options = await integration._create_mock_order_and_get_shipping(
                 page, product_type, dimensions, quantity, print_options, accessories, zip_code
             )

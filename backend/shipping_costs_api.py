@@ -130,7 +130,7 @@ async def get_shipping_costs(request: ShippingCostsRequest):
             if request.product_type in ['banner', 'banners']:
                 result = await integration.get_banner_shipping_costs(order_data)
             elif request.product_type in ['tent', 'tents']:
-                result = await integration.get_tent_shipping_costs(order_data)
+                raise HTTPException(status_code=400, detail="Tent products should use /api/shipping-costs/tent endpoint")
             else:
                 raise HTTPException(status_code=400, detail="Unsupported product type")
             
