@@ -176,11 +176,28 @@ async def get_tent_shipping_costs(order_data: Dict[str, Any], customer_info: Dic
         Dict with success status and shipping options
     """
     try:
-        # Create a fresh service instance for each request
+        logger.info("🏕️ Getting tent shipping costs from TentCheckout.jsx data...")
+        logger.info(f"📋 Tent order data: {order_data}")
+        
+        # Map TentCheckout.jsx data to B2Sign format
         service = TentShippingService()
-        return await service.get_tent_shipping_costs(order_data, customer_info)
+        b2sign_order_data = service._map_tent_data_to_b2sign(order_data, customer_info)
+        
+        # Create tent integration instance and initialize it
+        tent_integration = TentPlaywrightIntegration()
+        await tent_integration.initialize()
+        await tent_integration.login()
+        
+        # Get shipping costs using the tent integration
+        result = await tent_integration.get_tent_shipping_costs(b2sign_order_data)
+        
+        # Clean up
+        await tent_integration.cleanup()
+        
+        return result
+        
     except Exception as e:
-        logger.error(f"❌ Error in get_tent_shipping_costs: {e}")
+        logger.error(f"❌ Error in tent shipping endpoint: {e}")
         return {
             'success': False,
             'errors': [str(e)],
