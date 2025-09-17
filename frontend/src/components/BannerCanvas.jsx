@@ -31,7 +31,8 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowLeft,
-  ArrowRight
+  ArrowRight,
+  Magnet
 } from 'lucide-react'
 import { GlassCard, NeumorphicButton, GlassButton, GlassPanel } from './ui'
 import Konva from 'konva'
@@ -182,6 +183,7 @@ const BannerCanvas = forwardRef(({
   const [historyStep, setHistoryStep] = useState(0)
   const [showGrid, setShowGrid] = useState(true)
   const [showGuides, setShowGuides] = useState(true)
+  const [snapToElements, setSnapToElements] = useState(true) // Element snapping toggle
   const [isSelecting, setIsSelecting] = useState(false)
   const [selectionRect, setSelectionRect] = useState(null)
   const [selectionStart, setSelectionStart] = useState(null)
@@ -437,8 +439,232 @@ const BannerCanvas = forwardRef(({
 
 
 
+  // Enhanced snapping system with element-to-element snapping
+  const drawCenterGuidelines = useCallback((draggedElement) => {
+    // Remove existing guidelines
+    const layer = stageRef.current?.getLayers()[0]
+    if (layer) {
+      layer.find('.center-guideline').forEach(line => line.destroy())
+      layer.find('.element-guideline').forEach(line => line.destroy())
+    }
+
+    if (!draggedElement || !layer) return
+
+    const centerX = canvasSize.width / 2
+    const centerY = canvasSize.height / 2
+    const elementBox = draggedElement.getClientRect()
+    const elementCenterX = elementBox.x + elementBox.width / 2
+    const elementCenterY = elementBox.y + elementBox.height / 2
+
+    const GUIDELINE_OFFSET = 8 // Snap tolerance
+    const guidelines = []
+
+    // Canvas center guidelines
+    if (Math.abs(elementCenterX - centerX) < GUIDELINE_OFFSET) {
+      guidelines.push({
+        orientation: 'V',
+        position: centerX,
+        snap: true,
+        type: 'center'
+      })
+    }
+
+    if (Math.abs(elementCenterY - centerY) < GUIDELINE_OFFSET) {
+      guidelines.push({
+        orientation: 'H',
+        position: centerY,
+        snap: true,
+        type: 'center'
+      })
+    }
+
+    // Element-to-element snapping (if enabled)
+    if (snapToElements) {
+      const otherElements = elements.filter(el => 
+        el.id !== draggedElement.id() && 
+        el.visible !== false
+      )
+
+      otherElements.forEach(otherEl => {
+        // Find the Konva node for this element
+        const otherNode = layer.findOne(`#${otherEl.id}`)
+        if (!otherNode) return
+
+        const otherBox = otherNode.getClientRect()
+        const otherCenterX = otherBox.x + otherBox.width / 2
+        const otherCenterY = otherBox.y + otherBox.height / 2
+
+        // Vertical alignment checks
+        // Center-to-center alignment
+        if (Math.abs(elementCenterX - otherCenterX) < GUIDELINE_OFFSET) {
+          guidelines.push({
+            orientation: 'V',
+            position: otherCenterX,
+            snap: true,
+            type: 'element'
+          })
+        }
+
+        // Left edge alignment
+        if (Math.abs(elementBox.x - otherBox.x) < GUIDELINE_OFFSET) {
+          guidelines.push({
+            orientation: 'V',
+            position: otherBox.x,
+            snap: true,
+            type: 'element',
+            snapTo: 'left'
+          })
+        }
+
+        // Right edge alignment
+        if (Math.abs(elementBox.x + elementBox.width - (otherBox.x + otherBox.width)) < GUIDELINE_OFFSET) {
+          guidelines.push({
+            orientation: 'V',
+            position: otherBox.x + otherBox.width,
+            snap: true,
+            type: 'element',
+            snapTo: 'right'
+          })
+        }
+
+        // Horizontal alignment checks
+        // Center-to-center alignment
+        if (Math.abs(elementCenterY - otherCenterY) < GUIDELINE_OFFSET) {
+          guidelines.push({
+            orientation: 'H',
+            position: otherCenterY,
+            snap: true,
+            type: 'element'
+          })
+        }
+
+        // Top edge alignment
+        if (Math.abs(elementBox.y - otherBox.y) < GUIDELINE_OFFSET) {
+          guidelines.push({
+            orientation: 'H',
+            position: otherBox.y,
+            snap: true,
+            type: 'element',
+            snapTo: 'top'
+          })
+        }
+
+        // Bottom edge alignment
+        if (Math.abs(elementBox.y + elementBox.height - (otherBox.y + otherBox.height)) < GUIDELINE_OFFSET) {
+          guidelines.push({
+            orientation: 'H',
+            position: otherBox.y + otherBox.height,
+            snap: true,
+            type: 'element',
+            snapTo: 'bottom'
+          })
+        }
+      })
+    }
+
+    // Draw guidelines
+    guidelines.forEach(guide => {
+      const isElementGuideline = guide.type === 'element'
+      const lineColor = isElementGuideline ? 'rgba(255, 165, 0, 0.8)' : 'rgba(0, 161, 255, 0.9)'
+      const lineName = isElementGuideline ? 'element-guideline' : 'center-guideline'
+      
+      if (guide.orientation === 'H') {
+        // Horizontal guideline
+        const line = new Konva.Line({
+          points: [-6000, 0, 6000, 0],
+          stroke: lineColor,
+          strokeWidth: 1.5,
+          name: lineName,
+          dash: isElementGuideline ? [8, 4] : [12, 6],
+          listening: false
+        })
+        layer.add(line)
+        line.absolutePosition({ x: 0, y: guide.position })
+      } else if (guide.orientation === 'V') {
+        // Vertical guideline
+        const line = new Konva.Line({
+          points: [0, -6000, 0, 6000],
+          stroke: lineColor,
+          strokeWidth: 1.5,
+          name: lineName,
+          dash: isElementGuideline ? [8, 4] : [12, 6],
+          listening: false
+        })
+        layer.add(line)
+        line.absolutePosition({ x: guide.position, y: 0 })
+      }
+    })
+
+    layer.batchDraw()
+
+    // Apply snapping
+    if (guidelines.some(g => g.snap)) {
+      const currentAbsPos = draggedElement.absolutePosition()
+      const newAbsPos = { ...currentAbsPos }
+      
+      guidelines.forEach(guide => {
+        if (guide.snap) {
+          if (guide.orientation === 'V') {
+            if (guide.type === 'center') {
+              // Snap element center to canvas vertical center
+              const elementCenterOffset = elementBox.width / 2
+              newAbsPos.x = centerX - elementCenterOffset + (currentAbsPos.x - elementBox.x)
+            } else if (guide.type === 'element') {
+              // Snap to other element
+              if (guide.snapTo === 'left') {
+                // Align left edges
+                newAbsPos.x = guide.position + (currentAbsPos.x - elementBox.x)
+              } else if (guide.snapTo === 'right') {
+                // Align right edges
+                newAbsPos.x = guide.position - elementBox.width + (currentAbsPos.x - elementBox.x)
+              } else {
+                // Center-to-center alignment
+                const elementCenterOffset = elementBox.width / 2
+                newAbsPos.x = guide.position - elementCenterOffset + (currentAbsPos.x - elementBox.x)
+              }
+            }
+          } else if (guide.orientation === 'H') {
+            if (guide.type === 'center') {
+              // Snap element center to canvas horizontal center
+              const elementCenterOffset = elementBox.height / 2
+              newAbsPos.y = centerY - elementCenterOffset + (currentAbsPos.y - elementBox.y)
+            } else if (guide.type === 'element') {
+              // Snap to other element
+              if (guide.snapTo === 'top') {
+                // Align top edges
+                newAbsPos.y = guide.position + (currentAbsPos.y - elementBox.y)
+              } else if (guide.snapTo === 'bottom') {
+                // Align bottom edges
+                newAbsPos.y = guide.position - elementBox.height + (currentAbsPos.y - elementBox.y)
+              } else {
+                // Center-to-center alignment
+                const elementCenterOffset = elementBox.height / 2
+                newAbsPos.y = guide.position - elementCenterOffset + (currentAbsPos.y - elementBox.y)
+              }
+            }
+          }
+        }
+      })
+      
+      draggedElement.absolutePosition(newAbsPos)
+    }
+  }, [canvasSize, snapToElements, elements])
+
+  const handleDragMove = useCallback((e, id) => {
+    drawCenterGuidelines(e.target)
+  }, [drawCenterGuidelines])
+
   const handleDragEnd = (e, id) => {
     const node = e.target
+    
+    // Remove guidelines on drag end
+    const layer = stageRef.current?.getLayers()[0]
+    if (layer) {
+      layer.find('.center-guideline').forEach(line => line.destroy())
+      layer.find('.element-guideline').forEach(line => line.destroy())
+      layer.batchDraw()
+    }
+
     handleElementChange(id, {
       x: node.x(),
       y: node.y()
@@ -1128,6 +1354,7 @@ const BannerCanvas = forwardRef(({
       onTap: (e) => {
         handleSelect(safeElement.id)
       },
+      onDragMove: (e) => handleDragMove(e, safeElement.id),
       onDragEnd: (e) => handleDragEnd(e, safeElement.id),
       onTransformEnd: (e) => handleTransformEnd(e, safeElement.id)
     }
@@ -1684,6 +1911,17 @@ const BannerCanvas = forwardRef(({
             
               <GlassButton onClick={zoomIn} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <ZoomIn className="w-3.5 h-3.5" />
+            </GlassButton>
+            
+            <div className="w-px h-5 bg-white/20 mx-1" />
+            
+            {/* Snapping Toggle */}
+            <GlassButton 
+              onClick={() => setSnapToElements(!snapToElements)}
+              className={`p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center ${snapToElements ? 'bg-blue-500/20 border-blue-400/50' : ''}`}
+              title={snapToElements ? 'Disable Element Snapping' : 'Enable Element Snapping'}
+            >
+              <Magnet className={`w-3.5 h-3.5 ${snapToElements ? 'text-blue-600' : ''}`} />
             </GlassButton>
           </div>
 
