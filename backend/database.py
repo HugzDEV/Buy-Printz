@@ -553,7 +553,7 @@ class DatabaseManager:
                 "canvas_data": json.dumps(canvas_data),
                 "banner_type": template_data.get("banner_type"),
                 "is_public": template_data.get("is_public", False),
-                "thumbnail": template_data.get("thumbnail"),  # Store thumbnail image data
+                "thumbnail_url": template_data.get("thumbnail_url"),  # Store thumbnail URL (not base64 data)
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat()
             }
