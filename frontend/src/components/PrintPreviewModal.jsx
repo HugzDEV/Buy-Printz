@@ -37,30 +37,41 @@ const PrintPreviewModal = ({
   const [selectedSurface, setSelectedSurface] = useState(currentSurface)
   const [approvedSurfaces, setApprovedSurfaces] = useState(new Set())
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
-  
 
-  // Initialize selected surface to first available surface when modal opens
+  // Initialize selected surface to current surface from editor when modal opens
   useEffect(() => {
-    if (isOpen && hasMultipleSurfaces()) {
-      const surfaces = getAllSurfaces()
-      if (surfaces.length > 0) {
-        // For tents, prefer to start with the first canopy surface
-        const firstCanopySurface = surfaces.find(s => s.key.startsWith('canopy_'))
-        const initialSurface = firstCanopySurface || surfaces[0]
-        setSelectedSurface(initialSurface.key)
+    if (isOpen) {
+      if (hasMultipleSurfaces()) {
+        const surfaces = getAllSurfaces()
+        if (surfaces.length > 0) {
+          // ALWAYS use the current surface from editor if it exists in available surfaces
+          const currentSurfaceExists = surfaces.find(s => s.key === currentSurface)
+          if (currentSurfaceExists) {
+            setSelectedSurface(currentSurface)
+            const surfaceIndex = surfaces.findIndex(s => s.key === currentSurface)
+            setCurrentSurfaceIndex(surfaceIndex >= 0 ? surfaceIndex : 0)
+            console.log('🎨 PrintPreviewModal - Using current editor surface:', currentSurface)
+          } else {
+            // Fallback: For tents, prefer to start with the first canopy surface
+            const firstCanopySurface = surfaces.find(s => s.key.startsWith('canopy_'))
+            const initialSurface = firstCanopySurface || surfaces[0]
+            setSelectedSurface(initialSurface.key)
+            setCurrentSurfaceIndex(0)
+            console.log('🎨 PrintPreviewModal - Current surface not available, using fallback:', initialSurface.key)
+          }
+        }
+      } else {
+        // For single-surface products, always use the current surface
+        setSelectedSurface(currentSurface)
         setCurrentSurfaceIndex(0)
-        console.log('🎨 PrintPreviewModal - Initialized to first surface:', initialSurface.key)
       }
     }
-  }, [isOpen, productType, orderDetails?.design_option])
+  }, [isOpen, productType, orderDetails?.design_option, currentSurface])
 
   // Get surface names based on product type and design option
   const getSurfaceNames = () => {
     if (productType === 'tin') {
-      // Use the specification data to determine which surfaces to show
       const surfaceCoverage = orderDetails?.design_option || orderDetails?.tin_surface_coverage || 'front-back'
-      console.log('🎨 PrintPreviewModal - Tin surface coverage from specs:', surfaceCoverage)
-      
       const allTinSurfaces = [
         { key: 'front', name: 'Front', description: 'Main front surface' },
         { key: 'back', name: 'Back', description: 'Back surface' },
@@ -69,7 +80,6 @@ const PrintPreviewModal = ({
       ]
       
       let filteredSurfaces = []
-      
       if (surfaceCoverage === 'front-only') {
         filteredSurfaces = allTinSurfaces.filter(s => s.key === 'front')
       } else if (surfaceCoverage === 'front-back') {
@@ -77,11 +87,8 @@ const PrintPreviewModal = ({
       } else if (surfaceCoverage === 'all-surfaces') {
         filteredSurfaces = allTinSurfaces
       } else {
-        // Default to front-back
         filteredSurfaces = allTinSurfaces.filter(s => s.key === 'front' || s.key === 'back')
       }
-      
-      console.log('🎨 PrintPreviewModal - Tin surfaces based on specs:', filteredSurfaces.map(s => s.key))
       return filteredSurfaces
       
     } else if (productType === 'tent') {
@@ -95,10 +102,7 @@ const PrintPreviewModal = ({
         { key: 'backwall', name: 'Back Wall', description: 'Back wall panel' }
       ]
       
-      // Use the specification data to determine which surfaces to show
       const designOption = orderDetails?.design_option || orderDetails?.tent_design_option || 'canopy-only'
-      console.log('🎨 PrintPreviewModal - Design option from specs:', designOption)
-      
       let filteredSurfaces = []
       
       if (designOption === 'canopy-only') {
@@ -106,45 +110,13 @@ const PrintPreviewModal = ({
       } else if (designOption === 'canopy-backwall') {
         filteredSurfaces = allSurfaces.filter(s => s.key.startsWith('canopy_') || s.key === 'backwall')
       } else if (designOption === 'all-sides') {
-        // For all-sides, return all surfaces
         filteredSurfaces = allSurfaces
       } else {
-        // Default to canopy-only
         filteredSurfaces = allSurfaces.filter(s => s.key.startsWith('canopy_'))
       }
-      
-      console.log('🎨 PrintPreviewModal - Tent surfaces based on specs:', filteredSurfaces.map(s => s.key))
       return filteredSurfaces
     }
     return [{ key: 'front', name: 'Design', description: 'Main design' }]
-  }
-
-  // Get tent surface dimensions
-  const getTentSurfaceDimensions = (surfaceKey) => {
-    const tentDimensions = {
-      'canopy_front': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
-      'canopy_back': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
-      'canopy_left': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
-      'canopy_right': { width: 1160, height: 1049, shape: 'triangular + rectangular' },
-      'sidewall_left': { width: 1110, height: 390, shape: 'rectangular' },
-      'sidewall_right': { width: 1110, height: 390, shape: 'rectangular' },
-      'backwall': { width: 1110, height: 780, shape: 'rectangular' }
-    }
-    return tentDimensions[surfaceKey] || { width: 1160, height: 1049, shape: 'triangular + rectangular' }
-  }
-
-  // Get current surface dimensions
-  const getCurrentSurfaceDimensions = () => {
-    if (productType === 'tent') {
-      // For tent canopies, always use the full canopy+valence dimensions (1160x1049)
-      // to maintain consistent viewport size for all canopy surfaces
-      if (selectedSurface && selectedSurface.startsWith('canopy_')) {
-        return getTentSurfaceDimensions('canopy_front') // Use canopy dimensions
-      }
-      // For sidewalls and backwall, use their specific dimensions
-      return getTentSurfaceDimensions(selectedSurface)
-    }
-    return dimensions
   }
 
   // Get all surfaces for multi-surface products
@@ -173,813 +145,98 @@ const PrintPreviewModal = ({
   // Navigate between surfaces
   const navigateToSurface = (index) => {
     const surfaces = getAllSurfaces()
-    if (index >= 0 && index < surfaces.length) {
-      setCurrentSurfaceIndex(index)
+    if (surfaces && surfaces[index]) {
       setSelectedSurface(surfaces[index].key)
+      setCurrentSurfaceIndex(index)
     }
   }
 
-  // Check if all surfaces are approved
-  const areAllSurfacesApproved = () => {
-    if (!hasMultipleSurfaces()) return true
-    const surfaces = getAllSurfaces()
-    return surfaces.every(surface => approvedSurfaces.has(surface.key))
-  }
-
-  // Get approval progress
-  const getApprovalProgress = () => {
-    if (!hasMultipleSurfaces()) return { current: 1, total: 1 }
-    const surfaces = getAllSurfaces()
-    return {
-      current: approvedSurfaces.size,
-      total: surfaces.length
-    }
-  }
-
-
-  // Generate canvas image from canvas data when images are missing
-  const generateCanvasImageFromData = async (targetSurface = null) => {
-    try {
-      console.log('🎨 Generating canvas image from canvas data for surface:', targetSurface || 'default')
-      
-      // Create a temporary canvas to render the design
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      
-      // Get elements to render - for multi-surface products, use surface-specific elements
-      let elementsToRender = []
-      
-      console.log('🎨 Debug - orderDetails keys:', Object.keys(orderDetails || {}))
-      console.log('🎨 Debug - canvasData keys:', Object.keys(canvasData || {}))
-      console.log('🎨 Debug - surface_elements:', orderDetails?.surface_elements)
-      
-      // Debug elements to understand data structure
-      if (hasMultipleSurfaces() && targetSurface && (orderDetails?.surface_elements || surfaceElements)) {
-        const surfaceElementsData = orderDetails?.surface_elements || surfaceElements
-        const elements = surfaceElementsData[targetSurface] || []
-        console.log(`🎨 Debug - Elements for ${targetSurface}:`, elements.map(el => ({
-          id: el.id,
-          type: el.type,
-          assetName: el.assetName,
-          hasImageDataUrl: !!el.imageDataUrl,
-          hasImage: !!el.image,
-          hasQrData: !!el.qrData,
-          x: el.x,
-          y: el.y,
-          width: el.width,
-          height: el.height
-        })))
-      } else if (canvasData?.elements) {
-        console.log('🎨 Debug - Main canvas elements:', canvasData.elements.map(el => ({
-          id: el.id,
-          type: el.type,
-          assetName: el.assetName,
-          hasImageDataUrl: !!el.imageDataUrl,
-          hasImage: !!el.image,
-          hasQrData: !!el.qrData,
-          x: el.x,
-          y: el.y,
-          width: el.width,
-          height: el.height
-        })))
-      }
-      
-      if (hasMultipleSurfaces() && targetSurface && (orderDetails?.surface_elements || surfaceElements)) {
-        // For multi-surface products, get elements for the specific surface
-        const surfaceElementsData = orderDetails?.surface_elements || surfaceElements
-        elementsToRender = surfaceElementsData[targetSurface] || []
-      console.log(`🎨 Rendering ${elementsToRender.length} elements for surface: ${targetSurface}`)
-      
-      } else if (canvasData?.elements) {
-        // For single-surface products or fallback, use main canvas elements
-        elementsToRender = canvasData.elements
-        console.log(`🎨 Rendering ${elementsToRender.length} elements from main canvas`)
+   // KONVA-ONLY IMAGE LOADING - No more Canvas2D conflicts!
+   useEffect(() => {
+     const loadPreviewImage = async () => {
+       console.log('🎨 KONVA-ONLY: Loading preview image - isOpen:', isOpen, 'orderDetails:', !!orderDetails, 'canvasData:', !!canvasData)
+       
+       if (isOpen && (orderDetails || canvasData)) {
+         console.log('🎨 KONVA-ONLY: Canvas data available:', !!canvasData)
+         console.log('🎨 KONVA-ONLY: Selected surface:', selectedSurface, 'Current surface:', currentSurface)
+         
+         // Get surface images from multiple sources
+         const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
+         console.log('🎨 DEBUG: Available surface images keys:', Object.keys(surfaceImages || {}))
+         console.log('🎨 DEBUG: Looking for surface:', selectedSurface)
+         
+         // PRIORITY 1: Use stored surface image for selected surface (MOST RELIABLE!)
+         if (surfaceImages && surfaceImages[selectedSurface]) {
+           console.log('🎨 ✅ USING STORED SURFACE IMAGE for:', selectedSurface)
+           setPreviewImage(surfaceImages[selectedSurface])
+           return
+         }
+         
+         // PRIORITY 2: Use Konva native export for current surface if selected surface matches
+         if (selectedSurface === currentSurface && canvasData?.konvaStageImage) {
+           console.log('🎨 ✅ USING KONVA NATIVE EXPORT - Perfect alignment guaranteed!')
+           setPreviewImage(canvasData.konvaStageImage)
+           return
+         }
+         
+         // PRIORITY 3: Use main canvas image (captured with Konva) for current surface only
+         const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+         if (canvasImage) {
+           if (!hasMultipleSurfaces() || selectedSurface === currentSurface) {
+             console.log('🎨 ✅ Using stored Konva canvas image for current surface')
+             setPreviewImage(canvasImage)
+             return
+           }
+         }
         
-      }
-      
-      if (elementsToRender.length === 0) {
-        console.warn('No elements found to render')
-        return null
-      }
-      
-      // Set canvas size - ALWAYS PRIORITIZE canvasData.canvasSize for ALL product types
-      let canvasSize
-      
-      // CRITICAL: Always use canvasData.canvasSize first for consistency with editor
-      // This ensures tent, banner, and tin all use the same dimensions as the editor
-      if (canvasData?.canvasSize) {
-        canvasSize = canvasData.canvasSize
-        console.log('🎨 Using canvasData.canvasSize (PRIORITY):', canvasSize, 'for product:', productType)
-      } else if (hasMultipleSurfaces() && targetSurface) {
-        // Second priority: For multi-surface products without canvasData, use surface-specific dimensions
-        if (productType === 'tent') {
-          const tentDimensions = {
-            'canopy_front': { width: 1160, height: 1049 },
-            'canopy_back': { width: 1160, height: 1049 },
-            'canopy_left': { width: 1160, height: 1049 },
-            'canopy_right': { width: 1160, height: 1049 },
-            'sidewall_left': { width: 1110, height: 390 },
-            'sidewall_right': { width: 1110, height: 390 },
-            'backwall': { width: 1110, height: 780 }
-          }
-          canvasSize = tentDimensions[targetSurface] || { width: 1160, height: 1049 }
-          console.log('🎨 Using tent fallback dimensions:', canvasSize, 'for surface:', targetSurface)
-        } else if (productType === 'tin') {
-          canvasSize = { width: 374, height: 225 }
-          console.log('🎨 Using tin fallback dimensions:', canvasSize)
-        } else {
-          canvasSize = { width: 800, height: 400 } // Banner fallback
-          console.log('🎨 Using banner fallback dimensions:', canvasSize)
-        }
-      } else {
-        // Last priority: Product type defaults (only when no canvasData available)
-        if (productType === 'tent') {
-          canvasSize = { width: 1160, height: 1049 } // Default tent canopy
-        } else if (productType === 'tin') {
-          canvasSize = { width: 374, height: 225 }
-        } else {
-          canvasSize = { width: 800, height: 400 } // Banner default
-        }
-        console.log('🎨 Using product type defaults (FALLBACK):', canvasSize)
-      }
-      
-      console.log('🎨 Using canvas dimensions:', canvasSize, 'for surface:', targetSurface || 'default')
-      canvas.width = canvasSize.width
-      canvas.height = canvasSize.height
-      
-      
-      // Set background color
-      ctx.fillStyle = canvasData?.backgroundColor || '#ffffff'
-      ctx.fillRect(0, 0, canvasSize.width, canvasSize.height)
-      
-      // Apply tent canopy clipping for tent canopy surfaces
-      if (productType === 'tent' && targetSurface && targetSurface.startsWith('canopy_')) {
-        // Create the tent canopy + valence clipping path
-        ctx.beginPath()
-        
-        // Start with triangular canopy path
-        ctx.moveTo(canvasSize.width / 2, 0) // Top point (center top)
-        ctx.lineTo(0, 789)                  // Bottom left of triangle
-        ctx.lineTo(canvasSize.width, 789)   // Bottom right of triangle
-        
-        // Continue to rectangular valence path (no closePath between them)
-        ctx.lineTo(canvasSize.width, 809)   // Top right of valence
-        ctx.lineTo(0, 809)                  // Top left of valence
-        ctx.lineTo(0, 1009)                 // Bottom left of valence (789 + 20 + 200)
-        ctx.lineTo(canvasSize.width, 1009)  // Bottom right of valence
-        ctx.lineTo(canvasSize.width, 789)   // Back to bottom right of triangle
-        
-        ctx.closePath()
-        ctx.clip() // Apply the clipping path
-      }
-      
-      // Render elements
-      for (const element of elementsToRender) {
-        // Apply rotation if element has rotation property
-        const hasRotation = element.rotation && element.rotation !== 0
-        if (hasRotation) {
-          ctx.save()
-          // Calculate rotation center based on element type
-          let centerX, centerY
-          if (element.type === 'circle' || element.type === 'star' || element.type === 'triangle' || element.type === 'hexagon' || element.type === 'octagon') {
-            // For center-positioned shapes, use x,y as center
-            centerX = element.x
-            centerY = element.y
-          } else {
-            // For top-left positioned shapes (rect, text, image), calculate center
-            centerX = element.x + (element.width || 0) / 2
-            centerY = element.y + (element.height || 0) / 2
-          }
-          ctx.translate(centerX, centerY)
-          ctx.rotate((element.rotation * Math.PI) / 180) // Convert degrees to radians
-          ctx.translate(-centerX, -centerY)
-        }
-        
-        if (element.type === 'image' && (element.imageDataUrl || element.image)) {
-          // Create image from data URL or image object
-          const img = new Image()
-          img.crossOrigin = 'anonymous'
-          
-            await new Promise((resolve, reject) => {
-              img.onload = () => {
-                // Improve image quality for crisp rendering
-                ctx.imageSmoothingEnabled = false // Disable smoothing for pixel-perfect images like QR codes
-                ctx.drawImage(img, element.x, element.y, element.width, element.height)
-                ctx.imageSmoothingEnabled = true // Re-enable for other elements
-                resolve()
-              }
-            img.onerror = (error) => {
-              console.warn('⚠️ Error loading image element:', error, element)
-              resolve() // Continue rendering other elements
-            }
-            
-            // Handle both imageDataUrl (string) and image object
-            if (element.imageDataUrl) {
-              img.src = element.imageDataUrl
-            } else if (element.image && element.image.src) {
-              img.src = element.image.src
-            } else if (element.image && typeof element.image === 'string') {
-              img.src = element.image
-            } else {
-              console.warn('⚠️ Image element has no valid source:', element)
-              resolve()
-            }
-          })
-        } else if (element.type === 'text') {
-          // Render text - Match Konva's text positioning and wrapping exactly
-          const fontSize = element.fontSize || 24
-          const fontFamily = element.fontFamily || 'Arial'
-          const lineHeight = element.lineHeight || 1.2
-          const textWidth = element.width || 200
-          const align = element.align || 'left'
-          const padding = element.padding || 0
-          
-          // Use exact same font specification as Konva for consistent rendering
-          ctx.font = `${fontSize}px "${fontFamily}"`
-          ctx.fillStyle = element.fill || element.color || '#000000'
-          ctx.textRenderingOptimization = 'optimizeQuality'
-          ctx.textAlign = 'left' // Always left for consistent positioning
-          ctx.textBaseline = 'top'
-          
-          // Split text into lines (handle both manual line breaks and word wrapping)
-          const text = element.text || 'Text'
-          const lines = []
-          
-          // First, split by manual line breaks (\n)
-          const manualLines = text.split('\n')
-          
-          // Then, handle word wrapping for each line
-          for (const line of manualLines) {
-            if (line.trim() === '') {
-              lines.push('') // Preserve empty lines
-              continue
-            }
-            
-            // Check if line fits within width
-            const lineWidth = ctx.measureText(line).width
-            if (lineWidth <= textWidth - padding * 2) {
-              lines.push(line)
-            } else {
-              // Word wrap this line
-              const words = line.split(' ')
-              let currentLine = ''
-              
-              for (const word of words) {
-                const testLine = currentLine ? `${currentLine} ${word}` : word
-                const testWidth = ctx.measureText(testLine).width
-                
-                if (testWidth <= textWidth - padding * 2) {
-                  currentLine = testLine
-                } else {
-                  if (currentLine) {
-                    lines.push(currentLine)
-                    currentLine = word
-                  } else {
-                    // Single word is too long, force it
-                    lines.push(word)
-                  }
-                }
-              }
-              if (currentLine) {
-                lines.push(currentLine)
-              }
-            }
-          }
-          
-          // Calculate starting position
-          let startX = element.x + padding
-          const startY = element.y + padding
-          
-          // Render each line
-          lines.forEach((line, lineIndex) => {
-            const lineY = startY + (lineIndex * fontSize * lineHeight)
-            let lineX = startX
-            
-            // Handle alignment for each line
-            if (align === 'center' || align === 'right') {
-              const actualLineWidth = ctx.measureText(line).width
-              const availableWidth = textWidth - padding * 2
-              
-              if (align === 'center') {
-                lineX += (availableWidth - actualLineWidth) / 2
-              } else if (align === 'right') {
-                lineX += (availableWidth - actualLineWidth)
-              }
-            }
-            
-            // Render text with stroke if specified (like Konva)
-            if (element.stroke && element.strokeWidth > 0) {
-              ctx.strokeStyle = element.stroke
-              ctx.lineWidth = element.strokeWidth
-              ctx.strokeText(line, lineX, lineY)
-            }
-            ctx.fillText(line, lineX, lineY)
-          })
-          
-          // Debug logging (remove in production)
-          // console.log(`🎨 Rendered text "${text}" as ${lines.length} lines:`, lines)
-        } else if (element.type === 'rect') {
-          // Render rectangle
-          const width = element.width || 100
-          const height = element.height || 100
-          // console.log(`🎨 Rendering rectangle at (${element.x}, ${element.y}), size: ${width}x${height}`)
-          
-          ctx.fillStyle = element.fill || '#000000'
-          ctx.fillRect(element.x, element.y, width, height)
-          
-          // Add stroke if specified (match Konva)
-          if (element.stroke && element.strokeWidth > 0) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.strokeRect(element.x, element.y, width, height)
-          }
-        } else if (element.type === 'circle') {
-          // Render circle - position (x,y) is the CENTER in Konva
-          const radius = element.radius || 50
-          const strokeWidth = element.strokeWidth || 0
-          
-          // Apply scaling factor to match Konva visual rendering
-          
-          // Fine-tuned radius scaling to match Konva visual size
-          const adjustedRadius = radius * 0.48  // Reduce by 52%
-          ctx.beginPath()
-          ctx.arc(element.x, element.y, adjustedRadius, 0, 2 * Math.PI)
-          ctx.fillStyle = element.fill || '#000000'
-          ctx.fill()
-          
-          // Add stroke if specified (exact same as Konva)
-          if (element.stroke && strokeWidth > 0) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = strokeWidth
-            ctx.stroke()
-          }
-        } else if (element.type === 'star') {
-          // Render star - position (x,y) is the CENTER in Konva
-          const numPoints = element.numPoints || 5
-          const innerRadius = element.innerRadius || 40
-          const outerRadius = element.outerRadius || 80
-          const centerX = element.x  // x,y is already the center in Konva
-          const centerY = element.y
-          
-          // console.log(`🎨 Rendering star at (${centerX}, ${centerY}), inner: ${innerRadius}, outer: ${outerRadius}, points: ${numPoints}`)
-          
-          ctx.beginPath()
-          for (let i = 0; i < numPoints * 2; i++) {
-            // Adjust angle to match Konva's star orientation (rotate by -90 degrees)
-            const angle = (i * Math.PI) / numPoints - Math.PI / 2
-            const radius = i % 2 === 0 ? outerRadius : innerRadius
-            const x = centerX + Math.cos(angle) * radius
-            const y = centerY + Math.sin(angle) * radius
-            
-            if (i === 0) {
-              ctx.moveTo(x, y)
-            } else {
-              ctx.lineTo(x, y)
-            }
-          }
-          ctx.closePath()
-          ctx.fillStyle = element.fill || '#000000'
-          ctx.fill()
-          
-          // Add stroke if specified (match Konva)
-          if (element.stroke && element.strokeWidth > 0) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
-        } else if (element.type === 'triangle') {
-          // Render triangle - position (x,y) is the CENTER in Konva
-          ctx.beginPath()
-          const radius = element.radius || 60
-          const centerX = element.x  // x,y is already the center in Konva
-          const centerY = element.y
-          
-          for (let i = 0; i < 3; i++) {
-            const angle = (i * 2 * Math.PI) / 3 - Math.PI / 2
-            const x = centerX + Math.cos(angle) * radius
-            const y = centerY + Math.sin(angle) * radius
-            
-            if (i === 0) {
-              ctx.moveTo(x, y)
-            } else {
-              ctx.lineTo(x, y)
-            }
-          }
-          ctx.closePath()
-          ctx.fillStyle = element.fill || '#000000'
-          ctx.fill()
-          
-          // Add stroke if specified (match Konva)
-          if (element.stroke && element.strokeWidth > 0) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
-        } else if (element.type === 'hexagon') {
-          // Render hexagon - position (x,y) is the CENTER in Konva
-          ctx.beginPath()
-          const radius = element.radius || 60
-          const centerX = element.x  // x,y is already the center in Konva
-          const centerY = element.y
-          
-          for (let i = 0; i < 6; i++) {
-            const angle = (i * 2 * Math.PI) / 6
-            const x = centerX + Math.cos(angle) * radius
-            const y = centerY + Math.sin(angle) * radius
-            
-            if (i === 0) {
-              ctx.moveTo(x, y)
-            } else {
-              ctx.lineTo(x, y)
-            }
-          }
-          ctx.closePath()
-          ctx.fillStyle = element.fill || '#000000'
-          ctx.fill()
-          
-          // Add stroke if specified (match Konva)
-          if (element.stroke && element.strokeWidth > 0) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
-        } else if (element.type === 'octagon') {
-          // Render octagon - position (x,y) is the CENTER in Konva
-          ctx.beginPath()
-          const radius = element.radius || 60
-          const centerX = element.x  // x,y is already the center in Konva
-          const centerY = element.y
-          
-          for (let i = 0; i < 8; i++) {
-            const angle = (i * 2 * Math.PI) / 8
-            const x = centerX + Math.cos(angle) * radius
-            const y = centerY + Math.sin(angle) * radius
-            
-            if (i === 0) {
-              ctx.moveTo(x, y)
-            } else {
-              ctx.lineTo(x, y)
-            }
-          }
-          ctx.closePath()
-          ctx.fillStyle = element.fill || '#000000'
-          ctx.fill()
-          
-          // Add stroke if specified (match Konva)
-          if (element.stroke && element.strokeWidth > 0) {
-            ctx.strokeStyle = element.stroke
-            ctx.lineWidth = element.strokeWidth
-            ctx.stroke()
-          }
-        } else if (element.type === 'line') {
-          // Render line-based shapes (heart, diamond, arrows, etc.)
-          if (element.points && element.points.length > 0) {
-            ctx.beginPath()
-            
-            // Apply scaling if present
-            const scaleX = element.scaleX || 1
-            const scaleY = element.scaleY || 1
-            
-            for (let i = 0; i < element.points.length; i += 2) {
-              const x = element.x + (element.points[i] * scaleX)
-              const y = element.y + (element.points[i + 1] * scaleY)
-              
-              if (i === 0) {
-                ctx.moveTo(x, y)
-              } else {
-                ctx.lineTo(x, y)
-              }
-            }
-            
-            if (element.closed !== false) {
-              ctx.closePath()
-            }
-            
-            // Set stroke properties
-            ctx.strokeStyle = element.stroke || element.fill || '#000000'
-            ctx.lineWidth = element.strokeWidth || 2
-            ctx.lineCap = 'round'
-            ctx.lineJoin = 'round'
-            
-            // Fill or stroke based on shape type
-            if (element.closed !== false) {
-              ctx.fillStyle = element.fill || '#000000'
-              ctx.fill()
-            }
-            ctx.stroke()
-          }
-        } else if (element.type === 'icon') {
-          // Render icons (missing from original code!)
-          if (element.imagePath) {
-            // Image-based icons
-            const img = new Image()
-            img.crossOrigin = 'anonymous'
-            
-            await new Promise((resolve, reject) => {
-              img.onload = () => {
-                ctx.drawImage(img, element.x, element.y, element.width || 60, element.height || 60)
-                resolve()
-              }
-              img.onerror = (error) => {
-                console.warn('⚠️ Error loading icon:', error, element)
-                resolve()
-              }
-              img.src = element.imagePath
-            })
-          } else if (element.symbol) {
-            // Symbol-based icons (render as text) - Match Konva's icon text positioning
-            const fontSize = Math.max(12, Math.min(element.width || 60, element.height || 60) * 0.6)
-            ctx.font = `${fontSize}px Arial`
-            ctx.fillStyle = element.fill || '#000000'
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            // Konva icon text uses center/middle alignment, so we calculate center
-            ctx.fillText(
-              element.symbol, 
-              element.x + (element.width || 60) / 2, 
-              element.y + (element.height || 60) / 2
-            )
-          }
-        } else if (element.type === 'qrcode' || (element.type === 'image' && element.assetName === 'QR Code')) {
-          // Handle QR codes - both explicit qrcode type and QR images
-          if (element.imageDataUrl || (element.image && element.image.src)) {
-            // QR code with image data
-            const img = new Image()
-            img.crossOrigin = 'anonymous'
-            
-            await new Promise((resolve, reject) => {
-              img.onload = () => {
-                // Improve QR code rendering quality
-                ctx.imageSmoothingEnabled = false // Disable smoothing for crisp QR codes
-                ctx.drawImage(img, element.x, element.y, element.width || 200, element.height || 200)
-                ctx.imageSmoothingEnabled = true // Re-enable for other elements
-                resolve()
-              }
-              img.onerror = (error) => {
-                console.warn('⚠️ Error loading QR code image, attempting to regenerate:', error, element)
-                // Fallback: try to regenerate QR code if we have qrData
-                if (element.qrData) {
-                  try {
-                    // Generate QR code on the fly using canvas 2D API
-                    // This is a simplified fallback - in production you'd want a proper QR library
-                    ctx.fillStyle = element.qrData.backgroundColor || '#ffffff'
-                    ctx.fillRect(element.x, element.y, element.width || 200, element.height || 200)
-                    ctx.strokeStyle = element.qrData.color || '#000000'
-                    ctx.strokeRect(element.x, element.y, element.width || 200, element.height || 200)
-                    
-                    // Add "QR" text as placeholder
-                    ctx.fillStyle = element.qrData.color || '#000000'
-                    ctx.font = '24px Arial'
-                    ctx.textAlign = 'center'
-                    ctx.textBaseline = 'middle'
-                    ctx.fillText('QR', element.x + (element.width || 200) / 2, element.y + (element.height || 200) / 2)
-                  } catch (fallbackError) {
-                    console.error('⚠️ QR code fallback rendering failed:', fallbackError)
-                  }
-                }
-                resolve()
-              }
-              
-              // Use imageDataUrl or image.src
-              if (element.imageDataUrl) {
-                img.src = element.imageDataUrl
-              } else if (element.image && element.image.src) {
-                img.src = element.image.src
-              } else {
-                console.warn('⚠️ QR code has no image data, using fallback')
-                // Fallback rendering
-                if (element.qrData) {
-                  ctx.fillStyle = element.qrData.backgroundColor || '#ffffff'
-                  ctx.fillRect(element.x, element.y, element.width || 200, element.height || 200)
-                  ctx.strokeStyle = element.qrData.color || '#000000'
-                  ctx.strokeRect(element.x, element.y, element.width || 200, element.height || 200)
-                  
-                  // Add "QR" text as placeholder
-                  ctx.fillStyle = element.qrData.color || '#000000'
-                  ctx.font = '24px Arial'
-                  ctx.textAlign = 'center'
-                  ctx.textBaseline = 'middle'
-                  ctx.fillText('QR', element.x + (element.width || 200) / 2, element.y + (element.height || 200) / 2)
-                }
-                resolve()
-              }
-            })
-          } else if (element.qrData) {
-            // QR code without image data - render fallback
-            ctx.fillStyle = element.qrData.backgroundColor || '#ffffff'
-            ctx.fillRect(element.x, element.y, element.width || 200, element.height || 200)
-            ctx.strokeStyle = element.qrData.color || '#000000'
-            ctx.strokeRect(element.x, element.y, element.width || 200, element.height || 200)
-            
-            // Add "QR" text as placeholder
-            ctx.fillStyle = element.qrData.color || '#000000'
-            ctx.font = '24px Arial'
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.fillText('QR', element.x + (element.width || 200) / 2, element.y + (element.height || 200) / 2)
-          }
-        }
-        
-        // Restore canvas state if rotation was applied
-        if (hasRotation) {
-          ctx.restore()
-        }
-      }
-      
-      // Add BuyPrintz watermark to production image
-      try {
-        console.log('🎨 Adding BuyPrintz watermark to production image...')
-        const watermarkImg = new Image()
-        watermarkImg.crossOrigin = 'anonymous'
-        
-        await new Promise((resolve, reject) => {
-          watermarkImg.onload = () => {
-            // Calculate watermark size and position
-            const watermarkWidth = canvas.width * 0.8  // 80% of canvas width
-            const watermarkHeight = (watermarkImg.height / watermarkImg.width) * watermarkWidth
-            const watermarkX = (canvas.width - watermarkWidth) / 2
-            const watermarkY = (canvas.height - watermarkHeight) / 2
-            
-            // Set transparency and blend mode for watermark
-            ctx.globalAlpha = 0.15  // 15% opacity for subtle watermark
-            ctx.globalCompositeOperation = 'multiply'  // Blend with underlying content
-            
-            // Draw watermark
-            ctx.drawImage(watermarkImg, watermarkX, watermarkY, watermarkWidth, watermarkHeight)
-            
-            // Reset canvas properties
-            ctx.globalAlpha = 1.0
-            ctx.globalCompositeOperation = 'source-over'
-            
-            console.log('✅ BuyPrintz watermark added to production image')
-            resolve()
-          }
-          watermarkImg.onerror = (error) => {
-            console.warn('⚠️ Could not load watermark image from /assets/images/BuyPrintz_Watermark_1200px_72dpi.png:', error)
-            console.warn('⚠️ Trying alternative watermark path...')
-            // Try alternative path
-            watermarkImg.src = '/BuyPrintz_Watermark_1200px_72dpi.png'
-            watermarkImg.onerror = (altError) => {
-              console.error('⚠️ Could not load watermark from any path:', altError)
-              resolve() // Continue without watermark rather than failing
-            }
-          }
-          watermarkImg.src = '/assets/images/BuyPrintz_Watermark_1200px_72dpi.png'
-        })
-      } catch (error) {
-        console.warn('⚠️ Error adding watermark:', error)
-        // Continue without watermark rather than failing
-      }
-      
-      // Convert to data URL
-      const imageDataUrl = canvas.toDataURL('image/png', 0.8)
-      console.log('🎨 Generated canvas image successfully for surface:', targetSurface || 'default')
-      return imageDataUrl
-      
-    } catch (error) {
-      console.error('Error generating canvas image:', error)
-      return null
-    }
-  }
-
-  // Modified useEffect to handle missing surface images
-  useEffect(() => {
-    const loadPreviewImage = async () => {
-      console.log('🎨 loadPreviewImage called - isOpen:', isOpen, 'orderDetails:', !!orderDetails, 'canvasData:', !!canvasData, 'previewImage exists:', !!previewImage)
-      if (isOpen && (orderDetails || canvasData)) {
-        console.log('🎨 PrintPreviewModal - Full order details:', orderDetails)
-        console.log('🎨 PrintPreviewModal - Canvas data:', canvasData)
-        console.log('🎨 PrintPreviewModal - Surface images keys:', Object.keys((canvasData?.surface_images || orderDetails?.surface_images) || {}))
-        console.log('🎨 PrintPreviewModal - Design option from order:', orderDetails?.design_option)
-        
-        // Get images from orderDetails (where they're actually stored after capture)
-        const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
-        const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
-        
-        console.log('🎨 Debug - orderDetails.surface_images:', orderDetails?.surface_images)
-        console.log('🎨 Debug - canvasData.surface_images:', canvasData?.surface_images)
-        
-        console.log('🎨 Debug - hasMultipleSurfaces():', hasMultipleSurfaces())
-        console.log('🎨 Debug - surfaceImages:', surfaceImages)
-        console.log('🎨 Debug - canvasImage:', canvasImage)
-        console.log('🎨 Debug - selectedSurface:', selectedSurface)
-        
-        // Simplified image loading logic
-        console.log('🎨 Image loading path check - hasMultipleSurfaces:', hasMultipleSurfaces(), 'surfaceImages keys:', Object.keys(surfaceImages || {}), 'surfaceImages length:', Object.keys(surfaceImages || {}).length)
-        
-        if (hasMultipleSurfaces() && surfaceImages && surfaceImages[selectedSurface]) {
-          console.log('🎨 Taking path: hasMultipleSurfaces with surface images')
-          const surfaceImage = surfaceImages[selectedSurface]
-          console.log(`🎨 Found surface image for ${selectedSurface}:`, typeof surfaceImage)
-          setPreviewImage(surfaceImage)
-        } else if (hasMultipleSurfaces()) {
-          console.log('🎨 Taking path: multi-surface but no surface images, generating from surface elements')
-          // For multi-surface products, always generate from surface elements to ensure unique images
-          const generatedImage = await generateCanvasImageFromData(selectedSurface)
-          console.log('🎨 Setting preview image (generated for surface):', generatedImage ? 'Generated successfully' : 'Failed to generate')
-          setPreviewImage(generatedImage)
-        } else if (canvasImage) {
-          console.log('🎨 Taking path: has canvasImage')
-          setPreviewImage(canvasImage)
-        } else {
-          console.log('🎨 Taking path: no images available, generating from canvas data')
-          // Only generate if we don't already have a preview image
-          if (!previewImage) {
-            const generatedImage = await generateCanvasImageFromData(hasMultipleSurfaces() ? selectedSurface : null)
-            console.log('🎨 Setting preview image (generated):', generatedImage ? 'Generated successfully' : 'Failed to generate')
-            setPreviewImage(generatedImage)
-          } else {
-            console.log('🎨 Preview image already exists, skipping generation')
-          }
-        }
-      setIsGenerating(false)
+         // NO FALLBACK TO CANVAS2D - Force proper Konva capture
+         console.warn('🚫 NO IMAGE AVAILABLE - Canvas2D generation has been PURGED!')
+         console.warn('🚫 Ensure all surfaces are captured using Konva stageRef.current.toDataURL()')
+         console.warn('🚫 Selected surface:', selectedSurface, 'Current surface:', currentSurface)
+         console.warn('🚫 Available surface images:', Object.keys(surfaceImages || {}))
+         console.warn('🚫 Konva stage image available:', !!canvasData?.konvaStageImage)
+         
+         // PRIORITY 4: If selected surface is current surface, use Konva stage image anyway
+         if (selectedSurface === currentSurface && canvasData?.konvaStageImage) {
+           console.log('🎨 ⚠️ FALLBACK: Using Konva stage image for missing surface data')
+           setPreviewImage(canvasData.konvaStageImage)
+           return
+         }
+         
+         setPreviewImage(null)
       }
     }
     
     loadPreviewImage()
-  }, [isOpen, orderDetails, canvasData, selectedSurface])
+  }, [isOpen, orderDetails, canvasData, selectedSurface, currentSurface])
 
-  // Debug image dimensions when it loads
-  const handleImageLoad = (event) => {
-    const img = event.target
-    console.log('Image loaded:', {
-      naturalWidth: img.naturalWidth,
-      naturalHeight: img.naturalHeight,
-      clientWidth: img.clientWidth,
-      clientHeight: img.clientHeight,
-      offsetWidth: img.offsetWidth,
-      offsetHeight: img.offsetHeight
-    })
+  // Handle surface navigation
+  const handlePreviousSurface = () => {
+    const surfaces = getAllSurfaces()
+    const newIndex = currentSurfaceIndex > 0 ? currentSurfaceIndex - 1 : surfaces.length - 1
+    navigateToSurface(newIndex)
   }
 
-  // Debug previewImage state changes
-  useEffect(() => {
-    console.log('🎨 PreviewImage state changed:', previewImage ? 'Has image' : 'No image')
-    if (previewImage) {
-      console.log('🎨 PreviewImage type:', typeof previewImage)
-      console.log('🎨 PreviewImage length:', previewImage.length)
-      console.log('🎨 PreviewImage starts with:', previewImage.substring(0, 50))
-    }
-  }, [previewImage])
-
-  // Set image scale consistently across all devices to preserve element positioning
-  useEffect(() => {
-    const updateScale = () => {
-      // Use consistent scaling across all devices to prevent element positioning issues
-      setImageScale(1.0)
-    }
-    
-    updateScale()
-    window.addEventListener('resize', updateScale)
-    return () => window.removeEventListener('resize', updateScale)
-  }, [])
-
-  // Generate PDF only when user approves (for production)
-  const generatePDFForProduction = async () => {
-    try {
-      setIsGenerating(true)
-      
-      // Get canvas image from canvasData first, fallback to orderDetails
-      let canvasImage = canvasData?.canvas_image || orderDetails?.canvas_image
-      
-      // If no canvas image available, generate one from canvas data
-      if (!canvasImage) {
-        console.log('No canvas image available, generating from canvas data for PDF...')
-        // For multi-surface products, generate image for the current surface
-        const targetSurface = hasMultipleSurfaces() ? selectedSurface : null
-        canvasImage = await generateCanvasImageFromData(targetSurface)
-      }
-      
-      if (canvasImage) {
-        console.log('Generating production PDF from high-quality canvas image...')
-        const pdfBlob = await createPDFFromImage(canvasImage)
-        return pdfBlob // Return the PDF blob
-      } else {
-        console.error('No canvas image available for PDF generation!')
-        throw new Error('No canvas image available')
-      }
-    } catch (error) {
-      console.error('Error generating production PDF:', error)
-      throw error
-    } finally {
-      setIsGenerating(false)
-    }
+  const handleNextSurface = () => {
+    const surfaces = getAllSurfaces()
+    const newIndex = currentSurfaceIndex < surfaces.length - 1 ? currentSurfaceIndex + 1 : 0
+    navigateToSurface(newIndex)
   }
 
-  // Create PDF directly from canvas image (production quality)
+  // Create PDF from Konva image (production quality)
   const createPDFFromImage = async (imageDataURL) => {
     try {
       let pdfWidthInches, pdfHeightInches
       
       if (productType === 'tent') {
         // For tents, use pixel dimensions converted to inches at 150 DPI
-        const surfaceDims = getCurrentSurfaceDimensions()
-        pdfWidthInches = surfaceDims.width / 150 // Convert pixels to inches at 150 DPI
-        pdfHeightInches = surfaceDims.height / 150
+        const canvasSize = canvasData?.canvasSize || { width: 1160, height: 1049 }
+        pdfWidthInches = canvasSize.width / 150
+        pdfHeightInches = canvasSize.height / 150
       } else {
         // For banners and tins, convert feet to inches for printing
-      const printWidthFeet = parseFloat(dimensions.width) || 2
-      const printHeightFeet = parseFloat(dimensions.height) || 4
+        const printWidthFeet = parseFloat(dimensions.width) || 2
+        const printHeightFeet = parseFloat(dimensions.height) || 4
         pdfWidthInches = printWidthFeet * 12
         pdfHeightInches = printHeightFeet * 12
       }
@@ -993,16 +250,15 @@ const PrintPreviewModal = ({
         precision: 16 // Maximum precision for production quality
       })
 
-      // Add the canvas image to PDF with maximum quality settings
-      // Use 'MEDIUM' quality for best balance of quality and file size
+      // Add the Konva image to PDF with maximum quality settings
       pdf.addImage(imageDataURL, 'PNG', 0, 0, pdfWidthInches, pdfHeightInches, undefined, 'MEDIUM', 0)
 
       // Create blob for production
       const pdfBlob = pdf.output('blob')
-      setPdfBlob(pdfBlob) // Also update state for other uses
+      setPdfBlob(pdfBlob)
       
-      console.log('Production-quality PDF created successfully!')
-      return pdfBlob // Return the blob
+      console.log('✅ Production-quality PDF created from Konva export!')
+      return pdfBlob
     } catch (error) {
       console.error('Error creating production PDF:', error)
       throw error
@@ -1010,340 +266,264 @@ const PrintPreviewModal = ({
   }
 
   const handleApprove = async () => {
-    try {
-      // Generate PDF for production only when user approves
-      const pdfBlob = await generatePDFForProduction()
-      
-      // Now we have the PDF blob, proceed with approval
-      if (pdfBlob) {
-        console.log('PDF generated successfully, proceeding with approval')
-        onApprove(pdfBlob)
-      } else {
-        console.error('PDF generation failed - cannot approve')
-        alert('PDF generation failed. Please try again.')
-      }
-    } catch (error) {
-      console.error('Error in approval process:', error)
-      alert('Error generating production PDF. Please try again.')
+    if (previewImage) {
+      await createPDFFromImage(previewImage)
+      onApprove?.()
     }
   }
 
+  const handleDownload = async () => {
+    if (!previewImage) return
+    
+    try {
+      setIsGenerating(true)
+      const pdfBlob = await createPDFFromImage(previewImage)
+      
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${productType}-design-production.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      
+    } catch (error) {
+      console.error('Download failed:', error)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const surfaces = getAllSurfaces()
+  const currentSurfaceData = surfaces.find(s => s.key === selectedSurface)
+
+  // Calculate actual DPI based on canvas size and product dimensions
+  const calculateDPI = () => {
+    if (productType === 'tent') {
+      // Tent canopy: 1160x1049 pixels for approximately 10x10 ft tent
+      const canvasSize = canvasData?.canvasSize || { width: 1160, height: 1049 }
+      // Approximate tent dimensions in inches (10ft = 120 inches)
+      const physicalWidth = 120 // inches
+      const dpi = Math.round(canvasSize.width / physicalWidth)
+      return dpi
+    } else if (productType === 'tin') {
+      // Business card tin: typically 3.5" x 2" 
+      const physicalWidth = 3.5 // inches
+      const canvasSize = canvasData?.canvasSize || { width: 374, height: 225 }
+      const dpi = Math.round(canvasSize.width / physicalWidth)
+      return dpi
+    } else {
+      // Banner: use provided dimensions or default
+      const widthFeet = parseFloat(dimensions?.width) || 2
+      const physicalWidth = widthFeet * 12 // convert to inches
+      const canvasSize = canvasData?.canvasSize || { width: 800, height: 600 }
+      const dpi = Math.round(canvasSize.width / physicalWidth)
+      return dpi
+    }
+  }
+
+  const currentDPI = calculateDPI()
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl w-[95vw] max-h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
-        <DialogHeader className="pb-4 sm:pb-6">
-          <DialogTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-            <Printer className="h-5 w-5" />
-            Print Preview & Approval
-            </div>
+      <DialogContent className="max-w-5xl w-[95vw] max-h-[90vh] mx-auto overflow-hidden">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Eye className="h-5 w-5" />
+            Print Preview - {productType.charAt(0).toUpperCase() + productType.slice(1)}
+            {hasMultipleSurfaces() && (
+              <Badge variant="outline" className="ml-2">
+                {currentSurfaceData?.name || selectedSurface}
+              </Badge>
+            )}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-8 pb-4 sm:pb-6 justify-items-center">
-          {/* Left Column - Preview */}
-          <div className="space-y-3 sm:space-y-6 w-full max-w-2xl">
-            <Card className="w-full">
-              <CardHeader className="pb-3 sm:pb-4">
-                <CardTitle className="flex items-center gap-2 text-center justify-center">
-                  <Eye className="h-4 w-4" />
-                  Design Preview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4">
-                 {isGenerating ? (
-                   <div className="flex items-center justify-center p-4 sm:p-12">
-                     <div className="text-center space-y-2">
-                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                       <p className="text-sm text-gray-600">Generating your {productType} preview...</p>
-                     </div>
-                   </div>
-                 ) : previewImage ? (
-                   <div className="space-y-3 sm:space-y-4">
-                     {/* Multi-Surface Preview for Tins and Tents */}
-                     {(productType === 'tin' || productType === 'tent') ? (
-                       <SurfaceThumbnailViewer
-                         productType={productType}
-                         orderDetails={orderDetails}
-                         canvasData={canvasData}
-                         surfaceElements={surfaceElements}
-                         designOption={orderDetails?.design_option}
-                         tentDesignOption={orderDetails?.tent_design_option}
-                         tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
-                       />
-                     ) : (
-                       /* Design Preview */
-                       <div className="bg-gray-100 rounded-lg p-3 sm:p-6 flex items-center justify-center overflow-hidden">
-                         <div className="relative flex items-center justify-center w-full max-w-lg mx-auto" style={{ 
-                           minHeight: window.innerWidth < 768 ? '200px' : '300px',
-                           maxHeight: window.innerWidth < 768 ? '240px' : '400px'
-                         }}>
-                           {previewImage ? (
-                             <div className="relative">
-                             <img
-                               src={previewImage}
-                               alt="Banner Design Preview"
-                               className="rounded border shadow-lg"
-                               style={{
-                                 width: 'auto',
-                                 height: 'auto',
-                                 maxWidth: '100%',
-                                   maxHeight: window.innerWidth < 768 ? '200px' : '280px',
-                                   minHeight: window.innerWidth < 768 ? '150px' : '250px',
-                                 objectFit: 'contain',
-                                   transform: 'scale(1.0)',
-                                 transformOrigin: 'center center'
-                               }}
-                               onLoad={handleImageLoad}
-                             />
-                               
-                               {/* BuyPrintz Watermark Overlay - IP Protection - Consistent across all devices */}
-                               <div 
-                                 className="absolute inset-0 pointer-events-none" 
-                                 style={{ 
-                                   zIndex: 10
-                                 }}
-                               >
-                                 <img
-                                   src="/assets/images/BuyPrintz_Watermark_1200px_72dpi.png"
-                                   alt="BuyPrintz Watermark"
-                                   className="w-full h-full object-cover"
-                                   style={{
-                                     position: 'absolute',
-                                     top: 0,
-                                     left: 0,
-                                     opacity: 0.3
-                                   }}
-                                 />
-                               </div>
-                               
-                               {/* Preview label */}
-                               <div 
-                                 className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs" 
-                                 style={{ 
-                                   zIndex: 20
-                                 }}
-                               >
-                                 Preview
-                               </div>
-                             </div>
-                           ) : (
-                             <div className="text-center text-gray-500 p-8">
-                               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                               <p className="text-sm">No preview available</p>
-                             </div>
-                           )}
-                         </div>
-                       </div>
-                     )}
-                     
-                     {/* Print Information */}
-                     <div className="bg-green-50 rounded-lg p-2 sm:p-4">
-                       <div className="text-center">
-                         <p className="text-sm font-medium text-green-900">
-                           {productType === 'tent' ? (
-                             `${getCurrentSurfaceDimensions().width}px × ${getCurrentSurfaceDimensions().height}px - ${getCurrentSurfaceDimensions().shape}`
-                           ) : (
-                             `${dimensions.width}ft × ${dimensions.height}ft`
-                           )} - Production Ready
-                         </p>
-                         <p className="text-xs text-green-700 mt-1">
-                           This is the exact image that will be printed
-                         </p>
-                       </div>
-                     </div>
-
-                     {/* Quick Actions */}
-                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+           {/* Left Column: Preview + Quality Assurance */}
+           <div className="lg:col-span-2 space-y-6">
+             {/* Design Preview */}
+             <Card className="overflow-hidden">
+               <CardHeader className="pb-3">
+                 <CardTitle className="text-lg flex items-center justify-between">
+                   <span>Design Preview</span>
+                   {hasMultipleSurfaces() && (
+                     <div className="flex items-center gap-2">
                        <Button
                          variant="outline"
-                         onClick={() => {
-                           if (!previewImage) {
-                             alert('No preview image available for download')
-                             return
-                           }
-                           
-                           try {
-                             // Create a temporary link element for download
-                           const link = document.createElement('a')
-                             let filename = 'design'
-                             
-                             if (productType === 'tent') {
-                               filename = `tent-${orderDetails?.tent_size || '10x10'}-${selectedSurface.replace('_', '-')}`
-                             } else if (productType === 'tin') {
-                               filename = `tin-${selectedSurface}`
-                             } else {
-                               filename = `banner-${orderDetails?.banner_type || 'custom'}`
-                             }
-                             
-                             // Set download attributes
-                             link.download = `${filename}.png`
-                           link.href = previewImage
-                             link.target = '_blank'
-                             
-                             // Append to body, click, and remove (for mobile compatibility)
-                             document.body.appendChild(link)
-                           link.click()
-                             document.body.removeChild(link)
-                             
-                             console.log('Download initiated for:', filename)
-                           } catch (error) {
-                             console.error('Download failed:', error)
-                             alert('Download failed. Please try again.')
-                           }
-                         }}
-                         className="flex items-center gap-2"
-                         disabled={!previewImage}
+                         size="sm"
+                         onClick={handlePreviousSurface}
+                         disabled={surfaces.length <= 1}
                        >
-                         <Download className="h-4 w-4" />
-                         Download Production Image
+                         ← Previous
+                       </Button>
+                       <span className="text-sm text-muted-foreground">
+                         {currentSurfaceIndex + 1} of {surfaces.length}
+                       </span>
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={handleNextSurface}
+                         disabled={surfaces.length <= 1}
+                       >
+                         Next →
                        </Button>
                      </div>
-                   </div>
-                 ) : (
-                  <div className="flex items-center justify-center p-6 sm:p-12">
-                    <div className="text-center space-y-2">
-                      <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto" />
-                      <p className="text-sm text-gray-600">No preview available</p>
-                    </div>
+                   )}
+                 </CardTitle>
+               </CardHeader>
+               <CardContent className="overflow-hidden">
+                  <div className="w-full h-[400px] lg:h-[500px] bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
+                    {previewImage ? (
+                      <div className="w-full h-full flex items-center justify-center p-4">
+                        <img 
+                          src={previewImage} 
+                          alt="Design Preview"
+                          className="object-contain rounded shadow-lg"
+                          style={{
+                            transform: `scale(${imageScale})`,
+                            transition: 'transform 0.2s ease-in-out',
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: 'auto',
+                            height: 'auto'
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-center space-y-3">
+                        <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+                         <div>
+                           <p className="text-lg font-medium text-gray-900">Preview Not Available</p>
+                           <p className="text-sm text-gray-500 mt-1">
+                             Please save your design and try again.
+                           </p>
+                         </div>
+                      </div>
+                    )}
                   </div>
-                 )}
                </CardContent>
-            </Card>
-          </div>
+             </Card>
 
-          {/* Right Column - Specifications */}
-          <div className="space-y-3 sm:space-y-6 w-full max-w-2xl">
-            {/* Print Specifications */}
-            <Card className="w-full">
-              <CardHeader className="pb-3 sm:pb-4">
-                <CardTitle className="flex items-center gap-2 text-center justify-center">
-                  <FileText className="h-4 w-4" />
-                  Print Specifications
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-sm font-medium text-gray-600">Dimensions</p>
-                    <Badge variant="outline">
-                      {productType === 'tent' ? (
-                        `${getCurrentSurfaceDimensions().width}px × ${getCurrentSurfaceDimensions().height}px`
-                      ) : (
-                        `${dimensions.width}ft × ${dimensions.height}ft`
-                      )}
-                    </Badge>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-sm font-medium text-gray-600">Material</p>
-                    <Badge variant="outline">
-                      {productType === 'tent' ? (
-                        orderDetails?.tent_material || '6oz Tent Fabric'
-                      ) : productType === 'tin' ? (
-                        'Premium Vinyl Stickers'
-                      ) : (
-                        orderDetails?.banner_material || 'Standard Vinyl'
-                      )}
-                    </Badge>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-sm font-medium text-gray-600">
-                      {productType === 'tent' ? 'Print Method' : 'Finish'}
-                    </p>
-                    <Badge variant="outline">
-                      {productType === 'tent' ? (
-                        orderDetails?.tent_print_method || 'Dye-Sublimation'
-                      ) : productType === 'tin' ? (
-                        orderDetails?.tin_finish || 'Silver'
-                      ) : (
-                        orderDetails?.banner_finish || 'Matte'
-                      )}
-                    </Badge>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-sm font-medium text-gray-600">Quantity</p>
-                    <Badge variant="outline">
-                      {orderDetails?.quantity || 1} piece(s)
-                    </Badge>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-sm font-medium text-gray-600">Resolution</p>
-                    <Badge variant="outline" className="bg-green-50 text-green-700">
-                      {productType === 'tent' ? '150 DPI' : '300 DPI'}
-                    </Badge>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-sm font-medium text-gray-600">Color Profile</p>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                      CMYK
-                    </Badge>
-                  </div>
-                </div>
-                
-                {/* Tent-specific specifications */}
-                {productType === 'tent' && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                      <div className="space-y-2 sm:space-y-3">
-                        <p className="text-sm font-medium text-gray-600">Tent Size</p>
-                        <Badge variant="outline">
-                          {orderDetails?.tent_size || '10x10'}
-                        </Badge>
-                      </div>
-                      <div className="space-y-2 sm:space-y-3">
-                        <p className="text-sm font-medium text-gray-600">Frame Type</p>
-                        <Badge variant="outline">
-                          {orderDetails?.tent_frame_type || '40mm Aluminum Hex'}
-                        </Badge>
-                      </div>
-                      <div className="space-y-2 sm:space-y-3">
-                        <p className="text-sm font-medium text-gray-600">Surface Shape</p>
-                        <Badge variant="outline" className="bg-purple-50 text-purple-700">
-                          {getCurrentSurfaceDimensions().shape}
-                        </Badge>
-                      </div>
-                      <div className="space-y-2 sm:space-y-3">
-                        <p className="text-sm font-medium text-gray-600">Surface Type</p>
-                        <Badge variant="outline" className="bg-orange-50 text-orange-700">
-                          {selectedSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+             {/* Quality Assurance */}
+             <Card>
+               <CardHeader className="pb-3">
+                 <CardTitle className="text-lg">Quality Assurance</CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-3">
+                 <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                   <p className="text-sm font-medium text-amber-800 mb-2">Important Notice</p>
+                   <p className="text-sm text-amber-700">
+                     Please review all surfaces carefully. Orders are <strong>non-refundable</strong> once approved and sent to production.
+                   </p>
+                 </div>
+                 <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                   <p className="text-sm font-medium text-green-800 mb-2">Quality Guarantee</p>
+                   <p className="text-sm text-green-700">
+                     All designs are reviewed for print quality and technical requirements before production begins.
+                   </p>
+                 </div>
+               </CardContent>
+             </Card>
+           </div>
 
-            {/* Print Ready Status */}
-            <Alert variant="success" className="p-2 sm:p-4">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
-                <strong>Ready for Production!</strong><br />
-                Your design meets all print quality requirements and is ready to be sent to our production facility.
-              </AlertDescription>
-            </Alert>
-          </div>
-        </div>
+           {/* Right Column: Surfaces + Print Specs + Actions */}
+           <div className="space-y-6">
+             {/* All Surfaces */}
+             {hasMultipleSurfaces() && (
+               <Card>
+                 <CardHeader className="pb-3">
+                   <CardTitle className="text-lg">All Surfaces</CardTitle>
+                 </CardHeader>
+                 <CardContent className="overflow-y-auto max-h-[400px]">
+                    <SurfaceThumbnailViewer
+                      orderDetails={orderDetails}
+                      canvasData={canvasData}
+                      surfaceElements={surfaceElements}
+                      productType={productType}
+                      onSurfaceSelect={setSelectedSurface}
+                      selectedSurface={selectedSurface}
+                      designOption={orderDetails?.design_option || orderDetails?.tent_design_option}
+                      tentDesignOption={orderDetails?.tent_design_option}
+                      tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
+                      dimensions={canvasData?.canvasSize || dimensions}
+                      currentSurface={currentSurface}
+                    />
+                 </CardContent>
+               </Card>
+             )}
 
-        {/* Approval Buttons - Centered Layout */}
-        <div className="p-4 sm:p-6 border-t bg-gray-50 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[120px]"
-            >
-              <X className="h-4 w-4" />
-              Cancel
-            </Button>
-            
-            <Button
-              onClick={handleApprove}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[140px]"
-            >
-              <Check className="h-4 w-4" />
-              Approve & Print
-            </Button>
-          </div>
+             {/* Print Specifications */}
+             <Card>
+               <CardHeader className="pb-2">
+                 <CardTitle className="text-sm">Print Specifications</CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-2">
+                 <div className="grid grid-cols-2 gap-2 text-xs">
+                   <div className="bg-white p-2 rounded border">
+                     <p className="font-medium text-gray-600 mb-1">Resolution</p>
+                     <div className="flex items-center gap-1">
+                       <span className="text-gray-900 font-medium">{currentDPI} DPI</span>
+                       {currentDPI >= 150 ? (
+                         <span className="text-green-600 text-xs">✓</span>
+                       ) : currentDPI >= 100 ? (
+                         <span className="text-yellow-600 text-xs">⚠</span>
+                       ) : (
+                         <span className="text-red-600 text-xs">⚠</span>
+                       )}
+                     </div>
+                   </div>
+                   <div className="bg-white p-2 rounded border">
+                     <p className="font-medium text-gray-600 mb-1">Color</p>
+                     <p className="text-gray-900 font-medium">CMYK</p>
+                   </div>
+                 </div>
+                 <div className="bg-blue-50 border border-blue-200 p-2 rounded text-xs">
+                   <p className="text-blue-700">
+                     {currentDPI >= 150 ? 'Excellent quality' :
+                      currentDPI >= 100 ? 'Good quality' :
+                      'Consider higher resolution'}
+                   </p>
+                 </div>
+               </CardContent>
+             </Card>
+
+             {/* Actions */}
+             <Card>
+               <CardHeader className="pb-3">
+                 <CardTitle className="text-lg">Actions</CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-3">
+                 <Button
+                   onClick={handleDownload}
+                   disabled={!previewImage || isGenerating}
+                   className="w-full"
+                   variant="outline"
+                 >
+                   <Download className="h-4 w-4 mr-2" />
+                   {isGenerating ? 'Generating PDF...' : 'Download Production PDF'}
+                 </Button>
+                 
+                 <Button
+                   onClick={handleApprove}
+                   disabled={!previewImage}
+                   className="w-full bg-green-600 hover:bg-green-700"
+                 >
+                   <CheckCircle className="h-4 w-4 mr-2" />
+                   Approve Design
+                 </Button>
+               </CardContent>
+             </Card>
+           </div>
+         </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+            Close
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

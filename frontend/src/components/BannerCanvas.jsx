@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback, forwardRef } from 'react'
 import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
 import { 
   ZoomIn, 
@@ -50,7 +50,7 @@ Konva.hitOnDragEnabled = true
 Konva.captureTouchEventsEnabled = true
 
 
-const BannerCanvas = ({
+const BannerCanvas = forwardRef(({
   elements,
   setElements,
   selectedId,
@@ -66,8 +66,7 @@ const BannerCanvas = ({
   onSurfaceChange,
   availableSurfaces = [],
   clipFunc = null
-}) => {
-  const stageRef = useRef()
+}, stageRef) => {
   const transformerRef = useRef()
   const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
@@ -1148,9 +1147,9 @@ const BannerCanvas = ({
             stroke={safeElement.stroke || null}
             strokeWidth={safeElement.strokeWidth || 0}
             align={safeElement.align || 'left'}
-            verticalAlign={safeElement.verticalAlign || 'top'}
+            verticalAlign="top"
             width={safeElement.width || 200}
-            height={safeElement.height || 'auto'}
+            height="auto"
             padding={safeElement.padding || 0}
             wrap="word"
             lineHeight={safeElement.lineHeight || 1.2}
@@ -3095,6 +3094,6 @@ const BannerCanvas = ({
 
     </div>
   )
-}
+})
 
 export default BannerCanvas

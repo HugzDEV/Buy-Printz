@@ -26,6 +26,7 @@ import cacheService from '../services/cache'
 const BannerEditorNew = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const stageRef = useRef() // Add stageRef to BannerEditor
   
   // Product type selection - Must be declared first
   const [productType, setProductType] = useState(() => {
@@ -166,6 +167,74 @@ const BannerEditorNew = () => {
     sidewall_right: [],
     backwall: []
   })
+  
+  // Store captured surface images (Konva exports for each surface)
+  const [surfaceImages, setSurfaceImages] = useState({})
+  
+  // Generate canvas image data for preview - MOVED UP for use in handleSurfaceChange
+  const generateCanvasImage = useCallback(() => {
+    try {
+      // PRIORITY 1: Use Konva native export for perfect alignment
+      if (stageRef.current) {
+        console.log('🎨 Using Konva native export (toDataURL) - eliminates alignment issues')
+        const imageData = stageRef.current.toDataURL({
+          pixelRatio: 2, // High quality export
+          mimeType: 'image/png',
+          quality: 0.8
+        })
+        console.log('🎨 Konva image generated successfully, length:', imageData.length)
+        
+        // Check if image is too large (limit to 5MB)
+        if (imageData.length > 5 * 1024 * 1024) {
+          console.warn('🎨 Konva image too large, reducing quality')
+          return stageRef.current.toDataURL({
+            pixelRatio: 1, // Reduce pixel ratio for smaller file
+            mimeType: 'image/png',
+            quality: 0.5
+          })
+        }
+        
+        return imageData
+      }
+      
+      // FALLBACK: Canvas method if Konva fails
+      const selectors = [
+        '.konvajs-content canvas',
+        'canvas[data-konva-stage]',
+        'canvas',
+        '[data-konva-stage] canvas'
+      ]
+      
+      let stageElement = null
+      for (const selector of selectors) {
+        stageElement = document.querySelector(selector)
+        if (stageElement) {
+          console.log('Found canvas with selector:', selector)
+          break
+        }
+      }
+      
+      if (stageElement) {
+        console.log('🎨 Falling back to canvas export method')
+        const imageData = stageElement.toDataURL('image/png', 0.8)
+        console.log('Canvas image generated successfully, length:', imageData.length)
+        
+        // Check if image is too large (limit to 5MB)
+        if (imageData.length > 5 * 1024 * 1024) {
+          console.warn('Canvas image too large, reducing quality')
+          return stageElement.toDataURL('image/png', 0.5)
+        }
+        
+        return imageData
+      }
+      
+      console.warn('No canvas element found for image generation')
+      return null
+    } catch (error) {
+      console.error('Failed to generate canvas image:', error)
+      return null
+    }
+  }, [stageRef])
   
   // Function to copy design elements between surfaces
   const copyDesignToSurface = useCallback((sourceSurface, targetSurface) => {
@@ -427,9 +496,9 @@ const BannerEditorNew = () => {
     },
     tent: {
       name: 'Tradeshow Tent',
-      defaultSize: { width: 1160, height: 789 }, // Canopy default (116" x 78.86" scaled to pixels)
+      defaultSize: { width: 1160, height: 1049 }, // Canopy + valence default (789px + 20px gap + 200px valence + 40px padding)
       sizes: [
-        { name: 'Canopy', width: 1160, height: 789, orientation: 'landscape', category: 'canopy' },
+        { name: 'Canopy + Valence', width: 1160, height: 1049, orientation: 'landscape', category: 'canopy' },
         { name: 'Full Wall', width: 1110, height: 780, orientation: 'landscape', category: 'wall' },
         { name: 'Half Wall', width: 1110, height: 370, orientation: 'landscape', category: 'wall' }
       ],
@@ -581,8 +650,30 @@ const BannerEditorNew = () => {
     })
   }, [productType])
 
-  // Handle surface navigation
+  // Handle surface navigation with automatic image capture
   const handleSurfaceChange = useCallback((surface) => {
+    // CAPTURE CURRENT SURFACE IMAGE BEFORE SWITCHING
+    if (productType === 'tin' || productType === 'tent') {
+      const currentElements = surfaceElements[currentSurface] || []
+      
+      // Only capture if current surface has elements
+      if (currentElements.length > 0) {
+        try {
+          const currentSurfaceImage = generateCanvasImage()
+          if (currentSurfaceImage) {
+            setSurfaceImages(prev => ({
+              ...prev,
+              [currentSurface]: currentSurfaceImage
+            }))
+            console.log(`🎨 AUTO-CAPTURED: Surface image for ${currentSurface} (${currentElements.length} elements)`)
+          }
+        } catch (error) {
+          console.warn('🎨 Failed to auto-capture surface image for:', currentSurface, error)
+        }
+      }
+    }
+    
+    // SWITCH TO NEW SURFACE
     setCurrentSurface(surface)
     // Clear selection when switching surfaces
     setSelectedId(null)
@@ -601,7 +692,7 @@ const BannerEditorNew = () => {
         setCanvasSize({ width: 1160, height: 1049 })
       }
     }
-  }, [productType])
+  }, [productType, currentSurface, surfaceElements, generateCanvasImage])
 
   // Handle available surfaces change from sidebar
   const handleAvailableSurfacesChange = useCallback((surfaces) => {
@@ -708,11 +799,17 @@ const BannerEditorNew = () => {
 
   // Add shape element
   const addShape = useCallback((shapeType) => {
+    // Konva coordinate system: center-positioned shapes (circle, star, triangle, hexagon) 
+    // use x,y as center, while top-left positioned shapes (rect, text, image) use x,y as top-left
+    const isCenterPositioned = ['circle', 'star', 'triangle', 'hexagon', 'octagon'].includes(shapeType)
+    
     const baseProps = {
       id: generateId(shapeType),
       type: shapeType,
-      x: canvasSize.width / 2 - 50,
-      y: canvasSize.height / 2 - 50,
+      // For center-positioned shapes: use exact center coordinates
+      // For top-left positioned shapes: offset by shape size for visual centering
+      x: isCenterPositioned ? canvasSize.width / 2 : canvasSize.width / 2 - 50,
+      y: isCenterPositioned ? canvasSize.height / 2 : canvasSize.height / 2 - 50,
       fill: '#6B7280', // Neutral gray instead of blue
       stroke: '#374151', // Darker gray for stroke
       strokeWidth: 2,
@@ -3029,107 +3126,106 @@ const BannerEditorNew = () => {
 
   // Create order
   const createOrder = useCallback(async () => {
-    // Generate canvas image data for preview
-    const generateCanvasImage = () => {
-      try {
-        // Try multiple selectors to find the Konva canvas
-        const selectors = [
-          '.konvajs-content canvas',
-          'canvas[data-konva-stage]',
-          'canvas',
-          '[data-konva-stage] canvas'
-        ]
-        
-        let stageElement = null
-        for (const selector of selectors) {
-          stageElement = document.querySelector(selector)
-          if (stageElement) {
-            console.log('Found canvas with selector:', selector)
-            break
-          }
-        }
-        
-        if (stageElement) {
-          // Use a higher quality export but limit size
-          const imageData = stageElement.toDataURL('image/png', 0.8)
-          console.log('Canvas image generated successfully, length:', imageData.length)
-          
-          // Check if image is too large (limit to 5MB)
-          if (imageData.length > 5 * 1024 * 1024) {
-            console.warn('Canvas image too large, reducing quality')
-            return stageElement.toDataURL('image/png', 0.5)
-          }
-          
-          return imageData
-        }
-        
-        console.warn('No canvas element found for image generation')
-        return null
-      } catch (error) {
-        console.error('Failed to generate canvas image:', error)
-        return null
-      }
-    }
 
-    // Capture images for all surfaces (proper multi-surface solution)
+    // MULTI-SURFACE QUALITY CONTROL: Capture ALL surfaces for print preview
+    // This is our "forced stop and check moment" - users MUST see all surfaces
     const captureAllSurfaceImages = async () => {
       if (productType === 'tin' || productType === 'tent') {
-        const surfaceImages = {}
+        console.log('🛡️ QUALITY CONTROL: Capturing ALL surfaces for mandatory review')
+        const allCapturedImages = { ...surfaceImages } // Start with auto-captured images
         
-        // Get all available surfaces
+        // Get all available surfaces based on product configuration
         const allSurfaces = productType === 'tin' 
           ? ['front', 'back', 'inside', 'lid']
           : ['canopy_front', 'canopy_back', 'canopy_left', 'canopy_right', 'sidewall_left', 'sidewall_right', 'backwall']
         
-        // Store current surface to restore later
+        // Store current surface to restore later (minimize UI disruption)
         const originalSurface = currentSurface
+        console.log('🛡️ QUALITY CONTROL: Original surface:', originalSurface)
         
         try {
-          // Capture image for each surface
+          // Capture EVERY surface that has elements (critical for templates/reprints)
           for (const surface of allSurfaces) {
-            // Get elements for this surface directly from surfaceElements
             const surfaceElementsForCapture = surfaceElements[surface] || []
             
-            if (surfaceElementsForCapture.length > 0) {
-              // Temporarily set current surface for canvas rendering
-              setCurrentSurface(surface)
-              
-              // Wait for the canvas to update
-              await new Promise(resolve => setTimeout(resolve, 300))
-              
-              // Capture the canvas image for this surface
-              const surfaceImage = generateCanvasImage()
-              if (surfaceImage) {
-                surfaceImages[surface] = surfaceImage
-                console.log(`🎨 Captured image for surface: ${surface} (${surfaceElementsForCapture.length} elements)`)
-              } else {
-                console.warn(`🎨 Failed to capture image for surface: ${surface}`)
-              }
+            // Skip truly empty surfaces
+            if (surfaceElementsForCapture.length === 0) {
+              console.log(`🛡️ QUALITY CONTROL: Surface ${surface} is empty - skipping`)
+              continue
+            }
+            
+            // Use auto-captured image if available (better performance)
+            if (allCapturedImages[surface]) {
+              console.log(`🛡️ QUALITY CONTROL: Using auto-captured image for ${surface}`)
+              continue
+            }
+            
+            // CRITICAL: Capture surfaces that have elements but weren't auto-captured
+            // This happens with templates/reprints where user didn't manually switch
+            console.log(`🛡️ QUALITY CONTROL: Force-capturing ${surface} (${surfaceElementsForCapture.length} elements) - user may not have visited this surface`)
+            
+            // Temporarily switch to surface for accurate capture
+            setCurrentSurface(surface)
+            
+            // Wait for Konva stage to update with new surface elements
+            await new Promise(resolve => setTimeout(resolve, 400)) // Slightly longer for reliability
+            
+            // Capture using Konva (same method as auto-capture)
+            const surfaceImage = generateCanvasImage()
+            if (surfaceImage) {
+              allCapturedImages[surface] = surfaceImage
+              console.log(`🛡️ QUALITY CONTROL: ✅ Captured ${surface} for mandatory review`)
             } else {
-              console.log(`🎨 Skipping empty surface: ${surface}`)
+              console.warn(`🛡️ QUALITY CONTROL: ⚠️ Failed to capture ${surface} - will show placeholder`)
             }
           }
           
-          // Restore original surface
+          // Restore original surface (minimize UI disruption)
           setCurrentSurface(originalSurface)
+          console.log('🛡️ QUALITY CONTROL: Restored original surface:', originalSurface)
           
-          console.log('🎨 Captured images for all surfaces:', Object.keys(surfaceImages))
-          return surfaceImages
+          // Wait for UI to stabilize
+          await new Promise(resolve => setTimeout(resolve, 200))
+          
+          console.log('🛡️ QUALITY CONTROL: All surfaces captured for mandatory review:', Object.keys(allCapturedImages))
+          return allCapturedImages
+          
         } catch (error) {
-          console.error('Error capturing surface images:', error)
+          console.error('🛡️ QUALITY CONTROL: Error during surface capture:', error)
+          
           // Restore original surface on error
           setCurrentSurface(originalSurface)
           
-          // Fallback: use current surface image for all
+          // Fallback: ensure user can still see SOMETHING for each surface
           const fallbackImage = generateCanvasImage()
           allSurfaces.forEach(surface => {
-            surfaceImages[surface] = fallbackImage
+            if (!allCapturedImages[surface] && (surfaceElements[surface] || []).length > 0) {
+              allCapturedImages[surface] = fallbackImage
+              console.log(`🛡️ QUALITY CONTROL: Using fallback image for ${surface}`)
+            }
           })
-          return surfaceImages
+          
+          return allCapturedImages
         }
       }
       
       return { front: generateCanvasImage() }
+    }
+
+    // CAPTURE FINAL SURFACE IMAGE before checkout
+    if ((productType === 'tin' || productType === 'tent') && elements.length > 0) {
+      try {
+        const finalSurfaceImage = generateCanvasImage()
+        if (finalSurfaceImage) {
+          setSurfaceImages(prev => ({
+            ...prev,
+            [currentSurface]: finalSurfaceImage
+          }))
+          console.log(`🎨 FINAL-CAPTURED: Surface image for ${currentSurface} before checkout`)
+        }
+      } catch (error) {
+        console.warn('🎨 Failed to capture final surface image:', error)
+      }
     }
 
     // Navigate to checkout with design data
@@ -3149,10 +3245,12 @@ const BannerEditorNew = () => {
         canvasSize,
         backgroundColor,
         bannerSpecs,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        konvaStageImage: generateCanvasImage(), // Include Konva export for current surface (generateCanvasImage handles stageRef internally)
+        surface_images: surfaceImages // Include auto-captured surface images for preview modal
       },
       canvas_image: generateCanvasImage(),
-      surface_images: await captureAllSurfaceImages(),
+      surface_images: await captureAllSurfaceImages(), // QUALITY CONTROL: Ensure ALL surfaces are captured
       surface_elements: surfaceElements, // Include surface elements for restoration
       
       // Marketplace templates used in the design
@@ -3225,8 +3323,8 @@ const BannerEditorNew = () => {
     const orderDataForStorage = {
       ...orderData,
       canvas_image: null, // Canvas image is in Supabase, not needed in sessionStorage
-      // Remove large image data that causes quota exceeded errors
-      surface_images: null, // Will be regenerated when needed
+      // Keep surface_images for print preview modal - these are essential for quality control
+      surface_images: orderData.surface_images, // CRITICAL: Keep for print preview modal
       // Ensure tent_specs is properly included
       tent_specs: finalTentSpecs,
       // Clean surface_elements to remove image objects but preserve structure
@@ -3274,7 +3372,7 @@ const BannerEditorNew = () => {
     } else {
       navigate('/checkout')
     }
-  }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate, productType, marketplaceTemplates])
+  }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate, productType, marketplaceTemplates, generateCanvasImage, surfaceImages, currentSurface, surfaceElements, tentDesignOption, tentSpecs, tinSpecs, canvasOrientation])
 
   // Helper function to find the correct image path for an asset
   const findAssetImagePath = useCallback(async (assetName) => {
@@ -4213,6 +4311,7 @@ const BannerEditorNew = () => {
           transition-all duration-300 ease-in-out
         `}>
           <BannerCanvas
+            ref={stageRef}
             elements={elements}
             setElements={setElements}
             selectedId={selectedId}

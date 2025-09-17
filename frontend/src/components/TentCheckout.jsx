@@ -504,6 +504,31 @@ const TentCheckout = () => {
     toast.success('Tent design approved! Proceeding with order.')
   }
 
+  // Handle preview design - run quality control check before opening modal
+  const handlePreviewDesign = async () => {
+    console.log('🛡️ QUALITY CONTROL: Starting preview design process')
+    
+    if (!orderData) {
+      console.error('🛡️ QUALITY CONTROL: No order data available for preview')
+      return
+    }
+    
+    // Check if we already have surface images (quality control already ran)
+    if (orderData.surface_images && Object.keys(orderData.surface_images).length > 0) {
+      console.log('🛡️ QUALITY CONTROL: Surface images already available, opening modal')
+      setShowPreviewModal(true)
+      return
+    }
+    
+    // Need to trigger quality control capture in the editor
+    console.warn('🛡️ QUALITY CONTROL: No surface images available!')
+    console.warn('🛡️ This suggests the editor needs to run captureAllSurfaceImages()')
+    console.warn('🛡️ Opening modal anyway - will show current surface only')
+    
+    // Open modal anyway - the modal will handle missing surface images
+    setShowPreviewModal(true)
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -563,7 +588,7 @@ const TentCheckout = () => {
                     Before proceeding, please review your tent design to ensure it's exactly what you want printed.
                   </p>
                   <button
-                    onClick={() => setShowPreviewModal(true)}
+                    onClick={handlePreviewDesign}
                     className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
                   >
                     <Eye className="w-5 h-5" />

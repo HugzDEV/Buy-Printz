@@ -7,12 +7,13 @@ const SurfaceThumbnailViewer = ({
   surfaceElements,
   designOption,
   tentDesignOption,
-  tinSurfaceCoverage
+  tinSurfaceCoverage,
+  onSurfaceSelect,
+  selectedSurface,
+  currentSurface
 }) => {
   const [surfaceThumbnails, setSurfaceThumbnails] = useState({})
   const [isGenerating, setIsGenerating] = useState(false)
-  const [selectedSurface, setSelectedSurface] = useState(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
 
   // Get available surfaces based on product type and specifications
   const getAvailableSurfaces = useCallback(() => {
@@ -55,199 +56,85 @@ const SurfaceThumbnailViewer = ({
     return [{ key: 'front', name: 'Design', dimensions: { width: 800, height: 600 } }]
   }, [productType, designOption, tentDesignOption, tinSurfaceCoverage])
 
-  // Generate thumbnail for a specific surface
-  const generateSurfaceThumbnail = useCallback(async (surface) => {
-    const { key: surfaceKey, dimensions } = surface
+   // KONVA-ONLY: Generate thumbnail using only Konva exports
+   const generateSurfaceThumbnail = useCallback(async (surface) => {
+     const { key: surfaceKey, dimensions } = surface
+     
+     console.log('🎨 KONVA-ONLY: Generating thumbnail for surface:', surfaceKey)
+     
+     // PRIORITY 1: Use live Konva export for current surface (most up-to-date!)
+     if (surfaceKey === currentSurface && canvasData?.konvaStageImage) {
+       console.log('🎨 ✅ Using LIVE Konva export for current surface thumbnail:', surfaceKey)
+       return {
+         dataUrl: canvasData.konvaStageImage,
+         dimensions,
+         elementCount: (orderDetails?.surface_elements || surfaceElements)[surfaceKey]?.length || 0
+       }
+     }
+     
+     // PRIORITY 2: Use stored Konva surface images (perfect alignment)
+     const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
+     if (surfaceImages && surfaceImages[surfaceKey]) {
+       console.log('🎨 ✅ Using stored Konva surface image for thumbnail:', surfaceKey)
+       return {
+         dataUrl: surfaceImages[surfaceKey],
+         dimensions,
+         elementCount: (orderDetails?.surface_elements || surfaceElements)[surfaceKey]?.length || 0
+       }
+     }
     
-    // Create canvas with proper dimensions
+    // NO FALLBACK TO CANVAS2D - Show placeholder instead
+    console.log('🚫 No Konva export available for surface:', surfaceKey, '- showing placeholder')
+    
+    // Create simple placeholder (small Canvas2D only for placeholder text)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
+    canvas.width = 200 // Small thumbnail size
+    canvas.height = 120
     
-    canvas.width = dimensions.width
-    canvas.height = dimensions.height
-    
-    // Get elements for this surface
-    const surfaceElementsData = orderDetails?.surface_elements || surfaceElements
-    const elementsToRender = surfaceElementsData[surfaceKey] || []
-    
-    // Set background
-    ctx.fillStyle = canvasData?.backgroundColor || '#ffffff'
+    // Gray background
+    ctx.fillStyle = '#f3f4f6'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     
-    // Apply clipping for tent canopy surfaces
-    if (productType === 'tent' && surfaceKey.startsWith('canopy_')) {
-      ctx.beginPath()
-      
-      // Triangular canopy path
-      ctx.moveTo(canvas.width / 2, 0) // Top point
-      ctx.lineTo(0, 789)              // Bottom left of triangle
-      ctx.lineTo(canvas.width, 789)   // Bottom right of triangle
-      
-      // Rectangular valence path
-      ctx.lineTo(canvas.width, 809)   // Top right of valence
-      ctx.lineTo(0, 809)              // Top left of valence
-      ctx.lineTo(0, 1009)             // Bottom left of valence
-      ctx.lineTo(canvas.width, 1009)  // Bottom right of valence
-      ctx.lineTo(canvas.width, 789)   // Back to bottom right of triangle
-      
-      ctx.closePath()
-      ctx.clip()
-    }
+    // Border
+    ctx.strokeStyle = '#d1d5db'
+    ctx.lineWidth = 1
+    ctx.strokeRect(0, 0, canvas.width, canvas.height)
     
-    // Render elements
-    for (const element of elementsToRender) {
-      if (element.type === 'image' && element.imageDataUrl) {
-        const img = new Image()
-        img.crossOrigin = 'anonymous'
-        
-        await new Promise((resolve, reject) => {
-          img.onload = () => {
-            ctx.drawImage(img, element.x, element.y, element.width, element.height)
-            resolve()
-          }
-          img.onerror = reject
-          img.src = element.imageDataUrl
-        })
-      } else if (element.type === 'text') {
-        ctx.font = `${element.fontSize}px ${element.fontFamily}`
-        ctx.fillStyle = element.fill || element.color || '#000000'
-        ctx.textAlign = element.align || element.textAlign || 'left'
-        ctx.fillText(element.text, element.x, element.y)
-      } else if (element.type === 'rect') {
-        ctx.fillStyle = element.fill || '#000000'
-        ctx.fillRect(element.x, element.y, element.width, element.height)
-      } else if (element.type === 'circle') {
-        // Render circle - position (x,y) is the CENTER in Konva
-        ctx.beginPath()
-        ctx.arc(element.x, element.y, element.radius || 50, 0, 2 * Math.PI)
-        ctx.fillStyle = element.fill || '#000000'
-        ctx.fill()
-      } else if (element.type === 'star') {
-        // Render star - position (x,y) is the CENTER in Konva
-        ctx.beginPath()
-        const numPoints = element.numPoints || 5
-        const innerRadius = element.innerRadius || 40
-        const outerRadius = element.outerRadius || 80
-        const centerX = element.x  // x,y is already the center in Konva
-        const centerY = element.y
-        
-        for (let i = 0; i < numPoints * 2; i++) {
-          const angle = (i * Math.PI) / numPoints
-          const radius = i % 2 === 0 ? outerRadius : innerRadius
-          const x = centerX + Math.cos(angle) * radius
-          const y = centerY + Math.sin(angle) * radius
-          
-          if (i === 0) {
-            ctx.moveTo(x, y)
-          } else {
-            ctx.lineTo(x, y)
-          }
-        }
-        ctx.closePath()
-        ctx.fillStyle = element.fill || '#000000'
-        ctx.fill()
-      } else if (element.type === 'triangle') {
-        // Render triangle - position (x,y) is the CENTER in Konva
-        ctx.beginPath()
-        const radius = element.radius || 60
-        const centerX = element.x  // x,y is already the center in Konva
-        const centerY = element.y
-        
-        for (let i = 0; i < 3; i++) {
-          const angle = (i * 2 * Math.PI) / 3 - Math.PI / 2
-          const x = centerX + Math.cos(angle) * radius
-          const y = centerY + Math.sin(angle) * radius
-          
-          if (i === 0) {
-            ctx.moveTo(x, y)
-          } else {
-            ctx.lineTo(x, y)
-          }
-        }
-        ctx.closePath()
-        ctx.fillStyle = element.fill || '#000000'
-        ctx.fill()
-      } else if (element.type === 'hexagon') {
-        // Render hexagon - position (x,y) is the CENTER in Konva
-        ctx.beginPath()
-        const radius = element.radius || 60
-        const centerX = element.x  // x,y is already the center in Konva
-        const centerY = element.y
-        
-        for (let i = 0; i < 6; i++) {
-          const angle = (i * 2 * Math.PI) / 6
-          const x = centerX + Math.cos(angle) * radius
-          const y = centerY + Math.sin(angle) * radius
-          
-          if (i === 0) {
-            ctx.moveTo(x, y)
-          } else {
-            ctx.lineTo(x, y)
-          }
-        }
-        ctx.closePath()
-        ctx.fillStyle = element.fill || '#000000'
-        ctx.fill()
-      } else if (element.type === 'icon') {
-        // Render icons (missing from original code!)
-        if (element.imagePath) {
-          // Image-based icons
-          const img = new Image()
-          img.crossOrigin = 'anonymous'
-          
-          await new Promise((resolve, reject) => {
-            img.onload = () => {
-              ctx.drawImage(img, element.x, element.y, element.width || 60, element.height || 60)
-              resolve()
-            }
-            img.onerror = reject
-            img.src = element.imagePath
-          })
-        } else if (element.symbol) {
-          // Symbol-based icons (render as text)
-          const fontSize = Math.max(12, Math.min(element.width || 60, element.height || 60) * 0.6)
-          ctx.font = `${fontSize}px Arial`
-          ctx.fillStyle = element.fill || '#000000'
-          ctx.textAlign = 'center'
-          ctx.textBaseline = 'middle'
-          ctx.fillText(
-            element.symbol, 
-            element.x + (element.width || 60) / 2, 
-            element.y + (element.height || 60) / 2
-          )
-        }
-      }
-    }
+     // "No Preview" text
+     ctx.fillStyle = '#6b7280'
+     ctx.font = '14px Arial'
+     ctx.textAlign = 'center'
+     ctx.textBaseline = 'middle'
+     ctx.fillText('Not Available', canvas.width / 2, canvas.height / 2 - 8)
+     ctx.font = '12px Arial'
+     ctx.fillText('(Design Required)', canvas.width / 2, canvas.height / 2 + 8)
+    
+    const elementCount = (orderDetails?.surface_elements || surfaceElements)[surfaceKey]?.length || 0
     
     return {
       dataUrl: canvas.toDataURL('image/png', 0.8),
       dimensions,
-      elementCount: elementsToRender.length
+      elementCount
     }
-  }, [productType, orderDetails, canvasData, surfaceElements])
+   }, [orderDetails, canvasData, surfaceElements, currentSurface])
 
-  // Generate all surface thumbnails
+  // Generate all surface thumbnails using Konva exports only
   const generateAllThumbnails = useCallback(async () => {
     setIsGenerating(true)
     const thumbnails = {}
     
     try {
       const surfaces = getAvailableSurfaces()
-      console.log('🎨 Generating thumbnails for surfaces:', surfaces.map(s => s.key))
+      console.log('🎨 KONVA-ONLY: Generating thumbnails for surfaces:', surfaces.map(s => s.key))
       
       for (const surface of surfaces) {
         const thumbnail = await generateSurfaceThumbnail(surface)
         thumbnails[surface.key] = thumbnail
-        console.log(`🎨 Generated thumbnail for ${surface.key}: ${thumbnail.dimensions.width}x${thumbnail.dimensions.height}`)
+        console.log(`🎨 Generated thumbnail for ${surface.key}: ${thumbnail.dimensions.width}x${thumbnail.dimensions.height} (${thumbnail.elementCount} elements)`)
       }
       
       setSurfaceThumbnails(thumbnails)
-      
-      // Set initial selected surface
-      if (surfaces.length > 0) {
-        setSelectedSurface(surfaces[0].key)
-        setCurrentIndex(0)
-      }
       
     } catch (error) {
       console.error('Error generating thumbnails:', error)
@@ -263,21 +150,8 @@ const SurfaceThumbnailViewer = ({
     }
   }, [generateAllThumbnails])
 
-  // Navigation functions
-  const navigateToSurface = (index) => {
-    const surfaces = getAvailableSurfaces()
-    if (index >= 0 && index < surfaces.length) {
-      setCurrentIndex(index)
-      setSelectedSurface(surfaces[index].key)
-    }
-  }
-
-  const navigatePrevious = () => navigateToSurface(currentIndex - 1)
-  const navigateNext = () => navigateToSurface(currentIndex + 1)
-
   // Get current surface info
   const surfaces = getAvailableSurfaces()
-  const currentSurface = surfaces[currentIndex]
   const currentThumbnail = surfaceThumbnails[selectedSurface]
 
   if (isGenerating) {
@@ -285,70 +159,75 @@ const SurfaceThumbnailViewer = ({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-gray-600">Generating surface previews...</p>
+            <p className="text-sm text-gray-600">Generating thumbnails...</p>
         </div>
       </div>
     )
   }
 
-  if (!currentThumbnail) {
+  if (surfaces.length === 0) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <p className="text-gray-600">No preview available</p>
+      <div className="text-center p-4">
+        <p className="text-sm text-gray-500">No surfaces available</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      {/* Surface Navigation */}
-      <div className="flex items-center justify-between">
-        <h5 className="font-medium text-gray-900">
-          {currentSurface?.name} Preview
-        </h5>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={navigatePrevious}
-            disabled={currentIndex === 0}
-            className="p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+    <div className="space-y-3">
+      {surfaces.map((surface) => {
+        const thumbnail = surfaceThumbnails[surface.key]
+        const isSelected = selectedSurface === surface.key
+        
+        return (
+          <div
+            key={surface.key}
+            className={`
+              cursor-pointer p-3 rounded-lg border transition-all duration-200
+              ${isSelected 
+                ? 'border-blue-500 bg-blue-50 shadow-md' 
+                : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+              }
+            `}
+            onClick={() => onSurfaceSelect?.(surface.key)}
           >
-            ←
-          </button>
-          <span className="text-sm text-gray-600">
-            {currentIndex + 1} of {surfaces.length}
-          </span>
-          <button
-            onClick={navigateNext}
-            disabled={currentIndex === surfaces.length - 1}
-            className="p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
-          >
-            →
-          </button>
-        </div>
-      </div>
-
-      {/* Surface Preview */}
-      <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center overflow-hidden">
-        <img
-          src={currentThumbnail.dataUrl}
-          alt={`${currentSurface?.name} preview`}
-          className="max-w-full max-h-96 object-contain"
-          style={{
-            width: 'auto',
-            height: 'auto',
-            maxWidth: '100%',
-            maxHeight: '400px'
-          }}
-        />
-      </div>
-
-      {/* Surface Info */}
-      <div className="text-sm text-gray-600 text-center">
-        {currentThumbnail.dimensions.width} × {currentThumbnail.dimensions.height}px
-        {currentThumbnail.elementCount > 0 && (
-          <span> • {currentThumbnail.elementCount} elements</span>
-        )}
-      </div>
+            <div className="flex items-center space-x-3">
+              {/* Thumbnail Image */}
+              <div className="flex-shrink-0">
+                {thumbnail ? (
+                  <img
+                    src={thumbnail.dataUrl}
+                    alt={surface.name}
+                    className="w-16 h-10 object-contain rounded border bg-gray-50"
+                  />
+                ) : (
+                  <div className="w-16 h-10 bg-gray-200 rounded border flex items-center justify-center">
+                    <span className="text-xs text-gray-400">...</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Surface Info */}
+              <div className="flex-1 min-w-0">
+                <h4 className={`font-medium text-sm truncate ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
+                  {surface.name}
+                </h4>
+                <p className="text-xs text-gray-500 mt-1">
+                  {thumbnail ? `${thumbnail.dimensions.width} × ${thumbnail.dimensions.height}px • ${thumbnail.elementCount} elements` : 'Loading...'}
+                </p>
+              </div>
+              
+              {/* Selection Indicator */}
+              {isSelected && (
+                <div className="flex-shrink-0">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })}
+      
     </div>
   )
 }
