@@ -37,6 +37,64 @@ const PrintPreviewModal = ({
   const [selectedSurface, setSelectedSurface] = useState(currentSurface)
   const [approvedSurfaces, setApprovedSurfaces] = useState(new Set())
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Mobile detection and responsive scaling
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      
+      // Calculate optimal scale for mobile
+      if (mobile && previewImage) {
+        const img = new Image()
+        img.onload = () => {
+          const viewportWidth = window.innerWidth
+          const viewportHeight = window.innerHeight * 0.7 // 70vh container
+          const containerPadding = 32 // Account for padding
+          
+          const availableWidth = viewportWidth - containerPadding
+          const availableHeight = viewportHeight - containerPadding
+          
+          const imageAspectRatio = img.width / img.height
+          const containerAspectRatio = availableWidth / availableHeight
+          
+          let optimalScale = 1.0
+          
+          if (imageAspectRatio > containerAspectRatio) {
+            // Image is wider - scale based on width
+            optimalScale = availableWidth / img.width
+          } else {
+            // Image is taller - scale based on height  
+            optimalScale = availableHeight / img.height
+          }
+          
+          // Ensure minimum scale for readability but maximum scale for mobile
+          optimalScale = Math.max(0.5, Math.min(optimalScale * 1.2, 2.0))
+          
+          console.log('📱 Mobile scaling calculated:', {
+            viewportWidth,
+            viewportHeight,
+            availableWidth,
+            availableHeight,
+            imageWidth: img.width,
+            imageHeight: img.height,
+            optimalScale
+          })
+          
+          setImageScale(optimalScale)
+        }
+        img.src = previewImage
+      } else if (!mobile) {
+        // Reset scale for desktop
+        setImageScale(1.0)
+      }
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [previewImage, isOpen])
 
   // Initialize selected surface to current surface from editor when modal opens
   useEffect(() => {
@@ -417,20 +475,20 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden">
+      <DialogContent className={`max-w-6xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden ${isMobile ? 'p-2' : ''}`}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Eye className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2 text-sm sm:text-base">
+            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
             Print Preview - {productType.charAt(0).toUpperCase() + productType.slice(1)}
             {hasMultipleSurfaces() && (
-              <Badge variant="outline" className="ml-2">
+              <Badge variant="outline" className="ml-2 text-xs">
                 {currentSurfaceData?.name || selectedSurface}
               </Badge>
             )}
           </DialogTitle>
         </DialogHeader>
 
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+         <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6'}`}>
            {/* Left Column: Preview + Quality Assurance */}
            <div className="lg:col-span-2 space-y-4 lg:space-y-6">
              {/* Design Preview */}
@@ -463,26 +521,25 @@ const PrintPreviewModal = ({
                    )}
                  </CardTitle>
                </CardHeader>
-               <CardContent className="overflow-hidden">
-                 <div className="w-full h-[60vh] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-1 sm:p-3 md:p-4">
-                   {previewImage ? (
-                     <div className="relative w-full h-full flex items-center justify-center">
-                       <img 
-                         src={previewImage} 
-                         alt="Design Preview"
-                         className="object-contain rounded shadow-lg w-full h-full sm:w-auto sm:h-auto"
-                         style={{
-                           maxWidth: '100%',
-                           maxHeight: '100%',
-                           width: 'auto',
-                           height: 'auto',
-                           transform: `scale(${imageScale})`,
-                           transition: 'transform 0.2s ease-in-out'
-                         }}
-                         onContextMenu={(e) => e.preventDefault()}
-                         onDragStart={(e) => e.preventDefault()}
-                         draggable={false}
-                       />
+              <CardContent className="overflow-hidden">
+                <div className="w-full h-[70vh] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-2 sm:p-3 md:p-4">
+                  {previewImage ? (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <img 
+                        src={previewImage} 
+                        alt="Design Preview"
+                        className="rounded shadow-lg max-w-none max-h-none"
+                        style={{
+                          width: 'min(95vw, 100%)',
+                          height: 'min(65vh, 100%)',
+                          objectFit: 'contain',
+                          transform: `scale(${imageScale})`,
+                          transition: 'transform 0.2s ease-in-out'
+                        }}
+                        onContextMenu={(e) => e.preventDefault()}
+                        onDragStart={(e) => e.preventDefault()}
+                        draggable={false}
+                      />
                         {/* BuyPrintz Watermark Overlay for IP Protection */}
                         <div 
                           className="absolute inset-0 pointer-events-none z-50"
@@ -543,14 +600,14 @@ const PrintPreviewModal = ({
            </div>
 
            {/* Right Column: Surfaces + Print Specs + Actions */}
-           <div className="space-y-4 lg:space-y-6">
+           <div className={`space-y-4 lg:space-y-6 ${isMobile ? 'order-first' : ''}`}>
              {/* All Surfaces */}
              {hasMultipleSurfaces() && (
                <Card>
-                 <CardHeader className="pb-3">
-                   <CardTitle className="text-lg">All Surfaces</CardTitle>
+                 <CardHeader className={`pb-3 ${isMobile ? 'pb-2' : ''}`}>
+                   <CardTitle className={`text-lg ${isMobile ? 'text-base' : ''}`}>All Surfaces</CardTitle>
                  </CardHeader>
-                 <CardContent className="overflow-y-auto max-h-[250px] md:max-h-[350px] lg:max-h-[400px]">
+                 <CardContent className={`overflow-y-auto ${isMobile ? 'max-h-[150px]' : 'max-h-[250px] md:max-h-[350px] lg:max-h-[400px]'}`}>
                     <SurfaceThumbnailViewer
                       orderDetails={orderDetails}
                       canvasData={canvasData}
@@ -569,7 +626,7 @@ const PrintPreviewModal = ({
              )}
 
              {/* Print Specifications */}
-             <Card>
+             <Card className={isMobile ? 'hidden' : ''}>
                <CardHeader className="pb-2">
                  <CardTitle className="text-sm">Print Specifications</CardTitle>
                </CardHeader>
@@ -605,26 +662,26 @@ const PrintPreviewModal = ({
 
              {/* Actions */}
              <Card>
-               <CardHeader className="pb-3">
-                 <CardTitle className="text-lg">Actions</CardTitle>
+               <CardHeader className={`pb-3 ${isMobile ? 'pb-2' : ''}`}>
+                 <CardTitle className={`text-lg ${isMobile ? 'text-base' : ''}`}>Actions</CardTitle>
                </CardHeader>
-               <CardContent className="space-y-3">
+               <CardContent className={`space-y-3 ${isMobile ? 'space-y-2' : ''}`}>
                  <Button
                    onClick={handleDownload}
                    disabled={!previewImage || isGenerating}
-                   className="w-full"
+                   className={`w-full ${isMobile ? 'text-sm py-2' : ''}`}
                    variant="outline"
                  >
-                   <Download className="h-4 w-4 mr-2" />
-                   {isGenerating ? 'Generating PDF...' : 'Download Production PDF'}
+                   <Download className={`h-4 w-4 mr-2 ${isMobile ? 'h-3 w-3' : ''}`} />
+                   {isGenerating ? 'Generating PDF...' : isMobile ? 'Download PDF' : 'Download Production PDF'}
                  </Button>
                  
                  <Button
                    onClick={handleApprove}
                    disabled={!previewImage}
-                   className="w-full bg-green-600 hover:bg-green-700"
+                   className={`w-full bg-green-600 hover:bg-green-700 ${isMobile ? 'text-sm py-2' : ''}`}
                  >
-                   <CheckCircle className="h-4 w-4 mr-2" />
+                   <CheckCircle className={`h-4 w-4 mr-2 ${isMobile ? 'h-3 w-3' : ''}`} />
                    Approve Design
                  </Button>
                </CardContent>
