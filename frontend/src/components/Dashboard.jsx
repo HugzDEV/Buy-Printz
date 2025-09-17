@@ -21,10 +21,6 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([])
   const [templates, setTemplates] = useState([])
   
-  // Debug: Log templates state changes
-  useEffect(() => {
-    console.log('🔄 Templates state updated:', templates.length, 'templates:', templates)
-  }, [templates])
   const [userStats, setUserStats] = useState(null)
   const [preferences, setPreferences] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -915,8 +911,10 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : templates.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                {templates.map((template) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {templates.map((template) => {
+                console.log('🖼️ Template data:', template.name, 'thumbnail:', template.thumbnail ? 'present' : 'missing', template.thumbnail?.substring(0, 50) + '...')
+                return (
                   <div key={template.id} className="group relative">
                     {/* Main Template Card */}
                     <div className="backdrop-blur-xl bg-white/10 rounded-3xl overflow-hidden border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02]">
@@ -931,7 +929,20 @@ const Dashboard = () => {
                               src={template.thumbnail} 
                               alt={`${template.name} preview`}
                               className="w-full h-full object-contain bg-white"
+                              onError={(e) => {
+                                console.log('❌ Thumbnail failed to load:', template.name, template.thumbnail)
+                                e.target.style.display = 'none'
+                                e.target.nextSibling.style.display = 'flex'
+                              }}
+                              onLoad={() => console.log('✅ Thumbnail loaded:', template.name)}
                             />
+                            {/* Fallback for failed images */}
+                            <div className="w-full h-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100" style={{display: 'none'}}>
+                              <div className="text-center">
+                                <Layout className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 mx-auto mb-2" />
+                                <p className="text-xs text-gray-500">Preview Failed</p>
+                              </div>
+                            </div>
                             {/* Overlay gradient for better text readability */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           </>
@@ -1012,7 +1023,8 @@ const Dashboard = () => {
                       <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
                   </div>
-                ))}
+                )
+              })}
               </div>
             ) : (
               <div className="backdrop-blur-xl bg-white/10 rounded-3xl p-16 text-center border border-white/20 shadow-2xl">
