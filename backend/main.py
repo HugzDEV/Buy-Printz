@@ -1226,7 +1226,14 @@ async def generate_template_thumbnail(
                 # Get public URL
                 try:
                     public_url_result = supabase.storage.from_("thumbnails").get_public_url(storage_path)
-                    thumbnail_url = public_url_result
+                    
+                    # Clean up the URL - remove any trailing query parameters or extra characters
+                    if isinstance(public_url_result, str):
+                        thumbnail_url = public_url_result.rstrip('?').rstrip()
+                    else:
+                        # Handle case where result might be an object with a 'publicUrl' property
+                        thumbnail_url = getattr(public_url_result, 'publicUrl', str(public_url_result)).rstrip('?').rstrip()
+                    
                     logger.info(f"✅ Public URL generated: {thumbnail_url}")
                 except Exception as e:
                     logger.error(f"❌ Failed to get public URL: {e}")
