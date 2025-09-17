@@ -1211,9 +1211,9 @@ async def generate_template_thumbnail(
                 
                 logger.info(f"☁️ Uploading thumbnail to Supabase Storage: {storage_path}")
                 
-                # Upload to Supabase Storage
+                # Upload to Supabase Storage (use marketplace-thumbnails bucket which is public)
                 try:
-                    upload_result = supabase.storage.from_("thumbnails").upload(
+                    upload_result = supabase.storage.from_("marketplace-thumbnails").upload(
                         storage_path,
                         thumbnail_bytes,
                         file_options={"content-type": "image/jpeg"}
@@ -1225,7 +1225,7 @@ async def generate_template_thumbnail(
                 
                 # Get public URL
                 try:
-                    public_url_result = supabase.storage.from_("thumbnails").get_public_url(storage_path)
+                    public_url_result = supabase.storage.from_("marketplace-thumbnails").get_public_url(storage_path)
                     
                     # Clean up the URL - remove any trailing query parameters or extra characters
                     if isinstance(public_url_result, str):
