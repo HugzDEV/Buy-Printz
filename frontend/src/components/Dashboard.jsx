@@ -114,41 +114,32 @@ const Dashboard = () => {
       const response = await Promise.race([apiCall(), timeoutPromise])
       const data = await response.json()
       
-      // Debug: Log the raw data structure
-      console.log(`🔍 Raw API response for ${loadingKey}:`, data)
-      console.log(`🔍 Data type:`, typeof data)
-      console.log(`🔍 Is array:`, Array.isArray(data))
-      console.log(`🔍 Data keys:`, Object.keys(data || {}))
+      // Debug: Log the raw data structure (only for templates)
+      if (loadingKey === 'templates') {
+        console.log(`🔍 Templates API response:`, data)
+      }
       
       if (data.success) {
         let processedData = null
         
         // Handle different response formats
         if (data.templates) {
-          console.log(`✅ Found data.templates:`, data.templates)
           processedData = data.templates
         } else if (data.designs) {
-          console.log(`✅ Found data.designs:`, data.designs)
           processedData = data.designs
         } else if (data.orders) {
-          console.log(`✅ Found data.orders:`, data.orders)
           processedData = data.orders
         } else if (data.preferences) {
-          console.log(`✅ Found data.preferences:`, data.preferences)
           processedData = data.preferences
         } else if (Array.isArray(data)) {
-          // Handle direct array responses
-          console.log(`✅ Found direct array:`, data)
           processedData = data
         } else {
-          console.log(`⚠️ Fallback to full data:`, data)
           processedData = data
         }
         
         // Cache the data if cacheKey is provided
         if (cacheKey && user?.id && processedData) {
           cacheService.set(cacheKey, processedData)
-          console.log(`💾 Cached data for ${loadingKey}`)
         }
         
         setter(processedData)
@@ -188,23 +179,17 @@ const Dashboard = () => {
     await new Promise(resolve => setTimeout(resolve, 100))
 
     // Load secondary data
-    try {
-      console.log('🚀 About to load templates...')
-      await loadDataSafely(
+    await Promise.all([
+      loadDataSafely(
         () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
-          console.log('Dashboard: Processed templates data from loadDataSafely:', data)
-          console.log('Dashboard: Setting templates state with:', data?.length || 0, 'items')
           setTemplates(data || [])
         },
         [],
         'templates',
         `templates_${user?.id}`
-      )
-      console.log('✅ Templates loading completed')
-    } catch (error) {
-      console.error('❌ Templates loading failed:', error)
-    }
+      ),
+    ])
 
     // Another small delay
     await new Promise(resolve => setTimeout(resolve, 100))
@@ -903,7 +888,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {console.log('Dashboard: Rendering templates, count:', templates.length, 'templates:', templates)}
             {loadingStates.templates ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -912,9 +896,7 @@ const Dashboard = () => {
               </div>
             ) : templates.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {templates.map((template) => {
-                console.log('🖼️ Template data:', template.name, 'thumbnail:', template.thumbnail ? 'present' : 'missing', template.thumbnail?.substring(0, 50) + '...')
-                return (
+              {templates.map((template) => (
                   <div key={template.id} className="group relative">
                     {/* Main Template Card */}
                     <div className="backdrop-blur-xl bg-white/10 rounded-3xl overflow-hidden border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02]">
@@ -930,11 +912,9 @@ const Dashboard = () => {
                               alt={`${template.name} preview`}
                               className="w-full h-full object-contain bg-white"
                               onError={(e) => {
-                                console.log('❌ Thumbnail failed to load:', template.name, template.thumbnail)
                                 e.target.style.display = 'none'
                                 e.target.nextSibling.style.display = 'flex'
                               }}
-                              onLoad={() => console.log('✅ Thumbnail loaded:', template.name)}
                             />
                             {/* Fallback for failed images */}
                             <div className="w-full h-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100" style={{display: 'none'}}>
@@ -1023,8 +1003,7 @@ const Dashboard = () => {
                       <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
                   </div>
-                )
-              })}
+                ))}
               </div>
             ) : (
               <div className="backdrop-blur-xl bg-white/10 rounded-3xl p-16 text-center border border-white/20 shadow-2xl">
