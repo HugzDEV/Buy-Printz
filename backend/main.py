@@ -1120,13 +1120,14 @@ async def generate_template_thumbnail(
     thumbnail_data: dict,
     current_user: dict = Depends(get_current_user)
 ):
-    """Generate thumbnail for user template using marketplace thumbnail service"""
+    """Generate thumbnail for user template using Supabase Storage"""
     try:
         logger.info(f"🎨 Thumbnail generation requested by user: {current_user['user_id']}")
         
         import base64
-        import os
         import tempfile
+        import uuid
+        from database import supabase
         
         image_data = thumbnail_data.get("imageData", "")
         template_name = thumbnail_data.get("templateName", "template")
@@ -1175,35 +1176,60 @@ async def generate_template_thumbnail(
                     logger.error(f"❌ Failed to import process_single_image: {e} | Fallback: {e2}")
                     raise HTTPException(status_code=500, detail=f"Thumbnail service not available: {e}")
             
-            # Use the same approach as marketplace - save to frontend public directory
-            # This ensures thumbnails are served as static files like marketplace thumbnails
-            user_thumbnail_dir = "../frontend/public/assets/images/user_templates"
-            try:
-                os.makedirs(user_thumbnail_dir, exist_ok=True)
-                logger.info(f"📁 Created/verified output directory: {user_thumbnail_dir}")
-            except Exception as e:
-                logger.error(f"❌ Failed to create output directory: {e}")
-                raise HTTPException(status_code=500, detail=f"Failed to create output directory: {e}")
-            
-            # Process the image
-            logger.info("🔄 Processing image with thumbnail service...")
-            result = process_single_image(temp_path, user_thumbnail_dir)
-            logger.info(f"📊 Thumbnail service result: {result}")
-            
-            if result["success"]:
-                # Generate web-accessible URL (same pattern as marketplace thumbnails)
-                thumbnail_filename = os.path.basename(result["thumbnail_path"])
-                thumbnail_url = f"/assets/images/user_templates/{thumbnail_filename}"
+            # Create temporary directory for thumbnail processing
+            with tempfile.TemporaryDirectory() as temp_thumbnail_dir:
+                logger.info(f"📁 Created temporary thumbnail directory: {temp_thumbnail_dir}")
                 
-                logger.info(f"✅ Thumbnail generated successfully: {thumbnail_url}")
+                # Process the image to create thumbnail
+                logger.info("🔄 Processing image with thumbnail service...")
+                result = process_single_image(temp_path, temp_thumbnail_dir)
+                logger.info(f"📊 Thumbnail service result: {result}")
+                
+                if not result["success"]:
+                    logger.error(f"❌ Thumbnail generation failed: {result.get('error', 'Unknown error')}")
+                    raise HTTPException(status_code=500, detail=f"Thumbnail generation failed: {result.get('error', 'Unknown error')}")
+                
+                # Read the generated thumbnail
+                thumbnail_path = result["thumbnail_path"]
+                with open(thumbnail_path, 'rb') as thumbnail_file:
+                    thumbnail_bytes = thumbnail_file.read()
+                
+                logger.info(f"📊 Thumbnail file size: {len(thumbnail_bytes)} bytes")
+                
+                # Generate unique filename for Supabase Storage
+                file_extension = "jpg"  # thumbnails are generated as JPG
+                unique_filename = f"{current_user['user_id']}_{uuid.uuid4().hex[:8]}_{template_name.replace(' ', '_')}.{file_extension}"
+                storage_path = f"user_templates/{unique_filename}"
+                
+                logger.info(f"☁️ Uploading thumbnail to Supabase Storage: {storage_path}")
+                
+                # Upload to Supabase Storage
+                try:
+                    upload_result = supabase.storage.from_("thumbnails").upload(
+                        storage_path,
+                        thumbnail_bytes,
+                        file_options={"content-type": "image/jpeg"}
+                    )
+                    logger.info(f"✅ Upload result: {upload_result}")
+                except Exception as e:
+                    logger.error(f"❌ Supabase Storage upload failed: {e}")
+                    raise HTTPException(status_code=500, detail=f"Failed to upload thumbnail: {e}")
+                
+                # Get public URL
+                try:
+                    public_url_result = supabase.storage.from_("thumbnails").get_public_url(storage_path)
+                    thumbnail_url = public_url_result
+                    logger.info(f"✅ Public URL generated: {thumbnail_url}")
+                except Exception as e:
+                    logger.error(f"❌ Failed to get public URL: {e}")
+                    raise HTTPException(status_code=500, detail=f"Failed to get public URL: {e}")
+                
+                logger.info(f"✅ Thumbnail uploaded successfully: {thumbnail_url}")
                 return {
                     "success": True,
                     "thumbnail_url": thumbnail_url,
-                    "file_size": result["thumbnail_size"]
+                    "file_size": len(thumbnail_bytes)
                 }
-            else:
-                logger.error(f"❌ Thumbnail generation failed: {result.get('error', 'Unknown error')}")
-                raise HTTPException(status_code=500, detail=f"Thumbnail generation failed: {result.get('error', 'Unknown error')}")
                 
         finally:
             # Clean up temporary file
