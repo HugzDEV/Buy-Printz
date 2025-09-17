@@ -443,9 +443,9 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') {
       return {
-        finish: 'silver',
-        surfaceCoverage: 'front-back',
-        printingMethod: 'premium-vinyl'
+    finish: 'silver',
+    surfaceCoverage: 'front-back',
+    printingMethod: 'premium-vinyl'
       }
     }
     return null // For non-tin products, return null
@@ -572,7 +572,7 @@ const BannerEditorNew = () => {
     }))
     console.log('🎨 BannerEditor - Tin spec changed:', key, 'to', value)
   }, [])
-  
+
   // Handle tent design option changes
   const handleTentDesignOptionChange = useCallback((value) => {
     const previousOption = tentDesignOption
@@ -743,9 +743,9 @@ const BannerEditorNew = () => {
     
     // Only set banner specs for banner products
     if (productType === 'banner') {
-      // Find the matching banner type
-      const selectedBannerType = bannerTypes.find(banner => banner.id === productType)
-      return selectedBannerType || bannerTypes[0]
+    // Find the matching banner type
+    const selectedBannerType = bannerTypes.find(banner => banner.id === productType)
+    return selectedBannerType || bannerTypes[0]
     }
     
     // For non-banner products, return null or a default structure
@@ -2857,33 +2857,33 @@ const BannerEditorNew = () => {
     } else {
       // Handle regular banner template
       console.log('🎨 Loading regular template:', template.name)
-      const selectedTemplate = bannerTemplates.find(t => t.id === template.id)
+    const selectedTemplate = bannerTemplates.find(t => t.id === template.id)
+    
+    if (selectedTemplate) {
+      // Clear existing elements
+      setElements([])
       
-      if (selectedTemplate) {
-        // Clear existing elements
-        setElements([])
-        
-        // Scale template elements to fit current canvas size
-        const scaledElements = scaleTemplateElements(
-          selectedTemplate.elements, 
-          canvasSize.width, 
+      // Scale template elements to fit current canvas size
+      const scaledElements = scaleTemplateElements(
+        selectedTemplate.elements, 
+        canvasSize.width, 
           canvasSize.height,
           selectedTemplate.canvasSize || { width: 800, height: 400 } // Banner templates use 800x400
-        ).map(element => ({
-          ...element,
-          id: generateId(element.type)
-        }))
-        
-        setElements(scaledElements)
-        
-        // Clear selection
-        setSelectedId(null)
+      ).map(element => ({
+        ...element,
+        id: generateId(element.type)
+      }))
+      
+      setElements(scaledElements)
+      
+      // Clear selection
+      setSelectedId(null)
         
         console.log(`🎨 Loaded regular template: ${template.name}`)
-      } else {
+    } else {
         console.error('🎨 Template not found in bannerTemplates:', template.id)
-        alert('Template not found. Please try again.')
-      }
+      alert('Template not found. Please try again.')
+    }
     }
   }, [bannerTemplates, scaleTemplateElements, canvasSize.width, canvasSize.height, productType, currentSurface])
 
@@ -3409,7 +3409,7 @@ const BannerEditorNew = () => {
     } else if (orderData.product_type === 'tradeshow_tent') {
       navigate('/tent-checkout') // Future implementation
     } else {
-      navigate('/checkout')
+    navigate('/checkout')
     }
   }, [elements, canvasSize, backgroundColor, bannerSpecs, navigate, productType, marketplaceTemplates, generateCanvasImage, surfaceImages, currentSurface, surfaceElements, tentDesignOption, tentSpecs, tinSpecs, canvasOrientation])
 
@@ -3647,12 +3647,12 @@ const BannerEditorNew = () => {
                 
                 // Verify the image is valid before using it
                 if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-                  // Create the restored element
-                  const restoredElement = {
-                    ...element,
-                    image: img
-                  }
-                  restoredElements.push(restoredElement)
+                // Create the restored element
+                const restoredElement = {
+                  ...element,
+                  image: img
+                }
+                restoredElements.push(restoredElement)
                   console.log('🎨 Successfully restored image element:', element.assetName || 'uploaded image')
                 } else {
                   console.warn('Image loaded but has invalid dimensions:', imageSrc)
@@ -3801,8 +3801,8 @@ const BannerEditorNew = () => {
             // No scaling needed, restore elements as-is
             restoreImageElements(elementsToRestore).then(restoredElements => {
               setElements(restoredElements)
-            }).catch(error => {
-              console.error('Failed to restore image elements:', error)
+          }).catch(error => {
+            console.error('Failed to restore image elements:', error)
               setElements(elementsToRestore)
             })
           }
@@ -3822,14 +3822,14 @@ const BannerEditorNew = () => {
           }
           
           // Restore other template properties
-          setBackgroundColor(canvasData.backgroundColor || '#ffffff')
-          if (canvasData.bannerSpecs) {
-            setBannerSpecs(canvasData.bannerSpecs)
-          }
-          if (canvasData.canvasSize) {
-            setCanvasSize(canvasData.canvasSize)
-            setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
-          }
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
         }
       } else {
         console.error('Failed to load template from database')
@@ -3968,16 +3968,16 @@ const BannerEditorNew = () => {
             }
           } else {
             // For single-surface products or fallback, restore image elements properly
-            restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
-              setElements(restoredElements)
-              setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
-              if (orderData.canvas_data.bannerSpecs) {
-                setBannerSpecs(orderData.canvas_data.bannerSpecs)
-              }
-              if (orderData.canvas_data.canvasSize) {
-                setCanvasSize(orderData.canvas_data.canvasSize)
-                setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
-              }
+          restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
+            setElements(restoredElements)
+            setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
+            if (orderData.canvas_data.bannerSpecs) {
+              setBannerSpecs(orderData.canvas_data.bannerSpecs)
+            }
+            if (orderData.canvas_data.canvasSize) {
+              setCanvasSize(orderData.canvas_data.canvasSize)
+              setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+            }
               // Restore tent design option if available
               if (orderData.tent_design_option) {
                 setTentDesignOption(orderData.tent_design_option)
@@ -3988,24 +3988,24 @@ const BannerEditorNew = () => {
                 setTentSpecs(orderData.tent_specs)
                 console.log('🎨 Restored tent specs (fallback):', orderData.tent_specs)
               }
-            }).catch(error => {
-              console.error('Failed to restore image elements:', error)
-              // Fallback to loading without images
-              setElements(orderData.canvas_data.elements || [])
-              setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
-              if (orderData.canvas_data.bannerSpecs) {
-                setBannerSpecs(orderData.canvas_data.bannerSpecs)
-              }
-              if (orderData.canvas_data.canvasSize) {
-                setCanvasSize(orderData.canvas_data.canvasSize)
-                setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
-              }
+          }).catch(error => {
+            console.error('Failed to restore image elements:', error)
+            // Fallback to loading without images
+            setElements(orderData.canvas_data.elements || [])
+            setBackgroundColor(orderData.canvas_data.backgroundColor || '#ffffff')
+            if (orderData.canvas_data.bannerSpecs) {
+              setBannerSpecs(orderData.canvas_data.bannerSpecs)
+            }
+            if (orderData.canvas_data.canvasSize) {
+              setCanvasSize(orderData.canvas_data.canvasSize)
+              setCanvasOrientation(orderData.canvas_data.canvasSize.width > orderData.canvas_data.canvasSize.height ? 'landscape' : 'portrait')
+            }
               // Restore tent design option if available
               if (orderData.tent_design_option) {
                 setTentDesignOption(orderData.tent_design_option)
                 console.log('🎨 Restored tent design option (error fallback):', orderData.tent_design_option)
               }
-            })
+          })
           }
         }
         sessionStorage.removeItem('cancelledOrder')
@@ -4131,16 +4131,16 @@ const BannerEditorNew = () => {
             })
           } else {
             // For single-surface products or fallback, restore image elements properly
-            console.log('🎨 About to restore elements:', canvasData.elements)
-            console.log('🎨 Canvas data keys:', Object.keys(canvasData))
-            restoreImageElements(canvasData.elements || []).then(restoredElements => {
-              console.log('🎨 Restored elements:', restoredElements)
-              setElements(restoredElements)
-            }).catch(error => {
-              console.error('Failed to restore image elements:', error)
-              // Fallback to loading without images
-              console.log('🎨 Fallback: Setting elements directly:', canvasData.elements)
-              setElements(canvasData.elements || [])
+          console.log('🎨 About to restore elements:', canvasData.elements)
+          console.log('🎨 Canvas data keys:', Object.keys(canvasData))
+          restoreImageElements(canvasData.elements || []).then(restoredElements => {
+            console.log('🎨 Restored elements:', restoredElements)
+            setElements(restoredElements)
+          }).catch(error => {
+            console.error('Failed to restore image elements:', error)
+            // Fallback to loading without images
+            console.log('🎨 Fallback: Setting elements directly:', canvasData.elements)
+            setElements(canvasData.elements || [])
             })
           }
           
@@ -4162,17 +4162,17 @@ const BannerEditorNew = () => {
           }
           
           // Restore other template properties
-          setBackgroundColor(canvasData.backgroundColor || '#ffffff')
-          if (canvasData.bannerSpecs) {
-            setBannerSpecs(canvasData.bannerSpecs)
-          }
-          if (canvasData.canvasSize) {
-            setCanvasSize(canvasData.canvasSize)
-            setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
-          }
+            setBackgroundColor(canvasData.backgroundColor || '#ffffff')
+            if (canvasData.bannerSpecs) {
+              setBannerSpecs(canvasData.bannerSpecs)
+            }
+            if (canvasData.canvasSize) {
+              setCanvasSize(canvasData.canvasSize)
+              setCanvasOrientation(canvasData.canvasSize.width > canvasData.canvasSize.height ? 'landscape' : 'portrait')
+            }
           
-          // Clear the template data from sessionStorage after loading
-          sessionStorage.removeItem('templateData')
+            // Clear the template data from sessionStorage after loading
+            sessionStorage.removeItem('templateData')
         } catch (error) {
           console.error('Failed to parse template data from sessionStorage:', error)
           // Clear invalid data and fallback to loading from database
