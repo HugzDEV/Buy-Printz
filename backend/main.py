@@ -1025,12 +1025,17 @@ async def test_thumbnail_dependencies():
         
         # Test generate_thumbnails import
         try:
-            from generate_thumbnails import process_single_image
+            from backend.generate_thumbnails import process_single_image
             thumbnails_available = True
             thumbnails_error = None
         except ImportError as e:
-            thumbnails_available = False
-            thumbnails_error = str(e)
+            try:
+                from generate_thumbnails import process_single_image
+                thumbnails_available = True
+                thumbnails_error = "Fallback import worked"
+            except ImportError as e2:
+                thumbnails_available = False
+                thumbnails_error = f"Main: {e} | Fallback: {e2}"
         
         # Test file system access
         try:
@@ -1121,11 +1126,16 @@ async def generate_template_thumbnail(
         try:
             # Try to import the thumbnail service
             try:
-                from generate_thumbnails import process_single_image
+                from backend.generate_thumbnails import process_single_image
                 logger.info("✅ Successfully imported process_single_image")
             except ImportError as e:
-                logger.error(f"❌ Failed to import process_single_image: {e}")
-                raise HTTPException(status_code=500, detail=f"Thumbnail service not available: {e}")
+                # Fallback to direct import (for different environments)
+                try:
+                    from generate_thumbnails import process_single_image
+                    logger.info("✅ Successfully imported process_single_image (fallback)")
+                except ImportError as e2:
+                    logger.error(f"❌ Failed to import process_single_image: {e} | Fallback: {e2}")
+                    raise HTTPException(status_code=500, detail=f"Thumbnail service not available: {e}")
             
             # Create output directory (use uploads directory that Railway can write to)
             user_thumbnail_dir = "uploads/user_thumbnails"
