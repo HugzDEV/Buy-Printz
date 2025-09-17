@@ -919,8 +919,12 @@ const Dashboard = () => {
                               alt={`${template.name} preview`}
                               className="w-full h-full object-contain bg-white"
                               onError={(e) => {
+                                console.error(`❌ Failed to load thumbnail: ${template.thumbnail_url}`, e)
                                 e.target.style.display = 'none'
                                 e.target.nextSibling.style.display = 'flex'
+                              }}
+                              onLoad={() => {
+                                console.log(`✅ Successfully loaded thumbnail: ${template.thumbnail_url}`)
                               }}
                             />
                             {/* Fallback for failed images */}

@@ -134,6 +134,9 @@ def process_single_image(image_path: str, output_dir: str = None) -> dict:
             # Generate relative URL for web access
             if output_dir == THUMBNAIL_DIR:
                 result['thumbnail_url'] = f"/assets/images/Marketplace/thumbnails/{thumbnail_filename}"
+            elif output_dir.endswith("user_templates"):
+                # For user templates directory (same pattern as marketplace)
+                result['thumbnail_url'] = f"/assets/images/user_templates/{thumbnail_filename}"
             elif output_dir.startswith("uploads/"):
                 # For uploads directory (Railway-compatible)
                 result['thumbnail_url'] = f"/{output_dir}/{thumbnail_filename}"

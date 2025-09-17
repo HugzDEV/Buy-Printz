@@ -1010,6 +1010,44 @@ async def test_templates_connection():
             "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
         }
 
+@app.get("/api/test/file-exists/{file_path:path}")
+async def test_file_exists(file_path: str):
+    """Test if a file exists on the server"""
+    try:
+        import os
+        full_path = file_path
+        exists = os.path.exists(full_path)
+        
+        if exists:
+            file_size = os.path.getsize(full_path)
+            return {
+                "exists": True,
+                "path": full_path,
+                "size": file_size,
+                "absolute_path": os.path.abspath(full_path)
+            }
+        else:
+            # List directory contents to help debug
+            dir_path = os.path.dirname(full_path)
+            if os.path.exists(dir_path):
+                contents = os.listdir(dir_path)
+                return {
+                    "exists": False,
+                    "path": full_path,
+                    "directory_exists": True,
+                    "directory_contents": contents,
+                    "absolute_path": os.path.abspath(full_path)
+                }
+            else:
+                return {
+                    "exists": False,
+                    "path": full_path,
+                    "directory_exists": False,
+                    "absolute_path": os.path.abspath(full_path)
+                }
+    except Exception as e:
+        return {"error": str(e), "path": file_path}
+
 @app.get("/api/test/thumbnail-dependencies")
 async def test_thumbnail_dependencies():
     """Test if thumbnail service dependencies are available"""
@@ -1137,8 +1175,9 @@ async def generate_template_thumbnail(
                     logger.error(f"❌ Failed to import process_single_image: {e} | Fallback: {e2}")
                     raise HTTPException(status_code=500, detail=f"Thumbnail service not available: {e}")
             
-            # Create output directory (use uploads directory that Railway can write to)
-            user_thumbnail_dir = "uploads/user_thumbnails"
+            # Use the same approach as marketplace - save to frontend public directory
+            # This ensures thumbnails are served as static files like marketplace thumbnails
+            user_thumbnail_dir = "../frontend/public/assets/images/user_templates"
             try:
                 os.makedirs(user_thumbnail_dir, exist_ok=True)
                 logger.info(f"📁 Created/verified output directory: {user_thumbnail_dir}")
@@ -1152,9 +1191,9 @@ async def generate_template_thumbnail(
             logger.info(f"📊 Thumbnail service result: {result}")
             
             if result["success"]:
-                # Generate web-accessible URL (uploads is already mounted as static files)
+                # Generate web-accessible URL (same pattern as marketplace thumbnails)
                 thumbnail_filename = os.path.basename(result["thumbnail_path"])
-                thumbnail_url = f"/uploads/user_thumbnails/{thumbnail_filename}"
+                thumbnail_url = f"/assets/images/user_templates/{thumbnail_filename}"
                 
                 logger.info(f"✅ Thumbnail generated successfully: {thumbnail_url}")
                 return {
