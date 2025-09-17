@@ -117,6 +117,10 @@ const Dashboard = () => {
       // Debug: Log the raw data structure (only for templates)
       if (loadingKey === 'templates') {
         console.log(`🔍 Templates API response:`, data)
+        if (data.templates && data.templates.length > 0) {
+          console.log(`🔍 First template data:`, data.templates[0])
+          console.log(`🔍 Thumbnail URL check:`, data.templates[0].thumbnail_url)
+        }
       }
       
       if (data.success) {
@@ -905,7 +909,10 @@ const Dashboard = () => {
                       
                       {/* Thumbnail Section */}
                       <div className="relative h-32 sm:h-40 lg:h-48 mb-4 overflow-hidden bg-gray-100 rounded-t-3xl">
-                        {template.thumbnail_url ? (
+                        {(() => {
+                          console.log(`🖼️ Template ${template.name} thumbnail_url:`, template.thumbnail_url)
+                          return template.thumbnail_url
+                        })() ? (
                           <>
                             <img 
                               src={template.thumbnail_url} 
