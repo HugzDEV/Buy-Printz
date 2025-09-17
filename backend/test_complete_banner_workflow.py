@@ -564,10 +564,10 @@ async def test_complete_banner_workflow():
                             'name': 'John Doe',
                             'company': 'BuyPrintz Inc',
                             'phone': '617-800-9049',
-                            'address': '12 Alton Place',
-                            'city': 'Brookline',
+                            'address': '816 Morton Street',
+                            'city': 'Boston',
                             'state': 'MA',
-                            'zipCode': '02446'
+                            'zipCode': '02124'
                         }
                     
                         address_fields = [

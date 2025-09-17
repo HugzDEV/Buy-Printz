@@ -14,6 +14,118 @@ from playwright.async_api import async_playwright
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+async def extract_tax_from_subtotal_box(page):
+    """Extract tax amount from the subtotal box at the bottom of the page"""
+    try:
+        logger.info("💰 Extracting tax from subtotal box...")
+        
+        # Look for tax-related elements in the subtotal section
+        tax_selectors = [
+            # Direct tax field selectors
+            'input[name*="tax"]',
+            'input[placeholder*="tax"]',
+            '[data-testid*="tax"]',
+            # Text elements containing tax
+            'text*="Tax"',
+            'text*="tax"',
+            # Elements near "Tax" or "Sales Tax" text
+            '*:has-text("Tax") + *',
+            '*:has-text("Sales Tax") + *',
+            '*:has-text("tax") + *',
+            # Generic subtotal area elements
+            '.subtotal *',
+            '.total-box *',
+            '.summary *',
+            '[class*="subtotal"] *',
+            '[class*="total"] *'
+        ]
+        
+        tax_amount = None
+        
+        # Try each selector to find tax amount
+        for selector in tax_selectors:
+            try:
+                elements = await page.query_selector_all(selector)
+                for element in elements:
+                    try:
+                        # Check if it's an input field
+                        tag_name = await element.evaluate('el => el.tagName.toLowerCase()')
+                        
+                        if tag_name == 'input':
+                            # Get value from input field
+                            value = await element.get_attribute('value')
+                            if value and ('$' in value or value.replace('.', '').replace(',', '').isdigit()):
+                                logger.info(f"🔍 Found tax input field with value: {value}")
+                                tax_amount = value
+                                break
+                        else:
+                            # Get text content
+                            text = await element.inner_text()
+                            if text and text.strip():
+                                # Look for price patterns like $12.34
+                                import re
+                                price_matches = re.findall(r'\$[\d,]+\.?\d*', text)
+                                if price_matches:
+                                    # Check if this element is related to tax
+                                    parent_text = ""
+                                    try:
+                                        parent = await element.query_selector('xpath=..')
+                                        if parent:
+                                            parent_text = await parent.inner_text()
+                                    except:
+                                        pass
+                                    
+                                    combined_text = (text + " " + parent_text).lower()
+                                    if any(tax_keyword in combined_text for tax_keyword in ['tax', 'sales tax', 'state tax']):
+                                        tax_amount = price_matches[0]
+                                        logger.info(f"🔍 Found tax in text element: {tax_amount} (context: {text})")
+                                        break
+                    except:
+                        continue
+                
+                if tax_amount:
+                    break
+                    
+            except Exception as e:
+                logger.debug(f"Selector {selector} failed: {e}")
+                continue
+        
+        # If still not found, look for any element containing both "tax" and a dollar amount
+        if not tax_amount:
+            logger.info("🔍 Fallback: Looking for any element with 'tax' and dollar amount...")
+            all_elements = await page.query_selector_all('*')
+            
+            for element in all_elements:
+                try:
+                    text = await element.inner_text()
+                    if text and 'tax' in text.lower():
+                        import re
+                        price_matches = re.findall(r'\$[\d,]+\.?\d*', text)
+                        if price_matches:
+                            tax_amount = price_matches[0]
+                            logger.info(f"🔍 Found tax in fallback search: {tax_amount} (text: {text})")
+                            break
+                except:
+                    continue
+        
+        if tax_amount:
+            # Clean up the tax amount
+            clean_tax = tax_amount.replace('$', '').replace(',', '').strip()
+            try:
+                float(clean_tax)  # Validate it's a number
+                logger.info(f"✅ Successfully extracted tax amount: {tax_amount}")
+                return tax_amount
+            except ValueError:
+                logger.warning(f"⚠️ Invalid tax amount format: {tax_amount}")
+                return "$0.00"
+        else:
+            logger.warning("⚠️ Could not find tax amount, defaulting to $0.00")
+            return "$0.00"
+            
+    except Exception as e:
+        logger.warning(f"⚠️ Error extracting tax: {e}")
+        return "$0.00"
+
 def _parse_shipping_option_text(option_text):
     """Parse shipping option text to extract name, cost, and delivery date (EXACT COPY from production banner workflow)"""
     try:
@@ -188,12 +300,28 @@ async def test_complete_tent_workflow():
             print("📊 Step 8: Workflow Summary...")
             print("=" * 60)
             
+            # Extract tax from subtotal box
+            print("\n💰 Extracting tax from subtotal box...")
+            logger.info("💰 Extracting tax from subtotal box...")
+            
+            # Wait for subtotal box to update
+            await tent_integration.page.wait_for_timeout(2000)
+            
+            tax_amount = await extract_tax_from_subtotal_box(tent_integration.page)
+            if tax_amount and tax_amount != "$0.00":
+                print(f"✅ Tax extracted: {tax_amount}")
+                logger.info(f"✅ Tax extracted: {tax_amount}")
+            else:
+                print(f"⚠️ Tax amount: {tax_amount} (may be zero or not found)")
+                logger.info(f"⚠️ Tax amount: {tax_amount}")
+            
             workflow_summary = {
                 'test_completed': True,
                 'login_successful': 'login' not in current_url,
                 'tent_specs_configured': order_data,
                 'shipping_options_found': len(shipping_options),
                 'shipping_options': shipping_options,
+                'tax_amount': tax_amount,
                 'screenshots_taken': ['tent_workflow_final.png']
             }
             

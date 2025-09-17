@@ -27,12 +27,10 @@ const Dashboard = () => {
   }, [templates])
   const [userStats, setUserStats] = useState(null)
   const [preferences, setPreferences] = useState(null)
-  const [checkoutOrders, setCheckoutOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingStates, setLoadingStates] = useState({
     orders: true,
     templates: true,
-    checkoutOrders: true,
     stats: true,
     preferences: true
   })
@@ -93,7 +91,6 @@ const Dashboard = () => {
       setLoadingStates({
         orders: false,
         templates: false,
-        checkoutOrders: false,
         stats: false,
         preferences: false
       })
@@ -188,18 +185,6 @@ const Dashboard = () => {
         [],
         'orders',
         `orders_${user?.id}`
-      ),
-      
-      // Load checkout orders (orders that reached checkout but may not be paid)
-      loadDataSafely(
-        () => authService.authenticatedRequest('/api/orders/pending'),
-        (data) => {
-          const checkoutOrders = data.orders || []
-          setCheckoutOrders(checkoutOrders)
-        },
-        [],
-        'checkoutOrders',
-        `checkout_orders_${user?.id}`
       )
     ])
 
@@ -211,9 +196,8 @@ const Dashboard = () => {
       loadDataSafely(
         () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
-          console.log('Dashboard: Received templates data:', data)
-          console.log('Dashboard: Setting templates state with:', data)
-          setTemplates(data)
+          console.log('Dashboard: Processed templates data from loadDataSafely:', data)
+          setTemplates(data || [])
         },
         [],
         'templates',
@@ -362,12 +346,7 @@ const Dashboard = () => {
   const allOrders = [
     ...orders.filter(order => 
       ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(order.status)
-    ),
-    ...checkoutOrders.map(order => ({
-      ...order,
-      status: order.status || 'checkout', // Mark as checkout if no status
-      isCheckoutOrder: true // Flag to identify checkout orders
-    }))
+    )
   ]
   
   const filteredOrders = allOrders.filter(order => {
@@ -442,7 +421,12 @@ const Dashboard = () => {
       const data = await response.json()
       
       if (data.success || Array.isArray(data)) {
-        const templatesData = data.templates || data
+        let templatesData = []
+        if (data.success && data.templates) {
+          templatesData = data.templates
+        } else if (Array.isArray(data)) {
+          templatesData = data
+        }
         setTemplates(templatesData)
         cacheService.setTemplates(user.id, templatesData)
         toast.success('Templates refreshed')
@@ -935,6 +919,28 @@ const Dashboard = () => {
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       
+                      {/* Thumbnail Section */}
+                      <div className="relative h-32 sm:h-40 lg:h-48 mb-4 overflow-hidden bg-gray-100 rounded-t-3xl">
+                        {template.thumbnail ? (
+                          <>
+                            <img 
+                              src={template.thumbnail} 
+                              alt={`${template.name} preview`}
+                              className="w-full h-full object-contain bg-white"
+                            />
+                            {/* Overlay gradient for better text readability */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          </>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                            <div className="text-center">
+                              <Layout className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 mx-auto mb-2" />
+                              <p className="text-xs text-gray-500">No Preview</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <div className="relative p-4 sm:p-6 lg:p-8">
                         {/* Header Section - Mobile optimized */}
                         <div className="flex items-start justify-between mb-4 sm:mb-6">
@@ -1046,7 +1052,7 @@ const Dashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Orders</h2>
-                <p className="text-gray-600">{allOrders.length} total orders ({checkoutOrders.length} checkout, {orders.filter(o => ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(o.status)).length} completed)</p>
+                <p className="text-gray-600">{allOrders.length} total orders ({orders.filter(o => ['completed', 'paid', 'approved', 'shipped', 'delivered'].includes(o.status)).length} completed)</p>
               </div>
               
               {/* Search and Filter */}

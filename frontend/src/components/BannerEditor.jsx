@@ -3047,6 +3047,21 @@ const BannerEditorNew = () => {
     setSaveError(null)
     
     try {
+      // Generate thumbnail from current canvas
+      let thumbnail = null
+      try {
+        if (stageRef.current) {
+          thumbnail = stageRef.current.toDataURL({
+            mimeType: 'image/jpeg',
+            quality: 0.8,
+            pixelRatio: 0.5 // Smaller size for thumbnail
+          })
+          console.log('Generated template thumbnail')
+        }
+      } catch (error) {
+        console.warn('Failed to generate thumbnail:', error)
+      }
+
       const templateData = {
         name: name,
         description: description || `Template created on ${new Date().toLocaleDateString()}`,
@@ -3065,7 +3080,8 @@ const BannerEditorNew = () => {
           timestamp: new Date().toISOString()
         },
         banner_type: bannerSpecs?.id || 'vinyl-13oz',
-        is_public: false
+        is_public: false,
+        thumbnail: thumbnail // Include generated thumbnail
       }
       
       console.log('Sending template data:', templateData)
