@@ -8,30 +8,33 @@ const TinProducts = () => {
     {
       id: 'silver',
       name: "Silver",
-      price: "$399",
-      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking",
+      price: "$399.99",
+      priceNote: "100 unit minimum",
+      description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking (100 unit minimum)",
       image: "/assets/images/silvertin-buyprintz.jpg",
-      features: ["Premium silver aluminum", "Custom vinyl stickers", "Professional finish"],
+      features: ["Premium silver aluminum", "Custom vinyl stickers", "Professional finish", "100 unit minimum"],
       bestseller: true,
       icon: <Package className="w-8 h-8" />
     },
     {
       id: 'black',
       name: "Black",
-      price: "$425",
-      description: "Sleek black aluminum business card tins with custom vinyl stickers - modern and sophisticated",
+      price: "$425.00",
+      priceNote: "100 unit minimum",
+      description: "Sleek black aluminum business card tins with custom vinyl stickers - modern and sophisticated (100 unit minimum)",
       image: "/assets/images/black tins-buyprintz.jpg",
-      features: ["Premium black aluminum", "Custom vinyl stickers", "Modern finish"],
+      features: ["Premium black aluminum", "Custom vinyl stickers", "Modern finish", "100 unit minimum"],
       popular: true,
       icon: <Layers className="w-8 h-8" />
     },
     {
       id: 'gold',
       name: "Gold",
-      price: "$450",
-      description: "Luxurious gold aluminum business card tins with custom vinyl stickers - premium and elegant",
+      price: "$450.00",
+      priceNote: "100 unit minimum",
+      description: "Luxurious gold aluminum business card tins with custom vinyl stickers - premium and elegant (100 unit minimum)",
       image: "/assets/images/gold tins-buyprintz.jpg",
-      features: ["Premium gold aluminum", "Custom vinyl stickers", "Luxury finish"],
+      features: ["Premium gold aluminum", "Custom vinyl stickers", "Luxury finish", "100 unit minimum"],
       premium: true,
       icon: <Crown className="w-8 h-8" />
     }
@@ -120,7 +123,7 @@ const TinProducts = () => {
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 All finishes include premium aluminum construction with custom vinyl stickers. 
-                Select your preferred finish and start designing your professional business card tins.
+                <strong>100 unit minimum order required.</strong> Select your preferred finish and start designing your professional business card tins.
               </p>
             </div>
             
@@ -173,7 +176,10 @@ const TinProducts = () => {
                     </div>
                     
                     <div className="flex items-center justify-between mb-6">
-                      <div className="text-3xl font-bold text-blue-600">{finish.price}</div>
+                      <div>
+                        <div className="text-3xl font-bold text-blue-600">{finish.price}</div>
+                        <div className="text-sm text-gray-500 font-medium">{finish.priceNote}</div>
+                      </div>
                       <div className="flex items-center gap-1 text-yellow-500">
                         {[...Array(5)].map((_, i) => (
                           <Star key={i} className="w-4 h-4 fill-current" />

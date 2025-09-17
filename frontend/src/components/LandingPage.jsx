@@ -32,7 +32,7 @@ const LandingPage = () => {
   const featuredProducts = [
     {
       name: "Vinyl Banners",
-      price: "From $25",
+      price: "From $1.60/sqft",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included"],
@@ -43,19 +43,19 @@ const LandingPage = () => {
     {
       name: "Business Card Tins",
       price: "From $399.99",
-      description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking",
+      description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking (100 unit minimum)",
       image: "/assets/images/Tins_BC_v2_new phone number.png",
-      features: ["Premium aluminum", "Custom vinyl stickers", "100-500 units"],
+      features: ["Premium aluminum", "Custom vinyl stickers", "100 unit minimum"],
       badge: "New",
       category: "tin",
       link: "/tin-products"
     },
     {
       name: "Tradeshow Tents",
-      price: "From $299.99",
-      description: "Professional tradeshow tents with custom graphics for maximum event impact",
+      price: "From $325.00",
+      description: "Professional tradeshow tents with custom graphics for maximum event impact (canopy-only option available)",
       image: "/assets/images/tent_complete-buyprintz.jpg",
-      features: ["10x10 & 10x20 sizes", "Custom graphics", "Complete package"],
+      features: ["10x10 & 10x20 sizes", "Custom graphics", "Canopy-only option"],
       badge: "New",
       category: "tent",
       link: "/tent-products"

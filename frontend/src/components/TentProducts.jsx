@@ -8,20 +8,20 @@ const TentProducts = () => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const sizes = [
-    { id: 'all', name: 'All Sizes', count: 2 },
-    { id: '10x10', name: '10x10', count: 1 },
-    { id: '10x20', name: '10x20', count: 1 }
+    { id: 'all', name: 'All Options', count: 2 },
+    { id: 'canopy-only', name: 'Canopy Only', count: 1 },
+    { id: 'with-walls', name: 'With Walls', count: 1 }
   ]
 
   const tentProducts = [
     {
-      id: 'tent-10x10',
-      size: '10x10',
-      name: "10x10 Event Tent",
-      price: "From $299",
-      description: "Professional 10x10 event tent with heavy duty aluminum hex frame and custom dye sublimated graphics",
-      image: "/assets/images/tent_complete-buyprintz.jpg",
-      features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Dye sublimated graphics", "Carry bag included"],
+      id: 'tent-canopy-only',
+      size: 'canopy-only',
+      name: "10x10 Complete Tent (Canopy Only)",
+      price: "$325.00 - $599.00",
+      description: "Complete tent package with frame and canopy. Perfect starter option with professional aluminum frame and custom dye sublimated canopy graphics.",
+      image: "/assets/images/Tent_only-buyprintz.jpg",
+      features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Dye sublimated graphics", "Complete accessories included"],
       bestseller: true,
       specs: {
         material: "6oz Tent Fabric (600x600 denier)",
@@ -32,36 +32,34 @@ const TentProducts = () => {
         dimensions: "120\"w x 120\"d x 124.5\"-137\"h"
       },
       accessories: [
-        "Carrying Bag w/ Wheels",
-        "Sandbags (Sand not included)",
-        "Reinforced Strip",
-        "Full Wall",
-        "Half Wall"
+        "Standard Carrying Bag (FREE)",
+        "Sandbags (FREE - Sand not included)", 
+        "Ropes & Stakes (FREE)",
+        "Carrying Bag w/ Wheels (Upgrade)"
       ]
     },
     {
-      id: 'tent-10x20',
-      size: '10x20',
-      name: "10x20 Event Tent",
-      price: "From $499",
-      description: "Large 10x20 event tent perfect for major trade shows and outdoor events with maximum branding impact",
-      image: "/assets/images/full_10x20_tent-buyprintz.jpg",
-      features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Dye sublimated graphics", "Carry bag included"],
+      id: 'tent-with-walls',
+      size: 'with-walls',
+      name: "10x10 Complete Tent + Walls",
+      price: "$750.00 - $900.00",
+      description: "Complete tent with frame, canopy, and wall options. Enhanced coverage with sidewalls and/or backwall for maximum branding and protection.",
+      image: "/assets/images/tent_complete-buyprintz.jpg",
+      features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Canopy + wall graphics", "Complete package with accessories"],
       premium: true,
       specs: {
         material: "6oz Tent Fabric (600x600 denier)",
         frame: "40mm Aluminum Hex Hardware",
         print: "Dye-Sublimation Graphic",
         durability: "Weather resistant (waterproof coated fabric)",
-        weight: "85 lbs (Full Package)",
-        dimensions: "240\"w x 120\"d x 124.5\"-137\"h"
+        weight: "58-65 lbs (depending on walls)",
+        dimensions: "120\"w x 120\"d x 124.5\"-137\"h with walls"
       },
       accessories: [
-        "Carrying Bag w/ Wheels",
-        "Sandbags (Sand not included)",
-        "Reinforced Strip",
-        "Full Wall",
-        "Half Wall"
+        "Standard Carrying Bag (FREE)",
+        "Sandbags (FREE - Sand not included)",
+        "Ropes & Stakes (FREE)", 
+        "Carrying Bag w/ Wheels (Upgrade)"
       ]
     }
   ]
@@ -105,7 +103,7 @@ const TentProducts = () => {
               Tradeshow Tents
             </h1>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto drop-shadow-md">
-              Professional tradeshow tents with custom graphics - achieve 360 degrees of branding with heavy duty aluminum frames
+              Professional tradeshow tents with custom graphics - starting at $325.00 for canopy-only, up to $900.00 for full wall coverage
             </p>
           </div>
           
@@ -134,9 +132,9 @@ const TentProducts = () => {
                 <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
                   <Truck className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-white">Complete Package</span>
+                <span className="text-2xl font-bold text-white">Flexible Options</span>
               </div>
-              <p className="text-primary-100">Tent, graphics, and hardware included</p>
+              <p className="text-primary-100">Canopy-only or complete tent packages</p>
             </div>
           </div>
         </div>
@@ -159,7 +157,7 @@ const TentProducts = () => {
                 />
               </div>
               
-              {/* Size Filters */}
+              {/* Option Filters */}
               <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => (
                   <button

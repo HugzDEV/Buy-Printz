@@ -3987,7 +3987,7 @@ const BannerEditorNew = () => {
               if (orderData.tent_specs) {
                 setTentSpecs(orderData.tent_specs)
                 console.log('🎨 Restored tent specs (fallback):', orderData.tent_specs)
-              }
+            }
           }).catch(error => {
             console.error('Failed to restore image elements:', error)
             // Fallback to loading without images
@@ -4004,7 +4004,7 @@ const BannerEditorNew = () => {
               if (orderData.tent_design_option) {
                 setTentDesignOption(orderData.tent_design_option)
                 console.log('🎨 Restored tent design option (error fallback):', orderData.tent_design_option)
-              }
+            }
           })
           }
         }

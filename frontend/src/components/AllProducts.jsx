@@ -7,7 +7,7 @@ const AllProducts = () => {
   const featuredProducts = [
     {
       name: "Vinyl Banners",
-      price: "From $25",
+      price: "From $2.25/sqft",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
       link: "/banner-products",
@@ -18,7 +18,7 @@ const AllProducts = () => {
     {
       name: "Business Card Tins",
       price: "From $399.99",
-      description: "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
+      description: "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging (100 unit minimum)",
       image: "/assets/images/Tins_BC_v2_new phone number.png",
       link: "/tin-products",
       badge: "New",
@@ -27,8 +27,8 @@ const AllProducts = () => {
     },
     {
       name: "Tradeshow Tents",
-      price: "From $299.99",
-      description: "Professional event tents with 360-degree branding coverage and heavy-duty aluminum frames",
+      price: "From $325.00",
+      description: "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
       image: "/assets/images/tent_complete-buyprintz.jpg",
       link: "/tent-products",
       badge: "New",
