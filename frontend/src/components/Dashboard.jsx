@@ -97,7 +97,6 @@ const Dashboard = () => {
     }
   }
 
-  const loadDataProgressively = async () => {
   const loadDataSafely = async (apiCall, setter, fallback, loadingKey, cacheKey = null) => {
     try {
       // Check cache first if cacheKey is provided
@@ -174,6 +173,7 @@ const Dashboard = () => {
     }
   }
 
+  const loadDataProgressively = async () => {
     // Load core data first (orders)
     await Promise.all([
       loadDataSafely(
@@ -197,6 +197,7 @@ const Dashboard = () => {
         () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
           console.log('Dashboard: Processed templates data from loadDataSafely:', data)
+          console.log('Dashboard: Setting templates state with:', data?.length || 0, 'items')
           setTemplates(data || [])
         },
         [],
