@@ -9,7 +9,10 @@ import os
 import sys
 from PIL import Image
 import asyncio
-from .database import db_manager
+try:
+    from .database import db_manager
+except ImportError:
+    from database import db_manager
 
 # Thumbnail configuration
 THUMBNAIL_SIZE = (300, 300)  # Square thumbnails for consistent grid layout
