@@ -46,8 +46,55 @@ def validate_image_file(image_path: str) -> tuple[bool, str]:
     except Exception as e:
         return False, f"Invalid image file: {e}"
 
+def detect_content_bounds(img):
+    """Detect the bounds of actual content in the image (non-background areas)"""
+    import numpy as np
+    
+    # Convert to numpy array for analysis
+    img_array = np.array(img)
+    
+    # Detect the dominant background color (assume it's the corner pixels)
+    corners = [
+        img_array[0, 0],  # top-left
+        img_array[0, -1], # top-right
+        img_array[-1, 0], # bottom-left
+        img_array[-1, -1] # bottom-right
+    ]
+    
+    # Use the most common corner color as background
+    from collections import Counter
+    corner_colors = [tuple(corner) for corner in corners]
+    background_color = Counter(corner_colors).most_common(1)[0][0]
+    
+    print(f"🎨 Detected background color: {background_color}")
+    
+    # Define threshold for background similarity (allow for slight variations)
+    background_threshold = 30
+    
+    # Find non-background pixels
+    background_array = np.array(background_color)
+    diff = np.sqrt(np.sum((img_array - background_array) ** 2, axis=2))
+    non_background_mask = diff > background_threshold
+    
+    # Find bounds of non-background content
+    rows = np.any(non_background_mask, axis=1)
+    cols = np.any(non_background_mask, axis=0)
+    
+    if not np.any(rows) or not np.any(cols):
+        # No content found, return full image bounds
+        print("🔍 No distinct content detected, using full image")
+        return 0, 0, img.width, img.height
+    
+    top = np.argmax(rows)
+    bottom = len(rows) - np.argmax(rows[::-1])
+    left = np.argmax(cols)
+    right = len(cols) - np.argmax(cols[::-1])
+    
+    print(f"🎯 Content bounds detected: ({left}, {top}) to ({right}, {bottom})")
+    return left, top, right, bottom
+
 def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
-    """Generate a thumbnail for an image"""
+    """Generate a smart thumbnail that focuses on actual content"""
     try:
         # Increase PIL's image size limit to handle large images
         Image.MAX_IMAGE_PIXELS = None
@@ -65,6 +112,36 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             elif img.mode != 'RGB':
                 img = img.convert('RGB')
             
+            # Detect content bounds to focus on actual design content
+            try:
+                left, top, right, bottom = detect_content_bounds(img)
+                content_width = right - left
+                content_height = bottom - top
+                
+                # Only crop if we found meaningful content and it's not the whole image
+                if (content_width > 50 and content_height > 50 and 
+                    (content_width < img.width * 0.9 or content_height < img.height * 0.9)):
+                    
+                    # Add padding around content (10% of content size, minimum 20px)
+                    padding_x = max(20, int(content_width * 0.1))
+                    padding_y = max(20, int(content_height * 0.1))
+                    
+                    # Expand bounds with padding, but stay within image
+                    crop_left = max(0, left - padding_x)
+                    crop_top = max(0, top - padding_y)
+                    crop_right = min(img.width, right + padding_x)
+                    crop_bottom = min(img.height, bottom + padding_y)
+                    
+                    # Crop to content with padding
+                    img = img.crop((crop_left, crop_top, crop_right, crop_bottom))
+                    print(f"🎯 Smart crop applied: {crop_left},{crop_top} to {crop_right},{crop_bottom}")
+                else:
+                    print(f"📏 Content bounds too small or covers whole image, using full image")
+                    
+            except Exception as e:
+                print(f"⚠️ Content detection failed, using full image: {e}")
+                # Continue with full image if content detection fails
+            
             # Calculate thumbnail size maintaining aspect ratio
             img.thumbnail(THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
             
@@ -76,7 +153,7 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             y = (THUMBNAIL_SIZE[1] - img.size[1]) // 2
             thumbnail.paste(img, (x, y))
             
-            # Save the thumbnail
+            # Save the thumbnail with higher quality for better mobile viewing
             thumbnail.save(thumbnail_path, 'JPEG', quality=THUMBNAIL_QUALITY, optimize=True)
             return True
             

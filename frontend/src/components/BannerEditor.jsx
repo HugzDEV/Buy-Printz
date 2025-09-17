@@ -3052,11 +3052,17 @@ const BannerEditorNew = () => {
       try {
         if (stageRef.current) {
           // Generate high-quality image for server-side thumbnail creation
+          // Use higher pixelRatio for mobile to compensate for smaller screen designs
+          const isMobile = window.innerWidth < 768
+          const pixelRatio = isMobile ? 3 : 2 // Higher quality for mobile captures
+          
           const fullQualityImage = stageRef.current.toDataURL({
             mimeType: 'image/png',
             quality: 1.0,
-            pixelRatio: 2 // High resolution for server processing
+            pixelRatio: pixelRatio // Adaptive resolution based on device
           })
+          
+          console.log(`🎨 Generated template image - Mobile: ${isMobile}, PixelRatio: ${pixelRatio}`)
           
           console.log('🎨 Sending image to thumbnail service...')
           
