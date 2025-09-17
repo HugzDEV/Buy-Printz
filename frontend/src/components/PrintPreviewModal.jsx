@@ -260,8 +260,8 @@ const PrintPreviewModal = ({
           ctx.globalAlpha = 1
           ctx.globalCompositeOperation = 'source-over'
           
-          // Return watermarked image as data URL
-          resolve(canvas.toDataURL('image/png', 0.9))
+          // Return watermarked image as data URL with maximum quality
+          resolve(canvas.toDataURL('image/png', 1.0))
         }
         
         watermarkImg.onerror = () => {
@@ -308,8 +308,34 @@ const PrintPreviewModal = ({
         precision: 16 // Maximum precision for production quality
       })
 
-      // Add the Konva image to PDF with maximum quality settings
-      pdf.addImage(imageDataURL, 'PNG', 0, 0, pdfWidthInches, pdfHeightInches, undefined, 'MEDIUM', 0)
+      // Calculate image dimensions to maintain aspect ratio
+      const img = new Image()
+      img.src = imageDataURL
+      await new Promise((resolve) => {
+        img.onload = resolve
+      })
+      
+      const imageAspectRatio = img.width / img.height
+      const pdfAspectRatio = pdfWidthInches / pdfHeightInches
+      
+      let finalWidth = pdfWidthInches
+      let finalHeight = pdfHeightInches
+      let offsetX = 0
+      let offsetY = 0
+      
+      // Maintain aspect ratio and center the image
+      if (imageAspectRatio > pdfAspectRatio) {
+        // Image is wider than PDF - fit to width
+        finalHeight = pdfWidthInches / imageAspectRatio
+        offsetY = (pdfHeightInches - finalHeight) / 2
+      } else {
+        // Image is taller than PDF - fit to height
+        finalWidth = pdfHeightInches * imageAspectRatio
+        offsetX = (pdfWidthInches - finalWidth) / 2
+      }
+      
+      // Add the Konva image to PDF with proper aspect ratio and maximum quality
+      pdf.addImage(imageDataURL, 'PNG', offsetX, offsetY, finalWidth, finalHeight, undefined, 'SLOW', 0)
 
       // Create blob for production
       const pdfBlob = pdf.output('blob')
@@ -391,7 +417,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden">
+      <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5" />
@@ -404,7 +430,7 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
            {/* Left Column: Preview + Quality Assurance */}
            <div className="lg:col-span-2 space-y-4 lg:space-y-6">
              {/* Design Preview */}
@@ -438,18 +464,20 @@ const PrintPreviewModal = ({
                  </CardTitle>
                </CardHeader>
                <CardContent className="overflow-hidden">
-                  <div className="w-full h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-2 md:p-4">
+                  <div className="w-full h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-2 sm:p-3 md:p-4">
                     {previewImage ? (
                       <div className="relative w-full h-full flex items-center justify-center">
                         <img 
                           src={previewImage} 
                           alt="Design Preview"
-                          className="object-contain rounded shadow-lg max-w-full max-h-full"
+                          className="object-contain rounded shadow-lg"
                           style={{
-                            transform: `scale(${imageScale})`,
-                            transition: 'transform 0.2s ease-in-out',
+                            maxWidth: '100%',
+                            maxHeight: '100%',
                             width: 'auto',
-                            height: 'auto'
+                            height: 'auto',
+                            transform: `scale(${imageScale})`,
+                            transition: 'transform 0.2s ease-in-out'
                           }}
                           onContextMenu={(e) => e.preventDefault()}
                           onDragStart={(e) => e.preventDefault()}

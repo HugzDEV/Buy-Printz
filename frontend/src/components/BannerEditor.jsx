@@ -178,14 +178,14 @@ const BannerEditorNew = () => {
       if (stageRef.current) {
         console.log('🎨 Using Konva native export (toDataURL) - eliminates alignment issues')
         const imageData = stageRef.current.toDataURL({
-          pixelRatio: 2, // High quality export
+          pixelRatio: 3, // Higher quality export for better print quality
           mimeType: 'image/png',
-          quality: 0.8
+          quality: 1.0 // Maximum quality for print
         })
         console.log('🎨 Konva image generated successfully, length:', imageData.length)
         
-        // Check if image is too large (limit to 5MB)
-        if (imageData.length > 5 * 1024 * 1024) {
+        // Check if image is too large (limit to 10MB for high quality)
+        if (imageData.length > 10 * 1024 * 1024) {
           console.warn('🎨 Konva image too large, reducing quality')
           return stageRef.current.toDataURL({
             pixelRatio: 1, // Reduce pixel ratio for smaller file
