@@ -1032,57 +1032,100 @@ async def generate_template_thumbnail(
 ):
     """Generate thumbnail for user template using marketplace thumbnail service"""
     try:
+        logger.info(f"🎨 Thumbnail generation requested by user: {current_user['user_id']}")
+        
         import base64
         import os
         import tempfile
-        from generate_thumbnails import process_single_image
         
         image_data = thumbnail_data.get("imageData", "")
         template_name = thumbnail_data.get("templateName", "template")
         
         if not image_data:
+            logger.error("❌ No image data provided")
             raise HTTPException(status_code=400, detail="No image data provided")
+        
+        logger.info(f"📊 Image data size: {len(image_data)} characters")
         
         # Remove data URL prefix if present
         if "," in image_data:
             image_data = image_data.split(",")[1]
+            logger.info("✂️ Removed data URL prefix")
         
         # Decode base64 image
-        image_bytes = base64.b64decode(image_data)
+        try:
+            image_bytes = base64.b64decode(image_data)
+            logger.info(f"✅ Decoded image: {len(image_bytes)} bytes")
+        except Exception as e:
+            logger.error(f"❌ Base64 decode failed: {e}")
+            raise HTTPException(status_code=400, detail=f"Invalid image data: {e}")
         
         # Create temporary file for processing
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
-            temp_file.write(image_bytes)
-            temp_path = temp_file.name
+        temp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+                temp_file.write(image_bytes)
+                temp_path = temp_file.name
+            logger.info(f"📁 Created temp file: {temp_path}")
+        except Exception as e:
+            logger.error(f"❌ Failed to create temp file: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to create temporary file: {e}")
         
         try:
-            # Use marketplace thumbnail generation service
-            user_thumbnail_dir = f"../frontend/public/assets/images/user_templates"
-            os.makedirs(user_thumbnail_dir, exist_ok=True)
+            # Try to import the thumbnail service
+            try:
+                from generate_thumbnails import process_single_image
+                logger.info("✅ Successfully imported process_single_image")
+            except ImportError as e:
+                logger.error(f"❌ Failed to import process_single_image: {e}")
+                raise HTTPException(status_code=500, detail=f"Thumbnail service not available: {e}")
             
+            # Create output directory
+            user_thumbnail_dir = f"../frontend/public/assets/images/user_templates"
+            try:
+                os.makedirs(user_thumbnail_dir, exist_ok=True)
+                logger.info(f"📁 Created/verified output directory: {user_thumbnail_dir}")
+            except Exception as e:
+                logger.error(f"❌ Failed to create output directory: {e}")
+                raise HTTPException(status_code=500, detail=f"Failed to create output directory: {e}")
+            
+            # Process the image
+            logger.info("🔄 Processing image with thumbnail service...")
             result = process_single_image(temp_path, user_thumbnail_dir)
+            logger.info(f"📊 Thumbnail service result: {result}")
             
             if result["success"]:
                 # Generate web-accessible URL
                 thumbnail_filename = os.path.basename(result["thumbnail_path"])
                 thumbnail_url = f"/assets/images/user_templates/{thumbnail_filename}"
                 
+                logger.info(f"✅ Thumbnail generated successfully: {thumbnail_url}")
                 return {
                     "success": True,
                     "thumbnail_url": thumbnail_url,
                     "file_size": result["thumbnail_size"]
                 }
             else:
-                raise HTTPException(status_code=500, detail=f"Thumbnail generation failed: {result['error']}")
+                logger.error(f"❌ Thumbnail generation failed: {result.get('error', 'Unknown error')}")
+                raise HTTPException(status_code=500, detail=f"Thumbnail generation failed: {result.get('error', 'Unknown error')}")
                 
         finally:
             # Clean up temporary file
-            if os.path.exists(temp_path):
-                os.unlink(temp_path)
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.unlink(temp_path)
+                    logger.info(f"🗑️ Cleaned up temp file: {temp_path}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to clean up temp file: {e}")
                 
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
-        logger.error(f"Error generating thumbnail: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"❌ Unexpected error in thumbnail generation: {e}")
+        import traceback
+        logger.error(f"📋 Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @app.delete("/api/templates/{template_id}")
 async def delete_template(template_id: str, current_user: dict = Depends(get_current_user)):
