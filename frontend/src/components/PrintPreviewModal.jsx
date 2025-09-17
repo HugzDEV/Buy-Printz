@@ -88,8 +88,13 @@ const PrintPreviewModal = ({
             imageAspectRatio: imageAspectRatio.toFixed(3),
             containerAspectRatio: containerAspectRatio.toFixed(3),
             isWideImage: imageAspectRatio >= 1.8,
-            optimalScale: optimalScale.toFixed(3)
+            optimalScale: optimalScale.toFixed(3),
+            finalImageWidth: `${optimalScale * img.width}px`,
+            finalImageHeight: `${optimalScale * img.height}px`
           })
+          
+          // Force a re-render to ensure the scale is applied
+          console.log('📱 Setting imageScale to:', optimalScale)
           
           setImageScale(optimalScale)
         }
@@ -537,19 +542,29 @@ const PrintPreviewModal = ({
                       <img 
                         src={previewImage} 
                         alt="Design Preview"
-                        className="rounded shadow-lg max-w-none max-h-none"
+                        className={`rounded shadow-lg ${isMobile ? '' : 'max-w-none max-h-none'}`}
                         style={{
-                          // Mobile: Use calculated dimensions, Desktop: Use auto sizing
-                          width: isMobile ? `${imageScale * 300}px` : 'auto',
+                          // DIRECT IMAGE SCALING - Force the image to scale properly on mobile
+                          width: isMobile ? '90vw' : 'auto',
                           height: isMobile ? 'auto' : 'auto',
-                          maxWidth: isMobile ? '95vw' : '100%',
-                          maxHeight: isMobile ? '65vh' : '100%',
+                          minWidth: isMobile ? '300px' : 'auto',
+                          minHeight: isMobile ? '150px' : 'auto',
+                          maxWidth: isMobile ? '90vw' : '100%',
+                          maxHeight: isMobile ? '60vh' : '100%',
                           objectFit: 'contain',
+                          transform: isMobile ? `scale(${imageScale})` : 'none',
+                          transformOrigin: 'center center',
                           transition: 'all 0.2s ease-in-out'
                         }}
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}
                         draggable={false}
+                        onLoad={() => {
+                          if (isMobile) {
+                            console.log('📱 Mobile image loaded with scale:', imageScale)
+                            console.log('📱 Image element computed style:', window.getComputedStyle(event.target))
+                          }
+                        }}
                       />
                         {/* BuyPrintz Watermark Overlay for IP Protection */}
                         <div 
@@ -566,7 +581,10 @@ const PrintPreviewModal = ({
                             mozUserSelect: 'none',
                             msUserSelect: 'none',
                             pointerEvents: 'none',
-                            zIndex: 9999
+                            zIndex: 9999,
+                            // Scale watermark with image on mobile
+                            transform: isMobile ? `scale(${imageScale})` : 'none',
+                            transformOrigin: 'center center'
                           }}
                           onContextMenu={(e) => e.preventDefault()}
                           onDragStart={(e) => e.preventDefault()}
