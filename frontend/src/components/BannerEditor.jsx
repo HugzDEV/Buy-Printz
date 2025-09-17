@@ -3053,10 +3053,10 @@ const BannerEditorNew = () => {
         if (stageRef.current) {
           thumbnail = stageRef.current.toDataURL({
             mimeType: 'image/jpeg',
-            quality: 0.8,
-            pixelRatio: 0.5 // Smaller size for thumbnail
+            quality: 0.9,
+            pixelRatio: 1.0 // Good quality for thumbnail display
           })
-          console.log('Generated template thumbnail')
+          console.log('Generated template thumbnail:', thumbnail ? 'SUCCESS' : 'FAILED')
         }
       } catch (error) {
         console.warn('Failed to generate thumbnail:', error)
@@ -3084,7 +3084,10 @@ const BannerEditorNew = () => {
         thumbnail: thumbnail // Include generated thumbnail
       }
       
-      console.log('Sending template data:', templateData)
+      console.log('Sending template data with thumbnail:', {
+        ...templateData,
+        thumbnail: thumbnail ? `${thumbnail.substring(0, 50)}...` : 'NO THUMBNAIL'
+      })
       
       const response = await authService.authenticatedRequest('/api/templates/save', {
         method: 'POST',

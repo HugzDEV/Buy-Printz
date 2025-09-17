@@ -266,6 +266,7 @@ class TemplateData(BaseModel):
     canvas_data: dict
     banner_type: Optional[str] = None
     is_public: bool = False
+    thumbnail: Optional[str] = None  # Base64 encoded thumbnail image
 
 class EnhancedCanvasData(BaseModel):
     name: str
