@@ -464,25 +464,25 @@ const PrintPreviewModal = ({
                  </CardTitle>
                </CardHeader>
                <CardContent className="overflow-hidden">
-                  <div className="w-full h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-2 sm:p-3 md:p-4">
-                    {previewImage ? (
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        <img 
-                          src={previewImage} 
-                          alt="Design Preview"
-                          className="object-contain rounded shadow-lg"
-                          style={{
-                            maxWidth: '100%',
-                            maxHeight: '100%',
-                            width: 'auto',
-                            height: 'auto',
-                            transform: `scale(${imageScale})`,
-                            transition: 'transform 0.2s ease-in-out'
-                          }}
-                          onContextMenu={(e) => e.preventDefault()}
-                          onDragStart={(e) => e.preventDefault()}
-                          draggable={false}
-                        />
+                 <div className="w-full h-[60vh] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-1 sm:p-3 md:p-4">
+                   {previewImage ? (
+                     <div className="relative w-full h-full flex items-center justify-center">
+                       <img 
+                         src={previewImage} 
+                         alt="Design Preview"
+                         className="object-contain rounded shadow-lg w-full h-full sm:w-auto sm:h-auto"
+                         style={{
+                           maxWidth: '100%',
+                           maxHeight: '100%',
+                           width: 'auto',
+                           height: 'auto',
+                           transform: `scale(${imageScale})`,
+                           transition: 'transform 0.2s ease-in-out'
+                         }}
+                         onContextMenu={(e) => e.preventDefault()}
+                         onDragStart={(e) => e.preventDefault()}
+                         draggable={false}
+                       />
                         {/* BuyPrintz Watermark Overlay for IP Protection */}
                         <div 
                           className="absolute inset-0 pointer-events-none z-50"
