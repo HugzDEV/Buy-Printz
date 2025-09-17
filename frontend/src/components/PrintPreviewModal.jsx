@@ -223,6 +223,64 @@ const PrintPreviewModal = ({
     navigateToSurface(newIndex)
   }
 
+  // Generate watermarked image for downloads
+  const generateWatermarkedImage = async (originalImageDataURL) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      
+      const img = new Image()
+      img.onload = () => {
+        // Set canvas size to match image
+        canvas.width = img.width
+        canvas.height = img.height
+        
+        // Draw the original image
+        ctx.drawImage(img, 0, 0)
+        
+        // Load and draw watermark
+        const watermarkImg = new Image()
+        watermarkImg.onload = () => {
+          // Calculate watermark pattern
+          const watermarkWidth = Math.min(canvas.width / 4, 300)
+          const watermarkHeight = (watermarkImg.height / watermarkImg.width) * watermarkWidth
+          
+          // Set watermark properties
+          ctx.globalAlpha = 0.3
+          ctx.globalCompositeOperation = 'multiply'
+          
+          // Draw repeating watermark pattern
+          for (let x = 0; x < canvas.width; x += watermarkWidth * 1.5) {
+            for (let y = 0; y < canvas.height; y += watermarkHeight * 1.5) {
+              ctx.drawImage(watermarkImg, x, y, watermarkWidth, watermarkHeight)
+            }
+          }
+          
+          // Reset context properties
+          ctx.globalAlpha = 1
+          ctx.globalCompositeOperation = 'source-over'
+          
+          // Return watermarked image as data URL
+          resolve(canvas.toDataURL('image/png', 0.9))
+        }
+        
+        watermarkImg.onerror = () => {
+          console.warn('Watermark image failed to load, using original image')
+          resolve(originalImageDataURL)
+        }
+        
+        watermarkImg.src = '/assets/images/BuyPrintz_Watermark_1200px_72dpi.png'
+      }
+      
+      img.onerror = () => {
+        console.error('Failed to load original image for watermarking')
+        resolve(originalImageDataURL)
+      }
+      
+      img.src = originalImageDataURL
+    })
+  }
+
   // Create PDF from Konva image (production quality)
   const createPDFFromImage = async (imageDataURL) => {
     try {
@@ -267,7 +325,9 @@ const PrintPreviewModal = ({
 
   const handleApprove = async () => {
     if (previewImage) {
-      await createPDFFromImage(previewImage)
+      // Generate watermarked version for approval (IP protection)
+      const watermarkedImage = await generateWatermarkedImage(previewImage)
+      await createPDFFromImage(watermarkedImage)
       onApprove?.()
     }
   }
@@ -277,7 +337,10 @@ const PrintPreviewModal = ({
     
     try {
       setIsGenerating(true)
-      const pdfBlob = await createPDFFromImage(previewImage)
+      
+      // Generate watermarked version for download (IP protection)
+      const watermarkedImage = await generateWatermarkedImage(previewImage)
+      const pdfBlob = await createPDFFromImage(watermarkedImage)
       
       // Create download link
       const url = URL.createObjectURL(pdfBlob)
@@ -328,7 +391,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl w-[95vw] max-h-[90vh] mx-auto overflow-hidden">
+      <DialogContent className="max-w-5xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5" />
@@ -341,9 +404,9 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
            {/* Left Column: Preview + Quality Assurance */}
-           <div className="lg:col-span-2 space-y-6">
+           <div className="lg:col-span-2 space-y-4 lg:space-y-6">
              {/* Design Preview */}
              <Card className="overflow-hidden">
                <CardHeader className="pb-3">
@@ -375,21 +438,43 @@ const PrintPreviewModal = ({
                  </CardTitle>
                </CardHeader>
                <CardContent className="overflow-hidden">
-                  <div className="w-full h-[400px] lg:h-[500px] bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-2 md:p-4">
                     {previewImage ? (
-                      <div className="w-full h-full flex items-center justify-center p-4">
+                      <div className="relative w-full h-full flex items-center justify-center">
                         <img 
                           src={previewImage} 
                           alt="Design Preview"
-                          className="object-contain rounded shadow-lg"
+                          className="object-contain rounded shadow-lg max-w-full max-h-full"
                           style={{
                             transform: `scale(${imageScale})`,
                             transition: 'transform 0.2s ease-in-out',
-                            maxWidth: '100%',
-                            maxHeight: '100%',
                             width: 'auto',
                             height: 'auto'
                           }}
+                          onContextMenu={(e) => e.preventDefault()}
+                          onDragStart={(e) => e.preventDefault()}
+                          draggable={false}
+                        />
+                        {/* BuyPrintz Watermark Overlay for IP Protection */}
+                        <div 
+                          className="absolute inset-0 pointer-events-none z-50"
+                          style={{
+                            backgroundImage: `url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')`,
+                            backgroundSize: 'contain',
+                            backgroundRepeat: 'repeat',
+                            backgroundPosition: 'center',
+                            opacity: 0.3,
+                            mixBlendMode: 'multiply',
+                            userSelect: 'none',
+                            webkitUserSelect: 'none',
+                            mozUserSelect: 'none',
+                            msUserSelect: 'none',
+                            pointerEvents: 'none',
+                            zIndex: 9999
+                          }}
+                          onContextMenu={(e) => e.preventDefault()}
+                          onDragStart={(e) => e.preventDefault()}
+                          onSelectStart={(e) => e.preventDefault()}
                         />
                       </div>
                     ) : (
@@ -430,14 +515,14 @@ const PrintPreviewModal = ({
            </div>
 
            {/* Right Column: Surfaces + Print Specs + Actions */}
-           <div className="space-y-6">
+           <div className="space-y-4 lg:space-y-6">
              {/* All Surfaces */}
              {hasMultipleSurfaces() && (
                <Card>
                  <CardHeader className="pb-3">
                    <CardTitle className="text-lg">All Surfaces</CardTitle>
                  </CardHeader>
-                 <CardContent className="overflow-y-auto max-h-[400px]">
+                 <CardContent className="overflow-y-auto max-h-[250px] md:max-h-[350px] lg:max-h-[400px]">
                     <SurfaceThumbnailViewer
                       orderDetails={orderDetails}
                       canvasData={canvasData}
