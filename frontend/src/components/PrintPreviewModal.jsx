@@ -539,14 +539,13 @@ const PrintPreviewModal = ({
                         alt="Design Preview"
                         className="rounded shadow-lg max-w-none max-h-none"
                         style={{
-                          // Enhanced mobile sizing to work with improved scaling calculation
-                          maxWidth: '100%',
-                          maxHeight: '100%',
-                          width: 'auto',
-                          height: 'auto',
+                          // Mobile: Use calculated dimensions, Desktop: Use auto sizing
+                          width: isMobile ? `${imageScale * 300}px` : 'auto',
+                          height: isMobile ? 'auto' : 'auto',
+                          maxWidth: isMobile ? '95vw' : '100%',
+                          maxHeight: isMobile ? '65vh' : '100%',
                           objectFit: 'contain',
-                          transform: `scale(${imageScale})`,
-                          transition: 'transform 0.2s ease-in-out'
+                          transition: 'all 0.2s ease-in-out'
                         }}
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}

@@ -159,21 +159,28 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             print(f"🔍 Original aspect ratio: {original_aspect:.3f}")
             print(f"🔍 Target aspect ratio: {target_aspect:.3f}")
             
-            # Calculate dimensions to fill more of the thumbnail space
+            # IMPROVED: More conservative sizing to prevent cropping and ensure centering
             if original_aspect > target_aspect:
-                # Image is wider than square - fit to width, allow some cropping of height
-                new_width = THUMBNAIL_SIZE[0]
-                new_height = int(THUMBNAIL_SIZE[0] / original_aspect)
-                if new_height < THUMBNAIL_SIZE[1] * 0.7:  # If too narrow, fit to height instead
-                    new_height = int(THUMBNAIL_SIZE[1] * 0.85)  # Use 85% of height for better visibility
+                # Image is wider than square - be more conservative to prevent cropping
+                new_width = int(THUMBNAIL_SIZE[0] * 0.95)  # Use 95% of width to ensure it fits
+                new_height = int(new_width / original_aspect)
+                
+                # If still too narrow, increase height but keep it reasonable
+                if new_height < THUMBNAIL_SIZE[1] * 0.6:  # Reduced from 0.7
+                    new_height = int(THUMBNAIL_SIZE[1] * 0.75)  # Reduced from 0.85 to prevent cropping
                     new_width = int(new_height * original_aspect)
+                    # Ensure width doesn't exceed thumbnail bounds
+                    if new_width > THUMBNAIL_SIZE[0]:
+                        new_width = int(THUMBNAIL_SIZE[0] * 0.95)
+                        new_height = int(new_width / original_aspect)
             else:
                 # Image is taller than square or square - fit to height
-                new_height = int(THUMBNAIL_SIZE[1] * 0.85)  # Use 85% of height for better visibility
+                new_height = int(THUMBNAIL_SIZE[1] * 0.75)  # Reduced from 0.85 to prevent cropping
                 new_width = int(new_height * original_aspect)
-                if new_width > THUMBNAIL_SIZE[0]:  # If too wide, fit to width
-                    new_width = THUMBNAIL_SIZE[0]
-                    new_height = int(THUMBNAIL_SIZE[0] / original_aspect)
+                # Ensure width doesn't exceed thumbnail bounds
+                if new_width > THUMBNAIL_SIZE[0]:
+                    new_width = int(THUMBNAIL_SIZE[0] * 0.95)
+                    new_height = int(new_width / original_aspect)
             
             print(f"🔍 Calculated new size: {new_width} x {new_height}")
             
