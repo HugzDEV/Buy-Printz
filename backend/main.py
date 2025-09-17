@@ -1127,7 +1127,15 @@ async def generate_template_thumbnail(
         import base64
         import tempfile
         import uuid
-        from database import supabase
+        
+        # Import supabase with fallback for different environments
+        try:
+            from database import supabase
+        except ImportError:
+            try:
+                from backend.database import supabase
+            except ImportError:
+                from .database import supabase
         
         image_data = thumbnail_data.get("imageData", "")
         template_name = thumbnail_data.get("templateName", "template")
