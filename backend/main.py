@@ -1080,8 +1080,8 @@ async def generate_template_thumbnail(
                 logger.error(f"❌ Failed to import process_single_image: {e}")
                 raise HTTPException(status_code=500, detail=f"Thumbnail service not available: {e}")
             
-            # Create output directory
-            user_thumbnail_dir = f"../frontend/public/assets/images/user_templates"
+            # Create output directory (use uploads directory that Railway can write to)
+            user_thumbnail_dir = "uploads/user_thumbnails"
             try:
                 os.makedirs(user_thumbnail_dir, exist_ok=True)
                 logger.info(f"📁 Created/verified output directory: {user_thumbnail_dir}")
@@ -1095,9 +1095,9 @@ async def generate_template_thumbnail(
             logger.info(f"📊 Thumbnail service result: {result}")
             
             if result["success"]:
-                # Generate web-accessible URL
+                # Generate web-accessible URL (uploads is already mounted as static files)
                 thumbnail_filename = os.path.basename(result["thumbnail_path"])
-                thumbnail_url = f"/assets/images/user_templates/{thumbnail_filename}"
+                thumbnail_url = f"/uploads/user_thumbnails/{thumbnail_filename}"
                 
                 logger.info(f"✅ Thumbnail generated successfully: {thumbnail_url}")
                 return {
