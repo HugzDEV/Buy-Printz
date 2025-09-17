@@ -45,7 +45,7 @@ const PrintPreviewModal = ({
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
       
-      // Calculate optimal scale for mobile
+      // Enhanced mobile scaling to handle aspect ratio issues (like thumbnail fix)
       if (mobile && previewImage) {
         const img = new Image()
         img.onload = () => {
@@ -61,25 +61,34 @@ const PrintPreviewModal = ({
           
           let optimalScale = 1.0
           
+          // Enhanced scaling logic similar to backend thumbnail fix
           if (imageAspectRatio > containerAspectRatio) {
-            // Image is wider - scale based on width
+            // Image is wider (like mobile 2:1 designs) - be more aggressive with scaling
             optimalScale = availableWidth / img.width
+            
+            // For wide images, boost the scale to use more vertical space
+            if (imageAspectRatio >= 1.8) { // Very wide images like 2:1 mobile designs
+              optimalScale = Math.min(optimalScale * 1.4, availableHeight * 0.85 / img.height)
+            }
           } else {
-            // Image is taller - scale based on height  
+            // Image is taller or square - scale based on height  
             optimalScale = availableHeight / img.height
           }
           
-          // Ensure minimum scale for readability but maximum scale for mobile
-          optimalScale = Math.max(0.5, Math.min(optimalScale * 1.2, 2.0))
+          // More generous scaling bounds for mobile
+          optimalScale = Math.max(0.3, Math.min(optimalScale * 1.3, 3.0))
           
-          console.log('📱 Mobile scaling calculated:', {
+          console.log('📱 Enhanced mobile scaling calculated:', {
             viewportWidth,
             viewportHeight,
             availableWidth,
             availableHeight,
             imageWidth: img.width,
             imageHeight: img.height,
-            optimalScale
+            imageAspectRatio: imageAspectRatio.toFixed(3),
+            containerAspectRatio: containerAspectRatio.toFixed(3),
+            isWideImage: imageAspectRatio >= 1.8,
+            optimalScale: optimalScale.toFixed(3)
           })
           
           setImageScale(optimalScale)
@@ -530,8 +539,11 @@ const PrintPreviewModal = ({
                         alt="Design Preview"
                         className="rounded shadow-lg max-w-none max-h-none"
                         style={{
-                          width: 'min(95vw, 100%)',
-                          height: 'min(65vh, 100%)',
+                          // Enhanced mobile sizing to work with improved scaling calculation
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          width: 'auto',
+                          height: 'auto',
                           objectFit: 'contain',
                           transform: `scale(${imageScale})`,
                           transition: 'transform 0.2s ease-in-out'
