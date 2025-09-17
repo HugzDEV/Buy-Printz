@@ -192,8 +192,9 @@ const Dashboard = () => {
     await new Promise(resolve => setTimeout(resolve, 100))
 
     // Load secondary data
-    await Promise.all([
-      loadDataSafely(
+    try {
+      console.log('🚀 About to load templates...')
+      await loadDataSafely(
         () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
           console.log('Dashboard: Processed templates data from loadDataSafely:', data)
@@ -203,9 +204,11 @@ const Dashboard = () => {
         [],
         'templates',
         `templates_${user?.id}`
-      ),
-      
-    ])
+      )
+      console.log('✅ Templates loading completed')
+    } catch (error) {
+      console.error('❌ Templates loading failed:', error)
+    }
 
     // Another small delay
     await new Promise(resolve => setTimeout(resolve, 100))
