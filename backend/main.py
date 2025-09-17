@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 import stripe
 import os
+import sys
 import json
 import uuid
 import logging
@@ -1008,6 +1009,52 @@ async def test_templates_connection():
             "supabase_url": os.getenv("SUPABASE_URL"),
             "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
         }
+
+@app.get("/api/test/thumbnail-dependencies")
+async def test_thumbnail_dependencies():
+    """Test if thumbnail service dependencies are available"""
+    try:
+        # Test PIL import
+        try:
+            from PIL import Image
+            pil_available = True
+            pil_error = None
+        except ImportError as e:
+            pil_available = False
+            pil_error = str(e)
+        
+        # Test generate_thumbnails import
+        try:
+            from generate_thumbnails import process_single_image
+            thumbnails_available = True
+            thumbnails_error = None
+        except ImportError as e:
+            thumbnails_available = False
+            thumbnails_error = str(e)
+        
+        # Test file system access
+        try:
+            import os
+            os.makedirs("uploads/test", exist_ok=True)
+            os.rmdir("uploads/test")
+            filesystem_writable = True
+            filesystem_error = None
+        except Exception as e:
+            filesystem_writable = False
+            filesystem_error = str(e)
+        
+        return {
+            "pil_available": pil_available,
+            "pil_error": pil_error,
+            "thumbnails_available": thumbnails_available,
+            "thumbnails_error": thumbnails_error,
+            "filesystem_writable": filesystem_writable,
+            "filesystem_error": filesystem_error,
+            "python_version": sys.version,
+            "working_directory": os.getcwd()
+        }
+    except Exception as e:
+        return {"error": f"Test failed: {e}"}
 
 @app.get("/api/templates/{template_id}")
 async def get_template(template_id: str, current_user: dict = Depends(get_current_user)):
