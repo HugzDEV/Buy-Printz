@@ -48,7 +48,12 @@ def validate_image_file(image_path: str) -> tuple[bool, str]:
 
 def detect_content_bounds(img):
     """Detect the bounds of actual content in the image (non-background areas)"""
-    import numpy as np
+    try:
+        import numpy as np
+    except ImportError:
+        print("⚠️ NumPy not available, using simple content detection")
+        # Simple fallback without numpy - just return full bounds
+        return 0, 0, img.width, img.height
     
     # Convert to numpy array for analysis
     img_array = np.array(img)
@@ -144,9 +149,37 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             
             print(f"🔍 Image size before thumbnail generation: {img.width} x {img.height}")
             
-            # Calculate thumbnail size maintaining aspect ratio
-            img.thumbnail(THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
-            print(f"🔍 Image size after thumbnail(): {img.width} x {img.height}")
+            # IMPROVED THUMBNAIL GENERATION FOR BETTER MOBILE SUPPORT
+            # Instead of just using thumbnail() which preserves aspect ratio,
+            # we'll resize to fill the square thumbnail space better
+            
+            original_aspect = img.width / img.height
+            target_aspect = THUMBNAIL_SIZE[0] / THUMBNAIL_SIZE[1]  # Should be 1.0 for square
+            
+            print(f"🔍 Original aspect ratio: {original_aspect:.3f}")
+            print(f"🔍 Target aspect ratio: {target_aspect:.3f}")
+            
+            # Calculate dimensions to fill more of the thumbnail space
+            if original_aspect > target_aspect:
+                # Image is wider than square - fit to width, allow some cropping of height
+                new_width = THUMBNAIL_SIZE[0]
+                new_height = int(THUMBNAIL_SIZE[0] / original_aspect)
+                if new_height < THUMBNAIL_SIZE[1] * 0.7:  # If too narrow, fit to height instead
+                    new_height = int(THUMBNAIL_SIZE[1] * 0.85)  # Use 85% of height for better visibility
+                    new_width = int(new_height * original_aspect)
+            else:
+                # Image is taller than square or square - fit to height
+                new_height = int(THUMBNAIL_SIZE[1] * 0.85)  # Use 85% of height for better visibility
+                new_width = int(new_height * original_aspect)
+                if new_width > THUMBNAIL_SIZE[0]:  # If too wide, fit to width
+                    new_width = THUMBNAIL_SIZE[0]
+                    new_height = int(THUMBNAIL_SIZE[0] / original_aspect)
+            
+            print(f"🔍 Calculated new size: {new_width} x {new_height}")
+            
+            # Resize the image to the calculated dimensions
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            print(f"🔍 Image size after resize: {img.width} x {img.height}")
             
             # Create a square thumbnail with white background
             thumbnail = Image.new('RGB', THUMBNAIL_SIZE, (255, 255, 255))
@@ -155,6 +188,9 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             x = (THUMBNAIL_SIZE[0] - img.size[0]) // 2
             y = (THUMBNAIL_SIZE[1] - img.size[1]) // 2
             thumbnail.paste(img, (x, y))
+            
+            print(f"🔍 Final positioning: centered at ({x}, {y})")
+            print(f"🔍 Final thumbnail fills: {(img.width * img.height) / (THUMBNAIL_SIZE[0] * THUMBNAIL_SIZE[1]) * 100:.1f}% of thumbnail space")
             
             print(f"🔍 Final thumbnail: {THUMBNAIL_SIZE[0]} x {THUMBNAIL_SIZE[1]} (content centered at {x}, {y})")
             print(f"🔍 Content detected and cropped: {content_detected}")
