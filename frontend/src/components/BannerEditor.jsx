@@ -3064,6 +3064,17 @@ const BannerEditorNew = () => {
           
           console.log(`🎨 Generated template image - Mobile: ${isMobile}, PixelRatio: ${pixelRatio}`)
           
+          // Log image details for debugging mobile vs desktop differences
+          const img = new Image()
+          img.onload = () => {
+            console.log(`🔍 FRONTEND DEBUG - Generated image dimensions: ${img.width} x ${img.height}`)
+            console.log(`🔍 FRONTEND DEBUG - Canvas size setting: ${canvasSize.width} x ${canvasSize.height}`)
+            console.log(`🔍 FRONTEND DEBUG - Pixel ratio used: ${pixelRatio}`)
+            console.log(`🔍 FRONTEND DEBUG - Expected final size: ${canvasSize.width * pixelRatio} x ${canvasSize.height * pixelRatio}`)
+            console.log(`🔍 FRONTEND DEBUG - Image data length: ${fullQualityImage.length} characters`)
+          }
+          img.src = fullQualityImage
+          
           console.log('🎨 Sending image to thumbnail service...')
           
           // Send to backend thumbnail service (similar to marketplace approach)

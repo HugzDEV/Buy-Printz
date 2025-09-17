@@ -101,6 +101,12 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
         
         # Open the original image
         with Image.open(image_path) as img:
+            print(f"🔍 PROCESSING IMAGE: {image_path}")
+            print(f"🔍 Original dimensions: {img.width} x {img.height}")
+            print(f"🔍 Original mode: {img.mode}")
+            
+            original_width, original_height = img.width, img.height
+            
             # Convert to RGB if necessary (handles PNG with transparency)
             if img.mode in ('RGBA', 'LA', 'P'):
                 # Create a white background
@@ -109,22 +115,35 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
                     img = img.convert('RGBA')
                 background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
                 img = background
+                print(f"🔍 Converted from {img.mode} to RGB with white background")
             elif img.mode != 'RGB':
                 img = img.convert('RGB')
+                print(f"🔍 Converted to RGB from {img.mode}")
             
             # Detect content bounds to focus on actual design content
+            content_detected = False
             try:
                 left, top, right, bottom = detect_content_bounds(img)
                 content_width = right - left
                 content_height = bottom - top
                 
-                # Only crop if we found meaningful content and it's not the whole image
-                if (content_width > 50 and content_height > 50 and 
-                    (content_width < img.width * 0.9 or content_height < img.height * 0.9)):
+                print(f"🔍 Content bounds: ({left}, {top}) to ({right}, {bottom})")
+                print(f"🔍 Content size: {content_width} x {content_height}")
+                print(f"🔍 Content coverage: {(content_width * content_height) / (img.width * img.height) * 100:.1f}% of image")
+                
+                # More aggressive cropping strategy for better mobile thumbnails
+                # Reduce the coverage threshold to catch more content
+                min_content_size = 30  # Reduced from 50 for smaller mobile elements
+                max_coverage = 0.95    # Increased from 0.9 to be more selective
+                
+                if (content_width > min_content_size and content_height > min_content_size and 
+                    (content_width < img.width * max_coverage or content_height < img.height * max_coverage)):
                     
-                    # Add padding around content (10% of content size, minimum 20px)
-                    padding_x = max(20, int(content_width * 0.1))
-                    padding_y = max(20, int(content_height * 0.1))
+                    # More generous padding for mobile designs (15% of content size, minimum 30px)
+                    padding_x = max(30, int(content_width * 0.15))
+                    padding_y = max(30, int(content_height * 0.15))
+                    
+                    print(f"🔍 Calculated padding: {padding_x}px (x), {padding_y}px (y)")
                     
                     # Expand bounds with padding, but stay within image
                     crop_left = max(0, left - padding_x)
@@ -132,18 +151,31 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
                     crop_right = min(img.width, right + padding_x)
                     crop_bottom = min(img.height, bottom + padding_y)
                     
+                    print(f"🔍 Crop bounds with padding: ({crop_left}, {crop_top}) to ({crop_right}, {crop_bottom})")
+                    
                     # Crop to content with padding
                     img = img.crop((crop_left, crop_top, crop_right, crop_bottom))
-                    print(f"🎯 Smart crop applied: {crop_left},{crop_top} to {crop_right},{crop_bottom}")
+                    content_detected = True
+                    print(f"🎯 SMART CROP APPLIED: {crop_left},{crop_top} to {crop_right},{crop_bottom}")
+                    print(f"🎯 New image size after crop: {img.width} x {img.height}")
                 else:
-                    print(f"📏 Content bounds too small or covers whole image, using full image")
+                    print(f"📏 CONTENT BOUNDS TOO SMALL OR COVERS WHOLE IMAGE")
+                    print(f"📏 Content width: {content_width} (min: {min_content_size})")
+                    print(f"📏 Content height: {content_height} (min: {min_content_size})")
+                    print(f"📏 Width coverage: {content_width / img.width * 100:.1f}% (max: {max_coverage * 100:.0f}%)")
+                    print(f"📏 Height coverage: {content_height / img.height * 100:.1f}% (max: {max_coverage * 100:.0f}%)")
+                    print(f"📏 Using full image for thumbnail")
                     
             except Exception as e:
-                print(f"⚠️ Content detection failed, using full image: {e}")
+                print(f"⚠️ CONTENT DETECTION FAILED: {e}")
+                print(f"⚠️ Using full image for thumbnail")
                 # Continue with full image if content detection fails
+            
+            print(f"🔍 Image size before thumbnail generation: {img.width} x {img.height}")
             
             # Calculate thumbnail size maintaining aspect ratio
             img.thumbnail(THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
+            print(f"🔍 Image size after thumbnail(): {img.width} x {img.height}")
             
             # Create a square thumbnail with white background
             thumbnail = Image.new('RGB', THUMBNAIL_SIZE, (255, 255, 255))
@@ -153,8 +185,13 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             y = (THUMBNAIL_SIZE[1] - img.size[1]) // 2
             thumbnail.paste(img, (x, y))
             
+            print(f"🔍 Final thumbnail: {THUMBNAIL_SIZE[0]} x {THUMBNAIL_SIZE[1]} (content centered at {x}, {y})")
+            print(f"🔍 Content detected and cropped: {content_detected}")
+            print(f"🔍 Original vs Final scaling: {img.width / original_width:.3f}x width, {img.height / original_height:.3f}x height")
+            
             # Save the thumbnail with higher quality for better mobile viewing
             thumbnail.save(thumbnail_path, 'JPEG', quality=THUMBNAIL_QUALITY, optimize=True)
+            print(f"✅ THUMBNAIL SAVED: {thumbnail_path}")
             return True
             
     except Exception as e:

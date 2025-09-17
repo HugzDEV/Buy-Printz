@@ -1146,6 +1146,18 @@ async def generate_template_thumbnail(
         
         logger.info(f"📊 Image data size: {len(image_data)} characters")
         
+        # Enhanced debugging for mobile vs desktop differences
+        logger.info(f"🔍 DEBUGGING: Analyzing image data for thumbnail generation...")
+        
+        # Log the data URL prefix for debugging
+        if "," in thumbnail_data.get("imageData", ""):
+            data_url_prefix = thumbnail_data.get("imageData", "").split(",")[0]
+            logger.info(f"🔍 Data URL prefix: {data_url_prefix}")
+        
+        # Log template name for tracking
+        logger.info(f"🔍 Template name: {template_name}")
+        logger.info(f"🔍 User ID: {current_user['user_id']}")
+        
         # Remove data URL prefix if present
         if "," in image_data:
             image_data = image_data.split(",")[1]
@@ -1155,6 +1167,15 @@ async def generate_template_thumbnail(
         try:
             image_bytes = base64.b64decode(image_data)
             logger.info(f"✅ Decoded image: {len(image_bytes)} bytes")
+            
+            # Analyze the decoded image dimensions for debugging
+            from PIL import Image
+            import io
+            with Image.open(io.BytesIO(image_bytes)) as debug_img:
+                logger.info(f"🔍 ORIGINAL IMAGE DIMENSIONS: {debug_img.width} x {debug_img.height}")
+                logger.info(f"🔍 Original image mode: {debug_img.mode}")
+                logger.info(f"🔍 Original image format: {debug_img.format}")
+                
         except Exception as e:
             logger.error(f"❌ Base64 decode failed: {e}")
             raise HTTPException(status_code=400, detail=f"Invalid image data: {e}")
