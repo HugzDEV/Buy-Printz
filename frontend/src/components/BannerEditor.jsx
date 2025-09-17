@@ -3047,19 +3047,39 @@ const BannerEditorNew = () => {
     setSaveError(null)
     
     try {
-      // Generate thumbnail from current canvas
-      let thumbnail = null
+      // Generate thumbnail using marketplace-style service (stores as file, not base64 in DB)
+      let thumbnailUrl = null
       try {
         if (stageRef.current) {
-          thumbnail = stageRef.current.toDataURL({
-            mimeType: 'image/jpeg',
-            quality: 0.9,
-            pixelRatio: 1.0 // Good quality for thumbnail display
+          // Generate high-quality image for server-side thumbnail creation
+          const fullQualityImage = stageRef.current.toDataURL({
+            mimeType: 'image/png',
+            quality: 1.0,
+            pixelRatio: 2 // High resolution for server processing
           })
-          console.log('Generated template thumbnail:', thumbnail ? 'SUCCESS' : 'FAILED')
+          
+          console.log('🎨 Sending image to thumbnail service...')
+          
+          // Send to backend thumbnail service (similar to marketplace approach)
+          const thumbnailResponse = await authService.authenticatedRequest('/api/templates/generate-thumbnail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              imageData: fullQualityImage,
+              templateName: name
+            })
+          })
+          
+          if (thumbnailResponse.ok) {
+            const thumbnailResult = await thumbnailResponse.json()
+            thumbnailUrl = thumbnailResult.thumbnail_url
+            console.log(`✅ Generated template thumbnail: ${thumbnailUrl}`)
+          } else {
+            console.warn('⚠️ Thumbnail service failed, template will be saved without thumbnail')
+          }
         }
       } catch (error) {
-        console.warn('Failed to generate thumbnail:', error)
+        console.warn('Failed to generate thumbnail via service:', error)
       }
 
       const templateData = {
@@ -3081,12 +3101,12 @@ const BannerEditorNew = () => {
         },
         banner_type: bannerSpecs?.id || 'vinyl-13oz',
         is_public: false,
-        thumbnail: thumbnail // Include generated thumbnail
+        thumbnail_url: thumbnailUrl // Include thumbnail URL (not base64 data)
       }
       
-      console.log('Sending template data with thumbnail:', {
+      console.log('Sending template data with thumbnail URL:', {
         ...templateData,
-        thumbnail: thumbnail ? `${thumbnail.substring(0, 50)}...` : 'NO THUMBNAIL'
+        thumbnail_url: thumbnailUrl || 'NO THUMBNAIL'
       })
       
       const response = await authService.authenticatedRequest('/api/templates/save', {

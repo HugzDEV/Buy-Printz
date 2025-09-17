@@ -905,10 +905,10 @@ const Dashboard = () => {
                       
                       {/* Thumbnail Section */}
                       <div className="relative h-32 sm:h-40 lg:h-48 mb-4 overflow-hidden bg-gray-100 rounded-t-3xl">
-                        {template.thumbnail ? (
+                        {template.thumbnail_url ? (
                           <>
                             <img 
-                              src={template.thumbnail} 
+                              src={template.thumbnail_url} 
                               alt={`${template.name} preview`}
                               className="w-full h-full object-contain bg-white"
                               onError={(e) => {

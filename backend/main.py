@@ -266,7 +266,7 @@ class TemplateData(BaseModel):
     canvas_data: dict
     banner_type: Optional[str] = None
     is_public: bool = False
-    thumbnail: Optional[str] = None  # Base64 encoded thumbnail image
+    thumbnail_url: Optional[str] = None  # URL to thumbnail image file
 
 class EnhancedCanvasData(BaseModel):
     name: str
@@ -1023,6 +1023,65 @@ async def get_template(template_id: str, current_user: dict = Depends(get_curren
         else:
             raise HTTPException(status_code=404, detail="Template not found")
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/templates/generate-thumbnail")
+async def generate_template_thumbnail(
+    thumbnail_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate thumbnail for user template using marketplace thumbnail service"""
+    try:
+        import base64
+        import os
+        import tempfile
+        from generate_thumbnails import process_single_image
+        
+        image_data = thumbnail_data.get("imageData", "")
+        template_name = thumbnail_data.get("templateName", "template")
+        
+        if not image_data:
+            raise HTTPException(status_code=400, detail="No image data provided")
+        
+        # Remove data URL prefix if present
+        if "," in image_data:
+            image_data = image_data.split(",")[1]
+        
+        # Decode base64 image
+        image_bytes = base64.b64decode(image_data)
+        
+        # Create temporary file for processing
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+            temp_file.write(image_bytes)
+            temp_path = temp_file.name
+        
+        try:
+            # Use marketplace thumbnail generation service
+            user_thumbnail_dir = f"../frontend/public/assets/images/user_templates"
+            os.makedirs(user_thumbnail_dir, exist_ok=True)
+            
+            result = process_single_image(temp_path, user_thumbnail_dir)
+            
+            if result["success"]:
+                # Generate web-accessible URL
+                thumbnail_filename = os.path.basename(result["thumbnail_path"])
+                thumbnail_url = f"/assets/images/user_templates/{thumbnail_filename}"
+                
+                return {
+                    "success": True,
+                    "thumbnail_url": thumbnail_url,
+                    "file_size": result["thumbnail_size"]
+                }
+            else:
+                raise HTTPException(status_code=500, detail=f"Thumbnail generation failed: {result['error']}")
+                
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+                
+    except Exception as e:
+        logger.error(f"Error generating thumbnail: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/templates/{template_id}")
