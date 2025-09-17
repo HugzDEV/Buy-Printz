@@ -1780,6 +1780,23 @@ async def invalidate_cache_key(cache_key: str):
         "timestamp": datetime.utcnow().isoformat()
     }
 
+@app.post("/api/templates/clear-cache")
+async def clear_templates_cache(current_user: dict = Depends(get_current_user)):
+    """Clear templates cache for current user"""
+    try:
+        user_id = current_user["user_id"]
+        cache_key = f"templates_user_{user_id}"
+        deleted = cache.delete(cache_key)
+        
+        return {
+            "success": True,
+            "deleted": deleted,
+            "message": f"Templates cache {'cleared' if deleted else 'was already empty'} for user {user_id}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Business Card Tins API Endpoints
 
 class BusinessCardTinRequest(BaseModel):
