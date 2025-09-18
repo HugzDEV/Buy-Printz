@@ -7,7 +7,7 @@ Supports both bulk generation and single image processing
 
 import os
 import sys
-from PIL import Image
+from PIL import Image, ImageChops, ImageStat
 import asyncio
 try:
     from .database import db_manager
@@ -47,54 +47,41 @@ def validate_image_file(image_path: str) -> tuple[bool, str]:
         return False, f"Invalid image file: {e}"
 
 def detect_content_bounds(img):
-    """Detect the bounds of actual content in the image (non-background areas)"""
-    try:
-        import numpy as np
-    except ImportError:
-        print("⚠️ NumPy not available, using simple content detection")
-        # Simple fallback without numpy - just return full bounds
-        return 0, 0, img.width, img.height
-    
-    # Convert to numpy array for analysis
-    img_array = np.array(img)
-    
-    # Detect the dominant background color (assume it's the corner pixels)
-    corners = [
-        img_array[0, 0],  # top-left
-        img_array[0, -1], # top-right
-        img_array[-1, 0], # bottom-left
-        img_array[-1, -1] # bottom-right
-    ]
-    
-    # Use the most common corner color as background
-    from collections import Counter
-    corner_colors = [tuple(corner) for corner in corners]
-    background_color = Counter(corner_colors).most_common(1)[0][0]
-    
-    print(f"🎨 Detected background color: {background_color}")
-    
-    # Define threshold for background similarity (allow for slight variations)
-    background_threshold = 30
-    
-    # Find non-background pixels
-    background_array = np.array(background_color)
-    diff = np.sqrt(np.sum((img_array - background_array) ** 2, axis=2))
-    non_background_mask = diff > background_threshold
-    
-    # Find bounds of non-background content
-    rows = np.any(non_background_mask, axis=1)
-    cols = np.any(non_background_mask, axis=0)
-    
-    if not np.any(rows) or not np.any(cols):
-        # No content found, return full image bounds
+    """Detect content bounds using pure PIL (no NumPy).
+    Approach: estimate background color from corners, difference with solid bg,
+    threshold to mask content, then use getbbox().
+    """
+    # Ensure RGB
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+
+    # Estimate background color from corners (average to be robust)
+    w, h = img.size
+    corner_coords = [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]
+    corner_pixels = [img.getpixel(p) for p in corner_coords]
+    bg_r = sum(p[0] for p in corner_pixels) // 4
+    bg_g = sum(p[1] for p in corner_pixels) // 4
+    bg_b = sum(p[2] for p in corner_pixels) // 4
+    background_color = (bg_r, bg_g, bg_b)
+    print(f"🎨 Detected background color (avg corners): {background_color}")
+
+    # Difference against a solid background image
+    bg_img = Image.new('RGB', (w, h), background_color)
+    diff = ImageChops.difference(img, bg_img).convert('L')
+
+    # Auto threshold: use mean to adapt to noise
+    stat = ImageStat.Stat(diff)
+    mean_val = stat.mean[0]
+    # Set threshold slightly above mean to capture content
+    threshold = max(10, int(mean_val * 1.5))
+    diff = diff.point(lambda v: 255 if v > threshold else 0)
+
+    bbox = diff.getbbox()
+    if not bbox:
         print("🔍 No distinct content detected, using full image")
-        return 0, 0, img.width, img.height
-    
-    top = np.argmax(rows)
-    bottom = len(rows) - np.argmax(rows[::-1])
-    left = np.argmax(cols)
-    right = len(cols) - np.argmax(cols[::-1])
-    
+        return 0, 0, w, h
+
+    left, top, right, bottom = bbox
     print(f"🎯 Content bounds detected: ({left}, {top}) to ({right}, {bottom})")
     return left, top, right, bottom
 
@@ -125,27 +112,33 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
                 img = img.convert('RGB')
                 print(f"🔍 Converted to RGB from {img.mode}")
             
-            # TEMPORARILY DISABLE SMART CROPPING TO DEBUG MOBILE ISSUE
-            # The smart cropping might be causing mobile thumbnails to appear smaller
-            print(f"🚫 SMART CROPPING TEMPORARILY DISABLED FOR DEBUGGING")
-            print(f"🚫 Using full image to ensure consistent thumbnail sizes")
+            # Content-aware crop to significantly increase apparent size
             content_detected = False
-            
-            # Keep the content detection code for logging but don't apply cropping
             try:
                 left, top, right, bottom = detect_content_bounds(img)
-                content_width = right - left
-                content_height = bottom - top
-                
-                print(f"🔍 Content bounds detected: ({left}, {top}) to ({right}, {bottom})")
-                print(f"🔍 Content size: {content_width} x {content_height}")
-                print(f"🔍 Content coverage: {(content_width * content_height) / (img.width * img.height) * 100:.1f}% of image")
-                print(f"🔍 Would crop: {content_width > 30 and content_height > 30 and (content_width < img.width * 0.95 or content_height < img.height * 0.95)}")
-                
+                content_width = max(1, right - left)
+                content_height = max(1, bottom - top)
+                coverage = (content_width * content_height) / (img.width * img.height)
+                print(f"🔍 Content size: {content_width} x {content_height} ({coverage*100:.1f}% coverage)")
+
+                # Apply padding ~12% to avoid over-tight crops
+                pad_x = max(20, int(content_width * 0.12))
+                pad_y = max(20, int(content_height * 0.12))
+                crop_left = max(0, left - pad_x)
+                crop_top = max(0, top - pad_y)
+                crop_right = min(img.width, right + pad_x)
+                crop_bottom = min(img.height, bottom + pad_y)
+                print(f"🔍 Cropping to: ({crop_left}, {crop_top}) → ({crop_right}, {crop_bottom}) with padding {pad_x},{pad_y}")
+
+                # Only crop if coverage suggests lots of empty background
+                if coverage < 0.85:
+                    img = img.crop((crop_left, crop_top, crop_right, crop_bottom))
+                    content_detected = True
+                    print(f"🎯 Applied content-aware crop. New size: {img.width} x {img.height}")
+                else:
+                    print("📏 Coverage high; skipping crop to avoid clipping.")
             except Exception as e:
-                print(f"⚠️ Content detection failed: {e}")
-            
-            print(f"📏 USING FULL IMAGE FOR CONSISTENT THUMBNAILS")
+                print(f"⚠️ Content detection failed: {e}. Proceeding without crop.")
             
             print(f"🔍 Image size before thumbnail generation: {img.width} x {img.height}")
             
@@ -164,7 +157,8 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             height_fill_ratio = 0.82
             width_cap_ratio = 0.98
 
-            # Start by filling height to 82%
+            # Start by filling height to 92% (for stronger presence)
+            height_fill_ratio = 0.92
             new_height = int(target_height * height_fill_ratio)
             new_width = int(new_height * original_aspect)
 
