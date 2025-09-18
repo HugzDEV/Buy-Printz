@@ -442,12 +442,12 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-         <div className={`grid grid-cols-1 ${isMobile ? 'gap-1' : 'lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4'}`}>
-           {/* Left Column: Preview + Quality Assurance */}
-           <div className={`lg:col-span-2 ${isMobile ? 'space-y-2' : 'space-y-4 lg:space-y-6'}`}>
-             {/* Design Preview */}
+         {isMobile ? (
+           /* Mobile Layout: Viewport -> Surface Selection -> Warnings -> Actions */
+           <div className="space-y-3">
+             {/* 1. Design Preview (Viewport) */}
              <Card className="overflow-hidden">
-               <CardHeader className={`${isMobile ? 'pb-1' : 'pb-3'}`}>
+               <CardHeader className="pb-1">
                  <CardTitle className="text-lg flex items-center justify-between">
                    <span>Design Preview</span>
                    {hasMultipleSurfaces() && (
@@ -475,181 +475,336 @@ const PrintPreviewModal = ({
                    )}
                  </CardTitle>
                </CardHeader>
-              <CardContent className={`overflow-hidden ${isMobile ? 'p-1' : 'p-3'}`}>
-                <div className="w-full h-[25vh] sm:h-[200px] md:h-[300px] lg:h-[400px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
-                  {previewImage ? (
-                    <div className="relative w-full h-full flex items-center justify-center" style={{ zIndex: 1 }}>
-                      <img 
-                        src={previewImage} 
-                        alt="Design Preview"
-                        className="rounded shadow-lg w-full h-full object-contain"
-                        style={isMobile ? {
-                          transform: productType === 'tent' 
-                            ? 'scale(3.857) translate(22.5%, 35%)' 
-                            : 'scale(2.5) translate(30%, 25%)',
-                          transformOrigin: 'center center',
-                          zIndex: 1,
-                          position: 'relative'
-                        } : {}}
-                        onContextMenu={(e) => e.preventDefault()}
-                        onDragStart={(e) => e.preventDefault()}
-                        draggable={false}
-                      />
-                        {/* BuyPrintz Watermark Overlay for IP Protection */}
-                        <div 
-                          className="absolute inset-0 pointer-events-none"
-                          style={{
-                            backgroundImage: `url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')`,
-                            backgroundSize: 'contain',
-                            backgroundRepeat: 'repeat',
-                            backgroundPosition: 'center',
-                            opacity: 0.3,
-                            mixBlendMode: 'multiply',
-                            userSelect: 'none',
-                            webkitUserSelect: 'none',
-                            mozUserSelect: 'none',
-                            msUserSelect: 'none',
-                            pointerEvents: 'none',
-                            zIndex: 10,
-                            transform: isMobile 
-                              ? (productType === 'tent' 
-                                  ? 'scale(3.857) translate(22.5%, 35%)' 
-                                  : 'scale(2.5) translate(30%, 25%)')
-                              : 'none',
-                            transformOrigin: 'center center',
-                            position: 'absolute'
-                          }}
-                          onContextMenu={(e) => e.preventDefault()}
-                          onDragStart={(e) => e.preventDefault()}
-                          onSelectStart={(e) => e.preventDefault()}
-                        />
-                   </div>
-                 ) : (
-                      <div className="text-center space-y-3">
-                        <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
-                         <div>
-                           <p className="text-lg font-medium text-gray-900">Preview Not Available</p>
-                           <p className="text-sm text-gray-500 mt-1">
-                             Please save your design and try again.
-                           </p>
-                    </div>
-                  </div>
-                 )}
-                  </div>
+               <CardContent className="overflow-hidden p-1">
+                 <div className="w-full h-[30vh] bg-gray-50 rounded-lg flex items-center justify-center p-0">
+                   {previewImage ? (
+                     <div className="relative w-full h-full flex items-center justify-center" style={{ zIndex: 1 }}>
+                       <img 
+                         src={previewImage} 
+                         alt="Design Preview"
+                         className="rounded shadow-lg w-full h-full object-contain"
+                         style={{
+                           transform: productType === 'tent' 
+                             ? 'scale(3.857) translate(22.5%, 35%)' 
+                             : 'scale(2.5) translate(30%, 25%)',
+                           transformOrigin: 'center center',
+                           zIndex: 1,
+                           position: 'relative'
+                         }}
+                         onContextMenu={(e) => e.preventDefault()}
+                         onDragStart={(e) => e.preventDefault()}
+                         draggable={false}
+                       />
+                         {/* BuyPrintz Watermark Overlay for IP Protection */}
+                         <div 
+                           className="absolute inset-0 pointer-events-none"
+                           style={{
+                             backgroundImage: `url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')`,
+                             backgroundSize: 'contain',
+                             backgroundRepeat: 'repeat',
+                             backgroundPosition: 'center',
+                             opacity: 0.3,
+                             mixBlendMode: 'multiply',
+                             userSelect: 'none',
+                             webkitUserSelect: 'none',
+                             mozUserSelect: 'none',
+                             msUserSelect: 'none',
+                             pointerEvents: 'none',
+                             zIndex: 10,
+                             transform: productType === 'tent' 
+                               ? 'scale(3.857) translate(22.5%, 35%)' 
+                               : 'scale(2.5) translate(30%, 25%)',
+                             transformOrigin: 'center center',
+                             position: 'absolute'
+                           }}
+                           onContextMenu={(e) => e.preventDefault()}
+                           onDragStart={(e) => e.preventDefault()}
+                           onSelectStart={(e) => e.preventDefault()}
+                         />
+                     </div>
+                   ) : (
+                     <div className="text-center space-y-3">
+                       <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+                       <div>
+                         <p className="text-lg font-medium text-gray-900">Preview Not Available</p>
+                         <p className="text-sm text-gray-500 mt-1">
+                           Please save your design and try again.
+                         </p>
+                       </div>
+                     </div>
+                   )}
+                 </div>
                </CardContent>
              </Card>
 
-             {/* Quality Assurance */}
+             {/* 2. Surface Selection */}
+             {hasMultipleSurfaces() && (
+               <Card>
+                 <CardHeader className="pb-2">
+                   <CardTitle className="text-base">All Surfaces</CardTitle>
+                 </CardHeader>
+                 <CardContent className="overflow-y-auto max-h-[150px]">
+                   <SurfaceThumbnailViewer
+                     orderDetails={orderDetails}
+                     canvasData={canvasData}
+                     surfaceElements={surfaceElements}
+                     productType={productType}
+                     onSurfaceSelect={setSelectedSurface}
+                     selectedSurface={selectedSurface}
+                     designOption={orderDetails?.design_option || orderDetails?.tent_design_option}
+                     tentDesignOption={orderDetails?.tent_design_option}
+                     tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
+                     dimensions={canvasData?.canvasSize || dimensions}
+                     currentSurface={currentSurface}
+                   />
+                 </CardContent>
+               </Card>
+             )}
+
+             {/* 3. Quality Assurance Warnings */}
              <Card>
-               <CardHeader className="pb-3">
-                 <CardTitle className="text-lg">Quality Assurance</CardTitle>
+               <CardHeader className="pb-2">
+                 <CardTitle className="text-base">Quality Assurance</CardTitle>
                </CardHeader>
                <CardContent className="space-y-3">
-                 <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                   <p className="text-sm font-medium text-amber-800 mb-2">Important Notice</p>
+                 <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                   <p className="text-sm font-medium text-amber-800 mb-1">Important Notice</p>
                    <p className="text-sm text-amber-700">
                      Please review all surfaces carefully. Orders are <strong>non-refundable</strong> once approved and sent to production.
                    </p>
                  </div>
-                 <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-                   <p className="text-sm font-medium text-green-800 mb-2">Quality Guarantee</p>
+                 <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                   <p className="text-sm font-medium text-green-800 mb-1">Quality Guarantee</p>
                    <p className="text-sm text-green-700">
                      All designs are reviewed for print quality and technical requirements before production begins.
                    </p>
                  </div>
                </CardContent>
-            </Card>
-          </div>
+             </Card>
 
-           {/* Right Column: Surfaces + Print Specs + Actions */}
-           <div className={`space-y-4 lg:space-y-6 ${isMobile ? 'order-first' : ''}`}>
-             {/* All Surfaces */}
-             {hasMultipleSurfaces() && (
-               <Card>
-                 <CardHeader className={`pb-3 ${isMobile ? 'pb-2' : ''}`}>
-                   <CardTitle className={`text-lg ${isMobile ? 'text-base' : ''}`}>All Surfaces</CardTitle>
-                 </CardHeader>
-                 <CardContent className={`overflow-y-auto ${isMobile ? 'max-h-[150px]' : 'max-h-[250px] md:max-h-[350px] lg:max-h-[400px]'}`}>
-                    <SurfaceThumbnailViewer
-                      orderDetails={orderDetails}
-                      canvasData={canvasData}
-                      surfaceElements={surfaceElements}
-                      productType={productType}
-                      onSurfaceSelect={setSelectedSurface}
-                      selectedSurface={selectedSurface}
-                      designOption={orderDetails?.design_option || orderDetails?.tent_design_option}
-                      tentDesignOption={orderDetails?.tent_design_option}
-                      tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
-                      dimensions={canvasData?.canvasSize || dimensions}
-                      currentSurface={currentSurface}
-                    />
-                 </CardContent>
-               </Card>
-             )}
-
-            {/* Print Specifications */}
-             <Card className={isMobile ? 'hidden' : ''}>
-               <CardHeader className="pb-2">
-                 <CardTitle className="text-sm">Print Specifications</CardTitle>
-              </CardHeader>
-               <CardContent className="space-y-2">
-                 <div className="grid grid-cols-2 gap-2 text-xs">
-                   <div className="bg-white p-2 rounded border">
-                     <p className="font-medium text-gray-600 mb-1">Resolution</p>
-                     <div className="flex items-center gap-1">
-                       <span className="text-gray-900 font-medium">{currentDPI} DPI</span>
-                       {currentDPI >= 150 ? (
-                         <span className="text-green-600 text-xs">✓</span>
-                       ) : currentDPI >= 100 ? (
-                         <span className="text-yellow-600 text-xs">⚠</span>
-                       ) : (
-                         <span className="text-red-600 text-xs">⚠</span>
-                       )}
-                  </div>
-                  </div>
-                   <div className="bg-white p-2 rounded border">
-                     <p className="font-medium text-gray-600 mb-1">Color</p>
-                     <p className="text-gray-900 font-medium">CMYK</p>
-                  </div>
-                </div>
-                 <div className="bg-blue-50 border border-blue-200 p-2 rounded text-xs">
-                   <p className="text-blue-700">
-                     {currentDPI >= 150 ? 'Excellent quality' :
-                      currentDPI >= 100 ? 'Good quality' :
-                      'Consider higher resolution'}
-                   </p>
-                 </div>
-              </CardContent>
-            </Card>
-
-             {/* Actions */}
+             {/* 4. Action Buttons */}
              <Card>
-               <CardHeader className={`pb-3 ${isMobile ? 'pb-2' : ''}`}>
-                 <CardTitle className={`text-lg ${isMobile ? 'text-base' : ''}`}>Actions</CardTitle>
+               <CardHeader className="pb-2">
+                 <CardTitle className="text-base">Actions</CardTitle>
                </CardHeader>
-               <CardContent className={`space-y-3 ${isMobile ? 'space-y-2' : ''}`}>
-            <Button
+               <CardContent className="space-y-2">
+                 <Button
                    onClick={handleDownload}
                    disabled={!previewImage || isGenerating}
-                   className={`w-full ${isMobile ? 'text-sm py-2' : ''}`}
-              variant="outline"
-            >
-                   <Download className={`h-4 w-4 mr-2 ${isMobile ? 'h-3 w-3' : ''}`} />
-                   {isGenerating ? 'Generating PDF...' : isMobile ? 'Download PDF' : 'Download Production PDF'}
-            </Button>
-            
-            <Button
-              onClick={handleApprove}
+                   className="w-full text-sm py-2"
+                   variant="outline"
+                 >
+                   <Download className="h-3 w-3 mr-2" />
+                   {isGenerating ? 'Generating PDF...' : 'Download PDF'}
+                 </Button>
+                 
+                 <Button
+                   onClick={handleApprove}
                    disabled={!previewImage}
-                   className={`w-full bg-green-600 hover:bg-green-700 ${isMobile ? 'text-sm py-2' : ''}`}
-            >
-                   <CheckCircle className={`h-4 w-4 mr-2 ${isMobile ? 'h-3 w-3' : ''}`} />
+                   className="w-full bg-green-600 hover:bg-green-700 text-sm py-2"
+                 >
+                   <CheckCircle className="h-3 w-3 mr-2" />
                    Approve Design
-            </Button>
+                 </Button>
                </CardContent>
              </Card>
            </div>
-          </div>
+         ) : (
+           /* Desktop Layout: Original grid layout */
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+             {/* Left Column: Preview + Quality Assurance */}
+             <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+               {/* Design Preview */}
+               <Card className="overflow-hidden">
+                 <CardHeader className="pb-3">
+                   <CardTitle className="text-lg flex items-center justify-between">
+                     <span>Design Preview</span>
+                     {hasMultipleSurfaces() && (
+                       <div className="flex items-center gap-2">
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={handlePreviousSurface}
+                           disabled={surfaces.length <= 1}
+                         >
+                           ← Previous
+                         </Button>
+                         <span className="text-sm text-muted-foreground">
+                           {currentSurfaceIndex + 1} of {surfaces.length}
+                         </span>
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={handleNextSurface}
+                           disabled={surfaces.length <= 1}
+                         >
+                           Next →
+                         </Button>
+                       </div>
+                     )}
+                   </CardTitle>
+                 </CardHeader>
+                 <CardContent className="overflow-hidden p-3">
+                   <div className="w-full h-[200px] md:h-[300px] lg:h-[400px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
+                     {previewImage ? (
+                       <div className="relative w-full h-full flex items-center justify-center" style={{ zIndex: 1 }}>
+                         <img 
+                           src={previewImage} 
+                           alt="Design Preview"
+                           className="rounded shadow-lg w-full h-full object-contain"
+                           onContextMenu={(e) => e.preventDefault()}
+                           onDragStart={(e) => e.preventDefault()}
+                           draggable={false}
+                         />
+                           {/* BuyPrintz Watermark Overlay for IP Protection */}
+                           <div 
+                             className="absolute inset-0 pointer-events-none"
+                             style={{
+                               backgroundImage: `url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')`,
+                               backgroundSize: 'contain',
+                               backgroundRepeat: 'repeat',
+                               backgroundPosition: 'center',
+                               opacity: 0.3,
+                               mixBlendMode: 'multiply',
+                               userSelect: 'none',
+                               webkitUserSelect: 'none',
+                               mozUserSelect: 'none',
+                               msUserSelect: 'none',
+                               pointerEvents: 'none',
+                               zIndex: 10
+                             }}
+                             onContextMenu={(e) => e.preventDefault()}
+                             onDragStart={(e) => e.preventDefault()}
+                             onSelectStart={(e) => e.preventDefault()}
+                           />
+                       </div>
+                     ) : (
+                       <div className="text-center space-y-3">
+                         <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+                         <div>
+                           <p className="text-lg font-medium text-gray-900">Preview Not Available</p>
+                           <p className="text-sm text-gray-500 mt-1">
+                             Please save your design and try again.
+                           </p>
+                         </div>
+                       </div>
+                     )}
+                   </div>
+                 </CardContent>
+               </Card>
+
+               {/* Quality Assurance */}
+               <Card>
+                 <CardHeader className="pb-3">
+                   <CardTitle className="text-lg">Quality Assurance</CardTitle>
+                 </CardHeader>
+                 <CardContent className="space-y-3">
+                   <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                     <p className="text-sm font-medium text-amber-800 mb-2">Important Notice</p>
+                     <p className="text-sm text-amber-700">
+                       Please review all surfaces carefully. Orders are <strong>non-refundable</strong> once approved and sent to production.
+                     </p>
+                   </div>
+                   <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                     <p className="text-sm font-medium text-green-800 mb-2">Quality Guarantee</p>
+                     <p className="text-sm text-green-700">
+                       All designs are reviewed for print quality and technical requirements before production begins.
+                     </p>
+                   </div>
+                 </CardContent>
+               </Card>
+             </div>
+
+             {/* Right Column: Surfaces + Print Specs + Actions */}
+             <div className="space-y-4 lg:space-y-6">
+               {/* All Surfaces */}
+               {hasMultipleSurfaces() && (
+                 <Card>
+                   <CardHeader className="pb-3">
+                     <CardTitle className="text-lg">All Surfaces</CardTitle>
+                   </CardHeader>
+                   <CardContent className="overflow-y-auto max-h-[250px] md:max-h-[350px] lg:max-h-[400px]">
+                     <SurfaceThumbnailViewer
+                       orderDetails={orderDetails}
+                       canvasData={canvasData}
+                       surfaceElements={surfaceElements}
+                       productType={productType}
+                       onSurfaceSelect={setSelectedSurface}
+                       selectedSurface={selectedSurface}
+                       designOption={orderDetails?.design_option || orderDetails?.tent_design_option}
+                       tentDesignOption={orderDetails?.tent_design_option}
+                       tinSurfaceCoverage={orderDetails?.tin_surface_coverage}
+                       dimensions={canvasData?.canvasSize || dimensions}
+                       currentSurface={currentSurface}
+                     />
+                   </CardContent>
+                 </Card>
+               )}
+
+               {/* Print Specifications */}
+               <Card>
+                 <CardHeader className="pb-2">
+                   <CardTitle className="text-sm">Print Specifications</CardTitle>
+                 </CardHeader>
+                 <CardContent className="space-y-2">
+                   <div className="grid grid-cols-2 gap-2 text-xs">
+                     <div className="bg-white p-2 rounded border">
+                       <p className="font-medium text-gray-600 mb-1">Resolution</p>
+                       <div className="flex items-center gap-1">
+                         <span className="text-gray-900 font-medium">{currentDPI} DPI</span>
+                         {currentDPI >= 150 ? (
+                           <span className="text-green-600 text-xs">✓</span>
+                         ) : currentDPI >= 100 ? (
+                           <span className="text-yellow-600 text-xs">⚠</span>
+                         ) : (
+                           <span className="text-red-600 text-xs">⚠</span>
+                         )}
+                       </div>
+                     </div>
+                     <div className="bg-white p-2 rounded border">
+                       <p className="font-medium text-gray-600 mb-1">Color</p>
+                       <p className="text-gray-900 font-medium">CMYK</p>
+                     </div>
+                   </div>
+                   <div className="bg-blue-50 border border-blue-200 p-2 rounded text-xs">
+                     <p className="text-blue-700">
+                       {currentDPI >= 150 ? 'Excellent quality' :
+                        currentDPI >= 100 ? 'Good quality' :
+                        'Consider higher resolution'}
+                     </p>
+                   </div>
+                 </CardContent>
+               </Card>
+
+               {/* Actions */}
+               <Card>
+                 <CardHeader className="pb-3">
+                   <CardTitle className="text-lg">Actions</CardTitle>
+                 </CardHeader>
+                 <CardContent className="space-y-3">
+                   <Button
+                     onClick={handleDownload}
+                     disabled={!previewImage || isGenerating}
+                     className="w-full"
+                     variant="outline"
+                   >
+                     <Download className="h-4 w-4 mr-2" />
+                     {isGenerating ? 'Generating PDF...' : 'Download Production PDF'}
+                   </Button>
+                   
+                   <Button
+                     onClick={handleApprove}
+                     disabled={!previewImage}
+                     className="w-full bg-green-600 hover:bg-green-700"
+                   >
+                     <CheckCircle className="h-4 w-4 mr-2" />
+                     Approve Design
+                   </Button>
+                 </CardContent>
+               </Card>
+             </div>
+           </div>
+         )}
           
         <DialogFooter>
           <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
