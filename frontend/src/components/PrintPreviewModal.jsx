@@ -303,8 +303,8 @@ const PrintPreviewModal = ({
         pdfHeightInches = canvasSize.height / 150
       } else {
         // For banners and tins, convert feet to inches for printing
-        const printWidthFeet = parseFloat(dimensions.width) || 2
-        const printHeightFeet = parseFloat(dimensions.height) || 4
+      const printWidthFeet = parseFloat(dimensions.width) || 2
+      const printHeightFeet = parseFloat(dimensions.height) || 4
         pdfWidthInches = printWidthFeet * 12
         pdfHeightInches = printHeightFeet * 12
       }
@@ -482,7 +482,7 @@ const PrintPreviewModal = ({
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
                         style={isMobile ? {
-                          transform: 'scale(3) translate(33%, 33%)',
+                          transform: 'scale(2.5) translate(20%, 25%)',
                           transformOrigin: 'center center'
                         } : {}}
                         onContextMenu={(e) => e.preventDefault()}
@@ -505,15 +505,15 @@ const PrintPreviewModal = ({
                             msUserSelect: 'none',
                             pointerEvents: 'none',
                             zIndex: 9999,
-                            transform: isMobile ? 'scale(3) translate(33%, 33%)' : 'none',
+                            transform: isMobile ? 'scale(2.5) translate(20%, 25%)' : 'none',
                             transformOrigin: 'center center'
                           }}
                           onContextMenu={(e) => e.preventDefault()}
                           onDragStart={(e) => e.preventDefault()}
                           onSelectStart={(e) => e.preventDefault()}
                         />
-                      </div>
-                    ) : (
+                   </div>
+                 ) : (
                       <div className="text-center space-y-3">
                         <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
                          <div>
@@ -521,9 +521,9 @@ const PrintPreviewModal = ({
                            <p className="text-sm text-gray-500 mt-1">
                              Please save your design and try again.
                            </p>
-                         </div>
-                      </div>
-                    )}
+                    </div>
+                  </div>
+                 )}
                   </div>
                </CardContent>
              </Card>
@@ -547,8 +547,8 @@ const PrintPreviewModal = ({
                    </p>
                  </div>
                </CardContent>
-             </Card>
-           </div>
+            </Card>
+          </div>
 
            {/* Right Column: Surfaces + Print Specs + Actions */}
            <div className={`space-y-4 lg:space-y-6 ${isMobile ? 'order-first' : ''}`}>
@@ -576,11 +576,11 @@ const PrintPreviewModal = ({
                </Card>
              )}
 
-             {/* Print Specifications */}
+            {/* Print Specifications */}
              <Card className={isMobile ? 'hidden' : ''}>
                <CardHeader className="pb-2">
                  <CardTitle className="text-sm">Print Specifications</CardTitle>
-               </CardHeader>
+              </CardHeader>
                <CardContent className="space-y-2">
                  <div className="grid grid-cols-2 gap-2 text-xs">
                    <div className="bg-white p-2 rounded border">
@@ -594,13 +594,13 @@ const PrintPreviewModal = ({
                        ) : (
                          <span className="text-red-600 text-xs">⚠</span>
                        )}
-                     </div>
-                   </div>
+                  </div>
+                  </div>
                    <div className="bg-white p-2 rounded border">
                      <p className="font-medium text-gray-600 mb-1">Color</p>
                      <p className="text-gray-900 font-medium">CMYK</p>
-                   </div>
-                 </div>
+                  </div>
+                </div>
                  <div className="bg-blue-50 border border-blue-200 p-2 rounded text-xs">
                    <p className="text-blue-700">
                      {currentDPI >= 150 ? 'Excellent quality' :
@@ -608,8 +608,8 @@ const PrintPreviewModal = ({
                       'Consider higher resolution'}
                    </p>
                  </div>
-               </CardContent>
-             </Card>
+              </CardContent>
+            </Card>
 
              {/* Actions */}
              <Card>
@@ -617,29 +617,29 @@ const PrintPreviewModal = ({
                  <CardTitle className={`text-lg ${isMobile ? 'text-base' : ''}`}>Actions</CardTitle>
                </CardHeader>
                <CardContent className={`space-y-3 ${isMobile ? 'space-y-2' : ''}`}>
-                 <Button
+            <Button
                    onClick={handleDownload}
                    disabled={!previewImage || isGenerating}
                    className={`w-full ${isMobile ? 'text-sm py-2' : ''}`}
-                   variant="outline"
-                 >
+              variant="outline"
+            >
                    <Download className={`h-4 w-4 mr-2 ${isMobile ? 'h-3 w-3' : ''}`} />
                    {isGenerating ? 'Generating PDF...' : isMobile ? 'Download PDF' : 'Download Production PDF'}
-                 </Button>
-                 
-                 <Button
-                   onClick={handleApprove}
+            </Button>
+            
+            <Button
+              onClick={handleApprove}
                    disabled={!previewImage}
                    className={`w-full bg-green-600 hover:bg-green-700 ${isMobile ? 'text-sm py-2' : ''}`}
-                 >
+            >
                    <CheckCircle className={`h-4 w-4 mr-2 ${isMobile ? 'h-3 w-3' : ''}`} />
                    Approve Design
-                 </Button>
+            </Button>
                </CardContent>
              </Card>
            </div>
-         </div>
-
+          </div>
+          
         <DialogFooter>
           <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
             Close
