@@ -157,8 +157,8 @@ def generate_thumbnail(image_path: str, thumbnail_path: str) -> bool:
             height_fill_ratio = 0.82
             width_cap_ratio = 0.98
 
-            # Start by filling height to 92% (for stronger presence)
-            height_fill_ratio = 0.92
+            # Start by filling height to 96% (to match desktop size)
+            height_fill_ratio = 0.96
             new_height = int(target_height * height_fill_ratio)
             new_width = int(new_height * original_aspect)
 

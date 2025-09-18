@@ -39,19 +39,19 @@ const PrintPreviewModal = ({
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
 
-  // Mobile detection and responsive scaling
+  // Mobile detection and content-aware scaling (similar to thumbnail fix)
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
       
-      // Enhanced mobile scaling to handle aspect ratio issues (like thumbnail fix)
+      // Content-aware mobile scaling (like backend thumbnail fix)
       if (mobile && previewImage) {
         const img = new Image()
         img.onload = () => {
           const viewportWidth = window.innerWidth
-          const viewportHeight = window.innerHeight * 0.7 // 70vh container
-          const containerPadding = 32 // Account for padding
+          const viewportHeight = window.innerHeight * 0.75 // 75vh container
+          const containerPadding = 16 // Reduced padding for more space
           
           const availableWidth = viewportWidth - containerPadding
           const availableHeight = viewportHeight - containerPadding
@@ -61,24 +61,28 @@ const PrintPreviewModal = ({
           
           let optimalScale = 1.0
           
-          // Enhanced scaling logic similar to backend thumbnail fix
+          // Content-aware scaling: fill 96% of available height (like thumbnail fix)
+          const heightFillRatio = 0.96
+          const targetHeight = availableHeight * heightFillRatio
+          
           if (imageAspectRatio > containerAspectRatio) {
-            // Image is wider (like mobile 2:1 designs) - be more aggressive with scaling
-            optimalScale = availableWidth / img.width
+            // Wide image: scale to fill height, then check width
+            optimalScale = targetHeight / img.height
+            const resultingWidth = optimalScale * img.width
             
-            // For wide images, boost the scale to use more vertical space
-            if (imageAspectRatio >= 1.8) { // Very wide images like 2:1 mobile designs
-              optimalScale = Math.min(optimalScale * 1.4, availableHeight * 0.85 / img.height)
+            // If too wide, cap at 98% of available width
+            if (resultingWidth > availableWidth * 0.98) {
+              optimalScale = (availableWidth * 0.98) / img.width
             }
           } else {
-            // Image is taller or square - scale based on height  
-            optimalScale = availableHeight / img.height
+            // Tall/square image: scale to fill height
+            optimalScale = targetHeight / img.height
           }
           
-          // More generous scaling bounds for mobile
-          optimalScale = Math.max(0.3, Math.min(optimalScale * 1.3, 3.0))
+          // Apply aggressive scaling for mobile (like thumbnail fix)
+          optimalScale = Math.max(0.4, Math.min(optimalScale * 1.2, 4.0))
           
-          console.log('📱 Enhanced mobile scaling calculated:', {
+          console.log('📱 Content-aware mobile scaling:', {
             viewportWidth,
             viewportHeight,
             availableWidth,
@@ -87,14 +91,12 @@ const PrintPreviewModal = ({
             imageHeight: img.height,
             imageAspectRatio: imageAspectRatio.toFixed(3),
             containerAspectRatio: containerAspectRatio.toFixed(3),
-            isWideImage: imageAspectRatio >= 1.8,
+            heightFillRatio,
+            targetHeight,
             optimalScale: optimalScale.toFixed(3),
             finalImageWidth: `${optimalScale * img.width}px`,
             finalImageHeight: `${optimalScale * img.height}px`
           })
-          
-          // Force a re-render to ensure the scale is applied
-          console.log('📱 Setting imageScale to:', optimalScale)
           
           setImageScale(optimalScale)
         }
@@ -543,6 +545,10 @@ const PrintPreviewModal = ({
                         src={previewImage} 
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
+                        style={isMobile ? {
+                          transform: `scale(${imageScale})`,
+                          transformOrigin: 'center center'
+                        } : {}}
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}
                         draggable={false}
