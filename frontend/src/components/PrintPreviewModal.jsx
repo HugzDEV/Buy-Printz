@@ -251,6 +251,7 @@ const PrintPreviewModal = ({
         // Load and draw watermark
         const watermarkImg = new Image()
         watermarkImg.onload = () => {
+          console.log('✅ Watermark image loaded successfully for PDF generation')
           // Calculate watermark pattern
           const watermarkWidth = Math.min(canvas.width / 4, 300)
           const watermarkHeight = (watermarkImg.height / watermarkImg.width) * watermarkWidth
@@ -270,6 +271,7 @@ const PrintPreviewModal = ({
           ctx.globalAlpha = 1
           ctx.globalCompositeOperation = 'source-over'
           
+          console.log('✅ Watermarked image generated for PDF download')
           // Return watermarked image as data URL with maximum quality
           resolve(canvas.toDataURL('image/png', 1.0))
         }
@@ -476,15 +478,16 @@ const PrintPreviewModal = ({
               <CardContent className={`overflow-hidden ${isMobile ? 'p-1' : 'p-3'}`}>
                 <div className="w-full h-[25vh] sm:h-[200px] md:h-[300px] lg:h-[400px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
                   {previewImage ? (
-                    <div className="relative w-full h-full flex items-center justify-center">
+                    <div className="relative w-full h-full flex items-center justify-center" style={{ zIndex: 1 }}>
                       <img 
                         src={previewImage} 
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
                         style={isMobile ? {
-                          transform: 'scale(2.5) translate(30%, 20%)',
+                          transform: 'scale(2.5) translate(30%, 25%)',
                           transformOrigin: 'center center',
-                          zIndex: 1
+                          zIndex: 1,
+                          position: 'relative'
                         } : {}}
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}
@@ -505,9 +508,10 @@ const PrintPreviewModal = ({
                             mozUserSelect: 'none',
                             msUserSelect: 'none',
                             pointerEvents: 'none',
-                            zIndex: 10001,
-                            transform: isMobile ? 'scale(2.5) translate(30%, 20%)' : 'none',
-                            transformOrigin: 'center center'
+                            zIndex: 10,
+                            transform: isMobile ? 'scale(2.5) translate(30%, 25%)' : 'none',
+                            transformOrigin: 'center center',
+                            position: 'absolute'
                           }}
                           onContextMenu={(e) => e.preventDefault()}
                           onDragStart={(e) => e.preventDefault()}
