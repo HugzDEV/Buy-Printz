@@ -482,7 +482,7 @@ const PrintPreviewModal = ({
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
                         style={isMobile ? {
-                          transform: 'scale(3)',
+                          transform: 'scale(3) translate(33%, 33%)',
                           transformOrigin: 'center center'
                         } : {}}
                         onContextMenu={(e) => e.preventDefault()}
@@ -505,7 +505,7 @@ const PrintPreviewModal = ({
                             msUserSelect: 'none',
                             pointerEvents: 'none',
                             zIndex: 9999,
-                            transform: isMobile ? 'scale(3)' : 'none',
+                            transform: isMobile ? 'scale(3) translate(33%, 33%)' : 'none',
                             transformOrigin: 'center center'
                           }}
                           onContextMenu={(e) => e.preventDefault()}
