@@ -536,35 +536,16 @@ const PrintPreviewModal = ({
                  </CardTitle>
                </CardHeader>
               <CardContent className="overflow-hidden">
-                <div className="w-full h-[70vh] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-2 sm:p-3 md:p-4">
+                <div className="w-full h-[75vh] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-1 sm:p-3 md:p-4">
                   {previewImage ? (
                     <div className="relative w-full h-full flex items-center justify-center">
                       <img 
                         src={previewImage} 
                         alt="Design Preview"
-                        className={`rounded shadow-lg ${isMobile ? '' : 'max-w-none max-h-none'}`}
-                        style={{
-                          // DIRECT IMAGE SCALING - Force the image to scale properly on mobile
-                          width: isMobile ? '90vw' : 'auto',
-                          height: isMobile ? 'auto' : 'auto',
-                          minWidth: isMobile ? '300px' : 'auto',
-                          minHeight: isMobile ? '150px' : 'auto',
-                          maxWidth: isMobile ? '90vw' : '100%',
-                          maxHeight: isMobile ? '60vh' : '100%',
-                          objectFit: 'contain',
-                          transform: isMobile ? `scale(${imageScale})` : 'none',
-                          transformOrigin: 'center center',
-                          transition: 'all 0.2s ease-in-out'
-                        }}
+                        className="rounded shadow-lg w-full h-full object-contain"
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}
                         draggable={false}
-                        onLoad={() => {
-                          if (isMobile) {
-                            console.log('📱 Mobile image loaded with scale:', imageScale)
-                            console.log('📱 Image element computed style:', window.getComputedStyle(event.target))
-                          }
-                        }}
                       />
                         {/* BuyPrintz Watermark Overlay for IP Protection */}
                         <div 
@@ -581,10 +562,7 @@ const PrintPreviewModal = ({
                             mozUserSelect: 'none',
                             msUserSelect: 'none',
                             pointerEvents: 'none',
-                            zIndex: 9999,
-                            // Scale watermark with image on mobile
-                            transform: isMobile ? `scale(${imageScale})` : 'none',
-                            transformOrigin: 'center center'
+                            zIndex: 9999
                           }}
                           onContextMenu={(e) => e.preventDefault()}
                           onDragStart={(e) => e.preventDefault()}
