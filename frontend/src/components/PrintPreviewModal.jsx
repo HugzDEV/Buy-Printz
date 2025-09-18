@@ -427,7 +427,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`max-w-6xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden ${isMobile ? 'p-0' : 'p-2'}`}>
+      <DialogContent className={`max-w-6xl w-[95vw] max-h-[90vh] mx-auto overflow-hidden ${isMobile ? 'p-0' : 'p-2'}`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-sm sm:text-base">
             <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -474,13 +474,17 @@ const PrintPreviewModal = ({
                  </CardTitle>
                </CardHeader>
               <CardContent className={`overflow-hidden ${isMobile ? 'p-1' : 'p-3'}`}>
-                <div className="w-full h-[60vh] sm:h-[350px] md:h-[450px] lg:h-[550px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
+                <div className="w-full h-[40vh] sm:h-[300px] md:h-[400px] lg:h-[500px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
                   {previewImage ? (
                     <div className="relative w-full h-full flex items-center justify-center">
                       <img 
                         src={previewImage} 
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
+                        style={isMobile ? {
+                          transform: 'scale(3)',
+                          transformOrigin: 'center center'
+                        } : {}}
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}
                         draggable={false}
@@ -500,7 +504,9 @@ const PrintPreviewModal = ({
                             mozUserSelect: 'none',
                             msUserSelect: 'none',
                             pointerEvents: 'none',
-                            zIndex: 9999
+                            zIndex: 9999,
+                            transform: isMobile ? 'scale(3)' : 'none',
+                            transformOrigin: 'center center'
                           }}
                           onContextMenu={(e) => e.preventDefault()}
                           onDragStart={(e) => e.preventDefault()}
