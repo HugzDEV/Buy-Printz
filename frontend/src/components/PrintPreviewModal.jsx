@@ -474,7 +474,7 @@ const PrintPreviewModal = ({
                  </CardTitle>
                </CardHeader>
               <CardContent className={`overflow-hidden ${isMobile ? 'p-1' : 'p-3'}`}>
-                <div className="w-full h-[40vh] sm:h-[300px] md:h-[400px] lg:h-[500px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
+                <div className="w-full h-[25vh] sm:h-[200px] md:h-[300px] lg:h-[400px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
                   {previewImage ? (
                     <div className="relative w-full h-full flex items-center justify-center">
                       <img 
@@ -482,8 +482,9 @@ const PrintPreviewModal = ({
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
                         style={isMobile ? {
-                          transform: 'scale(2.5) translate(28%, 22%)',
-                          transformOrigin: 'center center'
+                          transform: 'scale(2.5) translate(30%, 20%)',
+                          transformOrigin: 'center center',
+                          zIndex: 1
                         } : {}}
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}
@@ -491,7 +492,7 @@ const PrintPreviewModal = ({
                       />
                         {/* BuyPrintz Watermark Overlay for IP Protection */}
                         <div 
-                          className="absolute inset-0 pointer-events-none z-50"
+                          className="absolute inset-0 pointer-events-none"
                           style={{
                             backgroundImage: `url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')`,
                             backgroundSize: 'contain',
@@ -504,8 +505,8 @@ const PrintPreviewModal = ({
                             mozUserSelect: 'none',
                             msUserSelect: 'none',
                             pointerEvents: 'none',
-                            zIndex: 9999,
-                            transform: isMobile ? 'scale(2.5) translate(28%, 22%)' : 'none',
+                            zIndex: 10001,
+                            transform: isMobile ? 'scale(2.5) translate(30%, 20%)' : 'none',
                             transformOrigin: 'center center'
                           }}
                           onContextMenu={(e) => e.preventDefault()}
