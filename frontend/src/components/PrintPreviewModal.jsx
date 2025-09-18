@@ -427,7 +427,7 @@ const PrintPreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`max-w-6xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden ${isMobile ? 'p-2' : ''}`}>
+      <DialogContent className={`max-w-6xl w-[95vw] max-h-[95vh] mx-auto overflow-hidden ${isMobile ? 'p-0' : 'p-2'}`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-sm sm:text-base">
             <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -440,12 +440,12 @@ const PrintPreviewModal = ({
           </DialogTitle>
         </DialogHeader>
 
-         <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6'}`}>
+         <div className={`grid grid-cols-1 ${isMobile ? 'gap-1' : 'lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4'}`}>
            {/* Left Column: Preview + Quality Assurance */}
-           <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+           <div className={`lg:col-span-2 ${isMobile ? 'space-y-2' : 'space-y-4 lg:space-y-6'}`}>
              {/* Design Preview */}
              <Card className="overflow-hidden">
-               <CardHeader className="pb-3">
+               <CardHeader className={`${isMobile ? 'pb-1' : 'pb-3'}`}>
                  <CardTitle className="text-lg flex items-center justify-between">
                    <span>Design Preview</span>
                    {hasMultipleSurfaces() && (
@@ -473,8 +473,8 @@ const PrintPreviewModal = ({
                    )}
                  </CardTitle>
                </CardHeader>
-              <CardContent className="overflow-hidden">
-                <div className="w-full h-[75vh] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-50 rounded-lg flex items-center justify-center p-1 sm:p-3 md:p-4">
+              <CardContent className={`overflow-hidden ${isMobile ? 'p-1' : 'p-3'}`}>
+                <div className="w-full h-[60vh] sm:h-[350px] md:h-[450px] lg:h-[550px] bg-gray-50 rounded-lg flex items-center justify-center p-0">
                   {previewImage ? (
                     <div className="relative w-full h-full flex items-center justify-center">
                       <img 
