@@ -485,7 +485,7 @@ const PrintPreviewModal = ({
                          className="rounded shadow-lg w-full h-full object-contain"
                          style={{
                            transform: productType === 'tent' 
-                             ? 'scale(3.857) translate(22.5%, 35%)' 
+                             ? 'scale(3.664) translate(27.5%, 35%)' 
                              : 'scale(2.5) translate(30%, 25%)',
                            transformOrigin: 'center center',
                            zIndex: 1,
@@ -512,7 +512,7 @@ const PrintPreviewModal = ({
                              pointerEvents: 'none',
                              zIndex: 10,
                              transform: productType === 'tent' 
-                               ? 'scale(3.857) translate(22.5%, 35%)' 
+                               ? 'scale(3.664) translate(27.5%, 35%)' 
                                : 'scale(2.5) translate(30%, 25%)',
                              transformOrigin: 'center center',
                              position: 'absolute'
