@@ -484,7 +484,9 @@ const PrintPreviewModal = ({
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
                         style={isMobile ? {
-                          transform: 'scale(4.5) translate(20%, 30%)',
+                          transform: productType === 'tent' 
+                            ? 'scale(4.5) translate(20%, 30%)' 
+                            : 'scale(2.5) translate(30%, 25%)',
                           transformOrigin: 'center center',
                           zIndex: 1,
                           position: 'relative'
@@ -509,7 +511,11 @@ const PrintPreviewModal = ({
                             msUserSelect: 'none',
                             pointerEvents: 'none',
                             zIndex: 10,
-                            transform: isMobile ? 'scale(4.5) translate(20%, 30%)' : 'none',
+                            transform: isMobile 
+                              ? (productType === 'tent' 
+                                  ? 'scale(4.5) translate(20%, 30%)' 
+                                  : 'scale(2.5) translate(30%, 25%)')
+                              : 'none',
                             transformOrigin: 'center center',
                             position: 'absolute'
                           }}
