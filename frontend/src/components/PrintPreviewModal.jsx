@@ -484,7 +484,7 @@ const PrintPreviewModal = ({
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
                         style={isMobile ? {
-                          transform: 'scale(2.5) translate(30%, 25%)',
+                          transform: 'scale(3.0) translate(30%, 20%)',
                           transformOrigin: 'center center',
                           zIndex: 1,
                           position: 'relative'
@@ -509,7 +509,7 @@ const PrintPreviewModal = ({
                             msUserSelect: 'none',
                             pointerEvents: 'none',
                             zIndex: 10,
-                            transform: isMobile ? 'scale(2.5) translate(30%, 25%)' : 'none',
+                            transform: isMobile ? 'scale(3.0) translate(30%, 20%)' : 'none',
                             transformOrigin: 'center center',
                             position: 'absolute'
                           }}
