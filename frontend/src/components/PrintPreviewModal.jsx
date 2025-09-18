@@ -487,7 +487,7 @@ const PrintPreviewModal = ({
                            transform: productType === 'tent' 
                              ? 'scale(3.664) translate(27.5%, 35%)' 
                              : productType === 'tin'
-                             ? 'scale(1.25) translate(30%, 25%)'
+                             ? 'scale(1.0) translate(0%, 0%)'
                              : 'scale(2.5) translate(30%, 25%)',
                            transformOrigin: 'center center',
                            zIndex: 1,
@@ -516,7 +516,7 @@ const PrintPreviewModal = ({
                              transform: productType === 'tent' 
                                ? 'scale(3.664) translate(27.5%, 35%)' 
                                : productType === 'tin'
-                               ? 'scale(1.25) translate(30%, 25%)'
+                               ? 'scale(1.0) translate(0%, 0%)'
                                : 'scale(2.5) translate(30%, 25%)',
                              transformOrigin: 'center center',
                              position: 'absolute'
