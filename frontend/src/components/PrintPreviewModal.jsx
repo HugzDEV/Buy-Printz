@@ -39,78 +39,21 @@ const PrintPreviewModal = ({
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
 
-  // Mobile detection and content-aware scaling (similar to thumbnail fix)
+  // Mobile detection - simplified since we now generate fresh images with correct pixel ratio
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
       
-      // Content-aware mobile scaling (like backend thumbnail fix)
-      if (mobile && previewImage) {
-        const img = new Image()
-        img.onload = () => {
-          const viewportWidth = window.innerWidth
-          const viewportHeight = window.innerHeight * 0.75 // 75vh container
-          const containerPadding = 16 // Reduced padding for more space
-          
-          const availableWidth = viewportWidth - containerPadding
-          const availableHeight = viewportHeight - containerPadding
-          
-          const imageAspectRatio = img.width / img.height
-          const containerAspectRatio = availableWidth / availableHeight
-          
-          let optimalScale = 1.0
-          
-          // Content-aware scaling: fill 96% of available height (like thumbnail fix)
-          const heightFillRatio = 0.96
-          const targetHeight = availableHeight * heightFillRatio
-          
-          if (imageAspectRatio > containerAspectRatio) {
-            // Wide image: scale to fill height, then check width
-            optimalScale = targetHeight / img.height
-            const resultingWidth = optimalScale * img.width
-            
-            // If too wide, cap at 98% of available width
-            if (resultingWidth > availableWidth * 0.98) {
-              optimalScale = (availableWidth * 0.98) / img.width
-            }
-          } else {
-            // Tall/square image: scale to fill height
-            optimalScale = targetHeight / img.height
-          }
-          
-          // Apply aggressive scaling for mobile (like thumbnail fix)
-          optimalScale = Math.max(0.4, Math.min(optimalScale * 1.2, 4.0))
-          
-          console.log('📱 Content-aware mobile scaling:', {
-            viewportWidth,
-            viewportHeight,
-            availableWidth,
-            availableHeight,
-            imageWidth: img.width,
-            imageHeight: img.height,
-            imageAspectRatio: imageAspectRatio.toFixed(3),
-            containerAspectRatio: containerAspectRatio.toFixed(3),
-            heightFillRatio,
-            targetHeight,
-            optimalScale: optimalScale.toFixed(3),
-            finalImageWidth: `${optimalScale * img.width}px`,
-            finalImageHeight: `${optimalScale * img.height}px`
-          })
-          
-          setImageScale(optimalScale)
-        }
-        img.src = previewImage
-      } else if (!mobile) {
-        // Reset scale for desktop
-        setImageScale(1.0)
-      }
+      // Since we're now generating fresh images with mobile-optimized pixel ratio,
+      // we don't need complex scaling - just use CSS for responsive sizing
+      setImageScale(1.0)
     }
     
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
-  }, [previewImage, isOpen])
+  }, [isOpen])
 
   // Initialize selected surface to current surface from editor when modal opens
   useEffect(() => {
@@ -225,64 +168,57 @@ const PrintPreviewModal = ({
     }
   }
 
-   // KONVA-ONLY IMAGE LOADING - No more Canvas2D conflicts!
+   // Generate fresh Konva image with mobile-optimized pixel ratio
    useEffect(() => {
-     const loadPreviewImage = async () => {
-       console.log('🎨 KONVA-ONLY: Loading preview image - isOpen:', isOpen, 'orderDetails:', !!orderDetails, 'canvasData:', !!canvasData)
+     const generatePreviewImage = async () => {
+       console.log('🎨 GENERATING FRESH PREVIEW IMAGE - isOpen:', isOpen, 'orderDetails:', !!orderDetails, 'canvasData:', !!canvasData)
        
        if (isOpen && (orderDetails || canvasData)) {
-         console.log('🎨 KONVA-ONLY: Canvas data available:', !!canvasData)
-         console.log('🎨 KONVA-ONLY: Selected surface:', selectedSurface, 'Current surface:', currentSurface)
+         console.log('🎨 Selected surface:', selectedSurface, 'Current surface:', currentSurface)
          
-         // Get surface images from multiple sources
+         // PRIORITY 1: Generate fresh Konva image with mobile-optimized pixel ratio
+         // This ensures consistent sizing regardless of how the original was captured
+         const stageElement = document.querySelector('.konvajs-content canvas, canvas[data-konva-stage], [data-konva-stage] canvas')
+         if (stageElement) {
+           console.log('🎨 ✅ GENERATING FRESH KONVA IMAGE with mobile-optimized pixel ratio')
+           
+           // Use same pixel ratio logic as BannerEditor for consistency
+           const isMobile = window.innerWidth < 768
+           const pixelRatio = isMobile ? 3 : 2 // Higher quality for mobile captures
+           
+           const freshImage = stageElement.toDataURL({
+             mimeType: 'image/png',
+             quality: 1.0,
+             pixelRatio: pixelRatio
+           })
+           
+           console.log(`🎨 Generated fresh preview image - Mobile: ${isMobile}, PixelRatio: ${pixelRatio}`)
+           setPreviewImage(freshImage)
+           return
+         }
+         
+         // PRIORITY 2: Fallback to stored surface images
          const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
-         console.log('🎨 DEBUG: Available surface images keys:', Object.keys(surfaceImages || {}))
-         console.log('🎨 DEBUG: Looking for surface:', selectedSurface)
-         
-         // PRIORITY 1: Use stored surface image for selected surface (MOST RELIABLE!)
          if (surfaceImages && surfaceImages[selectedSurface]) {
            console.log('🎨 ✅ USING STORED SURFACE IMAGE for:', selectedSurface)
            setPreviewImage(surfaceImages[selectedSurface])
            return
          }
          
-         // PRIORITY 2: Use Konva native export for current surface if selected surface matches
+         // PRIORITY 3: Fallback to stored Konva stage image
          if (selectedSurface === currentSurface && canvasData?.konvaStageImage) {
-           console.log('🎨 ✅ USING KONVA NATIVE EXPORT - Perfect alignment guaranteed!')
+           console.log('🎨 ✅ USING STORED KONVA STAGE IMAGE')
            setPreviewImage(canvasData.konvaStageImage)
            return
          }
          
-         // PRIORITY 3: Use main canvas image (captured with Konva) for current surface only
-         const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
-         if (canvasImage) {
-           if (!hasMultipleSurfaces() || selectedSurface === currentSurface) {
-             console.log('🎨 ✅ Using stored Konva canvas image for current surface')
-             setPreviewImage(canvasImage)
-             return
-           }
-         }
-        
-         // NO FALLBACK TO CANVAS2D - Force proper Konva capture
-         console.warn('🚫 NO IMAGE AVAILABLE - Canvas2D generation has been PURGED!')
-         console.warn('🚫 Ensure all surfaces are captured using Konva stageRef.current.toDataURL()')
-         console.warn('🚫 Selected surface:', selectedSurface, 'Current surface:', currentSurface)
-         console.warn('🚫 Available surface images:', Object.keys(surfaceImages || {}))
-         console.warn('🚫 Konva stage image available:', !!canvasData?.konvaStageImage)
-         
-         // PRIORITY 4: If selected surface is current surface, use Konva stage image anyway
-         if (selectedSurface === currentSurface && canvasData?.konvaStageImage) {
-           console.log('🎨 ⚠️ FALLBACK: Using Konva stage image for missing surface data')
-           setPreviewImage(canvasData.konvaStageImage)
-           return
-         }
-         
+         console.warn('🚫 NO IMAGE AVAILABLE - No Konva stage found')
          setPreviewImage(null)
-      }
-    }
-    
-    loadPreviewImage()
-  }, [isOpen, orderDetails, canvasData, selectedSurface, currentSurface])
+       }
+     }
+     
+     generatePreviewImage()
+   }, [isOpen, orderDetails, canvasData, selectedSurface, currentSurface])
 
   // Handle surface navigation
   const handlePreviousSurface = () => {
@@ -545,10 +481,6 @@ const PrintPreviewModal = ({
                         src={previewImage} 
                         alt="Design Preview"
                         className="rounded shadow-lg w-full h-full object-contain"
-                        style={isMobile ? {
-                          transform: `scale(${imageScale})`,
-                          transformOrigin: 'center center'
-                        } : {}}
                         onContextMenu={(e) => e.preventDefault()}
                         onDragStart={(e) => e.preventDefault()}
                         draggable={false}
