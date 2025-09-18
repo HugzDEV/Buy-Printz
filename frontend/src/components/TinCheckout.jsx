@@ -996,7 +996,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
+                      {shippingOptions.find(q => q.value === shippingOption)?.price || 'Calculating...'}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -1122,7 +1122,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingQuotes.find(q => q.type === shippingOption)?.cost || 'Calculating...'}
+                      {shippingOptions.find(q => q.value === shippingOption)?.price || 'Calculating...'}
                     </span>
                   </div>
                   
