@@ -485,7 +485,7 @@ const PrintPreviewModal = ({
                         className="rounded shadow-lg w-full h-full object-contain"
                         style={isMobile ? {
                           transform: productType === 'tent' 
-                            ? 'scale(4.06) translate(20%, 35%)' 
+                            ? 'scale(3.857) translate(22.5%, 35%)' 
                             : 'scale(2.5) translate(30%, 25%)',
                           transformOrigin: 'center center',
                           zIndex: 1,
@@ -513,7 +513,7 @@ const PrintPreviewModal = ({
                             zIndex: 10,
                             transform: isMobile 
                               ? (productType === 'tent' 
-                                  ? 'scale(4.06) translate(20%, 35%)' 
+                                  ? 'scale(3.857) translate(22.5%, 35%)' 
                                   : 'scale(2.5) translate(30%, 25%)')
                               : 'none',
                             transformOrigin: 'center center',
