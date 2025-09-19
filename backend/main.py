@@ -48,6 +48,14 @@ try:
     print("✅ Tin Skinz API loaded successfully")
 except ImportError as e:
     TIN_SKINZ_API_AVAILABLE = False
+
+# Import Tin Skinz Shipping API routes
+try:
+    from backend.tin_skinz_shipping_api import router as tin_skinz_shipping_router
+    TIN_SKINZ_SHIPPING_API_AVAILABLE = True
+    print("✅ Tin Skinz Shipping API loaded successfully")
+except ImportError as e:
+    TIN_SKINZ_SHIPPING_API_AVAILABLE = False
     print(f"❌ Tin Skinz API failed to load: {e}")
 
 # Simple in-memory cache
@@ -197,6 +205,13 @@ if TIN_SKINZ_API_AVAILABLE:
     logger.info("Tin Skinz API routes loaded successfully")
 else:
     logger.warning("Tin Skinz API routes not available")
+
+# Include Tin Skinz Shipping API routes if available
+if TIN_SKINZ_SHIPPING_API_AVAILABLE:
+    app.include_router(tin_skinz_shipping_router)
+    logger.info("Tin Skinz Shipping API routes loaded successfully")
+else:
+    logger.warning("Tin Skinz Shipping API routes not available")
 
 # Mount static files - create uploads directory if it doesn't exist
 uploads_dir = "uploads"

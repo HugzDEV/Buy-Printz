@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { calculateTinSkinzPricing, formatCurrency, CANDY_OPTIONS, calculateCandyPricing } from '../utils/tinSkinzPricing';
 import { NeumorphicButton } from './ui';
+import { Truck, CreditCard, User, MapPin, Shield, AlertTriangle } from 'lucide-react';
 
 const TinSkinzCheckout = () => {
   const [searchParams] = useSearchParams();
@@ -10,6 +11,51 @@ const TinSkinzCheckout = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Billing Information
+  const [billingInfo, setBillingInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    company: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'US'
+  });
+  
+  // Shipping Information
+  const [shippingInfo, setShippingInfo] = useState({
+    firstName: '',
+    lastName: '',
+    company: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'US',
+    sameAsBilling: true
+  });
+  
+  // Shipping Options
+  const [shippingOptions, setShippingOptions] = useState([]);
+  const [selectedShipping, setSelectedShipping] = useState(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingError, setShippingError] = useState(null);
+  
+  // Fraud Prevention
+  const [fraudChecks, setFraudChecks] = useState({
+    emailVerified: false,
+    phoneVerified: false,
+    addressVerified: false,
+    riskScore: 0
+  });
+  
+  // Form Validation
+  const [formErrors, setFormErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
   
   // Order data from marketplace
   const [orderData, setOrderData] = useState(() => {
@@ -49,6 +95,121 @@ const TinSkinzCheckout = () => {
 
   // Final pricing (candy already included per design)
   const [finalPricing, setFinalPricing] = useState(null);
+  
+  // Form validation
+  const validateForm = () => {
+    const errors = {};
+    
+    // Billing validation
+    if (!billingInfo.firstName.trim()) errors.firstName = 'First name is required';
+    if (!billingInfo.lastName.trim()) errors.lastName = 'Last name is required';
+    if (!billingInfo.email.trim()) errors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(billingInfo.email)) errors.email = 'Email is invalid';
+    if (!billingInfo.phone.trim()) errors.phone = 'Phone number is required';
+    if (!billingInfo.address.trim()) errors.address = 'Address is required';
+    if (!billingInfo.city.trim()) errors.city = 'City is required';
+    if (!billingInfo.state.trim()) errors.state = 'State is required';
+    if (!billingInfo.zipCode.trim()) errors.zipCode = 'Zip code is required';
+    
+    // Shipping validation
+    if (!shippingInfo.sameAsBilling) {
+      if (!shippingInfo.firstName.trim()) errors.shippingFirstName = 'First name is required';
+      if (!shippingInfo.lastName.trim()) errors.shippingLastName = 'Last name is required';
+      if (!shippingInfo.address.trim()) errors.shippingAddress = 'Address is required';
+      if (!shippingInfo.city.trim()) errors.shippingCity = 'City is required';
+      if (!shippingInfo.state.trim()) errors.shippingState = 'State is required';
+      if (!shippingInfo.zipCode.trim()) errors.shippingZipCode = 'Zip code is required';
+    }
+    
+    // Shipping option validation
+    if (!selectedShipping) errors.shipping = 'Please select a shipping option';
+    
+    setFormErrors(errors);
+    const isValid = Object.keys(errors).length === 0;
+    setIsFormValid(isValid);
+    return isValid;
+  };
+  
+  // Get shipping rates from UPS
+  const getShippingRates = async () => {
+    if (!shippingInfo.zipCode) {
+      setShippingError('Please enter your shipping address to get shipping rates');
+      return;
+    }
+    
+    setShippingLoading(true);
+    setShippingError(null);
+    
+    try {
+      const response = await fetch('/api/tin-skinz/shipping/get-rates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          selected_designs: orderData.selected_designs,
+          total_quantity: orderData.total_quantity,
+          customer_info: shippingInfo
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get shipping rates');
+      }
+      
+      const result = await response.json();
+      
+      if (result.success && result.shipping_options.length > 0) {
+        setShippingOptions(result.shipping_options);
+        // Auto-select the first (cheapest) option
+        setSelectedShipping(result.shipping_options[0]);
+      } else {
+        setShippingError('No shipping options available');
+      }
+    } catch (error) {
+      console.error('Error getting shipping rates:', error);
+      setShippingError('Unable to get shipping rates. Please try again.');
+    } finally {
+      setShippingLoading(false);
+    }
+  };
+  
+  // Fraud prevention checks
+  const performFraudChecks = async () => {
+    try {
+      // Basic email validation
+      const emailValid = /\S+@\S+\.\S+/.test(billingInfo.email);
+      
+      // Basic phone validation
+      const phoneValid = /^\+?[\d\s\-\(\)]{10,}$/.test(billingInfo.phone);
+      
+      // Basic address validation
+      const addressValid = billingInfo.address.length > 5 && 
+                          billingInfo.city.length > 2 && 
+                          billingInfo.state.length === 2 && 
+                          /^\d{5}(-\d{4})?$/.test(billingInfo.zipCode);
+      
+      // Calculate risk score (0-100, lower is better)
+      let riskScore = 0;
+      if (!emailValid) riskScore += 30;
+      if (!phoneValid) riskScore += 25;
+      if (!addressValid) riskScore += 25;
+      if (billingInfo.email.includes('temp') || billingInfo.email.includes('test')) riskScore += 20;
+      if (billingInfo.phone.includes('555')) riskScore += 15;
+      
+      setFraudChecks({
+        emailVerified: emailValid,
+        phoneVerified: phoneValid,
+        addressVerified: addressValid,
+        riskScore
+      });
+      
+      return riskScore < 50; // Allow orders with risk score < 50
+    } catch (error) {
+      console.error('Error performing fraud checks:', error);
+      return false;
+    }
+  };
 
 
   // Use marketplace pricing directly (candy already included)
@@ -70,6 +231,25 @@ const TinSkinzCheckout = () => {
       setFinalPricing(null);
     }
   }, [orderData]);
+  
+  // Validate form when billing or shipping info changes
+  useEffect(() => {
+    validateForm();
+  }, [billingInfo, shippingInfo, selectedShipping]);
+  
+  // Get shipping rates when shipping address is complete
+  useEffect(() => {
+    if (shippingInfo.zipCode && shippingInfo.address && shippingInfo.city && shippingInfo.state) {
+      getShippingRates();
+    }
+  }, [shippingInfo.zipCode, shippingInfo.address, shippingInfo.city, shippingInfo.state]);
+  
+  // Perform fraud checks when billing info changes
+  useEffect(() => {
+    if (billingInfo.email && billingInfo.phone && billingInfo.address) {
+      performFraudChecks();
+    }
+  }, [billingInfo.email, billingInfo.phone, billingInfo.address]);
 
   const handlePurchase = async () => {
     if (!finalPricing) {
@@ -80,6 +260,19 @@ const TinSkinzCheckout = () => {
     if (!stripe || !elements) {
       console.error('Stripe not ready');
       alert('Payment system not ready. Please try again.');
+      return;
+    }
+    
+    // Validate form
+    if (!validateForm()) {
+      console.error('Form validation failed');
+      return;
+    }
+    
+    // Perform fraud checks
+    const fraudCheckPassed = await performFraudChecks();
+    if (!fraudCheckPassed) {
+      alert('Order could not be processed due to security concerns. Please contact support.');
       return;
     }
 
@@ -97,22 +290,10 @@ const TinSkinzCheckout = () => {
           tax_amount: finalPricing.tax_amount,
           total_amount: finalPricing.total_amount
         },
-        shipping_address: {
-          name: 'John Doe',
-          line1: '123 Main St',
-          city: 'Anytown',
-          state: 'MA',
-          postal_code: '12345',
-          country: 'US'
-        },
-        billing_address: {
-          name: 'John Doe',
-          line1: '123 Main St',
-          city: 'Anytown',
-          state: 'MA',
-          postal_code: '12345',
-          country: 'US'
-        }
+        billing_info: billingInfo,
+        shipping_info: shippingInfo.sameAsBilling ? billingInfo : shippingInfo,
+        shipping_option: selectedShipping,
+        fraud_checks: fraudChecks
       };
 
       const response = await fetch('/api/tin-skinz/create-order', {
