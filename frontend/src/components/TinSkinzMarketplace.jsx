@@ -420,10 +420,10 @@ const TinSkinzMarketplace = () => {
     initializeStripe();
   }, []);
 
-  // Calculate pricing whenever relevant values change
+  // Calculate pricing whenever relevant values change (no candy in marketplace)
   useEffect(() => {
     if (selectedDesign) {
-      const hasCandy = selectedCandy !== '';
+      const hasCandy = false; // Candy moved to checkout
       const hasCustomMessage = customMessage.trim() !== '';
       
       try {
@@ -434,7 +434,7 @@ const TinSkinzMarketplace = () => {
         setPricing(null);
       }
     }
-  }, [selectedDesign, selectedCandy, customMessage, quantity]);
+  }, [selectedDesign, customMessage, quantity]);
 
   const handleDesignSelect = (design) => {
     setSelectedDesign(design);
@@ -451,79 +451,42 @@ const TinSkinzMarketplace = () => {
       return;
     }
 
-    if (!stripe) {
-      alert('Payment system is not ready. Please try again.');
-      return;
-    }
 
     if (!pricing) {
       alert('Unable to calculate pricing. Please try again.');
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Create order and get payment intent
-      const orderData = {
-        design_id: selectedDesign.id,
-        custom_message: customMessage.trim() || null,
-        candy_id: selectedCandy || null,
-        quantity: quantity,
-        shipping_address: {
-          // This would be collected from a form in a real implementation
-          name: "John Doe",
-          line1: "123 Main St",
-          city: "Anytown",
-          state: "CA",
-          postal_code: "12345",
-          country: "US"
-        },
-        billing_address: {
-          // This would be collected from a form in a real implementation
-          name: "John Doe",
-          line1: "123 Main St",
-          city: "Anytown",
-          state: "CA",
-          postal_code: "12345",
-          country: "US"
-        }
-      };
-
-      const response = await fetch('/api/tin-skinz/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create order');
+    // Prepare order data for checkout
+    const orderData = {
+      design_id: selectedDesign.id,
+      custom_message: customMessage.trim() || null,
+      quantity: quantity,
+      pricing: {
+        unit_price: pricing.unitPrice,
+        candy_unit_price: 0, // No candy in marketplace
+        message_unit_price: pricing.messageUnitPrice,
+        subtotal: pricing.subtotal,
+        tax_amount: pricing.taxAmount,
+        total_amount: pricing.totalAmount
       }
+    };
 
-      const { order_id, payment_intent_id, client_secret, total_amount } = await response.json();
-
-      // Confirm payment with Stripe
-      const { error } = await stripe.confirmPayment({
-        clientSecret: client_secret,
-        confirmParams: {
-          return_url: `${window.location.origin}/tin-skinz/success?order_id=${order_id}`,
-        },
-      });
-
-      if (error) {
-        console.error('Payment failed:', error);
-        alert(`Payment failed: ${error.message}`);
-      } else {
-        // Payment succeeded
-        window.location.href = `/tin-skinz/success?order_id=${order_id}`;
-      }
-    } catch (error) {
-      console.error('Purchase failed:', error);
-      alert('Purchase failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Navigate to checkout with order data
+    const params = new URLSearchParams();
+    params.set('design_id', orderData.design_id);
+    params.set('custom_message', orderData.custom_message || '');
+    params.set('quantity', orderData.quantity.toString());
+    params.set('pricing', JSON.stringify(orderData.pricing));
+    
+    const checkoutUrl = `/tin-skinz/checkout?${params.toString()}`;
+    console.log('TinSkinzMarketplace - Navigating to checkout:', {
+      orderData,
+      checkoutUrl,
+      params: Object.fromEntries(params.entries())
+    });
+    
+    window.location.href = checkoutUrl;
   };
 
   return (
@@ -539,44 +502,13 @@ const TinSkinzMarketplace = () => {
             />
           </div>
           
-           <p className="text-xl text-white/90 max-w-2xl mx-auto mb-6">
+           <p className="text-xl text-white/90 max-w-2xl mx-auto">
              Pre-designed tins filled with candy for every occasion. Perfect for weddings, 
              birthdays, holidays, and special events. Customize with your own message or use our <a href="/editor?product=tin" className="text-yellow-500 font-semibold hover:underline">full editor</a>.
            </p>
-           
-           {/* Pricing Overview */}
-           <div className="backdrop-blur-md bg-white/20 border border-white/30 rounded-2xl p-4 max-w-4xl mx-auto">
-             <h3 className="text-lg font-semibold text-white mb-3">Pricing Tiers</h3>
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-               <div className="text-center">
-                 <div className="text-yellow-400 font-bold">1-2 tins</div>
-                 <div className="text-white">$9.99 each</div>
-                 <div className="text-white/70">+ $3.00 candy</div>
-                 <div className="text-white/70">+ $0.99 message</div>
-               </div>
-               <div className="text-center">
-                 <div className="text-yellow-400 font-bold">3 tins</div>
-                 <div className="text-white">$6.67 each</div>
-                 <div className="text-white/70">+ $1.67 candy</div>
-                 <div className="text-white/70">+ $0.99 message</div>
-               </div>
-               <div className="text-center">
-                 <div className="text-yellow-400 font-bold">20-50 tins</div>
-                 <div className="text-white">$6.00 each</div>
-                 <div className="text-white/70">No candy</div>
-                 <div className="text-white/70">+ $0.99 message</div>
-               </div>
-               <div className="text-center">
-                 <div className="text-yellow-400 font-bold">51+ tins</div>
-                 <div className="text-white">$5.50 each</div>
-                 <div className="text-white/70">No candy</div>
-                 <div className="text-white/70">Free message</div>
-               </div>
-             </div>
-           </div>
         </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 lg:gap-8">
         {/* Left Column: Design Selection */}
         <div className="space-y-6">
            {/* Category Selection */}
@@ -600,22 +532,23 @@ const TinSkinzMarketplace = () => {
             <div className="mb-4">
               <h3 className="font-semibold text-gray-900 text-lg">Select Design</h3>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+            <div className="flex overflow-x-auto gap-4 pb-2 lg:grid lg:grid-cols-4 lg:pb-0 lg:gap-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {currentDesigns.map((design) => (
                 <div
                   key={design.id}
-                  className={`cursor-pointer rounded-xl p-2 transition-all duration-300 ${
+                  className={`cursor-pointer rounded-xl p-2 lg:p-2 transition-all duration-300 flex-shrink-0 lg:flex-shrink ${
                     selectedDesign?.id === design.id
                       ? 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-yellow-100 border-2 border-yellow-500/30'
                       : 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-gray-100 hover:bg-gray-200'
                   }`}
                   onClick={() => handleDesignSelect(design)}
+                  style={{ minWidth: '120px' }}
                 >
                   <div className="aspect-square bg-gray-200 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
                     <img 
                       src={design.thumbnailUrl} 
                       alt={design.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
                       onError={(e) => {
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
@@ -625,8 +558,8 @@ const TinSkinzMarketplace = () => {
                       <span className="text-gray-500 text-xs">Preview</span>
                     </div>
                   </div>
-                  <h3 className="font-medium text-xs text-gray-900 truncate">{design.name}</h3>
-                  <p className="text-yellow-600 font-bold text-xs">${design.price}</p>
+                  <h3 className="font-medium text-xs text-gray-900 truncate text-center lg:text-left">{design.name}</h3>
+                  <p className="text-yellow-600 font-bold text-xs text-center lg:text-left">${design.price}</p>
                 </div>
               ))}
             </div>
@@ -651,40 +584,16 @@ const TinSkinzMarketplace = () => {
             />
              <p className="text-sm text-gray-500 mt-1">
                {customMessage.length}/50 characters
-               {customMessage.trim() && quantity < 51 && (
-                 <span className="text-yellow-600 font-medium ml-2">
-                   (+$0.99 per tin)
-                 </span>
-               )}
-               {customMessage.trim() && quantity >= 51 && (
-                 <span className="text-green-600 font-medium ml-2">
-                   (Free on orders 51+)
+               {customMessage.trim() && (
+                 <span className={`font-medium ml-2 ${
+                   quantity >= 51 ? 'text-green-600' : 'text-yellow-600'
+                 }`}>
+                   {quantity >= 51 ? '(Free on orders 51+)' : `(+${formatCurrency(pricing?.messageUnitPrice || 0.99)} per tin)`}
                  </span>
                )}
              </p>
           </div>
 
-           {/* Candy Selection */}
-           <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-4 sm:p-6">
-            <div className="mb-4">
-              <h3 className="font-semibold text-gray-900 text-lg">Choose Candy</h3>
-            </div>
-            <select 
-              value={selectedCandy} 
-              onChange={(e) => setSelectedCandy(e.target.value)}
-              className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent transition-all duration-200"
-            >
-              <option value="">Select candy type</option>
-              {candyOptions.map((candy) => (
-                <option key={candy.id} value={candy.id}>
-                  {candy.name} - ${candy.price}
-                </option>
-               ))}
-             </select>
-             <p className="text-sm text-gray-500 mt-2">
-               Candy available for orders 1-19 tins. Bulk orders (20+) focus on the tin design.
-             </p>
-           </div>
 
         </div>
 
@@ -710,60 +619,80 @@ const TinSkinzMarketplace = () => {
               <h3 className="font-semibold text-gray-900 text-lg">Order Summary</h3>
             </div>
              <div className="space-y-4">
-               {selectedDesign && (
-                 <div className="flex justify-between text-gray-700">
-                   <span>{selectedDesign.name}</span>
-                   <span>{formatCurrency(pricing?.unitPrice || 0)}</span>
-                 </div>
-               )}
-               {selectedCandy && (
-                 <div className="flex justify-between text-gray-700">
-                   <span>{candyOptions.find(c => c.id === selectedCandy)?.name}</span>
-                   <span>{formatCurrency(pricing?.candyUnitPrice || 0)}</span>
-                 </div>
-               )}
-               {customMessage.trim() && (
-                 <div className="flex justify-between text-gray-700">
-                   <span>Custom Message</span>
-                   <span>{formatCurrency(pricing?.messageUnitPrice || 0)}</span>
+               {selectedDesign ? (
+                 <>
+                   {/* Base Tin Price */}
+                   <div className="flex justify-between text-gray-700">
+                     <span>{selectedDesign.name} ({quantity} × {formatCurrency(pricing?.unitPrice || 0)})</span>
+                     <span>{formatCurrency((pricing?.unitPrice || 0) * quantity)}</span>
+                   </div>
+
+
+                   {/* Custom Message */}
+                   {customMessage.trim() && (
+                     <div className="flex justify-between text-gray-700">
+                       <span>Custom Message ({quantity} × {formatCurrency(pricing?.messageUnitPrice || 0)})</span>
+                       <span>{formatCurrency((pricing?.messageUnitPrice || 0) * quantity)}</span>
+                     </div>
+                   )}
+
+                   {/* Quantity Discount Info */}
+                   {quantity >= 3 && (
+                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                       <div className="text-sm text-blue-800 font-medium">
+                         💰 Bulk Discount Applied - {pricing?.tier?.description}
+                       </div>
+                     </div>
+                   )}
+
+                   {/* Free Messaging Info */}
+                   {quantity >= 51 && customMessage.trim() && (
+                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                       <div className="text-sm text-green-800 font-medium">
+                         🎉 Free Custom Messaging on orders 51+
+                       </div>
+                     </div>
+                   )}
+
+                   {/* Subtotal */}
+                   <div className="flex justify-between text-gray-700 border-t border-gray-200 pt-2">
+                     <span>Subtotal</span>
+                     <span>{formatCurrency(pricing?.subtotal || 0)}</span>
+                   </div>
+
+                  {/* Tax */}
+                  <div className="flex justify-between text-gray-700">
+                    <span>Tax (6.25%)</span>
+                    <span>{formatCurrency(pricing?.taxAmount || 0)}</span>
+                  </div>
+                 </>
+               ) : (
+                 <div className="text-center text-gray-500 py-8">
+                   <p>Select a design to see pricing</p>
                  </div>
                )}
                
                {/* Quantity Selector */}
-               <div className="flex items-center justify-between text-gray-700">
-                 <span>Quantity</span>
-                 <div className="flex items-center space-x-3">
-                   <NeumorphicButton
-                     variant="default"
-                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                     className="w-8 h-8 text-sm"
-                   >
-                     -
-                   </NeumorphicButton>
-                   <span className="text-lg font-medium text-gray-900 min-w-[2rem] text-center">{quantity}</span>
-                   <NeumorphicButton
-                     variant="default"
-                     onClick={() => setQuantity(quantity + 1)}
-                     className="w-8 h-8 text-sm"
-                   >
-                     +
-                   </NeumorphicButton>
-                 </div>
-               </div>
-
-               {/* Bulk Savings Info */}
-               {getBulkSavingsInfo() && (
-                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                   <div className="text-sm text-green-800 font-medium">
-                     🎉 {getBulkSavingsInfo().description}
+               {selectedDesign && (
+                 <div className="flex items-center justify-between text-gray-700 border-t border-gray-200 pt-4">
+                   <span>Quantity</span>
+                   <div className="flex items-center space-x-3">
+                     <NeumorphicButton
+                       variant="default"
+                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                       className="w-8 h-8 text-sm"
+                     >
+                       -
+                     </NeumorphicButton>
+                     <span className="text-lg font-medium text-gray-900 min-w-[2rem] text-center">{quantity}</span>
+                     <NeumorphicButton
+                       variant="default"
+                       onClick={() => setQuantity(quantity + 1)}
+                       className="w-8 h-8 text-sm"
+                     >
+                       +
+                     </NeumorphicButton>
                    </div>
-                 </div>
-               )}
-
-               {/* Pricing Tier Info */}
-               {pricing?.tier && (
-                 <div className="text-xs text-gray-500 text-center">
-                   {pricing.tier.description}
                  </div>
                )}
                
@@ -778,7 +707,7 @@ const TinSkinzMarketplace = () => {
                 disabled={!selectedDesign || isLoading}
                 className="w-full px-4 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Processing...' : 'Purchase Tin Skinz'}
+                {isLoading ? 'Processing...' : 'Continue to Checkout'}
               </button>
             </div>
           </div>

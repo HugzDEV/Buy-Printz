@@ -14,8 +14,8 @@ const PRICING_TIERS = [
   { min: 100, max: null, basePrice: 4.50, candyPrice: 0.00, messagePrice: 0.00 } // Free messaging
 ];
 
-// Tax rate (8.5%)
-const TAX_RATE = 0.085;
+// Tax rate (6.25% MA state tax)
+const TAX_RATE = 0.0625;
 
 /**
  * Calculate pricing for Tin Skinz order
@@ -124,7 +124,7 @@ export function getPricingBreakdown(pricing) {
   
   // Tax
   breakdown.push({
-    label: 'Tax (8.5%)',
+    label: 'Tax (6.25%)',
     amount: pricing.taxAmount,
     type: 'tax'
   });

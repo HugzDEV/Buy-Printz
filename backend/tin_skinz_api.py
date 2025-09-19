@@ -58,6 +58,7 @@ class TinSkinzOrderRequest(BaseModel):
     custom_message: Optional[str] = None
     candy_id: Optional[str] = None
     quantity: int
+    pricing: Optional[dict] = None  # Dynamic pricing data from frontend
     shipping_address: dict
     billing_address: dict
 
@@ -177,29 +178,43 @@ async def create_order(order_request: TinSkinzOrderRequest):
                 raise HTTPException(status_code=404, detail="Candy option not found")
             candy_price = float(candy_result.data[0]["price"])
         
-        # Calculate pricing
-        has_candy = order_request.candy_id is not None
-        has_custom_message = order_request.custom_message is not None and order_request.custom_message.strip() != ""
-        
-        pricing_result = supabase.rpc(
-            "calculate_tin_skinz_price",
-            {
-                "p_quantity": order_request.quantity,
-                "p_has_candy": has_candy,
-                "p_has_custom_message": has_custom_message
-            }
-        ).execute()
-        
-        if not pricing_result.data:
-            raise HTTPException(status_code=400, detail="Invalid quantity for pricing")
-        
-        pricing = pricing_result.data[0]
-        
-        # Calculate totals
-        tax_rate = 0.085
-        subtotal = float(pricing["total_price"])
-        tax_amount = subtotal * tax_rate
-        total_amount = subtotal + tax_amount
+        # Use dynamic pricing from frontend if provided, otherwise calculate
+        if order_request.pricing:
+            # Use frontend-calculated pricing
+            pricing_data = order_request.pricing
+            unit_price = float(pricing_data.get("unit_price", 0))
+            candy_price = float(pricing_data.get("candy_unit_price", 0))
+            custom_message_price = float(pricing_data.get("message_unit_price", 0))
+            subtotal = float(pricing_data.get("subtotal", 0))
+            tax_amount = float(pricing_data.get("tax_amount", 0))
+            total_amount = float(pricing_data.get("total_amount", 0))
+        else:
+            # Fallback to backend calculation
+            has_candy = order_request.candy_id is not None
+            has_custom_message = order_request.custom_message is not None and order_request.custom_message.strip() != ""
+            
+            pricing_result = supabase.rpc(
+                "calculate_tin_skinz_price",
+                {
+                    "p_quantity": order_request.quantity,
+                    "p_has_candy": has_candy,
+                    "p_has_custom_message": has_custom_message
+                }
+            ).execute()
+            
+            if not pricing_result.data:
+                raise HTTPException(status_code=400, detail="Invalid quantity for pricing")
+            
+            pricing = pricing_result.data[0]
+            unit_price = float(pricing["unit_price"])
+            candy_price = float(pricing["candy_price"])
+            custom_message_price = float(pricing["custom_message_price"])
+            
+            # Calculate totals
+            tax_rate = 0.0625  # 6.25% MA state tax
+            subtotal = float(pricing["total_price"])
+            tax_amount = subtotal * tax_rate
+            total_amount = subtotal + tax_amount
         
         # Generate order ID
         order_id = f"TS-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8].upper()}"
@@ -223,9 +238,9 @@ async def create_order(order_request: TinSkinzOrderRequest):
             'custom_message': order_request.custom_message,
             'candy_id': order_request.candy_id,
             'quantity': order_request.quantity,
-            'unit_price': float(pricing["unit_price"]),
+            'unit_price': unit_price,
             'candy_price': candy_price,
-            'custom_message_price': float(pricing["custom_message_price"]),
+            'custom_message_price': custom_message_price,
             'subtotal': subtotal,
             'tax_amount': tax_amount,
             'total_amount': total_amount,

@@ -34,6 +34,7 @@ import TemplateUpload from './components/TemplateUpload'
 import CreatorEarnings from './components/CreatorEarnings'
 import TinSkinzMarketplace from './components/TinSkinzMarketplace'
 import TinSkinzDemo from './components/TinSkinzDemo'
+import TinSkinzCheckout from './components/TinSkinzCheckout'
 import TinSkinzSuccess from './components/TinSkinzSuccess'
 import authService from './services/auth'
 
@@ -199,6 +200,14 @@ function App() {
           <>
             <Header />
             <TinSkinzDemo />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/tin-skinz/checkout" element={
+          <>
+            <Header />
+            <TinSkinzCheckout />
             <Footer />
           </>
         } />
