@@ -856,14 +856,6 @@ const TinSkinzMarketplace = () => {
                      </div>
                    )}
 
-                   {/* Free Messaging Info */}
-                   {getTotalQuantity() >= 51 && customMessage.trim() && (
-                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                       <div className="text-sm text-green-800 font-medium">
-                         🎉 Free Custom Messaging on orders 51+
-                       </div>
-                     </div>
-                   )}
 
                    {/* Subtotal */}
                    <div className="flex justify-between text-gray-700 border-t border-gray-200 pt-2">
