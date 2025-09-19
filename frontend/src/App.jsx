@@ -32,6 +32,9 @@ import CreatorRegistration from './components/CreatorRegistration'
 import CreatorDashboard from './components/CreatorDashboard'
 import TemplateUpload from './components/TemplateUpload'
 import CreatorEarnings from './components/CreatorEarnings'
+import TinSkinzMarketplace from './components/TinSkinzMarketplace'
+import TinSkinzDemo from './components/TinSkinzDemo'
+import TinSkinzSuccess from './components/TinSkinzSuccess'
 import authService from './services/auth'
 
 // Protected Route Component with Optimized Mobile Handling
@@ -180,6 +183,30 @@ function App() {
           <>
             <Header />
             <TemplateDetail />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/tin-skinz" element={
+          <>
+            <Header />
+            <TinSkinzMarketplace />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/tin-skinz-demo" element={
+          <>
+            <Header />
+            <TinSkinzDemo />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/tin-skinz/success" element={
+          <>
+            <Header />
+            <TinSkinzSuccess />
             <Footer />
           </>
         } />

@@ -51,7 +51,8 @@ const Header = () => {
     { name: 'All Products', href: '/all-products' },
     { name: 'Vinyl Banners', href: '/banner-products' },
     { name: 'Business Card Tins', href: '/tin-products' },
-    { name: 'Tradeshow Tents', href: '/tent-products' }
+    { name: 'Tradeshow Tents', href: '/tent-products' },
+    { name: 'Tin Skinz', href: '/tin-skinz' }
   ]
 
   const navigation = [

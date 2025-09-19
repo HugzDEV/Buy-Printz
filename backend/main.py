@@ -41,6 +41,15 @@ except ImportError as e:
     print("❌ Cannot deploy without real shipping costs - would cause financial losses")
     raise ImportError(f"B2Sign shipping integration is required: {e}")
 
+# Import Tin Skinz API routes
+try:
+    from backend.tin_skinz_api import router as tin_skinz_router
+    TIN_SKINZ_API_AVAILABLE = True
+    print("✅ Tin Skinz API loaded successfully")
+except ImportError as e:
+    TIN_SKINZ_API_AVAILABLE = False
+    print(f"❌ Tin Skinz API failed to load: {e}")
+
 # Simple in-memory cache
 class SimpleCache:
     def __init__(self, default_ttl=300):  # 5 minutes default
@@ -181,6 +190,13 @@ if SHIPPING_COSTS_API_AVAILABLE:
     logger.info("Shipping Costs API routes loaded successfully")
 else:
     logger.warning("Shipping Costs API routes not available - module not found")
+
+# Include Tin Skinz API routes if available
+if TIN_SKINZ_API_AVAILABLE:
+    app.include_router(tin_skinz_router)
+    logger.info("Tin Skinz API routes loaded successfully")
+else:
+    logger.warning("Tin Skinz API routes not available")
 
 # Mount static files - create uploads directory if it doesn't exist
 uploads_dir = "uploads"
