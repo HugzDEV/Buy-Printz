@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Button, NeumorphicButton } from './ui';
 import TinSkinzMockupViewer from './TinSkinzMockupViewer';
-import { calculateTinSkinzPricing, getPricingBreakdown, formatCurrency, getBulkSavings } from '../utils/tinSkinzPricing';
+import { calculateTinSkinzPricing, getPricingBreakdown, formatCurrency, getBulkSavings, CANDY_OPTIONS, calculateCandyPricing } from '../utils/tinSkinzPricing';
 import { loadStripe } from '@stripe/stripe-js';
 
 // All Tin Skinz designs
@@ -401,15 +401,21 @@ const candyOptions = [
 
 const TinSkinzMarketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('abstract-art');
-  const [selectedDesign, setSelectedDesign] = useState(null);
+  const [selectedDesigns, setSelectedDesigns] = useState({}); // { designId: { design, quantity, candyId } }
+  const [selectedDesign, setSelectedDesign] = useState(null); // For live preview
   const [customMessage, setCustomMessage] = useState('');
-  const [selectedCandy, setSelectedCandy] = useState('');
-  const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [pricing, setPricing] = useState(null);
   const [stripe, setStripe] = useState(null);
 
   const currentDesigns = tinSkinzDesigns[selectedCategory] || [];
+
+  // Set first design as preview when category changes
+  useEffect(() => {
+    if (currentDesigns.length > 0 && !selectedDesign) {
+      setSelectedDesign(currentDesigns[0]);
+    }
+  }, [selectedCategory, currentDesigns, selectedDesign]);
 
   // Initialize Stripe
   useEffect(() => {
@@ -420,51 +426,116 @@ const TinSkinzMarketplace = () => {
     initializeStripe();
   }, []);
 
-  // Calculate pricing whenever relevant values change (no candy in marketplace)
+  // Calculate total quantity and pricing whenever relevant values change
   useEffect(() => {
-    if (selectedDesign) {
-      const hasCandy = false; // Candy moved to checkout
+    const totalQuantity = Object.values(selectedDesigns).reduce((sum, item) => sum + item.quantity, 0);
+    
+    if (totalQuantity > 0) {
       const hasCustomMessage = customMessage.trim() !== '';
       
       try {
-        const calculatedPricing = calculateTinSkinzPricing(quantity, hasCandy, hasCustomMessage);
-        setPricing(calculatedPricing);
+        // Calculate base tin pricing (no candy in base calculation)
+        const calculatedPricing = calculateTinSkinzPricing(totalQuantity, false, hasCustomMessage);
+        
+        // Add candy costs per design with bulk discounts based on total quantity
+        let totalCandyCost = 0;
+        Object.values(selectedDesigns).forEach(item => {
+          if (item.candyId && item.quantity > 0) {
+            // Use total quantity for discount calculation, but apply to individual design quantity
+            const candyPricing = calculateCandyPricing(item.candyId, totalQuantity);
+            const candyCostForThisDesign = candyPricing.unitPrice * item.quantity;
+            totalCandyCost += candyCostForThisDesign;
+          }
+        });
+        
+        // Update pricing with candy costs
+        const finalPricing = {
+          ...calculatedPricing,
+          subtotal: calculatedPricing.subtotal + totalCandyCost,
+          taxAmount: (calculatedPricing.subtotal + totalCandyCost) * 0.0625, // 6.25% MA tax
+          totalAmount: calculatedPricing.subtotal + totalCandyCost + ((calculatedPricing.subtotal + totalCandyCost) * 0.0625)
+        };
+        
+        setPricing(finalPricing);
       } catch (error) {
         console.error('Error calculating pricing:', error);
         setPricing(null);
       }
+    } else {
+      setPricing(null);
     }
-  }, [selectedDesign, customMessage, quantity]);
+  }, [selectedDesigns, customMessage]);
 
-  const handleDesignSelect = (design) => {
-    setSelectedDesign(design);
+  const handleQuantityChange = (design, newQuantity) => {
+    setSelectedDesigns(prev => {
+      const updated = { ...prev };
+      
+      if (newQuantity <= 0) {
+        delete updated[design.id];
+      } else {
+        updated[design.id] = { 
+          design, 
+          quantity: newQuantity, 
+          candyId: updated[design.id]?.candyId || '' // Preserve existing candy selection
+        };
+      }
+      
+      return updated;
+    });
+  };
+
+  const handleCandyChange = (design, candyId) => {
+    setSelectedDesigns(prev => {
+      const updated = { ...prev };
+      
+      if (updated[design.id]) {
+        updated[design.id] = { 
+          ...updated[design.id], 
+          candyId 
+        };
+      }
+      
+      return updated;
+    });
+  };
+
+  const getTotalQuantity = () => {
+    return Object.values(selectedDesigns).reduce((sum, item) => sum + item.quantity, 0);
   };
 
   const getBulkSavingsInfo = () => {
-    if (!pricing || quantity < 3) return null;
-    return getBulkSavings(quantity);
+    const totalQuantity = getTotalQuantity();
+    if (!pricing || totalQuantity < 3) return null;
+    return getBulkSavings(totalQuantity);
   };
 
   const handlePurchase = async () => {
-    if (!selectedDesign) {
-      alert('Please select a design first');
+    const totalQuantity = getTotalQuantity();
+    
+    if (totalQuantity === 0) {
+      alert('Please select at least one design with quantity');
       return;
     }
-
 
     if (!pricing) {
       alert('Unable to calculate pricing. Please try again.');
       return;
     }
 
-    // Prepare order data for checkout
+    // Prepare order data for checkout with multiple designs and candy selections
     const orderData = {
-      design_id: selectedDesign.id,
+      selected_designs: Object.values(selectedDesigns).map(item => ({
+        design_id: item.design.id,
+        design_name: item.design.name,
+        design_thumbnail: item.design.thumbnailUrl,
+        quantity: item.quantity,
+        candy_id: item.candyId || null,
+        candy_name: item.candyId ? CANDY_OPTIONS.find(c => c.id === item.candyId)?.name : null
+      })),
       custom_message: customMessage.trim() || null,
-      quantity: quantity,
+      total_quantity: totalQuantity,
       pricing: {
         unit_price: pricing.unitPrice,
-        candy_unit_price: 0, // No candy in marketplace
         message_unit_price: pricing.messageUnitPrice,
         subtotal: pricing.subtotal,
         tax_amount: pricing.taxAmount,
@@ -474,9 +545,9 @@ const TinSkinzMarketplace = () => {
 
     // Navigate to checkout with order data
     const params = new URLSearchParams();
-    params.set('design_id', orderData.design_id);
+    params.set('selected_designs', JSON.stringify(orderData.selected_designs));
     params.set('custom_message', orderData.custom_message || '');
-    params.set('quantity', orderData.quantity.toString());
+    params.set('total_quantity', orderData.total_quantity.toString());
     params.set('pricing', JSON.stringify(orderData.pricing));
     
     const checkoutUrl = `/tin-skinz/checkout?${params.toString()}`;
@@ -530,38 +601,121 @@ const TinSkinzMarketplace = () => {
            {/* Design Selection */}
            <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-4 sm:p-6">
             <div className="mb-4">
-              <h3 className="font-semibold text-gray-900 text-lg">Select Design</h3>
+              <h3 className="font-semibold text-gray-900 text-lg">Select Designs & Quantities</h3>
+              <p className="text-sm text-gray-600 mt-1">Choose multiple designs and quantities to get bulk discounts</p>
             </div>
-            <div className="flex overflow-x-auto gap-4 pb-2 lg:grid lg:grid-cols-4 lg:pb-0 lg:gap-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {currentDesigns.map((design) => (
-                <div
-                  key={design.id}
-                  className={`cursor-pointer rounded-xl p-2 lg:p-2 transition-all duration-300 flex-shrink-0 lg:flex-shrink ${
-                    selectedDesign?.id === design.id
-                      ? 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-yellow-100 border-2 border-yellow-500/30'
-                      : 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-gray-100 hover:bg-gray-200'
-                  }`}
-                  onClick={() => handleDesignSelect(design)}
-                  style={{ minWidth: '120px' }}
-                >
-                  <div className="aspect-square bg-gray-200 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={design.thumbnailUrl} 
-                      alt={design.name}
-                      className="w-full h-full object-cover object-center"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                    <div className="w-full h-full flex items-center justify-center" style={{ display: 'none' }}>
-                      <span className="text-gray-500 text-xs">Preview</span>
+            <div className="flex overflow-x-auto gap-3 pb-2 lg:grid lg:grid-cols-4 lg:pb-0 lg:gap-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {currentDesigns.map((design) => {
+                const selectedItem = selectedDesigns[design.id];
+                const quantity = selectedItem?.quantity || 0;
+                const candyId = selectedItem?.candyId || '';
+                
+                return (
+                  <div
+                    key={design.id}
+                    className={`rounded-xl p-3 transition-all duration-300 flex-shrink-0 lg:flex-shrink cursor-pointer ${
+                      quantity > 0
+                        ? 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-yellow-100 border-2 border-yellow-500/30'
+                        : selectedDesign?.id === design.id
+                        ? 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-blue-100 border-2 border-blue-500/30'
+                        : 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-gray-100 hover:bg-gray-200'
+                    }`}
+                    style={{ minWidth: '130px' }}
+                    onClick={() => {
+                      // Set as selected design for live preview
+                      setSelectedDesign(design);
+                    }}
+                  >
+                    <div className="aspect-square bg-gradient-to-br from-amber-100/40 to-yellow-100/40 rounded-lg mb-2 flex items-center justify-center overflow-hidden shadow-inner">
+                      <img 
+                        src={design.thumbnailUrl} 
+                        alt={design.name}
+                        className="w-full h-full object-cover object-center"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                      <div className="w-full h-full flex items-center justify-center" style={{ display: 'none' }}>
+                        <span className="text-gray-500 text-xs">Preview</span>
+                      </div>
                     </div>
+                    
+                    <h3 className="font-medium text-xs text-gray-900 truncate text-center mb-1">{design.name}</h3>
+                    <p className="text-yellow-600 font-bold text-xs text-center mb-2">${design.price}</p>
+                    
+                    {/* Quantity Selector */}
+                    <div className="flex items-center justify-center space-x-1 mb-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuantityChange(design, Math.max(0, quantity - 1));
+                        }}
+                        className="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors duration-200"
+                        disabled={quantity <= 0}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      
+                      <span className="w-6 text-center font-medium text-gray-900 text-sm">{quantity}</span>
+                      
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuantityChange(design, quantity + 1);
+                        }}
+                        className="w-6 h-6 rounded-full bg-yellow-500 hover:bg-yellow-600 flex items-center justify-center text-white transition-colors duration-200"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Candy Selection Dropdown */}
+                    {quantity > 0 && (
+                      <div className="mb-2">
+                        <select
+                          value={candyId}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleCandyChange(design, e.target.value);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full px-1 py-1 text-xs bg-white/20 border border-white/30 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                        >
+                          <option value="">No Candy</option>
+                          {CANDY_OPTIONS.map((candy) => (
+                            <option key={candy.id} value={candy.id}>
+                              {candy.name} (+${candy.price.toFixed(2)})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    
+                    {quantity > 0 && (
+                      <div className="text-center">
+                        <span className="text-xs text-gray-600">
+                          Total: {formatCurrency(design.price * quantity)}
+                          {candyId && (
+                            <span className="block text-green-600 text-xs">
+                              + Candy: {formatCurrency(calculateCandyPricing(candyId, getTotalQuantity()).unitPrice * quantity)}
+                              {calculateCandyPricing(candyId, getTotalQuantity()).discountPercent > 0 && (
+                                <span className="block text-xs text-green-500">
+                                  ({calculateCandyPricing(candyId, getTotalQuantity()).discountPercent}% off)
+                                </span>
+                              )}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <h3 className="font-medium text-xs text-gray-900 truncate text-center lg:text-left">{design.name}</h3>
-                  <p className="text-yellow-600 font-bold text-xs text-center lg:text-left">${design.price}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -586,9 +740,9 @@ const TinSkinzMarketplace = () => {
                {customMessage.length}/50 characters
                {customMessage.trim() && (
                  <span className={`font-medium ml-2 ${
-                   quantity >= 51 ? 'text-green-600' : 'text-yellow-600'
+                   getTotalQuantity() >= 51 ? 'text-green-600' : 'text-yellow-600'
                  }`}>
-                   {quantity >= 51 ? '(Free on orders 51+)' : `(+${formatCurrency(pricing?.messageUnitPrice || 0.99)} per tin)`}
+                   {getTotalQuantity() >= 51 ? '(Free on orders 51+)' : `(+${formatCurrency(pricing?.messageUnitPrice || 0.99)} per tin)`}
                  </span>
                )}
              </p>
@@ -619,25 +773,45 @@ const TinSkinzMarketplace = () => {
               <h3 className="font-semibold text-gray-900 text-lg">Order Summary</h3>
             </div>
              <div className="space-y-4">
-               {selectedDesign ? (
+               {Object.keys(selectedDesigns).length > 0 ? (
                  <>
-                   {/* Base Tin Price */}
-                   <div className="flex justify-between text-gray-700">
-                     <span>{selectedDesign.name} ({quantity} × {formatCurrency(pricing?.unitPrice || 0)})</span>
-                     <span>{formatCurrency((pricing?.unitPrice || 0) * quantity)}</span>
-                   </div>
-
+                   {/* Selected Designs */}
+                   {Object.values(selectedDesigns).map((item) => {
+                     const candy = item.candyId ? CANDY_OPTIONS.find(c => c.id === item.candyId) : null;
+                     const candyPricing = item.candyId ? calculateCandyPricing(item.candyId, getTotalQuantity()) : null;
+                     const candyCostForThisDesign = candyPricing ? candyPricing.unitPrice * item.quantity : 0;
+                     
+                     return (
+                       <div key={item.design.id} className="space-y-1">
+                         <div className="flex justify-between text-gray-700">
+                           <span>{item.design.name} ({item.quantity} × {formatCurrency(pricing?.unitPrice || 0)})</span>
+                           <span>{formatCurrency((pricing?.unitPrice || 0) * item.quantity)}</span>
+                         </div>
+                         {candy && candyPricing && (
+                           <div className="flex justify-between text-gray-600 text-sm ml-4">
+                             <span>
+                               + {candy.name} ({item.quantity} × {formatCurrency(candyPricing.unitPrice)})
+                               {candyPricing.discountPercent > 0 && (
+                                 <span className="text-green-600 ml-1">({candyPricing.discountPercent}% off)</span>
+                               )}
+                             </span>
+                             <span>{formatCurrency(candyCostForThisDesign)}</span>
+                           </div>
+                         )}
+                       </div>
+                     );
+                   })}
 
                    {/* Custom Message */}
                    {customMessage.trim() && (
                      <div className="flex justify-between text-gray-700">
-                       <span>Custom Message ({quantity} × {formatCurrency(pricing?.messageUnitPrice || 0)})</span>
-                       <span>{formatCurrency((pricing?.messageUnitPrice || 0) * quantity)}</span>
+                       <span>Custom Message ({getTotalQuantity()} × {formatCurrency(pricing?.messageUnitPrice || 0)})</span>
+                       <span>{formatCurrency((pricing?.messageUnitPrice || 0) * getTotalQuantity())}</span>
                      </div>
                    )}
 
                    {/* Quantity Discount Info */}
-                   {quantity >= 3 && (
+                   {getTotalQuantity() >= 3 && (
                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                        <div className="text-sm text-blue-800 font-medium">
                          💰 Bulk Discount Applied - {pricing?.tier?.description}
@@ -646,7 +820,7 @@ const TinSkinzMarketplace = () => {
                    )}
 
                    {/* Free Messaging Info */}
-                   {quantity >= 51 && customMessage.trim() && (
+                   {getTotalQuantity() >= 51 && customMessage.trim() && (
                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                        <div className="text-sm text-green-800 font-medium">
                          🎉 Free Custom Messaging on orders 51+
@@ -668,31 +842,7 @@ const TinSkinzMarketplace = () => {
                  </>
                ) : (
                  <div className="text-center text-gray-500 py-8">
-                   <p>Select a design to see pricing</p>
-                 </div>
-               )}
-               
-               {/* Quantity Selector */}
-               {selectedDesign && (
-                 <div className="flex items-center justify-between text-gray-700 border-t border-gray-200 pt-4">
-                   <span>Quantity</span>
-                   <div className="flex items-center space-x-3">
-                     <NeumorphicButton
-                       variant="default"
-                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                       className="w-8 h-8 text-sm"
-                     >
-                       -
-                     </NeumorphicButton>
-                     <span className="text-lg font-medium text-gray-900 min-w-[2rem] text-center">{quantity}</span>
-                     <NeumorphicButton
-                       variant="default"
-                       onClick={() => setQuantity(quantity + 1)}
-                       className="w-8 h-8 text-sm"
-                     >
-                       +
-                     </NeumorphicButton>
-                   </div>
+                   <p>Select designs and quantities to see pricing</p>
                  </div>
                )}
                
@@ -704,7 +854,7 @@ const TinSkinzMarketplace = () => {
               
               <button
                 onClick={handlePurchase}
-                disabled={!selectedDesign || isLoading}
+                disabled={Object.keys(selectedDesigns).length === 0 || isLoading}
                 className="w-full px-4 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Processing...' : 'Continue to Checkout'}

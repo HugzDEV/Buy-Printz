@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
-import { calculateTinSkinzPricing, formatCurrency } from '../utils/tinSkinzPricing';
+import { calculateTinSkinzPricing, formatCurrency, CANDY_OPTIONS, calculateCandyPricing } from '../utils/tinSkinzPricing';
 import { NeumorphicButton } from './ui';
 
 const TinSkinzCheckout = () => {
@@ -12,44 +12,41 @@ const TinSkinzCheckout = () => {
   
   // Order data from marketplace
   const [orderData, setOrderData] = useState(() => {
-    const designId = searchParams.get('design_id');
+    const selectedDesignsParam = searchParams.get('selected_designs');
     const customMessage = searchParams.get('custom_message');
-    const quantity = parseInt(searchParams.get('quantity')) || 1;
+    const totalQuantity = parseInt(searchParams.get('total_quantity')) || 1;
     const pricingParam = searchParams.get('pricing');
     
+    let selectedDesigns = [];
     let marketplacePricing = {};
+    
     try {
+      selectedDesigns = selectedDesignsParam ? JSON.parse(selectedDesignsParam) : [];
       marketplacePricing = pricingParam ? JSON.parse(pricingParam) : {};
     } catch (error) {
-      console.error('Error parsing pricing data:', error);
+      console.error('Error parsing order data:', error);
+      selectedDesigns = [];
       marketplacePricing = {};
     }
     
     console.log('TinSkinzCheckout - Order data:', {
-      designId,
+      selectedDesigns,
       customMessage,
-      quantity,
+      totalQuantity,
       marketplacePricing
     });
     
     return {
-      design_id: designId,
+      selected_designs: selectedDesigns,
       custom_message: customMessage,
-      quantity,
+      total_quantity: totalQuantity,
       marketplace_pricing: marketplacePricing
     };
   });
 
-  // Candy selection
-  const [selectedCandy, setSelectedCandy] = useState('');
-  const [candyOptions] = useState([
-    { id: 'gummy-bears', name: 'Gummy Bears', price: 3.00 },
-    { id: 'chocolate-coins', name: 'Chocolate Coins', price: 3.50 },
-    { id: 'jelly-beans', name: 'Jelly Beans', price: 2.75 },
-    { id: 'sour-patch', name: 'Sour Patch Kids', price: 3.25 }
-  ]);
+  // Candy selection removed - now handled per design in marketplace
 
-  // Final pricing with candy
+  // Final pricing (candy already included per design)
   const [finalPricing, setFinalPricing] = useState(null);
 
   // Initialize Stripe
@@ -61,57 +58,25 @@ const TinSkinzCheckout = () => {
     initializeStripe();
   }, []);
 
-  // Calculate final pricing with candy
+  // Use marketplace pricing directly (candy already included)
   useEffect(() => {
-    console.log('TinSkinzCheckout - Pricing calculation triggered:', {
-      designId: orderData.design_id,
+    console.log('TinSkinzCheckout - Using marketplace pricing:', {
+      selectedDesigns: orderData.selected_designs,
       marketplacePricing: orderData.marketplace_pricing,
-      selectedCandy,
-      quantity: orderData.quantity
+      totalQuantity: orderData.total_quantity
     });
     
-    if (orderData.design_id && orderData.marketplace_pricing && Object.keys(orderData.marketplace_pricing).length > 0) {
-      const hasCandy = selectedCandy !== '';
-      const hasCustomMessage = orderData.custom_message && orderData.custom_message.trim() !== '';
+    if (orderData.selected_designs && orderData.selected_designs.length > 0 && orderData.marketplace_pricing && Object.keys(orderData.marketplace_pricing).length > 0) {
+      // Use marketplace pricing directly since candy is already included per design
+      const marketplacePricing = orderData.marketplace_pricing;
+      console.log('Using marketplace pricing:', marketplacePricing);
       
-      try {
-        // Start with marketplace pricing (no candy)
-        const marketplacePricing = orderData.marketplace_pricing;
-        console.log('Marketplace pricing:', marketplacePricing);
-        
-        // Calculate candy cost if selected
-        let candyUnitPrice = 0;
-        if (hasCandy && orderData.quantity <= 19) {
-          const candyOption = candyOptions.find(c => c.id === selectedCandy);
-          candyUnitPrice = candyOption ? candyOption.price : 0;
-        }
-        
-        // Calculate new totals with candy
-        const candyTotal = candyUnitPrice * orderData.quantity;
-        const newSubtotal = marketplacePricing.subtotal + candyTotal;
-        const newTaxAmount = newSubtotal * 0.0625; // 6.25% MA tax
-        const newTotalAmount = newSubtotal + newTaxAmount;
-        
-        const finalPricingData = {
-          ...marketplacePricing,
-          candyUnitPrice,
-          subtotal: Math.round(newSubtotal * 100) / 100,
-          taxAmount: Math.round(newTaxAmount * 100) / 100,
-          totalAmount: Math.round(newTotalAmount * 100) / 100,
-          hasCandy
-        };
-        
-        console.log('Final pricing calculated:', finalPricingData);
-        setFinalPricing(finalPricingData);
-      } catch (error) {
-        console.error('Error calculating final pricing:', error);
-        setFinalPricing(null);
-      }
+      setFinalPricing(marketplacePricing);
     } else {
       console.log('Missing required data for pricing calculation');
       setFinalPricing(null);
     }
-  }, [orderData, selectedCandy, candyOptions]);
+  }, [orderData]);
 
   const handlePurchase = async () => {
     if (!finalPricing) {
@@ -130,15 +95,13 @@ const TinSkinzCheckout = () => {
     setIsLoading(true);
     
     try {
-      // Create order with candy selection
+      // Create order with multiple designs (candy already included per design)
       const checkoutOrderData = {
-        design_id: orderData.design_id,
+        selected_designs: orderData.selected_designs,
         custom_message: orderData.custom_message,
-        candy_id: selectedCandy || null,
-        quantity: orderData.quantity,
+        total_quantity: orderData.total_quantity,
         pricing: {
           unit_price: finalPricing.unitPrice,
-          candy_unit_price: finalPricing.candyUnitPrice,
           message_unit_price: finalPricing.messageUnitPrice,
           subtotal: finalPricing.subtotal,
           tax_amount: finalPricing.taxAmount,
@@ -196,7 +159,7 @@ const TinSkinzCheckout = () => {
     }
   };
 
-  if (!orderData.design_id) {
+  if (!orderData.selected_designs || orderData.selected_designs.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
@@ -204,9 +167,9 @@ const TinSkinzCheckout = () => {
           <p className="text-gray-600 mb-6">Please start your order from the Tin Skinz marketplace.</p>
           <div className="mb-4 p-4 bg-gray-100 rounded-lg text-left">
             <h3 className="font-semibold mb-2">Debug Info:</h3>
-            <p>Design ID: {orderData.design_id || 'Not found'}</p>
+            <p>Selected Designs: {JSON.stringify(orderData.selected_designs)}</p>
             <p>Custom Message: {orderData.custom_message || 'Not found'}</p>
-            <p>Quantity: {orderData.quantity}</p>
+            <p>Total Quantity: {orderData.total_quantity}</p>
             <p>Pricing: {JSON.stringify(orderData.marketplace_pricing)}</p>
             <p>URL Params: {window.location.search}</p>
           </div>
@@ -229,61 +192,18 @@ const TinSkinzCheckout = () => {
           <p className="text-xl text-gray-600">Add candy and finalize your Tin Skinz purchase</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Candy Selection */}
-          <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Add Candy (Optional)</h2>
-              <p className="text-gray-600">Choose from our selection of premium candies to fill your tin.</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="backdrop-blur-md bg-white/30 border border-white/40 rounded-xl p-4">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="candy"
-                    value=""
-                    checked={selectedCandy === ''}
-                    onChange={(e) => setSelectedCandy(e.target.value)}
-                    className="w-4 h-4 text-yellow-600 focus:ring-yellow-500"
-                  />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900">No Candy</div>
-                    <div className="text-sm text-gray-600">Tin only, no candy included</div>
-                  </div>
-                  <div className="text-yellow-600 font-bold">$0.00</div>
-                </label>
-              </div>
-
-              {candyOptions.map((candy) => (
-                <div key={candy.id} className="backdrop-blur-md bg-white/30 border border-white/40 rounded-xl p-4">
-                  <label className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="candy"
-                      value={candy.id}
-                      checked={selectedCandy === candy.id}
-                      onChange={(e) => setSelectedCandy(e.target.value)}
-                      className="w-4 h-4 text-yellow-600 focus:ring-yellow-500"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{candy.name}</div>
-                      <div className="text-sm text-gray-600">Premium quality candy</div>
-                    </div>
-                    <div className="text-yellow-600 font-bold">${candy.price}</div>
-                  </label>
-                </div>
-              ))}
-            </div>
-
-            {orderData.quantity > 19 && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="text-sm text-blue-800 font-medium">
-                  ℹ️ Candy not available for bulk orders (20+ tins)
-                </div>
-              </div>
-            )}
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Back Button */}
+          <div className="flex justify-start">
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back to Tin Skinz Marketplace</span>
+            </button>
           </div>
 
           {/* Order Summary */}
@@ -293,30 +213,68 @@ const TinSkinzCheckout = () => {
             </div>
 
             <div className="space-y-4">
-              {/* Base Tin Price */}
-              <div className="flex justify-between text-gray-700">
-                <span>Tin Design ({orderData.quantity} × {formatCurrency(finalPricing?.unitPrice || 0)})</span>
-                <span>{formatCurrency((finalPricing?.unitPrice || 0) * orderData.quantity)}</span>
-              </div>
+              {/* Selected Designs with Candy */}
+              {orderData.selected_designs && orderData.selected_designs.map((item) => {
+                const candy = item.candy_id ? CANDY_OPTIONS.find(c => c.id === item.candy_id) : null;
+                const candyPricing = item.candy_id ? calculateCandyPricing(item.candy_id, orderData.total_quantity) : null;
+                const candyCostForThisDesign = candyPricing ? candyPricing.unitPrice * item.quantity : 0;
+                
+                return (
+                  <div key={item.design_id} className="space-y-2 border-b border-gray-200 pb-3 last:border-b-0">
+                    <div className="flex items-center gap-3">
+                      {/* Design Thumbnail */}
+                      <div className="w-16 h-16 bg-gradient-to-br from-amber-100/40 to-yellow-100/40 rounded-lg flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
+                        <img 
+                          src={item.design_thumbnail} 
+                          alt={item.design_name}
+                          className="w-full h-full object-cover object-center"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                        <div className="w-full h-full flex items-center justify-center" style={{ display: 'none' }}>
+                          <span className="text-gray-500 text-xs">Preview</span>
+                        </div>
+                      </div>
+                      
+                      {/* Design Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="font-medium text-gray-900 text-sm">{item.design_name}</h4>
+                            <p className="text-xs text-gray-600">Quantity: {item.quantity}</p>
+                            {candy && (
+                              <p className="text-xs text-green-600">+ {candy.name}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-gray-900">
+                              {formatCurrency((finalPricing?.unit_price || 0) * item.quantity)}
+                            </div>
+                            {candy && candyPricing && (
+                              <div className="text-xs text-green-600">
+                                + {formatCurrency(candyCostForThisDesign)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
 
               {/* Custom Message */}
               {orderData.custom_message && (
                 <div className="flex justify-between text-gray-700">
-                  <span>Custom Message ({orderData.quantity} × {formatCurrency(finalPricing?.messageUnitPrice || 0)})</span>
-                  <span>{formatCurrency((finalPricing?.messageUnitPrice || 0) * orderData.quantity)}</span>
-                </div>
-              )}
-
-              {/* Candy Selection */}
-              {selectedCandy && orderData.quantity <= 19 && (
-                <div className="flex justify-between text-gray-700">
-                  <span>{candyOptions.find(c => c.id === selectedCandy)?.name} ({orderData.quantity} × {formatCurrency(finalPricing?.candyUnitPrice || 0)})</span>
-                  <span>{formatCurrency((finalPricing?.candyUnitPrice || 0) * orderData.quantity)}</span>
+                  <span>Custom Message ({orderData.total_quantity} × {formatCurrency(finalPricing?.message_unit_price || 0)})</span>
+                  <span>{formatCurrency((finalPricing?.message_unit_price || 0) * orderData.total_quantity)}</span>
                 </div>
               )}
 
               {/* Quantity Discount Info */}
-              {orderData.quantity >= 3 && (
+              {orderData.total_quantity >= 3 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <div className="text-sm text-blue-800 font-medium">
                     💰 Bulk Discount Applied - {finalPricing?.tier?.description}
@@ -325,7 +283,7 @@ const TinSkinzCheckout = () => {
               )}
 
               {/* Free Messaging Info */}
-              {orderData.quantity >= 51 && orderData.custom_message && (
+              {orderData.total_quantity >= 51 && orderData.custom_message && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                   <div className="text-sm text-green-800 font-medium">
                     🎉 Free Custom Messaging on orders 51+
@@ -342,13 +300,13 @@ const TinSkinzCheckout = () => {
               {/* Tax */}
               <div className="flex justify-between text-gray-700">
                 <span>Tax (6.25%)</span>
-                <span>{formatCurrency(finalPricing?.taxAmount || 0)}</span>
+                <span>{formatCurrency(finalPricing?.tax_amount || 0)}</span>
               </div>
 
               <hr className="border-white/20" />
               <div className="flex justify-between font-bold text-xl text-gray-900">
                 <span>Total</span>
-                <span>{formatCurrency(finalPricing?.totalAmount || 0)}</span>
+                <span>{formatCurrency(finalPricing?.total_amount || 0)}</span>
               </div>
               
               <button
