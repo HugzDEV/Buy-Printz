@@ -407,6 +407,7 @@ const TinSkinzMarketplace = () => {
   const [selectedDesign, setSelectedDesign] = useState(null); // For live preview
   const [isLoading, setIsLoading] = useState(false);
   const [pricing, setPricing] = useState(null);
+  const [hasRestoredSelections, setHasRestoredSelections] = useState(false);
   const stripe = useStripe();
 
   const currentDesigns = tinSkinzDesigns[selectedCategory] || [];
@@ -414,7 +415,7 @@ const TinSkinzMarketplace = () => {
   // Restore selections from URL parameters (when coming back from checkout)
   useEffect(() => {
     const selectedDesignsParam = searchParams.get('selected_designs');
-    if (selectedDesignsParam) {
+    if (selectedDesignsParam && !hasRestoredSelections) {
       try {
         const restoredDesigns = JSON.parse(selectedDesignsParam);
         const restoredSelections = {};
@@ -445,20 +446,28 @@ const TinSkinzMarketplace = () => {
         
         // Set the first restored design as preview
         if (restoredDesigns.length > 0) {
-          const firstDesign = tinSkinzDesigns[selectedCategory].find(d => d.id === restoredDesigns[0].design_id);
-          if (firstDesign) {
-            setSelectedDesign(firstDesign);
+          const firstDesign = restoredDesigns[0];
+          // Find the design object from all categories
+          let designObj = null;
+          for (const category in tinSkinzDesigns) {
+            designObj = tinSkinzDesigns[category].find(d => d.id === firstDesign.design_id);
+            if (designObj) {
+              setSelectedDesign(designObj);
+              break;
+            }
           }
         }
         
-        // Clean up URL parameters after restoring
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, '', newUrl);
+        // Mark that we've restored selections to prevent re-running
+        setHasRestoredSelections(true);
+        
+        // Don't clean up URL parameters immediately - let user navigate naturally
+        // The parameters will be cleaned up when they navigate away or refresh
       } catch (error) {
         console.error('Error restoring selections from URL:', error);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, hasRestoredSelections]);
 
   // Set first design as preview when category changes
   useEffect(() => {
@@ -618,27 +627,27 @@ const TinSkinzMarketplace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-2 sm:p-4">
+      <div className="max-w-7xl mx-auto w-full overflow-hidden">
         <div className="text-center mb-8">
           {/* Tin Skinz Logo */}
           <div className="mb-6 flex justify-center">
             <img 
               src="/assets/tin-skinz/Tin Skinz_logo_full color_Secondary logo.png" 
               alt="Tin Skinz Logo" 
-              className="h-32 w-auto"
+              className="h-24 sm:h-32 w-auto"
             />
           </div>
           
-           <p className="text-xl text-white/90 max-w-2xl mx-auto">
+           <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto px-4">
              Pre-designed tins filled with candy for every occasion. Perfect for weddings, 
              birthdays, holidays, and special events. Customize with your own message or use our <a href="/editor?product=tin" className="text-yellow-500 font-semibold hover:underline">full editor</a>.
            </p>
         </div>
 
-      <div className="space-y-8">
+      <div className="space-y-4 sm:space-y-8">
         {/* Design Selection Section */}
-        <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-6">
+        <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-3 sm:p-6">
           {/* Category Selection */}
           <div className="mb-6">
             <h3 className="font-semibold text-gray-900 text-lg mb-3">Choose Category</h3>
@@ -657,7 +666,7 @@ const TinSkinzMarketplace = () => {
           <div>
             <h3 className="font-semibold text-gray-900 text-lg mb-3">Select Designs & Quantities</h3>
             <p className="text-sm text-gray-600 mb-4">Choose multiple designs and quantities to get bulk discounts</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4">
               {currentDesigns.map((design) => {
                 const selectedItem = selectedDesigns[design.id];
                 const quantity = selectedItem?.quantity || 0;
@@ -790,18 +799,20 @@ const TinSkinzMarketplace = () => {
         </div>
 
         {/* Bottom Section: Live Preview and Order Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
            <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-4 sm:p-6">
             <div className="mb-4">
               <h3 className="font-semibold text-gray-900 text-lg">Live Preview</h3>
             </div>
-            <div className="flex items-center justify-center min-h-[400px]">
-              <TinSkinzMockupViewer
-                selectedDesign={selectedDesign}
-                customMessage={Object.values(selectedDesigns)[0]?.customMessage || ''}
-                displayWidth={400}
-                displayHeight={400}
-              />
+            <div className="flex items-center justify-center min-h-[250px] sm:min-h-[400px]">
+              <div className="w-[250px] h-[250px] sm:w-[400px] sm:h-[400px]">
+                <TinSkinzMockupViewer
+                  selectedDesign={selectedDesign}
+                  customMessage={Object.values(selectedDesigns)[0]?.customMessage || ''}
+                  displayWidth={250}
+                  displayHeight={250}
+                />
+              </div>
             </div>
           </div>
 

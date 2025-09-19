@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useStripe } from '@stripe/react-stripe-js';
+import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { calculateTinSkinzPricing, formatCurrency, CANDY_OPTIONS, calculateCandyPricing } from '../utils/tinSkinzPricing';
 import { NeumorphicButton } from './ui';
 
@@ -8,6 +8,7 @@ const TinSkinzCheckout = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const stripe = useStripe();
+  const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   
   // Order data from marketplace
@@ -76,11 +77,9 @@ const TinSkinzCheckout = () => {
       return;
     }
 
-    // In production, Stripe is handled by Railway
-    // For local dev, we'll simulate the checkout flow
-    if (!stripe) {
-      console.log('Stripe not loaded (local dev) - simulating checkout');
-      alert('In local development mode. In production, this would proceed to Stripe checkout.');
+    if (!stripe || !elements) {
+      console.error('Stripe not ready');
+      alert('Payment system not ready. Please try again.');
       return;
     }
 
@@ -130,12 +129,28 @@ const TinSkinzCheckout = () => {
 
       const { client_secret } = await response.json();
 
+      // Get card element
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        throw new Error('Payment form not found');
+      }
+
       // Confirm payment with Stripe
-      const { error } = await stripe.confirmPayment({
-        clientSecret: client_secret,
-        confirmParams: {
-          return_url: `${window.location.origin}/tin-skinz/success`,
-        },
+      const { error } = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: 'John Doe',
+            email: 'customer@example.com',
+            address: {
+              line1: '123 Main St',
+              city: 'Anytown',
+              state: 'MA',
+              postal_code: '12345',
+              country: 'US'
+            }
+          }
+        }
       });
 
       if (error) {
@@ -189,7 +204,8 @@ const TinSkinzCheckout = () => {
             <button
               onClick={() => {
                 // Go back to marketplace with preserved selections
-                const backUrl = `/tin-skinz?${window.location.search}`;
+                const currentSearch = window.location.search;
+                const backUrl = `/tin-skinz${currentSearch}`;
                 navigate(backUrl);
               }}
               className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
@@ -305,12 +321,38 @@ const TinSkinzCheckout = () => {
                 <span>{formatCurrency(finalPricing?.total_amount || 0)}</span>
               </div>
               
+              {/* Payment Form */}
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Payment Information</h3>
+                <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
+                  <CardElement
+                    options={{
+                      style: {
+                        base: {
+                          fontSize: '16px',
+                          color: '#424770',
+                          '::placeholder': {
+                            color: '#aab7c4',
+                          },
+                        },
+                        invalid: {
+                          color: '#9e2146',
+                        },
+                      },
+                    }}
+                  />
+                </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  Your payment information is secure and encrypted. We accept all major credit cards.
+                </p>
+              </div>
+              
               <button
                 onClick={handlePurchase}
                 disabled={!finalPricing || isLoading}
                 className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold text-lg rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Processing...' : (!stripe ? 'Complete Purchase (Dev Mode)' : 'Complete Purchase')}
+                {isLoading ? 'Processing...' : 'Complete Purchase'}
               </button>
             </div>
           </div>
