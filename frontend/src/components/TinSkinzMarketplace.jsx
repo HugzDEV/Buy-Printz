@@ -401,9 +401,8 @@ const candyOptions = [
 
 const TinSkinzMarketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('abstract-art');
-  const [selectedDesigns, setSelectedDesigns] = useState({}); // { designId: { design, quantity, candyId } }
+  const [selectedDesigns, setSelectedDesigns] = useState({}); // { designId: { design, quantity, candyId, customMessage } }
   const [selectedDesign, setSelectedDesign] = useState(null); // For live preview
-  const [customMessage, setCustomMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [pricing, setPricing] = useState(null);
   const [stripe, setStripe] = useState(null);
@@ -431,7 +430,7 @@ const TinSkinzMarketplace = () => {
     const totalQuantity = Object.values(selectedDesigns).reduce((sum, item) => sum + item.quantity, 0);
     
     if (totalQuantity > 0) {
-      const hasCustomMessage = customMessage.trim() !== '';
+      const hasCustomMessage = Object.values(selectedDesigns).some(item => item.customMessage && item.customMessage.trim() !== '');
       
       try {
         // Calculate base tin pricing (no candy in base calculation)
@@ -464,7 +463,7 @@ const TinSkinzMarketplace = () => {
     } else {
       setPricing(null);
     }
-  }, [selectedDesigns, customMessage]);
+  }, [selectedDesigns]);
 
   const handleQuantityChange = (design, newQuantity) => {
     setSelectedDesigns(prev => {
@@ -492,6 +491,21 @@ const TinSkinzMarketplace = () => {
         updated[design.id] = { 
           ...updated[design.id], 
           candyId 
+        };
+      }
+      
+      return updated;
+    });
+  };
+
+  const handleCustomMessageChange = (design, message) => {
+    setSelectedDesigns(prev => {
+      const updated = { ...prev };
+      
+      if (updated[design.id]) {
+        updated[design.id] = { 
+          ...updated[design.id], 
+          customMessage: message.trim() || null
         };
       }
       
@@ -530,9 +544,9 @@ const TinSkinzMarketplace = () => {
         design_thumbnail: item.design.thumbnailUrl,
         quantity: item.quantity,
         candy_id: item.candyId || null,
-        candy_name: item.candyId ? CANDY_OPTIONS.find(c => c.id === item.candyId)?.name : null
+        candy_name: item.candyId ? CANDY_OPTIONS.find(c => c.id === item.candyId)?.name : null,
+        custom_message: item.customMessage || null
       })),
-      custom_message: customMessage.trim() || null,
       total_quantity: totalQuantity,
       pricing: {
         unit_price: pricing.unitPrice,
@@ -579,32 +593,28 @@ const TinSkinzMarketplace = () => {
            </p>
         </div>
 
-      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 lg:gap-8">
-        {/* Left Column: Design Selection */}
-        <div className="space-y-6">
-           {/* Category Selection */}
-           <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-4 sm:p-6">
-            <div className="mb-4">
-              <h3 className="font-semibold text-gray-900 text-lg">Choose Category</h3>
-            </div>
-              <select 
-                value={selectedCategory} 
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent transition-all duration-200"
-              >
-                <option value="abstract-art">Abstract Art</option>
-                <option value="zodiac">Zodiac Signs</option>
-                <option value="animals">Animals</option>
-              </select>
+      <div className="space-y-8">
+        {/* Design Selection Section */}
+        <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-6">
+          {/* Category Selection */}
+          <div className="mb-6">
+            <h3 className="font-semibold text-gray-900 text-lg mb-3">Choose Category</h3>
+            <select 
+              value={selectedCategory} 
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full max-w-xs px-3 py-2 bg-white/20 border border-white/30 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent transition-all duration-200"
+            >
+              <option value="abstract-art">Abstract Art</option>
+              <option value="zodiac">Zodiac Signs</option>
+              <option value="animals">Animals</option>
+            </select>
           </div>
 
-           {/* Design Selection */}
-           <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-4 sm:p-6">
-            <div className="mb-4">
-              <h3 className="font-semibold text-gray-900 text-lg">Select Designs & Quantities</h3>
-              <p className="text-sm text-gray-600 mt-1">Choose multiple designs and quantities to get bulk discounts</p>
-            </div>
-            <div className="flex overflow-x-auto gap-3 pb-2 lg:grid lg:grid-cols-4 lg:pb-0 lg:gap-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {/* Design Selection */}
+          <div>
+            <h3 className="font-semibold text-gray-900 text-lg mb-3">Select Designs & Quantities</h3>
+            <p className="text-sm text-gray-600 mb-4">Choose multiple designs and quantities to get bulk discounts</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {currentDesigns.map((design) => {
                 const selectedItem = selectedDesigns[design.id];
                 const quantity = selectedItem?.quantity || 0;
@@ -613,20 +623,19 @@ const TinSkinzMarketplace = () => {
                 return (
                   <div
                     key={design.id}
-                    className={`rounded-xl p-3 transition-all duration-300 flex-shrink-0 lg:flex-shrink cursor-pointer ${
+                    className={`rounded-xl p-4 transition-all duration-300 cursor-pointer ${
                       quantity > 0
                         ? 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-yellow-100 border-2 border-yellow-500/30'
                         : selectedDesign?.id === design.id
                         ? 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-blue-100 border-2 border-blue-500/30'
                         : 'shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-gray-100 hover:bg-gray-200'
                     }`}
-                    style={{ minWidth: '130px' }}
                     onClick={() => {
                       // Set as selected design for live preview
                       setSelectedDesign(design);
                     }}
                   >
-                    <div className="aspect-square bg-gradient-to-br from-amber-100/40 to-yellow-100/40 rounded-lg mb-2 flex items-center justify-center overflow-hidden shadow-inner">
+                    <div className="aspect-square bg-gradient-to-br from-amber-100/40 to-yellow-100/40 rounded-lg mb-3 flex items-center justify-center overflow-hidden shadow-inner">
                       <img 
                         src={design.thumbnailUrl} 
                         alt={design.name}
@@ -641,17 +650,17 @@ const TinSkinzMarketplace = () => {
                       </div>
                     </div>
                     
-                    <h3 className="font-medium text-xs text-gray-900 truncate text-center mb-1">{design.name}</h3>
-                    <p className="text-yellow-600 font-bold text-xs text-center mb-2">${design.price}</p>
+                    <h3 className="font-medium text-sm text-gray-900 truncate text-center mb-2">{design.name}</h3>
+                    <p className="text-yellow-600 font-bold text-sm text-center mb-3">${design.price}</p>
                     
                     {/* Quantity Selector */}
-                    <div className="flex items-center justify-center space-x-1 mb-2">
+                    <div className="flex items-center justify-center space-x-2 mb-3">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleQuantityChange(design, Math.max(0, quantity - 1));
                         }}
-                        className="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors duration-200"
+                        className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors duration-200"
                         disabled={quantity <= 0}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -659,14 +668,14 @@ const TinSkinzMarketplace = () => {
                         </svg>
                       </button>
                       
-                      <span className="w-6 text-center font-medium text-gray-900 text-sm">{quantity}</span>
+                      <span className="w-8 text-center font-medium text-gray-900 text-sm">{quantity}</span>
                       
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleQuantityChange(design, quantity + 1);
                         }}
-                        className="w-6 h-6 rounded-full bg-yellow-500 hover:bg-yellow-600 flex items-center justify-center text-white transition-colors duration-200"
+                        className="w-8 h-8 rounded-full bg-yellow-500 hover:bg-yellow-600 flex items-center justify-center text-white transition-colors duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -676,7 +685,7 @@ const TinSkinzMarketplace = () => {
 
                     {/* Candy Selection Dropdown */}
                     {quantity > 0 && (
-                      <div className="mb-2">
+                      <div className="mb-1">
                         <select
                           value={candyId}
                           onChange={(e) => {
@@ -684,7 +693,7 @@ const TinSkinzMarketplace = () => {
                             handleCandyChange(design, e.target.value);
                           }}
                           onClick={(e) => e.stopPropagation()}
-                          className="w-full px-1 py-1 text-xs bg-white/20 border border-white/30 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                          className="w-full px-2 py-2 text-sm bg-white/20 border border-white/30 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
                         >
                           <option value="">No Candy</option>
                           {CANDY_OPTIONS.map((candy) => (
@@ -693,6 +702,23 @@ const TinSkinzMarketplace = () => {
                             </option>
                           ))}
                         </select>
+                      </div>
+                    )}
+
+                    {/* Custom Message Input */}
+                    {quantity > 0 && (
+                      <div className="mb-1">
+                        <input
+                          type="text"
+                          placeholder="Custom message..."
+                          value={selectedItem?.customMessage || ''}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleCustomMessageChange(design, e.target.value);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full px-2 py-2 text-sm bg-white/20 border border-white/30 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                        />
                       </div>
                     )}
                     
@@ -718,41 +744,10 @@ const TinSkinzMarketplace = () => {
               })}
             </div>
           </div>
-
-           {/* Custom Message */}
-           <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-4 sm:p-6">
-            <div className="mb-4">
-              <h3 className="font-semibold text-gray-900 text-lg">Custom Message (Optional)</h3>
-            </div>
-            <label htmlFor="custom-message" className="block text-sm font-medium text-gray-700 mb-2">
-              Add a personal message
-            </label>
-            <input
-              id="custom-message"
-              type="text"
-              value={customMessage}
-              onChange={(e) => setCustomMessage(e.target.value)}
-              placeholder="Enter your custom message..."
-              maxLength={50}
-              className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:border-transparent transition-all duration-200"
-            />
-             <p className="text-sm text-gray-500 mt-1">
-               {customMessage.length}/50 characters
-               {customMessage.trim() && (
-                 <span className={`font-medium ml-2 ${
-                   getTotalQuantity() >= 51 ? 'text-green-600' : 'text-yellow-600'
-                 }`}>
-                   {getTotalQuantity() >= 51 ? '(Free on orders 51+)' : `(+${formatCurrency(pricing?.messageUnitPrice || 0.99)} per tin)`}
-                 </span>
-               )}
-             </p>
-          </div>
-
-
         </div>
 
-         {/* Right Column: Live Mockup */}
-         <div className="space-y-6">
+        {/* Bottom Section: Live Preview and Order Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
            <div className="backdrop-blur-md bg-gradient-to-br from-amber-50/90 to-yellow-50/90 border border-amber-200/50 shadow-xl rounded-3xl p-4 sm:p-6">
             <div className="mb-4">
               <h3 className="font-semibold text-gray-900 text-lg">Live Preview</h3>
@@ -760,7 +755,7 @@ const TinSkinzMarketplace = () => {
             <div className="flex items-center justify-center min-h-[400px]">
               <TinSkinzMockupViewer
                 selectedDesign={selectedDesign}
-                customMessage={customMessage}
+                customMessage={Object.values(selectedDesigns)[0]?.customMessage || ''}
                 displayWidth={400}
                 displayHeight={400}
               />
@@ -798,17 +793,16 @@ const TinSkinzMarketplace = () => {
                              <span>{formatCurrency(candyCostForThisDesign)}</span>
                            </div>
                          )}
+                         {item.customMessage && (
+                           <div className="flex justify-between text-gray-600 text-sm ml-4">
+                             <span>Custom Message: "{item.customMessage}"</span>
+                             <span className="text-xs text-gray-500">+ {formatCurrency((pricing?.messageUnitPrice || 0) * item.quantity)}</span>
+                           </div>
+                         )}
                        </div>
                      );
                    })}
 
-                   {/* Custom Message */}
-                   {customMessage.trim() && (
-                     <div className="flex justify-between text-gray-700">
-                       <span>Custom Message ({getTotalQuantity()} × {formatCurrency(pricing?.messageUnitPrice || 0)})</span>
-                       <span>{formatCurrency((pricing?.messageUnitPrice || 0) * getTotalQuantity())}</span>
-                     </div>
-                   )}
 
                    {/* Quantity Discount Info */}
                    {getTotalQuantity() >= 3 && (
@@ -862,7 +856,7 @@ const TinSkinzMarketplace = () => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
       </div>
     </div>
   );

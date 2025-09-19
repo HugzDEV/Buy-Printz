@@ -247,6 +247,9 @@ const TinSkinzCheckout = () => {
                             {candy && (
                               <p className="text-xs text-green-600">+ {candy.name}</p>
                             )}
+                            {item.custom_message && (
+                              <p className="text-xs text-blue-600">Message: "{item.custom_message}"</p>
+                            )}
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-medium text-gray-900">
@@ -257,6 +260,11 @@ const TinSkinzCheckout = () => {
                                 + {formatCurrency(candyCostForThisDesign)}
                               </div>
                             )}
+                            {item.custom_message && (
+                              <div className="text-xs text-blue-600">
+                                + {formatCurrency((finalPricing?.message_unit_price || 0) * item.quantity)}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -265,13 +273,6 @@ const TinSkinzCheckout = () => {
                 );
               })}
 
-              {/* Custom Message */}
-              {orderData.custom_message && (
-                <div className="flex justify-between text-gray-700">
-                  <span>Custom Message ({orderData.total_quantity} × {formatCurrency(finalPricing?.message_unit_price || 0)})</span>
-                  <span>{formatCurrency((finalPricing?.message_unit_price || 0) * orderData.total_quantity)}</span>
-                </div>
-              )}
 
               {/* Quantity Discount Info */}
               {orderData.total_quantity >= 3 && (
