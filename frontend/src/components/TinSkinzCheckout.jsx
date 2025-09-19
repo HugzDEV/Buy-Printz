@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
+import { useStripe } from '@stripe/react-stripe-js';
 import { calculateTinSkinzPricing, formatCurrency, CANDY_OPTIONS, calculateCandyPricing } from '../utils/tinSkinzPricing';
 import { NeumorphicButton } from './ui';
 
 const TinSkinzCheckout = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [stripe, setStripe] = useState(null);
+  const stripe = useStripe();
   const [isLoading, setIsLoading] = useState(false);
   
   // Order data from marketplace
@@ -49,14 +49,6 @@ const TinSkinzCheckout = () => {
   // Final pricing (candy already included per design)
   const [finalPricing, setFinalPricing] = useState(null);
 
-  // Initialize Stripe
-  useEffect(() => {
-    const initializeStripe = async () => {
-      const stripeInstance = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
-      setStripe(stripeInstance);
-    };
-    initializeStripe();
-  }, []);
 
   // Use marketplace pricing directly (candy already included)
   useEffect(() => {
@@ -98,14 +90,13 @@ const TinSkinzCheckout = () => {
       // Create order with multiple designs (candy already included per design)
       const checkoutOrderData = {
         selected_designs: orderData.selected_designs,
-        custom_message: orderData.custom_message,
         total_quantity: orderData.total_quantity,
         pricing: {
-          unit_price: finalPricing.unitPrice,
-          message_unit_price: finalPricing.messageUnitPrice,
+          unit_price: finalPricing.unit_price,
+          message_unit_price: finalPricing.message_unit_price,
           subtotal: finalPricing.subtotal,
-          tax_amount: finalPricing.taxAmount,
-          total_amount: finalPricing.totalAmount
+          tax_amount: finalPricing.tax_amount,
+          total_amount: finalPricing.total_amount
         },
         shipping_address: {
           name: 'John Doe',
@@ -196,7 +187,11 @@ const TinSkinzCheckout = () => {
           {/* Back Button */}
           <div className="flex justify-start">
             <button
-              onClick={() => window.history.back()}
+              onClick={() => {
+                // Go back to marketplace with preserved selections
+                const backUrl = `/tin-skinz?${window.location.search}`;
+                navigate(backUrl);
+              }}
               className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

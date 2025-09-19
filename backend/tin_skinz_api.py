@@ -20,10 +20,14 @@ logger = logging.getLogger(__name__)
 # Initialize Stripe
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-# Initialize Supabase
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_ANON_KEY")
-supabase: Client = create_client(supabase_url, supabase_key)
+# Initialize Supabase (lazy initialization)
+def get_supabase_client():
+    """Get Supabase client with lazy initialization"""
+    supabase_url = os.getenv("SUPABASE_URL")
+    supabase_key = os.getenv("SUPABASE_ANON_KEY")
+    if not supabase_url or not supabase_key:
+        raise HTTPException(status_code=500, detail="Supabase configuration missing")
+    return create_client(supabase_url, supabase_key)
 
 router = APIRouter(prefix="/api/tin-skinz", tags=["tin-skinz"])
 
@@ -54,10 +58,8 @@ class PricingCalculation(BaseModel):
     total_amount: float
 
 class TinSkinzOrderRequest(BaseModel):
-    design_id: str
-    custom_message: Optional[str] = None
-    candy_id: Optional[str] = None
-    quantity: int
+    selected_designs: List[dict]  # Array of designs with quantities and candy
+    total_quantity: int
     pricing: Optional[dict] = None  # Dynamic pricing data from frontend
     shipping_address: dict
     billing_address: dict
@@ -72,6 +74,7 @@ class TinSkinzOrderResponse(BaseModel):
 async def get_designs(category: Optional[str] = None):
     """Get all Tin Skinz designs, optionally filtered by category"""
     try:
+        supabase = get_supabase_client()
         query = supabase.table("tin_skinz_designs").select("*").eq("is_active", True)
         
         if category:
@@ -100,6 +103,7 @@ async def get_designs(category: Optional[str] = None):
 async def get_candy_options():
     """Get all available candy options"""
     try:
+        supabase = get_supabase_client()
         result = supabase.table("tin_skinz_candy_options").select("*").eq("is_active", True).execute()
         
         candy_options = []
@@ -123,6 +127,7 @@ async def calculate_price(
 ):
     """Calculate pricing for Tin Skinz order"""
     try:
+        supabase = get_supabase_client()
         # Call the database function to calculate pricing
         result = supabase.rpc(
             "calculate_tin_skinz_price",
@@ -163,56 +168,50 @@ async def calculate_price(
 async def create_order(order_request: TinSkinzOrderRequest):
     """Create a new Tin Skinz order and Stripe payment intent"""
     try:
-        # Validate design exists
-        design_result = supabase.table("tin_skinz_designs").select("*").eq("design_id", order_request.design_id).eq("is_active", True).execute()
-        if not design_result.data:
-            raise HTTPException(status_code=404, detail="Design not found")
+        supabase = get_supabase_client()
+        # Validate all designs exist
+        design_ids = [design['design_id'] for design in order_request.selected_designs]
+        design_result = supabase.table("tin_skinz_designs").select("*").in_("design_id", design_ids).eq("is_active", True).execute()
         
-        design = design_result.data[0]
+        if len(design_result.data) != len(design_ids):
+            raise HTTPException(status_code=404, detail="One or more designs not found")
         
-        # Get candy option if provided
-        candy_price = 0.0
-        if order_request.candy_id:
-            candy_result = supabase.table("tin_skinz_candy_options").select("*").eq("candy_id", order_request.candy_id).eq("is_active", True).execute()
-            if not candy_result.data:
-                raise HTTPException(status_code=404, detail="Candy option not found")
-            candy_price = float(candy_result.data[0]["price"])
-        
-        # Use dynamic pricing from frontend if provided, otherwise calculate
+        # Use dynamic pricing from frontend if provided
         if order_request.pricing:
-            # Use frontend-calculated pricing
             pricing_data = order_request.pricing
-            unit_price = float(pricing_data.get("unit_price", 0))
-            candy_price = float(pricing_data.get("candy_unit_price", 0))
-            custom_message_price = float(pricing_data.get("message_unit_price", 0))
             subtotal = float(pricing_data.get("subtotal", 0))
             tax_amount = float(pricing_data.get("tax_amount", 0))
             total_amount = float(pricing_data.get("total_amount", 0))
         else:
-            # Fallback to backend calculation
-            has_candy = order_request.candy_id is not None
-            has_custom_message = order_request.custom_message is not None and order_request.custom_message.strip() != ""
-            
-            pricing_result = supabase.rpc(
-                "calculate_tin_skinz_price",
-                {
-                    "p_quantity": order_request.quantity,
-                    "p_has_candy": has_candy,
-                    "p_has_custom_message": has_custom_message
-                }
-            ).execute()
-            
-            if not pricing_result.data:
-                raise HTTPException(status_code=400, detail="Invalid quantity for pricing")
-            
-            pricing = pricing_result.data[0]
-            unit_price = float(pricing["unit_price"])
-            candy_price = float(pricing["candy_price"])
-            custom_message_price = float(pricing["custom_message_price"])
-            
-            # Calculate totals
+            # Fallback to backend calculation (simplified for multi-design)
             tax_rate = 0.0625  # 6.25% MA state tax
-            subtotal = float(pricing["total_price"])
+            subtotal = 0.0
+            
+            for design_item in order_request.selected_designs:
+                # Calculate base price for this design
+                design_id = design_item['design_id']
+                quantity = design_item['quantity']
+                
+                # Get design price
+                design = next(d for d in design_result.data if d['design_id'] == design_id)
+                base_price = float(design['base_price'])
+                
+                # Add candy cost if specified
+                candy_cost = 0.0
+                if design_item.get('candy_id'):
+                    candy_result = supabase.table("tin_skinz_candy_options").select("*").eq("candy_id", design_item['candy_id']).eq("is_active", True).execute()
+                    if candy_result.data:
+                        candy_cost = float(candy_result.data[0]["price"])
+                
+                # Add custom message cost if specified
+                message_cost = 0.0
+                if design_item.get('custom_message') and design_item['custom_message'].strip():
+                    message_cost = 0.99  # $0.99 per tin for custom message
+                
+                # Calculate total for this design
+                design_total = (base_price + candy_cost + message_cost) * quantity
+                subtotal += design_total
+            
             tax_amount = subtotal * tax_rate
             total_amount = subtotal + tax_amount
         
@@ -226,21 +225,16 @@ async def create_order(order_request: TinSkinzOrderRequest):
             metadata={
                 'order_id': order_id,
                 'product_type': 'tin_skinz',
-                'design_id': order_request.design_id,
-                'quantity': str(order_request.quantity)
+                'total_quantity': str(order_request.total_quantity),
+                'design_count': str(len(order_request.selected_designs))
             }
         )
         
         # Create order record in database
         order_data = {
             'order_id': order_id,
-            'design_id': order_request.design_id,
-            'custom_message': order_request.custom_message,
-            'candy_id': order_request.candy_id,
-            'quantity': order_request.quantity,
-            'unit_price': unit_price,
-            'candy_price': candy_price,
-            'custom_message_price': custom_message_price,
+            'selected_designs': order_request.selected_designs,
+            'total_quantity': order_request.total_quantity,
             'subtotal': subtotal,
             'tax_amount': tax_amount,
             'total_amount': total_amount,
@@ -271,6 +265,7 @@ async def create_order(order_request: TinSkinzOrderRequest):
 async def confirm_payment(payment_intent_id: str):
     """Confirm payment and update order status"""
     try:
+        supabase = get_supabase_client()
         # Retrieve payment intent from Stripe
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
         
@@ -297,6 +292,7 @@ async def confirm_payment(payment_intent_id: str):
 async def get_user_orders(user_id: str):
     """Get orders for a specific user"""
     try:
+        supabase = get_supabase_client()
         result = supabase.table("tin_skinz_orders").select("""
             *,
             tin_skinz_designs(name, category),

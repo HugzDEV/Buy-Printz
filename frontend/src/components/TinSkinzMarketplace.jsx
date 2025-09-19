@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, Button, NeumorphicButton } from './ui';
 import TinSkinzMockupViewer from './TinSkinzMockupViewer';
 import { calculateTinSkinzPricing, getPricingBreakdown, formatCurrency, getBulkSavings, CANDY_OPTIONS, calculateCandyPricing } from '../utils/tinSkinzPricing';
-import { loadStripe } from '@stripe/stripe-js';
+import { useStripe } from '@stripe/react-stripe-js';
 
 // All Tin Skinz designs
 const tinSkinzDesigns = {
@@ -400,14 +401,64 @@ const candyOptions = [
 ];
 
 const TinSkinzMarketplace = () => {
+  const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState('abstract-art');
   const [selectedDesigns, setSelectedDesigns] = useState({}); // { designId: { design, quantity, candyId, customMessage } }
   const [selectedDesign, setSelectedDesign] = useState(null); // For live preview
   const [isLoading, setIsLoading] = useState(false);
   const [pricing, setPricing] = useState(null);
-  const [stripe, setStripe] = useState(null);
+  const stripe = useStripe();
 
   const currentDesigns = tinSkinzDesigns[selectedCategory] || [];
+
+  // Restore selections from URL parameters (when coming back from checkout)
+  useEffect(() => {
+    const selectedDesignsParam = searchParams.get('selected_designs');
+    if (selectedDesignsParam) {
+      try {
+        const restoredDesigns = JSON.parse(selectedDesignsParam);
+        const restoredSelections = {};
+        
+        // Convert the array format back to object format
+        restoredDesigns.forEach(item => {
+          // Find the design object from all categories
+          let design = null;
+          for (const category in tinSkinzDesigns) {
+            design = tinSkinzDesigns[category].find(d => d.id === item.design_id);
+            if (design) {
+              setSelectedCategory(category); // Set the correct category
+              break;
+            }
+          }
+          
+          if (design) {
+            restoredSelections[design.id] = {
+              design,
+              quantity: item.quantity,
+              candyId: item.candy_id || null,
+              customMessage: item.custom_message || null
+            };
+          }
+        });
+        
+        setSelectedDesigns(restoredSelections);
+        
+        // Set the first restored design as preview
+        if (restoredDesigns.length > 0) {
+          const firstDesign = tinSkinzDesigns[selectedCategory].find(d => d.id === restoredDesigns[0].design_id);
+          if (firstDesign) {
+            setSelectedDesign(firstDesign);
+          }
+        }
+        
+        // Clean up URL parameters after restoring
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      } catch (error) {
+        console.error('Error restoring selections from URL:', error);
+      }
+    }
+  }, [searchParams]);
 
   // Set first design as preview when category changes
   useEffect(() => {
@@ -416,14 +467,6 @@ const TinSkinzMarketplace = () => {
     }
   }, [selectedCategory, currentDesigns, selectedDesign]);
 
-  // Initialize Stripe
-  useEffect(() => {
-    const initializeStripe = async () => {
-      const stripeInstance = await loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
-      setStripe(stripeInstance);
-    };
-    initializeStripe();
-  }, []);
 
   // Calculate total quantity and pricing whenever relevant values change
   useEffect(() => {
