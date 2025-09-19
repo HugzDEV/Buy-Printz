@@ -5,7 +5,8 @@ Handles shipping costs for Tin Skinz orders using UPS API
 """
 
 import logging
-from fastapi import APIRouter, HTTPException, Depends
+import json
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime
@@ -113,6 +114,64 @@ async def health_check():
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
+
+@router.post("/ups-callback")
+async def ups_webhook_callback(request: Request):
+    """
+    Handle UPS webhook callbacks for shipping updates
+    """
+    try:
+        # Get the raw request body
+        body = await request.body()
+        
+        # Parse the webhook data
+        webhook_data = json.loads(body)
+        
+        logger.info(f"📨 Received UPS webhook: {webhook_data}")
+        
+        # Handle different webhook types
+        webhook_type = webhook_data.get('type', '')
+        
+        if webhook_type == 'shipping.rate.updated':
+            # Handle rate updates
+            await handle_shipping_rate_update(webhook_data)
+        elif webhook_type == 'shipping.tracking.updated':
+            # Handle tracking updates
+            await handle_tracking_update(webhook_data)
+        else:
+            logger.warning(f"Unknown UPS webhook type: {webhook_type}")
+        
+        return {"status": "success", "message": "Webhook processed"}
+        
+    except Exception as e:
+        logger.error(f"❌ Error processing UPS webhook: {e}")
+        raise HTTPException(status_code=500, detail=f"Webhook processing failed: {str(e)}")
+
+async def handle_shipping_rate_update(webhook_data: Dict[str, Any]):
+    """Handle shipping rate updates from UPS"""
+    try:
+        # Extract rate information
+        rate_data = webhook_data.get('data', {})
+        logger.info(f"📊 Processing rate update: {rate_data}")
+        
+        # Update cached rates or notify relevant orders
+        # This could update a database or cache with new rates
+        
+    except Exception as e:
+        logger.error(f"❌ Error handling rate update: {e}")
+
+async def handle_tracking_update(webhook_data: Dict[str, Any]):
+    """Handle tracking updates from UPS"""
+    try:
+        # Extract tracking information
+        tracking_data = webhook_data.get('data', {})
+        logger.info(f"📦 Processing tracking update: {tracking_data}")
+        
+        # Update order tracking status in database
+        # This could update order status and notify customers
+        
+    except Exception as e:
+        logger.error(f"❌ Error handling tracking update: {e}")
 
 @router.post("/test")
 async def test_ups_integration():
