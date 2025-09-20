@@ -131,6 +131,9 @@ const TinSkinzCheckout = () => {
   };
   
   // Get shipping rates from UPS
+  // Note: Weight calculation is handled on the backend:
+  // - Empty tins: 1.18oz (0.074 lbs) each
+  // - Tins with candy: 3.11oz (0.194 lbs) each
   const getShippingRates = async () => {
     if (!shippingInfo.zipCode) {
       setShippingError('Please enter your shipping address to get shipping rates');
@@ -496,15 +499,320 @@ const TinSkinzCheckout = () => {
                 <span>{formatCurrency(finalPricing?.tax_amount || 0)}</span>
               </div>
 
+              {/* Shipping */}
+              {selectedShipping && (
+                <div className="flex justify-between text-gray-700">
+                  <span>Shipping ({selectedShipping.name})</span>
+                  <span>{formatCurrency(selectedShipping.cost)}</span>
+                </div>
+              )}
+
               <hr className="border-white/20" />
               <div className="flex justify-between font-bold text-xl text-gray-900">
                 <span>Total</span>
-                <span>{formatCurrency(finalPricing?.total_amount || 0)}</span>
+                <span>{formatCurrency((finalPricing?.total_amount || 0) + (selectedShipping?.cost || 0))}</span>
               </div>
               
+              {/* Billing Information */}
+              <div className="mt-6">
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer p-4 bg-gradient-to-r from-amber-100/50 to-yellow-100/50 rounded-xl border border-amber-200/50 hover:from-amber-200/50 hover:to-yellow-200/50 transition-all duration-200">
+                    <div className="flex items-center space-x-3">
+                      <User className="w-5 h-5 text-amber-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Billing Information</h3>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="mt-4 p-4 bg-white/50 rounded-xl border border-amber-200/30">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                    <input
+                      type="text"
+                      value={billingInfo.firstName}
+                      onChange={(e) => setBillingInfo({...billingInfo, firstName: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.firstName ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.firstName && <p className="text-red-500 text-sm mt-1">{formErrors.firstName}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                    <input
+                      type="text"
+                      value={billingInfo.lastName}
+                      onChange={(e) => setBillingInfo({...billingInfo, lastName: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.lastName ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.lastName && <p className="text-red-500 text-sm mt-1">{formErrors.lastName}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <input
+                      type="email"
+                      value={billingInfo.email}
+                      onChange={(e) => setBillingInfo({...billingInfo, email: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.email ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                    <input
+                      type="tel"
+                      value={billingInfo.phone}
+                      onChange={(e) => setBillingInfo({...billingInfo, phone: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.phone ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.phone && <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                    <input
+                      type="text"
+                      value={billingInfo.address}
+                      onChange={(e) => setBillingInfo({...billingInfo, address: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.address ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.address && <p className="text-red-500 text-sm mt-1">{formErrors.address}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                    <input
+                      type="text"
+                      value={billingInfo.city}
+                      onChange={(e) => setBillingInfo({...billingInfo, city: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.city ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.city && <p className="text-red-500 text-sm mt-1">{formErrors.city}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                    <input
+                      type="text"
+                      value={billingInfo.state}
+                      onChange={(e) => setBillingInfo({...billingInfo, state: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.state ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.state && <p className="text-red-500 text-sm mt-1">{formErrors.state}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Zip Code *</label>
+                    <input
+                      type="text"
+                      value={billingInfo.zipCode}
+                      onChange={(e) => setBillingInfo({...billingInfo, zipCode: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        formErrors.zipCode ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.zipCode && <p className="text-red-500 text-sm mt-1">{formErrors.zipCode}</p>}
+                  </div>
+                </div>
+                  </div>
+                </details>
+              </div>
+
+              {/* Shipping Information */}
+              <div className="mt-6">
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer p-4 bg-gradient-to-r from-amber-100/50 to-yellow-100/50 rounded-xl border border-amber-200/50 hover:from-amber-200/50 hover:to-yellow-200/50 transition-all duration-200">
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="w-5 h-5 text-amber-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Shipping Information</h3>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="mt-4 p-4 bg-white/50 rounded-xl border border-amber-200/30">
+                
+                <div className="mb-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={shippingInfo.sameAsBilling}
+                      onChange={(e) => setShippingInfo({...shippingInfo, sameAsBilling: e.target.checked})}
+                      className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Same as billing address</span>
+                  </label>
+                </div>
+
+                {!shippingInfo.sameAsBilling && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                      <input
+                        type="text"
+                        value={shippingInfo.firstName}
+                        onChange={(e) => setShippingInfo({...shippingInfo, firstName: e.target.value})}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                          formErrors.shippingFirstName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.shippingFirstName && <p className="text-red-500 text-sm mt-1">{formErrors.shippingFirstName}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                      <input
+                        type="text"
+                        value={shippingInfo.lastName}
+                        onChange={(e) => setShippingInfo({...shippingInfo, lastName: e.target.value})}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                          formErrors.shippingLastName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.shippingLastName && <p className="text-red-500 text-sm mt-1">{formErrors.shippingLastName}</p>}
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                      <input
+                        type="text"
+                        value={shippingInfo.address}
+                        onChange={(e) => setShippingInfo({...shippingInfo, address: e.target.value})}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                          formErrors.shippingAddress ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.shippingAddress && <p className="text-red-500 text-sm mt-1">{formErrors.shippingAddress}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                      <input
+                        type="text"
+                        value={shippingInfo.city}
+                        onChange={(e) => setShippingInfo({...shippingInfo, city: e.target.value})}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                          formErrors.shippingCity ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.shippingCity && <p className="text-red-500 text-sm mt-1">{formErrors.shippingCity}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                      <input
+                        type="text"
+                        value={shippingInfo.state}
+                        onChange={(e) => setShippingInfo({...shippingInfo, state: e.target.value})}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                          formErrors.shippingState ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.shippingState && <p className="text-red-500 text-sm mt-1">{formErrors.shippingState}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Zip Code *</label>
+                      <input
+                        type="text"
+                        value={shippingInfo.zipCode}
+                        onChange={(e) => setShippingInfo({...shippingInfo, zipCode: e.target.value})}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                          formErrors.shippingZipCode ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.shippingZipCode && <p className="text-red-500 text-sm mt-1">{formErrors.shippingZipCode}</p>}
+                    </div>
+                  </div>
+                )}
+                  </div>
+                </details>
+              </div>
+
+              {/* Shipping Options */}
+              <div className="mt-6">
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer p-4 bg-gradient-to-r from-amber-100/50 to-yellow-100/50 rounded-xl border border-amber-200/50 hover:from-amber-200/50 hover:to-yellow-200/50 transition-all duration-200">
+                    <div className="flex items-center space-x-3">
+                      <Truck className="w-5 h-5 text-amber-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Shipping Options</h3>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="mt-4 p-4 bg-white/50 rounded-xl border border-amber-200/30">
+
+                {shippingLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Getting shipping rates...</p>
+                  </div>
+                ) : shippingError ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-600">{shippingError}</div>
+                  </div>
+                ) : shippingOptions.length > 0 ? (
+                  <div className="space-y-3">
+                    {shippingOptions.map((option) => (
+                      <label key={option.id} className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-amber-50">
+                        <input
+                          type="radio"
+                          name="shipping"
+                          value={option.id}
+                          checked={selectedShipping?.id === option.id}
+                          onChange={() => setSelectedShipping(option)}
+                          className="text-amber-600 focus:ring-amber-500"
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-900">{option.name}</span>
+                            <span className="font-bold text-amber-600">{formatCurrency(option.cost)}</span>
+                          </div>
+                          <p className="text-sm text-gray-600">Estimated delivery: {option.estimated_days} business days</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">Enter your shipping address to see shipping options</p>
+                  </div>
+                )}
+                  </div>
+                </details>
+              </div>
+
               {/* Payment Form */}
               <div className="mt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Payment Information</h3>
+                <details className="group">
+                  <summary className="flex items-center justify-between cursor-pointer p-4 bg-gradient-to-r from-amber-100/50 to-yellow-100/50 rounded-xl border border-amber-200/50 hover:from-amber-200/50 hover:to-yellow-200/50 transition-all duration-200">
+                    <div className="flex items-center space-x-3">
+                      <CreditCard className="w-5 h-5 text-amber-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Payment Information</h3>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="mt-4 p-4 bg-white/50 rounded-xl border border-amber-200/30">
                 <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
                   <CardElement
                     options={{
@@ -526,6 +834,8 @@ const TinSkinzCheckout = () => {
                 <p className="text-sm text-gray-600 mt-2">
                   Your payment information is secure and encrypted. We accept all major credit cards.
                 </p>
+                  </div>
+                </details>
               </div>
               
               <button

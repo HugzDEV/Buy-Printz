@@ -114,13 +114,33 @@ class UPSShippingService:
         """Prepare UPS rate request payload"""
         
         # Calculate total weight and dimensions for Tin Skinz order
-        tin_weight = 0.5  # lbs per tin (estimated)
+        # Tin weights: Empty tin = 1.18oz (0.074 lbs), With candy = 3.11oz (0.194 lbs)
+        tin_weight_empty = 0.074  # lbs per empty tin (1.18oz)
+        tin_weight_with_candy = 0.194  # lbs per tin with candy (3.11oz)
         tin_length = 4.0  # inches
         tin_width = 4.0   # inches
         tin_height = 6.0  # inches
         
         total_quantity = order_data.get('total_quantity', 1)
-        total_weight = tin_weight * total_quantity
+        selected_designs = order_data.get('selected_designs', [])
+        
+        # Calculate total weight based on which tins have candy
+        total_weight = 0
+        tins_with_candy = 0
+        tins_without_candy = 0
+        
+        for design in selected_designs:
+            quantity = design.get('quantity', 1)
+            has_candy = design.get('candy_id') is not None
+            
+            if has_candy:
+                total_weight += tin_weight_with_candy * quantity
+                tins_with_candy += quantity
+            else:
+                total_weight += tin_weight_empty * quantity
+                tins_without_candy += quantity
+        
+        logger.info(f"📦 Tin Skinz weight calculation: {tins_with_candy} tins with candy ({tin_weight_with_candy}lbs each), {tins_without_candy} empty tins ({tin_weight_empty}lbs each), total weight: {total_weight:.3f}lbs")
         
         # Calculate package dimensions (assuming tins are packed efficiently)
         if total_quantity <= 4:
