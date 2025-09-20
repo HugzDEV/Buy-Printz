@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 class UPSShippingService:
     def __init__(self):
         # Use production URL by default, CIE for testing if specified
-        # CIE URL: https://cie-api.ups.com/api (if available)
-        # Production URL: https://onlinetools.ups.com/api
-        self.base_url = os.getenv('UPS_BASE_URL', 'https://onlinetools.ups.com/api')
+        # CIE URL: https://wwwcie.ups.com (for testing)
+        # Production URL: https://onlinetools.ups.com
+        self.base_url = os.getenv('UPS_BASE_URL', 'https://onlinetools.ups.com')
         self.client_id = os.getenv('UPS_CLIENT_ID')
         self.client_secret = os.getenv('UPS_CLIENT_SECRET')
         self.shipper_number = os.getenv('UPS_SHIPPER_NUMBER')
@@ -84,7 +84,7 @@ class UPSShippingService:
             rate_request = self._prepare_ups_rate_request(order_data, customer_info)
             
             # Make UPS API request
-            url = f"{self.base_url}/rating/v1/Rate"
+            url = f"{self.base_url}/api/rating/v1/Rate"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
@@ -317,7 +317,7 @@ class UPSShippingService:
             rate_request = self._prepare_multi_service_request(order_data, customer_info)
             
             # Make UPS API request
-            url = f"{self.base_url}/rating/v1/Rate"
+            url = f"{self.base_url}/api/rating/v1/Rate"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
