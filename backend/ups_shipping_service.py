@@ -401,50 +401,96 @@ class UPSShippingService:
     def _parse_ups_tracking_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
         """Parse UPS tracking response into our format"""
         try:
+            logger.info(f"📦 Parsing UPS tracking response: {response}")
+            
+            # Handle different response formats
+            if isinstance(response, str):
+                # If response is a string, try to parse it as JSON
+                try:
+                    response = json.loads(response)
+                except json.JSONDecodeError:
+                    return {
+                        'tracking_number': '',
+                        'status': 'Invalid response format',
+                        'error': 'Response is not valid JSON'
+                    }
+            
             # Extract tracking information from UPS response
-            if 'trackResponse' in response and 'shipment' in response['trackResponse']:
-                shipment = response['trackResponse']['shipment'][0] if isinstance(response['trackResponse']['shipment'], list) else response['trackResponse']['shipment']
+            if 'trackResponse' in response:
+                track_response = response['trackResponse']
                 
-                # Get package details
-                package = shipment.get('package', [{}])[0] if shipment.get('package') else {}
-                
-                # Get current status
-                current_status = package.get('activity', [{}])[0] if package.get('activity') else {}
-                
-                # Get delivery information
-                delivery_info = package.get('deliveryInformation', {})
-                
-                # Get package details
-                package_details = package.get('packageWeight', {})
-                
-                return {
-                    'tracking_number': shipment.get('inquiryNumber', {}).get('number', ''),
-                    'status': current_status.get('status', {}).get('description', 'Unknown'),
-                    'status_code': current_status.get('status', {}).get('code', ''),
-                    'location': current_status.get('location', {}).get('address', {}).get('city', '') + ', ' + current_status.get('location', {}).get('address', {}).get('stateProvinceCode', ''),
-                    'timestamp': current_status.get('date', '') + ' ' + current_status.get('time', ''),
-                    'delivery_date': delivery_info.get('deliveryDate', ''),
-                    'delivery_time': delivery_info.get('deliveryTime', ''),
-                    'weight': package_details.get('weight', ''),
-                    'service': shipment.get('service', {}).get('description', ''),
-                    'activities': [
-                        {
-                            'status': activity.get('status', {}).get('description', ''),
-                            'location': activity.get('location', {}).get('address', {}).get('city', '') + ', ' + activity.get('location', {}).get('address', {}).get('stateProvinceCode', ''),
-                            'timestamp': activity.get('date', '') + ' ' + activity.get('time', '')
+                # Handle shipment data
+                if 'shipment' in track_response:
+                    shipment = track_response['shipment']
+                    
+                    # Handle both single shipment and array of shipments
+                    if isinstance(shipment, list) and len(shipment) > 0:
+                        shipment = shipment[0]
+                    elif not isinstance(shipment, dict):
+                        return {
+                            'tracking_number': '',
+                            'status': 'No shipment data available',
+                            'error': 'Invalid shipment format'
                         }
-                        for activity in package.get('activity', [])
-                    ]
-                }
+                    
+                    # Get package details
+                    package = shipment.get('package', {})
+                    if isinstance(package, list) and len(package) > 0:
+                        package = package[0]
+                    
+                    # Get current status from activities
+                    activities = package.get('activity', [])
+                    current_status = activities[0] if activities else {}
+                    
+                    # Get delivery information
+                    delivery_info = package.get('deliveryInformation', {})
+                    
+                    # Get package details
+                    package_details = package.get('packageWeight', {})
+                    
+                    # Build location string safely
+                    location = ''
+                    if current_status.get('location', {}).get('address'):
+                        address = current_status['location']['address']
+                        city = address.get('city', '')
+                        state = address.get('stateProvinceCode', '')
+                        location = f"{city}, {state}".strip(', ')
+                    
+                    return {
+                        'tracking_number': shipment.get('inquiryNumber', {}).get('number', ''),
+                        'status': current_status.get('status', {}).get('description', 'Unknown'),
+                        'status_code': current_status.get('status', {}).get('code', ''),
+                        'location': location,
+                        'timestamp': f"{current_status.get('date', '')} {current_status.get('time', '')}".strip(),
+                        'delivery_date': delivery_info.get('deliveryDate', ''),
+                        'delivery_time': delivery_info.get('deliveryTime', ''),
+                        'weight': package_details.get('weight', ''),
+                        'service': shipment.get('service', {}).get('description', ''),
+                        'activities': [
+                            {
+                                'status': activity.get('status', {}).get('description', ''),
+                                'location': f"{activity.get('location', {}).get('address', {}).get('city', '')}, {activity.get('location', {}).get('address', {}).get('stateProvinceCode', '')}".strip(', '),
+                                'timestamp': f"{activity.get('date', '')} {activity.get('time', '')}".strip()
+                            }
+                            for activity in activities
+                        ]
+                    }
+                else:
+                    return {
+                        'tracking_number': '',
+                        'status': 'No shipment data available',
+                        'error': 'No shipment in response'
+                    }
             else:
                 return {
                     'tracking_number': '',
                     'status': 'No tracking information available',
-                    'error': 'Invalid response format'
+                    'error': 'Invalid response format - no trackResponse'
                 }
                 
         except Exception as e:
             logger.error(f"❌ Error parsing UPS tracking response: {e}")
+            logger.error(f"📦 Raw response: {response}")
             return {
                 'tracking_number': '',
                 'status': 'Error parsing tracking information',
