@@ -58,6 +58,15 @@ except ImportError as e:
     TIN_SKINZ_SHIPPING_API_AVAILABLE = False
     print(f"❌ Tin Skinz API failed to load: {e}")
 
+# Import Business Card Tin API routes
+try:
+    from backend.business_card_tin_api import router as business_card_tin_router
+    BUSINESS_CARD_TIN_API_AVAILABLE = True
+    print("✅ Business Card Tin API loaded successfully")
+except ImportError as e:
+    BUSINESS_CARD_TIN_API_AVAILABLE = False
+    print(f"❌ Business Card Tin API failed to load: {e}")
+
 # Simple in-memory cache
 class SimpleCache:
     def __init__(self, default_ttl=300):  # 5 minutes default
@@ -212,6 +221,13 @@ if TIN_SKINZ_SHIPPING_API_AVAILABLE:
     logger.info("Tin Skinz Shipping API routes loaded successfully")
 else:
     logger.warning("Tin Skinz Shipping API routes not available")
+
+# Include Business Card Tin API routes if available
+if BUSINESS_CARD_TIN_API_AVAILABLE:
+    app.include_router(business_card_tin_router)
+    logger.info("Business Card Tin API routes loaded successfully")
+else:
+    logger.warning("Business Card Tin API routes not available")
 
 # Mount static files - create uploads directory if it doesn't exist
 uploads_dir = "uploads"

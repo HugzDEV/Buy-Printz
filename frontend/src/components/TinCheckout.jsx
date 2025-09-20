@@ -39,6 +39,7 @@ import {
 import authService from '../services/auth'
 import PrintPreviewModal from './PrintPreviewModal'
 import { GlassCard } from './ui'
+import { CANDY_OPTIONS, calculateCandyPricing, formatCurrency } from '../utils/tinSkinzPricing'
 
 // Collapsible Section Component - Standardized design
 const CollapsibleSection = ({ title, icon: Icon, children, isExpanded, onToggle, defaultExpanded = false }) => (
@@ -142,7 +143,9 @@ const TinCheckout = () => {
     tinFinish: 'silver',
     printingMethod: 'premium-vinyl',
     jobName: '',
-    showAdvancedOptions: false
+    showAdvancedOptions: false,
+    candyId: '', // Add candy selection
+    customMessage: '' // Add custom message
   })
   
   // Shipping Options State
@@ -155,9 +158,10 @@ const TinCheckout = () => {
   const [expandedSections, setExpandedSections] = useState({
     printPreview: true,      // Start with print preview
     tinOptions: false,       // Opens after preview approval
-    shipping: false,         // Opens after tin options
-    customerInfo: false,     // Opens after shipping selection
-    reviewPayment: false     // Opens after customer info completion
+    candySelection: false,   // Opens after tin options
+    customerInfo: false,     // Opens after candy selection
+    shipping: false,         // Opens after customer info
+    reviewPayment: false     // Opens after shipping selection
   })
   
   const [loading, setLoading] = useState(false)
@@ -190,7 +194,7 @@ const TinCheckout = () => {
 
   // Progressive navigation functions
   const continueToNextSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'tinOptions', 'customerInfo', 'shipping', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'tinOptions', 'candySelection', 'customerInfo', 'shipping', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const nextSection = sectionOrder[currentIndex + 1]
     
@@ -214,7 +218,7 @@ const TinCheckout = () => {
   }
 
   const goToPreviousSection = (currentSection) => {
-    const sectionOrder = ['printPreview', 'tinOptions', 'customerInfo', 'shipping', 'reviewPayment']
+    const sectionOrder = ['printPreview', 'tinOptions', 'candySelection', 'customerInfo', 'shipping', 'reviewPayment']
     const currentIndex = sectionOrder.indexOf(currentSection)
     const prevSection = sectionOrder[currentIndex - 1]
     
@@ -332,8 +336,16 @@ const TinCheckout = () => {
   const marketplaceCost = orderData?.marketplace_templates ? 
     orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
   
+  // Calculate candy costs
+  const candyCost = tinOptions.candyId ? 
+    calculateCandyPricing(tinOptions.candyId, tinOptions.quantity).unitPrice * tinOptions.quantity : 0
+  
+  // Calculate custom message cost ($0.99 per unit, free for orders 100+)
+  const customMessageCost = tinOptions.customMessage && tinOptions.customMessage.trim() !== '' && tinOptions.quantity < 100 ? 
+    0.99 * tinOptions.quantity : 0
+  
   // Calculate tax (MA 6.25%)
-  const subtotal = tinBasePrice + marketplaceCost
+  const subtotal = tinBasePrice + marketplaceCost + candyCost + customMessageCost
   const taxRate = 0.0625
   const taxAmount = subtotal * taxRate
   
@@ -532,6 +544,8 @@ const TinCheckout = () => {
         total_quantity: tinOptions.quantity,
         pricing: {
           unit_price: tinBasePrice / tinOptions.quantity,
+          candy_cost: candyCost,
+          custom_message_cost: customMessageCost,
           subtotal: subtotal,
           tax_amount: taxAmount,
           total_amount: totalAmount
@@ -910,6 +924,7 @@ const TinCheckout = () => {
                 </div>
               </div>
 
+
               {/* Navigation */}
               <div className="flex justify-between pt-6 pb-2 border-t border-gray-200 mt-6">
                 <button
@@ -921,6 +936,120 @@ const TinCheckout = () => {
                 <button
                   onClick={() => continueToNextSection('tinOptions')}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 active:scale-95 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                >
+                  Continue to Candy Selection →
+                </button>
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* Candy Selection - Step 2.5 */}
+          <CollapsibleSection
+            title="Candy Selection"
+            icon={Package}
+            isExpanded={expandedSections.candySelection}
+            onToggle={() => toggleSection('candySelection')}
+            defaultExpanded={false}
+            data-section="candySelection"
+          >
+            <div className="space-y-6">
+              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <Package className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <p className="text-purple-700">Choose premium candy to fill your business card tins</p>
+              </div>
+
+              {/* Candy Options */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-purple-600" />
+                  Candy Options
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <label className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 active:bg-purple-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2">
+                    <input 
+                      type="radio" 
+                      name="candy" 
+                      value="" 
+                      checked={tinOptions.candyId === ''} 
+                      onChange={(e) => setTinOptions(prev => ({ ...prev, candyId: e.target.value }))} 
+                      className="mr-3 text-purple-600 focus:ring-purple-500" 
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">No Candy</p>
+                      <p className="text-sm text-gray-600">Empty tin only</p>
+                      <p className="text-sm text-gray-500">No additional cost</p>
+                    </div>
+                  </label>
+                  {CANDY_OPTIONS.map((candy) => {
+                    const candyPricing = calculateCandyPricing(candy.id, tinOptions.quantity);
+                    return (
+                      <label key={candy.id} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 active:bg-purple-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2">
+                        <input 
+                          type="radio" 
+                          name="candy" 
+                          value={candy.id} 
+                          checked={tinOptions.candyId === candy.id} 
+                          onChange={(e) => setTinOptions(prev => ({ ...prev, candyId: e.target.value }))} 
+                          className="mr-3 text-purple-600 focus:ring-purple-500" 
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{candy.name}</p>
+                          <p className="text-sm text-gray-600">Premium candy selection</p>
+                          <p className="text-sm text-purple-600">
+                            ${candyPricing.unitPrice.toFixed(2)}/unit
+                            {candyPricing.discountPercent > 0 && (
+                              <span className="ml-1 text-green-600">({candyPricing.discountPercent}% off)</span>
+                            )}
+                          </p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+                {tinOptions.quantity >= 100 && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="text-sm text-green-800 font-medium">
+                      🎉 Candy discounts available for orders 100+ units
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Custom Message */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  Custom Message (Optional)
+                </h4>
+                <div>
+                  <input
+                    type="text"
+                    value={tinOptions.customMessage}
+                    onChange={(e) => setTinOptions(prev => ({ ...prev, customMessage: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your custom message..."
+                  />
+                  <p className="text-sm text-gray-600 mt-1">
+                    {tinOptions.quantity >= 100 ? (
+                      <span className="text-green-600">Free custom messaging on orders 100+ units</span>
+                    ) : (
+                      <span>Custom messaging: $0.99 per unit</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <div className="flex justify-between pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => goToPreviousSection('candySelection')}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
+                >
+                  ← Back to Tin Options
+                </button>
+                <button
+                  onClick={() => continueToNextSection('candySelection')}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
                 >
                   Continue to Customer Info →
                 </button>
@@ -1079,7 +1208,7 @@ const TinCheckout = () => {
                   onClick={() => goToPreviousSection('customerInfo')}
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2"
                 >
-                  ← Back to Tin Options
+                  ← Back to Candy Selection
                 </button>
                 <button
                   onClick={() => continueToNextSection('customerInfo')}
@@ -1251,6 +1380,28 @@ const TinCheckout = () => {
                       ))}
                     </>
                   )}
+                  {/* Candy Selection */}
+                  {tinOptions.candyId && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Candy:</span>
+                      <span className="font-medium text-purple-600">
+                        {CANDY_OPTIONS.find(c => c.id === tinOptions.candyId)?.name}
+                        <span className="ml-1">(+${candyCost.toFixed(2)})</span>
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Custom Message */}
+                  {tinOptions.customMessage && tinOptions.customMessage.trim() !== '' && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Custom Message:</span>
+                      <span className="font-medium text-blue-600">
+                        "{tinOptions.customMessage}"
+                        {customMessageCost > 0 && <span className="ml-1">(+${customMessageCost.toFixed(2)})</span>}
+                      </span>
+                    </div>
+                  )}
+                  
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax (6.25%):</span>
                     <span className="font-medium">
@@ -1408,6 +1559,26 @@ const TinCheckout = () => {
                       <span className="text-gray-600">Marketplace Templates:</span>
                       <span className="font-medium text-buyprint-brand">
                         +${marketplaceCost.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Candy Selection in sidebar */}
+                  {tinOptions.candyId && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Candy:</span>
+                      <span className="font-medium text-purple-600">
+                        +${candyCost.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Custom Message in sidebar */}
+                  {tinOptions.customMessage && tinOptions.customMessage.trim() !== '' && customMessageCost > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Custom Message:</span>
+                      <span className="font-medium text-blue-600">
+                        +${customMessageCost.toFixed(2)}
                       </span>
                     </div>
                   )}
