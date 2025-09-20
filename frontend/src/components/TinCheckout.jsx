@@ -146,7 +146,7 @@ const TinCheckout = () => {
   })
   
   // Shipping Options State
-  const [shippingOption, setShippingOption] = useState('standard')
+  const [shippingOption, setShippingOption] = useState('')
   const [shippingOptions, setShippingOptions] = useState([])
   const [shippingLoading, setShippingLoading] = useState(false)
   const [shippingError, setShippingError] = useState(null)
@@ -279,6 +279,10 @@ const TinCheckout = () => {
         const data = await response.json()
         if (data.success && data.shipping_options) {
           setShippingOptions(data.shipping_options)
+          // Auto-select the first (cheapest) option
+          if (data.shipping_options.length > 0 && !shippingOption) {
+            setShippingOption(data.shipping_options[0].type)
+          }
         } else {
           setShippingError('Unable to get shipping rates')
           setShippingOptions([])
@@ -322,13 +326,18 @@ const TinCheckout = () => {
   }
   
   const tinBasePrice = calculateTinPrice()
-  const shippingCost = shippingOptions.find(opt => opt.service_code === shippingOption)?.total_cost || 0
+  const shippingCost = shippingOptions.find(opt => opt.type === shippingOption)?.cost || 0
   
   // Calculate marketplace template costs
   const marketplaceCost = orderData?.marketplace_templates ? 
     orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
   
-  const totalAmount = tinBasePrice + shippingCost + marketplaceCost
+  // Calculate tax (MA 6.25%)
+  const subtotal = tinBasePrice + marketplaceCost
+  const taxRate = 0.0625
+  const taxAmount = subtotal * taxRate
+  
+  const totalAmount = subtotal + taxAmount + shippingCost
 
   useEffect(() => {
     const savedOrderData = sessionStorage.getItem('orderData')
@@ -507,12 +516,78 @@ const TinCheckout = () => {
       return
     }
 
+    if (!stripe || !elements) {
+      toast.error('Payment system not ready. Please try again.')
+      return
+    }
+
     setLoading(true)
     setCheckoutStep('processing')
 
     try {
-      // Create the shipment with UPS
+      // Create order with pricing
       const orderData = {
+        product_type: 'business_card_tin',
+        tin_options: tinOptions,
+        total_quantity: tinOptions.quantity,
+        pricing: {
+          unit_price: tinBasePrice / tinOptions.quantity,
+          subtotal: subtotal,
+          tax_amount: taxAmount,
+          total_amount: totalAmount
+        },
+        customer_info: customerInfo,
+        shipping_option: {
+          service_code: shippingOption,
+          cost: shippingCost
+        }
+      }
+
+      // Create order
+      const orderResponse = await authService.authenticatedRequest('/api/orders/create', {
+        method: 'POST',
+        body: JSON.stringify(orderData)
+      })
+
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json()
+        throw new Error(errorData.detail || 'Failed to create order')
+      }
+
+      const { client_secret } = await orderResponse.json()
+
+      // Get card element
+      const cardElement = elements.getElement(CardElement)
+      if (!cardElement) {
+        throw new Error('Payment form not found')
+      }
+
+      // Confirm payment with Stripe
+      const { error } = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: customerInfo.name,
+            email: customerInfo.email,
+            address: {
+              line1: customerInfo.address,
+              city: customerInfo.city,
+              state: customerInfo.state,
+              postal_code: customerInfo.zipCode,
+              country: 'US'
+            }
+          }
+        }
+      })
+
+      if (error) {
+        console.error('Payment failed:', error)
+        toast.error('Payment failed. Please try again.')
+        return
+      }
+
+      // Create shipment with UPS
+      const shippingOrderData = {
         total_quantity: tinOptions.quantity,
         selected_designs: [{
           design_id: 'business-card-tin',
@@ -534,7 +609,7 @@ const TinCheckout = () => {
       const shipmentResponse = await authService.authenticatedRequest('/api/tin-skinz/shipping/create-shipment', {
         method: 'POST',
         body: JSON.stringify({
-          order_data: orderData,
+          order_data: shippingOrderData,
           customer_info: shippingCustomerInfo,
           service_code: shippingOption
         })
@@ -543,14 +618,10 @@ const TinCheckout = () => {
       if (shipmentResponse.ok) {
         const shipmentData = await shipmentResponse.json()
         if (shipmentData.success && shipmentData.shipment_info?.tracking_number) {
-          // Store tracking number for the order
           console.log('Shipment created with tracking number:', shipmentData.shipment_info.tracking_number)
           toast.success(`Order shipped! Tracking: ${shipmentData.shipment_info.tracking_number}`)
         }
       }
-
-      await saveCustomerInfo()
-      await new Promise(resolve => setTimeout(resolve, 2000))
 
       setCheckoutStep('completed')
       toast.success('Tin order submitted successfully!')
@@ -1070,26 +1141,26 @@ const TinCheckout = () => {
                 ) : shippingOptions.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {shippingOptions.map((option) => (
-                      <label key={option.service_code} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
+                      <label key={option.id} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
                         <input
                           type="radio"
                           name="shipping"
-                          value={option.service_code}
-                          checked={shippingOption === option.service_code}
+                          value={option.type}
+                          checked={shippingOption === option.type}
                           onChange={(e) => setShippingOption(e.target.value)}
                           className="mr-3 text-green-600 focus:ring-green-500"
                         />
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <Truck className="w-4 h-4 text-green-600" />
-                            <p className="font-medium text-gray-900">{option.service_name}</p>
+                            <p className="font-medium text-gray-900">{option.name}</p>
                           </div>
                           <p className="text-sm text-green-600 font-medium">
-                            ${option.total_cost}
+                            ${option.cost}
                           </p>
-                          {option.estimated_delivery && (
+                          {option.estimated_days && (
                             <p className="text-xs text-gray-500">
-                              Est. delivery: {option.estimated_delivery}
+                              Est. delivery: {option.estimated_days} days
                             </p>
                           )}
                         </div>
@@ -1181,6 +1252,12 @@ const TinCheckout = () => {
                     </>
                   )}
                   <div className="flex justify-between">
+                    <span className="text-gray-600">Tax (6.25%):</span>
+                    <span className="font-medium">
+                      ${taxAmount.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
                       {shippingCost > 0 ? `$${shippingCost.toFixed(2)}` : 'Calculating...'}
@@ -1223,6 +1300,35 @@ const TinCheckout = () => {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Payment Information */}
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <CreditCardIcon className="w-5 h-5 text-blue-600" />
+                  Payment Information
+                </h4>
+                <div className="p-4 border border-gray-300 rounded-lg bg-white">
+                  <CardElement
+                    options={{
+                      style: {
+                        base: {
+                          fontSize: '16px',
+                          color: '#424770',
+                          '::placeholder': {
+                            color: '#aab7c4',
+                          },
+                        },
+                        invalid: {
+                          color: '#9e2146',
+                        },
+                      },
+                    }}
+                  />
+                </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  Your payment information is secure and encrypted. We accept all major credit cards.
+                </p>
               </div>
 
               {/* Action Buttons */}
@@ -1305,6 +1411,13 @@ const TinCheckout = () => {
                       </span>
                     </div>
                   )}
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax (6.25%):</span>
+                    <span className="font-medium">
+                      ${taxAmount.toFixed(2)}
+                    </span>
+                  </div>
                   
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
