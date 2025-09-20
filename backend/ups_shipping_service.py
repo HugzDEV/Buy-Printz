@@ -70,6 +70,70 @@ class UPSShippingService:
             logger.error(f"❌ Error getting UPS access token: {e}")
             raise
     
+    async def get_multiple_service_rates(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Get multiple UPS service rates for Tin Skinz orders
+        
+        Args:
+            order_data: Order data including quantity, dimensions, weight
+            customer_info: Customer shipping information
+            
+        Returns:
+            Dict with success status and shipping options
+        """
+        try:
+            logger.info("🚚 Getting multiple UPS service rates...")
+            
+            # Get access token
+            access_token = await self.get_access_token()
+            
+            # Prepare UPS rate request
+            rate_request = self._prepare_ups_rate_request(order_data, customer_info)
+            
+            # Make UPS API request
+            url = "https://onlinetools.ups.com/api/rating/v1/Rate"
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {access_token}',
+                'transId': f'tin-skinz-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                'transactionSrc': 'testing'
+            }
+            
+            logger.info(f"🚚 Making UPS rate request to: {url}")
+            logger.info(f"📦 Request headers: {headers}")
+            logger.info(f"📋 Request body: {json.dumps(rate_request, indent=2)}")
+            
+            response = requests.post(url, headers=headers, json=rate_request)
+            
+            if response.status_code != 200:
+                logger.error(f"❌ UPS API error: {response.status_code} - {response.text}")
+            
+            response.raise_for_status()
+            
+            rate_response = response.json()
+            
+            # Parse UPS response into our format
+            shipping_options = self._parse_ups_response(rate_response)
+            
+            return {
+                'success': True,
+                'shipping_options': shipping_options,
+                'carrier': 'UPS',
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting multiple UPS service rates: {e}")
+            logger.error(f"❌ Exception type: {type(e)}")
+            logger.error(f"❌ Exception details: {str(e)}")
+            import traceback
+            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
+            return {
+                'success': False,
+                'errors': [str(e)],
+                'shipping_options': []
+            }
+
     async def get_shipping_rates(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
         """
         Get UPS shipping rates for Tin Skinz orders
