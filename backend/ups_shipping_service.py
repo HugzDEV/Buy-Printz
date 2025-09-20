@@ -663,6 +663,53 @@ class UPSShippingService:
                 'timestamp': datetime.now().isoformat()
             }
 
+    def _calculate_package_details(self, order_data: Dict[str, Any]) -> tuple:
+        """Calculate package dimensions and weight for Tin Skinz order"""
+        try:
+            total_quantity = order_data.get('total_quantity', 1)
+            selected_designs = order_data.get('selected_designs', [])
+            
+            # Calculate total weight
+            total_weight = 0.0
+            for design in selected_designs:
+                quantity = design.get('quantity', 1)
+                candy_id = design.get('candy_id')
+                
+                if candy_id:
+                    # Tin with candy: 0.194 lbs each
+                    total_weight += quantity * 0.194
+                else:
+                    # Empty tin: 0.074 lbs each
+                    total_weight += quantity * 0.074
+            
+            # Calculate package dimensions based on quantity
+            # Assume tins are roughly 3" x 3" x 2" each
+            # Package dimensions will scale with quantity
+            if total_quantity <= 4:
+                # Small package: 8" x 8" x 6"
+                package_length = 8.0
+                package_width = 8.0
+                package_height = 6.0
+            elif total_quantity <= 12:
+                # Medium package: 12" x 12" x 8"
+                package_length = 12.0
+                package_width = 12.0
+                package_height = 8.0
+            else:
+                # Large package: 16" x 16" x 10"
+                package_length = 16.0
+                package_width = 16.0
+                package_height = 10.0
+            
+            logger.info(f"📦 Package details: {total_quantity} tins, {total_weight:.3f} lbs, {package_length}x{package_width}x{package_height} inches")
+            
+            return package_length, package_width, package_height, total_weight
+            
+        except Exception as e:
+            logger.error(f"❌ Error calculating package details: {e}")
+            # Return default values
+            return 8.0, 8.0, 6.0, 0.5
+
     def _parse_ups_shipment_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
         """Parse UPS shipment response into our format"""
         try:
