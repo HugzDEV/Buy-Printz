@@ -8,6 +8,7 @@ import logging
 import os
 import requests
 import json
+import base64
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 
@@ -15,9 +16,12 @@ logger = logging.getLogger(__name__)
 
 class UPSShippingService:
     def __init__(self):
-        self.base_url = "https://onlinetools.ups.com/api"
+        # Use CIE (Customer Integration Environment) for testing
+        # Change to "https://onlinetools.ups.com/api" for production
+        self.base_url = os.getenv('UPS_BASE_URL', 'https://cie-api.ups.com/api')
         self.client_id = os.getenv('UPS_CLIENT_ID')
         self.client_secret = os.getenv('UPS_CLIENT_SECRET')
+        self.shipper_number = os.getenv('UPS_SHIPPER_NUMBER')
         self.access_token = None
         self.token_expires = None
         
@@ -29,14 +33,17 @@ class UPSShippingService:
                 
             url = f"{self.base_url}/security/v1/oauth/token"
             
+            # Encode credentials in Base64 for Basic Authentication
+            credentials = f"{self.client_id}:{self.client_secret}"
+            encoded_credentials = base64.b64encode(credentials.encode()).decode()
+            
             headers = {
+                'Authorization': f'Basic {encoded_credentials}',
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
             
             data = {
-                'grant_type': 'client_credentials',
-                'client_id': self.client_id,
-                'client_secret': self.client_secret
+                'grant_type': 'client_credentials'
             }
             
             response = requests.post(url, headers=headers, data=data)

@@ -8,6 +8,11 @@ Add these environment variables to your Railway deployment:
 # UPS OAuth 2.0 Credentials
 UPS_CLIENT_ID=your_ups_client_id_here
 UPS_CLIENT_SECRET=your_ups_client_secret_here
+UPS_SHIPPER_NUMBER=your_ups_shipper_number_here
+
+# Environment (optional - defaults to CIE for testing)
+UPS_BASE_URL=https://cie-api.ups.com/api  # For testing
+# UPS_BASE_URL=https://onlinetools.ups.com/api  # For production
 ```
 
 ## UPS Developer Account Setup

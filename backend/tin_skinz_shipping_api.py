@@ -94,7 +94,8 @@ async def health_check():
         # Check if UPS credentials are configured
         has_credentials = all([
             ups_shipping_service.client_id,
-            ups_shipping_service.client_secret
+            ups_shipping_service.client_secret,
+            ups_shipping_service.shipper_number
         ])
         
         return {
