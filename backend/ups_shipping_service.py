@@ -86,7 +86,7 @@ class UPSShippingService:
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
                 'transId': f'tin-skinz-{datetime.now().strftime("%Y%m%d%H%M%S")}',
-                'transactionSrc': 'BuyPrintz'
+                'transactionSrc': 'testing'
             }
             
             logger.info(f"🚚 Making UPS rate request to: {url}")
@@ -224,10 +224,21 @@ class UPSShippingService:
                             "CountryCode": "US"
                         }
                     },
+                    "PaymentDetails": {
+                        "ShipmentCharge": [
+                            {
+                                "Type": "01",
+                                "BillShipper": {
+                                    "AccountNumber": self.shipper_number
+                                }
+                            }
+                        ]
+                    },
                     "Service": {
                         "Code": "03",  # Ground
-                        "Description": "UPS Ground"
+                        "Description": "Ground"
                     },
+                    "NumOfPieces": "1",
                     "Package": {
                         "PackagingType": {
                             "Code": "02",  # Customer Supplied Package
@@ -337,7 +348,7 @@ class UPSShippingService:
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
                 'transId': f'tin-skinz-{datetime.now().strftime("%Y%m%d%H%M%S")}',
-                'transactionSrc': 'BuyPrintz'
+                'transactionSrc': 'testing'
             }
             
             logger.info(f"🚚 Making UPS rate request to: {url}")
@@ -390,7 +401,7 @@ class UPSShippingService:
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
                 'transId': f'tin-skinz-multi-{datetime.now().strftime("%Y%m%d%H%M%S")}',
-                'transactionSrc': 'BuyPrintz'
+                'transactionSrc': 'testing'
             }
             
             response = requests.post(url, headers=headers, json=rate_request)
