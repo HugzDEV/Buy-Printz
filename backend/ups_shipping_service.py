@@ -53,7 +53,7 @@ class UPSShippingService:
             token_data = response.json()
             self.access_token = token_data['access_token']
             # Set expiration 5 minutes before actual expiration for safety
-            expires_in = token_data.get('expires_in', 3600) - 300
+            expires_in = int(token_data.get('expires_in', 3600)) - 300
             self.token_expires = datetime.now() + timedelta(seconds=expires_in)
             
             logger.info("✅ UPS access token obtained successfully")
