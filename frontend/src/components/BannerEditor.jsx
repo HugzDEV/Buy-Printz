@@ -3495,16 +3495,9 @@ const BannerEditorNew = () => {
     console.log('🎨 Current tentSpecs state when saving:', tentSpecs)
     console.log('🎨 finalTentSpecs used in order:', finalTentSpecs)
     console.log('🎨 Current tentDesignOption when saving:', tentDesignOption)
-    // Attempt write with lightweight key compression; if it fails, reduce payload and retry
+    // Attempt write; if it fails, further reduce payload and retry
     try {
-      const json = JSON.stringify(orderDataForStorage)
-      let toStore = json
-      try {
-        // Lazy-load compression util to avoid bundling overhead if unused
-        const { compressJsonString } = await import('../utils/compression.js')
-        toStore = compressJsonString(json)
-      } catch {}
-      sessionStorage.setItem('orderData', toStore)
+      sessionStorage.setItem('orderData', JSON.stringify(orderDataForStorage))
     } catch (e) {
       console.warn('sessionStorage quota exceeded, reducing payload...', e)
       // Drop optional fields to fit quota
@@ -3513,10 +3506,7 @@ const BannerEditorNew = () => {
         orderDataForStorage.canvas_data.elements = []
       }
       try {
-        const json2 = JSON.stringify(orderDataForStorage)
-        let toStore2 = json2
-        try { const { compressJsonString } = await import('../utils/compression.js'); toStore2 = compressJsonString(json2) } catch {}
-        sessionStorage.setItem('orderData', toStore2)
+        sessionStorage.setItem('orderData', JSON.stringify(orderDataForStorage))
       } catch (err) {
         console.error('Still over quota after reduction; storing minimal payload.', err)
         const minimalPayload = {
@@ -3531,10 +3521,7 @@ const BannerEditorNew = () => {
             konvaStageImage: orderDataForStorage.canvas_data?.konvaStageImage
           }
         }
-        const json3 = JSON.stringify(minimalPayload)
-        let toStore3 = json3
-        try { const { compressJsonString } = await import('../utils/compression.js'); toStore3 = compressJsonString(json3) } catch {}
-        sessionStorage.setItem('orderData', toStore3)
+        sessionStorage.setItem('orderData', JSON.stringify(minimalPayload))
       }
     }
     
