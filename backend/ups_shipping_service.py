@@ -92,7 +92,15 @@ class UPSShippingService:
                 'transactionSrc': 'BuyPrintz'
             }
             
+            logger.info(f"🚚 Making UPS rate request to: {url}")
+            logger.info(f"📦 Request headers: {headers}")
+            logger.info(f"📋 Request body: {json.dumps(rate_request, indent=2)}")
+            
             response = requests.post(url, headers=headers, json=rate_request)
+            
+            if response.status_code != 200:
+                logger.error(f"❌ UPS API error: {response.status_code} - {response.text}")
+            
             response.raise_for_status()
             
             rate_response = response.json()
