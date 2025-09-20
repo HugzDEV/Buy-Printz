@@ -44,7 +44,8 @@ class UPSShippingService:
             }
             
             data = {
-                'grant_type': 'client_credentials'
+                'grant_type': 'client_credentials',
+                'scope': 'rating'
             }
             
             response = requests.post(url, headers=headers, data=data)
