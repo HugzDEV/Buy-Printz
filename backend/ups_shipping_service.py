@@ -220,17 +220,7 @@ class UPSShippingService:
                             "AddressLine": [customer_info.get('address', '')],
                             "City": customer_info.get('city', ''),
                             "StateProvinceCode": customer_info.get('state', ''),
-                            "PostalCode": customer_info.get('zipCode', ''),
-                            "CountryCode": "US"
-                        }
-                    },
-                    "ShipFrom": {
-                        "Name": "BuyPrintz",
-                        "Address": {
-                            "AddressLine": ["123 Business St"],
-                            "City": "Boston",
-                            "StateProvinceCode": "MA",
-                            "PostalCode": "02101",
+                            "PostalCode": customer_info.get('zipCode', '').replace('-', '').strip(),
                             "CountryCode": "US"
                         }
                     },
@@ -259,16 +249,16 @@ class UPSShippingService:
                                 "Code": "IN",
                                 "Description": "Inches"
                             },
-                            "Length": str(package_length),
-                            "Width": str(package_width),
-                            "Height": str(package_height)
+                            "Length": f"{package_length:.1f}",
+                            "Width": f"{package_width:.1f}",
+                            "Height": f"{package_height:.1f}"
                         },
                         "PackageWeight": {
                             "UnitOfMeasurement": {
                                 "Code": "LBS",
                                 "Description": "Pounds"
                             },
-                            "Weight": str(total_weight)
+                            "Weight": f"{total_weight:.3f}"
                         }
                     }
                 }
