@@ -46,7 +46,15 @@ class UPSShippingService:
                 'grant_type': 'client_credentials'
             }
             
+            logger.info(f"🔐 Making OAuth token request to: {url}")
+            logger.info(f"👤 Using username: {self.username}")
+            logger.info(f"📋 Request data: {data}")
+            
             response = requests.post(url, headers=headers, data=data, auth=(self.username, self.password))
+            
+            if response.status_code != 200:
+                logger.error(f"❌ OAuth token request failed: {response.status_code} - {response.text}")
+            
             response.raise_for_status()
             
             token_data = response.json()
