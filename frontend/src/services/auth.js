@@ -5,7 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // API Configuration
-const apiUrl = import.meta.env.VITE_API_URL || 'https://buy-printz-production.up.railway.app'
+const apiUrl = import.meta.env.VITE_API_URL || 'https://api.buyprintz.com'
 
 // Debug: Log environment variables (remove in production)
 console.log('Environment check:', {
