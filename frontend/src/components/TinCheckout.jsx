@@ -169,8 +169,7 @@ const TinCheckout = () => {
   const [previewApproved, setPreviewApproved] = useState(false)
 
   // Shipping Options Configuration - REMOVED HARDCODED PRICES
-  // All shipping options now come from our print partners
-  const shippingOptions = []
+  // All shipping options now come from our print partners via UPS API
 
   // Toggle section expansion
   const toggleSection = (section) => {
