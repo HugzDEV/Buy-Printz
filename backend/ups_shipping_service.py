@@ -23,6 +23,8 @@ class UPSShippingService:
         self.client_id = os.getenv('UPS_CLIENT_ID')
         self.client_secret = os.getenv('UPS_CLIENT_SECRET')
         self.shipper_number = os.getenv('UPS_SHIPPER_NUMBER')
+        self.username = os.getenv('UPS_USERNAME')
+        self.password = os.getenv('UPS_PASSWORD')
         self.access_token = None
         self.token_expires = None
         
@@ -44,7 +46,7 @@ class UPSShippingService:
                 'grant_type': 'client_credentials'
             }
             
-            response = requests.post(url, headers=headers, data=data, auth=(self.client_id, self.client_secret))
+            response = requests.post(url, headers=headers, data=data, auth=(self.username, self.password))
             response.raise_for_status()
             
             token_data = response.json()
