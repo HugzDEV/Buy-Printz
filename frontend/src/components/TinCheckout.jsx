@@ -147,6 +147,9 @@ const TinCheckout = () => {
   
   // Shipping Options State
   const [shippingOption, setShippingOption] = useState('standard')
+  const [shippingOptions, setShippingOptions] = useState([])
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingError, setShippingError] = useState(null)
   
   // Collapsible sections state - Progressive user journey
   const [expandedSections, setExpandedSections] = useState({
@@ -235,6 +238,64 @@ const TinCheckout = () => {
     }
   }
 
+  // Get shipping rates from UPS
+  const getShippingRates = async () => {
+    if (!customerInfo.zipCode || !customerInfo.address) {
+      setShippingOptions([])
+      return
+    }
+
+    try {
+      setShippingLoading(true)
+      setShippingError(null)
+
+      const orderData = {
+        total_quantity: tinOptions.quantity,
+        selected_designs: [{
+          design_id: 'business-card-tin',
+          quantity: tinOptions.quantity,
+          candy_id: null // Business card tins don't have candy
+        }]
+      }
+
+      const shippingCustomerInfo = {
+        name: customerInfo.name || 'Customer',
+        address: customerInfo.address,
+        city: customerInfo.city,
+        state: customerInfo.state,
+        zipCode: customerInfo.zipCode,
+        phone: customerInfo.phone || '5551234567'
+      }
+
+      const response = await authService.authenticatedRequest('/api/tin-skinz/shipping/get-rates', {
+        method: 'POST',
+        body: JSON.stringify({
+          order_data: orderData,
+          customer_info: shippingCustomerInfo
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.shipping_options) {
+          setShippingOptions(data.shipping_options)
+        } else {
+          setShippingError('Unable to get shipping rates')
+          setShippingOptions([])
+        }
+      } else {
+        setShippingError('Failed to get shipping rates')
+        setShippingOptions([])
+      }
+    } catch (error) {
+      console.error('Error getting shipping rates:', error)
+      setShippingError('Error getting shipping rates')
+      setShippingOptions([])
+    } finally {
+      setShippingLoading(false)
+    }
+  }
+
   // Calculate tin pricing
   const calculateTinPrice = () => {
     const baseQuantity = tinConfig.quantities.find(q => q.value === tinOptions.quantity)
@@ -261,7 +322,7 @@ const TinCheckout = () => {
   }
   
   const tinBasePrice = calculateTinPrice()
-  const shippingCost = shippingOptions.find(opt => opt.value === shippingOption)?.price || 0
+  const shippingCost = shippingOptions.find(opt => opt.service_code === shippingOption)?.total_cost || 0
   
   // Calculate marketplace template costs
   const marketplaceCost = orderData?.marketplace_templates ? 
@@ -318,6 +379,13 @@ const TinCheckout = () => {
       createOrder()
     }
   }, [orderData, isAuthenticated, authLoading])
+
+  // Get shipping rates when customer info changes
+  useEffect(() => {
+    if (customerInfo.zipCode && customerInfo.address && customerInfo.city && customerInfo.state) {
+      getShippingRates()
+    }
+  }, [customerInfo.zipCode, customerInfo.address, customerInfo.city, customerInfo.state, tinOptions.quantity])
 
   const createOrder = async () => {
     try {
@@ -434,10 +502,53 @@ const TinCheckout = () => {
       return
     }
 
+    if (!shippingOption || shippingCost === 0) {
+      toast.error('Please select a shipping method')
+      return
+    }
+
     setLoading(true)
     setCheckoutStep('processing')
 
     try {
+      // Create the shipment with UPS
+      const orderData = {
+        total_quantity: tinOptions.quantity,
+        selected_designs: [{
+          design_id: 'business-card-tin',
+          quantity: tinOptions.quantity,
+          candy_id: null
+        }]
+      }
+
+      const shippingCustomerInfo = {
+        name: customerInfo.name,
+        address: customerInfo.address,
+        city: customerInfo.city,
+        state: customerInfo.state,
+        zipCode: customerInfo.zipCode,
+        phone: customerInfo.phone || '5551234567'
+      }
+
+      // Create shipment
+      const shipmentResponse = await authService.authenticatedRequest('/api/tin-skinz/shipping/create-shipment', {
+        method: 'POST',
+        body: JSON.stringify({
+          order_data: orderData,
+          customer_info: shippingCustomerInfo,
+          service_code: shippingOption
+        })
+      })
+
+      if (shipmentResponse.ok) {
+        const shipmentData = await shipmentResponse.json()
+        if (shipmentData.success && shipmentData.shipment_info?.tracking_number) {
+          // Store tracking number for the order
+          console.log('Shipment created with tracking number:', shipmentData.shipment_info.tracking_number)
+          toast.success(`Order shipped! Tracking: ${shipmentData.shipment_info.tracking_number}`)
+        }
+      }
+
       await saveCustomerInfo()
       await new Promise(resolve => setTimeout(resolve, 2000))
 
@@ -888,32 +999,57 @@ const TinCheckout = () => {
                     <p className="text-gray-600 mb-2">Shipping options will appear here</p>
                     <p className="text-sm text-gray-500">Please enter your shipping address above to see available shipping methods and costs</p>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {shippingOptions.map((option) => {
-                      const Icon = option.icon
-                      return (
-                        <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
-                          <input
-                            type="radio"
-                            name="shipping"
-                            value={option.value}
-                            checked={shippingOption === option.value}
-                            onChange={(e) => setShippingOption(e.target.value)}
-                            className="mr-3 text-green-600 focus:ring-green-500"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Icon className="w-4 h-4 text-green-600" />
-                              <p className="font-medium text-gray-900">{option.label}</p>
-                            </div>
-                            <p className={`text-sm ${option.price > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                              {option.price > 0 ? `+$${option.price}` : 'Free shipping'}
-                            </p>
+                ) : shippingLoading ? (
+                  <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-3"></div>
+                    <p className="text-gray-600">Getting shipping rates...</p>
+                  </div>
+                ) : shippingError ? (
+                  <div className="text-center p-6 bg-red-50 rounded-lg border border-red-200">
+                    <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
+                    <p className="text-red-600 mb-2">Unable to get shipping rates</p>
+                    <p className="text-sm text-red-500">{shippingError}</p>
+                    <button
+                      onClick={getShippingRates}
+                      className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                ) : shippingOptions.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {shippingOptions.map((option) => (
+                      <label key={option.service_code} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2">
+                        <input
+                          type="radio"
+                          name="shipping"
+                          value={option.service_code}
+                          checked={shippingOption === option.service_code}
+                          onChange={(e) => setShippingOption(e.target.value)}
+                          className="mr-3 text-green-600 focus:ring-green-500"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Truck className="w-4 h-4 text-green-600" />
+                            <p className="font-medium text-gray-900">{option.service_name}</p>
                           </div>
-                        </label>
-                      )
-                    })}
+                          <p className="text-sm text-green-600 font-medium">
+                            ${option.total_cost}
+                          </p>
+                          {option.estimated_delivery && (
+                            <p className="text-xs text-gray-500">
+                              Est. delivery: {option.estimated_delivery}
+                            </p>
+                          )}
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <Truck className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-2">No shipping options available</p>
+                    <p className="text-sm text-gray-500">Please check your address and try again</p>
                   </div>
                 )}
               </div>
@@ -996,7 +1132,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingOptions.find(q => q.value === shippingOption)?.price || 'Calculating...'}
+                      {shippingCost > 0 ? `$${shippingCost.toFixed(2)}` : 'Calculating...'}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -1122,7 +1258,7 @@ const TinCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">
-                      {shippingOptions.find(q => q.value === shippingOption)?.price || 'Calculating...'}
+                      {shippingCost > 0 ? `$${shippingCost.toFixed(2)}` : 'Calculating...'}
                     </span>
                   </div>
                   

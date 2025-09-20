@@ -7,7 +7,8 @@ import {
   Star, Edit, Trash2, RefreshCw, Archive,
   Filter, Search, Clock, CheckCircle, XCircle,
   AlertCircle, Truck, Crown, Layers, Layout,
-  PaintBucket, Ruler, Tag, MapPin, ShoppingCart
+  PaintBucket, Ruler, Tag, MapPin, ShoppingCart,
+  Navigation, ExternalLink, MapPin as MapPinIcon
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import authService from '../services/auth'
@@ -35,6 +36,8 @@ const Dashboard = () => {
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [showOrderModal, setShowOrderModal] = useState(false)
+  const [trackingInfo, setTrackingInfo] = useState(null)
+  const [trackingLoading, setTrackingLoading] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [profileModalType, setProfileModalType] = useState('')
   const [profileForm, setProfileForm] = useState({
@@ -431,11 +434,40 @@ const Dashboard = () => {
   const viewOrderDetails = (order) => {
     setSelectedOrder(order)
     setShowOrderModal(true)
+    // Load tracking info if order has tracking number
+    if (order.tracking_number) {
+      loadTrackingInfo(order.tracking_number)
+    }
+  }
+
+  const loadTrackingInfo = async (trackingNumber) => {
+    try {
+      setTrackingLoading(true)
+      const response = await authService.authenticatedRequest('/api/tin-skinz/shipping/track', {
+        method: 'POST',
+        body: JSON.stringify({ tracking_number: trackingNumber })
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setTrackingInfo(data)
+      } else {
+        console.error('Failed to load tracking info')
+        setTrackingInfo(null)
+      }
+    } catch (error) {
+      console.error('Error loading tracking info:', error)
+      setTrackingInfo(null)
+    } finally {
+      setTrackingLoading(false)
+    }
   }
 
   const closeOrderModal = () => {
     setSelectedOrder(null)
     setShowOrderModal(false)
+    setTrackingInfo(null)
+    setTrackingLoading(false)
   }
 
   const reorderItem = (order) => {
@@ -1108,6 +1140,12 @@ const Dashboard = () => {
                             <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
                               {order.status}
                             </span>
+                            {order.tracking_number && (
+                              <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                <Truck className="w-3 h-3" />
+                                Tracked
+                              </span>
+                            )}
                           </div>
                         </div>
                         
@@ -1558,6 +1596,80 @@ const Dashboard = () => {
                           <p className="font-medium">{selectedOrder.customer_info.address}</p>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Shipping & Tracking Information */}
+                {selectedOrder.tracking_number && (
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                      <Truck className="w-4 h-4 mr-2 text-blue-600" />
+                      Shipping & Tracking
+                    </h4>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-600">Tracking Number:</p>
+                          <p className="font-mono text-sm font-medium text-blue-600">
+                            {selectedOrder.tracking_number}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => window.open(`https://www.ups.com/track?tracknum=${selectedOrder.tracking_number}`, '_blank')}
+                          className="flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Track on UPS
+                        </button>
+                      </div>
+
+                      {trackingLoading ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                          Loading tracking information...
+                        </div>
+                      ) : trackingInfo?.success ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${
+                              trackingInfo.tracking_info?.status === 'Delivered' ? 'bg-green-500' :
+                              trackingInfo.tracking_info?.status === 'In Transit' ? 'bg-blue-500' :
+                              trackingInfo.tracking_info?.status === 'Out for Delivery' ? 'bg-yellow-500' :
+                              'bg-gray-400'
+                            }`}></div>
+                            <span className="font-medium text-gray-900">
+                              {trackingInfo.tracking_info?.status || 'Status Unknown'}
+                            </span>
+                          </div>
+                          
+                          {trackingInfo.tracking_info?.location && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <MapPinIcon className="w-3 h-3" />
+                              <span>{trackingInfo.tracking_info.location}</span>
+                            </div>
+                          )}
+                          
+                          {trackingInfo.tracking_info?.timestamp && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Clock className="w-3 h-3" />
+                              <span>{new Date(trackingInfo.tracking_info.timestamp).toLocaleString()}</span>
+                            </div>
+                          )}
+                          
+                          {trackingInfo.tracking_info?.delivery_date && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Calendar className="w-3 h-3" />
+                              <span>Expected delivery: {trackingInfo.tracking_info.delivery_date}</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : trackingInfo && !trackingInfo.success ? (
+                        <div className="text-sm text-red-600">
+                          Unable to load tracking information
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 )}
