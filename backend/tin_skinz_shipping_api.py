@@ -211,8 +211,8 @@ async def test_ups_integration():
             'zipCode': '02101'
         }
         
-        # Test UPS integration
-        result = await ups_shipping_service.get_multiple_service_rates(test_order_data, test_customer_info)
+        # Test UPS integration with single service first
+        result = await ups_shipping_service.get_single_service_rate(test_order_data, test_customer_info)
         
         if result['success']:
             logger.info(f"✅ UPS integration test successful: {len(result['shipping_options'])} options")
