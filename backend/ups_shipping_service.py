@@ -119,7 +119,7 @@ class UPSShippingService:
             rate_request = self._prepare_ups_rate_request(order_data, customer_info)
             
             # Make UPS API request
-            url = "https://onlinetools.ups.com/api/rating/v1/Rate"
+            url = "https://onlinetools.ups.com/api/rating/v2409/Shop"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
@@ -1110,7 +1110,7 @@ class UPSShippingService:
             rate_request = self._prepare_ups_rate_request(order_data, customer_info)
             
             # Make UPS API request
-            url = "https://onlinetools.ups.com/api/rating/v1/Rate"
+            url = "https://onlinetools.ups.com/api/rating/v2409/Shop"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
@@ -1163,7 +1163,7 @@ class UPSShippingService:
             rate_request = self._prepare_multi_service_request(order_data, customer_info)
             
             # Make UPS API request
-            url = "https://onlinetools.ups.com/api/rating/v1/Rate"
+            url = "https://onlinetools.ups.com/api/rating/v2409/Shop"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
