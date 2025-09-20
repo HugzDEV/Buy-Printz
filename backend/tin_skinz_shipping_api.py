@@ -220,6 +220,53 @@ async def create_shipment(request: Request):
             "timestamp": datetime.now().isoformat()
         }
 
+@router.post("/void-shipment")
+async def void_shipment(request: Request):
+    """Void/cancel a UPS shipment"""
+    try:
+        data = await request.json()
+        
+        # Extract required data
+        shipment_id = data.get('shipment_id')
+        tracking_numbers = data.get('tracking_numbers', [])
+        
+        if not shipment_id:
+            return {
+                "success": False,
+                "message": "Shipment ID is required",
+                "errors": ["Missing shipment_id"]
+            }
+        
+        logger.info(f"❌ Voiding shipment: {shipment_id}")
+        
+        # Void the shipment
+        result = await ups_shipping_service.void_shipment(shipment_id, tracking_numbers)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Shipment voided successfully",
+                "void_info": result.get('void_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to void shipment",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error voiding shipment: {e}")
+        return {
+            "success": False,
+            "message": "Error voiding shipment",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
 @router.post("/track")
 async def track_shipment(request: Request):
     """Track a UPS shipment"""

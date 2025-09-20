@@ -775,6 +775,137 @@ class UPSShippingService:
                 'error': str(e)
             }
 
+    async def void_shipment(self, shipment_id: str, tracking_numbers: list = None) -> Dict[str, Any]:
+        """Void/cancel a UPS shipment"""
+        try:
+            logger.info(f"❌ Voiding UPS shipment: {shipment_id}")
+            
+            # Get access token
+            access_token = await self.get_access_token()
+            
+            # Prepare UPS void request URL
+            url = f"https://onlinetools.ups.com/api/shipments/v2409/void/cancel/{shipment_id}"
+            
+            headers = {
+                'transId': f'tin-skinz-void-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                'transactionSrc': 'testing',
+                'Authorization': f'Bearer {access_token}'
+            }
+            
+            # Add tracking numbers as query parameters if provided
+            params = {}
+            if tracking_numbers:
+                if len(tracking_numbers) == 1:
+                    params['trackingnumber'] = tracking_numbers[0]
+                else:
+                    # Multiple tracking numbers as comma-separated string
+                    params['trackingnumber'] = ','.join(tracking_numbers)
+            
+            logger.info(f"❌ Making UPS void request to: {url}")
+            logger.info(f"📋 Request headers: {headers}")
+            logger.info(f"📋 Request params: {params}")
+            
+            response = requests.delete(url, headers=headers, params=params)
+            
+            if response.status_code != 200:
+                logger.error(f"❌ UPS void API error: {response.status_code} - {response.text}")
+            
+            response.raise_for_status()
+            
+            void_response = response.json()
+            
+            # Parse UPS void response
+            void_info = self._parse_ups_void_response(void_response)
+            
+            return {
+                'success': True,
+                'void_info': void_info,
+                'carrier': 'UPS',
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error voiding UPS shipment: {e}")
+            return {
+                'success': False,
+                'void_info': None,
+                'carrier': 'UPS',
+                'errors': [str(e)],
+                'timestamp': datetime.now().isoformat()
+            }
+
+    def _parse_ups_void_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """Parse UPS void shipment response into our format"""
+        try:
+            logger.info(f"❌ Parsing UPS void response: {response}")
+            
+            # Extract void information from UPS response
+            if 'VoidShipmentResponse' in response:
+                void_response = response['VoidShipmentResponse']
+                
+                # Get response status
+                response_status = void_response.get('Response', {}).get('ResponseStatus', {})
+                status_code = response_status.get('Code', '')
+                status_description = response_status.get('Description', '')
+                
+                # Get summary result
+                summary_result = void_response.get('SummaryResult', {})
+                summary_status = summary_result.get('Status', {})
+                summary_code = summary_status.get('Code', '')
+                summary_description = summary_status.get('Description', '')
+                
+                # Get package level results
+                package_results = void_response.get('PackageLevelResults', [])
+                package_statuses = []
+                
+                for package in package_results:
+                    if isinstance(package, dict):
+                        tracking_number = package.get('TrackingNumber', '')
+                        package_status = package.get('Status', {})
+                        package_code = package_status.get('Code', '') if isinstance(package_status, dict) else ''
+                        package_description = package_status.get('Description', '') if isinstance(package_status, dict) else ''
+                        
+                        package_statuses.append({
+                            'tracking_number': tracking_number,
+                            'status_code': package_code,
+                            'status_description': package_description
+                        })
+                
+                return {
+                    'shipment_id': response.get('shipment_id', ''),
+                    'response_code': status_code,
+                    'response_description': status_description,
+                    'summary_code': summary_code,
+                    'summary_description': summary_description,
+                    'package_statuses': package_statuses,
+                    'success': status_code.lower() == 's' or summary_code.lower() == 's'
+                }
+            else:
+                return {
+                    'shipment_id': '',
+                    'response_code': '',
+                    'response_description': 'Invalid response format',
+                    'summary_code': '',
+                    'summary_description': '',
+                    'package_statuses': [],
+                    'success': False,
+                    'error': 'Invalid response format - no VoidShipmentResponse'
+                }
+                
+        except Exception as e:
+            logger.error(f"❌ Error parsing UPS void response: {e}")
+            logger.error(f"❌ Raw response: {response}")
+            return {
+                'shipment_id': '',
+                'response_code': '',
+                'response_description': str(e),
+                'summary_code': '',
+                'summary_description': '',
+                'package_statuses': [],
+                'success': False,
+                'error': str(e)
+            }
+
     async def get_single_service_rate(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
         """Get rate for a single UPS service (Ground)"""
         try:
