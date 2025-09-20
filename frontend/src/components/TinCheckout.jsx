@@ -37,7 +37,7 @@ import {
   Box
 } from 'lucide-react'
 import authService from '../services/auth'
-import PrintPreviewModal from './PrintPreviewModal'
+import InlinePrintPreview from './InlinePrintPreview'
 import { GlassCard } from './ui'
 import { CANDY_OPTIONS, calculateCandyPricing, formatCurrency } from '../utils/tinSkinzPricing'
 
@@ -763,19 +763,24 @@ const TinCheckout = () => {
             data-section="printPreview"
           >
             <div className="space-y-4">
-              <div className="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
-                <Eye className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">Review Your Tin Design</h3>
-                <p className="text-blue-700 mb-4">
-                  Before proceeding, please review your business card tin design to ensure it's exactly what you want printed.
-                </p>
-                <button
-                  onClick={() => setShowPreviewModal(true)}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
-                >
-                  <Eye className="w-5 h-5" />
-                  Preview Tin Design
-                </button>
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="mb-3 text-center">
+                  <Eye className="w-12 h-12 text-blue-600 mx-auto mb-2" />
+                  <h3 className="text-lg font-semibold text-blue-900">Review Your Tin Design</h3>
+                  <p className="text-blue-700">Confirm your design before proceeding.</p>
+                </div>
+                <InlinePrintPreview
+                  orderDetails={orderData}
+                  canvasData={orderData?.canvas_data}
+                  productType={orderData?.product_type === 'business_card_tin' ? 'tin' : orderData?.product_type || 'tin'}
+                  dimensions={orderData?.dimensions}
+                  surfaceElements={orderData?.surface_elements || {}}
+                  currentSurface={orderData?.current_surface || 'front'}
+                  onApprove={() => {
+                    setPreviewApproved(true)
+                    continueToNextSection('printPreview')
+                  }}
+                />
               </div>
               
               {previewApproved && (
@@ -1632,18 +1637,7 @@ const TinCheckout = () => {
         </div>
       </div>
 
-      {/* Print Preview Modal */}
-      <PrintPreviewModal
-        isOpen={showPreviewModal}
-        onClose={handlePreviewCancel}
-        onApprove={handlePreviewApprove}
-        canvasData={orderData?.canvas_data}
-        orderDetails={orderData}
-        dimensions={orderData?.dimensions}
-        productType={orderData?.product_type === 'business_card_tin' ? 'tin' : orderData?.product_type || 'tin'}
-        surfaceElements={orderData?.surface_elements || {}}
-        currentSurface={orderData?.current_surface || 'front'}
-      />
+      {/* Modal removed in favor of inline preview */}
     </div>
   )
 }

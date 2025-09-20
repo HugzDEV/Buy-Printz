@@ -174,7 +174,7 @@ const SurfaceThumbnailViewer = ({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 place-items-stretch">
       {surfaces.map((surface) => {
         const thumbnail = surfaceThumbnails[surface.key]
         const isSelected = selectedSurface === surface.key
@@ -183,7 +183,7 @@ const SurfaceThumbnailViewer = ({
           <div
             key={surface.key}
             className={`
-              cursor-pointer p-3 rounded-lg border transition-all duration-200
+              cursor-pointer p-3 rounded-lg border transition-all duration-200 h-full
               ${isSelected 
                 ? 'border-blue-500 bg-blue-50 shadow-md' 
                 : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
@@ -191,19 +191,33 @@ const SurfaceThumbnailViewer = ({
             `}
             onClick={() => onSurfaceSelect?.(surface.key)}
           >
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               {/* Thumbnail Image */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 relative">
                 {thumbnail ? (
-                  <img
-                    src={thumbnail.dataUrl}
-                    alt={surface.name}
-                    className={`w-16 h-10 rounded border bg-gray-50 ${
-                      productType === 'tent' 
-                        ? 'object-cover object-center' 
-                        : 'object-contain'
-                    }`}
-                  />
+                  <>
+                    <img
+                      src={thumbnail.dataUrl}
+                      alt={surface.name}
+                      className={`w-16 h-10 rounded border bg-gray-50 ${
+                        productType === 'tent' 
+                          ? 'object-cover object-center' 
+                          : 'object-contain'
+                      }`}
+                    />
+                    <div
+                      className="pointer-events-none absolute inset-0 rounded"
+                      style={{
+                        backgroundImage: "url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')",
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        backgroundSize: 'cover',
+                        opacity: 0.3,
+                        mixBlendMode: 'multiply',
+                        zIndex: 9999
+                      }}
+                    />
+                  </>
                 ) : (
                   <div className="w-16 h-10 bg-gray-200 rounded border flex items-center justify-center">
                     <span className="text-xs text-gray-400">...</span>

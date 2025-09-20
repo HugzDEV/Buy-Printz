@@ -39,7 +39,7 @@ import {
 } from 'lucide-react'
 import authService from '../services/auth'
 import shippingService from '../services/shippingService'
-import PrintPreviewModal from './PrintPreviewModal'
+import InlinePrintPreview from './InlinePrintPreview'
 import { GlassCard } from './ui'
 
 // Collapsible Section Component
@@ -581,19 +581,24 @@ const TentCheckout = () => {
               onToggle={() => toggleSection('tentDetails')}
             >
               <div className="space-y-4">
-                <div className="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
-                  <Eye className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">Review Your Tent Design</h3>
-                  <p className="text-blue-700 mb-4">
-                    Before proceeding, please review your tent design to ensure it's exactly what you want printed.
-                  </p>
-                  <button
-                    onClick={handlePreviewDesign}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
-                  >
-                    <Eye className="w-5 h-5" />
-                    Preview Tent Design
-                  </button>
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="mb-3 text-center">
+                    <Eye className="w-12 h-12 text-blue-600 mx-auto mb-2" />
+                    <h3 className="text-lg font-semibold text-blue-900">Review Your Tent Design</h3>
+                    <p className="text-blue-700">Confirm your design before proceeding.</p>
+                  </div>
+                  <InlinePrintPreview
+                    orderDetails={orderData}
+                    canvasData={orderData?.canvas_data}
+                    productType={orderData?.product_type === 'tradeshow_tent' ? 'tent' : orderData?.product_type || 'tent'}
+                    dimensions={orderData?.dimensions}
+                    surfaceElements={orderData?.surface_elements || {}}
+                    currentSurface={orderData?.current_surface || 'canopy_front'}
+                    onApprove={() => {
+                      setPreviewApproved(true)
+                      // Keep tent specific flow simple: just mark approved
+                    }}
+                  />
                 </div>
                 
                 {previewApproved && (
@@ -1164,22 +1169,7 @@ const TentCheckout = () => {
         </div>
       </div>
 
-      {/* Print Preview Modal */}
-      <PrintPreviewModal
-        isOpen={showPreviewModal}
-        onClose={handlePreviewCancel}
-        onApprove={handlePreviewApprove}
-        canvasData={orderData?.canvas_data}
-        orderDetails={{
-          ...orderData,
-          // canvas_image should already be the correct data URL from BannerEditor
-          // Don't override it with canvas_data object
-        }}
-        dimensions={orderData?.dimensions}
-        productType={orderData?.product_type === 'tradeshow_tent' ? 'tent' : orderData?.product_type || 'tent'}
-        surfaceElements={orderData?.surface_elements || {}}
-        currentSurface={orderData?.current_surface || 'canopy_front'}
-      />
+      {/* Modal removed in favor of inline preview */}
     </div>
   )
 }

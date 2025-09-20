@@ -3284,6 +3284,56 @@ const BannerEditorNew = () => {
       }
     }
 
+    // Helper to compress data URL for storage-friendly previews
+    const compressDataUrl = (dataUrl, { maxWidth = 1200, maxHeight = 1200, quality = 0.7 } = {}) => {
+      return new Promise((resolve) => {
+        const img = new Image()
+        img.onload = () => {
+          const scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1)
+          const targetWidth = Math.max(1, Math.floor(img.width * scale))
+          const targetHeight = Math.max(1, Math.floor(img.height * scale))
+          const canvas = document.createElement('canvas')
+          canvas.width = targetWidth
+          canvas.height = targetHeight
+          const ctx = canvas.getContext('2d')
+          // Ensure transparent areas render over white instead of black when saving JPEG
+          ctx.clearRect(0, 0, targetWidth, targetHeight)
+          ctx.fillStyle = '#ffffff'
+          ctx.fillRect(0, 0, targetWidth, targetHeight)
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
+          try {
+            const out = canvas.toDataURL('image/jpeg', quality)
+            resolve(out)
+          } catch (e) {
+            resolve(dataUrl)
+          }
+        }
+        img.onerror = () => resolve(dataUrl)
+        img.src = dataUrl
+      })
+    }
+
+    // Capture all surfaces (if applicable) and prepare compressed copies for storage
+    let capturedAllSurfaceImages = undefined
+    let compressedSurfaceImages = undefined
+    try {
+      capturedAllSurfaceImages = await captureAllSurfaceImages()
+      const entries = Object.entries(capturedAllSurfaceImages)
+      const compressedEntries = []
+      for (const [key, url] of entries) {
+        if (!url) continue
+        // Compress to storage-friendly size/quality
+        // JPEG is fine for preview; production PDF uses fresh export when downloading
+        // Use slightly higher quality for tins (small art) and tents (details)
+        const q = productType === 'tin' ? 0.8 : productType === 'tent' ? 0.75 : 0.7
+        const compressed = await compressDataUrl(url, { maxWidth: 1400, maxHeight: 1400, quality: q })
+        compressedEntries.push([key, compressed])
+      }
+      compressedSurfaceImages = Object.fromEntries(compressedEntries)
+    } catch (e) {
+      console.warn('Surface image capture/compress failed; previews may be limited:', e)
+    }
+
     // Navigate to checkout with design data
     const orderData = {
       // Canvas data (required by backend)
@@ -3306,7 +3356,7 @@ const BannerEditorNew = () => {
         surface_images: surfaceImages // Include auto-captured surface images for preview modal
       },
       canvas_image: generateCanvasImage(),
-      surface_images: await captureAllSurfaceImages(), // QUALITY CONTROL: Ensure ALL surfaces are captured
+      surface_images: capturedAllSurfaceImages || await captureAllSurfaceImages(), // QUALITY CONTROL: Ensure ALL surfaces are captured
       surface_elements: surfaceElements, // Include surface elements for restoration
       
       // Marketplace templates used in the design
@@ -3374,38 +3424,65 @@ const BannerEditorNew = () => {
       console.log('🎨 Using tent specs from ref instead of state:', finalTentSpecs)
     }
     
-    // Store in sessionStorage for checkout (temporary, will be replaced by Supabase order)
-    // Create minimal restoration data without large image objects
+    // Store in sessionStorage for checkout (temporary). Keep it lightweight to avoid quota errors.
+    // Sanitize marketplace templates to avoid large payloads in storage
+    const sanitizedMarketplaceTemplates = (orderData.marketplace_templates || []).map(t => ({
+      id: t.id,
+      name: t.name || t.title || null,
+      title: t.title || t.name || null,
+      price: typeof t.price === 'number' ? t.price : Number(t.price) || 0,
+      thumbnail: t.thumbnail || t.previewUrl || t.image || t.thumbnail_url || null
+    }))
+
     const orderDataForStorage = {
-      ...orderData,
-      canvas_image: null, // Canvas image is in Supabase, not needed in sessionStorage
-      // Keep surface_images for print preview modal - these are essential for quality control
-      surface_images: orderData.surface_images, // CRITICAL: Keep for print preview modal
-      // Ensure tent_specs is properly included
+      // Core order info
+      product_type: orderData.product_type,
+      quantity: orderData.quantity,
+      dimensions: orderData.dimensions,
+      banner_type: orderData.banner_type,
+      banner_material: orderData.banner_material,
+      banner_finish: orderData.banner_finish,
+      banner_size: orderData.banner_size,
+      banner_category: orderData.banner_category,
+      background_color: orderData.background_color,
+      design_option: orderData.design_option,
+      tent_design_option: orderData.tent_design_option,
+      tin_surface_coverage: orderData.tin_surface_coverage,
+      current_surface: currentSurface,
+      marketplace_templates: sanitizedMarketplaceTemplates,
+
+      // Specs
       tent_specs: finalTentSpecs,
-      // Clean surface_elements to remove image objects but preserve structure
+
+      // Sanitize surface elements (remove image objects)
       surface_elements: Object.keys(surfaceElements).reduce((acc, surfaceKey) => {
         acc[surfaceKey] = (surfaceElements[surfaceKey] || []).map(element => {
           if (element.type === 'image') {
             return {
               ...element,
-              image: null, // Remove the actual image object
-              imageDataUrl: element.imageDataUrl || (element.image?.src || null) // Keep data URL for restoration
+              image: null,
+              imageDataUrl: element.imageDataUrl || (element.image?.src || null)
             }
           }
           return element
         })
         return acc
       }, {}),
+
+      // Include compressed surface images for previews in checkout (omit for banners to save space)
+      surface_images: productType === 'banner' ? undefined : compressedSurfaceImages,
+
+      // Minimal canvas data: keep konva stage image and essentials; exclude large surface_images
       canvas_data: {
-        ...orderData.canvas_data,
-        // Remove image objects, keep only essential data for restoration
-        elements: orderData.canvas_data.elements.map(element => {
+        canvasSize: orderData.canvas_data?.canvasSize,
+        backgroundColor: orderData.canvas_data?.backgroundColor,
+        konvaStageImage: orderData.canvas_data?.konvaStageImage,
+        elements: orderData.canvas_data?.elements.map(element => {
           if (element.type === 'image') {
             return {
               ...element,
-              image: null, // Remove the actual image object
-              imageDataUrl: element.imageDataUrl || (element.image?.src || null) // Keep data URL for restoration
+              image: null,
+              imageDataUrl: element.imageDataUrl || (element.image?.src || null)
             }
           }
           return element
@@ -3418,7 +3495,35 @@ const BannerEditorNew = () => {
     console.log('🎨 Current tentSpecs state when saving:', tentSpecs)
     console.log('🎨 finalTentSpecs used in order:', finalTentSpecs)
     console.log('🎨 Current tentDesignOption when saving:', tentDesignOption)
-    sessionStorage.setItem('orderData', JSON.stringify(orderDataForStorage))
+    // Attempt write; if it fails, further reduce payload and retry
+    try {
+      sessionStorage.setItem('orderData', JSON.stringify(orderDataForStorage))
+    } catch (e) {
+      console.warn('sessionStorage quota exceeded, reducing payload...', e)
+      // Drop optional fields to fit quota
+      orderDataForStorage.surface_elements = undefined
+      if (orderDataForStorage.canvas_data?.elements) {
+        orderDataForStorage.canvas_data.elements = []
+      }
+      try {
+        sessionStorage.setItem('orderData', JSON.stringify(orderDataForStorage))
+      } catch (err) {
+        console.error('Still over quota after reduction; storing minimal payload.', err)
+        const minimalPayload = {
+          product_type: orderDataForStorage.product_type,
+          quantity: orderDataForStorage.quantity,
+          dimensions: orderDataForStorage.dimensions,
+          current_surface: orderDataForStorage.current_surface,
+          marketplace_templates: orderDataForStorage.marketplace_templates,
+          canvas_data: {
+            canvasSize: orderDataForStorage.canvas_data?.canvasSize,
+            backgroundColor: orderDataForStorage.canvas_data?.backgroundColor,
+            konvaStageImage: orderDataForStorage.canvas_data?.konvaStageImage
+          }
+        }
+        sessionStorage.setItem('orderData', JSON.stringify(minimalPayload))
+      }
+    }
     
     // Route to appropriate checkout based on product type
     if (orderData.product_type === 'business_card_tin') {
