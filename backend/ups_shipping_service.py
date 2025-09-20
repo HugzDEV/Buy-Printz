@@ -34,8 +34,8 @@ class UPSShippingService:
             if self.access_token and self.token_expires and datetime.now() < self.token_expires:
                 return self.access_token
                 
-            # Use CIE endpoint for testing
-            url = "https://wwwcie.ups.com/security/v1/oauth/token"
+            # Use production endpoint
+            url = "https://onlinetools.ups.com/security/v1/oauth/token"
             
             # Use Basic Authentication with username/password as per UPS OAuth documentation
             headers = {
@@ -47,10 +47,10 @@ class UPSShippingService:
             }
             
             logger.info(f"🔐 Making OAuth token request to: {url}")
-            logger.info(f"👤 Using username: {self.username}")
+            logger.info(f"👤 Using client_id: {self.client_id}")
             logger.info(f"📋 Request data: {data}")
             
-            response = requests.post(url, headers=headers, data=data, auth=(self.username, self.password))
+            response = requests.post(url, headers=headers, data=data, auth=(self.client_id, self.client_secret))
             
             if response.status_code != 200:
                 logger.error(f"❌ OAuth token request failed: {response.status_code} - {response.text}")
@@ -91,7 +91,7 @@ class UPSShippingService:
             rate_request = self._prepare_ups_rate_request(order_data, customer_info)
             
             # Make UPS API request
-            url = "https://wwwcie.ups.com/api/rating/v1/Rate"
+            url = "https://onlinetools.ups.com/api/rating/v1/Rate"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
@@ -353,7 +353,7 @@ class UPSShippingService:
             rate_request = self._prepare_ups_rate_request(order_data, customer_info)
             
             # Make UPS API request
-            url = "https://wwwcie.ups.com/api/rating/v1/Rate"
+            url = "https://onlinetools.ups.com/api/rating/v1/Rate"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
@@ -406,7 +406,7 @@ class UPSShippingService:
             rate_request = self._prepare_multi_service_request(order_data, customer_info)
             
             # Make UPS API request
-            url = "https://wwwcie.ups.com/api/rating/v1/Rate"
+            url = "https://onlinetools.ups.com/api/rating/v1/Rate"
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
