@@ -180,7 +180,7 @@ class UPSShippingService:
                 "Shipment": {
                     "Shipper": {
                         "Name": "BuyPrintz",
-                        "ShipperNumber": self.account_number,
+                        "ShipperNumber": self.shipper_number,
                         "Address": {
                             "AddressLine": ["123 Business St"],
                             "City": "Boston",
