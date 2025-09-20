@@ -16,9 +16,10 @@ logger = logging.getLogger(__name__)
 
 class UPSShippingService:
     def __init__(self):
-        # Use CIE (Customer Integration Environment) for testing
-        # Change to "https://onlinetools.ups.com/api" for production
-        self.base_url = os.getenv('UPS_BASE_URL', 'https://cie-api.ups.com/api')
+        # Use production URL by default, CIE for testing if specified
+        # CIE URL: https://cie-api.ups.com/api (if available)
+        # Production URL: https://onlinetools.ups.com/api
+        self.base_url = os.getenv('UPS_BASE_URL', 'https://onlinetools.ups.com/api')
         self.client_id = os.getenv('UPS_CLIENT_ID')
         self.client_secret = os.getenv('UPS_CLIENT_SECRET')
         self.shipper_number = os.getenv('UPS_SHIPPER_NUMBER')
