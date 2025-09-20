@@ -172,6 +172,54 @@ async def handle_tracking_update(webhook_data: Dict[str, Any]):
     except Exception as e:
         logger.error(f"❌ Error handling tracking update: {e}")
 
+@router.post("/create-shipment")
+async def create_shipment(request: Request):
+    """Create a UPS shipment and get tracking number"""
+    try:
+        data = await request.json()
+        
+        # Extract required data
+        order_data = data.get('order_data', {})
+        customer_info = data.get('customer_info', {})
+        service_code = data.get('service_code', '03')  # Default to Ground
+        
+        if not order_data or not customer_info:
+            return {
+                "success": False,
+                "message": "Order data and customer info are required",
+                "errors": ["Missing order_data or customer_info"]
+            }
+        
+        logger.info(f"📦 Creating shipment for {order_data.get('total_quantity', 0)} tins...")
+        
+        # Create the shipment
+        result = await ups_shipping_service.create_shipment(order_data, customer_info, service_code)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Shipment created successfully",
+                "shipment_info": result.get('shipment_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to create shipment",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error creating shipment: {e}")
+        return {
+            "success": False,
+            "message": "Error creating shipment",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
 @router.post("/track")
 async def track_shipment(request: Request):
     """Track a UPS shipment"""

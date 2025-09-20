@@ -506,6 +506,217 @@ class UPSShippingService:
                 'error': str(e)
             }
 
+    async def create_shipment(self, order_data: Dict[str, Any], customer_info: Dict[str, Any], service_code: str = "03") -> Dict[str, Any]:
+        """Create a UPS shipment and get tracking number"""
+        try:
+            logger.info(f"📦 Creating UPS shipment for {order_data.get('total_quantity', 0)} tins...")
+            
+            # Get access token
+            access_token = await self.get_access_token()
+            
+            # Calculate package dimensions and weight
+            total_quantity = order_data.get('total_quantity', 1)
+            package_length, package_width, package_height, total_weight = self._calculate_package_details(order_data)
+            
+            # Prepare UPS shipment request
+            shipment_request = {
+                "ShipmentRequest": {
+                    "Request": {
+                        "SubVersion": "1801",
+                        "RequestOption": "nonvalidate",
+                        "TransactionReference": {
+                            "CustomerContext": f"Tin Skinz Order {total_quantity} tins"
+                        }
+                    },
+                    "Shipment": {
+                        "Description": f"Tin Skinz Order - {total_quantity} tins",
+                        "Shipper": {
+                            "Name": "BuyPrintz",
+                            "AttentionName": "BuyPrintz Shipping",
+                            "Phone": {
+                                "Number": "5551234567"
+                            },
+                            "ShipperNumber": self.shipper_number,
+                            "Address": {
+                                "AddressLine": ["123 Business St"],
+                                "City": "Boston",
+                                "StateProvinceCode": "MA",
+                                "PostalCode": "02101",
+                                "CountryCode": "US"
+                            }
+                        },
+                        "ShipTo": {
+                            "Name": customer_info.get('name', 'Customer'),
+                            "AttentionName": customer_info.get('name', 'Customer'),
+                            "Phone": {
+                                "Number": customer_info.get('phone', '5551234567')
+                            },
+                            "Address": {
+                                "AddressLine": [customer_info.get('address', '')],
+                                "City": customer_info.get('city', ''),
+                                "StateProvinceCode": customer_info.get('state', ''),
+                                "PostalCode": customer_info.get('zipCode', ''),
+                                "CountryCode": "US"
+                            },
+                            "Residential": "true"
+                        },
+                        "ShipFrom": {
+                            "Name": "BuyPrintz",
+                            "AttentionName": "BuyPrintz Shipping",
+                            "Phone": {
+                                "Number": "5551234567"
+                            },
+                            "Address": {
+                                "AddressLine": ["123 Business St"],
+                                "City": "Boston",
+                                "StateProvinceCode": "MA",
+                                "PostalCode": "02101",
+                                "CountryCode": "US"
+                            }
+                        },
+                        "PaymentInformation": {
+                            "ShipmentCharge": {
+                                "Type": "01",
+                                "BillShipper": {
+                                    "AccountNumber": self.shipper_number
+                                }
+                            }
+                        },
+                        "Service": {
+                            "Code": service_code,
+                            "Description": "Ground"
+                        },
+                        "Package": {
+                            "Description": f"Tin Skinz Order - {total_quantity} tins",
+                            "Packaging": {
+                                "Code": "02",
+                                "Description": "Package"
+                            },
+                            "Dimensions": {
+                                "UnitOfMeasurement": {
+                                    "Code": "IN",
+                                    "Description": "Inches"
+                                },
+                                "Length": str(package_length),
+                                "Width": str(package_width),
+                                "Height": str(package_height)
+                            },
+                            "PackageWeight": {
+                                "UnitOfMeasurement": {
+                                    "Code": "LBS",
+                                    "Description": "Pounds"
+                                },
+                                "Weight": str(total_weight)
+                            }
+                        }
+                    },
+                    "LabelSpecification": {
+                        "LabelImageFormat": {
+                            "Code": "GIF",
+                            "Description": "GIF"
+                        },
+                        "HTTPUserAgent": "BuyPrintz-TinSkinz/1.0"
+                    }
+                }
+            }
+            
+            # Make UPS shipment request
+            url = f"https://onlinetools.ups.com/api/shipments/v2409/ship"
+            
+            headers = {
+                'Content-Type': 'application/json',
+                'transId': f'tin-skinz-ship-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                'transactionSrc': 'testing',
+                'Authorization': f'Bearer {access_token}'
+            }
+            
+            logger.info(f"📦 Making UPS shipment request to: {url}")
+            logger.info(f"📋 Request headers: {headers}")
+            logger.info(f"📋 Request body: {json.dumps(shipment_request, indent=2)}")
+            
+            response = requests.post(url, headers=headers, json=shipment_request)
+            
+            if response.status_code != 200:
+                logger.error(f"❌ UPS shipment API error: {response.status_code} - {response.text}")
+            
+            response.raise_for_status()
+            
+            shipment_response = response.json()
+            
+            # Parse UPS shipment response
+            shipment_info = self._parse_ups_shipment_response(shipment_response)
+            
+            return {
+                'success': True,
+                'shipment_info': shipment_info,
+                'carrier': 'UPS',
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error creating UPS shipment: {e}")
+            return {
+                'success': False,
+                'shipment_info': None,
+                'carrier': 'UPS',
+                'errors': [str(e)],
+                'timestamp': datetime.now().isoformat()
+            }
+
+    def _parse_ups_shipment_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """Parse UPS shipment response into our format"""
+        try:
+            logger.info(f"📦 Parsing UPS shipment response: {response}")
+            
+            # Extract shipment information from UPS response
+            if 'ShipmentResponse' in response:
+                shipment_response = response['ShipmentResponse']
+                
+                # Get shipment results
+                shipment_results = shipment_response.get('ShipmentResults', {})
+                
+                # Get package results
+                package_results = shipment_results.get('PackageResults', {})
+                
+                # Get tracking number
+                tracking_number = package_results.get('TrackingNumber', '')
+                
+                # Get label information
+                label_results = package_results.get('LabelImage', {})
+                label_format = label_results.get('GraphicImage', '')
+                
+                # Get shipping cost
+                shipment_charges = shipment_results.get('ShipmentCharges', {})
+                total_charges = shipment_charges.get('TotalCharges', {})
+                shipping_cost = total_charges.get('MonetaryValue', '0.00')
+                
+                return {
+                    'tracking_number': tracking_number,
+                    'label_image': label_format,
+                    'shipping_cost': shipping_cost,
+                    'service_code': shipment_results.get('Service', {}).get('Code', ''),
+                    'service_description': shipment_results.get('Service', {}).get('Description', ''),
+                    'shipment_date': shipment_results.get('ShipmentDate', ''),
+                    'delivery_date': shipment_results.get('DeliveryDate', ''),
+                    'package_count': shipment_results.get('PackageCount', 1)
+                }
+            else:
+                return {
+                    'tracking_number': '',
+                    'label_image': '',
+                    'shipping_cost': '0.00',
+                    'error': 'Invalid response format'
+                }
+                
+        except Exception as e:
+            logger.error(f"❌ Error parsing UPS shipment response: {e}")
+            return {
+                'tracking_number': '',
+                'label_image': '',
+                'shipping_cost': '0.00',
+                'error': str(e)
+            }
+
     async def get_single_service_rate(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
         """Get rate for a single UPS service (Ground)"""
         try:
