@@ -152,7 +152,7 @@ const TinSkinzCheckout = () => {
         customer_info: addressToUse
       });
       
-      const response = await fetch('/api/tin-skinz/shipping/get-rates', {
+      const response = await fetch('https://api.buyprintz.com/api/tin-skinz/shipping/get-rates', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ const TinSkinzCheckout = () => {
         fraud_checks: fraudChecks
       };
 
-      const response = await fetch('/api/tin-skinz/create-order', {
+      const response = await fetch('https://api.buyprintz.com/api/tin-skinz/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
