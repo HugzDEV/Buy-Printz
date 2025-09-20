@@ -135,7 +135,9 @@ const TinSkinzCheckout = () => {
   // - Empty tins: 1.18oz (0.074 lbs) each
   // - Tins with candy: 3.11oz (0.194 lbs) each
   const getShippingRates = async () => {
-    if (!shippingInfo.zipCode) {
+    const addressToUse = shippingInfo.sameAsBilling ? billingInfo : shippingInfo;
+    
+    if (!addressToUse.zipCode) {
       setShippingError('Please enter your shipping address to get shipping rates');
       return;
     }
@@ -144,6 +146,12 @@ const TinSkinzCheckout = () => {
     setShippingError(null);
     
     try {
+      console.log('Getting shipping rates for:', {
+        selected_designs: orderData.selected_designs,
+        total_quantity: orderData.total_quantity,
+        customer_info: addressToUse
+      });
+      
       const response = await fetch('/api/tin-skinz/shipping/get-rates', {
         method: 'POST',
         headers: {
@@ -152,17 +160,19 @@ const TinSkinzCheckout = () => {
         body: JSON.stringify({
           selected_designs: orderData.selected_designs,
           total_quantity: orderData.total_quantity,
-          customer_info: shippingInfo
+          customer_info: addressToUse
         })
       });
       
       if (!response.ok) {
-        throw new Error('Failed to get shipping rates');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `HTTP ${response.status}: Failed to get shipping rates`);
       }
       
       const result = await response.json();
+      console.log('Shipping rates response:', result);
       
-      if (result.success && result.shipping_options.length > 0) {
+      if (result.success && result.shipping_options && result.shipping_options.length > 0) {
         setShippingOptions(result.shipping_options);
         // Auto-select the first (cheapest) option
         setSelectedShipping(result.shipping_options[0]);
@@ -171,7 +181,7 @@ const TinSkinzCheckout = () => {
       }
     } catch (error) {
       console.error('Error getting shipping rates:', error);
-      setShippingError('Unable to get shipping rates. Please try again.');
+      setShippingError(`Unable to get shipping rates: ${error.message}`);
     } finally {
       setShippingLoading(false);
     }
@@ -242,10 +252,11 @@ const TinSkinzCheckout = () => {
   
   // Get shipping rates when shipping address is complete
   useEffect(() => {
-    if (shippingInfo.zipCode && shippingInfo.address && shippingInfo.city && shippingInfo.state) {
+    const addressToUse = shippingInfo.sameAsBilling ? billingInfo : shippingInfo;
+    if (addressToUse.zipCode && addressToUse.address && addressToUse.city && addressToUse.state) {
       getShippingRates();
     }
-  }, [shippingInfo.zipCode, shippingInfo.address, shippingInfo.city, shippingInfo.state]);
+  }, [shippingInfo.zipCode, shippingInfo.address, shippingInfo.city, shippingInfo.state, shippingInfo.sameAsBilling, billingInfo.zipCode, billingInfo.address, billingInfo.city, billingInfo.state]);
   
   // Perform fraud checks when billing info changes
   useEffect(() => {
@@ -786,7 +797,10 @@ const TinSkinzCheckout = () => {
                             <span className="font-medium text-gray-900">{option.name}</span>
                             <span className="font-bold text-amber-600">{formatCurrency(option.cost)}</span>
                           </div>
-                          <p className="text-sm text-gray-600">Estimated delivery: {option.estimated_days} business days</p>
+                          <p className="text-sm text-gray-600">
+                            Estimated delivery: {option.estimated_days} business days
+                            {option.carrier && <span className="ml-2 text-xs text-gray-500">({option.carrier})</span>}
+                          </p>
                         </div>
                       </label>
                     ))}
