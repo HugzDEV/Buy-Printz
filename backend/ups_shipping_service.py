@@ -722,27 +722,37 @@ class UPSShippingService:
                 # Get shipment results
                 shipment_results = shipment_response.get('ShipmentResults', {})
                 
-                # Get package results
+                # Handle PackageResults - it might be a list or dict
                 package_results = shipment_results.get('PackageResults', {})
+                if isinstance(package_results, list) and len(package_results) > 0:
+                    package_results = package_results[0]
                 
                 # Get tracking number
-                tracking_number = package_results.get('TrackingNumber', '')
+                tracking_number = package_results.get('TrackingNumber', '') if isinstance(package_results, dict) else ''
                 
-                # Get label information
-                label_results = package_results.get('LabelImage', {})
-                label_format = label_results.get('GraphicImage', '')
+                # Get label information - it's in ShippingLabel.GraphicImage
+                shipping_label = package_results.get('ShippingLabel', {}) if isinstance(package_results, dict) else {}
+                label_format = shipping_label.get('GraphicImage', '') if isinstance(shipping_label, dict) else ''
                 
                 # Get shipping cost
                 shipment_charges = shipment_results.get('ShipmentCharges', {})
-                total_charges = shipment_charges.get('TotalCharges', {})
-                shipping_cost = total_charges.get('MonetaryValue', '0.00')
+                if isinstance(shipment_charges, dict):
+                    total_charges = shipment_charges.get('TotalCharges', {})
+                    shipping_cost = total_charges.get('MonetaryValue', '0.00') if isinstance(total_charges, dict) else '0.00'
+                else:
+                    shipping_cost = '0.00'
+                
+                # Get service information
+                service_info = shipment_results.get('Service', {})
+                service_code = service_info.get('Code', '') if isinstance(service_info, dict) else ''
+                service_description = service_info.get('Description', '') if isinstance(service_info, dict) else ''
                 
                 return {
                     'tracking_number': tracking_number,
                     'label_image': label_format,
                     'shipping_cost': shipping_cost,
-                    'service_code': shipment_results.get('Service', {}).get('Code', ''),
-                    'service_description': shipment_results.get('Service', {}).get('Description', ''),
+                    'service_code': service_code,
+                    'service_description': service_description,
                     'shipment_date': shipment_results.get('ShipmentDate', ''),
                     'delivery_date': shipment_results.get('DeliveryDate', ''),
                     'package_count': shipment_results.get('PackageCount', 1)
@@ -752,11 +762,12 @@ class UPSShippingService:
                     'tracking_number': '',
                     'label_image': '',
                     'shipping_cost': '0.00',
-                    'error': 'Invalid response format'
+                    'error': 'Invalid response format - no ShipmentResponse'
                 }
                 
         except Exception as e:
             logger.error(f"❌ Error parsing UPS shipment response: {e}")
+            logger.error(f"📦 Raw response: {response}")
             return {
                 'tracking_number': '',
                 'label_image': '',
