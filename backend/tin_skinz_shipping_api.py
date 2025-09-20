@@ -267,6 +267,53 @@ async def void_shipment(request: Request):
             "timestamp": datetime.now().isoformat()
         }
 
+@router.post("/recover-label")
+async def recover_label(request: Request):
+    """Recover/retrieve a UPS shipping label"""
+    try:
+        data = await request.json()
+        
+        # Extract required data
+        tracking_number = data.get('tracking_number')
+        label_format = data.get('label_format', 'GIF')  # Default to GIF
+        
+        if not tracking_number:
+            return {
+                "success": False,
+                "message": "Tracking number is required",
+                "errors": ["Missing tracking_number"]
+            }
+        
+        logger.info(f"🏷️ Recovering label for tracking number: {tracking_number}")
+        
+        # Recover the label
+        result = await ups_shipping_service.recover_label(tracking_number, label_format)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Label recovered successfully",
+                "label_info": result.get('label_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to recover label",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error recovering label: {e}")
+        return {
+            "success": False,
+            "message": "Error recovering label",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
 @router.post("/track")
 async def track_shipment(request: Request):
     """Track a UPS shipment"""

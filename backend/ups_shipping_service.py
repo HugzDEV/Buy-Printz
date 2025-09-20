@@ -906,6 +906,180 @@ class UPSShippingService:
                 'error': str(e)
             }
 
+    async def recover_label(self, tracking_number: str, label_format: str = "GIF") -> Dict[str, Any]:
+        """Recover/retrieve a UPS shipping label"""
+        try:
+            logger.info(f"🏷️ Recovering UPS label for tracking number: {tracking_number}")
+            
+            # Get access token
+            access_token = await self.get_access_token()
+            
+            # Prepare UPS label recovery request
+            label_recovery_request = {
+                "LabelRecoveryRequest": {
+                    "Request": {
+                        "RequestOption": "Non_Validate",
+                        "SubVersion": "1903",
+                        "TransactionReference": {
+                            "CustomerContext": f"Tin Skinz Label Recovery - {tracking_number}"
+                        }
+                    },
+                    "LabelSpecification": {
+                        "HTTPUserAgent": "BuyPrintz-TinSkinz/1.0",
+                        "LabelImageFormat": {
+                            "Code": label_format,
+                            "Description": label_format
+                        }
+                    },
+                    "TrackingNumber": tracking_number,
+                    "Translate": {
+                        "Code": "01",
+                        "DialectCode": "US",
+                        "LanguageCode": "eng"
+                    }
+                }
+            }
+            
+            # Make UPS label recovery request
+            url = f"https://onlinetools.ups.com/api/labels/v1/recovery"
+            
+            headers = {
+                'Content-Type': 'application/json',
+                'transId': f'tin-skinz-label-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                'transactionSrc': 'testing',
+                'Authorization': f'Bearer {access_token}'
+            }
+            
+            logger.info(f"🏷️ Making UPS label recovery request to: {url}")
+            logger.info(f"📋 Request headers: {headers}")
+            logger.info(f"📋 Request body: {json.dumps(label_recovery_request, indent=2)}")
+            
+            response = requests.post(url, headers=headers, json=label_recovery_request)
+            
+            if response.status_code != 200:
+                logger.error(f"❌ UPS label recovery API error: {response.status_code} - {response.text}")
+            
+            response.raise_for_status()
+            
+            label_recovery_response = response.json()
+            
+            # Parse UPS label recovery response
+            label_info = self._parse_ups_label_recovery_response(label_recovery_response)
+            
+            return {
+                'success': True,
+                'label_info': label_info,
+                'carrier': 'UPS',
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error recovering UPS label: {e}")
+            return {
+                'success': False,
+                'label_info': None,
+                'carrier': 'UPS',
+                'errors': [str(e)],
+                'timestamp': datetime.now().isoformat()
+            }
+
+    def _parse_ups_label_recovery_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """Parse UPS label recovery response into our format"""
+        try:
+            logger.info(f"🏷️ Parsing UPS label recovery response: {response}")
+            
+            # Extract label information from UPS response
+            if 'LabelRecoveryResponse' in response:
+                label_recovery_response = response['LabelRecoveryResponse']
+                
+                # Get response status
+                response_status = label_recovery_response.get('Response', {}).get('ResponseStatus', {})
+                status_code = response_status.get('Code', '')
+                status_description = response_status.get('Description', '')
+                
+                # Get shipment identification number
+                shipment_id = label_recovery_response.get('ShipmentIdentificationNumber', '')
+                
+                # Get label results
+                label_results = label_recovery_response.get('LabelResults', [])
+                labels = []
+                
+                for label_result in label_results:
+                    if isinstance(label_result, dict):
+                        tracking_number = label_result.get('TrackingNumber', '')
+                        
+                        # Get label image
+                        label_image = label_result.get('LabelImage', {})
+                        graphic_image = label_image.get('GraphicImage', '') if isinstance(label_image, dict) else ''
+                        html_image = label_image.get('HTMLImage', '') if isinstance(label_image, dict) else ''
+                        pdf417 = label_image.get('PDF417', '') if isinstance(label_image, dict) else ''
+                        label_url = label_image.get('URL', '') if isinstance(label_image, dict) else ''
+                        
+                        # Get receipt
+                        receipt = label_result.get('Receipt', {})
+                        receipt_html = receipt.get('HTMLImage', '') if isinstance(receipt, dict) else ''
+                        receipt_url = receipt.get('URL', '') if isinstance(receipt, dict) else ''
+                        
+                        # Get form
+                        form = label_result.get('Form', {})
+                        form_image = form.get('Image', {}) if isinstance(form, dict) else {}
+                        form_graphic = form_image.get('GraphicImage', '') if isinstance(form_image, dict) else ''
+                        
+                        labels.append({
+                            'tracking_number': tracking_number,
+                            'label_image': graphic_image,
+                            'html_image': html_image,
+                            'pdf417': pdf417,
+                            'label_url': label_url,
+                            'receipt_html': receipt_html,
+                            'receipt_url': receipt_url,
+                            'form_image': form_graphic
+                        })
+                
+                # Get additional forms
+                cod_turn_in_page = label_recovery_response.get('CODTurnInPage', {})
+                cod_image = cod_turn_in_page.get('Image', {}) if isinstance(cod_turn_in_page, dict) else {}
+                cod_graphic = cod_image.get('GraphicImage', '') if isinstance(cod_image, dict) else ''
+                
+                high_value_report = label_recovery_response.get('HighValueReport', {})
+                hvr_image = high_value_report.get('Image', {}) if isinstance(high_value_report, dict) else {}
+                hvr_graphic = hvr_image.get('GraphicImage', '') if isinstance(hvr_image, dict) else ''
+                
+                return {
+                    'shipment_id': shipment_id,
+                    'response_code': status_code,
+                    'response_description': status_description,
+                    'labels': labels,
+                    'cod_turn_in_page': cod_graphic,
+                    'high_value_report': hvr_graphic,
+                    'success': status_code.lower() == 's'
+                }
+            else:
+                return {
+                    'shipment_id': '',
+                    'response_code': '',
+                    'response_description': 'Invalid response format',
+                    'labels': [],
+                    'cod_turn_in_page': '',
+                    'high_value_report': '',
+                    'success': False,
+                    'error': 'Invalid response format - no LabelRecoveryResponse'
+                }
+                
+        except Exception as e:
+            logger.error(f"❌ Error parsing UPS label recovery response: {e}")
+            logger.error(f"🏷️ Raw response: {response}")
+            return {
+                'shipment_id': '',
+                'response_code': '',
+                'response_description': str(e),
+                'labels': [],
+                'cod_turn_in_page': '',
+                'high_value_report': '',
+                'success': False,
+                'error': str(e)
+            }
+
     async def get_single_service_rate(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
         """Get rate for a single UPS service (Ground)"""
         try:
