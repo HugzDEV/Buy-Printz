@@ -187,7 +187,6 @@ class UPSShippingService:
         return {
             "RateRequest": {
                 "Request": {
-                    "RequestOption": "Rate",
                     "TransactionReference": {
                         "CustomerContext": f"Tin Skinz Order {total_quantity} tins"
                     }
@@ -196,16 +195,6 @@ class UPSShippingService:
                     "Shipper": {
                         "Name": "BuyPrintz",
                         "ShipperNumber": self.shipper_number,
-                        "Address": {
-                            "AddressLine": ["123 Business St"],
-                            "City": "Boston",
-                            "StateProvinceCode": "MA",
-                            "PostalCode": "02101",
-                            "CountryCode": "US"
-                        }
-                    },
-                    "ShipFrom": {
-                        "Name": "BuyPrintz",
                         "Address": {
                             "AddressLine": ["123 Business St"],
                             "City": "Boston",
@@ -224,6 +213,16 @@ class UPSShippingService:
                             "CountryCode": "US"
                         }
                     },
+                    "ShipFrom": {
+                        "Name": "BuyPrintz",
+                        "Address": {
+                            "AddressLine": ["123 Business St"],
+                            "City": "Boston",
+                            "StateProvinceCode": "MA",
+                            "PostalCode": "02101",
+                            "CountryCode": "US"
+                        }
+                    },
                     "PaymentDetails": {
                         "ShipmentCharge": [
                             {
@@ -235,14 +234,18 @@ class UPSShippingService:
                         ]
                     },
                     "Service": {
-                        "Code": "03",  # Ground
+                        "Code": "03",
                         "Description": "Ground"
                     },
                     "NumOfPieces": "1",
                     "Package": {
+                        "SimpleRate": {
+                            "Description": "Simple Rate",
+                            "Code": "XS"
+                        },
                         "PackagingType": {
-                            "Code": "02",  # Customer Supplied Package
-                            "Description": "Package"
+                            "Code": "02",
+                            "Description": "Packaging"
                         },
                         "Dimensions": {
                             "UnitOfMeasurement": {
