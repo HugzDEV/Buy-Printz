@@ -324,6 +324,59 @@ class UPSShippingService:
         }
         return delivery_days.get(service_code, 5)
     
+    async def get_single_service_rate(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
+        """Get rate for a single UPS service (Ground)"""
+        try:
+            logger.info("🚚 Getting single UPS service rate...")
+            
+            # Get access token
+            access_token = await self.get_access_token()
+            
+            # Prepare UPS rate request
+            rate_request = self._prepare_ups_rate_request(order_data, customer_info)
+            
+            # Make UPS API request
+            url = f"{self.base_url}/api/rating/v1/Rate"
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {access_token}',
+                'transId': f'tin-skinz-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                'transactionSrc': 'BuyPrintz'
+            }
+            
+            logger.info(f"🚚 Making UPS rate request to: {url}")
+            logger.info(f"📦 Request headers: {headers}")
+            logger.info(f"📋 Request body: {json.dumps(rate_request, indent=2)}")
+            
+            response = requests.post(url, headers=headers, json=rate_request)
+            
+            if response.status_code != 200:
+                logger.error(f"❌ UPS API error: {response.status_code} - {response.text}")
+            
+            response.raise_for_status()
+            
+            rate_response = response.json()
+            
+            # Parse UPS response into our format
+            shipping_options = self._parse_ups_response(rate_response)
+            
+            return {
+                'success': True,
+                'shipping_options': shipping_options,
+                'carrier': 'UPS',
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting single UPS service rate: {e}")
+            return {
+                'success': False,
+                'shipping_options': [],
+                'carrier': 'UPS',
+                'errors': [str(e)],
+                'timestamp': datetime.now().isoformat()
+            }
+
     async def get_multiple_service_rates(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
         """Get rates for multiple UPS services"""
         try:
