@@ -124,6 +124,10 @@ class UPSShippingService:
             
         except Exception as e:
             logger.error(f"❌ Error getting UPS shipping rates: {e}")
+            logger.error(f"❌ Exception type: {type(e)}")
+            logger.error(f"❌ Exception details: {str(e)}")
+            import traceback
+            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             return {
                 'success': False,
                 'errors': [str(e)],
