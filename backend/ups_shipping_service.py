@@ -197,6 +197,16 @@ class UPSShippingService:
                             "CountryCode": "US"
                         }
                     },
+                    "ShipFrom": {
+                        "Name": "BuyPrintz",
+                        "Address": {
+                            "AddressLine": ["123 Business St"],
+                            "City": "Boston",
+                            "StateProvinceCode": "MA",
+                            "PostalCode": "02101",
+                            "CountryCode": "US"
+                        }
+                    },
                     "ShipTo": {
                         "Name": customer_info.get('name', 'Customer'),
                         "Address": {
