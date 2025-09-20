@@ -239,10 +239,6 @@ class UPSShippingService:
                     },
                     "NumOfPieces": "1",
                     "Package": {
-                        "SimpleRate": {
-                            "Description": "Simple Rate",
-                            "Code": "XS"
-                        },
                         "PackagingType": {
                             "Code": "02",
                             "Description": "Packaging"
