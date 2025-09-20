@@ -71,8 +71,8 @@ async def get_tin_skinz_shipping_rates(request: TinSkinzShippingRequest):
             'product_type': 'tin-skinz'
         }
         
-        # Get UPS shipping rates - using multiple services method
-        result = await ups_shipping_service.get_multiple_service_rates(order_data, request.customer_info)
+        # Get UPS shipping rates - using the main method which now uses Shop option
+        result = await ups_shipping_service.get_shipping_rates(order_data, request.customer_info)
         
         if result['success']:
             logger.info(f"✅ Successfully retrieved {len(result['shipping_options'])} UPS shipping options")

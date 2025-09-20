@@ -219,6 +219,7 @@ class UPSShippingService:
         return {
             "RateRequest": {
                 "Request": {
+                    "RequestOption": "Shop",
                     "TransactionReference": {
                         "CustomerContext": f"Tin Skinz Order {total_quantity} tins"
                     }
@@ -264,10 +265,6 @@ class UPSShippingService:
                                 }
                             }
                         ]
-                    },
-                    "Service": {
-                        "Code": "03",
-                        "Description": "Ground"
                     },
                     "NumOfPieces": "1",
                     "Package": {

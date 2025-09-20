@@ -94,7 +94,7 @@ const TinProducts = () => {
                 </p>
                 <div className="flex justify-center lg:justify-start">
                   <Link
-                    to="/editor"
+                    to="/editor?product=tin"
                     className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg"
                   >
                     Design Now
