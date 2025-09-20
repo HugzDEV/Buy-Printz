@@ -1195,30 +1195,9 @@ class UPSShippingService:
             }
     
     def _prepare_multi_service_request(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
-        """Prepare UPS request for multiple services"""
-        base_request = self._prepare_ups_rate_request(order_data, customer_info)
-        
-        # Add multiple services
-        services = [
-            {'Code': '03', 'Description': 'UPS Ground'},
-            {'Code': '12', 'Description': 'UPS 3 Day Select'},
-            {'Code': '02', 'Description': 'UPS 2nd Day Air'},
-            {'Code': '01', 'Description': 'UPS Next Day Air'}
-        ]
-        
-        # Create separate shipments for each service
-        shipments = []
-        for service in services:
-            shipment = base_request['RateRequest']['Shipment'].copy()
-            shipment['Service'] = service
-            shipments.append(shipment)
-        
-        return {
-            "RateRequest": {
-                "Request": base_request['RateRequest']['Request'],
-                "Shipment": shipments
-            }
-        }
+        """Prepare UPS request for multiple services using Shop option"""
+        # Use the same request as single service but with Shop option
+        return self._prepare_ups_rate_request(order_data, customer_info)
 
 # Create singleton instance
 ups_shipping_service = UPSShippingService()
