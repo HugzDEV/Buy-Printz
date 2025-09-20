@@ -172,6 +172,50 @@ async def handle_tracking_update(webhook_data: Dict[str, Any]):
     except Exception as e:
         logger.error(f"❌ Error handling tracking update: {e}")
 
+@router.post("/track")
+async def track_shipment(request: Request):
+    """Track a UPS shipment"""
+    try:
+        data = await request.json()
+        tracking_number = data.get('tracking_number')
+        
+        if not tracking_number:
+            return {
+                "success": False,
+                "message": "Tracking number is required",
+                "errors": ["Missing tracking_number parameter"]
+            }
+        
+        logger.info(f"📦 Tracking shipment: {tracking_number}")
+        
+        # Track the shipment
+        result = await ups_shipping_service.track_shipment(tracking_number)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Tracking information retrieved successfully",
+                "tracking_info": result.get('tracking_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to retrieve tracking information",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error tracking shipment: {e}")
+        return {
+            "success": False,
+            "message": "Error tracking shipment",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
 @router.post("/test")
 async def test_ups_integration():
     """Test UPS integration with sample data"""

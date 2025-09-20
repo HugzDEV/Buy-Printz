@@ -341,6 +341,116 @@ class UPSShippingService:
         }
         return delivery_days.get(service_code, 5)
     
+    async def track_shipment(self, tracking_number: str) -> Dict[str, Any]:
+        """Track a UPS shipment using tracking number"""
+        try:
+            logger.info(f"📦 Tracking UPS shipment: {tracking_number}")
+            
+            # Get access token
+            access_token = await self.get_access_token()
+            
+            # Make UPS tracking request
+            url = f"https://onlinetools.ups.com/api/track/v1/details/{tracking_number}"
+            
+            headers = {
+                'transId': f'tin-skinz-track-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                'transactionSrc': 'testing',
+                'Authorization': f'Bearer {access_token}'
+            }
+            
+            query_params = {
+                'locale': 'en_US',
+                'returnSignature': 'false',
+                'returnMilestones': 'false',
+                'returnPOD': 'false'
+            }
+            
+            logger.info(f"📦 Making UPS tracking request to: {url}")
+            logger.info(f"📋 Request headers: {headers}")
+            logger.info(f"📋 Query params: {query_params}")
+            
+            response = requests.get(url, headers=headers, params=query_params)
+            
+            if response.status_code != 200:
+                logger.error(f"❌ UPS tracking API error: {response.status_code} - {response.text}")
+            
+            response.raise_for_status()
+            
+            tracking_response = response.json()
+            
+            # Parse UPS tracking response
+            tracking_info = self._parse_ups_tracking_response(tracking_response)
+            
+            return {
+                'success': True,
+                'tracking_info': tracking_info,
+                'carrier': 'UPS',
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error tracking UPS shipment: {e}")
+            return {
+                'success': False,
+                'tracking_info': None,
+                'carrier': 'UPS',
+                'errors': [str(e)],
+                'timestamp': datetime.now().isoformat()
+            }
+
+    def _parse_ups_tracking_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """Parse UPS tracking response into our format"""
+        try:
+            # Extract tracking information from UPS response
+            if 'trackResponse' in response and 'shipment' in response['trackResponse']:
+                shipment = response['trackResponse']['shipment'][0] if isinstance(response['trackResponse']['shipment'], list) else response['trackResponse']['shipment']
+                
+                # Get package details
+                package = shipment.get('package', [{}])[0] if shipment.get('package') else {}
+                
+                # Get current status
+                current_status = package.get('activity', [{}])[0] if package.get('activity') else {}
+                
+                # Get delivery information
+                delivery_info = package.get('deliveryInformation', {})
+                
+                # Get package details
+                package_details = package.get('packageWeight', {})
+                
+                return {
+                    'tracking_number': shipment.get('inquiryNumber', {}).get('number', ''),
+                    'status': current_status.get('status', {}).get('description', 'Unknown'),
+                    'status_code': current_status.get('status', {}).get('code', ''),
+                    'location': current_status.get('location', {}).get('address', {}).get('city', '') + ', ' + current_status.get('location', {}).get('address', {}).get('stateProvinceCode', ''),
+                    'timestamp': current_status.get('date', '') + ' ' + current_status.get('time', ''),
+                    'delivery_date': delivery_info.get('deliveryDate', ''),
+                    'delivery_time': delivery_info.get('deliveryTime', ''),
+                    'weight': package_details.get('weight', ''),
+                    'service': shipment.get('service', {}).get('description', ''),
+                    'activities': [
+                        {
+                            'status': activity.get('status', {}).get('description', ''),
+                            'location': activity.get('location', {}).get('address', {}).get('city', '') + ', ' + activity.get('location', {}).get('address', {}).get('stateProvinceCode', ''),
+                            'timestamp': activity.get('date', '') + ' ' + activity.get('time', '')
+                        }
+                        for activity in package.get('activity', [])
+                    ]
+                }
+            else:
+                return {
+                    'tracking_number': '',
+                    'status': 'No tracking information available',
+                    'error': 'Invalid response format'
+                }
+                
+        except Exception as e:
+            logger.error(f"❌ Error parsing UPS tracking response: {e}")
+            return {
+                'tracking_number': '',
+                'status': 'Error parsing tracking information',
+                'error': str(e)
+            }
+
     async def get_single_service_rate(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
         """Get rate for a single UPS service (Ground)"""
         try:
