@@ -438,41 +438,50 @@ class UPSShippingService:
                     if isinstance(package, list) and len(package) > 0:
                         package = package[0]
                     
-                    # Get current status from activities
-                    activities = package.get('activity', [])
-                    current_status = activities[0] if activities else {}
+                    # Get current status from currentStatus field (not activity)
+                    current_status = package.get('currentStatus', {})
                     
                     # Get delivery information
                     delivery_info = package.get('deliveryInformation', {})
                     
                     # Get package details
-                    package_details = package.get('packageWeight', {})
+                    package_weight = package.get('weight', {})
                     
-                    # Build location string safely
-                    location = ''
-                    if current_status.get('location', {}).get('address'):
-                        address = current_status['location']['address']
-                        city = address.get('city', '')
-                        state = address.get('stateProvinceCode', '')
-                        location = f"{city}, {state}".strip(', ')
+                    # Get service information
+                    service = package.get('service', {})
+                    
+                    # Get activities (tracking history)
+                    activities = package.get('activity', [])
+                    
+                    # Build location string from delivery info
+                    location = delivery_info.get('location', '')
+                    
+                    # Get delivery date and time
+                    delivery_date = ''
+                    delivery_time = ''
+                    if package.get('deliveryDate') and len(package['deliveryDate']) > 0:
+                        delivery_date = package['deliveryDate'][0].get('date', '')
+                    
+                    if package.get('deliveryTime'):
+                        delivery_time = package['deliveryTime'].get('startTime', '')
                     
                     return {
-                        'tracking_number': shipment.get('inquiryNumber', {}).get('number', ''),
-                        'status': current_status.get('status', {}).get('description', 'Unknown'),
-                        'status_code': current_status.get('status', {}).get('code', ''),
+                        'tracking_number': shipment.get('inquiryNumber', ''),
+                        'status': current_status.get('description', 'Unknown'),
+                        'status_code': current_status.get('code', ''),
                         'location': location,
                         'timestamp': f"{current_status.get('date', '')} {current_status.get('time', '')}".strip(),
-                        'delivery_date': delivery_info.get('deliveryDate', ''),
-                        'delivery_time': delivery_info.get('deliveryTime', ''),
-                        'weight': package_details.get('weight', ''),
-                        'service': shipment.get('service', {}).get('description', ''),
+                        'delivery_date': delivery_date,
+                        'delivery_time': delivery_time,
+                        'weight': package_weight.get('weight', ''),
+                        'service': service.get('description', ''),
                         'activities': [
                             {
-                                'status': activity.get('status', {}).get('description', ''),
-                                'location': f"{activity.get('location', {}).get('address', {}).get('city', '')}, {activity.get('location', {}).get('address', {}).get('stateProvinceCode', '')}".strip(', '),
+                                'status': activity.get('status', {}).get('description', '') if activity.get('status') else '',
+                                'location': activity.get('location', {}).get('address', {}).get('city', '') + ', ' + activity.get('location', {}).get('address', {}).get('stateProvinceCode', '') if activity.get('location', {}).get('address') else '',
                                 'timestamp': f"{activity.get('date', '')} {activity.get('time', '')}".strip()
                             }
-                            for activity in activities
+                            for activity in activities if activity.get('status') or activity.get('location')
                         ]
                     }
                 else:
