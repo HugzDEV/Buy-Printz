@@ -32,7 +32,8 @@ class UPSShippingService:
             if self.access_token and self.token_expires and datetime.now() < self.token_expires:
                 return self.access_token
                 
-            url = f"{self.base_url}/security/v1/oauth/token"
+            # Try Rating API specific OAuth endpoint
+            url = f"{self.base_url}/api/security/v1/oauth/token"
             
             # Encode credentials in Base64 for Basic Authentication
             credentials = f"{self.client_id}:{self.client_secret}"
@@ -44,8 +45,7 @@ class UPSShippingService:
             }
             
             data = {
-                'grant_type': 'client_credentials',
-                'scope': 'rating'
+                'grant_type': 'client_credentials'
             }
             
             response = requests.post(url, headers=headers, data=data)
