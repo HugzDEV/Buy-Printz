@@ -28,6 +28,34 @@ class UPSShippingService:
         self.access_token = None
         self.token_expires = None
         
+        # State name to abbreviation mapping
+        self.state_mapping = {
+            'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+            'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+            'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+            'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+            'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+            'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+            'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+            'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+            'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+            'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY',
+            'District of Columbia': 'DC'
+        }
+    
+    def _convert_state_to_abbreviation(self, state: str) -> str:
+        """Convert full state name to 2-letter abbreviation"""
+        if not state:
+            return state
+        
+        # If already 2 characters, assume it's already an abbreviation
+        if len(state) == 2:
+            return state.upper()
+        
+        # Convert to title case and look up in mapping
+        state_title = state.title()
+        return self.state_mapping.get(state_title, state.upper())
+        
     async def get_access_token(self) -> str:
         """Get UPS API access token"""
         try:
@@ -212,7 +240,7 @@ class UPSShippingService:
                         "Address": {
                             "AddressLine": [customer_info.get('address', '')],
                             "City": customer_info.get('city', ''),
-                            "StateProvinceCode": customer_info.get('state', ''),
+                            "StateProvinceCode": self._convert_state_to_abbreviation(customer_info.get('state', '')),
                             "PostalCode": customer_info.get('zipCode', '').replace('-', '').strip(),
                             "CountryCode": "US"
                         }
@@ -547,7 +575,7 @@ class UPSShippingService:
                             "Address": {
                                 "AddressLine": [customer_info.get('address', '')],
                                 "City": customer_info.get('city', ''),
-                                "StateProvinceCode": customer_info.get('state', ''),
+                                "StateProvinceCode": self._convert_state_to_abbreviation(customer_info.get('state', '')),
                                 "PostalCode": customer_info.get('zipCode', ''),
                                 "CountryCode": "US"
                             },
