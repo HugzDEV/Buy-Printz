@@ -16,10 +16,8 @@ logger = logging.getLogger(__name__)
 class UPSShippingService:
     def __init__(self):
         self.base_url = "https://onlinetools.ups.com/api"
-        self.access_key = os.getenv('UPS_ACCESS_KEY')
-        self.username = os.getenv('UPS_USERNAME')
-        self.password = os.getenv('UPS_PASSWORD')
-        self.account_number = os.getenv('UPS_ACCOUNT_NUMBER')
+        self.client_id = os.getenv('UPS_CLIENT_ID')
+        self.client_secret = os.getenv('UPS_CLIENT_SECRET')
         self.access_token = None
         self.token_expires = None
         
@@ -32,14 +30,13 @@ class UPSShippingService:
             url = f"{self.base_url}/security/v1/oauth/token"
             
             headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'x-merchant-id': self.access_key
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
             
             data = {
                 'grant_type': 'client_credentials',
-                'client_id': self.username,
-                'client_secret': self.password
+                'client_id': self.client_id,
+                'client_secret': self.client_secret
             }
             
             response = requests.post(url, headers=headers, data=data)

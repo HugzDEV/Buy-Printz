@@ -5,11 +5,9 @@
 Add these environment variables to your Railway deployment:
 
 ```bash
-# UPS API Credentials
-UPS_ACCESS_KEY=your_ups_access_key_here
-UPS_USERNAME=your_ups_username_here
-UPS_PASSWORD=your_ups_password_here
-UPS_ACCOUNT_NUMBER=your_ups_account_number_here
+# UPS OAuth 2.0 Credentials
+UPS_CLIENT_ID=your_ups_client_id_here
+UPS_CLIENT_SECRET=your_ups_client_secret_here
 ```
 
 ## UPS Developer Account Setup
