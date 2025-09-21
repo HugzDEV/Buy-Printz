@@ -319,9 +319,21 @@ const BannerSidebar = ({
       
       if (sidebar && scrollPositions.sidebar !== undefined) {
         sidebar.scrollTop = scrollPositions.sidebar
+        // Additional fallback for mobile devices
+        setTimeout(() => {
+          if (sidebar && scrollPositions.sidebar !== undefined) {
+            sidebar.scrollTop = scrollPositions.sidebar
+          }
+        }, 50)
       }
       if (templates && scrollPositions.templates !== undefined) {
         templates.scrollTop = scrollPositions.templates
+        // Additional fallback for mobile devices
+        setTimeout(() => {
+          if (templates && scrollPositions.templates !== undefined) {
+            templates.scrollTop = scrollPositions.templates
+          }
+        }, 50)
       }
     }
   }, [expandedSections, isPreservingScroll, scrollPositions])
@@ -692,16 +704,28 @@ const BannerSidebar = ({
     // Execute the callback
     callback()
     
+    // Use longer delay for mobile devices
+    const isMobile = window.innerWidth < 768
+    const delay = isMobile ? 300 : 150
+    
     // Re-enable pointer events after a delay
     setTimeout(() => {
       if (sidebar) {
         sidebar.style.pointerEvents = 'auto'
+        // Force scroll restoration as fallback
+        if (currentScrollTop > 0) {
+          sidebar.scrollTop = currentScrollTop
+        }
       }
       if (templates) {
         templates.style.pointerEvents = 'auto'
+        // Force scroll restoration as fallback
+        if (templatesScrollTop > 0) {
+          templates.scrollTop = templatesScrollTop
+        }
       }
       setIsPreservingScroll(false)
-    }, 150)
+    }, delay)
   }, [openSectionsCount])
 
   const toggleSection = (sectionKey) => {
@@ -1566,7 +1590,7 @@ const BannerSidebar = ({
                 {/* Size Category Tabs - Only show for banners */}
                   <div className="flex gap-1 mb-3">
                     <button
-                      onClick={() => setSizeCategory('landscape')}
+                      onClick={() => preserveScrollPosition(() => setSizeCategory('landscape'))}
                       className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                         sizeCategory === 'landscape' 
                           ? 'bg-blue-500 text-white shadow-lg' 
@@ -1576,7 +1600,7 @@ const BannerSidebar = ({
                       Landscape
                     </button>
                     <button
-                      onClick={() => setSizeCategory('portrait')}
+                      onClick={() => preserveScrollPosition(() => setSizeCategory('portrait'))}
                       className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                         sizeCategory === 'portrait' 
                           ? 'bg-blue-500 text-white shadow-lg' 
@@ -1586,7 +1610,7 @@ const BannerSidebar = ({
                       Portrait
                     </button>
                     <button
-                      onClick={() => setSizeCategory('custom')}
+                      onClick={() => preserveScrollPosition(() => setSizeCategory('custom'))}
                       className={`flex-1 px-2 py-1 text-xs rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                         sizeCategory === 'custom' 
                           ? 'bg-blue-500 text-white shadow-lg' 
@@ -2984,7 +3008,7 @@ const BannerSidebar = ({
                         ].map((tab) => (
                           <button
                             key={tab.id}
-                            onClick={() => setSelectedBannerOrientation(tab.id)}
+                            onClick={() => preserveScrollPosition(() => setSelectedBannerOrientation(tab.id))}
                             className={`flex-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                               selectedBannerOrientation === tab.id
                                 ? 'bg-blue-500 text-white shadow-lg'
@@ -3189,7 +3213,7 @@ const BannerSidebar = ({
         {/* Marketplace Section */}
         <GlassCard className="mb-4">
           <button
-            onClick={() => setExpandedSections(prev => ({ ...prev, marketplace: !prev.marketplace }))}
+            onClick={() => preserveScrollPosition(() => setExpandedSections(prev => ({ ...prev, marketplace: !prev.marketplace })))}
             className="w-full flex items-center justify-between p-4 hover:bg-white/10 transition-colors duration-200 rounded-lg"
           >
             <div className="flex items-center gap-3">
