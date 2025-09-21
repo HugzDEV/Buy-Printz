@@ -201,7 +201,7 @@ const InlinePrintPreview = ({
                     transform: productType === 'banner' 
                       ? window.innerHeight > window.innerWidth 
                         ? 'scale(2.18) translateX(74px) translateY(38px)' // Portrait
-                        : 'scale(2.18) translateX(157px) translateY(90px)' // Landscape
+                        : 'scale(2.62) translateX(236px) translateY(108px)' // Landscape
                       : productType === 'tent'
                       ? 'scale(2.5) translateX(75px) translateY(55px)'
                       : 'scale(1.98) translateX(40px) translateY(20px)'
