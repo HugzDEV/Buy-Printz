@@ -199,21 +199,9 @@ const SurfaceThumbnailViewer = ({
                     <img
                       src={thumbnail.dataUrl}
                       alt={surface.name}
-                      className="w-20 h-12 sm:w-24 sm:h-16 rounded border bg-gray-50 object-contain"
+                      className="w-24 h-16 sm:w-28 sm:h-20 rounded border bg-gray-50 object-contain"
                       style={{
-                        // Scale down large canvas images to fit thumbnail containers
-                        transform: window.innerWidth < 640 ? (
-                          // Mobile: larger scaling for better visibility
-                          productType === 'tent' 
-                            ? 'scale(1.2) translate(15%, 10%)' // tents: scale up and center for mobile
-                            : 'scale(1.0)' // banners/tins: normal size for mobile
-                        ) : (
-                          // Desktop: smaller scaling to fit containers
-                          productType === 'tent' 
-                            ? 'scale(0.8)' // tents: scale down for desktop
-                            : 'scale(0.6)' // banners/tins: scale down for desktop
-                        ),
-                        transformOrigin: 'center center'
+                        // No transforms needed - container size handles the sizing
                       }}
                     />
                     <div
@@ -230,7 +218,7 @@ const SurfaceThumbnailViewer = ({
                     />
                   </>
                 ) : (
-                  <div className="w-20 h-12 sm:w-24 sm:h-16 bg-gray-200 rounded border flex items-center justify-center">
+                  <div className="w-24 h-16 sm:w-28 sm:h-20 bg-gray-200 rounded border flex items-center justify-center">
                     <span className="text-xs text-gray-400">...</span>
                   </div>
                 )}
