@@ -70,6 +70,9 @@ const BannerCanvas = forwardRef(({
   onRemoveAssetFromTracking
 }, stageRef) => {
   
+  // Create a separate ref for the actual Konva Stage
+  const konvaStageRef = useRef(null)
+  
   // Expose clearTransformer function through ref
   useImperativeHandle(stageRef, () => ({
     clearTransformer: () => {
@@ -473,8 +476,8 @@ const BannerCanvas = forwardRef(({
       
       // Force transformer update immediately - don't wait for useEffect
       setTimeout(() => {
-        if (transformerRef.current && stageRef.current) {
-          const selectedNode = stageRef.current.findOne(`#${id}`)
+        if (transformerRef.current && konvaStageRef.current) {
+          const selectedNode = konvaStageRef.current.findOne(`#${id}`)
           if (selectedNode) {
             transformerRef.current.nodes([selectedNode])
             transformerRef.current.getLayer()?.batchDraw()
@@ -516,7 +519,7 @@ const BannerCanvas = forwardRef(({
   // Enhanced snapping system with element-to-element snapping
   const drawCenterGuidelines = useCallback((draggedElement) => {
     // Remove existing guidelines
-    const layer = stageRef.current?.getLayers()[0]
+    const layer = konvaStageRef.current?.getLayers()[0]
     if (layer) {
       layer.find('.center-guideline').forEach(line => line.destroy())
       layer.find('.element-guideline').forEach(line => line.destroy())
@@ -732,7 +735,7 @@ const BannerCanvas = forwardRef(({
     const node = e.target
     
     // Remove guidelines on drag end
-    const layer = stageRef.current?.getLayers()[0]
+    const layer = konvaStageRef.current?.getLayers()[0]
     if (layer) {
       layer.find('.center-guideline').forEach(line => line.destroy())
       layer.find('.element-guideline').forEach(line => line.destroy())
@@ -951,7 +954,7 @@ const BannerCanvas = forwardRef(({
       elements.forEach(element => {
         if (element.type === 'text') {
           // Find the Konva text node
-          const textNode = stageRef.current?.findOne(`#${element.id}`);
+          const textNode = konvaStageRef.current?.findOne(`#${element.id}`);
           if (textNode && textNode.getClassName() === 'Text') {
             const textHeight = textNode.height();
             const textWidth = textNode.width();
@@ -1248,13 +1251,13 @@ const BannerCanvas = forwardRef(({
     // Add a small delay to ensure state has been updated
     const timeoutId = setTimeout(() => {
       const updateTransformer = () => {
-        if (selectedIds.length > 0 && stageRef.current && transformerRef.current) {
+        if (selectedIds.length > 0 && konvaStageRef.current && transformerRef.current) {
           const selectedNodes = selectedIds.map(id => {
             const element = elements.find(el => el.id === id)
             if (!element) return null
             
             // Find the actual Konva node
-            const node = stageRef.current.findOne(`#${id}`)
+            const node = konvaStageRef.current.findOne(`#${id}`)
             if (node) {
               return node
             }
@@ -1272,8 +1275,8 @@ const BannerCanvas = forwardRef(({
               }
             }, 10)
           }
-        } else if (selectedId && stageRef.current && transformerRef.current) {
-          const selectedNode = stageRef.current.findOne(`#${selectedId}`)
+        } else if (selectedId && konvaStageRef.current && transformerRef.current) {
+          const selectedNode = konvaStageRef.current.findOne(`#${selectedId}`)
           if (selectedNode) {
             transformerRef.current.nodes([selectedNode])
             transformerRef.current.getLayer()?.batchDraw()
@@ -2207,7 +2210,7 @@ const BannerCanvas = forwardRef(({
           >
             
             <Stage
-              ref={stageRef}
+              ref={konvaStageRef}
               width={canvasSize.width}
               height={canvasSize.height}
               scale={{ x: scale, y: scale }}
@@ -2696,149 +2699,105 @@ const BannerCanvas = forwardRef(({
         </GlassPanel>
       </div>
 
-      {/* Status Bar - REMOVED TO ELIMINATE DUPLICATION */}
-      {/* The bottom actions section below provides all the same functionality in a better organized way */}
-
-      {/* Bottom Actions - Consolidated Interface */}
+      {/* Compact Status Bar - Mobile Optimized */}
       <div 
         className={`
-          fixed bottom-0 left-0 right-0 border-t border-white/20 
-          bg-gradient-to-br from-gray-50/95 to-gray-100/95 backdrop-blur-md
-          max-h-[30vh] sm:max-h-[35vh] overflow-y-auto
-          shadow-2xl z-50
+          fixed top-1/2 right-1 sm:right-4 transform -translate-y-1/2 z-50
           transition-all duration-300 ease-in-out
           ${(selectedId || selectedIds.length > 0) ? 'opacity-100 visible' : 'opacity-0 invisible'}
         `}
       >
-        <div className="flex flex-col gap-1.5 sm:gap-3 max-h-full p-1.5 sm:p-3">
-          
-                {/* Text Editing Hint */}
-      {selectedId && selectedElement?.type === 'text' && (
-        <div className="text-xs text-blue-600 bg-blue-50 p-1 sm:p-1.5 rounded text-center">
-          💡 Use the Edit Text button below to edit text
-            </div>
-          )}
-          
-          {/* Top Row - DPI Info, Selection Count, and Close Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-1">
-            {/* Close Button */}
-            <GlassButton
+        <div className="
+          bg-white/90 backdrop-blur-xl border border-white/30
+          rounded-2xl shadow-2xl p-2 sm:p-4 max-w-[240px] sm:max-w-xs
+          neumorphic-compact
+        ">
+          {/* Header with Close Button */}
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Properties</h3>
+            <button
               onClick={() => {
-                // Hide the bottom actions by deselecting all elements
                 setSelectedId(null);
                 setSelectedIds([]);
               }}
-              className="p-1 sm:p-1.5 rounded-full self-start sm:self-center"
-              title="Hide element properties"
+              className="p-1 sm:p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              title="Close"
             >
-              <EyeOff className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-            </GlassButton>
-            {/* DPI Information for Selected Image */}
-            {selectedId && getSelectedElementDPI() && (
-              <div className="flex items-center gap-1 p-1">
-                <div className="text-xs sm:text-sm">
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">DPI:</span>
-                    <span className={`font-bold ${
-                      getSelectedElementDPI().dpi >= 300 ? 'text-green-600' :
-                      getSelectedElementDPI().dpi >= 150 ? 'text-yellow-600' :
-                      getSelectedElementDPI().dpi >= 72 ? 'text-orange-600' : 'text-red-600'
-                    }`}>
-                      {getSelectedElementDPI().dpi}
-                    </span>
-                    <span className={`px-1 py-0.5 rounded text-xs font-medium ${
-                      getSelectedElementDPI().quality === 'Excellent' ? 'bg-green-100 text-green-700' :
-                      getSelectedElementDPI().quality === 'Good' ? 'bg-yellow-100 text-yellow-700' :
-                      getSelectedElementDPI().quality === 'Fair' ? 'bg-orange-100 text-orange-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {getSelectedElementDPI().quality}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {getSelectedElementDPI().originalWidth}×{getSelectedElementDPI().originalHeight}px
-                    {' → '}
-                    {getSelectedElementDPI().imageWidthInches}"×{getSelectedElementDPI().imageHeightInches}"
-                  </div>
-                  {getSelectedElementDPI().dpi < 150 && (
-                    <div className="text-xs text-red-600 font-medium">
-                      ⚠️ {getSelectedElementDPI().recommendation}
-                    </div>
-                  )}
-                  {getSelectedElementDPI().dpi >= 150 && getSelectedElementDPI().dpi < 300 && (
-                    <div className="text-xs text-yellow-600 font-medium">
-                      ℹ️ {getSelectedElementDPI().recommendation}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-            
-            {selectedIds.length > 0 && (
-              <div className="text-xs sm:text-sm text-gray-600 font-medium">
-                {selectedIds.length} elements selected
-              </div>
-            )}
+              <EyeOff className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+            </button>
           </div>
-          
-          {/* Middle Row - Text Properties */}
-          {selectedId && selectedElement?.type === 'text' && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 p-2 sm:p-3 overflow-x-auto">
-              {/* Text Color Picker */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Color:</span>
-                <input
-                  type="color"
-                  value={selectedElement?.fill || '#000000'}
-                  onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
-                  className="w-8 h-8 rounded border-2 border-white/30 cursor-pointer"
-                  title="Choose text color"
-                />
-                <span className="text-xs text-gray-500 font-mono min-w-[4rem]">
-                  {selectedElement?.fill || '#000000'}
+          {/* DPI Info - Compact */}
+          {selectedId && getSelectedElementDPI() && (
+            <div className="mb-2 sm:mb-3 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-600">DPI:</span>
+                <span className={`text-xs sm:text-sm font-bold ${
+                  getSelectedElementDPI().dpi >= 300 ? 'text-green-600' :
+                  getSelectedElementDPI().dpi >= 150 ? 'text-yellow-600' :
+                  getSelectedElementDPI().dpi >= 72 ? 'text-orange-600' : 'text-red-600'
+                }`}>
+                  {getSelectedElementDPI().dpi}
                 </span>
               </div>
-              
-              {/* Divider */}
-              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-              
-              {/* Font Size */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Size:</span>
+              <div className="text-xs text-gray-500 mt-1">
+                {getSelectedElementDPI().originalWidth}×{getSelectedElementDPI().originalHeight}px
+              </div>
+            </div>
+          )}
+          
+          {/* Selection Count */}
+          {selectedIds.length > 0 && (
+            <div className="mb-3 text-xs text-gray-600 text-center">
+              {selectedIds.length} elements selected
+            </div>
+          )}
+          
+          {/* Text Properties - Compact */}
+          {selectedId && selectedElement?.type === 'text' && (
+            <div className="space-y-2 sm:space-y-3">
+              {/* Color and Size Row */}
+              <div className="flex items-center justify-between gap-2 sm:gap-3">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="text-xs font-medium text-gray-600">Color:</span>
+                  <input
+                    type="color"
+                    value={selectedElement?.fill || '#000000'}
+                    onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                    title="Choose text color"
+                  />
+                </div>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleElementChange(selectedId, { fontSize: Math.max(8, (selectedElement?.fontSize || 24) - 2) })}
-                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-4 h-4 sm:w-5 sm:h-5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                   >
                     -
                   </button>
-                  <span className="text-xs font-medium text-gray-700 min-w-[2rem] text-center">
+                  <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] sm:min-w-[2rem] text-center">
                     {selectedElement?.fontSize || 24}
                   </span>
                   <button
                     onClick={() => handleElementChange(selectedId, { fontSize: Math.min(200, (selectedElement?.fontSize || 24) + 2) })}
-                    className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-4 h-4 sm:w-5 sm:h-5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                   >
                     +
                   </button>
                 </div>
               </div>
               
-              {/* Divider */}
-              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-              
               {/* Font Family */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Font:</span>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Font:</span>
                 <select
                   value={selectedElement?.fontFamily || 'Arial'}
                   onChange={(e) => handleElementChange(selectedId, { fontFamily: e.target.value })}
-                  className="px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-1 sm:px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                 >
                   {/* Sans-serif Fonts */}
                   <optgroup label="Sans-serif">
-                  <option value="Arial">Arial</option>
-                  <option value="Helvetica">Helvetica</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
                     <option value="Verdana">Verdana</option>
                     <option value="Tahoma">Tahoma</option>
                     <option value="Trebuchet MS">Trebuchet MS</option>
@@ -2856,8 +2815,8 @@ const BannerCanvas = forwardRef(({
                   
                   {/* Serif Fonts */}
                   <optgroup label="Serif">
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Georgia">Georgia</option>
                     <option value="Garamond">Garamond</option>
                     <option value="Book Antiqua">Book Antiqua</option>
                     <option value="Palatino">Palatino</option>
@@ -2871,8 +2830,8 @@ const BannerCanvas = forwardRef(({
                   
                   {/* Display/Decorative Fonts */}
                   <optgroup label="Display & Decorative">
-                  <option value="Impact">Impact</option>
-                  <option value="Comic Sans MS">Comic Sans MS</option>
+                    <option value="Impact">Impact</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
                     <option value="Papyrus">Papyrus</option>
                     <option value="Chalkduster">Chalkduster</option>
                     <option value="Marker Felt">Marker Felt</option>
@@ -2893,7 +2852,7 @@ const BannerCanvas = forwardRef(({
                   
                   {/* Monospace Fonts */}
                   <optgroup label="Monospace">
-                  <option value="Courier New">Courier New</option>
+                    <option value="Courier New">Courier New</option>
                     <option value="Lucida Console">Lucida Console</option>
                     <option value="Monaco">Monaco</option>
                     <option value="Consolas">Consolas</option>
@@ -2917,22 +2876,19 @@ const BannerCanvas = forwardRef(({
                 </select>
               </div>
               
-              {/* Divider */}
-              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-              
-              {/* Text Alignment */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Align:</span>
+              {/* Text Alignment - Matching sidebar exactly */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Align:</span>
                 <div className="flex gap-1">
                   {[
-                    { value: 'left', icon: '⫷', label: 'Left' },
-                    { value: 'center', icon: '⫸', label: 'Center' },
-                    { value: 'right', icon: '⫹', label: 'Right' }
+                    { value: 'left', icon: '⬅️', label: 'Left' },
+                    { value: 'center', icon: '↔️', label: 'Center' },
+                    { value: 'right', icon: '➡️', label: 'Right' }
                   ].map((align) => (
                     <button
                       key={align.value}
                       onClick={() => handleElementChange(selectedId, { align: align.value })}
-                      className={`w-6 h-6 rounded text-xs transition-colors duration-200 ${
+                      className={`w-5 h-5 sm:w-6 sm:h-6 rounded text-xs transition-colors duration-200 ${
                         (selectedElement?.align || 'left') === align.value
                           ? 'bg-blue-500 text-white'
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -2945,14 +2901,75 @@ const BannerCanvas = forwardRef(({
                 </div>
               </div>
               
-              {/* Divider */}
-              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
+              {/* Text Style - Matching sidebar with Normal option */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Style:</span>
+                <div className="flex gap-1">
+                  {[
+                    { value: 'normal', label: 'Regular' },
+                    { value: 'bold', label: 'Bold' },
+                    { value: 'italic', label: 'Italic' }
+                  ].map((style) => {
+                    // Get the current fontStyle from selected element
+                    const currentFontStyle = selectedElement?.fontStyle || 'normal'
+                    
+                    // Check if this style is currently active
+                    let isSelected = false
+                    if (style.value === 'normal') {
+                      isSelected = currentFontStyle === 'normal'
+                    } else if (style.value === 'bold') {
+                      isSelected = currentFontStyle === 'bold' || currentFontStyle === 'italic bold'
+                    } else if (style.value === 'italic') {
+                      isSelected = currentFontStyle === 'italic' || currentFontStyle === 'italic bold'
+                    }
+                    
+                    return (
+                      <button
+                        key={style.value}
+                        onClick={() => {
+                          let newFontStyle = 'normal'
+                          
+                          if (style.value === 'normal') {
+                            // Turn off all styles
+                            newFontStyle = 'normal'
+                          } else if (style.value === 'bold') {
+                            if (currentFontStyle === 'bold' || currentFontStyle === 'italic bold') {
+                              // Turn off bold
+                              newFontStyle = currentFontStyle === 'italic bold' ? 'italic' : 'normal'
+                            } else {
+                              // Turn on bold
+                              newFontStyle = currentFontStyle === 'italic' ? 'italic bold' : 'bold'
+                            }
+                          } else if (style.value === 'italic') {
+                            if (currentFontStyle === 'italic' || currentFontStyle === 'italic bold') {
+                              // Turn off italic
+                              newFontStyle = currentFontStyle === 'italic bold' ? 'bold' : 'normal'
+                            } else {
+                              // Turn on italic
+                              newFontStyle = currentFontStyle === 'bold' ? 'italic bold' : 'italic'
+                            }
+                          }
+                          
+                          handleElementChange(selectedId, { fontStyle: newFontStyle })
+                        }}
+                        className={`px-1.5 sm:px-2 py-1 rounded text-xs transition-colors duration-200 ${
+                          isSelected
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        }`}
+                        title={style.label}
+                      >
+                        {style.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
               
-              {/* Text Stroke/Outline */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Outline:</span>
+              {/* Text Outline Controls */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Outline:</span>
                 <div className="flex items-center gap-1">
-                  {/* Stroke Toggle */}
                   <button
                     onClick={() => {
                       const hasStroke = selectedElement?.stroke && selectedElement?.strokeWidth > 0
@@ -2962,115 +2979,7 @@ const BannerCanvas = forwardRef(({
                         handleElementChange(selectedId, { stroke: '#000000', strokeWidth: 2 })
                       }
                     }}
-                    className={`w-6 h-6 rounded text-xs transition-colors duration-200 ${
-                      selectedElement?.stroke && selectedElement?.strokeWidth > 0
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                    }`}
-                    title={selectedElement?.stroke && selectedElement?.strokeWidth > 0 ? "Disable Outline" : "Enable Outline"}
-                  >
-                    ⭕
-                  </button>
-                  
-                  {/* Stroke Color (only show if stroke is enabled) */}
-                  {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
-                    <>
-                      <input
-                        type="color"
-                        value={selectedElement?.stroke || '#000000'}
-                        onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
-                        className="w-6 h-6 rounded border border-gray-300 cursor-pointer"
-                        title="Choose outline color"
-                      />
-                      
-                      {/* Stroke Width */}
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            const currentWidth = selectedElement?.strokeWidth || 0
-                            const newWidth = Math.max(0, currentWidth - 1)
-                            handleElementChange(selectedId, { strokeWidth: newWidth })
-                            // If width becomes 0, also disable stroke
-                            if (newWidth === 0) {
-                              handleElementChange(selectedId, { stroke: null })
-                            }
-                          }}
-                          className="w-5 h-5 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
-                        >
-                          -
-                        </button>
-                        <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] text-center">
-                          {selectedElement?.strokeWidth || 0}
-                        </span>
-                        <button
-                          onClick={() => {
-                            const currentWidth = selectedElement?.strokeWidth || 0
-                            const newWidth = Math.min(20, currentWidth + 1)
-                            handleElementChange(selectedId, { strokeWidth: newWidth })
-                            // If width becomes > 0 and no stroke color, set default stroke
-                            if (newWidth > 0 && !selectedElement?.stroke) {
-                              handleElementChange(selectedId, { stroke: '#000000' })
-                            }
-                          }}
-                          className="w-5 h-5 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
-                        >
-                          +
-                        </button>
-            </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {/* Middle Row - Shape Properties with Color Picker */}
-          {selectedId && (
-            (selectedElement?.type === 'rect' || 
-             selectedElement?.type === 'circle' || 
-             selectedElement?.type === 'star' || 
-             selectedElement?.type === 'triangle' || 
-             selectedElement?.type === 'hexagon' || 
-             selectedElement?.type === 'octagon' ||
-             selectedElement?.type === 'line' ||
-             ['heart', 'diamond', 'arrow', 'arrow-right', 'arrow-left', 'arrow-up', 'arrow-down', 'double-arrow', 'cross', 'crown', 'badge', 'certificate', 'document', 'checkmark', 'target'].includes(selectedElement?.type)
-            )
-          ) && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 p-2 sm:p-3 overflow-x-auto">
-              {/* Fill Color Picker */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Fill:</span>
-                <input
-                  type="color"
-                  value={selectedElement?.fill || '#6B7280'}
-                  onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
-                  className="w-8 h-8 rounded border-2 border-white/30 cursor-pointer"
-                  title="Choose fill color"
-                />
-                <span className="text-xs text-gray-500 font-mono min-w-[4rem]">
-                  {selectedElement?.fill || '#6B7280'}
-                </span>
-              </div>
-              
-              {/* Divider */}
-              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-              
-              {/* Shape Stroke/Outline */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Outline:</span>
-                <div className="flex items-center gap-1">
-                  {/* Stroke Toggle */}
-                  <button
-                    onClick={() => {
-                      const hasStroke = selectedElement?.stroke && selectedElement?.strokeWidth > 0
-                      if (hasStroke) {
-                        handleElementChange(selectedId, { stroke: null, strokeWidth: 0 })
-                      } else {
-                        handleElementChange(selectedId, { stroke: '#374151', strokeWidth: 2 })
-                      }
-                    }}
-                    className={`w-6 h-6 rounded text-xs transition-colors duration-200 ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 rounded text-xs transition-colors duration-200 ${
                       selectedElement?.stroke && selectedElement?.strokeWidth > 0
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -3084,188 +2993,74 @@ const BannerCanvas = forwardRef(({
                   {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
                     <input
                       type="color"
-                      value={selectedElement?.stroke || '#374151'}
+                      value={selectedElement?.stroke || '#000000'}
                       onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
-                      className="w-6 h-6 rounded border border-gray-300 cursor-pointer"
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
                       title="Choose outline color"
                     />
                   )}
                 </div>
               </div>
               
-              {/* Divider */}
-              <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-              
-              {/* Stroke Width (only show if stroke is enabled) */}
-              {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Width:</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => {
-                        const currentWidth = selectedElement?.strokeWidth || 0
-                        const newWidth = Math.max(0, currentWidth - 1)
-                        handleElementChange(selectedId, { strokeWidth: newWidth })
-                        // If width becomes 0, also disable stroke
-                        if (newWidth === 0) {
-                          handleElementChange(selectedId, { stroke: null })
-                        }
-                      }}
-                      className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
-                    >
-                      -
-                    </button>
-                    <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] text-center">
-                      {selectedElement?.strokeWidth || 0}
-                    </span>
-                    <button
-                      onClick={() => {
-                        const currentWidth = selectedElement?.strokeWidth || 0
-                        const newWidth = Math.min(20, currentWidth + 1)
-                        handleElementChange(selectedId, { strokeWidth: newWidth })
-                        // If width becomes > 0 and no stroke color, set default stroke
-                        if (newWidth > 0 && !selectedElement?.stroke) {
-                          handleElementChange(selectedId, { stroke: '#374151' })
-                        }
-                      }}
-                      className="w-6 h-6 bg-white/20 hover:bg-white/30 border border-white/30 rounded flex items-center justify-center text-xs font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Text Edit Button */}
+              <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
+                <button
+                  onClick={() => handleTextEdit(selectedId)}
+                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors"
+                  title="Edit Text"
+                >
+                  ✏️ Edit
+                </button>
+              </div>
             </div>
           )}
           
-          {/* Bottom Row - Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 w-full overflow-x-auto">
-            {/* Layer Controls */}
-            <div className="flex gap-1">
-              <GlassButton 
-                onClick={sendToBack} 
-                disabled={!canSendBack}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
-                title="Send to Back"
-              >
-                <SendToBack className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={sendBack} 
-                disabled={!canSendBack}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
-                title="Send Back"
-              >
-                <MoveDown className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={bringForward} 
-                disabled={!canBringForward}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
-                title="Bring Forward"
-              >
-                <MoveUp className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={bringToFront} 
-                disabled={!canBringForward}
-                className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center"
-                title="Bring to Front"
-              >
-                <Layers className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-              </GlassButton>
-            </div>
-            
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-            
-            {/* Text Edit Button */}
-              {selectedId && selectedElement?.type === 'text' && (
-                <GlassButton 
-                  onClick={() => {
-              
-                  handleTextEdit(selectedId);
-                  }}
-                  variant="primary"
-                  className="px-3 py-2 flex items-center justify-center"
+          {/* Universal Action Buttons - Apply to all element types */}
+          {(selectedId || selectedIds.length > 0) && (
+            <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 border-t border-gray-200">
+              {/* Action Buttons */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                {/* Duplicate Button */}
+                <button
+                  onClick={duplicateSelected}
+                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded transition-colors"
+                  title="Duplicate"
                 >
-                <FileText className="w-4 h-4 mr-1" />
-                  <span className="text-xs">Edit Text</span>
-                </GlassButton>
-              )}
+                  📋 Copy
+                </button>
+                
+                {/* Delete Button */}
+                <button
+                  onClick={deleteSelected}
+                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors"
+                  title="Delete"
+                >
+                  🗑️ Delete
+                </button>
+              </div>
               
-            {/* Duplicate and Delete */}
-            <div className="flex gap-1 sm:gap-1.5">
-              <GlassButton onClick={duplicateSelected} className="px-1.5 sm:px-2 py-1 sm:py-1.5 flex items-center justify-center">
-                <Copy className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 mr-1" />
-                <span className="text-xs">Duplicate</span>
-              </GlassButton>
-              
-              <GlassButton onClick={deleteSelected} variant="danger" className="px-1.5 sm:px-2 py-1 sm:py-1.5 flex items-center justify-center">
-                <Trash2 className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 mr-1" />
-                <span className="text-xs">Delete</span>
-              </GlassButton>
+              {/* Layer Controls */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Layer:</span>
+                <div className="flex gap-1">
+                  <button
+                    onClick={sendToBack}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs"
+                    title="Send to Back"
+                  >
+                    ⬇️
+                  </button>
+                  <button
+                    onClick={bringToFront}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs"
+                    title="Bring to Front"
+                  >
+                    ⬆️
+                  </button>
+                </div>
+              </div>
             </div>
-            
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
-            
-            {/* Undo/Redo OR Surface Navigation for Tins/Tents */}
-            <div className="flex gap-1">
-              {(productType === 'tin' || productType === 'tent') ? (
-                <>
-                  <GlassButton 
-                    onClick={() => handleSurfaceNavigation('prev')} 
-                    disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
-                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Previous Surface"
-                  >
-                    <ArrowLeft className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-                  </GlassButton>
-                  
-                  {/* Surface Indicator - Mobile */}
-                  <div className="px-1.5 sm:px-2 py-1 bg-white/30 backdrop-blur-sm border border-white/30 rounded text-xs font-medium text-gray-800 min-w-[50px] sm:min-w-[60px] text-center">
-                    {productType === 'tin' 
-                      ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
-                      : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-                    }
-                  </div>
-                  
-                  <GlassButton 
-                    onClick={() => handleSurfaceNavigation('next')} 
-                    disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
-                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Next Surface"
-                  >
-                    <ArrowRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-                  </GlassButton>
-                </>
-              ) : (
-                <>
-                  <GlassButton 
-                    onClick={undo} 
-                    disabled={historyStep <= 0}
-                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Undo"
-                  >
-                    <Undo className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-                  </GlassButton>
-                  
-                  <GlassButton 
-                    onClick={redo} 
-                    disabled={historyStep >= history.length - 1}
-                    className="p-1 sm:p-1.5 min-w-[28px] sm:min-w-[32px] min-h-[28px] sm:min-h-[32px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Redo"
-                  >
-                    <Redo className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-                  </GlassButton>
-                </>
-              )}
-          </div>
-          </div>
+          )}
         </div>
       </div>
 

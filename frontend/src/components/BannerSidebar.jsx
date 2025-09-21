@@ -1109,7 +1109,7 @@ const BannerSidebar = ({
         <h4 className="text-sm font-medium text-gray-700">Text Style</h4>
         <div className="flex flex-wrap gap-1">
           {[
-            { value: 'normal', label: 'Normal' },
+            { value: 'normal', label: 'Regular' },
             { value: 'bold', label: 'Bold' },
             { value: 'italic', label: 'Italic' }
           ].map((style) => (
@@ -2475,7 +2475,7 @@ const BannerSidebar = ({
                 <h4 className="text-sm font-medium text-gray-700">✨ Text Style</h4>
                 <div className="flex flex-wrap gap-1">
                   {[
-                    { value: 'normal', label: 'Normal', icon: '📝' },
+                    { value: 'normal', label: 'Regular', icon: '📝' },
                     { value: 'bold', label: 'Bold', icon: '🔲' },
                     { value: 'italic', label: 'Italic', icon: '🔸' }
                   ].map((style) => {
