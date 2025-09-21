@@ -205,61 +205,11 @@ const InlinePrintPreview = ({
               <img
                 src={previewImage}
                 alt="Design Preview"
-                className="max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0"
-                style={{
-                  display: 'block',
-                  margin: '0 auto',
-                  objectPosition: 'center center',
-                  background: 'transparent',
-                  zIndex: 1,
-                  transformOrigin: 'center center',
-                  // Responsive positioning using viewport-based calculations
-                  ...((() => {
-                    const vw = window.innerWidth
-                    const vh = window.innerHeight
-                    const isDesktop = vw >= 640
-                    const isMobile = vw < 640
-                    const isPortrait = vh > vw
-                    const isLandscape = vw > vh
-                    
-                    if (isDesktop) {
-                      // Desktop: perfect positioning, no transforms needed
-                      return {}
-                    }
-                    
-                    if (isMobile) {
-                      let transform = ''
-                      
-                      if (productType === 'banner') {
-                        if (isPortrait) {
-                          // Banner portrait: responsive positioning
-                          const scaleValue = Math.min(2.18, vw / 180) // Responsive scale
-                          const translateX = Math.max(70, vw * 0.18) // 18% of viewport width
-                          const translateY = Math.max(38, vh * 0.08) // 8% of viewport height
-                          transform = `scale(${scaleValue}) translateX(${translateX}px) translateY(${translateY}px)`
-                        } else {
-                          // Banner landscape: aggressive positioning
-                          const scaleValue = Math.min(3.01, vw / 120) // Responsive scale
-                          const translateX = Math.max(400, vw * 0.6) // 60% of viewport width
-                          const translateY = Math.max(120, vh * 0.25) // 25% of viewport height
-                          transform = `scale(${scaleValue}) translateX(${translateX}px) translateY(${translateY}px)`
-                        }
-                      } else if (productType === 'tent') {
-                        const scaleValue = Math.min(2.5, vw / 150)
-                        const translateX = Math.max(75, vw * 0.2)
-                        const translateY = Math.max(55, vh * 0.12)
-                        transform = `scale(${scaleValue}) translateX(${translateX}px) translateY(${translateY}px)`
-                      } else {
-                        transform = 'scale(1.98) translateX(40px) translateY(20px)'
-                      }
-                      
-                      console.log(`🎨 Responsive Transform - Product: ${productType}, ${vw}x${vh}, Portrait: ${isPortrait}, Transform: ${transform}`)
-                      return { transform }
-                    }
-                    
-                    return {}
-                  })())
-                }}
+                className={`w-full h-full bg-white ${
+                  productType === 'tent' 
+                    ? 'object-cover object-center' 
+                    : 'object-contain'
+                }`}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
               />
