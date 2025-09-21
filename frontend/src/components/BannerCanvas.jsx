@@ -727,6 +727,21 @@ const BannerCanvas = forwardRef(({
     }
   }, [canvasSize, snapToElements, elements])
 
+  // Clear guidelines when snapToElements changes
+  const clearGuidelines = useCallback(() => {
+    const layer = konvaStageRef.current?.getLayers()[0]
+    if (layer) {
+      layer.find('.center-guideline').forEach(line => line.destroy())
+      layer.find('.element-guideline').forEach(line => line.destroy())
+      layer.batchDraw()
+    }
+  }, [])
+
+  // Effect to clear guidelines when snapToElements changes
+  useEffect(() => {
+    clearGuidelines()
+  }, [snapToElements, clearGuidelines])
+
   const handleDragMove = useCallback((e, id) => {
     drawCenterGuidelines(e.target)
   }, [drawCenterGuidelines])
@@ -2027,8 +2042,8 @@ const BannerCanvas = forwardRef(({
 
           {/* Right Section - Action Buttons */}
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
-            {/* Mobile: Compact toolbar tools */}
-            <div className="sm:hidden flex items-center gap-0.5 min-w-0 flex-shrink-0 flex-1 justify-end">
+            {/* Mobile: Double-wide toolbar tools */}
+            <div className="sm:hidden flex items-center gap-0.5 min-w-0 flex-shrink-0 flex-1 justify-end flex-wrap">
               {/* Mobile: Surface Navigation for Tins/Tents OR Zoom Controls for Banners */}
               {(productType === 'tin' || productType === 'tent') ? (
                 <>
@@ -2075,7 +2090,27 @@ const BannerCanvas = forwardRef(({
                 </>
               )}
               
+              {/* Mobile: Add Undo/Redo for all product types */}
               <div className="w-px h-4 bg-white/20 mx-0.5 flex-shrink-0" />
+              
+              <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Undo">
+                <Undo2 className="w-2.5 h-2.5" />
+              </GlassButton>
+              
+              <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0" title="Redo">
+                <Redo2 className="w-2.5 h-2.5" />
+              </GlassButton>
+              
+              <div className="w-px h-4 bg-white/20 mx-0.5 flex-shrink-0" />
+              
+              {/* Mobile: Snap to Elements (Magnet) */}
+              <GlassButton 
+                onClick={() => setSnapToElements(!snapToElements)}
+                className={`p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0 ${snapToElements ? 'bg-blue-500/20 border-blue-400/50' : ''}`}
+                title={snapToElements ? 'Disable Element Snapping' : 'Enable Element Snapping'}
+              >
+                <Magnet className={`w-2.5 h-2.5 ${snapToElements ? 'text-blue-600' : ''}`} />
+              </GlassButton>
               
               <GlassButton 
                 onClick={() => setAutoScaling(!autoScaling)} 
