@@ -173,7 +173,13 @@ const InlinePrintPreview = ({
               <img
                 src={previewImage}
                 alt="Design Preview"
-                className="max-w-full max-h-full object-contain select-none origin-center scale-[1.98] sm:scale-100 translate-x-[40px] translate-y-[20px] sm:translate-x-[10px] sm:translate-y-[10px]"
+                className={`max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0 ${
+                  productType === 'banner' 
+                    ? 'scale-[1.98] translate-x-[50px] translate-y-[25px]' 
+                    : productType === 'tent'
+                    ? 'scale-[2.2] translate-x-[45px] translate-y-[30px]'
+                    : 'scale-[1.98] translate-x-[40px] translate-y-[20px]'
+                }`}
                 style={{ display: 'block', margin: '0 auto', objectPosition: 'center center', background: 'transparent', zIndex: 1 }}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
