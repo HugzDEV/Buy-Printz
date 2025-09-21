@@ -43,9 +43,9 @@ class BusinessCardTinVolumeDiscount(BaseModel):
 class BusinessCardTinOrderRequest(BaseModel):
     # Tin Configuration
     quantity: int = Field(..., description="Must be 100, 250, or 500 units")
-    tin_finish: str = Field(..., regex="^(silver|black|gold)$")
-    printing_method: str = Field(..., regex="^(premium-vinyl|premium-clear-vinyl)$")
-    surface_coverage: str = Field(..., regex="^(front-back|all-sides)$")
+    tin_finish: str = Field(..., pattern="^(silver|black|gold)$")
+    printing_method: str = Field(..., pattern="^(premium-vinyl|premium-clear-vinyl)$")
+    surface_coverage: str = Field(..., pattern="^(front-back|all-sides)$")
     job_name: Optional[str] = None
     
     # Candy Selection
@@ -75,9 +75,9 @@ class BusinessCardTinOrderResponse(BaseModel):
 
 class BusinessCardTinPricingRequest(BaseModel):
     quantity: int = Field(..., description="Must be 100, 250, or 500 units")
-    tin_finish: str = Field(..., regex="^(silver|black|gold)$")
-    printing_method: str = Field(..., regex="^(premium-vinyl|premium-clear-vinyl)$")
-    surface_coverage: str = Field(..., regex="^(front-back|all-sides)$")
+    tin_finish: str = Field(..., pattern="^(silver|black|gold)$")
+    printing_method: str = Field(..., pattern="^(premium-vinyl|premium-clear-vinyl)$")
+    surface_coverage: str = Field(..., pattern="^(front-back|all-sides)$")
     candy_id: Optional[str] = None
     candy_quantity: int = Field(0, ge=0)
     custom_message: Optional[str] = None
