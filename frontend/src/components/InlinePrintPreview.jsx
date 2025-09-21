@@ -188,9 +188,9 @@ const InlinePrintPreview = ({
                 alt="Design Preview"
                 className={`max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0 ${
                   productType === 'banner' 
-                    ? 'scale-[1.98] translate-x-[65px] translate-y-[35px]' 
+                    ? 'scale-[1.98] translate-x-[80px] translate-y-[50px]' 
                     : productType === 'tent'
-                    ? 'scale-[2.5] translate-x-[60px] translate-y-[40px]'
+                    ? 'scale-[2.5] translate-x-[75px] translate-y-[55px]'
                     : 'scale-[1.98] translate-x-[40px] translate-y-[20px]'
                 }`}
                 style={{ 
@@ -202,9 +202,9 @@ const InlinePrintPreview = ({
                   // Production-specific positioning override for mobile portrait
                   ...(import.meta.env.PROD && window.innerWidth < 640 && {
                     transform: productType === 'banner' 
-                      ? 'scale(1.98) translateX(65px) translateY(35px)'
+                      ? 'scale(1.98) translateX(80px) translateY(50px)'
                       : productType === 'tent'
-                      ? 'scale(2.5) translateX(60px) translateY(40px)'
+                      ? 'scale(2.5) translateX(75px) translateY(55px)'
                       : 'scale(1.98) translateX(40px) translateY(20px)'
                   })
                 }}
