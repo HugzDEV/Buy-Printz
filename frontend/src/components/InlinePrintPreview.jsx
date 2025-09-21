@@ -173,7 +173,7 @@ const InlinePrintPreview = ({
               <img
                 src={previewImage}
                 alt="Design Preview"
-                className="max-w-full max-h-full object-contain select-none origin-center scale-[1.98] sm:scale-[1.2] translate-x-[10px] translate-y-[8px] sm:translate-x-[4px] sm:translate-y-[3px]"
+                className="max-w-full max-h-full object-contain select-none origin-center scale-[1.98] sm:scale-[1.2] translate-x-[18px] translate-y-[8px] sm:translate-x-[8px] sm:translate-y-[3px]"
                 style={{ display: 'block', margin: '0 auto', objectPosition: 'center center', background: 'transparent', zIndex: 1 }}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
