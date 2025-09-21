@@ -188,7 +188,7 @@ const InlinePrintPreview = ({
                 alt="Design Preview"
                 className={`max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0 ${
                   productType === 'banner' 
-                    ? 'scale-[1.98] portrait:translate-x-[75px] portrait:translate-y-[45px] landscape:translate-x-[95px] landscape:translate-y-[60px]' 
+                    ? 'scale-[1.98] portrait:translate-x-[74px] portrait:translate-y-[42px] landscape:translate-x-[115px] landscape:translate-y-[72px]' 
                     : productType === 'tent'
                     ? 'scale-[2.5] translate-x-[75px] translate-y-[55px]'
                     : 'scale-[1.98] translate-x-[40px] translate-y-[20px]'
@@ -203,8 +203,8 @@ const InlinePrintPreview = ({
                   ...(import.meta.env.PROD && window.innerWidth < 640 && {
                     transform: productType === 'banner' 
                       ? window.innerHeight > window.innerWidth 
-                        ? 'scale(1.98) translateX(75px) translateY(45px)' // Portrait
-                        : 'scale(1.98) translateX(95px) translateY(60px)' // Landscape
+                        ? 'scale(1.98) translateX(74px) translateY(42px)' // Portrait
+                        : 'scale(1.98) translateX(115px) translateY(72px)' // Landscape
                       : productType === 'tent'
                       ? 'scale(2.5) translateX(75px) translateY(55px)'
                       : 'scale(1.98) translateX(40px) translateY(20px)'
