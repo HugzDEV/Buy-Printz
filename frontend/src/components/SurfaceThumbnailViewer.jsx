@@ -202,9 +202,17 @@ const SurfaceThumbnailViewer = ({
                       className="w-20 h-12 sm:w-24 sm:h-16 rounded border bg-gray-50 object-contain"
                       style={{
                         // Scale down large canvas images to fit thumbnail containers
-                        transform: productType === 'tent' 
-                          ? 'scale(0.8)' // tents need more scaling down
-                          : 'scale(0.6)', // banners/tins need more scaling down
+                        transform: window.innerWidth < 640 ? (
+                          // Mobile: larger scaling for better visibility
+                          productType === 'tent' 
+                            ? 'scale(1.2)' // tents: scale up for mobile
+                            : 'scale(1.0)' // banners/tins: normal size for mobile
+                        ) : (
+                          // Desktop: smaller scaling to fit containers
+                          productType === 'tent' 
+                            ? 'scale(0.8)' // tents: scale down for desktop
+                            : 'scale(0.6)' // banners/tins: scale down for desktop
+                        ),
                         transformOrigin: 'center center'
                       }}
                     />
