@@ -205,7 +205,7 @@ const SurfaceThumbnailViewer = ({
                         transform: window.innerWidth < 640 ? (
                           // Mobile: larger scaling for better visibility
                           productType === 'tent' 
-                            ? 'scale(1.2)' // tents: scale up for mobile
+                            ? 'scale(1.2) translate(15%, 10%)' // tents: scale up and center for mobile
                             : 'scale(1.0)' // banners/tins: normal size for mobile
                         ) : (
                           // Desktop: smaller scaling to fit containers
