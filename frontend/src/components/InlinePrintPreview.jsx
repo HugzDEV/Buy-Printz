@@ -171,7 +171,10 @@ const InlinePrintPreview = ({
     <div className="space-y-4">
       <div className="w-full bg-white rounded-lg border border-gray-200 p-3">
         <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium text-gray-700">Design Preview</div>
+          <div className="text-sm font-medium text-gray-700">
+            Design Preview
+            <div className="text-xs text-gray-500 mt-1 sm:hidden">Refresh page after rotating device for optimal positioning</div>
+          </div>
           {surfaces.length > 1 && (
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <button onClick={handlePrev} className="px-2 py-1 border rounded">Prev</button>
@@ -180,7 +183,7 @@ const InlinePrintPreview = ({
             </div>
           )}
         </div>
-        <div className="relative w-full h-[220px] sm:h-[400px] lg:h-[500px] bg-white rounded-md overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-[200px] sm:h-[400px] lg:h-[500px] bg-white rounded-md overflow-hidden flex items-center justify-center">
           {previewImage ? (
             <>
               <img
@@ -188,7 +191,7 @@ const InlinePrintPreview = ({
                 alt="Design Preview"
                 className={`max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0 ${
                   productType === 'banner' 
-                    ? 'scale-[1.98] portrait:translate-x-[74px] portrait:translate-y-[42px] landscape:translate-x-[115px] landscape:translate-y-[72px]' 
+                    ? 'portrait:scale-[2.18] portrait:translate-x-[74px] portrait:translate-y-[38px] landscape:scale-[2.18] landscape:translate-x-[121px] landscape:translate-y-[72px]' 
                     : productType === 'tent'
                     ? 'scale-[2.5] translate-x-[75px] translate-y-[55px]'
                     : 'scale-[1.98] translate-x-[40px] translate-y-[20px]'
@@ -203,8 +206,8 @@ const InlinePrintPreview = ({
                   ...(import.meta.env.PROD && window.innerWidth < 640 && {
                     transform: productType === 'banner' 
                       ? window.innerHeight > window.innerWidth 
-                        ? 'scale(1.98) translateX(74px) translateY(42px)' // Portrait
-                        : 'scale(1.98) translateX(115px) translateY(72px)' // Landscape
+                        ? 'scale(2.18) translateX(74px) translateY(38px)' // Portrait
+                        : 'scale(2.18) translateX(121px) translateY(72px)' // Landscape
                       : productType === 'tent'
                       ? 'scale(2.5) translateX(75px) translateY(55px)'
                       : 'scale(1.98) translateX(40px) translateY(20px)'
