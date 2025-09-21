@@ -211,10 +211,10 @@ const InlinePrintPreview = ({
                   // Desktop views were already perfect, so leave them untouched
                   transform: window.innerWidth < 640 ? (
                     productType === 'tent' 
-                      ? 'scale(3.664) translate(27.5%, 35%)' 
+                      ? 'scale(3.48) translate(27.5%, 35%)' // reduced by 5%: 3.664 * 0.95
                       : productType === 'tin'
-                      ? 'scale(1.0) translate(2.5%, 0%)'
-                      : 'scale(2.5) translate(30%, 25%)' // banner
+                      ? 'scale(0.95) translate(2.5%, 0%)' // reduced by 5%: 1.0 * 0.95
+                      : 'scale(2.375) translate(30%, 25%)' // reduced by 5%: 2.5 * 0.95
                   ) : 'none',
                   transformOrigin: 'center center',
                   position: 'relative'
