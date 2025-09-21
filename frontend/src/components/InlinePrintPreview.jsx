@@ -207,12 +207,15 @@ const InlinePrintPreview = ({
                 alt="Design Preview"
                 className="w-full h-full object-contain bg-white"
                 style={{
-                  // Use the same scaling approach as PrintPreviewModal
-                  transform: productType === 'tent' 
-                    ? 'scale(3.664) translate(27.5%, 35%)' 
-                    : productType === 'tin'
-                    ? 'scale(1.0) translate(2.5%, 0%)'
-                    : 'scale(2.5) translate(30%, 25%)', // banner
+                  // Only apply scaling transforms on mobile (screen width < 640px)
+                  // Desktop views were already perfect, so leave them untouched
+                  transform: window.innerWidth < 640 ? (
+                    productType === 'tent' 
+                      ? 'scale(3.664) translate(27.5%, 35%)' 
+                      : productType === 'tin'
+                      ? 'scale(1.0) translate(2.5%, 0%)'
+                      : 'scale(2.5) translate(30%, 25%)' // banner
+                  ) : 'none',
                   transformOrigin: 'center center',
                   position: 'relative'
                 }}
