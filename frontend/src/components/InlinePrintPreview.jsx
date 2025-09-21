@@ -167,13 +167,13 @@ const InlinePrintPreview = ({
             </div>
           )}
         </div>
-        <div className="relative w-full h-[65vh] sm:h-[420px] lg:h-[520px] bg-white rounded-md overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-[360px] sm:h-[420px] lg:h-[520px] bg-white rounded-md overflow-hidden flex items-center justify-center">
           {previewImage ? (
             <>
               <img
                 src={previewImage}
                 alt="Design Preview"
-                className="max-w-full max-h-full object-contain select-none"
+                className="max-w-full max-h-full object-contain select-none origin-center scale-[1.18] sm:scale-100"
                 style={{ display: 'block', margin: '0 auto', objectPosition: 'center center', background: 'transparent', zIndex: 1 }}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
