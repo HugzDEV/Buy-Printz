@@ -17,6 +17,7 @@ import {
 import { GlassCard, GlassButton } from './ui'
 import ProtectedImage from './ProtectedImage'
 import authService from '../services/auth'
+import SEOHead, { seoConfigs } from './SEOHead'
 
 const Marketplace = () => {
   const [templates, setTemplates] = useState([])
@@ -173,7 +174,9 @@ const Marketplace = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-4">
+    <>
+      <SEOHead {...seoConfigs.marketplace} />
+      <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -494,6 +497,7 @@ const Marketplace = () => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

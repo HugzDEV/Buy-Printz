@@ -14,6 +14,7 @@ import toast from 'react-hot-toast'
 import authService from '../services/auth'
 import cacheService from '../services/cache'
 import LoadingSpinner, { SkeletonCard, SkeletonTemplateCard } from './LoadingSpinner'
+import SEOHead, { seoConfigs } from './SEOHead'
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -662,7 +663,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
+    <>
+      <SEOHead {...seoConfigs.dashboard} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
       {/* GlassUI Header - Mobile optimized */}
       <div className="backdrop-blur-xl bg-white/10 border-b border-white/20">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
@@ -1863,6 +1866,7 @@ const Dashboard = () => {
       )}
 
     </div>
+    </>
   )
 }
 

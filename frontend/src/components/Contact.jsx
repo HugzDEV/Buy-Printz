@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Mail, Phone, MapPin, Send, Clock, MessageSquare } from 'lucide-react'
+import SEOHead, { seoConfigs } from './SEOHead'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,9 @@ const Contact = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-16">
+    <>
+      <SEOHead {...seoConfigs.contact} />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-16">
       <div className="container mx-auto px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-16">
@@ -102,7 +105,7 @@ const Contact = () => {
                 
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-2">Can I get a sample before ordering?</h3>
-                  <p className="text-gray-600">We offer sample swatches for most materials. Contact us to request samples.</p>
+                  <p className="text-gray-600">We don't currently offer sample swatches, but our high-quality materials are guaranteed. Contact us if you have specific material questions.</p>
                 </div>
               </div>
             </div>
@@ -196,6 +199,7 @@ const Contact = () => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

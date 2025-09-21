@@ -95,6 +95,69 @@ export const seoConfigs = {
     description: "Manage your banner printing orders, track delivery status, and access your saved designs from your BuyPrintz dashboard.",
     keywords: "dashboard, order management, track orders, saved designs, account dashboard",
     url: "https://buyprintz.com/dashboard"
+  },
+  
+  marketplace: {
+    title: "Creator Marketplace - Professional Banner Templates | BuyPrintz",
+    description: "Browse and purchase professional banner templates from our creator marketplace. High-quality designs for business, events, and promotional use.",
+    keywords: "banner templates, marketplace, creator designs, professional templates, banner designs, custom templates",
+    url: "https://buyprintz.com/marketplace"
+  },
+  
+  tinskinz: {
+    title: "TinSkinz Marketplace - Custom Tin Designs | BuyPrintz",
+    description: "Discover unique tin designs in our TinSkinz marketplace. Custom tin wraps, business card tins, and promotional tin products.",
+    keywords: "tin designs, tin wraps, business card tins, promotional tins, custom tin products, TinSkinz",
+    url: "https://buyprintz.com/tinskinz"
+  },
+  
+  contact: {
+    title: "Contact Us - Get Support | BuyPrintz - Professional Banner Printing",
+    description: "Contact BuyPrintz for support, custom orders, or questions about our professional banner printing services. Fast response guaranteed.",
+    keywords: "contact, support, customer service, banner printing help, custom orders, BuyPrintz support",
+    url: "https://buyprintz.com/contact"
+  },
+  
+  terms: {
+    title: "Terms of Service | BuyPrintz - Professional Banner Printing",
+    description: "Read our terms of service for BuyPrintz professional banner printing services. Clear policies for orders, delivery, and customer rights.",
+    keywords: "terms of service, legal terms, banner printing terms, BuyPrintz policies",
+    url: "https://buyprintz.com/terms"
+  },
+  
+  privacy: {
+    title: "Privacy Policy | BuyPrintz - Professional Banner Printing",
+    description: "Learn how BuyPrintz protects your privacy and handles your personal information. Our commitment to data security and privacy.",
+    keywords: "privacy policy, data protection, privacy rights, BuyPrintz privacy, information security",
+    url: "https://buyprintz.com/privacy"
+  },
+  
+  support: {
+    title: "Support Center - Help & FAQ | BuyPrintz",
+    description: "Get help with your banner printing orders, design questions, and technical support. Comprehensive FAQ and support resources.",
+    keywords: "support, help, FAQ, customer service, banner printing help, technical support",
+    url: "https://buyprintz.com/support"
+  },
+  
+  blog: {
+    title: "Blog - Banner Printing Tips & News | BuyPrintz",
+    description: "Read our blog for banner printing tips, design inspiration, industry news, and best practices for professional signage.",
+    keywords: "blog, banner printing tips, design inspiration, signage news, printing best practices",
+    url: "https://buyprintz.com/blog"
+  },
+  
+  checkout: {
+    title: "Checkout - Complete Your Order | BuyPrintz",
+    description: "Complete your banner printing order with secure checkout. Review your design, select options, and place your order for fast delivery.",
+    keywords: "checkout, order completion, secure payment, banner order, fast delivery",
+    url: "https://buyprintz.com/checkout"
+  },
+  
+  confirmation: {
+    title: "Order Confirmation - Thank You | BuyPrintz",
+    description: "Your banner printing order has been confirmed. Track your order status and expect fast 2-3 business day delivery.",
+    keywords: "order confirmation, thank you, order tracking, delivery confirmation",
+    url: "https://buyprintz.com/confirmation"
   }
 }
 
