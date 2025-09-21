@@ -199,11 +199,14 @@ const SurfaceThumbnailViewer = ({
                     <img
                       src={thumbnail.dataUrl}
                       alt={surface.name}
-                      className={`w-20 h-12 sm:w-24 sm:h-16 rounded border bg-gray-50 ${
-                        productType === 'tent' 
-                          ? 'object-cover object-center' 
-                          : 'object-contain'
-                      }`}
+                      className="w-20 h-12 sm:w-24 sm:h-16 rounded border bg-gray-50 object-contain"
+                      style={{
+                        // Scale down large canvas images to fit thumbnail containers
+                        transform: productType === 'tent' 
+                          ? 'scale(0.8)' // tents need more scaling down
+                          : 'scale(0.6)', // banners/tins need more scaling down
+                        transformOrigin: 'center center'
+                      }}
                     />
                     <div
                       className="pointer-events-none absolute inset-0 rounded"
