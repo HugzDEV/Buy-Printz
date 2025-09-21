@@ -167,14 +167,14 @@ const InlinePrintPreview = ({
             </div>
           )}
         </div>
-        <div className="relative w-full h-[220px] md:h-[320px] lg:h-[420px] bg-white rounded-md overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-[65vh] sm:h-[420px] lg:h-[520px] bg-white rounded-md overflow-hidden flex items-center justify-center">
           {previewImage ? (
             <>
               <img
                 src={previewImage}
                 alt="Design Preview"
                 className="max-w-full max-h-full object-contain select-none"
-                style={{ display: 'block', margin: '0 auto', objectPosition: 'center center', background: 'transparent', transform: 'translateX(6px)', zIndex: 1 }}
+                style={{ display: 'block', margin: '0 auto', objectPosition: 'center center', background: 'transparent', zIndex: 1 }}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
               />
@@ -221,12 +221,12 @@ const InlinePrintPreview = ({
         </div>
       )}
 
-      <div className="flex gap-3">
-        <button onClick={handleDownloadPdf} disabled={!previewImage || isGenerating} className="px-4 py-2 border rounded flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button onClick={handleDownloadPdf} disabled={!previewImage || isGenerating} className="w-full sm:w-auto px-4 py-2 border rounded flex items-center gap-2 justify-center">
           <Download className="w-4 h-4" />
           {isGenerating ? 'Generating PDF...' : 'Download PDF'}
         </button>
-        <button onClick={handleApprove} disabled={!previewImage} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center gap-2">
+        <button onClick={handleApprove} disabled={!previewImage} className="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center gap-2 justify-center">
           <CheckCircle className="w-4 h-4" />
           Approve Design
         </button>
