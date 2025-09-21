@@ -189,21 +189,15 @@ const InlinePrintPreview = ({
               <img
                 src={previewImage}
                 alt="Design Preview"
-                className={`max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0 ${
-                  productType === 'banner' 
-                    ? 'portrait:scale-[2.18] portrait:translate-x-[74px] portrait:translate-y-[38px] landscape:scale-[2.18] landscape:translate-x-[157px] landscape:translate-y-[90px]' 
-                    : productType === 'tent'
-                    ? 'scale-[2.5] translate-x-[75px] translate-y-[55px]'
-                    : 'scale-[1.98] translate-x-[40px] translate-y-[20px]'
-                }`}
+                className="max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0"
                 style={{ 
                   display: 'block', 
                   margin: '0 auto', 
                   objectPosition: 'center center', 
                   background: 'transparent', 
                   zIndex: 1,
-                  // Production-specific positioning override for mobile
-                  ...(import.meta.env.PROD && window.innerWidth < 640 && {
+                  // Mobile-only positioning - NEVER affects desktop (sm+ screens)
+                  ...(window.innerWidth < 640 && {
                     transform: productType === 'banner' 
                       ? window.innerHeight > window.innerWidth 
                         ? 'scale(2.18) translateX(74px) translateY(38px)' // Portrait
