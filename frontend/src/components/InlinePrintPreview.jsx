@@ -196,18 +196,47 @@ const InlinePrintPreview = ({
                   objectPosition: 'center center', 
                   background: 'transparent', 
                   zIndex: 1,
-                  // Mobile-only positioning - NEVER affects desktop (sm+ screens)
+                  // Mobile-only positioning with forced landscape detection
                   ...(window.innerWidth < 640 && (() => {
-                    const isPortrait = window.innerHeight > window.innerWidth
-                    const transform = productType === 'banner' 
-                      ? isPortrait 
-                        ? 'scale(2.18) translateX(70px) translateY(38px)' // Portrait
-                        : 'scale(3.01) translateX(400px) translateY(120px)' // Landscape
-                      : productType === 'tent'
-                      ? 'scale(2.5) translateX(75px) translateY(55px)'
-                      : 'scale(1.98) translateX(40px) translateY(20px)'
-                    console.log(`🎨 Mobile transform - Product: ${productType}, Portrait: ${isPortrait}, Transform: ${transform}`)
-                    return { transform }
+                    const screenWidth = window.innerWidth
+                    const screenHeight = window.innerHeight
+                    const isPortrait = screenHeight > screenWidth
+                    const isLandscape = screenWidth > screenHeight
+                    
+                    let transform = ''
+                    if (productType === 'banner') {
+                      if (isPortrait) {
+                        transform = 'scale(2.18) translateX(70px) translateY(38px)'
+                      } else {
+                        // Force landscape positioning - this is critical for thumbnails/downloads
+                        transform = 'scale(3.01) translateX(400px) translateY(120px)'
+                      }
+                    } else if (productType === 'tent') {
+                      if (isPortrait) {
+                        transform = 'scale(2.5) translateX(75px) translateY(55px)'
+                      } else {
+                        // Force tent landscape positioning
+                        transform = 'scale(2.8) translateX(350px) translateY(100px)'
+                      }
+                    } else {
+                      transform = 'scale(1.98) translateX(40px) translateY(20px)'
+                    }
+                    
+                    console.log(`🎨 MOBILE TRANSFORM DEBUG:`)
+                    console.log(`   Screen: ${screenWidth}x${screenHeight}`)
+                    console.log(`   Product: ${productType}`)
+                    console.log(`   Portrait: ${isPortrait}, Landscape: ${isLandscape}`)
+                    console.log(`   Transform: ${transform}`)
+                    console.log(`   Production: ${import.meta.env.PROD}`)
+                    
+                    return { 
+                      transform,
+                      transformOrigin: 'top left',
+                      // Force the transform to be applied
+                      WebkitTransform: transform,
+                      MozTransform: transform,
+                      msTransform: transform
+                    }
                   })())
                 }}
                 draggable={false}
