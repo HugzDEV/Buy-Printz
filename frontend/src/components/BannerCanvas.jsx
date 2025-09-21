@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, forwardRef } from 'react'
+import React, { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react'
 import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
 import { 
   ZoomIn, 
@@ -66,8 +66,32 @@ const BannerCanvas = forwardRef(({
   currentSurface = 'front',
   onSurfaceChange,
   availableSurfaces = [],
-  clipFunc = null
+  clipFunc = null,
+  onRemoveAssetFromTracking
 }, stageRef) => {
+  
+  // Expose clearTransformer function through ref
+  useImperativeHandle(stageRef, () => ({
+    clearTransformer: () => {
+      if (transformerRef.current) {
+        console.log('🔧 Clearing transformer handles')
+        // Clear nodes and force update
+        transformerRef.current.nodes([])
+        transformerRef.current.getLayer()?.batchDraw()
+        transformerRef.current.forceUpdate()
+        
+        // Additional clearing to ensure handles are removed
+        setTimeout(() => {
+          if (transformerRef.current) {
+            transformerRef.current.nodes([])
+            transformerRef.current.getLayer()?.batchDraw()
+          }
+        }, 0)
+        
+        console.log('🔧 Transformer handles cleared')
+      }
+    }
+  }), [])
   const transformerRef = useRef()
   const [scale, setScale] = useState(1.0) // Default to 100% zoom
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
@@ -261,11 +285,25 @@ const BannerCanvas = forwardRef(({
 
   const deleteSelected = () => {
     if (selectedIds.length > 0) {
+      // Check for design assets being deleted
+      const elementsToDelete = elements.filter(el => selectedIds.includes(el.id))
+      elementsToDelete.forEach(element => {
+        if (element.type === 'image' && element.assetName && onRemoveAssetFromTracking) {
+          onRemoveAssetFromTracking(element.assetName)
+        }
+      })
+      
       setElements(prev => prev.filter(el => !selectedIds.includes(el.id)))
       setSelectedIds([])
       setSelectedId(null)
       saveToHistory()
     } else if (selectedId) {
+      // Check for design asset being deleted
+      const elementToDelete = elements.find(el => el.id === selectedId)
+      if (elementToDelete && elementToDelete.type === 'image' && elementToDelete.assetName && onRemoveAssetFromTracking) {
+        onRemoveAssetFromTracking(elementToDelete.assetName)
+      }
+      
       setElements(prev => prev.filter(el => el.id !== selectedId))
       setSelectedId(null)
       saveToHistory()
@@ -417,18 +455,54 @@ const BannerCanvas = forwardRef(({
       // Deselect if already selected
       setSelectedIds(prev => prev.filter(selectedId => selectedId !== id))
       setSelectedId(null)
+      
+      // Clear transformer immediately
+      if (transformerRef.current) {
+        transformerRef.current.nodes([])
+        transformerRef.current.getLayer()?.batchDraw()
+      }
     } else {
       // Select new element
       setSelectedIds([id])
-    setSelectedId(id)
+      setSelectedId(id)
+      
+      // Force parent component to update by calling setSelectedId again
+      setTimeout(() => {
+        setSelectedId(id)
+      }, 0)
+      
+      // Force transformer update immediately - don't wait for useEffect
+      setTimeout(() => {
+        if (transformerRef.current && stageRef.current) {
+          const selectedNode = stageRef.current.findOne(`#${id}`)
+          if (selectedNode) {
+            transformerRef.current.nodes([selectedNode])
+            transformerRef.current.getLayer()?.batchDraw()
+            transformerRef.current.forceUpdate()
+          }
+        }
+      }, 10)
     }
   }
 
   // Clean element change handler
   const handleElementChange = (id, newProps) => {
-    setElements(prev => prev.map(el => 
-      el.id === id ? { ...el, ...newProps } : el
-    ))
+    setElements(prev => prev.map(el => {
+      if (el.id === id) {
+        const updatedElement = { ...el, ...newProps }
+        
+          // Special handling for text elements when font size changes
+          if (el.type === 'text' && newProps.fontSize && newProps.fontSize !== el.fontSize) {
+            // When font size changes, set a reasonable width to allow expansion
+            // This prevents text from wrapping to new lines when font size increases
+            updatedElement.width = Math.max(200, updatedElement.width || 200)
+            updatedElement.wrap = 'none'
+          }
+        
+        return updatedElement
+      }
+      return el
+    }))
 
     saveToHistory()
   }
@@ -1171,58 +1245,65 @@ const BannerCanvas = forwardRef(({
 
   // Update transformer when selection or elements change
   useEffect(() => {
-    const updateTransformer = () => {
-      if (selectedIds.length > 0 && stageRef.current && transformerRef.current) {
-        const selectedNodes = selectedIds.map(id => {
-          const element = elements.find(el => el.id === id)
-          if (!element) return null
+    // Add a small delay to ensure state has been updated
+    const timeoutId = setTimeout(() => {
+      const updateTransformer = () => {
+        if (selectedIds.length > 0 && stageRef.current && transformerRef.current) {
+          const selectedNodes = selectedIds.map(id => {
+            const element = elements.find(el => el.id === id)
+            if (!element) return null
+            
+            // Find the actual Konva node
+            const node = stageRef.current.findOne(`#${id}`)
+            if (node) {
+              return node
+            }
+            return null
+          }).filter(Boolean)
           
-          // Find the actual Konva node
-          const node = stageRef.current.findOne(`#${id}`)
-          if (node) {
-
-            return node
+          if (selectedNodes.length > 0) {
+            transformerRef.current.nodes(selectedNodes)
+            transformerRef.current.getLayer()?.batchDraw()
+            
+            // Force update to ensure proper bounds calculation
+            setTimeout(() => {
+              if (transformerRef.current) {
+                transformerRef.current.forceUpdate()
+              }
+            }, 10)
           }
-          return null
-        }).filter(Boolean)
-        
-        if (selectedNodes.length > 0) {
-          transformerRef.current.nodes(selectedNodes)
-          transformerRef.current.getLayer()?.batchDraw()
+        } else if (selectedId && stageRef.current && transformerRef.current) {
+          const selectedNode = stageRef.current.findOne(`#${selectedId}`)
+          if (selectedNode) {
+            transformerRef.current.nodes([selectedNode])
+            transformerRef.current.getLayer()?.batchDraw()
+            
+            // Force update to ensure proper bounds calculation
+            setTimeout(() => {
+              if (transformerRef.current) {
+                transformerRef.current.forceUpdate()
+              }
+            }, 10)
+          }
+        } else if (transformerRef.current) {
+          // Clear transformer when there's no active selection
+          const hasActiveSelection = selectedId || selectedIds.length > 0
           
-          // Force update to ensure proper bounds calculation
-          setTimeout(() => {
-            if (transformerRef.current) {
-              transformerRef.current.forceUpdate()
-            }
-          }, 10)
+          if (!hasActiveSelection) {
+            transformerRef.current.nodes([])
+            transformerRef.current.getLayer()?.batchDraw()
+          }
         }
-      } else if (selectedId && stageRef.current && transformerRef.current) {
-        const selectedNode = stageRef.current.findOne(`#${selectedId}`)
-        if (selectedNode) {
-
-          
-          transformerRef.current.nodes([selectedNode])
-          transformerRef.current.getLayer()?.batchDraw()
-          
-          // Force update to ensure proper bounds calculation
-          setTimeout(() => {
-            if (transformerRef.current) {
-              transformerRef.current.forceUpdate()
-            }
-          }, 10)
-        }
-      } else if (transformerRef.current) {
-        transformerRef.current.nodes([])
-        transformerRef.current.getLayer()?.batchDraw()
       }
-    }
 
-    // Immediate update
-    updateTransformer()
-    
-    // Delayed update to ensure elements are rendered
-    const timeoutId = setTimeout(updateTransformer, 50)
+      // Immediate update
+      updateTransformer()
+      
+      // Delayed update to ensure elements are rendered
+      const delayedTimeoutId = setTimeout(updateTransformer, 50)
+      
+      return () => clearTimeout(delayedTimeoutId)
+    }, 10) // Small delay to ensure state is updated
     
     return () => clearTimeout(timeoutId)
   }, [selectedId, selectedIds, elements]) // Include elements for proper updates
@@ -1271,6 +1352,7 @@ const BannerCanvas = forwardRef(({
         if (element.strokeWidth === undefined) element.strokeWidth = 0
         if (!element.wrap) element.wrap = 'word'
         if (!element.lineHeight) element.lineHeight = 1.2
+        if (!element.fontStyle) element.fontStyle = 'normal'
         break
       case 'rect':
         if (!element.width) element.width = 100
@@ -1370,16 +1452,19 @@ const BannerCanvas = forwardRef(({
             text={safeElement.text || 'Text'}
             fontSize={safeElement.fontSize || 24}
             fontFamily={safeElement.fontFamily || 'Arial'}
+            fontStyle={safeElement.fontStyle || 'normal'}
             fill={safeElement.fill || '#000000'}
             stroke={safeElement.stroke || null}
             strokeWidth={safeElement.strokeWidth || 0}
             align={safeElement.align || 'left'}
-            verticalAlign="top"
+            verticalAlign={safeElement.verticalAlign || 'top'}
             width={safeElement.width || 200}
-            height="auto"
+            height={safeElement.height || 50}
             padding={safeElement.padding || 0}
-            wrap="word"
+            wrap={safeElement.wrap || 'word'}
             lineHeight={safeElement.lineHeight || 1.2}
+            textDecoration={safeElement.textDecoration || 'none'}
+            letterSpacing={safeElement.letterSpacing || 0}
             listening={true}
             onDblClick={() => {
               handleTextEdit(safeElement.id);

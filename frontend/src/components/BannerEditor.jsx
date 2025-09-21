@@ -267,6 +267,8 @@ const BannerEditorNew = () => {
   
   const [selectedId, setSelectedId] = useState(null)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [currentTemplateId, setCurrentTemplateId] = useState(null)
+  const [activeDesignAssets, setActiveDesignAssets] = useState(new Set())
   
   // Navigation state
   const [cameFromTemplate, setCameFromTemplate] = useState(false)
@@ -788,6 +790,8 @@ const BannerEditorNew = () => {
     if (confirm('Are you sure you want to clear the canvas? This will remove all elements and cannot be undone.')) {
       setElements([])
       setSelectedId(null)
+      setCurrentTemplateId(null) // Clear template selection
+      setActiveDesignAssets(new Set()) // Clear active design assets
       // Show success feedback
       console.log('Canvas cleared successfully')
     }
@@ -1053,7 +1057,7 @@ const BannerEditorNew = () => {
       const img = new window.Image()
       img.onload = () => {
         const newIcon = {
-          id: generateId('image'),
+          id: 'template_image_placeholder',
           type: 'image',
           x: canvasSize.width / 2 - 50,
           y: canvasSize.height / 2 - 50,
@@ -1079,7 +1083,7 @@ const BannerEditorNew = () => {
         console.error('Failed to load icon image:', imagePath)
         // Fallback to text element with emoji
         const newIcon = {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: canvasSize.width / 2 - 50,
           y: canvasSize.height / 2 - 50,
@@ -1162,7 +1166,7 @@ const BannerEditorNew = () => {
         const img = new window.Image()
         img.onload = () => {
           const newQRCode = {
-            id: generateId('qrcode'),
+            id: 'template_qrcode_placeholder',
             type: 'image',
             x: canvasSize.width / 2 - 100,
             y: canvasSize.height / 2 - 100,
@@ -1205,10 +1209,23 @@ const BannerEditorNew = () => {
     
     setElements(prev => prev.map(el => {
       if (el.id === selectedId && el.type === 'text') {
+        let updatedElement = { ...el }
+        
         if (typeof value === 'function') {
-          return { ...el, [property]: value(el[property]) }
+          updatedElement[property] = value(el[property])
+        } else {
+          updatedElement[property] = value
         }
-        return { ...el, [property]: value }
+        
+          // Special handling for text elements when font size changes
+          if (property === 'fontSize' && value !== el.fontSize) {
+            // When font size changes, set a reasonable width to allow expansion
+            // This prevents text from wrapping to new lines when font size increases
+            updatedElement.width = Math.max(200, updatedElement.width || 200)
+            updatedElement.wrap = 'none'
+          }
+        
+        return updatedElement
       }
       return el
     }))
@@ -1321,14 +1338,14 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#1e3a8a'
         },
         {
-          id: generateId('star'),
+          id: 'template_star_placeholder',
           type: 'star',
           x: 400, y: 200,
           numPoints: 16,
@@ -1336,31 +1353,47 @@ const BannerEditorNew = () => {
           outerRadius: 120,
           fill: '#fbbf24',
           strokeWidth: 3,
-          stroke: '#f59e0b'
+          stroke: '#f59e0b',
+          width: 240,
+          height: 240
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 160,
           text: 'GRAND OPENING',
-          fontSize: 32,
+          fontSize: 36,
           fontFamily: 'Impact',
+          fontStyle: 'bold',
           fill: '#ffffff',
           align: 'center',
-          strokeWidth: 2,
-          stroke: '#1e3a8a'
+          strokeWidth: 3,
+          stroke: '#1e3a8a',
+          width: 400,
+          height: 60,
+          wrap: 'none',
+          lineHeight: 1.2,
+          verticalAlign: 'middle',
+          padding: 0
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 240,
           text: 'NOW OPEN!',
-          fontSize: 24,
+          fontSize: 28,
           fontFamily: 'Arial Black',
+          fontStyle: 'bold',
           fill: '#dc2626',
           align: 'center',
           strokeWidth: 2,
-          stroke: '#ffffff'
+          stroke: '#ffffff',
+          width: 250,
+          height: 50,
+          wrap: 'none',
+          lineHeight: 1.2,
+          verticalAlign: 'middle',
+          padding: 0
         }
       ]
     },
@@ -1376,46 +1409,60 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#dc2626'
         },
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 200, height: 400,
           fill: '#991b1b'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 500, y: 100,
           text: 'MEGA SALE',
           fontSize: 48,
           fontFamily: 'Impact',
+          fontStyle: 'bold',
           fill: '#ffffff',
           align: 'center',
           shadowBlur: 5,
           shadowColor: 'rgba(0,0,0,0.5)',
-          shadowOffsetY: 3
+          shadowOffsetY: 3,
+          width: 400,
+          height: 60,
+          wrap: 'none',
+          lineHeight: 1.2,
+          verticalAlign: 'middle',
+          padding: 0
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 500, y: 180,
           text: 'UP TO 70% OFF',
           fontSize: 32,
           fontFamily: 'Arial Black',
+          fontStyle: 'bold',
           fill: '#fbbf24',
           align: 'center',
           strokeWidth: 2,
-          stroke: '#dc2626'
+          stroke: '#dc2626',
+          width: 350,
+          height: 50,
+          wrap: 'none',
+          lineHeight: 1.2,
+          verticalAlign: 'middle',
+          padding: 0
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 500, y: 240,
           text: 'JUNE 15-30',
@@ -1425,7 +1472,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 500, y: 280,
           text: 'LIMITED TIME ONLY!',
@@ -1448,21 +1495,21 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#1e40af'
         },
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 50, y: 50,
           width: 700, height: 300,
           fill: '#ffffff'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 120,
           text: 'FOR SALE',
@@ -1472,7 +1519,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 250, y: 200,
           text: '🏠',
@@ -1480,7 +1527,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 550, y: 200,
           text: 'CALL TODAY\n(555) 123-4567',
@@ -1504,21 +1551,21 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#7c2d12'
         },
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 100,
           fill: '#fbbf24'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 50,
           text: 'DAILY SPECIAL',
@@ -1528,7 +1575,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 220,
           text: '🍕',
@@ -1536,7 +1583,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 550, y: 180,
           text: 'WOOD FIRED PIZZA\n$12.99',
@@ -1547,7 +1594,7 @@ const BannerEditorNew = () => {
           lineHeight: 1.3
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 320,
           text: 'Available 11AM - 9PM Daily',
@@ -1570,14 +1617,14 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#f97316'
         },
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 250,
           width: 800, height: 150,
@@ -1585,7 +1632,7 @@ const BannerEditorNew = () => {
           rotation: -15
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 100,
           text: 'ABC CONSTRUCTION',
@@ -1597,7 +1644,7 @@ const BannerEditorNew = () => {
           stroke: '#1f2937'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 150,
           text: 'RESIDENTIAL • COMMERCIAL',
@@ -1605,10 +1652,10 @@ const BannerEditorNew = () => {
           fontFamily: 'Arial',
           fill: '#1f2937',
           align: 'center',
-          fontWeight: 'bold'
+          fontStyle: 'bold'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 200,
           text: '📞 (555) BUILD-NOW',
@@ -1618,7 +1665,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 320,
           text: 'LICENSED • INSURED • BONDED',
@@ -1641,21 +1688,21 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#1f2937'
         },
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 100,
           fill: '#dc2626'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 50,
           text: 'SUMMER SALE EVENT',
@@ -1665,7 +1712,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 180,
           text: '🚗',
@@ -1673,7 +1720,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 550, y: 150,
           text: 'SAVE UP TO\n$5,000 OFF',
@@ -1684,7 +1731,7 @@ const BannerEditorNew = () => {
           lineHeight: 1.2
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 280,
           text: 'ALL NEW & USED VEHICLES',
@@ -1694,7 +1741,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 320,
           text: '📞 (555) AUTO-SALE',
@@ -1717,21 +1764,21 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#ffffff'
         },
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 80,
           fill: '#2563eb'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 40,
           text: 'CITY MEDICAL CLINIC',
@@ -1741,7 +1788,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 150,
           text: '🏥',
@@ -1749,7 +1796,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 550, y: 120,
           text: 'ACCEPTING NEW PATIENTS',
@@ -1759,7 +1806,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 550, y: 160,
           text: 'Family Medicine • Urgent Care\nWalk-ins Welcome',
@@ -1770,7 +1817,7 @@ const BannerEditorNew = () => {
           lineHeight: 1.3
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 280,
           text: '📞 (555) MED-CARE • 📍 123 Main St',
@@ -1780,7 +1827,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 400, y: 320,
           text: 'Mon-Fri 8AM-6PM • Sat 9AM-2PM',
@@ -1804,21 +1851,21 @@ const BannerEditorNew = () => {
       recommendedSizes: ['3x2', '4x2', '5x2', '6x2'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 400, height: 800,
           fill: '#1e40af'
         },
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 25, y: 25,
           width: 350, height: 750,
           fill: '#ffffff'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 80,
           text: 'FOR SALE',
@@ -1828,7 +1875,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 200,
           text: '🏠',
@@ -1836,7 +1883,7 @@ const BannerEditorNew = () => {
           align: 'center'
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 350,
           text: 'BEAUTIFUL HOME\n3 BED • 2 BATH\n1,500 SQ FT',
@@ -1847,7 +1894,7 @@ const BannerEditorNew = () => {
           lineHeight: 1.3
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 500,
           text: 'CALL TODAY\n(555) 123-4567',
@@ -1858,7 +1905,7 @@ const BannerEditorNew = () => {
           lineHeight: 1.2
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 650,
           text: 'OPEN HOUSE\nSUNDAY 2-4PM',
@@ -1871,80 +1918,105 @@ const BannerEditorNew = () => {
       ]
     },
 
-    // Restaurant Portrait
+    // Restaurant Portrait - Professional Daily Special Design
     {
       id: 'restaurant-portrait',
-      name: 'Restaurant - Portrait',
+      name: 'Daily Special - Portrait',
       category: 'Food & Dining',
-      description: 'Tall design for restaurant promotions',
-      tags: ['restaurant', 'portrait', 'food', 'vertical'],
+      description: 'Professional portrait design for daily specials with proper typography and visual hierarchy',
+      tags: ['restaurant', 'portrait', 'food', 'vertical', 'daily special'],
       orientation: 'portrait',
       recommendedSizes: ['3x2', '4x2', '5x2', '6x2'],
       elements: [
+        // Main background - dark brown
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 400, height: 800,
-          fill: '#7c2d12'
+          fill: '#8B4513'
         },
+        // Top header section - golden yellow
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
-          width: 400, height: 100,
-          fill: '#fbbf24'
+          width: 400, height: 200,
+          fill: '#DAA520'
         },
+        // Main content background - dark brown
         {
-          id: generateId('text'),
+          id: 'template_rect_placeholder',
+          type: 'rect',
+          x: 0, y: 200,
+          width: 400, height: 600,
+          fill: '#8B4513'
+        },
+        // Daily Special header - bold, centered
+        {
+          id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 50,
+          x: 200, y: 100,
           text: 'DAILY SPECIAL',
-          fontSize: 24,
+          fontSize: 32,
           fontFamily: 'Impact',
-          fill: '#7c2d12',
-          align: 'center'
-        },
-        {
-          id: generateId('text'),
-          type: 'text',
-          x: 200, y: 180,
-          text: '🍕',
-          fontSize: 80,
-          align: 'center'
-        },
-        {
-          id: generateId('text'),
-          type: 'text',
-          x: 200, y: 320,
-          text: 'WOOD FIRED PIZZA\n$12.99',
-          fontSize: 20,
-          fontFamily: 'Arial Black',
-          fill: '#ffffff',
+          fontStyle: 'bold',
+          fill: '#8B4513',
           align: 'center',
-          lineHeight: 1.3
+          width: 300,
+          height: 50
         },
+        // Pizza emoji - large and centered
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 450,
-          text: 'Available 11AM - 9PM\nDaily Specials',
+          x: 200, y: 280,
+          text: '🍕',
+          fontSize: 100,
+          align: 'center',
+          width: 100,
+          height: 100
+        },
+        // Wood Fired main text - white, bold
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 200, y: 420,
+          text: 'WOOD FIRED',
+          fontSize: 36,
+          fontFamily: 'Arial Black',
+          fontStyle: 'bold',
+          fill: '#FFFFFF',
+          align: 'center',
+          width: 300,
+          height: 50
+        },
+        // Availability text - golden yellow
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 200, y: 520,
+          text: 'Available 11AM - 9PM Daily',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#DAA520',
+          align: 'center',
+          width: 300,
+          height: 30
+        },
+        // Contact info - white, smaller
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 200, y: 650,
+          text: '📞 (555) PIZZA-NOW\n📍 123 Main Street',
           fontSize: 14,
           fontFamily: 'Arial',
-          fill: '#fbbf24',
+          fill: '#FFFFFF',
           align: 'center',
-          lineHeight: 1.3
-        },
-        {
-          id: generateId('text'),
-          type: 'text',
-          x: 200, y: 600,
-          text: '📞 (555) PIZZA-NOW\n📍 123 Main Street',
-          fontSize: 12,
-          fontFamily: 'Arial',
-          fill: '#ffffff',
-          align: 'center',
-          lineHeight: 1.2
+          lineHeight: 1.4,
+          width: 300,
+          height: 60
         }
       ]
     },
@@ -1961,14 +2033,14 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#FF6B35'
         },
         {
-          id: generateId('pizza-bg'),
+          id: 'template_pizza_bg_placeholder',
           type: 'image',
           x: 50, y: 50,
           width: 200, height: 200,
@@ -1976,19 +2048,19 @@ const BannerEditorNew = () => {
           opacity: 0.1
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 300, y: 80,
           text: 'PIZZA SPECIAL',
           fontSize: 48,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FFFFFF',
           stroke: '#000000',
           strokeWidth: 2
         },
         {
-          id: generateId('text2'),
+          id: 'template_text2_placeholder',
           type: 'text',
           x: 300, y: 140,
           text: 'Buy 2 Get 1 FREE',
@@ -1999,7 +2071,7 @@ const BannerEditorNew = () => {
           strokeWidth: 1
         },
         {
-          id: generateId('text3'),
+          id: 'template_text3_placeholder',
           type: 'text',
           x: 300, y: 200,
           text: 'Starting at $12.99',
@@ -2008,7 +2080,7 @@ const BannerEditorNew = () => {
           fill: '#FFFFFF'
         },
         {
-          id: generateId('text4'),
+          id: 'template_text4_placeholder',
           type: 'text',
           x: 300, y: 250,
           text: 'Call: (555) 123-PIZZA',
@@ -2017,7 +2089,7 @@ const BannerEditorNew = () => {
           fill: '#FFFFFF'
         },
         {
-          id: generateId('qrcode'),
+          id: 'template_qrcode_placeholder',
           type: 'qrcode',
           x: 600, y: 250,
           width: 120, height: 120,
@@ -2040,14 +2112,14 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#8B4513'
         },
         {
-          id: generateId('coffee-bg'),
+          id: 'template_coffee_bg_placeholder',
           type: 'image',
           x: 50, y: 100,
           width: 150, height: 150,
@@ -2055,29 +2127,29 @@ const BannerEditorNew = () => {
           opacity: 0.2
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 250, y: 60,
           text: 'GRAND OPENING',
           fontSize: 42,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FFFFFF',
           stroke: '#8B4513',
           strokeWidth: 2
         },
         {
-          id: generateId('text2'),
+          id: 'template_text2_placeholder',
           type: 'text',
           x: 250, y: 120,
           text: 'Brew & Bean Café',
           fontSize: 32,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FFD700'
         },
         {
-          id: generateId('text3'),
+          id: 'template_text3_placeholder',
           type: 'text',
           x: 250, y: 170,
           text: 'Saturday, March 15th',
@@ -2086,7 +2158,7 @@ const BannerEditorNew = () => {
           fill: '#FFFFFF'
         },
         {
-          id: generateId('text4'),
+          id: 'template_text4_placeholder',
           type: 'text',
           x: 250, y: 200,
           text: '10:00 AM - 6:00 PM',
@@ -2095,17 +2167,17 @@ const BannerEditorNew = () => {
           fill: '#FFFFFF'
         },
         {
-          id: generateId('text5'),
+          id: 'template_text5_placeholder',
           type: 'text',
           x: 250, y: 240,
           text: 'FREE Coffee for First 100 Customers!',
           fontSize: 16,
           fontFamily: 'Inter',
           fill: '#FFD700',
-          fontWeight: 'bold'
+          fontStyle: 'bold'
         },
         {
-          id: generateId('text6'),
+          id: 'template_text6_placeholder',
           type: 'text',
           x: 250, y: 280,
           text: '123 Main Street, Downtown',
@@ -2126,7 +2198,7 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
@@ -2141,29 +2213,29 @@ const BannerEditorNew = () => {
           opacity: 0.15
         },
         {
-          id: generateId('text'),
+          id: 'template_text_placeholder',
           type: 'text',
           x: 300, y: 80,
           text: 'SAFETY FIRST',
           fontSize: 48,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FFFFFF',
           stroke: '#000000',
           strokeWidth: 3
         },
         {
-          id: generateId('text2'),
+          id: 'template_text2_placeholder',
           type: 'text',
           x: 300, y: 140,
           text: 'BuildRight Construction',
           fontSize: 28,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#000000'
         },
         {
-          id: generateId('text3'),
+          id: 'template_text3_placeholder',
           type: 'text',
           x: 300, y: 180,
           text: 'Building Tomorrow, Safely Today',
@@ -2172,7 +2244,7 @@ const BannerEditorNew = () => {
           fill: '#000000'
         },
         {
-          id: generateId('text4'),
+          id: 'template_text4_placeholder',
           type: 'text',
           x: 300, y: 220,
           text: 'Licensed & Insured • 20+ Years Experience',
@@ -2181,17 +2253,17 @@ const BannerEditorNew = () => {
           fill: '#000000'
         },
         {
-          id: generateId('text5'),
+          id: 'template_text5_placeholder',
           type: 'text',
           x: 300, y: 250,
           text: 'Call: (555) 123-BUILD',
           fontSize: 18,
           fontFamily: 'Inter',
           fill: '#000000',
-          fontWeight: 'bold'
+          fontStyle: 'bold'
         },
         {
-          id: generateId('text6'),
+          id: 'template_text6_placeholder',
           type: 'text',
           x: 300, y: 280,
           text: 'www.buildrightconstruction.com',
@@ -2213,7 +2285,7 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
@@ -2236,13 +2308,13 @@ const BannerEditorNew = () => {
           opacity: 0.9
         },
         {
-          id: generateId('main-text'),
+          id: 'template_main_text_placeholder',
           type: 'text',
           x: 350, y: 80,
           text: 'TECHNOVATE',
           fontSize: 48,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FFFFFF',
           stroke: '#1E293B',
           strokeWidth: 2
@@ -2275,7 +2347,7 @@ const BannerEditorNew = () => {
           fontSize: 20,
           fontFamily: 'Inter',
           fill: '#FBBF24',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           stroke: '#1E293B',
           strokeWidth: 1
         },
@@ -2312,7 +2384,7 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
@@ -2335,13 +2407,13 @@ const BannerEditorNew = () => {
           opacity: 0.2
         },
         {
-          id: generateId('main-text'),
+          id: 'template_main_text_placeholder',
           type: 'text',
           x: 250, y: 60,
           text: 'POWER GYM',
           fontSize: 52,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FFFFFF',
           stroke: '#DC2626',
           strokeWidth: 3
@@ -2353,7 +2425,7 @@ const BannerEditorNew = () => {
           text: 'NEW YEAR SPECIAL',
           fontSize: 28,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FBBF24',
           stroke: '#DC2626',
           strokeWidth: 2
@@ -2386,7 +2458,7 @@ const BannerEditorNew = () => {
           fontSize: 18,
           fontFamily: 'Inter',
           fill: '#FFFFFF',
-          fontWeight: 'bold'
+          fontStyle: 'bold'
         },
         {
           id: generateId('address-text'),
@@ -2421,7 +2493,7 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
@@ -2444,13 +2516,13 @@ const BannerEditorNew = () => {
           opacity: 0.8
         },
         {
-          id: generateId('main-text'),
+          id: 'template_main_text_placeholder',
           type: 'text',
           x: 250, y: 80,
           text: 'LUXURY LIVING',
           fontSize: 48,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FFFFFF',
           stroke: '#0F172A',
           strokeWidth: 2
@@ -2462,7 +2534,7 @@ const BannerEditorNew = () => {
           text: 'Exclusive Waterfront Estate',
           fontSize: 28,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#FBBF24',
           stroke: '#0F172A',
           strokeWidth: 1
@@ -2495,7 +2567,7 @@ const BannerEditorNew = () => {
           fontSize: 18,
           fontFamily: 'Inter',
           fill: '#FBBF24',
-          fontWeight: 'bold'
+          fontStyle: 'bold'
         },
         {
           id: generateId('contact-text'),
@@ -2530,7 +2602,7 @@ const BannerEditorNew = () => {
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: generateId('rect'),
+          id: 'template_rect_placeholder',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
@@ -2561,13 +2633,13 @@ const BannerEditorNew = () => {
           opacity: 0.4
         },
         {
-          id: generateId('main-text'),
+          id: 'template_main_text_placeholder',
           type: 'text',
           x: 200, y: 80,
           text: 'SAVE THE DATE',
           fontSize: 42,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#DC2626',
           stroke: '#FFFFFF',
           strokeWidth: 2
@@ -2579,7 +2651,7 @@ const BannerEditorNew = () => {
           text: 'Sarah & Michael',
           fontSize: 36,
           fontFamily: 'Inter',
-          fontWeight: 'bold',
+          fontStyle: 'bold',
           fill: '#1E293B',
           stroke: '#FFFFFF',
           strokeWidth: 1
@@ -2621,7 +2693,7 @@ const BannerEditorNew = () => {
           fontSize: 16,
           fontFamily: 'Inter',
           fill: '#DC2626',
-          fontWeight: 'bold'
+          fontStyle: 'bold'
         },
         {
           id: generateId('qr-code'),
@@ -2637,6 +2709,84 @@ const BannerEditorNew = () => {
       ]
     }
   ]
+
+  // Ensure element has all required properties for proper rendering and transformation
+  const ensureElementProperties = useCallback((element) => {
+    const defaults = {
+      id: element.id,
+      type: element.type,
+      x: element.x || 0,
+      y: element.y || 0,
+      rotation: element.rotation || 0,
+      fill: element.fill || '#000000',
+      stroke: element.stroke || null,
+      strokeWidth: element.strokeWidth || 0,
+      opacity: element.opacity || 1,
+      scaleX: element.scaleX || 1,
+      scaleY: element.scaleY || 1
+    }
+    
+    // Apply defaults for missing properties
+    Object.keys(defaults).forEach(key => {
+      if (element[key] === undefined || element[key] === null) {
+        element[key] = defaults[key]
+      }
+    })
+    
+    // Type-specific defaults
+    switch (element.type) {
+      case 'text':
+        if (!element.text) element.text = 'Text'
+        if (!element.fontSize) element.fontSize = 24
+        if (!element.fontFamily) element.fontFamily = 'Arial'
+        // Ensure text always has numeric dimensions for proper transformation
+        if (!element.width || element.width === 'auto') element.width = 200
+        if (!element.height || element.height === 'auto') element.height = 50
+        if (element.stroke === undefined) element.stroke = null
+        if (element.strokeWidth === undefined) element.strokeWidth = 0
+        if (!element.wrap) element.wrap = 'word'
+        if (!element.lineHeight) element.lineHeight = 1.2
+        if (!element.fontStyle) element.fontStyle = 'normal'
+        if (!element.align) element.align = 'left'
+        if (!element.verticalAlign) element.verticalAlign = 'top'
+        if (!element.padding) element.padding = 0
+        if (!element.textDecoration) element.textDecoration = 'none'
+        if (!element.letterSpacing) element.letterSpacing = 0
+        if (element.rotation === undefined) element.rotation = 0
+        if (element.fill === undefined) element.fill = '#000000'
+        break
+      case 'rect':
+        if (!element.width) element.width = 100
+        if (!element.height) element.height = 100
+        break
+      case 'circle':
+        if (!element.radius) element.radius = 50
+        break
+      case 'star':
+        if (!element.numPoints) element.numPoints = 5
+        if (!element.innerRadius) element.innerRadius = 30
+        if (!element.outerRadius) element.outerRadius = 50
+        if (!element.width) element.width = 100
+        if (!element.height) element.height = 100
+        break
+      case 'triangle':
+      case 'hexagon':
+      case 'octagon':
+        if (!element.radius) element.radius = 50
+        if (!element.width) element.width = 100
+        if (!element.height) element.height = 100
+        break
+      case 'line':
+        if (!element.points) element.points = [0, 0, 100, 100]
+        break
+      case 'image':
+        if (!element.width) element.width = 100
+        if (!element.height) element.height = 100
+        break
+    }
+    
+    return element
+  }, [])
 
   // Scale template elements to fit current canvas size
   const scaleTemplateElements = useCallback((templateElements, targetWidth, targetHeight, originalCanvasSize = null) => {
@@ -2741,6 +2891,9 @@ const BannerEditorNew = () => {
     console.log('🎨 Current product type:', productType)
     console.log('🎨 Current surface:', currentSurface)
     
+    // Set the current template ID for visual indication
+    setCurrentTemplateId(template.id)
+    
     // Check if it's a marketplace template
     if (template.marketplaceTemplate) {
       console.log('🎨 Loading marketplace template:', template.name)
@@ -2783,7 +2936,7 @@ const BannerEditorNew = () => {
             
             // Create image element that will be loaded asynchronously
             const imageElement = {
-              id: generateId('image'),
+              id: 'template_image_placeholder',
               type: 'image',
               x: 0,
               y: 0,
@@ -2831,10 +2984,15 @@ const BannerEditorNew = () => {
                 canvasSize.width, 
                 canvasSize.height,
                 templateData.canvasSize || null // Pass original canvas size if available
-              ).map(element => ({
-                ...element,
-                id: generateId(element.type)
-              }))
+              ).map(element => {
+                // Generate new ID for each element to avoid conflicts
+                const elementWithId = {
+                  ...element,
+                  id: generateId(element.type)
+                }
+                // Ensure all required properties are present for proper rendering and transformation
+                return ensureElementProperties(elementWithId)
+              })
               
               setElements(scaledElements)
               setSelectedId(null)
@@ -2869,10 +3027,15 @@ const BannerEditorNew = () => {
         canvasSize.width, 
           canvasSize.height,
           selectedTemplate.canvasSize || { width: 800, height: 400 } // Banner templates use 800x400
-      ).map(element => ({
-        ...element,
-        id: generateId(element.type)
-      }))
+      ).map(element => {
+        // Generate new ID for each element to avoid conflicts
+        const elementWithId = {
+          ...element,
+          id: generateId(element.type)
+        }
+        // Ensure all required properties are present for proper rendering and transformation
+        return ensureElementProperties(elementWithId)
+      })
       
       setElements(scaledElements)
       
@@ -2885,7 +3048,53 @@ const BannerEditorNew = () => {
       alert('Template not found. Please try again.')
     }
     }
-  }, [bannerTemplates, scaleTemplateElements, canvasSize.width, canvasSize.height, productType, currentSurface])
+  }, [bannerTemplates, scaleTemplateElements, ensureElementProperties, canvasSize.width, canvasSize.height, productType, currentSurface])
+
+  // Remove asset from tracking when deleted
+  const removeAssetFromTracking = useCallback((assetName) => {
+    setActiveDesignAssets(prev => {
+      const newSet = new Set(prev)
+      newSet.delete(assetName)
+      return newSet
+    })
+  }, [])
+
+  // Remove asset from canvas when toggled off
+  const removeAssetFromCanvas = useCallback((assetName) => {
+    console.log('🎨 Removing asset from canvas:', assetName)
+    
+    // Find the element to remove first
+    const elementToRemove = elements.find(el => el.type === 'image' && el.assetName === assetName)
+    console.log('🎨 Element to remove:', elementToRemove)
+    console.log('🎨 Current selectedId:', selectedId)
+    
+    // Clear selection immediately if the selected element is being removed
+    if (elementToRemove && selectedId === elementToRemove.id) {
+      console.log('🎨 Clearing selection for removed element')
+      setSelectedId(null)
+      
+      // Clear transformer handles immediately
+      if (stageRef.current && stageRef.current.clearTransformer) {
+        console.log('🎨 Calling clearTransformer')
+        stageRef.current.clearTransformer()
+      } else {
+        console.log('🎨 clearTransformer not available')
+      }
+    }
+    
+    // Find and remove the asset element from the canvas
+    setElements(prev => {
+      const newElements = prev.filter(el => !(el.type === 'image' && el.assetName === assetName))
+      return newElements
+    })
+    
+    // Remove from tracking
+    setActiveDesignAssets(prev => {
+      const newSet = new Set(prev)
+      newSet.delete(assetName)
+      return newSet
+    })
+  }, [elements, selectedId])
 
   // Add asset from library
   const addAsset = useCallback((imagePath, assetName) => {
@@ -2932,6 +3141,9 @@ const BannerEditorNew = () => {
         assetName: assetName,
         imagePath: imagePath // Store the actual image path for restoration
       }
+      
+      // Track this design asset as active
+      setActiveDesignAssets(prev => new Set([...prev, assetName]))
       
       // Use multi-surface logic for tin and tent products
       if (productType === 'tin' || productType === 'tent') {
@@ -2987,7 +3199,7 @@ const BannerEditorNew = () => {
           }
           
           const newImage = {
-            id: generateId('image'),
+            id: 'template_image_placeholder',
             type: 'image',
             x: canvasSize.width / 2 - finalWidth / 2,
             y: canvasSize.height / 2 - finalHeight / 2,
@@ -4451,6 +4663,7 @@ const BannerEditorNew = () => {
             onLoadTemplate={loadTemplate}
             onImageUpload={handleImageUpload}
             onAddQRCode={addQRCode}
+            onRemoveAssetFromTracking={removeAssetFromTracking}
 
             onTextPropertyChange={handleTextPropertyChange}
             onShapePropertyChange={handleShapePropertyChange}
@@ -4460,6 +4673,10 @@ const BannerEditorNew = () => {
             bannerTemplates={bannerTemplates}
             userTemplates={[]}
             selectedElement={elements.find(el => el.id === selectedId)}
+            selectedId={selectedId}
+            currentTemplateId={currentTemplateId}
+            activeDesignAssets={activeDesignAssets}
+            onRemoveAssetFromCanvas={removeAssetFromCanvas}
           />
         </div>
         
@@ -4488,6 +4705,7 @@ const BannerEditorNew = () => {
             onSurfaceChange={handleSurfaceChange}
             availableSurfaces={availableSurfaces}
             clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyValenceClipFunc() : null}
+            onRemoveAssetFromTracking={removeAssetFromTracking}
           />
           
                 {/* Mobile Overlay when sidebar is open */}

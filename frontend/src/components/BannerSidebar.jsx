@@ -23,7 +23,14 @@ import {
   Loader2,
   Eye,
   User,
-  Tag
+  Tag,
+  Hexagon,
+  Octagon,
+  ArrowRight,
+  ArrowLeft,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown
 } from 'lucide-react'
 
 const BannerSidebar = ({ 
@@ -61,7 +68,11 @@ const BannerSidebar = ({
   bannerTemplates = [],
   userTemplates = [],
   selectedElement = null,
-  elementsCount = 0
+  selectedId = null,
+  elementsCount = 0,
+  currentTemplateId = null,
+  activeDesignAssets = new Set(),
+  onRemoveAssetFromCanvas
 }) => {
   const [expandedSections, setExpandedSections] = useState({
     specifications: false,
@@ -77,6 +88,8 @@ const BannerSidebar = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [sizeCategory, setSizeCategory] = useState('landscape')
   const [uploadedImages, setUploadedImages] = useState([])
+  const [customWidth, setCustomWidth] = useState('')
+  const [customHeight, setCustomHeight] = useState('')
   
   // Marketplace state
   const [marketplaceTemplates, setMarketplaceTemplates] = useState([])
@@ -203,6 +216,9 @@ const BannerSidebar = ({
   // QR Code state
   const [qrColor, setQrColor] = useState('#000000')
   const [qrBackgroundColor, setQrBackgroundColor] = useState('#ffffff')
+
+  // Banner orientation tab state
+  const [selectedBannerOrientation, setSelectedBannerOrientation] = useState('landscape')
 
 
   const [isScrolling, setIsScrolling] = useState(false)
@@ -333,18 +349,18 @@ const BannerSidebar = ({
     { name: 'Rectangle', icon: Square, type: 'rect', category: 'basic' },
     { name: 'Circle', icon: CircleIcon, type: 'circle', category: 'basic' },
     { name: 'Triangle', icon: Triangle, type: 'triangle', category: 'basic' },
-    { name: 'Hexagon', icon: FileText, type: 'hexagon', category: 'basic' },
-    { name: 'Octagon', icon: FileText, type: 'octagon', category: 'basic' },
+    { name: 'Hexagon', icon: Hexagon, type: 'hexagon', category: 'basic' },
+    { name: 'Octagon', icon: Octagon, type: 'octagon', category: 'basic' },
     
     // Decorative Shapes
     { name: 'Star', icon: StarIcon, type: 'star', category: 'decorative' },
     
     // Arrows & Directional
-    { name: 'Arrow Right', icon: CornerDownRight, type: 'arrow-right', category: 'arrows' },
-    { name: 'Arrow Left', icon: CornerDownRight, type: 'arrow-left', category: 'arrows' },
-    { name: 'Arrow Up', icon: CornerDownRight, type: 'arrow-up', category: 'arrows' },
-    { name: 'Arrow Down', icon: CornerDownRight, type: 'arrow-down', category: 'arrows' },
-    { name: 'Double Arrow', icon: CornerDownRight, type: 'double-arrow', category: 'arrows' },
+    { name: 'Arrow Right', icon: ArrowRight, type: 'arrow-right', category: 'arrows' },
+    { name: 'Arrow Left', icon: ArrowLeft, type: 'arrow-left', category: 'arrows' },
+    { name: 'Arrow Up', icon: ArrowUp, type: 'arrow-up', category: 'arrows' },
+    { name: 'Arrow Down', icon: ArrowDown, type: 'arrow-down', category: 'arrows' },
+    { name: 'Double Arrow', icon: ArrowUpDown, type: 'double-arrow', category: 'arrows' },
     
     // Business Shapes
     { name: 'Badge', icon: FileText, type: 'badge', category: 'business' },
@@ -713,8 +729,16 @@ const BannerSidebar = ({
 
   const handleAssetClick = (asset) => {
     preserveScrollPosition(() => {
-    const imagePath = `/assets/images/${asset.file}`
-    onAddAsset(imagePath, asset.name)
+      const imagePath = `/assets/images/${asset.file}`
+      
+      // Check if this asset is already active (highlighted)
+      if (activeDesignAssets.has(asset.name)) {
+        // Asset is already active - remove it from canvas
+        onRemoveAssetFromCanvas(asset.name)
+      } else {
+        // Asset is not active - add it to canvas
+        onAddAsset(imagePath, asset.name)
+      }
     })
   }
 
@@ -1321,25 +1345,36 @@ const BannerSidebar = ({
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                     <div className="text-sm font-medium text-gray-800 mb-3">Surface Coverage</div>
                     <div className="space-y-2">
-                      <label className="flex items-center space-x-2">
+                      <label className="flex items-center space-x-2 cursor-pointer hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors duration-200">
+                        <input 
+                          type="radio" 
+                          name="surface-coverage" 
+                          value="front-only" 
+                          checked={tinSpecs?.surfaceCoverage === 'front-only'}
+                          onChange={(e) => handleTinSpecChange('surfaceCoverage', e.target.value)}
+                          className="text-blue-500 focus:ring-2 focus:ring-blue-500/50" 
+                        />
+                        <span className="text-sm text-gray-700">Front Only</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors duration-200">
                         <input 
                           type="radio" 
                           name="surface-coverage" 
                           value="front-back" 
                           checked={tinSpecs?.surfaceCoverage === 'front-back'}
                           onChange={(e) => handleTinSpecChange('surfaceCoverage', e.target.value)}
-                          className="text-blue-500" 
+                          className="text-blue-500 focus:ring-2 focus:ring-blue-500/50" 
                         />
-                        <span className="text-sm text-gray-700">Front + Back Only</span>
+                        <span className="text-sm text-gray-700">Front + Back</span>
                       </label>
-                      <label className="flex items-center space-x-2">
+                      <label className="flex items-center space-x-2 cursor-pointer hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors duration-200">
                         <input 
                           type="radio" 
                           name="surface-coverage" 
                           value="all-sides" 
                           checked={tinSpecs?.surfaceCoverage === 'all-sides'}
                           onChange={(e) => handleTinSpecChange('surfaceCoverage', e.target.value)}
-                          className="text-blue-500" 
+                          className="text-blue-500 focus:ring-2 focus:ring-blue-500/50" 
                         />
                         <span className="text-sm text-gray-700">All Sides (Front, Back, Inside, Lid)</span>
                       </label>
@@ -1410,20 +1445,20 @@ const BannerSidebar = ({
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                     <div className="text-sm font-medium text-gray-800 mb-3">Surfaces to Print</div>
                     <div className="space-y-2">
-                      <label className="flex items-center space-x-2">
+                      <label className="flex items-center space-x-2 cursor-pointer hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors duration-200">
                         <input 
                           type="checkbox" 
                           checked={tentSpecs?.surfaces?.canopy || true}
                           disabled={true}
-                          className="text-blue-500 opacity-50"
+                          className="text-blue-500 opacity-50 focus:ring-2 focus:ring-blue-500/50"
                         />
                         <span className="text-sm text-gray-700">Canopy (Always Included)</span>
                       </label>
-                      <label className="flex items-center space-x-2">
+                      <label className="flex items-center space-x-2 cursor-pointer hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors duration-200">
                         <input 
                           type="checkbox" 
                           checked={tentSpecs?.surfaces?.backwall || false}
-                          className="text-blue-500"
+                          className="text-blue-500 focus:ring-2 focus:ring-blue-500/50"
                           onChange={(e) => {
                             onTentSpecChange?.('surfaces.backwall', e.target.checked)
                             // Update tent design option based on surface selection
@@ -1440,11 +1475,11 @@ const BannerSidebar = ({
                         />
                         <span className="text-sm text-gray-700">Backwall</span>
                       </label>
-                      <label className="flex items-center space-x-2">
+                      <label className="flex items-center space-x-2 cursor-pointer hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors duration-200">
                         <input 
                           type="checkbox" 
                           checked={tentSpecs?.surfaces?.sidewalls || false}
-                          className="text-blue-500"
+                          className="text-blue-500 focus:ring-2 focus:ring-blue-500/50"
                           onChange={(e) => {
                             onTentSpecChange?.('surfaces.sidewalls', e.target.checked)
                             // Update tent design option based on surface selection
@@ -1463,6 +1498,13 @@ const BannerSidebar = ({
                         />
                         <span className="text-sm text-gray-700">Sidewalls (Left & Right)</span>
                       </label>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-white/20">
+                      <div className="text-xs text-gray-600">
+                        <strong>Current Design:</strong> {tentDesignOption === 'canopy-only' ? 'Canopy Only' : 
+                                                      tentDesignOption === 'canopy-backwall' ? 'Canopy + Backwall' : 
+                                                      'All Sides'}
+                      </div>
                     </div>
                   </div>
 
@@ -1594,37 +1636,39 @@ const BannerSidebar = ({
                         <label className="text-xs text-gray-600 block mb-1">Width (px)</label>
                         <input
                           type="number"
+                          min="100"
+                          max="5000"
                           className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 hover:border-white/50 active:border-blue-500/50"
                           placeholder="800"
-                          defaultValue={canvasSize.width}
+                          value={customWidth || canvasSize.width}
+                          onChange={(e) => setCustomWidth(e.target.value)}
                         />
                       </div>
                       <div>
                         <label className="text-xs text-gray-600 block mb-1">Height (px)</label>
                         <input
                           type="number"
+                          min="100"
+                          max="5000"
                           className="w-full px-2 py-1 bg-white/50 border border-white/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 hover:border-white/50 active:border-blue-500/50"
                           placeholder="400"
-                          defaultValue={canvasSize.height}
+                          value={customHeight || canvasSize.height}
+                          onChange={(e) => setCustomHeight(e.target.value)}
                         />
                       </div>
                     </div>
                     <button
                       onClick={() => {
-                        const widthInput = document.querySelector('input[placeholder="800"]')
-                        const heightInput = document.querySelector('input[placeholder="400"]')
-                        if (widthInput && heightInput && widthInput.value.trim() && heightInput.value.trim()) {
-                          const width = parseInt(widthInput.value.trim())
-                          const height = parseInt(heightInput.value.trim())
-                          if (!isNaN(width) && !isNaN(height) && width >= 100 && width <= 5000 && height >= 100 && height <= 5000) {
-                            onChangeCanvasSize?.(`Custom ${width}x${height}`)
-                            // Update the input values to reflect the new canvas size
-                            widthInput.value = width.toString()
-                            heightInput.value = height.toString()
-                          }
+                        const width = parseInt(customWidth || canvasSize.width)
+                        const height = parseInt(customHeight || canvasSize.height)
+                        if (!isNaN(width) && !isNaN(height) && width >= 100 && width <= 5000 && height >= 100 && height <= 5000) {
+                          onChangeCanvasSize?.(`Custom ${width}x${height}`)
+                          setCustomWidth('')
+                          setCustomHeight('')
                         }
                       }}
-                      className="w-full mt-2 px-3 py-1 bg-green-500/20 hover:bg-green-500/30 active:bg-green-500/40 text-green-700 border border-green-400/30 rounded text-xs font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-500/50 shadow-sm hover:shadow-md"
+                      disabled={!customWidth && !customHeight}
+                      className="w-full mt-2 px-3 py-1 bg-green-500/20 hover:bg-green-500/30 active:bg-green-500/40 disabled:bg-gray-500/20 disabled:text-gray-500 disabled:cursor-not-allowed text-green-700 border border-green-400/30 rounded text-xs font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-500/50 shadow-sm hover:shadow-md"
                     >
                       Apply Custom Size
                     </button>
@@ -1878,9 +1922,9 @@ const BannerSidebar = ({
                     }
                   }, 1000)
                 }}
-                className="w-full p-2 bg-purple-500/20 hover:bg-purple-500/30 active:bg-purple-500/40 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-sm font-medium transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-sm hover:shadow-md"
+                className="w-full p-3 bg-purple-500/20 hover:bg-purple-500/30 active:bg-purple-500/40 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-sm font-medium transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-sm hover:shadow-md"
               >
-                Browse Files
+                📁 Browse Files
               </button>
 
               {/* Uploaded Images */}
@@ -1920,7 +1964,7 @@ const BannerSidebar = ({
               {/* Surface Navigation for Tins */}
               {productType === 'tin' && (
                 <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                  <div className="text-sm font-medium text-gray-800 mb-3">Surface Navigation</div>
+                  <div className="text-sm font-medium text-gray-800 mb-3">🎨 Surface Navigation</div>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => handleSurfaceChange('front')}
@@ -1967,8 +2011,10 @@ const BannerSidebar = ({
                       </>
                     )}
                   </div>
-                  <div className="mt-2 text-xs text-gray-600 text-center">
-                    Currently editing: <span className="font-medium capitalize">{currentSurface}</span> surface
+                  <div className="mt-3 pt-2 border-t border-white/20">
+                    <div className="text-xs text-gray-600 text-center">
+                      Currently editing: <span className="font-medium capitalize text-blue-600">{currentSurface}</span> surface
+                    </div>
                   </div>
                 </div>
               )}
@@ -1976,7 +2022,7 @@ const BannerSidebar = ({
               {/* Surface Navigation for Tents */}
               {productType === 'tent' && (
                 <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                  <div className="text-sm font-medium text-gray-800 mb-3">Surface Navigation</div>
+                  <div className="text-sm font-medium text-gray-800 mb-3">🏕️ Surface Navigation</div>
                   
                   {/* Canopy Surfaces */}
                   <div className="mb-3">
@@ -2094,13 +2140,23 @@ const BannerSidebar = ({
 
           {expandedSections.text && (
             <div className="px-4 pb-4 space-y-4">
+              {/* Text Element Status */}
+              {!selectedElement && (
+                <div className="backdrop-blur-sm bg-yellow-50/50 border border-yellow-200/30 rounded-lg p-3">
+                  <div className="text-xs text-yellow-700 flex items-center gap-2">
+                    <span>💡</span>
+                    <span>Select a text element on the canvas to edit its properties</span>
+                  </div>
+                </div>
+              )}
+              
               {/* Multi-line Text Input */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Add Text</h4>
+                <h4 className="text-sm font-medium text-gray-700">✏️ Add Text</h4>
                 <div className="space-y-2">
                   <textarea
                     placeholder="Enter text... (Press Enter for new lines, Ctrl+Enter to add)"
-                    className="w-full h-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className="w-full h-20 px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 resize-none backdrop-blur-sm transition-all duration-200"
                     onKeyDown={(e) => {
                       // Allow Enter for new lines, Ctrl+Enter or Cmd+Enter to add text
                       if ((e.key === 'Enter' && (e.ctrlKey || e.metaKey)) && e.target.value.trim()) {
@@ -2122,20 +2178,23 @@ const BannerSidebar = ({
                         textarea.value = ''
                       }
                     }}
-                    className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                    className="w-full px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 active:bg-blue-500/40 text-blue-700 border border-blue-400/30 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm hover:shadow-md backdrop-blur-sm"
                   >
-                    Add Text
+                    ➕ Add Text
                   </button>
                 </div>
               </div>
               
               {/* Font Family */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Font Family</h4>
+                <h4 className="text-sm font-medium text-gray-700">🔤 Font Family</h4>
                 <select
                   onChange={(e) => onTextPropertyChange('fontFamily', e.target.value)}
                   value={selectedElement?.fontFamily || 'Arial'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={!selectedElement}
+                  className={`w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-200 ${
+                    !selectedElement ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
                   {/* Sans-serif Fonts */}
                   <optgroup label="Sans-serif">
@@ -2222,20 +2281,28 @@ const BannerSidebar = ({
               
               {/* Font Size */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Font Size</h4>
+                <h4 className="text-sm font-medium text-gray-700">📏 Font Size</h4>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => onTextPropertyChange('fontSize', Math.max(8, (selectedElement?.fontSize || 24) - 2))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
+                    onClick={() => selectedElement && onTextPropertyChange('fontSize', Math.max(8, (selectedElement?.fontSize || 24) - 2))}
+                    disabled={!selectedElement}
+                    className={`w-8 h-8 bg-white/20 hover:bg-white/30 active:bg-white/40 text-gray-700 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm border border-white/30 ${
+                      !selectedElement ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    -
+                    −
                   </button>
-                  <span className="flex-1 text-center text-sm font-medium text-gray-700">
+                  <span className={`flex-1 text-center text-sm font-medium text-gray-700 bg-white/20 rounded-lg py-2 backdrop-blur-sm border border-white/30 ${
+                    !selectedElement ? 'opacity-50' : ''
+                  }`}>
                     {selectedElement?.fontSize || 24}px
                   </span>
                   <button
-                    onClick={() => onTextPropertyChange('fontSize', Math.min(200, (selectedElement?.fontSize || 24) + 2))}
-                    className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center justify-center text-sm font-bold"
+                    onClick={() => selectedElement && onTextPropertyChange('fontSize', Math.min(200, (selectedElement?.fontSize || 24) + 2))}
+                    disabled={!selectedElement}
+                    className={`w-8 h-8 bg-white/20 hover:bg-white/30 active:bg-white/40 text-gray-700 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm border border-white/30 ${
+                      !selectedElement ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
                     +
                   </button>
@@ -2244,16 +2311,21 @@ const BannerSidebar = ({
               
               {/* Text Color */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Text Color</h4>
+                <h4 className="text-sm font-medium text-gray-700">🎨 Text Color</h4>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={selectedElement?.fill || '#000000'}
-                    onChange={(e) => onTextPropertyChange('fill', e.target.value)}
-                    className="w-10 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                    onChange={(e) => selectedElement && onTextPropertyChange('fill', e.target.value)}
+                    disabled={!selectedElement}
+                    className={`w-10 h-10 rounded-lg border-2 border-white/30 cursor-pointer transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm ${
+                      !selectedElement ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                     title="Choose text color"
                   />
-                  <span className="text-xs text-gray-500 font-mono">
+                  <span className={`text-xs text-gray-500 font-mono bg-white/20 rounded-lg px-2 py-1 backdrop-blur-sm border border-white/30 ${
+                    !selectedElement ? 'opacity-50' : ''
+                  }`}>
                     {selectedElement?.fill || '#000000'}
                   </span>
                 </div>
@@ -2350,20 +2422,20 @@ const BannerSidebar = ({
               
               {/* Text Alignment */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Alignment</h4>
+                <h4 className="text-sm font-medium text-gray-700">📐 Alignment</h4>
                 <div className="grid grid-cols-3 gap-1">
                   {[
-                    { value: 'left', icon: '⫷', label: 'Left' },
-                    { value: 'center', icon: '⫸', label: 'Center' },
-                    { value: 'right', icon: '⫹', label: 'Right' }
+                    { value: 'left', icon: '⬅️', label: 'Left' },
+                    { value: 'center', icon: '↔️', label: 'Center' },
+                    { value: 'right', icon: '➡️', label: 'Right' }
                   ].map((align) => (
                     <button
                       key={align.value}
                       onClick={() => onTextPropertyChange('align', align.value)}
-                      className={`p-2 rounded-lg text-sm transition-colors duration-200 ${
+                      className={`p-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                         (selectedElement?.align || 'left') === align.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                          ? 'bg-blue-500 text-white shadow-lg'
+                          : 'bg-white/20 hover:bg-white/30 text-gray-700 backdrop-blur-sm border border-white/30'
                       }`}
                       title={align.label}
                     >
@@ -2376,25 +2448,66 @@ const BannerSidebar = ({
               
               {/* Text Style */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Text Style</h4>
+                <h4 className="text-sm font-medium text-gray-700">✨ Text Style</h4>
                 <div className="flex flex-wrap gap-1">
                   {[
-                    { value: 'normal', label: 'Normal' },
-                    { value: 'bold', label: 'Bold' },
-                    { value: 'italic', label: 'Italic' }
-                  ].map((style) => (
-                    <button
-                      key={style.value}
-                      onClick={() => onTextPropertyChange('fontStyle', style.value)}
-                      className={`px-2 py-1 rounded text-xs transition-colors duration-200 ${
-                        (selectedElement?.fontStyle || 'normal') === style.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {style.label}
-                    </button>
-                  ))}
+                    { value: 'normal', label: 'Normal', icon: '📝' },
+                    { value: 'bold', label: 'Bold', icon: '🔲' },
+                    { value: 'italic', label: 'Italic', icon: '🔸' }
+                  ].map((style) => {
+                    // Get the current fontStyle from selected element
+                    const currentFontStyle = selectedElement?.fontStyle || 'normal'
+                    
+                    // Check if this style is currently active
+                    let isSelected = false
+                    if (style.value === 'normal') {
+                      isSelected = currentFontStyle === 'normal'
+                    } else if (style.value === 'bold') {
+                      isSelected = currentFontStyle === 'bold' || currentFontStyle === 'italic bold'
+                    } else if (style.value === 'italic') {
+                      isSelected = currentFontStyle === 'italic' || currentFontStyle === 'italic bold'
+                    }
+                    
+                    return (
+                      <button
+                        key={style.value}
+                        onClick={() => {
+                          // Handle toggling logic
+                          let newFontStyle = 'normal'
+                          
+                          if (style.value === 'normal') {
+                            newFontStyle = 'normal'
+                          } else if (style.value === 'bold') {
+                            if (currentFontStyle === 'bold' || currentFontStyle === 'italic bold') {
+                              // Toggle off bold
+                              newFontStyle = currentFontStyle === 'italic bold' ? 'italic' : 'normal'
+                            } else {
+                              // Turn on bold
+                              newFontStyle = currentFontStyle === 'italic' ? 'italic bold' : 'bold'
+                            }
+                          } else if (style.value === 'italic') {
+                            if (currentFontStyle === 'italic' || currentFontStyle === 'italic bold') {
+                              // Toggle off italic
+                              newFontStyle = currentFontStyle === 'italic bold' ? 'bold' : 'normal'
+                            } else {
+                              // Turn on italic
+                              newFontStyle = currentFontStyle === 'bold' ? 'italic bold' : 'italic'
+                            }
+                          }
+                          
+                          onTextPropertyChange('fontStyle', newFontStyle)
+                        }}
+                        className={`px-3 py-2 rounded-lg text-xs transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 flex items-center gap-1 ${
+                          isSelected
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 hover:bg-white/30 text-gray-700 backdrop-blur-sm border border-white/30'
+                        }`}
+                      >
+                        <span>{style.icon}</span>
+                        <span>{style.label}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             </div>
@@ -2426,12 +2539,11 @@ const BannerSidebar = ({
             <div className="px-4 pb-4 space-y-4">
               {/* URL Input */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Website URL</h4>
+                <h4 className="text-sm font-medium text-gray-700">🔗 Website URL</h4>
                 <div className="flex flex-col gap-2">
                   <input
                     type="url"
-                    placeholder="https://example.com"
-                    defaultValue="https://buyprintz.com"
+                    placeholder="https://your-website.com (example)"
                     onKeyDown={(e) => {
                       e.stopPropagation()
                       if (e.key === 'Enter' && e.target.value.trim()) {
@@ -2443,11 +2555,11 @@ const BannerSidebar = ({
                         }
                       }
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 backdrop-blur-sm transition-all duration-200 placeholder:text-gray-400"
                   />
                   <button
                     onClick={() => {
-                      const input = document.querySelector('input[placeholder="https://example.com"]')
+                      const input = document.querySelector('input[placeholder="https://your-website.com (example)"]')
                       if (input && input.value.trim()) {
                         if (input.value.trim().startsWith('http')) {
                           handleQRCodeAdd(input.value.trim(), qrColor, qrBackgroundColor)
@@ -2467,7 +2579,7 @@ const BannerSidebar = ({
               
               {/* QR Code Colors */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-700">QR Code Colors</h4>
+                <h4 className="text-sm font-medium text-gray-700">🎨 QR Code Colors</h4>
                 
                 {/* QR Code Color */}
                 <div className="space-y-2">
@@ -2480,10 +2592,10 @@ const BannerSidebar = ({
                       type="color"
                       value={qrColor}
                       onChange={(e) => setQrColor(e.target.value)}
-                      className="w-10 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                      className="w-10 h-10 rounded-lg border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
                       title="Choose QR code color"
                     />
-                    <span className="text-xs text-gray-500 font-mono">
+                    <span className="text-xs text-gray-500 font-mono bg-white/20 px-2 py-1 rounded backdrop-blur-sm">
                       {qrColor}
                     </span>
                   </div>
@@ -2500,10 +2612,10 @@ const BannerSidebar = ({
                       type="color"
                       value={qrBackgroundColor}
                       onChange={(e) => setQrBackgroundColor(e.target.value)}
-                      className="w-10 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                      className="w-10 h-10 rounded-lg border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
                       title="Choose background color"
                     />
-                    <span className="text-xs text-gray-500 font-mono">
+                    <span className="text-xs text-gray-500 font-mono bg-white/20 px-2 py-1 rounded backdrop-blur-sm">
                       {qrBackgroundColor}
                     </span>
                   </div>
@@ -2512,9 +2624,12 @@ const BannerSidebar = ({
               
               {/* Preview */}
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Preview</h4>
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="text-xs text-gray-500 mb-2">Enter URL above to generate QR code</div>
+                <h4 className="text-sm font-medium text-gray-700">👁️ Preview</h4>
+                <div className="p-4 bg-white/30 backdrop-blur-sm rounded-lg border border-white/30">
+                  <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    Enter URL above to generate QR code
+                  </div>
                   <div className="text-xs text-gray-500">
                     Colors: {qrColor} / {qrBackgroundColor}
                   </div>
@@ -2549,7 +2664,10 @@ const BannerSidebar = ({
             <div className="px-4 pb-4 space-y-6">
               {/* Basic Shapes */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Basic Shapes</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  <span>🔷</span>
+                  Basic Shapes
+                </h4>
                 <div className="grid grid-cols-4 gap-2">
                   {shapeLibrary.filter(shape => shape.category === 'basic').map((shape) => (
                     <NeumorphicButton
@@ -2558,8 +2676,8 @@ const BannerSidebar = ({
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
-                      <shape.icon className="w-4 h-4" />
-                      <span className="text-xs font-medium">{shape.name}</span>
+                      <shape.icon className="w-4 h-4 text-gray-700" />
+                      <span className="text-xs font-medium text-gray-700">{shape.name}</span>
                     </NeumorphicButton>
                   ))}
                 </div>
@@ -2567,7 +2685,10 @@ const BannerSidebar = ({
 
               {/* Decorative Shapes */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Decorative Shapes</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  <span>✨</span>
+                  Decorative Shapes
+                </h4>
                 <div className="grid grid-cols-4 gap-2">
                   {shapeLibrary.filter(shape => shape.category === 'decorative').map((shape) => (
                     <NeumorphicButton
@@ -2576,8 +2697,8 @@ const BannerSidebar = ({
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
-                      <shape.icon className="w-4 h-4" />
-                      <span className="text-xs font-medium">{shape.name}</span>
+                      <shape.icon className="w-4 h-4 text-gray-700" />
+                      <span className="text-xs font-medium text-gray-700">{shape.name}</span>
                     </NeumorphicButton>
                   ))}
                 </div>
@@ -2585,7 +2706,10 @@ const BannerSidebar = ({
 
               {/* Arrows */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Arrows & Directional</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  <span>➡️</span>
+                  Arrows & Directional
+                </h4>
                 <div className="grid grid-cols-4 gap-2">
                   {shapeLibrary.filter(shape => shape.category === 'arrows').map((shape) => (
                     <NeumorphicButton
@@ -2594,8 +2718,8 @@ const BannerSidebar = ({
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
-                      <shape.icon className="w-4 h-4" />
-                      <span className="text-xs font-medium">{shape.name}</span>
+                      <shape.icon className="w-4 h-4 text-gray-700" />
+                      <span className="text-xs font-medium text-gray-700">{shape.name}</span>
                     </NeumorphicButton>
                   ))}
                 </div>
@@ -2603,7 +2727,10 @@ const BannerSidebar = ({
 
               {/* Business Shapes */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Business Shapes</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  <span>💼</span>
+                  Business Shapes
+                </h4>
                 <div className="grid grid-cols-4 gap-2">
                   {shapeLibrary.filter(shape => shape.category === 'business').map((shape) => (
                     <NeumorphicButton
@@ -2612,8 +2739,8 @@ const BannerSidebar = ({
                       variant="glass"
                       className="p-2 flex flex-col items-center gap-1 transform hover:scale-105 active:scale-95 transition-all duration-200"
                     >
-                      <shape.icon className="w-4 h-4" />
-                      <span className="text-xs font-medium">{shape.name}</span>
+                      <shape.icon className="w-4 h-4 text-gray-700" />
+                      <span className="text-xs font-medium text-gray-700">{shape.name}</span>
                     </NeumorphicButton>
                   ))}
                 </div>
@@ -2748,30 +2875,42 @@ const BannerSidebar = ({
           </button>
 
           {expandedSections.templates && (
-            <div className="px-4 pb-4 space-y-4">
+            <div className="px-4 pb-4 space-y-6">
               {/* User Templates */}
               {userTemplates.length > 0 && (
-                <div className="mb-6">
+                <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-semibold text-gray-800">My Templates</h4>
+                    <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                      <span>💾</span>
+                      My Templates
+                    </h4>
                     <span className="text-xs text-gray-500 bg-green-100 px-2 py-1 rounded-full">
                       {userTemplates.length} saved
                     </span>
                   </div>
                   <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                     {userTemplates.map((template) => (
-                      <button
-                        key={template.id}
-                        onClick={() => handleTemplateClick(template)}
-                        className="w-full text-left p-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-green-500/50 group"
-                      >
+                        <button
+                          key={template.id}
+                          onClick={() => handleTemplateClick(template)}
+                          className={`w-full text-left p-3 rounded-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-green-500/50 group ${
+                            currentTemplateId === template.id
+                              ? 'bg-green-100 border-green-300 shadow-md'
+                              : 'bg-white/10 hover:bg-white/20 active:bg-white/30 border-white/20 hover:border-white/30'
+                          }`}
+                        >
                         <div className="flex items-center justify-between mb-1">
                           <div className="font-semibold text-gray-800 text-sm group-hover:text-green-700 transition-colors duration-200 flex-1 truncate">
                             {template.name}
                           </div>
-                          <span className="text-gray-400 group-hover:text-green-500 transition-colors duration-200">
-                            →
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {currentTemplateId === template.id && (
+                              <span className="text-green-600 text-sm font-bold">✓</span>
+                            )}
+                            <span className="text-gray-400 group-hover:text-green-500 transition-colors duration-200">
+                              →
+                            </span>
+                          </div>
                         </div>
                         <div className="text-xs text-gray-600 leading-relaxed line-clamp-2">{template.description}</div>
                       </button>
@@ -2780,88 +2919,197 @@ const BannerSidebar = ({
                 </div>
               )}
 
-              {/* Professional Templates */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-semibold text-gray-800">Professional Templates</h4>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                    {bannerTemplates.length} templates
-                  </span>
-                </div>
+                {/* Product-Specific Templates */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                      <span>🎨</span>
+                      Professional Designs
+                    </h4>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      {bannerTemplates.length} designs
+                    </span>
+                  </div>
                 
-                <div 
-                  ref={templatesScrollRef}
-                  className="space-y-2 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
-                >
-                  {bannerTemplates.map((template) => (
-                    <button
-                      key={template.id}
-                      onClick={() => handleTemplateClick(template)}
-                      className="w-full text-left p-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 group"
-                    >
-                      {/* Header with title and badges */}
-                      <div className="flex items-center justify-between mb-2">
-                        <h5 className="font-semibold text-gray-800 text-sm group-hover:text-blue-700 transition-colors duration-200 flex-1 truncate">
-                          {template.name}
-                        </h5>
-                        <div className="flex gap-1 ml-2">
-                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            template.orientation === 'landscape' 
-                              ? 'bg-emerald-100 text-emerald-700' 
-                              : 'bg-violet-100 text-violet-700'
-                          }`}>
-                            {template.orientation === 'landscape' ? '📐' : '📱'}
-                          </span>
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
-                            {template.category.split(' ')[0]}
-                          </span>
+                {/* Product Type Info */}
+                <div className="mb-4">
+                    <div className="flex items-center gap-2 p-3 bg-white/10 rounded-lg border border-white/20">
+                      <span className="text-lg">
+                        {productType === 'banner' ? '🏷️' : productType === 'tin' ? '🥫' : '⛺'}
+                      </span>
+                      <div>
+                        <div className="text-sm font-medium text-gray-800">
+                          {productType === 'banner' ? 'Banner Designs' : 
+                           productType === 'tin' ? 'Tin Designs' : 'Tent Designs'}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          Showing designs for {productType} products
                         </div>
                       </div>
-                      
-                      {/* Description */}
-                      <div className="text-xs text-gray-600 leading-relaxed mb-2 line-clamp-2">
-                        {template.description}
-                        </div>
-                      
-                      {/* Features */}
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          {template.recommendedSizes && template.recommendedSizes.length > 0 && (
-                            <span className="text-gray-500">
-                              {template.recommendedSizes[0]} ft
-                            </span>
-                          )}
-                          {template.tags && template.tags.length > 0 && (
-                            <span className="text-gray-400">•</span>
-                          )}
-                          {template.tags && template.tags.length > 0 && (
-                            <span className="text-gray-500">
-                              {template.tags[0]}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-gray-400 group-hover:text-blue-500 transition-colors duration-200">
-                          →
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                
-                {/* Template count and info */}
-                <div className="mt-3 pt-3 border-t border-white/20">
-                  <div className="text-center text-xs text-gray-500">
-                    <div className="mb-1">Professional designs with real assets</div>
-                    <div className="flex items-center justify-center gap-2">
-                      <span>✨</span>
-                      <span>QR codes</span>
-                      <span>•</span>
-                      <span>Icons</span>
-                      <span>•</span>
-                      <span>Shapes</span>
                     </div>
                   </div>
-                </div>
+
+                {/* Current Template Status */}
+                {currentTemplateId && (
+                  <div className="mb-4 p-3 bg-green-100 border border-green-300 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600 text-sm font-bold">✓</span>
+                      <span className="text-green-800 text-sm font-medium">
+                        Template Active: {bannerTemplates.find(t => t.id === currentTemplateId)?.name || 'Custom Template'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Banner Designs with Orientation Tabs */}
+                {productType === 'banner' ? (
+                  <div className="mb-6">
+                    
+                    {/* Orientation Tabs */}
+                    <div className="mb-4">
+                      <div className="flex gap-1 p-1 bg-white/20 rounded-lg border border-white/30">
+                        {[
+                          { 
+                            id: 'landscape', 
+                            name: 'Landscape', 
+                            icon: '📐',
+                            count: bannerTemplates.filter(t => t.orientation === 'landscape').length
+                          },
+                          { 
+                            id: 'portrait', 
+                            name: 'Portrait', 
+                            icon: '📱',
+                            count: bannerTemplates.filter(t => t.orientation === 'portrait').length
+                          }
+                        ].map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => setSelectedBannerOrientation(tab.id)}
+                            className={`flex-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                              selectedBannerOrientation === tab.id
+                                ? 'bg-blue-500 text-white shadow-lg'
+                                : 'text-gray-700 hover:bg-white/30'
+                            }`}
+                          >
+                            <span>{tab.icon}</span>
+                            <span>{tab.name}</span>
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                              selectedBannerOrientation === tab.id
+                                ? 'bg-blue-400 text-white'
+                                : 'bg-gray-200 text-gray-600'
+                            }`}>
+                              {tab.count}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Template List Based on Selected Orientation */}
+                    <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                      {bannerTemplates.filter(t => t.orientation === selectedBannerOrientation).map((template) => (
+                        <button
+                          key={template.id}
+                          onClick={() => handleTemplateClick(template)}
+                          className={`w-full text-left p-3 rounded-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 group ${
+                            currentTemplateId === template.id
+                              ? 'bg-blue-100 border-blue-300 shadow-md'
+                              : 'bg-white/10 hover:bg-white/20 active:bg-white/30 border-white/20 hover:border-white/30'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="font-semibold text-gray-800 text-sm group-hover:text-blue-700 transition-colors duration-200 flex-1 truncate">
+                              {template.name}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {currentTemplateId === template.id && (
+                                <span className="text-blue-600 text-sm font-bold">✓</span>
+                              )}
+                              <div className="flex gap-1">
+                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                  selectedBannerOrientation === 'landscape'
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : 'bg-violet-100 text-violet-700'
+                                }`}>
+                                  {selectedBannerOrientation === 'landscape' ? '📐' : '📱'}
+                                </span>
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                                  {template.category.split(' ')[0]}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-600 leading-relaxed line-clamp-2 mb-2">
+                            {template.description}
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              {template.recommendedSizes && template.recommendedSizes.length > 0 && (
+                                <span className="text-gray-500">
+                                  {template.recommendedSizes[0]} ft
+                                </span>
+                              )}
+                              {template.tags && template.tags.length > 0 && (
+                                <>
+                                  <span className="text-gray-400">•</span>
+                                  <span className="text-gray-500">{template.tags[0]}</span>
+                                </>
+                              )}
+                            </div>
+                            <span className="text-gray-400 group-hover:text-blue-500 transition-colors duration-200">
+                              →
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* No templates message */}
+                    {bannerTemplates.filter(t => t.orientation === selectedBannerOrientation).length === 0 && (
+                      <div className="text-center py-8 bg-white/10 rounded-lg border border-white/20">
+                        <div className="text-gray-400 text-4xl mb-2">
+                          {selectedBannerOrientation === 'landscape' ? '📐' : '📱'}
+                        </div>
+                        <p className="text-gray-500 text-sm">
+                          No {selectedBannerOrientation} templates available
+                        </p>
+                        <p className="text-gray-400 text-xs mt-1">
+                          Check back soon for new {selectedBannerOrientation} designs
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+
+                {/* Tin Designs */}
+                {productType === 'tin' ? (
+                  <div className="mb-6">
+                    <h5 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>🥫</span>
+                      Tin Designs
+                    </h5>
+                    <div className="text-center py-8 bg-white/10 rounded-lg border border-white/20">
+                      <div className="text-gray-400 text-4xl mb-2">🥫</div>
+                      <p className="text-gray-500 text-sm">Tin designs coming soon!</p>
+                      <p className="text-gray-400 text-xs mt-1">Professional business card tin designs</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Tent Designs */}
+                {productType === 'tent' ? (
+                  <div className="mb-6">
+                    <h5 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>⛺</span>
+                      Tent Designs
+                    </h5>
+                    <div className="text-center py-8 bg-white/10 rounded-lg border border-white/20">
+                      <div className="text-gray-400 text-4xl mb-2">⛺</div>
+                      <p className="text-gray-500 text-sm">Tent designs coming soon!</p>
+                      <p className="text-gray-400 text-xs mt-1">Professional tradeshow tent designs</p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
           )}
@@ -2903,23 +3151,36 @@ const BannerSidebar = ({
 
               {/* Designs Grid */}
               <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto">
-                {getFilteredAssets(assetCategories.skins.assets).map((asset, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAssetClick(asset)}
-                    className="aspect-square relative group overflow-hidden rounded-lg bg-white/20 hover:bg-white/30 active:bg-white/40 transition-all duration-200 border border-white/30 hover:border-purple-300/50 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-sm hover:shadow-md"
-                  >
-                    <img
-                      src={`/assets/images/${asset.file}`}
-                      alt={asset.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                    <div className="absolute bottom-1 left-1 right-1 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate">
-                      {asset.name}
-                    </div>
-                  </button>
-                ))}
+                {getFilteredAssets(assetCategories.skins.assets).map((asset, index) => {
+                  const isActive = activeDesignAssets.has(asset.name)
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleAssetClick(asset)}
+                      className={`aspect-square relative group overflow-hidden rounded-lg transition-all duration-200 border transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-sm hover:shadow-md ${
+                        isActive
+                          ? 'bg-purple-100 border-purple-300 shadow-md'
+                          : 'bg-white/20 hover:bg-white/30 active:bg-white/40 border-white/30 hover:border-purple-300/50'
+                      }`}
+                    >
+                      <img
+                        src={`/assets/images/${asset.file}`}
+                        alt={asset.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      <div className="absolute bottom-1 left-1 right-1 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate">
+                        {asset.name}
+                      </div>
+                      {/* Active indicator */}
+                      {isActive && (
+                        <div className="absolute top-1 right-1 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
