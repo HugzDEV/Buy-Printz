@@ -86,25 +86,41 @@ const InlinePrintPreview = ({
     }
 
     if (selectedSurface === currentSurface) {
-      const stageCanvas = document.querySelector('.konvajs-content canvas, canvas[data-konva-stage], [data-konva-stage] canvas')
+      // Try to find the Konva stage using multiple selectors
+      const stageSelectors = [
+        '.konvajs-content canvas',
+        'canvas[data-konva-stage]', 
+        '[data-konva-stage] canvas',
+        'canvas'
+      ]
+      
+      let stageCanvas = null
+      for (const selector of stageSelectors) {
+        stageCanvas = document.querySelector(selector)
+        if (stageCanvas) break
+      }
+      
       if (stageCanvas) {
-        const isMobile = window.innerWidth < 768
-        const pixelRatio = isMobile ? 3 : 2
         try {
-          // Add environment-specific handling for production
-          const isProduction = import.meta.env.PROD
-          console.log(`🎨 Preview generation - Environment: ${isProduction ? 'Production' : 'Development'}`)
+          // Use Konva's recommended high-quality export settings
+          const devicePixelRatio = window.devicePixelRatio || 1
+          const isMobile = window.innerWidth < 768
+          const exportPixelRatio = Math.max(devicePixelRatio, isMobile ? 3 : 2)
+          
+          console.log(`🎨 Konva Export - Mobile: ${isMobile}, DevicePixelRatio: ${devicePixelRatio}, ExportRatio: ${exportPixelRatio}`)
           
           const fresh = stageCanvas.toDataURL({ 
             mimeType: 'image/png', 
             quality: 1.0, 
-            pixelRatio: isProduction ? pixelRatio * 1.5 : pixelRatio // Higher quality in production
+            pixelRatio: exportPixelRatio,
+            imageSmoothingEnabled: true
           })
-          console.log(`🎨 Generated canvas image - Length: ${fresh.length}, Mobile: ${isMobile}`)
+          
+          console.log(`🎨 Generated high-quality canvas image - Length: ${fresh.length}`)
           processAndSet(fresh)
           return
         } catch (e) {
-          console.error('🎨 Canvas export failed:', e)
+          console.error('🎨 Konva canvas export failed:', e)
           // fall through to stored images
         }
       }
@@ -190,53 +206,58 @@ const InlinePrintPreview = ({
                 src={previewImage}
                 alt="Design Preview"
                 className="max-w-full max-h-full object-contain select-none origin-center sm:scale-100 sm:translate-x-0 sm:translate-y-0"
-                style={{ 
-                  display: 'block', 
-                  margin: '0 auto', 
-                  objectPosition: 'center center', 
-                  background: 'transparent', 
+                style={{
+                  display: 'block',
+                  margin: '0 auto',
+                  objectPosition: 'center center',
+                  background: 'transparent',
                   zIndex: 1,
-                  // Mobile-only positioning with forced landscape detection
-                  ...(window.innerWidth < 640 && (() => {
-                    const screenWidth = window.innerWidth
-                    const screenHeight = window.innerHeight
-                    const isPortrait = screenHeight > screenWidth
-                    const isLandscape = screenWidth > screenHeight
+                  transformOrigin: 'center center',
+                  // Responsive positioning using viewport-based calculations
+                  ...((() => {
+                    const vw = window.innerWidth
+                    const vh = window.innerHeight
+                    const isDesktop = vw >= 640
+                    const isMobile = vw < 640
+                    const isPortrait = vh > vw
+                    const isLandscape = vw > vh
                     
-                    let transform = ''
-                    if (productType === 'banner') {
-                      if (isPortrait) {
-                        transform = 'scale(2.18) translateX(70px) translateY(38px)'
-                      } else {
-                        // Force landscape positioning - this is critical for thumbnails/downloads
-                        transform = 'scale(3.01) translateX(400px) translateY(120px)'
-                      }
-                    } else if (productType === 'tent') {
-                      if (isPortrait) {
-                        transform = 'scale(2.5) translateX(75px) translateY(55px)'
-                      } else {
-                        // Force tent landscape positioning
-                        transform = 'scale(2.8) translateX(350px) translateY(100px)'
-                      }
-                    } else {
-                      transform = 'scale(1.98) translateX(40px) translateY(20px)'
+                    if (isDesktop) {
+                      // Desktop: perfect positioning, no transforms needed
+                      return {}
                     }
                     
-                    console.log(`🎨 MOBILE TRANSFORM DEBUG:`)
-                    console.log(`   Screen: ${screenWidth}x${screenHeight}`)
-                    console.log(`   Product: ${productType}`)
-                    console.log(`   Portrait: ${isPortrait}, Landscape: ${isLandscape}`)
-                    console.log(`   Transform: ${transform}`)
-                    console.log(`   Production: ${import.meta.env.PROD}`)
-                    
-                    return { 
-                      transform,
-                      transformOrigin: 'top left',
-                      // Force the transform to be applied
-                      WebkitTransform: transform,
-                      MozTransform: transform,
-                      msTransform: transform
+                    if (isMobile) {
+                      let transform = ''
+                      
+                      if (productType === 'banner') {
+                        if (isPortrait) {
+                          // Banner portrait: responsive positioning
+                          const scaleValue = Math.min(2.18, vw / 180) // Responsive scale
+                          const translateX = Math.max(70, vw * 0.18) // 18% of viewport width
+                          const translateY = Math.max(38, vh * 0.08) // 8% of viewport height
+                          transform = `scale(${scaleValue}) translateX(${translateX}px) translateY(${translateY}px)`
+                        } else {
+                          // Banner landscape: aggressive positioning
+                          const scaleValue = Math.min(3.01, vw / 120) // Responsive scale
+                          const translateX = Math.max(400, vw * 0.6) // 60% of viewport width
+                          const translateY = Math.max(120, vh * 0.25) // 25% of viewport height
+                          transform = `scale(${scaleValue}) translateX(${translateX}px) translateY(${translateY}px)`
+                        }
+                      } else if (productType === 'tent') {
+                        const scaleValue = Math.min(2.5, vw / 150)
+                        const translateX = Math.max(75, vw * 0.2)
+                        const translateY = Math.max(55, vh * 0.12)
+                        transform = `scale(${scaleValue}) translateX(${translateX}px) translateY(${translateY}px)`
+                      } else {
+                        transform = 'scale(1.98) translateX(40px) translateY(20px)'
+                      }
+                      
+                      console.log(`🎨 Responsive Transform - Product: ${productType}, ${vw}x${vh}, Portrait: ${isPortrait}, Transform: ${transform}`)
+                      return { transform }
                     }
+                    
+                    return {}
                   })())
                 }}
                 draggable={false}
