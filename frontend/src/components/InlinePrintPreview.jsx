@@ -211,7 +211,7 @@ const InlinePrintPreview = ({
                   // Desktop views were already perfect, so leave them untouched
                   transform: window.innerWidth < 640 ? (
                     productType === 'tent' 
-                      ? 'scale(3.48) translate(35%, 35%)' // moved right to center tent canopy
+                      ? 'scale(3.48) translate(32%, 35%)' // adjusted 3% left to prevent right cropping
                       : productType === 'tin'
                       ? 'scale(0.95) translate(2.5%, 0%)' // reduced by 5%: 1.0 * 0.95
                       : 'scale(2.375) translate(30%, 25%)' // reduced by 5%: 2.5 * 0.95
