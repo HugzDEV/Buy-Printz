@@ -205,11 +205,17 @@ const InlinePrintPreview = ({
               <img
                 src={previewImage}
                 alt="Design Preview"
-                className={`w-full h-full bg-white ${
-                  productType === 'tent' 
-                    ? 'object-cover object-center' 
-                    : 'object-contain'
-                }`}
+                className="w-full h-full object-contain bg-white"
+                style={{
+                  // Use the same scaling approach as PrintPreviewModal
+                  transform: productType === 'tent' 
+                    ? 'scale(3.664) translate(27.5%, 35%)' 
+                    : productType === 'tin'
+                    ? 'scale(1.0) translate(2.5%, 0%)'
+                    : 'scale(2.5) translate(30%, 25%)', // banner
+                  transformOrigin: 'center center',
+                  position: 'relative'
+                }}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
               />
