@@ -197,15 +197,18 @@ const InlinePrintPreview = ({
                   background: 'transparent', 
                   zIndex: 1,
                   // Mobile-only positioning - NEVER affects desktop (sm+ screens)
-                  ...(window.innerWidth < 640 && {
-                    transform: productType === 'banner' 
-                      ? window.innerHeight > window.innerWidth 
-                        ? 'scale(2.18) translateX(72px) translateY(38px)' // Portrait
-                        : 'scale(3.01) translateX(307px) translateY(108px)' // Landscape
+                  ...(window.innerWidth < 640 && (() => {
+                    const isPortrait = window.innerHeight > window.innerWidth
+                    const transform = productType === 'banner' 
+                      ? isPortrait 
+                        ? 'scale(2.18) translateX(70px) translateY(38px)' // Portrait
+                        : 'scale(3.01) translateX(400px) translateY(120px)' // Landscape
                       : productType === 'tent'
                       ? 'scale(2.5) translateX(75px) translateY(55px)'
                       : 'scale(1.98) translateX(40px) translateY(20px)'
-                  })
+                    console.log(`🎨 Mobile transform - Product: ${productType}, Portrait: ${isPortrait}, Transform: ${transform}`)
+                    return { transform }
+                  })())
                 }}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
