@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime
 import logging
 
-from .database import get_db_connection
+from .database import db_manager
 from .auth import get_current_user
 
 logger = logging.getLogger(__name__)
