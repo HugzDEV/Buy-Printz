@@ -91,10 +91,20 @@ const InlinePrintPreview = ({
         const isMobile = window.innerWidth < 768
         const pixelRatio = isMobile ? 3 : 2
         try {
-          const fresh = stageCanvas.toDataURL({ mimeType: 'image/png', quality: 1.0, pixelRatio })
+          // Add environment-specific handling for production
+          const isProduction = import.meta.env.PROD
+          console.log(`🎨 Preview generation - Environment: ${isProduction ? 'Production' : 'Development'}`)
+          
+          const fresh = stageCanvas.toDataURL({ 
+            mimeType: 'image/png', 
+            quality: 1.0, 
+            pixelRatio: isProduction ? pixelRatio * 1.5 : pixelRatio // Higher quality in production
+          })
+          console.log(`🎨 Generated canvas image - Length: ${fresh.length}, Mobile: ${isMobile}`)
           processAndSet(fresh)
           return
         } catch (e) {
+          console.error('🎨 Canvas export failed:', e)
           // fall through to stored images
         }
       }
@@ -103,16 +113,19 @@ const InlinePrintPreview = ({
     // Stored surface images for any selected surface
     const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
     if (surfaceImages && selectedSurface && surfaceImages[selectedSurface]) {
+      console.log(`🎨 Using stored surface image for ${selectedSurface}`)
       processAndSet(surfaceImages[selectedSurface])
       return
     }
 
     // Stored single-surface stage image as last resort (only for current surface)
     if (selectedSurface === currentSurface && canvasData?.konvaStageImage) {
+      console.log(`🎨 Using stored stage image for ${selectedSurface}`)
       processAndSet(canvasData.konvaStageImage)
       return
     }
 
+    console.warn(`🎨 No preview image available for surface: ${selectedSurface}`)
     setPreviewImage(null)
   }, [orderDetails, canvasData, selectedSurface, currentSurface])
 
@@ -180,7 +193,21 @@ const InlinePrintPreview = ({
                     ? 'scale-[2.2] translate-x-[45px] translate-y-[30px]'
                     : 'scale-[1.98] translate-x-[40px] translate-y-[20px]'
                 }`}
-                style={{ display: 'block', margin: '0 auto', objectPosition: 'center center', background: 'transparent', zIndex: 1 }}
+                style={{ 
+                  display: 'block', 
+                  margin: '0 auto', 
+                  objectPosition: 'center center', 
+                  background: 'transparent', 
+                  zIndex: 1,
+                  // Production-specific positioning override for mobile
+                  ...(import.meta.env.PROD && window.innerWidth < 640 && {
+                    transform: productType === 'banner' 
+                      ? 'scale(1.98) translateX(50px) translateY(25px)'
+                      : productType === 'tent'
+                      ? 'scale(2.2) translateX(45px) translateY(30px)'
+                      : 'scale(1.98) translateX(40px) translateY(20px)'
+                  })
+                }}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
               />
@@ -194,6 +221,10 @@ const InlinePrintPreview = ({
                   opacity: 0.3,
                   mixBlendMode: 'multiply',
                   zIndex: 9999
+                }}
+                onError={(e) => {
+                  console.warn('🎨 Watermark failed to load in production')
+                  e.target.style.display = 'none'
                 }}
               />
             </>
