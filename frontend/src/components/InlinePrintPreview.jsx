@@ -200,8 +200,8 @@ const InlinePrintPreview = ({
                   ...(window.innerWidth < 640 && {
                     transform: productType === 'banner' 
                       ? window.innerHeight > window.innerWidth 
-                        ? 'scale(2.18) translateX(74px) translateY(38px)' // Portrait
-                        : 'scale(2.62) translateX(236px) translateY(108px)' // Landscape
+                        ? 'scale(2.18) translateX(72px) translateY(38px)' // Portrait
+                        : 'scale(3.01) translateX(307px) translateY(108px)' // Landscape
                       : productType === 'tent'
                       ? 'scale(2.5) translateX(75px) translateY(55px)'
                       : 'scale(1.98) translateX(40px) translateY(20px)'
