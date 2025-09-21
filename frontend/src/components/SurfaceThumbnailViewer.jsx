@@ -199,7 +199,7 @@ const SurfaceThumbnailViewer = ({
                     <img
                       src={thumbnail.dataUrl}
                       alt={surface.name}
-                      className={`w-16 h-10 rounded border bg-gray-50 ${
+                      className={`w-20 h-12 sm:w-24 sm:h-16 rounded border bg-gray-50 ${
                         productType === 'tent' 
                           ? 'object-cover object-center' 
                           : 'object-contain'
@@ -219,7 +219,7 @@ const SurfaceThumbnailViewer = ({
                     />
                   </>
                 ) : (
-                  <div className="w-16 h-10 bg-gray-200 rounded border flex items-center justify-center">
+                  <div className="w-20 h-12 sm:w-24 sm:h-16 bg-gray-200 rounded border flex items-center justify-center">
                     <span className="text-xs text-gray-400">...</span>
                   </div>
                 )}
