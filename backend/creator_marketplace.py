@@ -571,6 +571,127 @@ async def upload_template(
             detail="Internal server error during template upload"
         )
 
+@router.post("/templates/upload-file")
+async def upload_template_file(
+    name: str = Form(...),
+    description: str = Form(...),
+    category: str = Form(...),
+    price: float = Form(...),
+    productType: str = Form(...),
+    tags: str = Form(...),
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload a new template from file to the marketplace"""
+    try:
+        user_id = current_user["user_id"]
+        
+        # Check if user is a creator
+        creator = await db_manager.get_creator_by_user_id(user_id)
+        if not creator:
+            raise HTTPException(
+                status_code=403,
+                detail="User must be a registered creator to upload templates"
+            )
+        
+        # Validate file
+        if not file.content_type or not file.content_type.startswith('image/'):
+            raise HTTPException(
+                status_code=400,
+                detail="File must be an image"
+            )
+        
+        # Validate file size (max 10MB)
+        content = await file.read()
+        if len(content) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400,
+                detail="File size must be less than 10MB"
+            )
+        
+        # Parse tags
+        try:
+            tags_list = json.loads(tags)
+        except:
+            tags_list = []
+        
+        # Generate unique filename
+        file_extension = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
+        filename = f"template_{creator['id']}_{uuid.uuid4().hex[:8]}.{file_extension}"
+        
+        # Upload to Supabase Storage
+        storage_path = f"template-uploads/{filename}"
+        upload_result = db_manager.supabase.storage.from_("marketplace-thumbnails").upload(
+            storage_path,
+            content,
+            file_options={
+                "content-type": file.content_type,
+                "cache-control": "3600"
+            }
+        )
+        
+        if hasattr(upload_result, 'error') and upload_result.error:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to upload file: {upload_result.error}"
+            )
+        
+        # Get public URL
+        preview_url = db_manager.supabase.storage.from_("marketplace-thumbnails").get_public_url(storage_path)
+        
+        # Create template record
+        template_id = str(uuid.uuid4())
+        template_record = {
+            "id": template_id,
+            "creator_id": creator["id"],
+            "name": name,
+            "description": description,
+            "category": category,
+            "price": price,
+            "product_type": productType,
+            "preview_image_url": preview_url,
+            "canvas_data": json.dumps({
+                "type": "file_upload",
+                "file_url": preview_url,
+                "product_type": productType
+            }),
+            "tags": tags_list,
+            "is_approved": False,
+            "is_featured": False,
+            "is_active": True,
+            "sales_count": 0,
+            "view_count": 0,
+            "rating": 0.0,
+            "rating_count": 0,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        # Insert into database
+        result = await db_manager.create_creator_template(template_record)
+        
+        if result:
+            return {
+                "success": True,
+                "message": "Template uploaded successfully",
+                "template_id": template_id,
+                "preview_url": preview_url
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to create template"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error uploading template file: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
+
 @router.get("/templates/my-templates")
 async def get_my_templates(
     current_user: dict = Depends(get_current_user)
