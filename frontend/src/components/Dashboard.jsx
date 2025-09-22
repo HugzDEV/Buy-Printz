@@ -63,6 +63,7 @@ const Dashboard = () => {
     loadDashboardData()
   }, [])
 
+
   // Check for URL parameters to set active tab
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -131,14 +132,6 @@ const Dashboard = () => {
       const response = await Promise.race([apiCall(), timeoutPromise])
       const data = await response.json()
       
-      // Debug: Log the raw data structure (only for templates)
-      if (loadingKey === 'templates') {
-        console.log(`🔍 Templates API response:`, data)
-        if (data.templates && data.templates.length > 0) {
-          console.log(`🔍 First template data:`, data.templates[0])
-          console.log(`🔍 Thumbnail URL check:`, data.templates[0].thumbnail_url)
-        }
-      }
       
       if (data.success) {
         let processedData = null
@@ -163,7 +156,12 @@ const Dashboard = () => {
           cacheService.set(cacheKey, processedData)
         }
         
-        setter(processedData)
+        // For templates, ensure we create a new array reference to trigger React state update
+        if (loadingKey === 'templates' && Array.isArray(processedData)) {
+          setter([...processedData])
+        } else {
+          setter(processedData)
+        }
       } else {
         console.warn(`API returned error for ${loadingKey}:`, data)
         setter(fallback)
@@ -204,7 +202,8 @@ const Dashboard = () => {
       loadDataSafely(
         () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
-          setTemplates(data.templates || [])
+          // The data is already the processed array from loadDataSafely
+          setTemplates(Array.isArray(data) ? [...data] : [])
         },
         [],
         'templates',
@@ -1041,14 +1040,9 @@ const Dashboard = () => {
                   <SkeletonTemplateCard key={i} />
                 ))}
               </div>
-            ) : (() => {
-              console.log(`🔄 Dashboard template state: loading=${loadingStates.templates}, count=${templates.length}`)
-              return templates.length > 0
-            })() ? (
+            ) : templates.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {templates.map((template) => {
-                console.log(`🎨 Rendering template: ${template.name}`)
-                return (
+              {templates.map((template) => (
                   <div key={template.id} className="group relative">
                     {/* Main Template Card */}
                     <div className="backdrop-blur-xl bg-white/10 rounded-3xl overflow-hidden border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02]">
@@ -1162,8 +1156,7 @@ const Dashboard = () => {
                       <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
                   </div>
-                )
-              })}
+                ))}
               </div>
             ) : (
               <div className="backdrop-blur-xl bg-white/10 rounded-3xl p-16 text-center border border-white/20 shadow-2xl">
