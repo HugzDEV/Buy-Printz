@@ -10,7 +10,7 @@ import {
   PaintBucket, Ruler, Tag, MapPin, ShoppingCart,
   Navigation, ExternalLink, MapPin as MapPinIcon,
   Upload, Camera, Instagram, Facebook, Twitter, Globe,
-  Award, Users, Heart, Share2, Link as LinkIcon
+  Award, Users, Heart, Share2, Link as LinkIcon, X
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import authService from '../services/auth'
