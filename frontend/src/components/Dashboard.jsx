@@ -1390,7 +1390,9 @@ const Dashboard = () => {
                       <div className="relative">
                         {creatorProfile?.profile_image_url ? (
                           <img 
-                            src={creatorProfile.profile_image_url} 
+                            src={creatorProfile.profile_image_url.startsWith('http') 
+                              ? creatorProfile.profile_image_url 
+                              : `https://api.buyprintz.com${creatorProfile.profile_image_url}`} 
                             alt="Creator Logo" 
                             className="w-20 h-20 rounded-full object-cover border-4 border-white/30"
                           />
