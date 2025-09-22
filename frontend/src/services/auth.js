@@ -162,7 +162,7 @@ class AuthService {
       console.log('Testing connectivity before login...')
       const isConnected = await this.testConnectivity()
       if (!isConnected) {
-        throw new Error('Unable to connect to authentication server. Please check your internet connection.')
+        throw new Error('Authentication service is temporarily unavailable. Please try again in a few minutes.')
       }
       
       console.log('Calling Supabase signInWithPassword...')
@@ -215,6 +215,12 @@ class AuthService {
         throw new Error('Network connection interrupted. Please try again.')
       } else if (error.message.includes('Failed to fetch')) {
         throw new Error('Unable to connect to authentication server. Please check your internet connection.')
+      } else if (error.message.includes('503') || error.message.includes('Service Unavailable')) {
+        throw new Error('Authentication service is temporarily unavailable. Please try again in a few minutes.')
+      } else if (error.message.includes('502') || error.message.includes('Bad Gateway')) {
+        throw new Error('Authentication service is experiencing issues. Please try again later.')
+      } else if (error.message.includes('504') || error.message.includes('Gateway Timeout')) {
+        throw new Error('Authentication service is slow to respond. Please try again.')
       }
       
       throw error
@@ -415,9 +421,23 @@ class AuthService {
       console.log('Testing Supabase connectivity...')
       const { data, error } = await this.supabase.auth.getSession()
       console.log('Connectivity test result:', { hasData: !!data, hasError: !!error })
+      
+      // Check for service unavailability
+      if (error && (error.message.includes('503') || error.message.includes('Service Unavailable'))) {
+        console.error('Supabase service is unavailable (503)')
+        return false
+      }
+      
       return !error
     } catch (error) {
       console.error('Connectivity test failed:', error)
+      
+      // Check for service unavailability in catch block too
+      if (error.message.includes('503') || error.message.includes('Service Unavailable')) {
+        console.error('Supabase service is unavailable (503)')
+        return false
+      }
+      
       return false
     }
   }
