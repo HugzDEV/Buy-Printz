@@ -150,15 +150,35 @@ class AuthService {
       throw new Error('Supabase not initialized. Please check your environment variables.')
     }
 
-    console.log('Attempting login with:', { email, supabaseUrl: this.supabase.supabaseUrl })
+    console.log('Attempting login with:', { 
+      email, 
+      supabaseUrl: this.supabase.supabaseUrl,
+      hasSupabase: !!this.supabase,
+      hasAuth: !!this.supabase.auth
+    })
 
     try {
-      const { data, error } = await this.supabase.auth.signInWithPassword({
+      console.log('Calling Supabase signInWithPassword...')
+      
+      // Add timeout to prevent hanging
+      const loginPromise = this.supabase.auth.signInWithPassword({
         email,
         password
       })
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Login request timeout')), 30000)
+      )
+      
+      const { data, error } = await Promise.race([loginPromise, timeoutPromise])
 
-      console.log('Login response:', { data, error })
+      console.log('Login response received:', { 
+        hasData: !!data, 
+        hasError: !!error, 
+        hasUser: !!data?.user,
+        hasSession: !!data?.session,
+        errorMessage: error?.message 
+      })
 
       if (error) {
         console.error('Login error details:', error)
