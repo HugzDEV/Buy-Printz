@@ -65,6 +65,13 @@ const Dashboard = () => {
     loadDashboardData()
   }, [])
 
+  // Refresh creator templates when creator tab becomes active
+  useEffect(() => {
+    if (activeTab === 'creator' && isCreator && user?.id) {
+      refreshCreatorTemplates()
+    }
+  }, [activeTab, isCreator, user?.id])
+
 
   // Check for URL parameters to set active tab
   useEffect(() => {
@@ -278,20 +285,53 @@ const Dashboard = () => {
   }
 
   const loadCreatorTemplates = async () => {
-    if (!user?.id || !isCreator) return
+    if (!user?.id || !isCreator) {
+      console.log('Skipping loadCreatorTemplates: user?.id =', user?.id, 'isCreator =', isCreator)
+      return
+    }
     
     try {
+      console.log('Loading creator templates for user:', user.id)
       setLoadingStates(prev => ({ ...prev, creatorTemplates: true }))
+      const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates')
+      const result = await response.json()
+      
+      console.log('Creator templates API response:', result)
+      
+      if (result.success && result.templates) {
+        console.log('Setting creator templates:', result.templates)
+        setCreatorTemplates(result.templates)
+      } else {
+        console.log('No templates found or API error')
+        setCreatorTemplates([])
+      }
+    } catch (error) {
+      console.error('Error loading creator templates:', error)
+      setCreatorTemplates([])
+    } finally {
+      setLoadingStates(prev => ({ ...prev, creatorTemplates: false }))
+    }
+  }
+
+  const refreshCreatorTemplates = async () => {
+    if (!user?.id || !isCreator) return
+    
+    setLoadingStates(prev => ({ ...prev, creatorTemplates: true }))
+    
+    try {
       const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates')
       const result = await response.json()
       
       if (result.success && result.templates) {
         setCreatorTemplates(result.templates)
+        toast.success('Creator templates refreshed')
       } else {
         setCreatorTemplates([])
+        toast.warning('No creator templates found')
       }
     } catch (error) {
-      console.error('Error loading creator templates:', error)
+      console.error('Error refreshing creator templates:', error)
+      toast.error('Failed to refresh creator templates')
       setCreatorTemplates([])
     } finally {
       setLoadingStates(prev => ({ ...prev, creatorTemplates: false }))
@@ -1555,14 +1595,24 @@ const Dashboard = () => {
                 {/* Creator Portfolio Section */}
                 <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-3 sm:p-6 border border-white/30 shadow-xl">
                   <div className="mb-4 sm:mb-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl shadow-lg border border-white/30">
-                        <Layout className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl shadow-lg border border-white/30">
+                          <Layout className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg sm:text-xl font-bold text-gray-900">My Portfolio</h3>
+                          <p className="text-sm text-gray-600">Your uploaded templates and designs</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-900">My Portfolio</h3>
-                        <p className="text-sm text-gray-600">Your uploaded templates and designs</p>
-                      </div>
+                      <button
+                        onClick={refreshCreatorTemplates}
+                        disabled={loadingStates.creatorTemplates}
+                        className="p-2 sm:p-3 bg-white/20 hover:bg-white/40 rounded-lg sm:rounded-xl text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Refresh portfolio"
+                      >
+                        <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${loadingStates.creatorTemplates ? 'animate-spin' : ''}`} />
+                      </button>
                     </div>
                   </div>
 
