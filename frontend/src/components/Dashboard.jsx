@@ -196,9 +196,9 @@ const Dashboard = () => {
         }
       }
 
-      // Add timeout to prevent infinite loading
+      // Add timeout to prevent infinite loading (increased to 60 seconds)
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 30000)
+        setTimeout(() => reject(new Error('Request timeout')), 60000)
       )
       
       const response = await Promise.race([apiCall(), timeoutPromise])
@@ -209,13 +209,13 @@ const Dashboard = () => {
         let processedData = null
         
         // Handle different response formats
-        if (data.templates) {
+        if (data?.templates) {
           processedData = data.templates
-        } else if (data.designs) {
+        } else if (data?.designs) {
           processedData = data.designs
-        } else if (data.orders) {
+        } else if (data?.orders) {
           processedData = data.orders
-        } else if (data.preferences) {
+        } else if (data?.preferences) {
           processedData = data.preferences
         } else if (Array.isArray(data)) {
           processedData = data
@@ -240,7 +240,25 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.warn(`API call failed for ${loadingKey}, using fallback:`, error)
-      setter(fallback)
+      
+      // Set appropriate fallback based on loading key if fallback is null
+      if (fallback !== null) {
+        setter(fallback)
+      } else {
+        switch (loadingKey) {
+          case 'orders':
+            setter([])
+            break
+          case 'stats':
+            setter(null)
+            break
+          case 'preferences':
+            setter(null)
+            break
+          default:
+            setter(null)
+        }
+      }
       
       // Only show error toast for critical data
       if (['designs', 'orders'].includes(loadingKey)) {
@@ -284,7 +302,7 @@ const Dashboard = () => {
       ),
       loadDataSafely(
         () => authService.authenticatedRequest('/api/user/preferences'),
-        (data) => setPreferences(data.preferences || null),
+        (data) => setPreferences(data?.preferences || null),
         null,
         'preferences'
       )
