@@ -2034,21 +2034,21 @@ const BannerCanvas = forwardRef(({
           {/* Right Section - Action Buttons */}
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
             {/* Mobile: Double-wide toolbar tools */}
-            <div className="sm:hidden flex items-center gap-0.5 min-w-0 flex-shrink-0 flex-1 justify-end flex-wrap">
+            <div className="sm:hidden flex items-center gap-1 min-w-0 flex-shrink-0 flex-1 justify-end flex-wrap">
               {/* Mobile: Surface Navigation for Tins/Tents OR Zoom Controls for Banners */}
               {(productType === 'tin' || productType === 'tent') ? (
                 <>
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('prev')} 
                     disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
-                    className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0"
+                    className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
                     title="Previous Surface"
                   >
-                    <ArrowLeft className="w-2.5 h-2.5" />
+                    <ArrowLeft className="w-4 h-4" />
                   </GlassButton>
                   
                   {/* Surface Indicator */}
-                  <div className="px-2 py-1 bg-white/30 backdrop-blur-sm border border-white/30 rounded text-xs font-medium text-gray-800 min-w-[50px] text-center flex-shrink-0 h-7 flex items-center justify-center">
+                  <div className="px-3 py-2 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-sm font-medium text-gray-800 min-w-[60px] text-center flex-shrink-0 h-9 flex items-center justify-center">
                     {productType === 'tin' 
                       ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
                       : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
@@ -2058,93 +2058,93 @@ const BannerCanvas = forwardRef(({
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('next')} 
                     disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
-                    className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0"
+                    className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
                     title="Next Surface"
                   >
-                    <ArrowRight className="w-2.5 h-2.5" />
+                    <ArrowRight className="w-4 h-4" />
                   </GlassButton>
                 </>
               ) : (
                 <>
                   {/* Mobile: Compact Zoom Controls for Banners */}
-                  <GlassButton onClick={zoomOut} className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0" title="Zoom Out">
-                    <ZoomOut className="w-2.5 h-2.5" />
+                  <GlassButton onClick={zoomOut} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
+                    <ZoomOut className="w-4 h-4" />
                   </GlassButton>
                   
-                  <GlassButton onClick={resetZoom} className="px-1 py-1 text-xs w-9 h-7 flex items-center justify-center flex-shrink-0" title="Reset Zoom">
+                  <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[50px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
                     {Math.round(scale * 100)}%
                   </GlassButton>
                   
-                  <GlassButton onClick={zoomIn} className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0" title="Zoom In">
-                    <ZoomIn className="w-2.5 h-2.5" />
+                  <GlassButton onClick={zoomIn} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom In">
+                    <ZoomIn className="w-4 h-4" />
                   </GlassButton>
                 </>
               )}
               
               {/* Mobile: Add Undo/Redo for all product types */}
-              <div className="w-px h-5 bg-white/20 mx-0.5 flex-shrink-0" />
+              <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
               
-              <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0" title="Undo">
-                <Undo2 className="w-2.5 h-2.5" />
+              <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Undo">
+                <Undo2 className="w-4 h-4" />
               </GlassButton>
               
-              <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0" title="Redo">
-                <Redo2 className="w-2.5 h-2.5" />
+              <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Redo">
+                <Redo2 className="w-4 h-4" />
               </GlassButton>
               
-              <div className="w-px h-5 bg-white/20 mx-0.5 flex-shrink-0" />
+              <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
               
               {/* Mobile: Snap to Elements (Magnet) */}
               <GlassButton 
                 onClick={() => setSnapToElements(!snapToElements)}
                 variant={snapToElements ? "primary" : "default"}
-                className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0"
+                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
                 title={snapToElements ? 'Disable Element Snapping' : 'Enable Element Snapping'}
               >
-                <Magnet className="w-2.5 h-2.5" />
+                <Magnet className="w-4 h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={() => setAutoScaling(!autoScaling)} 
                 variant={autoScaling ? "primary" : "default"}
-                className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0"
+                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
                 title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
               >
-                <Maximize2 className="w-2.5 h-2.5" />
+                <Maximize2 className="w-4 h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={() => setShowGrid(!showGrid)} 
                 variant={showGrid ? "primary" : "default"}
-                className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0"
+                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
                 title={showGrid ? "Hide Grid" : "Show Grid"}
               >
-                <Grid3X3 className="w-2.5 h-2.5" />
+                <Grid3X3 className="w-4 h-4" />
               </GlassButton>
               
               <GlassButton 
                 onClick={() => setShowGuides(!showGuides)} 
                 variant={showGuides ? "primary" : "default"}
-                className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0"
+                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
                 title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
               >
-                {showGuides ? <Eye className="w-2.5 h-2.5" /> : <EyeOff className="w-2.5 h-2.5" />}
+                {showGuides ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </GlassButton>
               
-              <div className="w-px h-5 bg-white/20 mx-0.5 flex-shrink-0" />
+              <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
               
               <GlassButton 
                 onClick={handleClearCanvas} 
                 disabled={!hasElements}
                 variant="warning" 
-                className="p-1 w-7 h-7 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border border-orange-400/50 flex-shrink-0" 
+                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border border-orange-400/50 flex-shrink-0" 
                 title="Clear Canvas"
               >
-                <Eraser className="w-2.5 h-2.5" />
+                <Eraser className="w-4 h-4" />
               </GlassButton>
               
-              <GlassButton onClick={onExport} variant="primary" className="p-1 w-7 h-7 flex items-center justify-center flex-shrink-0" title="Export PDF">
-                <Download className="w-2.5 h-2.5" />
+              <GlassButton onClick={onExport} variant="primary" className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Export PDF">
+                <Download className="w-4 h-4" />
               </GlassButton>
             </div>
             
