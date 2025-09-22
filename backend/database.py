@@ -1192,18 +1192,30 @@ class DatabaseManager:
             print(f"Error updating creator: {e}")
             return False
     
-    async def create_creator_template(self, template_data: Dict[str, Any]) -> bool:
+    async def create_creator_template(self, template_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new creator template"""
         try:
             if not self.is_connected():
-                return False
+                return {"success": False, "error": "Database not connected"}
             
             response = self.supabase.table("creator_templates").insert(template_data).execute()
-            return response.data is not None
+            if response.data is not None:
+                return {"success": True, "data": response.data}
+            else:
+                return {"success": False, "error": "No data returned from database"}
             
         except Exception as e:
             print(f"Error creating creator template: {e}")
-            return False
+            # Extract meaningful error message from database constraint violations
+            error_msg = str(e)
+            if "description_length" in error_msg:
+                return {"success": False, "error": "Description must be at least 10 characters long"}
+            elif "name_length" in error_msg:
+                return {"success": False, "error": "Template name must be between 3 and 100 characters"}
+            elif "price_range" in error_msg:
+                return {"success": False, "error": "Price must be between $3.00 and $25.00"}
+            else:
+                return {"success": False, "error": f"Database error: {error_msg}"}
     
     async def get_creator_template(self, template_id: str) -> Optional[Dict[str, Any]]:
         """Get creator template by ID"""

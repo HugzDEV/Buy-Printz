@@ -174,13 +174,38 @@ const TemplateUpload = () => {
       return false
     }
     
+    if (formData.name.trim().length < 3) {
+      setError('Template name must be at least 3 characters long')
+      return false
+    }
+    
+    if (formData.name.trim().length > 100) {
+      setError('Template name must be less than 100 characters')
+      return false
+    }
+    
     if (!formData.description.trim()) {
       setError('Description is required')
       return false
     }
     
+    if (formData.description.trim().length < 10) {
+      setError('Description must be at least 10 characters long')
+      return false
+    }
+    
+    if (formData.description.trim().length > 500) {
+      setError('Description must be less than 500 characters')
+      return false
+    }
+    
     if (!formData.category) {
       setError('Category is required')
+      return false
+    }
+    
+    if (formData.price < 3.00 || formData.price > 25.00) {
+      setError('Price must be between $3.00 and $25.00')
       return false
     }
     
