@@ -367,6 +367,7 @@ async def upload_creator_logo(
     try:
         user_id = current_user["user_id"]
         print(f"🔍 Logo upload request for user_id: {user_id}")
+        print(f"🔍 Logo file info: filename={logo.filename}, content_type={logo.content_type}, size={logo.size}")
         
         # Check if creator exists
         existing_creator = await db_manager.get_creator_by_user_id(user_id)
@@ -397,15 +398,20 @@ async def upload_creator_logo(
             )
         
         # Validate file type
+        print(f"🔍 Validating file type: {logo.content_type}")
         if not logo.content_type or not logo.content_type.startswith('image/'):
+            print(f"🔍 File type validation failed: {logo.content_type}")
             raise HTTPException(
                 status_code=400,
                 detail="File must be an image"
             )
         
         # Validate file size (max 5MB)
+        print(f"🔍 Reading file content...")
         content = await logo.read()
+        print(f"🔍 File content size: {len(content)} bytes")
         if len(content) > 5 * 1024 * 1024:
+            print(f"🔍 File size validation failed: {len(content)} bytes")
             raise HTTPException(
                 status_code=400,
                 detail="File size must be less than 5MB"
@@ -432,7 +438,9 @@ async def upload_creator_logo(
             "updated_at": datetime.utcnow().isoformat()
         }
         
+        print(f"🔍 Updating creator profile with data: {update_data}")
         result = await db_manager.update_creator(existing_creator["id"], update_data)
+        print(f"🔍 Database update result: {result}")
         
         if result:
             return {
@@ -444,6 +452,7 @@ async def upload_creator_logo(
             # Clean up uploaded file if database update failed
             if os.path.exists(file_path):
                 os.remove(file_path)
+            print(f"🔍 Database update failed, cleaned up file: {file_path}")
             raise HTTPException(
                 status_code=500,
                 detail="Failed to update creator profile with logo"
@@ -452,10 +461,13 @@ async def upload_creator_logo(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error uploading creator logo: {e}")
+        print(f"🔍 Unexpected error uploading creator logo: {e}")
+        print(f"🔍 Error type: {type(e)}")
+        import traceback
+        print(f"🔍 Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=500,
-            detail="Internal server error"
+            detail=f"Internal server error: {str(e)}"
         )
 
 # Moved this route to the end to avoid conflict with /creators/analytics
