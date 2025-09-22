@@ -42,25 +42,64 @@ const TemplateUpload = () => {
 
   const productTypes = [
     { value: 'banner', label: 'Vinyl Banners', icon: Monitor, description: 'Outdoor advertising banners' },
-    { value: 'tin', label: 'Business Card Tins', icon: Package, description: 'Custom tin designs' },
+    { value: 'tin_skinz', label: 'Tin Skinz', icon: Package, description: 'Custom tin designs' },
     { value: 'tent', label: 'Tradeshow Tents', icon: Tent, description: 'Event and tradeshow tents' }
   ]
 
-  const categories = [
-    'Restaurant & Food',
-    'Retail & Shopping', 
-    'Service Businesses',
-    'Events & Community',
-    'Seasonal',
-    'Industry Specific'
-  ]
+  // Product-specific categories
+  const getCategoriesForProduct = (productType) => {
+    const baseCategories = [
+      'Restaurant & Food',
+      'Retail & Shopping', 
+      'Service Businesses',
+      'Events & Community',
+      'Seasonal',
+      'Industry Specific',
+      'Business Cards'
+    ]
+    
+    const tinSkinzSpecificCategories = [
+      'Gender Reveal',
+      'Baby Shower',
+      'Graduation',
+      'Thank You',
+      'Weddings',
+      'Sweet 15s & 16s',
+      'Birthdays',
+      'Valentine\'s Day',
+      'Christmas',
+      'Hannukah',
+      'Halloween',
+      'Family Reunion'
+    ]
+    
+    switch (productType) {
+      case 'tin_skinz':
+        return [...baseCategories, ...tinSkinzSpecificCategories]
+      case 'banner':
+      case 'tent':
+      default:
+        return baseCategories
+    }
+  }
+  
+  const categories = getCategoriesForProduct(formData.productType)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: value
+      }
+      
+      // If product type changes, reset category since available categories change
+      if (name === 'productType') {
+        newData.category = ''
+      }
+      
+      return newData
+    })
   }
 
   const handlePriceChange = (e) => {
@@ -577,7 +616,7 @@ const TemplateUpload = () => {
                   <GlassButton
                     type="submit"
                     disabled={isLoading}
-                    className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-3"
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3"
                   >
                     {isLoading ? (
                       <>

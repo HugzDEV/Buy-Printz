@@ -202,9 +202,9 @@ const Dashboard = () => {
     // Load secondary data
     await Promise.all([
       loadDataSafely(
-        () => authService.authenticatedRequest('/api/templates/user'),
+        () => authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates'),
         (data) => {
-          setTemplates(data || [])
+          setTemplates(data.templates || [])
         },
         [],
         'templates',
@@ -334,7 +334,7 @@ const Dashboard = () => {
 
   // Copy creator profile link
   const copyProfileLink = () => {
-    const profileUrl = `${window.location.origin}/creator/${creatorProfile?.username || user?.user_id}`
+    const profileUrl = `${window.location.origin}/creator/${creatorProfile?.id || 'profile'}`
     navigator.clipboard.writeText(profileUrl)
     toast.success('Profile link copied to clipboard!')
   }
@@ -1408,7 +1408,7 @@ const Dashboard = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{creatorProfile?.display_name || user?.full_name}</h3>
-                        <p className="text-sm sm:text-base text-gray-600 truncate">@{creatorProfile?.username || user?.user_id}</p>
+                        <p className="text-sm sm:text-base text-gray-600 truncate">@{creatorProfile?.username || 'creator'}</p>
                         <div className="flex items-center space-x-2 mt-1 sm:mt-2">
                           <button
                             onClick={copyProfileLink}
@@ -1527,6 +1527,88 @@ const Dashboard = () => {
                     </button>
                   </div>
                 </div>
+
+                {/* Creator Portfolio Section */}
+                <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-3 sm:p-6 border border-white/30 shadow-xl">
+                  <div className="mb-4 sm:mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl shadow-lg border border-white/30">
+                        <Layout className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900">My Portfolio</h3>
+                        <p className="text-sm text-gray-600">Your uploaded templates and designs</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Portfolio Templates Grid */}
+                  {loadingStates.templates ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="bg-gray-200 rounded-xl h-32 mb-3"></div>
+                          <div className="bg-gray-200 rounded h-4 mb-2"></div>
+                          <div className="bg-gray-200 rounded h-3 w-2/3"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : templates.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {templates.map((template) => (
+                        <div key={template.id} className="group relative">
+                          <div className="backdrop-blur-sm bg-white/30 rounded-xl overflow-hidden border border-white/30 hover:border-white/50 transition-all duration-200">
+                            <div className="relative h-24 sm:h-32 bg-gray-100">
+                              {template.preview_image_url ? (
+                                <img 
+                                  src={template.preview_image_url} 
+                                  alt={template.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                  <Layout className="w-8 h-8 text-gray-400" />
+                                </div>
+                              )}
+                              <div className="absolute top-2 right-2">
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  template.is_approved 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {template.is_approved ? 'Approved' : 'Pending'}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-3">
+                              <h4 className="font-medium text-gray-900 text-sm truncate">{template.name}</h4>
+                              <p className="text-xs text-gray-600 mt-1">{template.category}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <span className="text-sm font-bold text-green-600">${template.price}</span>
+                                <span className="text-xs text-gray-500">{template.sales_count} sales</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Layout className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <h4 className="text-lg font-medium text-gray-900 mb-2">No templates yet</h4>
+                      <p className="text-gray-600 mb-4">Start building your portfolio by uploading your first template</p>
+                      <Link
+                        to="/creator/upload"
+                        className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-all duration-200 text-sm font-medium"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Upload Your First Template
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               /* Creator Registration - User is not a creator yet */
@@ -1544,7 +1626,7 @@ const Dashboard = () => {
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                       <Link
                         to="/creator/register"
-                        className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
+                        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
                       >
                         <Crown className="w-4 h-4 sm:w-5 sm:h-5 mr-2 inline" />
                         Register as Creator
@@ -1689,7 +1771,7 @@ const Dashboard = () => {
                         <button
                           onClick={uploadLogo}
                           disabled={!logoFile}
-                          className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg disabled:shadow-none text-sm sm:text-base"
+                          className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg disabled:shadow-none text-sm sm:text-base"
                         >
                           Upload Logo
                         </button>
@@ -1727,10 +1809,6 @@ const Dashboard = () => {
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl border border-white/30">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                   <p className="text-gray-800 font-medium">{user?.email}</p>
-                </div>
-                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl border border-white/30">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">User ID</label>
-                  <p className="text-gray-600 text-xs font-mono">{user?.user_id}</p>
                 </div>
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl border border-white/30">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Account Status</label>
