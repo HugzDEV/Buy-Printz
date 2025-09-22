@@ -141,6 +141,72 @@ async def check_database_status():
             "error": str(e)
         }
 
+@router.post("/creators/quick-register")
+async def quick_register_creator(
+    current_user: dict = Depends(get_current_user)
+):
+    """Quick register current user as creator with default values"""
+    try:
+        user_id = current_user["user_id"]
+        print(f"🔍 Quick register request for user_id: {user_id}")
+        
+        # Check if user is already a creator
+        existing_creator = await db_manager.get_creator_by_user_id(user_id)
+        if existing_creator:
+            return {
+                "success": True,
+                "message": "User is already registered as a creator",
+                "creator": existing_creator
+            }
+        
+        # Get user profile for display name
+        user_profile = await db_manager.get_user_profile(user_id)
+        display_name = user_profile.get("full_name", "Creator") if user_profile else "Creator"
+        
+        # Create creator profile with default values
+        creator_id = str(uuid.uuid4())
+        creator_profile = {
+            "id": creator_id,
+            "user_id": user_id,
+            "display_name": display_name,
+            "bio": "Welcome to my creator profile!",
+            "website": None,
+            "social_links": {},
+            "is_verified": False,
+            "is_active": True,
+            "total_earnings": 0.00,
+            "templates_sold": 0,
+            "rating": 0.00,
+            "rating_count": 0,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        # Insert into database
+        result = await db_manager.create_creator(creator_profile)
+        
+        if result:
+            return {
+                "success": True,
+                "message": "Creator account created successfully",
+                "creator_id": creator_id,
+                "creator": creator_profile
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to create creator account"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error in quick register: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+
 @router.post("/creators/register")
 async def register_creator(
     creator_data: CreatorRegistration,
