@@ -1384,9 +1384,9 @@ const Dashboard = () => {
               /* Creator Dashboard - User is already a creator */
               <div className="space-y-6">
                 {/* Creator Profile Card */}
-                <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex items-center space-x-4">
+                <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-3 sm:p-6 border border-white/30 shadow-xl">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
+                    <div className="flex items-center space-x-3 sm:space-x-4">
                       <div className="relative">
                         {creatorProfile?.profile_image_url ? (
                           <img 
@@ -1394,137 +1394,138 @@ const Dashboard = () => {
                               ? creatorProfile.profile_image_url 
                               : `https://api.buyprintz.com${creatorProfile.profile_image_url}`} 
                             alt="Creator Logo" 
-                            className="w-20 h-20 rounded-full object-cover border-4 border-white/30"
+                            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 sm:border-4 border-white/30"
                           />
                         ) : (
-                          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center border-4 border-white/30">
-                            <Crown className="w-8 h-8 text-white" />
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center border-2 sm:border-4 border-white/30">
+                            <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                           </div>
                         )}
                         <button
                           onClick={() => setShowLogoUpload(true)}
-                          className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-colors"
+                          className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-colors"
                         >
-                          <Camera className="w-3 h-3" />
+                          <Camera className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900">{creatorProfile?.display_name || user?.full_name}</h3>
-                        <p className="text-gray-600">@{creatorProfile?.username || user?.user_id}</p>
-                        <div className="flex items-center space-x-2 mt-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{creatorProfile?.display_name || user?.full_name}</h3>
+                        <p className="text-sm sm:text-base text-gray-600 truncate">@{creatorProfile?.username || user?.user_id}</p>
+                        <div className="flex items-center space-x-2 mt-1 sm:mt-2">
                           <button
                             onClick={copyProfileLink}
-                            className="flex items-center space-x-1 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm"
+                            className="flex items-center space-x-1 px-2 sm:px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-xs sm:text-sm"
                           >
                             <LinkIcon className="w-3 h-3" />
-                            <span>Copy Profile Link</span>
+                            <span className="hidden sm:inline">Copy Profile Link</span>
+                            <span className="sm:hidden">Copy Link</span>
                           </button>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-green-600">
+                    <div className="text-center sm:text-right">
+                      <div className="text-xl sm:text-2xl font-bold text-green-600">
                         ${creatorStats?.total_earnings || 0}
                       </div>
-                      <div className="text-sm text-gray-600">Total Earnings</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Total Earnings</div>
                     </div>
                   </div>
 
                   {/* Social Media Links */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">
                       <div className="flex items-center space-x-2 mb-2">
                         <Instagram className="w-4 h-4 text-pink-500" />
-                        <span className="text-sm font-medium text-gray-700">Instagram</span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Instagram</span>
                       </div>
                       <input
                         type="text"
                         placeholder="@yourusername"
                         defaultValue={creatorProfile?.social_links?.instagram || ''}
-                        className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-white/20 border border-white/30 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                     </div>
-                    <div className="backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20">
+                    <div className="backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">
                       <div className="flex items-center space-x-2 mb-2">
                         <Facebook className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm font-medium text-gray-700">Facebook</span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Facebook</span>
                       </div>
                       <input
                         type="text"
                         placeholder="facebook.com/yourpage"
                         defaultValue={creatorProfile?.social_links?.facebook || ''}
-                        className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-white/20 border border-white/30 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                     </div>
-                    <div className="backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20">
+                    <div className="backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20 sm:col-span-2 lg:col-span-1">
                       <div className="flex items-center space-x-2 mb-2">
                         <Globe className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">Website</span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Website</span>
                       </div>
                       <input
                         type="text"
                         placeholder="yourwebsite.com"
                         defaultValue={creatorProfile?.website || ''}
-                        className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-white/20 border border-white/30 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                     </div>
                   </div>
 
                   {/* Creator Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20">
-                      <div className="text-2xl font-bold text-blue-600">{creatorStats?.templates_sold || 0}</div>
-                      <div className="text-sm text-gray-600">Templates Sold</div>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">
+                      <div className="text-lg sm:text-2xl font-bold text-blue-600">{creatorStats?.templates_sold || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Templates Sold</div>
                     </div>
-                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20">
-                      <div className="text-2xl font-bold text-green-600">{creatorStats?.total_earnings || 0}</div>
-                      <div className="text-sm text-gray-600">Total Earnings</div>
+                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">
+                      <div className="text-lg sm:text-2xl font-bold text-green-600">{creatorStats?.total_earnings || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Total Earnings</div>
                     </div>
-                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20">
-                      <div className="text-2xl font-bold text-purple-600">{creatorStats?.followers || 0}</div>
-                      <div className="text-sm text-gray-600">Followers</div>
+                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">
+                      <div className="text-lg sm:text-2xl font-bold text-purple-600">{creatorStats?.followers || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Followers</div>
                     </div>
-                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20">
-                      <div className="text-2xl font-bold text-orange-600">{creatorStats?.rating || 0}</div>
-                      <div className="text-sm text-gray-600">Rating</div>
+                    <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">
+                      <div className="text-lg sm:text-2xl font-bold text-orange-600">{creatorStats?.rating || 0}</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Rating</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Creator Quick Actions */}
-                <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Creator Tools</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="backdrop-blur-xl bg-white/20 rounded-xl p-3 sm:p-6 border border-white/30 shadow-xl">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Creator Tools</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <Link
                       to="/creator/upload"
-                      className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                      className="flex items-center p-3 sm:p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
                     >
-                      <Plus className="w-5 h-5 text-blue-600 mr-3" />
-                      <span className="font-medium text-gray-800">Upload Template</span>
+                      <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="font-medium text-gray-800 text-sm sm:text-base">Upload Template</span>
                     </Link>
                     
                     <Link
                       to="/creator/earnings"
-                      className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                      className="flex items-center p-3 sm:p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
                     >
-                      <BarChart3 className="w-5 h-5 text-green-600 mr-3" />
-                      <span className="font-medium text-gray-800">View Earnings</span>
+                      <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="font-medium text-gray-800 text-sm sm:text-base">View Earnings</span>
                     </Link>
                     
                     <Link
                       to="/marketplace"
-                      className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                      className="flex items-center p-3 sm:p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
                     >
-                      <ShoppingCart className="w-5 h-5 text-orange-600 mr-3" />
-                      <span className="font-medium text-gray-800">Browse Marketplace</span>
+                      <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="font-medium text-gray-800 text-sm sm:text-base">Browse Marketplace</span>
                     </Link>
                     
                     <button
                       onClick={() => setShowLogoUpload(true)}
-                      className="flex items-center p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
+                      className="flex items-center p-3 sm:p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
                     >
-                      <Upload className="w-5 h-5 text-purple-600 mr-3" />
-                      <span className="font-medium text-gray-800">Update Logo</span>
+                      <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="font-medium text-gray-800 text-sm sm:text-base">Update Logo</span>
                     </button>
                   </div>
                 </div>
@@ -1533,26 +1534,26 @@ const Dashboard = () => {
               /* Creator Registration - User is not a creator yet */
               <div className="space-y-6">
                 {/* Creator Status Check */}
-                <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
+                <div className="backdrop-blur-xl bg-white/20 rounded-xl p-4 sm:p-6 border border-white/30 shadow-xl">
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Crown className="w-8 h-8 text-purple-600" />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                      <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Become a Creator</h3>
-                    <p className="text-gray-600 mb-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Become a Creator</h3>
+                    <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
                       Start earning by selling your design templates to small businesses. Join our creator community and turn your designs into income!
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                       <Link
                         to="/creator/register"
-                        className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
+                        className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
                       >
-                        <Crown className="w-5 h-5 mr-2 inline" />
+                        <Crown className="w-4 h-4 sm:w-5 sm:h-5 mr-2 inline" />
                         Register as Creator
                       </Link>
                       <Link
                         to="/creator/dashboard"
-                        className="bg-white/20 hover:bg-white/30 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-200 border border-white/30"
+                        className="bg-white/20 hover:bg-white/30 text-gray-700 font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl transition-all duration-200 border border-white/30 text-sm sm:text-base"
                       >
                         Creator Dashboard
                       </Link>
@@ -1561,33 +1562,33 @@ const Dashboard = () => {
                 </div>
 
                 {/* Creator Benefits */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                      <DollarSign className="w-6 h-6 text-green-600" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-4 sm:p-6 border border-white/30 shadow-xl">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                      <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                     </div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Earn 80%</h4>
-                    <p className="text-gray-600 text-sm">
+                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Earn 80%</h4>
+                    <p className="text-gray-600 text-xs sm:text-sm">
                       Keep 80% of every template sale. Set your own prices from $3-$25.
                     </p>
                   </div>
 
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                      <TrendingUp className="w-6 h-6 text-blue-600" />
+                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-4 sm:p-6 border border-white/30 shadow-xl">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                      <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                     </div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Weekly Payouts</h4>
-                    <p className="text-gray-600 text-sm">
+                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Weekly Payouts</h4>
+                    <p className="text-gray-600 text-xs sm:text-sm">
                       Get paid weekly via Stripe. No minimum payout requirements.
                     </p>
                   </div>
 
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 shadow-xl">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                      <Star className="w-6 h-6 text-purple-600" />
+                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-4 sm:p-6 border border-white/30 shadow-xl sm:col-span-2 lg:col-span-1">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                     </div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Build Your Brand</h4>
-                    <p className="text-gray-600 text-sm">
+                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Build Your Brand</h4>
+                    <p className="text-gray-600 text-xs sm:text-sm">
                       Upload your logo, link social media, and build a following of customers who love your designs.
                     </p>
                   </div>
@@ -1609,18 +1610,18 @@ const Dashboard = () => {
                 />
                 
                 {/* Modal */}
-                <div className="relative w-full max-w-md">
-                  <div className="backdrop-blur-xl bg-white/95 rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
+                <div className="relative w-full max-w-sm sm:max-w-md">
+                  <div className="backdrop-blur-xl bg-white/95 rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
                     {/* Header */}
-                    <div className="p-6 border-b border-gray-200/50">
+                    <div className="p-4 sm:p-6 border-b border-gray-200/50">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-3 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl shadow-lg border border-white/30">
-                            <Camera className="w-6 h-6 text-purple-600" />
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <div className="p-2 sm:p-3 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl sm:rounded-2xl shadow-lg border border-white/30">
+                            <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-bold text-gray-800">Upload Creator Logo</h3>
-                            <p className="text-sm text-gray-600">Choose an image to represent your brand</p>
+                            <h3 className="text-base sm:text-lg font-bold text-gray-800">Upload Creator Logo</h3>
+                            <p className="text-xs sm:text-sm text-gray-600">Choose an image to represent your brand</p>
                           </div>
                         </div>
                         <button
@@ -1629,18 +1630,18 @@ const Dashboard = () => {
                             setLogoFile(null)
                             setLogoPreview(null)
                           }}
-                          className="p-2 hover:bg-white/30 rounded-xl transition-colors"
+                          className="p-1.5 sm:p-2 hover:bg-white/30 rounded-xl transition-colors"
                         >
-                          <X className="w-5 h-5 text-gray-500" />
+                          <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                         </button>
                       </div>
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 space-y-6">
+                    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                       {/* File Input */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                           Choose Logo Image
                         </label>
                         <div className="relative">
@@ -1648,16 +1649,16 @@ const Dashboard = () => {
                             type="file"
                             accept="image/*"
                             onChange={handleLogoUpload}
-                            className="w-full px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all duration-200"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg sm:rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all duration-200"
                           />
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">Supports JPG, PNG, GIF up to 5MB</p>
+                        <p className="text-xs text-gray-500 mt-1 sm:mt-2">Supports JPG, PNG, GIF up to 5MB</p>
                       </div>
 
                       {/* Preview */}
                       {logoPreview && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-3">
+                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                             Preview
                           </label>
                           <div className="flex justify-center">
@@ -1665,10 +1666,10 @@ const Dashboard = () => {
                               <img 
                                 src={logoPreview} 
                                 alt="Logo Preview" 
-                                className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg"
+                                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 sm:border-4 border-white/30 shadow-lg"
                               />
-                              <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                <CheckCircle className="w-4 h-4 text-white" />
+                              <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                               </div>
                             </div>
                           </div>
@@ -1676,21 +1677,21 @@ const Dashboard = () => {
                       )}
 
                       {/* Actions */}
-                      <div className="flex space-x-3 pt-4">
+                      <div className="flex space-x-2 sm:space-x-3 pt-3 sm:pt-4">
                         <button
                           onClick={() => {
                             setShowLogoUpload(false)
                             setLogoFile(null)
                             setLogoPreview(null)
                           }}
-                          className="flex-1 px-4 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl text-gray-700 font-medium transition-all duration-200"
+                          className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg sm:rounded-xl text-gray-700 font-medium transition-all duration-200 text-sm sm:text-base"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={uploadLogo}
                           disabled={!logoFile}
-                          className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-xl transition-all duration-200 shadow-lg disabled:shadow-none"
+                          className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-medium rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg disabled:shadow-none text-sm sm:text-base"
                         >
                           Upload Logo
                         </button>
