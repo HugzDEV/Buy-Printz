@@ -1455,3 +1455,55 @@ async def get_creator_public_profile(creator_id: str):
             status_code=500,
             detail="Internal server error"
         )
+
+@router.get("/creators/{creator_id}/templates")
+async def get_creator_public_templates(creator_id: str, limit: int = 20, offset: int = 0):
+    """Get public templates by a specific creator"""
+    try:
+        # Verify creator exists and is active
+        creator = await db_manager.get_creator_by_id(creator_id)
+        if not creator or not creator.get("is_active", False):
+            raise HTTPException(
+                status_code=404,
+                detail="Creator not found"
+            )
+        
+        # Get creator's approved templates
+        templates_response = db_manager.supabase.table("creator_templates").select(
+            "id, name, description, category, price, preview_image_url, tags, "
+            "sales_count, view_count, rating, rating_count, created_at, is_featured"
+        ).eq("creator_id", creator_id).eq("is_approved", True).eq("is_active", True).order(
+            "is_featured", desc=True
+        ).order("created_at", desc=True).range(offset, offset + limit - 1).execute()
+        
+        templates = templates_response.data or []
+        
+        # Add creator info to each template
+        for template in templates:
+            template["creator"] = {
+                "id": creator["id"],
+                "display_name": creator["display_name"],
+                "profile_image_url": creator.get("profile_image_url"),
+                "is_verified": creator.get("is_verified", False)
+            }
+        
+        return {
+            "success": True,
+            "templates": templates,
+            "total": len(templates),
+            "creator": {
+                "id": creator["id"],
+                "display_name": creator["display_name"],
+                "profile_image_url": creator.get("profile_image_url"),
+                "is_verified": creator.get("is_verified", False)
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting creator templates: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )

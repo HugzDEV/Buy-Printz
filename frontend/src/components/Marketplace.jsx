@@ -399,7 +399,10 @@ const Marketplace = () => {
                       </div>
 
                       <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span className="flex items-center">
+                        <Link 
+                          to={`/creator/${template.creators?.id}`}
+                          className="flex items-center hover:text-purple-600 transition-colors"
+                        >
                           {template.creators?.profile_image_url ? (
         <img 
           src={template.creators.profile_image_url} 
@@ -410,7 +413,7 @@ const Marketplace = () => {
                             <User className="w-3 h-3 mr-1" />
                           )}
                           {template.creators?.display_name || 'Unknown'}
-                        </span>
+                        </Link>
                         <span className="flex items-center">
                           <Eye className="w-3 h-3 mr-1" />
                           {template.view_count || 0}
@@ -483,7 +486,10 @@ const Marketplace = () => {
 
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 gap-2">
                         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                          <span className="flex items-center">
+                          <Link 
+                            to={`/creator/${template.creators?.id}`}
+                            className="flex items-center hover:text-purple-600 transition-colors"
+                          >
                             {template.creators?.profile_image_url ? (
         <img 
           src={template.creators.profile_image_url} 
@@ -494,7 +500,7 @@ const Marketplace = () => {
                               <User className="w-3 h-3 mr-1" />
                             )}
                             <span className="truncate">{template.creators?.display_name || 'Unknown'}</span>
-                          </span>
+                          </Link>
                           <span className="flex items-center">
                             <Eye className="w-3 h-3 mr-1" />
                             {template.view_count || 0}

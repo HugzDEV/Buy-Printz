@@ -36,6 +36,7 @@ import TinSkinzMarketplace from './components/TinSkinzMarketplace'
 import TinSkinzDemo from './components/TinSkinzDemo'
 import TinSkinzCheckout from './components/TinSkinzCheckout'
 import TinSkinzSuccess from './components/TinSkinzSuccess'
+import CreatorProfile from './components/CreatorProfile'
 import authService from './services/auth'
 
 // Protected Route Component with Optimized Mobile Handling
@@ -184,6 +185,14 @@ function App() {
           <>
             <Header />
             <TemplateDetail />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/creator/:creatorId" element={
+          <>
+            <Header />
+            <CreatorProfile />
             <Footer />
           </>
         } />
