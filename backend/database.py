@@ -1384,11 +1384,16 @@ class DatabaseManager:
             # Get top performing templates
             top_templates = sorted(templates, key=lambda x: x.get("sales_count", 0), reverse=True)[:5]
             
+            # Get follower stats
+            followers_response = self.supabase.table("creator_followers").select("id").eq("creator_id", creator_id).execute()
+            followers_count = len(followers_response.data or [])
+            
             return {
                 "creator": creator,
                 "template_stats": template_stats,
                 "recent_sales": recent_sales,
-                "top_templates": top_templates
+                "top_templates": top_templates,
+                "followers_count": followers_count
             }
             
         except Exception as e:

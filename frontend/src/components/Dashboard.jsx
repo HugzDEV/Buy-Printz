@@ -1482,7 +1482,7 @@ const Dashboard = () => {
                       <div className="text-xs sm:text-sm text-gray-600">Total Earnings</div>
                     </div>
                     <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">
-                      <div className="text-lg sm:text-2xl font-bold text-purple-600">{creatorStats?.followers || 0}</div>
+                      <div className="text-lg sm:text-2xl font-bold text-purple-600">{creatorStats?.followers_count || 0}</div>
                       <div className="text-xs sm:text-sm text-gray-600">Followers</div>
                     </div>
                     <div className="text-center backdrop-blur-sm bg-white/10 rounded-xl p-3 sm:p-4 border border-white/20">

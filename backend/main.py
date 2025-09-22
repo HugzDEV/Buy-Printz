@@ -28,6 +28,14 @@ except ImportError:
     CREATOR_MARKETPLACE_AVAILABLE = False
     print("Warning: Creator marketplace module not available")
 
+# Import creator follower routes
+try:
+    from backend.creator_follower_api import router as creator_follower_router
+    CREATOR_FOLLOWER_AVAILABLE = True
+except ImportError:
+    CREATOR_FOLLOWER_AVAILABLE = False
+    print("Warning: Creator follower module not available")
+
 # Old shipping API routes removed - using Playwright integration only
 
 # Import shipping costs API routes - B2Sign integration with Playwright
@@ -209,6 +217,13 @@ if CREATOR_MARKETPLACE_AVAILABLE:
     logger.info("Creator marketplace routes loaded successfully")
 else:
     logger.warning("Creator marketplace routes not available - module not found")
+
+# Include creator follower routes if available
+if CREATOR_FOLLOWER_AVAILABLE:
+    app.include_router(creator_follower_router, prefix="/api/creator-marketplace", tags=["creator-followers"])
+    logger.info("Creator follower routes loaded successfully")
+else:
+    logger.warning("Creator follower routes not available - module not found")
 
 # Old shipping API routes removed - using Playwright integration only
 
