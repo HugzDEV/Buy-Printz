@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [user, setUser] = useState(null)
   const [orders, setOrders] = useState([])
   const [templates, setTemplates] = useState([])
+  const [creatorTemplates, setCreatorTemplates] = useState([])
   
   const [userStats, setUserStats] = useState(null)
   const [preferences, setPreferences] = useState(null)
@@ -39,6 +40,7 @@ const Dashboard = () => {
   const [loadingStates, setLoadingStates] = useState({
     orders: true,
     templates: true,
+    creatorTemplates: true,
     stats: true,
     preferences: true
   })
@@ -105,6 +107,7 @@ const Dashboard = () => {
       setLoadingStates({
         orders: false,
         templates: false,
+        creatorTemplates: false,
         stats: false,
         preferences: false
       })
@@ -259,6 +262,9 @@ const Dashboard = () => {
               setCreatorStats(statsResult.analytics)
             }
           }
+          
+          // Load creator templates
+          await loadCreatorTemplates()
         } else {
           setIsCreator(false)
         }
@@ -268,6 +274,27 @@ const Dashboard = () => {
     } catch (error) {
       console.log('User is not a creator or profile not found')
       setIsCreator(false)
+    }
+  }
+
+  const loadCreatorTemplates = async () => {
+    if (!user?.id || !isCreator) return
+    
+    try {
+      setLoadingStates(prev => ({ ...prev, creatorTemplates: true }))
+      const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates')
+      const result = await response.json()
+      
+      if (result.success && result.templates) {
+        setCreatorTemplates(result.templates)
+      } else {
+        setCreatorTemplates([])
+      }
+    } catch (error) {
+      console.error('Error loading creator templates:', error)
+      setCreatorTemplates([])
+    } finally {
+      setLoadingStates(prev => ({ ...prev, creatorTemplates: false }))
     }
   }
 
@@ -1540,7 +1567,7 @@ const Dashboard = () => {
                   </div>
 
                   {/* Portfolio Templates Grid */}
-                  {loadingStates.templates ? (
+                  {loadingStates.creatorTemplates ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="animate-pulse">
@@ -1550,9 +1577,9 @@ const Dashboard = () => {
                         </div>
                       ))}
                     </div>
-                  ) : templates.length > 0 ? (
+                  ) : creatorTemplates.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {templates.map((template) => (
+                      {creatorTemplates.map((template) => (
                         <div key={template.id} className="group relative">
                           <div className="backdrop-blur-sm bg-white/30 rounded-xl overflow-hidden border border-white/30 hover:border-white/50 transition-all duration-200">
                             <div className="relative h-24 sm:h-32 bg-gray-100">
