@@ -202,7 +202,7 @@ const Dashboard = () => {
     // Load secondary data
     await Promise.all([
       loadDataSafely(
-        () => authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates'),
+        () => authService.authenticatedRequest('/api/templates/user'),
         (data) => {
           setTemplates(data.templates || [])
         },
@@ -489,7 +489,7 @@ const Dashboard = () => {
     if (!confirm('Are you sure you want to delete this template?')) return
     
     try {
-      const response = await authService.authenticatedRequest(`/api/creator-marketplace/templates/${templateId}`, {
+      const response = await authService.authenticatedRequest(`/api/templates/${templateId}`, {
         method: 'DELETE'
       })
       
@@ -520,7 +520,7 @@ const Dashboard = () => {
     cacheService.invalidateTemplates(user.id)
     
     try {
-      const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates')
+      const response = await authService.authenticatedRequest('/api/templates/user')
       const data = await response.json()
       
       if (data.success && data.templates) {
