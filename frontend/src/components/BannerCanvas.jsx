@@ -527,8 +527,9 @@ const BannerCanvas = forwardRef(({
 
     if (!draggedElement || !layer) return
 
-    const centerX = canvasSize.width / 2
-    const centerY = canvasSize.height / 2
+    // Get the actual visual center accounting for scaling
+    const centerX = (canvasSize.width * scale) / 2
+    const centerY = (canvasSize.height * scale) / 2
     const elementBox = draggedElement.getClientRect()
     const elementCenterX = elementBox.x + elementBox.width / 2
     const elementCenterY = elementBox.y + elementBox.height / 2
@@ -725,7 +726,7 @@ const BannerCanvas = forwardRef(({
       
       draggedElement.absolutePosition(newAbsPos)
     }
-  }, [canvasSize, snapToElements, elements])
+  }, [canvasSize, snapToElements, elements, scale])
 
   // Clear guidelines when snapToElements changes
   const clearGuidelines = useCallback(() => {
@@ -1952,7 +1953,7 @@ const BannerCanvas = forwardRef(({
     <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 relative">
       
       {/* Top Toolbar - Mobile Responsive */}
-      <div className="p-1 border-b border-white/20">
+      <div className="p-1 border-b border-white/20 relative z-20">
         <GlassPanel className="flex items-center justify-between gap-1">
           
           {/* Left Section - Zoom Controls */}
@@ -2737,7 +2738,7 @@ const BannerCanvas = forwardRef(({
       {/* Compact Status Bar - Mobile: Top Right Corner, Desktop: Right Side */}
       <div 
         className={`
-          absolute top-4 right-4 sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 z-50
+          absolute top-16 right-4 sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 z-50
           transition-all duration-300 ease-in-out
           ${(selectedId || selectedIds.length > 0) ? 'opacity-100 visible' : 'opacity-0 invisible'}
         `}
