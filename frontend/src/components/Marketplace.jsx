@@ -401,13 +401,15 @@ const Marketplace = () => {
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <span className="flex items-center">
                           {template.creators?.profile_image_url ? (
-                            <img 
-                              src={template.creators.profile_image_url.startsWith('http') 
-                                ? template.creators.profile_image_url 
-                                : `https://api.buyprintz.com${template.creators.profile_image_url}`} 
-                              alt={template.creators.display_name}
-                              className="w-4 h-4 rounded-full mr-2 object-cover border border-white/30"
-                            />
+        <img 
+          src={template.creators.profile_image_url.startsWith('http') 
+            ? template.creators.profile_image_url 
+            : template.creators.profile_image_url.startsWith('/uploads/')
+            ? `https://api.buyprintz.com${template.creators.profile_image_url}`
+            : template.creators.profile_image_url} 
+          alt={template.creators.display_name}
+          className="w-4 h-4 rounded-full mr-2 object-cover border border-white/30"
+        />
                           ) : (
                             <User className="w-3 h-3 mr-1" />
                           )}
@@ -487,13 +489,15 @@ const Marketplace = () => {
                         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                           <span className="flex items-center">
                             {template.creators?.profile_image_url ? (
-                              <img 
-                                src={template.creators.profile_image_url.startsWith('http') 
-                                  ? template.creators.profile_image_url 
-                                  : `https://api.buyprintz.com${template.creators.profile_image_url}`} 
-                                alt={template.creators.display_name}
-                                className="w-4 h-4 rounded-full mr-2 object-cover border border-white/30"
-                              />
+        <img 
+          src={template.creators.profile_image_url.startsWith('http') 
+            ? template.creators.profile_image_url 
+            : template.creators.profile_image_url.startsWith('/uploads/')
+            ? `https://api.buyprintz.com${template.creators.profile_image_url}`
+            : template.creators.profile_image_url} 
+          alt={template.creators.display_name}
+          className="w-4 h-4 rounded-full mr-2 object-cover border border-white/30"
+        />
                             ) : (
                               <User className="w-3 h-3 mr-1" />
                             )}

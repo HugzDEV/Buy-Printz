@@ -211,6 +211,45 @@ async def debug_endpoint():
         "cors_origins": allowed_origins
     }
 
+@app.get("/api/test-static-files")
+async def test_static_files():
+    """Test endpoint to verify static file serving"""
+    import os
+    
+    # Check if uploads directory exists
+    uploads_dir = "uploads"
+    creator_logos_dir = "uploads/creator_logos"
+    
+    uploads_exists = os.path.exists(uploads_dir)
+    creator_logos_exists = os.path.exists(creator_logos_dir)
+    
+    # List files in uploads directory
+    uploads_files = []
+    creator_logos_files = []
+    
+    if uploads_exists:
+        try:
+            uploads_files = os.listdir(uploads_dir)
+        except Exception as e:
+            uploads_files = [f"Error listing uploads: {str(e)}"]
+    
+    if creator_logos_exists:
+        try:
+            creator_logos_files = os.listdir(creator_logos_dir)
+        except Exception as e:
+            creator_logos_files = [f"Error listing creator_logos: {str(e)}"]
+    
+    return {
+        "success": True,
+        "message": "Static file serving test",
+        "uploads_dir_exists": uploads_exists,
+        "creator_logos_dir_exists": creator_logos_exists,
+        "uploads_files": uploads_files,
+        "creator_logos_files": creator_logos_files,
+        "current_working_directory": os.getcwd(),
+        "absolute_uploads_path": os.path.abspath(uploads_dir) if uploads_exists else "N/A"
+    }
+
 # Include creator marketplace routes if available
 if CREATOR_MARKETPLACE_AVAILABLE:
     app.include_router(creator_marketplace_router)
