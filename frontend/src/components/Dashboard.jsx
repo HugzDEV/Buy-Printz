@@ -199,9 +199,10 @@ const Dashboard = () => {
         }
       }
 
-      // Add timeout to prevent infinite loading
+      // Add timeout to prevent infinite loading (shorter for non-critical data)
+      const timeoutDuration = loadingKey === 'orders' ? 10000 : 60000 // 10s for orders, 60s for others
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 30000)
+        setTimeout(() => reject(new Error('Request timeout')), timeoutDuration)
       )
       
       const response = await Promise.race([apiCall(), timeoutPromise])
@@ -211,20 +212,20 @@ const Dashboard = () => {
       if (data.success) {
         let processedData = null
         
-        // Handle different response formats
-        if (data.templates) {
-          processedData = data.templates
-        } else if (data.designs) {
-          processedData = data.designs
-        } else if (data.orders) {
-          processedData = data.orders
-        } else if (data.preferences) {
-          processedData = data.preferences
-        } else if (Array.isArray(data)) {
-          processedData = data
-        } else {
-          processedData = data
-        }
+      // Handle different response formats
+      if (data?.templates) {
+        processedData = data.templates
+      } else if (data?.designs) {
+        processedData = data.designs
+      } else if (data?.orders) {
+        processedData = data.orders
+      } else if (data?.preferences) {
+        processedData = data.preferences
+      } else if (Array.isArray(data)) {
+        processedData = data
+      } else {
+        processedData = data
+      }
         
         // Cache the data if cacheKey is provided
         if (cacheKey && user?.id && processedData) {
@@ -285,12 +286,12 @@ const Dashboard = () => {
         null,
         'stats'
       ),
-      loadDataSafely(
-        () => authService.authenticatedRequest('/api/user/preferences'),
-        (data) => setPreferences(data.preferences || null),
-        null,
-        'preferences'
-      )
+        loadDataSafely(
+          () => authService.authenticatedRequest('/api/user/preferences'),
+          (data) => setPreferences(data?.preferences || null),
+          null,
+          'preferences'
+        )
     ])
   }
 
