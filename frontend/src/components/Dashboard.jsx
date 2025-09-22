@@ -73,6 +73,14 @@ const Dashboard = () => {
     }
   }, [activeTab, isCreator, user?.id, creatorTemplates.length])
 
+  // Load orders when orders tab becomes active
+  useEffect(() => {
+    if (activeTab === 'orders' && user?.id) {
+      console.log('Orders tab active, loading orders...')
+      loadOrders()
+    }
+  }, [activeTab, user?.id])
+
 
   // Check for URL parameters to set active tab
   useEffect(() => {
@@ -256,26 +264,10 @@ const Dashboard = () => {
   }
 
   const loadDataProgressively = async () => {
-    // Load core data first (orders)
-    await Promise.all([
-      loadDataSafely(
-        () => authService.authenticatedRequest('/api/orders'),
-        (data) => {
-          const orders = data.orders || []
-          setOrders(orders)
-        },
-        [],
-        'orders',
-        `orders_${user?.id}`
-      )
-    ])
-
+    // Load only essential data on dashboard load
+    // Orders will be loaded when user visits the orders tab
+    
     // Small delay to prevent overwhelming mobile connections
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // Templates are now loaded from auth service, skip loading them here
-
-    // Another small delay
     await new Promise(resolve => setTimeout(resolve, 100))
 
     // Load tertiary data - use main endpoints and filter on frontend
@@ -293,6 +285,32 @@ const Dashboard = () => {
           'preferences'
         )
     ])
+  }
+
+  // Load orders only when needed (when user visits orders tab)
+  const loadOrders = async () => {
+    if (!user?.id || orders.length > 0) {
+      // Already loaded or no user
+      return
+    }
+
+    try {
+      setLoadingStates(prev => ({ ...prev, orders: true }))
+      
+      const response = await authService.authenticatedRequest('/api/orders')
+      const data = await response.json()
+      
+      if (data.success && data.orders) {
+        setOrders(data.orders)
+      } else {
+        setOrders([])
+      }
+    } catch (error) {
+      console.warn('Failed to load orders:', error)
+      setOrders([])
+    } finally {
+      setLoadingStates(prev => ({ ...prev, orders: false }))
+    }
   }
 
   const handleLogout = async () => {
