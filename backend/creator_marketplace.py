@@ -584,6 +584,11 @@ async def upload_template_file(
 ):
     """Upload a new template from file to the marketplace"""
     try:
+        print(f"🔍 Template upload request received")
+        print(f"🔍 User ID: {current_user.get('user_id')}")
+        print(f"🔍 File: {file.filename}, Content-Type: {file.content_type}")
+        print(f"🔍 Form data: name={name}, category={category}, price={price}")
+        
         user_id = current_user["user_id"]
         
         # Check if user is a creator
@@ -686,10 +691,12 @@ async def upload_template_file(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error uploading template file: {e}")
+        print(f"❌ Error uploading template file: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail="Internal server error"
+            detail=f"Internal server error: {str(e)}"
         )
 
 @router.get("/templates/my-templates")
