@@ -1557,9 +1557,9 @@ const Dashboard = () => {
                         <div key={template.id} className="group relative">
                           <div className="backdrop-blur-sm bg-white/30 rounded-xl overflow-hidden border border-white/30 hover:border-white/50 transition-all duration-200">
                             <div className="relative h-24 sm:h-32 bg-gray-100">
-                              {template.preview_image_url ? (
+                              {template.preview_image_url || template.thumbnail_url ? (
                                 <img 
-                                  src={template.preview_image_url} 
+                                  src={template.preview_image_url || template.thumbnail_url} 
                                   alt={template.name}
                                   className="w-full h-full object-cover"
                                 />
