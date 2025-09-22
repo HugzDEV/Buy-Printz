@@ -362,12 +362,19 @@ class AuthService {
 
     try {
       const headers = await this.getAuthHeaders()
+      
+      // Don't override Content-Type for FormData requests
+      const finalHeaders = { ...headers }
+      if (options.body instanceof FormData) {
+        delete finalHeaders['Content-Type'] // Let browser set multipart/form-data
+      }
+      
       // Construct full URL if it's a relative path
       const fullUrl = url.startsWith('http') ? url : `${apiUrl}${url}`
       const response = await fetch(fullUrl, {
         ...options,
         headers: {
-          ...headers,
+          ...finalHeaders,
           ...options.headers
         }
       })
@@ -378,10 +385,17 @@ class AuthService {
           console.log('Token expired, attempting refresh...')
           await this.refreshToken()
           const newHeaders = await this.getAuthHeaders()
+          
+          // Don't override Content-Type for FormData requests in retry
+          const retryHeaders = { ...newHeaders }
+          if (options.body instanceof FormData) {
+            delete retryHeaders['Content-Type'] // Let browser set multipart/form-data
+          }
+          
           const retryResponse = await fetch(fullUrl, {
             ...options,
             headers: {
-              ...newHeaders,
+              ...retryHeaders,
               ...options.headers
             }
           })
