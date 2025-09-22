@@ -192,6 +192,17 @@ app.add_middleware(
     allow_origin_regex=r"https://.*\.vercel\.app$"
 )
 
+# Debug endpoint to test CORS and basic connectivity
+@app.get("/api/debug")
+async def debug_endpoint():
+    """Debug endpoint to test CORS and basic connectivity"""
+    return {
+        "success": True,
+        "message": "Backend is running",
+        "timestamp": datetime.now().isoformat(),
+        "cors_origins": allowed_origins
+    }
+
 # Include creator marketplace routes if available
 if CREATOR_MARKETPLACE_AVAILABLE:
     app.include_router(creator_marketplace_router)
