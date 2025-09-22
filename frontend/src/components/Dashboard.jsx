@@ -65,12 +65,13 @@ const Dashboard = () => {
     loadDashboardData()
   }, [])
 
-  // Refresh creator templates when creator tab becomes active
+  // Refresh creator templates when creator tab becomes active (only if needed)
   useEffect(() => {
-    if (activeTab === 'creator' && isCreator && user?.id) {
+    if (activeTab === 'creator' && isCreator && user?.id && creatorTemplates.length === 0) {
+      console.log('Creator tab active but no templates loaded, refreshing...')
       refreshCreatorTemplates()
     }
-  }, [activeTab, isCreator, user?.id])
+  }, [activeTab, isCreator, user?.id, creatorTemplates.length])
 
 
   // Check for URL parameters to set active tab
@@ -82,10 +83,48 @@ const Dashboard = () => {
     }
   }, [location.search])
 
+  // Load creator-specific data (analytics, templates, etc.)
+  const loadCreatorSpecificData = async () => {
+    if (!user?.id || !isCreator) {
+      console.log('Skipping loadCreatorSpecificData: user?.id =', user?.id, 'isCreator =', isCreator)
+      return
+    }
+    
+    try {
+      console.log('Loading creator-specific data for user:', user.id)
+      
+      // Load creator analytics and templates in parallel
+      await Promise.all([
+        loadCreatorAnalytics(),
+        loadCreatorTemplates()
+      ])
+    } catch (error) {
+      console.error('Error loading creator-specific data:', error)
+    }
+  }
+
+  // Load creator analytics
+  const loadCreatorAnalytics = async () => {
+    try {
+      const statsResponse = await authService.authenticatedRequest('/api/creator-marketplace/creators/analytics')
+      if (statsResponse.ok) {
+        const statsResult = await statsResponse.json()
+        if (statsResult.success && statsResult.analytics) {
+          setCreatorStats(statsResult.analytics)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading creator analytics:', error)
+    }
+  }
+
   const loadDashboardData = async () => {
     try {
+      console.log('Loading dashboard data...')
       // Since we're already protected by ProtectedRoute, just get user info
       const currentUser = await authService.getCurrentUser()
+      
+      console.log('Current user from auth service:', currentUser)
       
       if (!currentUser) {
         // This should rarely happen since ProtectedRoute handles auth
@@ -94,7 +133,28 @@ const Dashboard = () => {
         return
       }
 
+      console.log('Setting user state:', currentUser)
       setUser(currentUser)
+
+      // Set creator status from auth service (already cached)
+      if (currentUser.isCreator) {
+        console.log('User is a creator, setting creator state from auth service')
+        setIsCreator(true)
+        setCreatorProfile(currentUser.creatorProfile)
+      } else {
+        console.log('User is not a creator')
+        setIsCreator(false)
+        setCreatorProfile(null)
+      }
+
+      // Set templates from auth service (already cached)
+      if (currentUser.templates) {
+        console.log('Setting templates from auth service:', currentUser.templates.length, 'templates')
+        setTemplates(currentUser.templates)
+      } else {
+        console.log('No templates found in auth service')
+        setTemplates([])
+      }
 
       // Load essential data first to show basic dashboard
       setLoading(false)
@@ -102,8 +162,10 @@ const Dashboard = () => {
       // Load data progressively to avoid overwhelming mobile connections
       await loadDataProgressively()
       
-      // Load creator profile if user is a creator
-      await loadCreatorProfile()
+      // Load creator-specific data if user is a creator
+      if (currentUser.isCreator) {
+        await loadCreatorSpecificData()
+      }
 
     } catch (error) {
       console.error('Error loading dashboard data:', error)
@@ -207,19 +269,7 @@ const Dashboard = () => {
     // Small delay to prevent overwhelming mobile connections
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    // Load secondary data
-    await Promise.all([
-      loadDataSafely(
-        () => authService.authenticatedRequest('/api/templates/user'),
-        (data) => {
-          // The data is already the processed array from loadDataSafely
-          setTemplates(Array.isArray(data) ? [...data] : [])
-        },
-        [],
-        'templates',
-        `templates_${user?.id}`
-      ),
-    ])
+    // Templates are now loaded from auth service, skip loading them here
 
     // Another small delay
     await new Promise(resolve => setTimeout(resolve, 100))
@@ -251,36 +301,33 @@ const Dashboard = () => {
     }
   }
 
-  // Load creator profile and check creator status
+  // Legacy function - now just loads additional data if needed
   const loadCreatorProfile = async () => {
+    // This function is now mainly for refreshing creator data
+    if (!user?.id) {
+      console.log('Skipping loadCreatorProfile: user?.id =', user?.id)
+      return
+    }
+    
     try {
-      const response = await authService.authenticatedRequest('/api/creator-marketplace/creators/profile')
-      if (response.ok) {
-        const result = await response.json()
-        if (result.success && result.creator) {
-          setCreatorProfile(result.creator)
-          setIsCreator(true)
-          
-          // Load creator analytics (which includes stats)
-          const statsResponse = await authService.authenticatedRequest('/api/creator-marketplace/creators/analytics')
-          if (statsResponse.ok) {
-            const statsResult = await statsResponse.json()
-            if (statsResult.success && statsResult.analytics) {
-              setCreatorStats(statsResult.analytics)
-            }
-          }
-          
-          // Load creator templates
-          await loadCreatorTemplates()
-        } else {
-          setIsCreator(false)
-        }
+      console.log('Refreshing creator profile for user:', user.id)
+      
+      // Invalidate cache and reload
+      authService.invalidateCreatorStatusCache(user.id)
+      
+      // Get fresh creator status
+      const creatorStatus = await authService.getCreatorStatus(user.id)
+      
+      if (creatorStatus.isCreator) {
+        setCreatorProfile(creatorStatus.creatorProfile)
+        setIsCreator(true)
+        await loadCreatorSpecificData()
       } else {
         setIsCreator(false)
+        setCreatorProfile(null)
       }
     } catch (error) {
-      console.log('User is not a creator or profile not found')
-      setIsCreator(false)
+      console.log('Error refreshing creator profile:', error)
     }
   }
 
@@ -582,21 +629,13 @@ const Dashboard = () => {
     
     setLoadingStates(prev => ({ ...prev, templates: true }))
     
-    // Invalidate cache and reload
-    cacheService.invalidateTemplates(user.id)
-    
     try {
-      const response = await authService.authenticatedRequest('/api/templates/user')
-      const data = await response.json()
+      // Invalidate cache and reload from auth service
+      authService.invalidateUserTemplatesCache(user.id)
       
-      if (data.success && data.templates) {
-        setTemplates(data.templates)
-        cacheService.setTemplates(user.id, data.templates)
-        toast.success('Templates refreshed')
-      } else {
-        setTemplates([])
-        toast.warning('No templates found')
-      }
+      const templates = await authService.getUserTemplates(user.id)
+      setTemplates(templates)
+      toast.success('Templates refreshed')
     } catch (error) {
       console.error('Error refreshing templates:', error)
       toast.error('Failed to refresh templates')

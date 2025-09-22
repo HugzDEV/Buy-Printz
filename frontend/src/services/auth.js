@@ -202,7 +202,7 @@ class AuthService {
     }
   }
 
-  // Get current user from Supabase
+  // Get current user from Supabase with creator status
   async getCurrentUser() {
     if (!this.supabase) {
       return null
@@ -217,11 +217,33 @@ class AuthService {
       }
 
       if (user) {
-        return {
+        const userData = {
           user_id: user.id,
           email: user.email,
           full_name: user.user_metadata?.full_name
         }
+
+        // Check if user is a creator (with caching)
+        try {
+          const creatorStatus = await this.getCreatorStatus(user.id)
+          userData.isCreator = creatorStatus.isCreator
+          userData.creatorProfile = creatorStatus.creatorProfile
+        } catch (creatorError) {
+          console.log('Creator status check failed:', creatorError)
+          userData.isCreator = false
+          userData.creatorProfile = null
+        }
+
+        // Load user templates (with caching)
+        try {
+          const templates = await this.getUserTemplates(user.id)
+          userData.templates = templates
+        } catch (templateError) {
+          console.log('Template loading failed:', templateError)
+          userData.templates = []
+        }
+
+        return userData
       }
 
       return null
@@ -229,6 +251,124 @@ class AuthService {
       console.error('Error getting current user:', error)
       return null
     }
+  }
+
+  // Get creator status with caching
+  async getCreatorStatus(userId) {
+    // Check cache first
+    const cacheKey = `creator_status_${userId}`
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached)
+        // Cache for 5 minutes
+        if (Date.now() - cachedData.timestamp < 5 * 60 * 1000) {
+          console.log('Using cached creator status for user:', userId)
+          return cachedData.data
+        }
+      } catch (e) {
+        // Invalid cache, continue to fetch
+      }
+    }
+
+    try {
+      console.log('Fetching creator status for user:', userId)
+      const response = await this.authenticatedRequest('/api/creator-marketplace/creators/profile')
+      
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success && result.creator) {
+          const creatorData = {
+            isCreator: true,
+            creatorProfile: result.creator
+          }
+          
+          // Cache the result
+          localStorage.setItem(cacheKey, JSON.stringify({
+            data: creatorData,
+            timestamp: Date.now()
+          }))
+          
+          return creatorData
+        }
+      }
+      
+      // User is not a creator
+      const notCreatorData = {
+        isCreator: false,
+        creatorProfile: null
+      }
+      
+      // Cache the result
+      localStorage.setItem(cacheKey, JSON.stringify({
+        data: notCreatorData,
+        timestamp: Date.now()
+      }))
+      
+      return notCreatorData
+    } catch (error) {
+      console.log('Creator status check failed:', error)
+      return {
+        isCreator: false,
+        creatorProfile: null
+      }
+    }
+  }
+
+  // Get user templates with caching
+  async getUserTemplates(userId) {
+    // Check cache first
+    const cacheKey = `user_templates_${userId}`
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached)
+        // Cache for 3 minutes (templates change more frequently than creator status)
+        if (Date.now() - cachedData.timestamp < 3 * 60 * 1000) {
+          console.log('Using cached templates for user:', userId)
+          return cachedData.data
+        }
+      } catch (e) {
+        // Invalid cache, continue to fetch
+      }
+    }
+
+    try {
+      console.log('Fetching templates for user:', userId)
+      const response = await this.authenticatedRequest('/api/templates/user')
+      
+      if (response.ok) {
+        const result = await response.json()
+        const templates = result.templates || []
+        
+        // Cache the result
+        localStorage.setItem(cacheKey, JSON.stringify({
+          data: templates,
+          timestamp: Date.now()
+        }))
+        
+        return templates
+      }
+      
+      return []
+    } catch (error) {
+      console.log('Template loading failed:', error)
+      return []
+    }
+  }
+
+  // Invalidate creator status cache
+  invalidateCreatorStatusCache(userId) {
+    const cacheKey = `creator_status_${userId}`
+    localStorage.removeItem(cacheKey)
+    console.log('Creator status cache invalidated for user:', userId)
+  }
+
+  // Invalidate user templates cache
+  invalidateUserTemplatesCache(userId) {
+    const cacheKey = `user_templates_${userId}`
+    localStorage.removeItem(cacheKey)
+    console.log('User templates cache invalidated for user:', userId)
   }
 
   // Check if user is authenticated with simplified mobile handling
