@@ -1214,6 +1214,8 @@ class DatabaseManager:
                 return {"success": False, "error": "Template name must be between 3 and 100 characters"}
             elif "price_range" in error_msg:
                 return {"success": False, "error": "Price must be between $3.00 and $25.00"}
+            elif "product_type_check" in error_msg:
+                return {"success": False, "error": "Invalid product type. Must be 'banner', 'tin_skinz', or 'tent'"}
             else:
                 return {"success": False, "error": f"Database error: {error_msg}"}
     
