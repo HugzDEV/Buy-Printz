@@ -489,7 +489,7 @@ const Dashboard = () => {
     if (!confirm('Are you sure you want to delete this template?')) return
     
     try {
-      const response = await authService.authenticatedRequest(`/api/templates/${templateId}`, {
+      const response = await authService.authenticatedRequest(`/api/creator-marketplace/templates/${templateId}`, {
         method: 'DELETE'
       })
       
@@ -520,23 +520,21 @@ const Dashboard = () => {
     cacheService.invalidateTemplates(user.id)
     
     try {
-      const response = await authService.authenticatedRequest('/api/templates/user')
+      const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates')
       const data = await response.json()
       
-      if (data.success || Array.isArray(data)) {
-        let templatesData = []
-        if (data.success && data.templates) {
-          templatesData = data.templates
-        } else if (Array.isArray(data)) {
-          templatesData = data
-        }
-        setTemplates(templatesData)
-        cacheService.setTemplates(user.id, templatesData)
+      if (data.success && data.templates) {
+        setTemplates(data.templates)
+        cacheService.setTemplates(user.id, data.templates)
         toast.success('Templates refreshed')
+      } else {
+        setTemplates([])
+        toast.warning('No templates found')
       }
     } catch (error) {
       console.error('Error refreshing templates:', error)
       toast.error('Failed to refresh templates')
+      setTemplates([])
     } finally {
       setLoadingStates(prev => ({ ...prev, templates: false }))
     }
