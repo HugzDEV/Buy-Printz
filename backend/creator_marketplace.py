@@ -120,6 +120,27 @@ class TemplatePurchase(BaseModel):
 # CREATOR MANAGEMENT ENDPOINTS
 # =============================================
 
+@router.get("/creators/database-status")
+async def check_database_status():
+    """Check if creator database tables exist and are accessible"""
+    try:
+        # Test if we can query the creators table
+        test_response = db_manager.supabase.table("creators").select("id").limit(1).execute()
+        
+        return {
+            "success": True,
+            "message": "Creator database tables are accessible",
+            "tables_exist": True,
+            "sample_data": test_response.data[:1] if test_response.data else []
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Database error: {str(e)}",
+            "tables_exist": False,
+            "error": str(e)
+        }
+
 @router.post("/creators/register")
 async def register_creator(
     creator_data: CreatorRegistration,
@@ -187,12 +208,26 @@ async def get_creator_profile(
     """Get current user's creator profile"""
     try:
         user_id = current_user["user_id"]
+        print(f"🔍 Looking for creator profile for user_id: {user_id}")
+        
         creator = await db_manager.get_creator_by_user_id(user_id)
+        print(f"🔍 Creator lookup result: {creator}")
         
         if not creator:
+            # Check if database tables exist
+            try:
+                test_response = db_manager.supabase.table("creators").select("id").limit(1).execute()
+                print(f"🔍 Database test successful, tables exist. Sample: {test_response.data}")
+            except Exception as db_error:
+                print(f"🔍 Database error: {db_error}")
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Database error: {str(db_error)}"
+                )
+            
             raise HTTPException(
                 status_code=404,
-                detail="Creator profile not found"
+                detail="Creator profile not found. Please register as a creator first."
             )
         
         return {
@@ -206,7 +241,7 @@ async def get_creator_profile(
         print(f"Error getting creator profile: {e}")
         raise HTTPException(
             status_code=500,
-            detail="Internal server error"
+            detail=f"Internal server error: {str(e)}"
         )
 
 @router.put("/creators/profile")
@@ -265,13 +300,27 @@ async def upload_creator_logo(
     """Upload creator profile logo"""
     try:
         user_id = current_user["user_id"]
+        print(f"🔍 Logo upload request for user_id: {user_id}")
         
         # Check if creator exists
         existing_creator = await db_manager.get_creator_by_user_id(user_id)
+        print(f"🔍 Creator lookup for logo upload: {existing_creator}")
+        
         if not existing_creator:
+            # Check if database tables exist
+            try:
+                test_response = db_manager.supabase.table("creators").select("id").limit(1).execute()
+                print(f"🔍 Database test successful, tables exist. Sample: {test_response.data}")
+            except Exception as db_error:
+                print(f"🔍 Database error during logo upload: {db_error}")
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Database error: {str(db_error)}"
+                )
+            
             raise HTTPException(
                 status_code=404,
-                detail="Creator profile not found"
+                detail="Creator profile not found. Please register as a creator first."
             )
         
         # Validate file type
@@ -615,10 +664,24 @@ async def get_creator_analytics(
     """Get creator analytics and earnings"""
     try:
         user_id = current_user["user_id"]
+        print(f"🔍 Analytics request for user_id: {user_id}")
         
         # Check if user is a creator
         creator = await db_manager.get_creator_by_user_id(user_id)
+        print(f"🔍 Creator lookup for analytics: {creator}")
+        
         if not creator:
+            # Check if database tables exist
+            try:
+                test_response = db_manager.supabase.table("creators").select("id").limit(1).execute()
+                print(f"🔍 Database test successful, tables exist. Sample: {test_response.data}")
+            except Exception as db_error:
+                print(f"🔍 Database error during analytics: {db_error}")
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Database error: {str(db_error)}"
+                )
+            
             raise HTTPException(
                 status_code=403,
                 detail="User must be a registered creator"
@@ -626,6 +689,7 @@ async def get_creator_analytics(
         
         # Get analytics data
         analytics = await db_manager.get_creator_analytics(creator["id"])
+        print(f"🔍 Analytics data: {analytics}")
         
         return {
             "success": True,
@@ -638,7 +702,7 @@ async def get_creator_analytics(
         print(f"Error getting creator analytics: {e}")
         raise HTTPException(
             status_code=500,
-            detail="Internal server error"
+            detail=f"Internal server error: {str(e)}"
         )
 
 # =============================================
