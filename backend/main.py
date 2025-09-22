@@ -215,7 +215,7 @@ async def debug_endpoint():
 
 # Include creator marketplace routes if available
 if CREATOR_MARKETPLACE_AVAILABLE:
-    app.include_router(creator_marketplace_router)
+    app.include_router(creator_marketplace_router, tags=["creator-marketplace"])
     logger.info("Creator marketplace routes loaded successfully")
 else:
     logger.warning("Creator marketplace routes not available - module not found")
