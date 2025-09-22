@@ -98,65 +98,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Why Choose BuyPrintz?
-            </h2>
-            <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-              Professional-grade design tools combined with premium printing materials and lightning-fast delivery
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            {features.map((feature, index) => (
-              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl text-center p-8 rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[280px]">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3 leading-tight">
-                  {feature.title}
-                </h3>
-                <p className="text-white/80 leading-relaxed text-base flex-grow">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Delivery Promise Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
-                ⚡ Lightning Fast Delivery Promise
-              </h2>
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-8">
-                  <div className="text-6xl mb-4">🚀</div>
-                  <h3 className="text-2xl font-bold text-white mb-3">Super Rush</h3>
-                  <p className="text-white/90 text-lg mb-2">Order by <span className="font-bold text-buyprint-brand">12:00 PM</span></p>
-                  <p className="text-white font-bold text-xl">2 business days</p>
-                  <p className="text-white/80 text-sm mt-1">(Mon-Fri delivery)</p>
-                </div>
-                <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-8">
-                  <div className="text-6xl mb-4">📦</div>
-                  <h3 className="text-2xl font-bold text-white mb-3">Standard Rush</h3>
-                  <p className="text-white/90 text-lg mb-2">Order by <span className="font-bold text-buyprint-brand">4:00 PM</span></p>
-                  <p className="text-white font-bold text-xl">3 business days</p>
-                  <p className="text-white/80 text-sm mt-1">(Printed, shipped & delivered)</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Featured Products Section */}
       <section id="products" className="py-24">
         <div className="container mx-auto px-4">
@@ -235,8 +176,65 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
+      {/* Features Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Why Choose BuyPrintz?
+            </h2>
+            <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
+              Professional-grade design tools combined with premium printing materials and lightning-fast delivery
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {features.map((feature, index) => (
+              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl text-center p-8 rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[280px]">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 leading-tight">
+                  {feature.title}
+                </h3>
+                <p className="text-white/80 leading-relaxed text-base flex-grow">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* Delivery Promise Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl p-12 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+                ⚡ Lightning Fast Delivery Promise
+              </h2>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-8">
+                  <div className="text-6xl mb-4">🚀</div>
+                  <h3 className="text-2xl font-bold text-white mb-3">Super Rush</h3>
+                  <p className="text-white/90 text-lg mb-2">Order by <span className="font-bold text-buyprint-brand">12:00 PM</span></p>
+                  <p className="text-white font-bold text-xl">2 business days</p>
+                  <p className="text-white/80 text-sm mt-1">(Mon-Fri delivery)</p>
+                </div>
+                <div className="backdrop-blur-sm bg-white/10 border border-white/20 rounded-2xl p-8">
+                  <div className="text-6xl mb-4">📦</div>
+                  <h3 className="text-2xl font-bold text-white mb-3">Standard Rush</h3>
+                  <p className="text-white/90 text-lg mb-2">Order by <span className="font-bold text-buyprint-brand">4:00 PM</span></p>
+                  <p className="text-white font-bold text-xl">3 business days</p>
+                  <p className="text-white/80 text-sm mt-1">(Printed, shipped & delivered)</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
