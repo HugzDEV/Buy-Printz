@@ -25,6 +25,38 @@
     <priority>0.9</priority>
   </url>
   
+  <!-- All Products -->
+  <url>
+    <loc>https://buyprintz.com/all-products</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Banner Products -->
+  <url>
+    <loc>https://buyprintz.com/banner-products</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Tin Products -->
+  <url>
+    <loc>https://buyprintz.com/tin-products</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Tent Products -->
+  <url>
+    <loc>https://buyprintz.com/tent-products</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
   <!-- Design Tool -->
   <url>
     <loc>https://buyprintz.com/editor</loc>
@@ -73,12 +105,68 @@
     <priority>0.7</priority>
   </url>
   
+  <!-- Creator Registration -->
+  <url>
+    <loc>https://buyprintz.com/creator/register</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Creator Dashboard -->
+  <url>
+    <loc>https://buyprintz.com/creator/dashboard</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Creator Upload -->
+  <url>
+    <loc>https://buyprintz.com/creator/upload</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Creator Earnings -->
+  <url>
+    <loc>https://buyprintz.com/creator/earnings</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
   <!-- TinSkinz Marketplace -->
   <url>
     <loc>https://buyprintz.com/tinskinz</loc>
     <lastmod>2025-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  
+  <!-- TinSkinz Demo -->
+  <url>
+    <loc>https://buyprintz.com/tin-skinz-demo</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- TinSkinz Checkout -->
+  <url>
+    <loc>https://buyprintz.com/tin-skinz/checkout</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- TinSkinz Success -->
+  <url>
+    <loc>https://buyprintz.com/tin-skinz/success</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <!-- Login -->
@@ -102,6 +190,54 @@
     <loc>https://buyprintz.com/about</loc>
     <lastmod>2025-09-21</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Checkout -->
+  <url>
+    <loc>https://buyprintz.com/checkout</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Tin Checkout -->
+  <url>
+    <loc>https://buyprintz.com/tin-checkout</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Tent Checkout -->
+  <url>
+    <loc>https://buyprintz.com/tent-checkout</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Order Confirmation -->
+  <url>
+    <loc>https://buyprintz.com/confirmation</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Support -->
+  <url>
+    <loc>https://buyprintz.com/support</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Blog -->
+  <url>
+    <loc>https://buyprintz.com/blog</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   
