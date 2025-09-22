@@ -1041,9 +1041,14 @@ const Dashboard = () => {
                   <SkeletonTemplateCard key={i} />
                 ))}
               </div>
-            ) : templates.length > 0 ? (
+            ) : (() => {
+              console.log(`🔄 Dashboard template state: loading=${loadingStates.templates}, count=${templates.length}`)
+              return templates.length > 0
+            })() ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {templates.map((template) => (
+              {templates.map((template) => {
+                console.log(`🎨 Rendering template: ${template.name}`)
+                return (
                   <div key={template.id} className="group relative">
                     {/* Main Template Card */}
                     <div className="backdrop-blur-xl bg-white/10 rounded-3xl overflow-hidden border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02]">
@@ -1157,7 +1162,8 @@ const Dashboard = () => {
                       <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
                   </div>
-                ))}
+                )
+              })}
               </div>
             ) : (
               <div className="backdrop-blur-xl bg-white/10 rounded-3xl p-16 text-center border border-white/20 shadow-2xl">

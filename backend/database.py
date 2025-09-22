@@ -538,7 +538,18 @@ class DatabaseManager:
             
             if existing_templates.data:
                 print(f"Template name '{template_name}' already exists for user {user_id}")
-                return {"success": False, "error": f"Template name '{template_name}' already exists. Please choose a different name."}
+                # Generate a unique name by appending a number
+                counter = 1
+                new_name = f"{template_name} ({counter})"
+                while True:
+                    check_templates = self.supabase.table("banner_templates").select("id").eq("user_id", user_id).eq("name", new_name).execute()
+                    if not check_templates.data:
+                        break
+                    counter += 1
+                    new_name = f"{template_name} ({counter})"
+                
+                print(f"Auto-generating unique name: '{new_name}'")
+                template_data["name"] = new_name
             
             # Ensure canvas_data is properly formatted
             canvas_data = template_data.get("canvas_data", {})
