@@ -76,13 +76,13 @@ async def get_designs(category: Optional[str] = None):
         designs = []
         for design in result.data:
             designs.append(TinSkinzDesign(
-                id=design["design_id"],
+                id=design["id"],
                 name=design["name"],
                 category=design["category"],
                 thumbnail_url=design["thumbnail_url"],
                 back_thumbnail_url=design["back_thumbnail_url"],
                 design_url=design["design_url"],
-                base_price=float(design["base_price"])
+                base_price=float(design["price"])
             ))
         
         return designs
@@ -95,14 +95,14 @@ async def get_candy_options():
     """Get all available candy options"""
     try:
         supabase = db_manager.supabase
-        result = supabase.table("tin_skinz_candy_options").select("*").eq("is_active", True).execute()
+        result = supabase.table("tin_skinz_candy_options").select("*").execute()
         
         candy_options = []
         for candy in result.data:
             candy_options.append(TinSkinzCandyOption(
-                id=candy["candy_id"],
+                id=candy["id"],
                 name=candy["name"],
-                price=float(candy["price"])
+                base_price=float(candy["base_price"])
             ))
         
         return candy_options
@@ -162,7 +162,7 @@ async def create_order(order_request: TinSkinzOrderRequest):
         supabase = db_manager.supabase
         # Validate all designs exist
         design_ids = [design['design_id'] for design in order_request.selected_designs]
-        design_result = supabase.table("tin_skinz_designs").select("*").in_("design_id", design_ids).eq("is_active", True).execute()
+        design_result = supabase.table("tin_skinz_designs").select("*").in_("id", design_ids).execute()
         
         if len(design_result.data) != len(design_ids):
             raise HTTPException(status_code=404, detail="One or more designs not found")
@@ -184,15 +184,15 @@ async def create_order(order_request: TinSkinzOrderRequest):
                 quantity = design_item['quantity']
                 
                 # Get design price
-                design = next(d for d in design_result.data if d['design_id'] == design_id)
-                base_price = float(design['base_price'])
+                design = next(d for d in design_result.data if d['id'] == design_id)
+                base_price = float(design['price'])
                 
                 # Add candy cost if specified
                 candy_cost = 0.0
                 if design_item.get('candy_id'):
-                    candy_result = supabase.table("tin_skinz_candy_options").select("*").eq("candy_id", design_item['candy_id']).eq("is_active", True).execute()
+                    candy_result = supabase.table("tin_skinz_candy_options").select("*").eq("id", design_item['candy_id']).execute()
                     if candy_result.data:
-                        candy_cost = float(candy_result.data[0]["price"])
+                        candy_cost = float(candy_result.data[0]["base_price"])
                 
                 # Add custom message cost if specified
                 message_cost = 0.0
