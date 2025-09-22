@@ -245,17 +245,23 @@ const Dashboard = () => {
   // Load creator profile and check creator status
   const loadCreatorProfile = async () => {
     try {
-      const response = await authService.authenticatedRequest('/api/creator/profile')
+      const response = await authService.authenticatedRequest('/api/creator-marketplace/creators/profile')
       if (response.ok) {
-        const profile = await response.json()
-        setCreatorProfile(profile)
-        setIsCreator(true)
-        
-        // Load creator stats
-        const statsResponse = await authService.authenticatedRequest('/api/creator/stats')
-        if (statsResponse.ok) {
-          const stats = await statsResponse.json()
-          setCreatorStats(stats)
+        const result = await response.json()
+        if (result.success && result.creator) {
+          setCreatorProfile(result.creator)
+          setIsCreator(true)
+          
+          // Load creator analytics (which includes stats)
+          const statsResponse = await authService.authenticatedRequest('/api/creator-marketplace/creators/analytics')
+          if (statsResponse.ok) {
+            const statsResult = await statsResponse.json()
+            if (statsResult.success && statsResult.analytics) {
+              setCreatorStats(statsResult.analytics)
+            }
+          }
+        } else {
+          setIsCreator(false)
         }
       } else {
         setIsCreator(false)
@@ -301,18 +307,22 @@ const Dashboard = () => {
       const formData = new FormData()
       formData.append('logo', logoFile)
 
-      const response = await authService.authenticatedRequest('/api/creator/upload-logo', {
+      const response = await authService.authenticatedRequest('/api/creator-marketplace/creators/upload-logo', {
         method: 'POST',
         body: formData
       })
 
       if (response.ok) {
         const result = await response.json()
-        setCreatorProfile(prev => ({ ...prev, logo_url: result.logo_url }))
-        setShowLogoUpload(false)
-        setLogoFile(null)
-        setLogoPreview(null)
-        toast.success('Logo uploaded successfully!')
+        if (result.success) {
+          setCreatorProfile(prev => ({ ...prev, profile_image_url: result.logo_url }))
+          setShowLogoUpload(false)
+          setLogoFile(null)
+          setLogoPreview(null)
+          toast.success('Logo uploaded successfully!')
+        } else {
+          throw new Error(result.message || 'Upload failed')
+        }
       } else {
         throw new Error('Upload failed')
       }
@@ -1378,9 +1388,9 @@ const Dashboard = () => {
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        {creatorProfile?.logo_url ? (
+                        {creatorProfile?.profile_image_url ? (
                           <img 
-                            src={creatorProfile.logo_url} 
+                            src={creatorProfile.profile_image_url} 
                             alt="Creator Logo" 
                             className="w-20 h-20 rounded-full object-cover border-4 border-white/30"
                           />
@@ -1428,7 +1438,7 @@ const Dashboard = () => {
                       <input
                         type="text"
                         placeholder="@yourusername"
-                        defaultValue={creatorProfile?.instagram || ''}
+                        defaultValue={creatorProfile?.social_links?.instagram || ''}
                         className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                     </div>
@@ -1440,7 +1450,7 @@ const Dashboard = () => {
                       <input
                         type="text"
                         placeholder="facebook.com/yourpage"
-                        defaultValue={creatorProfile?.facebook || ''}
+                        defaultValue={creatorProfile?.social_links?.facebook || ''}
                         className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                     </div>

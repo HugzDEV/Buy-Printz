@@ -257,6 +257,85 @@ async def update_creator_profile(
             detail="Internal server error"
         )
 
+@router.post("/creators/upload-logo")
+async def upload_creator_logo(
+    logo: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload creator profile logo"""
+    try:
+        user_id = current_user["user_id"]
+        
+        # Check if creator exists
+        existing_creator = await db_manager.get_creator_by_user_id(user_id)
+        if not existing_creator:
+            raise HTTPException(
+                status_code=404,
+                detail="Creator profile not found"
+            )
+        
+        # Validate file type
+        if not logo.content_type or not logo.content_type.startswith('image/'):
+            raise HTTPException(
+                status_code=400,
+                detail="File must be an image"
+            )
+        
+        # Validate file size (max 5MB)
+        content = await logo.read()
+        if len(content) > 5 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400,
+                detail="File size must be less than 5MB"
+            )
+        
+        # Generate unique filename
+        file_extension = logo.filename.split('.')[-1] if '.' in logo.filename else 'jpg'
+        filename = f"creator_logo_{existing_creator['id']}_{uuid.uuid4().hex[:8]}.{file_extension}"
+        
+        # Save file to uploads directory
+        uploads_dir = "uploads/creator_logos"
+        os.makedirs(uploads_dir, exist_ok=True)
+        
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+        
+        # Generate URL for the uploaded file
+        logo_url = f"/uploads/creator_logos/{filename}"
+        
+        # Update creator profile with logo URL
+        update_data = {
+            "profile_image_url": logo_url,
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        result = await db_manager.update_creator(existing_creator["id"], update_data)
+        
+        if result:
+            return {
+                "success": True,
+                "message": "Logo uploaded successfully",
+                "logo_url": logo_url
+            }
+        else:
+            # Clean up uploaded file if database update failed
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to update creator profile with logo"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error uploading creator logo: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
+
 @router.get("/creators/{creator_id}")
 async def get_creator_public_profile(creator_id: str):
     """Get public creator profile"""
