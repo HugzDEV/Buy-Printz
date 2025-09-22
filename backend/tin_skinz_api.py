@@ -10,8 +10,8 @@ import stripe
 import os
 from datetime import datetime
 import uuid
-from supabase import create_client, Client
 import logging
+from backend.database import db_manager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,15 +19,6 @@ logger = logging.getLogger(__name__)
 
 # Initialize Stripe
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-
-# Initialize Supabase (lazy initialization)
-def get_supabase_client():
-    """Get Supabase client with lazy initialization"""
-    supabase_url = os.getenv("SUPABASE_URL")
-    supabase_key = os.getenv("SUPABASE_ANON_KEY")
-    if not supabase_url or not supabase_key:
-        raise HTTPException(status_code=500, detail="Supabase configuration missing")
-    return create_client(supabase_url, supabase_key)
 
 router = APIRouter(prefix="/api/tin-skinz", tags=["tin-skinz"])
 
@@ -74,7 +65,7 @@ class TinSkinzOrderResponse(BaseModel):
 async def get_designs(category: Optional[str] = None):
     """Get all Tin Skinz designs, optionally filtered by category"""
     try:
-        supabase = get_supabase_client()
+        supabase = db_manager.supabase
         query = supabase.table("tin_skinz_designs").select("*").eq("is_active", True)
         
         if category:
@@ -103,7 +94,7 @@ async def get_designs(category: Optional[str] = None):
 async def get_candy_options():
     """Get all available candy options"""
     try:
-        supabase = get_supabase_client()
+        supabase = db_manager.supabase
         result = supabase.table("tin_skinz_candy_options").select("*").eq("is_active", True).execute()
         
         candy_options = []
@@ -127,7 +118,7 @@ async def calculate_price(
 ):
     """Calculate pricing for Tin Skinz order"""
     try:
-        supabase = get_supabase_client()
+        supabase = db_manager.supabase
         # Call the database function to calculate pricing
         result = supabase.rpc(
             "calculate_tin_skinz_price",
@@ -168,7 +159,7 @@ async def calculate_price(
 async def create_order(order_request: TinSkinzOrderRequest):
     """Create a new Tin Skinz order and Stripe payment intent"""
     try:
-        supabase = get_supabase_client()
+        supabase = db_manager.supabase
         # Validate all designs exist
         design_ids = [design['design_id'] for design in order_request.selected_designs]
         design_result = supabase.table("tin_skinz_designs").select("*").in_("design_id", design_ids).eq("is_active", True).execute()
@@ -265,7 +256,7 @@ async def create_order(order_request: TinSkinzOrderRequest):
 async def confirm_payment(payment_intent_id: str):
     """Confirm payment and update order status"""
     try:
-        supabase = get_supabase_client()
+        supabase = db_manager.supabase
         # Retrieve payment intent from Stripe
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
         
@@ -292,7 +283,7 @@ async def confirm_payment(payment_intent_id: str):
 async def get_user_orders(user_id: str):
     """Get orders for a specific user"""
     try:
-        supabase = get_supabase_client()
+        supabase = db_manager.supabase
         result = supabase.table("tin_skinz_orders").select("""
             *,
             tin_skinz_designs(name, category),
