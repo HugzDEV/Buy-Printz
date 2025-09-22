@@ -56,7 +56,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Welcome to BuyPrintz!</h3>
           <p className="text-gray-600">
-            This is your professional banner design studio. Let's take a quick tour!
+            This is your professional design studio. Let's explore the new features!
           </p>
         </div>
       ),
@@ -81,21 +81,21 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
       placement: 'bottom',
     },
     {
-      target: '.action-buttons',
+      target: '.sidebar-tools',
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
-            <div className="p-3 bg-purple-100 rounded-full">
-              <Save className="w-8 h-8 text-purple-600" />
+            <div className="p-3 bg-green-100 rounded-full">
+              <Palette className="w-8 h-8 text-green-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Save & Order</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Design Tools Sidebar</h3>
           <p className="text-gray-600">
-            Save your design, create templates, and order when you're ready!
+            Access text tools, shapes, icons, templates, and design assets. The sidebar is organized by category for easy navigation!
           </p>
         </div>
       ),
-      placement: 'bottom',
+      placement: 'right',
     },
     {
       target: '.zoom-controls',
@@ -106,30 +106,30 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
               <Eye className="w-8 h-8 text-orange-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Zoom & Navigate</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Canvas Controls</h3>
           <p className="text-gray-600">
-            Zoom in for detail work, zoom out to see the full design.
+            Zoom in/out, undo/redo, and navigate between surfaces (for tins/tents). The magnet tool helps align elements perfectly!
           </p>
         </div>
       ),
       placement: 'left',
     },
     {
-      target: '.mobile-hamburger',
+      target: '.action-buttons',
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
-            <div className="p-3 bg-green-100 rounded-full">
-              <Menu className="w-8 h-8 text-green-600" />
+            <div className="p-3 bg-purple-100 rounded-full">
+              <Save className="w-8 h-8 text-purple-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Design Tools</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Save & Order</h3>
           <p className="text-gray-600">
-            Click here to access all design tools - text, shapes, icons, and more!
+            Save your design, create templates, and order when you're ready! Your work is automatically saved as you design.
           </p>
         </div>
       ),
-      placement: 'right',
+      placement: 'bottom',
     },
     {
       target: '.final-step',
@@ -146,7 +146,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">You're Ready!</h3>
           <p className="text-gray-600">
-            Start creating your amazing banner design! 🎨
+            Start creating your amazing design! Select any element to see the new compact status bar with editing options! 🎨
           </p>
         </div>
       ),
@@ -167,7 +167,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Welcome to BuyPrintz!</h3>
           <p className="text-gray-600">
-            This is your professional banner design studio. Let's take a quick tour!
+            This is your professional design studio. Let's explore the mobile-optimized interface!
           </p>
         </div>
       ),
@@ -183,9 +183,9 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
               <Menu className="w-8 h-8 text-yellow-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Design Tools & Product Selection</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Design Tools Sidebar</h3>
           <p className="text-gray-600">
-            Tap this button to access all design tools AND switch between products (Banners, Tins, Tents). Each product has unique design options!
+            Tap this button to access all design tools - text, shapes, icons, templates, and more! The sidebar slides in from the left with organized categories.
           </p>
         </div>
       ),
@@ -200,13 +200,13 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
               <Eye className="w-8 h-8 text-orange-600" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Zoom & Navigate</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Mobile Toolbar</h3>
           <p className="text-gray-600">
-            Zoom in for detail work, zoom out to see the full design.
+            Double-wide mobile toolbar with zoom controls, undo/redo, magnet tool, and surface navigation. All essential tools are easily accessible!
           </p>
         </div>
       ),
-      placement: 'left',
+      placement: 'top',
     },
     {
       target: '.final-step',
@@ -223,7 +223,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">You're Ready!</h3>
           <p className="text-gray-600">
-            Start creating your amazing banner design! 🎨
+            Start creating your amazing design! Select any element to see the compact status bar with editing options! 🎨
           </p>
         </div>
       ),
@@ -310,6 +310,41 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
             if (foundButton) {
               // Add the mobile-hamburger class to the found button
               foundButton.classList.add('mobile-hamburger')
+              
+              // Wait a bit for the class to be applied, then retry
+              setTimeout(() => {
+                checkTargets()
+              }, 100)
+              return
+            }
+          }
+          
+          // Special handling for sidebar-tools if it's missing
+          if (missingTargets.includes('.sidebar-tools')) {
+            // Try to find the sidebar by alternative means
+            const sidebarSelectors = [
+              'div[class*="sidebar"]',
+              'div[class*="tools"]',
+              '.BannerSidebar',
+              '[class*="sidebar-tools"]'
+            ]
+            
+            let foundSidebar = null
+            for (const selector of sidebarSelectors) {
+              try {
+                const element = document.querySelector(selector)
+                if (element) {
+                  foundSidebar = element
+                  break
+                }
+              } catch (e) {
+                // Selector failed, continue to next
+              }
+            }
+            
+            if (foundSidebar) {
+              // Add the sidebar-tools class to the found element
+              foundSidebar.classList.add('sidebar-tools')
               
               // Wait a bit for the class to be applied, then retry
               setTimeout(() => {

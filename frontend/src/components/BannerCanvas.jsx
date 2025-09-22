@@ -2738,7 +2738,7 @@ const BannerCanvas = forwardRef(({
       {/* Compact Status Bar - Mobile: Top Right Corner, Desktop: Right Side */}
       <div 
         className={`
-          absolute top-16 right-4 sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 z-50
+          status-bar absolute top-16 right-4 sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 z-50
           transition-all duration-300 ease-in-out
           ${(selectedId || selectedIds.length > 0) ? 'opacity-100 visible' : 'opacity-0 invisible'}
         `}
