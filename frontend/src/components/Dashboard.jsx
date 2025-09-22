@@ -84,14 +84,17 @@ const Dashboard = () => {
   }, [location.search])
 
   // Load creator-specific data (analytics, templates, etc.)
-  const loadCreatorSpecificData = async () => {
-    if (!user?.id || !isCreator) {
-      console.log('Skipping loadCreatorSpecificData: user?.id =', user?.id, 'isCreator =', isCreator)
+  const loadCreatorSpecificData = async (userData = null) => {
+    const currentUser = userData || user
+    const currentIsCreator = userData ? userData.isCreator : isCreator
+    
+    if (!currentUser?.id || !currentIsCreator) {
+      console.log('Skipping loadCreatorSpecificData: user?.id =', currentUser?.id, 'isCreator =', currentIsCreator)
       return
     }
     
     try {
-      console.log('Loading creator-specific data for user:', user.id)
+      console.log('Loading creator-specific data for user:', currentUser.id)
       
       // Load creator analytics and templates in parallel
       await Promise.all([
@@ -164,7 +167,7 @@ const Dashboard = () => {
       
       // Load creator-specific data if user is a creator
       if (currentUser.isCreator) {
-        await loadCreatorSpecificData()
+        await loadCreatorSpecificData(currentUser)
       }
 
     } catch (error) {
