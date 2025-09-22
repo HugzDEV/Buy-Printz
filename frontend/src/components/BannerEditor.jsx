@@ -4685,7 +4685,7 @@ const BannerEditorNew = () => {
           canvas-container flex-1 relative
           ${isMobileSidebarOpen ? 'hidden' : 'block'}
           md:block
-          z-10 md:z-auto
+          z-0 md:z-auto
           transition-all duration-300 ease-in-out
         `}>
           <BannerCanvas

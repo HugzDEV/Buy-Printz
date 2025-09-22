@@ -2016,16 +2016,6 @@ const BannerCanvas = forwardRef(({
                 <ZoomIn className="w-3.5 h-3.5" />
             </GlassButton>
             
-            <div className="w-px h-5 bg-white/20 mx-1" />
-            
-            {/* Snapping Toggle */}
-            <GlassButton 
-              onClick={() => setSnapToElements(!snapToElements)}
-              className={`p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center ${snapToElements ? 'bg-blue-500/20 border-blue-400/50' : ''}`}
-              title={snapToElements ? 'Disable Element Snapping' : 'Enable Element Snapping'}
-            >
-              <Magnet className={`w-3.5 h-3.5 ${snapToElements ? 'text-blue-600' : ''}`} />
-            </GlassButton>
           </div>
 
           </div>
@@ -2106,10 +2096,11 @@ const BannerCanvas = forwardRef(({
               {/* Mobile: Snap to Elements (Magnet) */}
               <GlassButton 
                 onClick={() => setSnapToElements(!snapToElements)}
-                className={`p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0 ${snapToElements ? 'bg-blue-500/20 border-blue-400/50' : ''}`}
+                variant={snapToElements ? "primary" : "default"}
+                className="p-1 min-w-[28px] min-h-[28px] flex items-center justify-center flex-shrink-0"
                 title={snapToElements ? 'Disable Element Snapping' : 'Enable Element Snapping'}
               >
-                <Magnet className={`w-2.5 h-2.5 ${snapToElements ? 'text-blue-600' : ''}`} />
+                <Magnet className="w-2.5 h-2.5" />
               </GlassButton>
               
               <GlassButton 
@@ -2185,6 +2176,16 @@ const BannerCanvas = forwardRef(({
                 {showGuides ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
             </GlassButton>
             
+            {/* Desktop: Snap to Elements (Magnet) */}
+            <GlassButton 
+              onClick={() => setSnapToElements(!snapToElements)}
+              variant={snapToElements ? "primary" : "default"}
+              className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+              title={snapToElements ? 'Disable Element Snapping' : 'Enable Element Snapping'}
+            >
+              <Magnet className="w-3.5 h-3.5" />
+            </GlassButton>
+            
               <div className="w-px h-5 bg-white/20 mx-1" />
             
               <GlassButton 
@@ -2213,9 +2214,9 @@ const BannerCanvas = forwardRef(({
           
           
 
-          {/* Surface Indicator for Tins and Tents */}
+          {/* Surface Indicator for Tins and Tents - Moved to bottom */}
           {(productType === 'tin' || productType === 'tent') && (
-            <div className="absolute top-4 left-4 z-10">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
               <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-2 shadow-lg">
                 <div className="text-sm font-medium text-gray-800">
                   Editing: <span className="text-blue-600 capitalize">
@@ -2238,7 +2239,6 @@ const BannerCanvas = forwardRef(({
               maxWidth: '100%',
               maxHeight: '95vh', // Use maximum available height
               userSelect: 'none', // Prevent text selection
-              transform: window.innerWidth < 768 ? 'translateY(-40px)' : 'translateY(-20px)', // Move canvas content up to avoid status bar collision
               // Add rounded corners for tins (0.33 degree radius = ~2.3px at 100 DPI)
               borderRadius: productType === 'tin' ? '2.3px' : undefined
             }}
@@ -2734,10 +2734,10 @@ const BannerCanvas = forwardRef(({
         </GlassPanel>
       </div>
 
-      {/* Compact Status Bar - Mobile Optimized */}
+      {/* Compact Status Bar - Mobile: Top Right Corner, Desktop: Right Side */}
       <div 
         className={`
-          fixed top-1/2 right-1 sm:right-4 transform -translate-y-1/2 z-50
+          absolute top-4 right-4 sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 z-50
           transition-all duration-300 ease-in-out
           ${(selectedId || selectedIds.length > 0) ? 'opacity-100 visible' : 'opacity-0 invisible'}
         `}
