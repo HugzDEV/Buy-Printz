@@ -1,7 +1,5 @@
--- Fix creator_templates product_type constraint
--- The constraint might have been created with wrong values
-
--- Step 1: Check what product types currently exist
+-- STEP 1: Check what product types currently exist
+-- Run this first to see what data we're working with
 SELECT 
     product_type,
     COUNT(*) as count
@@ -9,7 +7,7 @@ FROM creator_templates
 GROUP BY product_type
 ORDER BY count DESC;
 
--- Step 2: Update any invalid product types to valid ones
+-- STEP 2: Update invalid product types (run after step 1)
 -- Map common invalid types to valid ones
 UPDATE creator_templates 
 SET product_type = 'banner' 
@@ -23,25 +21,20 @@ UPDATE creator_templates
 SET product_type = 'tent' 
 WHERE product_type = 'tradeshow_tent';
 
--- Step 3: Set default for any remaining invalid types
+-- Set default for any remaining invalid types
 UPDATE creator_templates 
 SET product_type = 'banner' 
 WHERE product_type NOT IN ('banner', 'tin_skinz', 'tent');
 
--- Step 4: Drop the existing constraint
+-- STEP 3: Drop the existing constraint
 ALTER TABLE creator_templates DROP CONSTRAINT IF EXISTS creator_templates_product_type_check;
 
--- Step 5: Add the correct constraint with proper product types
+-- STEP 4: Add the correct constraint
 ALTER TABLE creator_templates 
 ADD CONSTRAINT creator_templates_product_type_check 
 CHECK (product_type IN ('banner', 'tin_skinz', 'tent'));
 
--- Step 6: Verify the constraint was added and data is clean
-SELECT conname, consrc 
-FROM pg_constraint 
-WHERE conname = 'creator_templates_product_type_check';
-
--- Step 7: Verify all data now conforms to the constraint
+-- STEP 5: Verify everything is working
 SELECT 
     product_type,
     COUNT(*) as count
