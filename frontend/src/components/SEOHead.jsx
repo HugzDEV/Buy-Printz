@@ -45,9 +45,15 @@ const SEOHead = ({
       
       {/* Structured Data */}
       {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData, null, 2)}
-        </script>
+        Array.isArray(structuredData) ? 
+          structuredData.map((data, index) => (
+            <script key={index} type="application/ld+json">
+              {JSON.stringify(data, null, 2)}
+            </script>
+          )) :
+          <script type="application/ld+json">
+            {JSON.stringify(structuredData, null, 2)}
+          </script>
       )}
     </Helmet>
   )
@@ -112,10 +118,17 @@ export const seoConfigs = {
   },
   
   contact: {
-    title: "Contact Us - Get Support | BuyPrintz - Professional Banner Printing",
-    description: "Contact BuyPrintz for support, custom orders, or questions about our professional banner printing services. Fast response guaranteed.",
-    keywords: "contact, support, customer service, banner printing help, custom orders, BuyPrintz support",
+    title: "Contact Us - Professional Banner Printing Support | BuyPrintz",
+    description: "Get in touch with our professional banner printing team. Expert support for custom designs, fast delivery, and quality printing services.",
+    keywords: "contact, support, banner printing help, custom design assistance, printing questions",
     url: "https://buyprintz.com/contact"
+  },
+  
+  blog: {
+    title: "Blog - Banner Printing Tips & Industry Insights | BuyPrintz",
+    description: "Read our latest blog posts about banner printing, design tips, marketing strategies, and industry insights to help your business grow.",
+    keywords: "banner printing blog, design tips, marketing insights, printing industry news, business tips",
+    url: "https://buyprintz.com/blog"
   },
   
   terms: {
@@ -137,13 +150,6 @@ export const seoConfigs = {
     description: "Get help with your banner printing orders, design questions, and technical support. Comprehensive FAQ and support resources.",
     keywords: "support, help, FAQ, customer service, banner printing help, technical support",
     url: "https://buyprintz.com/support"
-  },
-  
-  blog: {
-    title: "Blog - Banner Printing Tips & News | BuyPrintz",
-    description: "Read our blog for banner printing tips, design inspiration, industry news, and best practices for professional signage.",
-    keywords: "blog, banner printing tips, design inspiration, signage news, printing best practices",
-    url: "https://buyprintz.com/blog"
   },
   
   checkout: {

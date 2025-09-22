@@ -24,9 +24,57 @@ const Contact = () => {
     // You can add email service integration here
   }
 
+  // FAQ structured data for contact page
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is your turnaround time for banner printing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We offer lightning-fast delivery with 2-3 business day turnaround. Order by 12pm for 2-day delivery, or by 4pm for 3-day delivery including shipping."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What file formats do you accept for banner printing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We accept JPEG and PDF files. For best results, submit artwork in CMYK color space at 150 DPI resolution. Maximum file size is 300MB."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you offer custom business card tins?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! We offer premium aluminum business card tins with custom vinyl stickers and fresh mints. Available in silver, black, and gold finishes with a 100 unit minimum order."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What materials do you use for banners?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We use premium materials including 13oz vinyl, 18oz blockout vinyl, and mesh banners. All materials are weather-resistant and suitable for both indoor and outdoor use."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you provide design services?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! We have a professional design team and an advanced online design tool. You can create custom banners using our canvas editor with text, shapes, and color tools."
+        }
+      }
+    ]
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.contact} />
+      <SEOHead {...seoConfigs.contact} structuredData={faqStructuredData} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-16">
       <div className="container mx-auto px-6 lg:px-8">
         {/* Header Section */}

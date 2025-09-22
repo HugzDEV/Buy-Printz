@@ -168,9 +168,49 @@ const Products = () => {
     return matchesCategory && matchesSearch
   })
 
+  // Generate product collection structured data
+  const productCollectionStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Banner Products & Pricing",
+    "description": "Browse our complete catalog of banner products. 13oz vinyl banners from $25, mesh banners from $30, blockout banners from $35. Fast 2-3 day delivery on all orders.",
+    "url": "https://buyprintz.com/banner-products",
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": allProducts.length,
+      "itemListElement": allProducts.map((product, index) => ({
+        "@type": "Product",
+        "position": index + 1,
+        "name": product.name,
+        "description": product.description,
+        "image": `https://buyprintz.com${product.image}`,
+        "offers": {
+          "@type": "Offer",
+          "price": product.price.replace(/[^\d.]/g, ''),
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "BuyPrintz"
+          }
+        },
+        "brand": {
+          "@type": "Brand",
+          "name": "BuyPrintz"
+        },
+        "category": product.category,
+        "additionalProperty": product.features.map(feature => ({
+          "@type": "PropertyValue",
+          "name": "Feature",
+          "value": feature
+        }))
+      }))
+    }
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.products} />
+      <SEOHead {...seoConfigs.products} structuredData={productCollectionStructuredData} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">

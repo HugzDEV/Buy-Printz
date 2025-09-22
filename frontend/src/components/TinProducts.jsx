@@ -64,9 +64,73 @@ const TinProducts = () => {
     }
   ]
 
+  // Generate business card tin products structured data
+  const tinProductsStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Business Card Tins - Custom Aluminum Tins with Mints",
+    "description": "Premium aluminum business card tins with custom vinyl stickers and fresh mints. Perfect for professional networking and memorable first impressions. 100 unit minimum orders.",
+    "url": "https://buyprintz.com/tin-products",
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": tinFinishes.length,
+      "itemListElement": tinFinishes.map((tin, index) => ({
+        "@type": "Product",
+        "position": index + 1,
+        "name": `${tin.name} Business Card Tin`,
+        "description": tin.description,
+        "image": `https://buyprintz.com${tin.image}`,
+        "offers": {
+          "@type": "Offer",
+          "price": tin.price.replace(/[^\d.]/g, ''),
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "priceValidUntil": "2025-12-31",
+          "seller": {
+            "@type": "Organization",
+            "name": "BuyPrintz"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "businessDays": {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+              },
+              "cutoffTime": "12:00",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 1,
+                "maxValue": 2,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 2,
+                "maxValue": 3,
+                "unitCode": "DAY"
+              }
+            }
+          }
+        },
+        "brand": {
+          "@type": "Brand",
+          "name": "BuyPrintz"
+        },
+        "category": "Business Card Tins",
+        "additionalProperty": tin.features.map(feature => ({
+          "@type": "PropertyValue",
+          "name": "Feature",
+          "value": feature
+        }))
+      }))
+    }
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.products} />
+      <SEOHead {...seoConfigs.products} structuredData={tinProductsStructuredData} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         {/* Header Section with Integrated Product Image */}
         <section className="relative py-16 overflow-hidden">

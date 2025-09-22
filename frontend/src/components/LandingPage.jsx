@@ -62,9 +62,84 @@ const LandingPage = () => {
     }
   ]
 
+  // Business structured data for homepage
+  const businessStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "https://buyprintz.com",
+    "name": "BuyPrintz",
+    "description": "Professional banner printing with lightning-fast 2-3 business day delivery. Custom vinyl banners, trade show displays, and outdoor signage with advanced design tools.",
+    "url": "https://buyprintz.com",
+    "telephone": "+1-555-BUY-PRINT",
+    "email": "orders@buyprintz.com",
+    "logo": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
+    "image": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
+    "priceRange": "$25-$500",
+    "paymentAccepted": "Credit Card, Debit Card",
+    "currenciesAccepted": "USD",
+    "areaServed": "United States",
+    "serviceType": "Banner Printing Service",
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Banner Printing Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "13oz Vinyl Banner Printing",
+            "description": "Weather resistant vinyl banners perfect for outdoor use"
+          },
+          "price": "25",
+          "priceCurrency": "USD",
+          "availability": "InStock"
+        },
+        {
+          "@type": "Offer", 
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Mesh Banner Printing",
+            "description": "Wind resistant mesh banners with 70% air flow"
+          },
+          "price": "30",
+          "priceCurrency": "USD",
+          "availability": "InStock"
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service", 
+            "name": "18oz Blockout Banner Printing",
+            "description": "Premium double-sided blockout banners"
+          },
+          "price": "35",
+          "priceCurrency": "USD",
+          "availability": "InStock"
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service", 
+            "name": "Business Card Tins",
+            "description": "Custom aluminum business card tins with mints"
+          },
+          "price": "399",
+          "priceCurrency": "USD",
+          "availability": "InStock"
+        }
+      ]
+    },
+    "makesOffer": {
+      "@type": "Offer",
+      "description": "Fast banner printing with 2-3 business day delivery",
+      "deliveryLeadTime": "P2D",
+      "availableDeliveryMethod": "OnSitePickup"
+    }
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.home} />
+      <SEOHead {...seoConfigs.home} structuredData={businessStructuredData} />
       <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900">
       {/* Hero Section */}
       <section className="text-white py-20">

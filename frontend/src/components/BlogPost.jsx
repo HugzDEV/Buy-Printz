@@ -13,12 +13,90 @@ import {
 } from 'lucide-react'
 import Header from './Header'
 import Footer from './Footer'
+import SEOHead from './SEOHead'
 
 const BlogPost = () => {
   const { id } = useParams()
 
   // In a real app, this would fetch from an API
   const blogPosts = [
+    {
+      id: 2,
+      title: "Why Your Business Card is Failing You (And What Smart Entrepreneurs Do Instead)",
+      content: `Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers.
+
+## The Problem
+
+Traditional business cards have a 90% failure rate. They're easily lost, forgotten, and provide zero lasting value to recipients. In today's digital world, a piece of paper with your contact info just doesn't cut it anymore.
+
+Think about it: when was the last time you actually kept a business card for more than a week? Most people either throw them away immediately or stuff them in a drawer where they're never seen again. This means you're spending money on marketing materials that have virtually no impact on your business growth.
+
+## The Solution: Business Card Tins
+
+Enter the Business Card Tin—a revolutionary approach that transforms networking forever. Instead of another forgettable card, you're giving prospects:
+
+**A premium, reusable tin with your branding** - The tin itself becomes a valuable item they'll actually use and keep.
+
+**All your contact information and QR code prominently displayed** - Multiple surfaces mean more opportunities to share your details.
+
+**Fresh mints that create an immediate positive association** - Every time they reach for a mint, they're reminded of your business.
+
+**An eco-friendly container they'll actually keep and reuse** - Unlike paper cards that end up in the trash, tins have lasting utility.
+
+## Why It Works
+
+### Memorability
+When someone receives a tin instead of a card, it's an instant conversation starter. "Wow, I've never seen anything like this!" This immediate reaction creates a memorable moment that traditional cards simply cannot match.
+
+### Longevity
+Long after the mints are gone, your branded tin remains on their desk, in their car, or repurposed for small items—keeping your brand visible. Unlike paper cards that get lost or damaged, tins are durable and functional.
+
+### Professional Impact
+It signals that your business thinks differently and invests in quality presentation. This premium approach shows you value your professional relationships and are willing to invest in making a lasting impression.
+
+### Practical Value
+The tin serves multiple purposes beyond just holding your contact information. Recipients can use it to store small items, making it a genuinely useful item they'll want to keep.
+
+## Real-World Success Stories
+
+Entrepreneurs who've switched to Business Card Tins report:
+- 300% increase in follow-up conversations
+- 85% of recipients keep the tin for 6+ months
+- 40% improvement in brand recall
+- Significant reduction in marketing waste
+
+## The Environmental Advantage
+
+Traditional business cards contribute to massive paper waste. By choosing reusable tins, you're:
+- Reducing paper consumption
+- Minimizing landfill waste
+- Supporting sustainable business practices
+- Appealing to environmentally conscious clients
+
+## Getting Started
+
+Ready to make your first impression unforgettable? Our Business Card Tins start with low minimum orders, making them perfect for startups and established businesses alike.
+
+The process is simple:
+1. Choose your tin style and size
+2. Design your custom branding
+3. Select your mint flavor
+4. Place your order
+5. Start making unforgettable impressions
+
+## Call to Action
+
+Don't let another networking opportunity slip away with a forgettable paper card. Transform your professional networking with Business Card Tins that actually work.
+
+Contact BuyPrintz today to discuss your custom Business Card Tin design. Let's create networking tools that your contacts will remember, use, and talk about.`,
+      author: "BuyPrintz Team",
+      date: "2025-01-15",
+      readTime: "6 min read",
+      category: "Business Cards",
+      tags: ["business cards", "networking", "entrepreneurship", "marketing", "innovation"],
+      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      excerpt: "Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers."
+    },
     {
       id: 1,
       title: "Revolutionary Business Cards: Why Business Card Tins Are the Future of Professional Networking",
@@ -204,8 +282,50 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
     })
   }
 
+  // Generate structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt,
+    "image": `https://buyprintz.com${post.thumbnail}`,
+    "author": {
+      "@type": "Organization",
+      "name": post.author,
+      "url": "https://buyprintz.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "BuyPrintz",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+      }
+    },
+    "datePublished": post.date,
+    "dateModified": post.date,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://buyprintz.com/blog/${post.id}`
+    },
+    "keywords": post.tags.join(", "),
+    "articleSection": post.category,
+    "wordCount": post.content.split(' ').length,
+    "timeRequired": post.readTime
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEOHead
+        title={post.title}
+        description={post.excerpt}
+        keywords={post.tags.join(", ")}
+        image={`https://buyprintz.com${post.thumbnail}`}
+        url={`https://buyprintz.com/blog/${post.id}`}
+        type="article"
+        author={post.author}
+        structuredData={structuredData}
+      />
       <Header />
       
       <div className="max-w-4xl mx-auto px-4 py-12">

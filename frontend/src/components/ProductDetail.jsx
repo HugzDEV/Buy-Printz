@@ -752,12 +752,67 @@ const ProductDetail = () => {
     )
   }
 
+  // Generate product detail structured data with breadcrumbs
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://buyprintz.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Products",
+        "item": "https://buyprintz.com/banner-products"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": product.name,
+        "item": `https://buyprintz.com/product/${productId}`
+      }
+    ]
+  }
+
+  const productStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description.split('\n')[0],
+    "image": `https://buyprintz.com${product.image}`,
+    "offers": {
+      "@type": "Offer",
+      "price": product.price.replace(/[^\d.]/g, ''),
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "BuyPrintz"
+      }
+    },
+    "brand": {
+      "@type": "Brand",
+      "name": "BuyPrintz"
+    },
+    "category": "Banner Printing",
+    "additionalProperty": product.spec?.features?.map(feature => ({
+      "@type": "PropertyValue",
+      "name": "Feature",
+      "value": feature
+    })) || []
+  }
+
   return (
     <>
       <SEOHead 
         title={`${product.name} - BuyPrintz`}
         description={product.description.split('\n')[0]}
         keywords={`${product.name}, banner printing, custom banners, ${product.spec.material}`}
+        structuredData={[breadcrumbStructuredData, productStructuredData]}
       />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         {/* Header */}

@@ -173,9 +173,56 @@ const Marketplace = () => {
     )
   }
 
+  // Generate marketplace structured data
+  const marketplaceStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Creator Marketplace - Professional Banner Templates",
+    "description": "Browse and purchase professional banner templates from our creator marketplace. High-quality designs for business, events, and promotional use.",
+    "url": "https://buyprintz.com/marketplace",
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": totalTemplates,
+      "itemListElement": templates.slice(0, 10).map((template, index) => ({
+        "@type": "Product",
+        "position": index + 1,
+        "name": template.title,
+        "description": template.description,
+        "image": `https://buyprintz.com${template.thumbnail_url}`,
+        "offers": {
+          "@type": "Offer",
+          "price": template.price,
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Person",
+            "name": template.creator_name
+          }
+        },
+        "brand": {
+          "@type": "Brand",
+          "name": "BuyPrintz Marketplace"
+        },
+        "category": template.category,
+        "additionalProperty": [
+          {
+            "@type": "PropertyValue",
+            "name": "Downloads",
+            "value": template.download_count
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Rating",
+            "value": template.rating
+          }
+        ]
+      }))
+    }
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.marketplace} />
+      <SEOHead {...seoConfigs.marketplace} structuredData={marketplaceStructuredData} />
       <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}

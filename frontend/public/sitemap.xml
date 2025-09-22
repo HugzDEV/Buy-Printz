@@ -236,9 +236,25 @@
   <!-- Blog -->
   <url>
     <loc>https://buyprintz.com/blog</loc>
-    <lastmod>2025-09-21</lastmod>
+    <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
+  </url>
+  
+  <!-- Blog Post: Why Your Business Card is Failing You -->
+  <url>
+    <loc>https://buyprintz.com/blog/2</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog Post: Revolutionary Business Cards -->
+  <url>
+    <loc>https://buyprintz.com/blog/1</loc>
+    <lastmod>2025-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <!-- Contact -->
