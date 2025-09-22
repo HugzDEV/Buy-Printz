@@ -435,16 +435,15 @@ async def upload_creator_logo(
             }
         )
         
-        if upload_result.get('error'):
-            print(f"🔍 Supabase Storage upload error: {upload_result['error']}")
+        if hasattr(upload_result, 'error') and upload_result.error:
+            print(f"🔍 Supabase Storage upload error: {upload_result.error}")
             raise HTTPException(
                 status_code=500,
-                detail=f"Failed to upload to Supabase Storage: {upload_result['error']}"
+                detail=f"Failed to upload to Supabase Storage: {upload_result.error}"
             )
         
         # Get public URL from Supabase Storage
-        public_url_result = db_manager.supabase.storage.from_("creator-assets").get_public_url(storage_path)
-        logo_url = public_url_result.get('publicURL')
+        logo_url = db_manager.supabase.storage.from_("creator-assets").get_public_url(storage_path)
         
         if not logo_url:
             print(f"🔍 Failed to get public URL from Supabase Storage")
@@ -462,10 +461,15 @@ async def upload_creator_logo(
         }
         
         print(f"🔍 Updating creator profile with data: {update_data}")
+        print(f"🔍 Creator ID: {existing_creator['id']}")
         result = await db_manager.update_creator(existing_creator["id"], update_data)
         print(f"🔍 Database update result: {result}")
         
         if result:
+            # Verify the update by fetching the creator again
+            updated_creator = await db_manager.get_creator_by_id(existing_creator["id"])
+            print(f"🔍 Verification - Updated creator profile_image_url: {updated_creator.get('profile_image_url') if updated_creator else 'None'}")
+            
             return {
                 "success": True,
                 "message": "Logo uploaded successfully",
