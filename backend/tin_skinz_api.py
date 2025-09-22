@@ -66,7 +66,7 @@ async def get_designs(category: Optional[str] = None):
     """Get all Tin Skinz designs, optionally filtered by category"""
     try:
         supabase = db_manager.supabase
-        query = supabase.table("tin_skinz_designs").select("*").eq("is_active", True)
+        query = supabase.table("tin_skinz_designs").select("*")
         
         if category:
             query = query.eq("category", category)
@@ -102,7 +102,7 @@ async def get_candy_options():
             candy_options.append(TinSkinzCandyOption(
                 id=candy["id"],
                 name=candy["name"],
-                base_price=float(candy["base_price"])
+                price=float(candy["base_price"])
             ))
         
         return candy_options
