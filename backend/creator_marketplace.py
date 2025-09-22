@@ -458,46 +458,7 @@ async def upload_creator_logo(
             detail="Internal server error"
         )
 
-@router.get("/creators/{creator_id}")
-async def get_creator_public_profile(creator_id: str):
-    """Get public creator profile"""
-    try:
-        creator = await db_manager.get_creator_by_id(creator_id)
-        
-        if not creator or not creator.get("is_active", False):
-            raise HTTPException(
-                status_code=404,
-                detail="Creator not found"
-            )
-        
-        # Remove sensitive information for public view
-        public_creator = {
-            "id": creator["id"],
-            "display_name": creator["display_name"],
-            "bio": creator["bio"],
-            "profile_image_url": creator.get("profile_image_url"),
-            "website": creator.get("website"),
-            "social_links": creator.get("social_links", {}),
-            "is_verified": creator.get("is_verified", False),
-            "templates_sold": creator.get("templates_sold", 0),
-            "rating": creator.get("rating", 0.0),
-            "rating_count": creator.get("rating_count", 0),
-            "created_at": creator["created_at"]
-        }
-        
-        return {
-            "success": True,
-            "creator": public_creator
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error getting creator public profile: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Internal server error"
-        )
+# Moved this route to the end to avoid conflict with /creators/analytics
 
 # =============================================
 # TEMPLATE MANAGEMENT ENDPOINTS
@@ -1412,3 +1373,48 @@ async def get_download_url(
     except Exception as e:
         print(f"Error getting download URL: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+# =============================================
+# PUBLIC CREATOR PROFILE (moved to end to avoid route conflicts)
+# =============================================
+
+@router.get("/creators/{creator_id}")
+async def get_creator_public_profile(creator_id: str):
+    """Get public creator profile"""
+    try:
+        creator = await db_manager.get_creator_by_id(creator_id)
+        
+        if not creator or not creator.get("is_active", False):
+            raise HTTPException(
+                status_code=404,
+                detail="Creator not found"
+            )
+        
+        # Remove sensitive information for public view
+        public_creator = {
+            "id": creator["id"],
+            "display_name": creator["display_name"],
+            "bio": creator["bio"],
+            "profile_image_url": creator.get("profile_image_url"),
+            "website": creator.get("website"),
+            "social_links": creator.get("social_links", {}),
+            "is_verified": creator.get("is_verified", False),
+            "templates_sold": creator.get("templates_sold", 0),
+            "rating": creator.get("rating", 0.0),
+            "rating_count": creator.get("rating_count", 0),
+            "created_at": creator["created_at"]
+        }
+        
+        return {
+            "success": True,
+            "creator": public_creator
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting creator public profile: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )
