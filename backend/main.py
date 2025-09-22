@@ -200,16 +200,7 @@ app.add_middleware(
     allow_origin_regex=r"https://.*\.vercel\.app$"
 )
 
-# Debug endpoint to test CORS and basic connectivity
-@app.get("/api/debug")
-async def debug_endpoint():
-    """Debug endpoint to test CORS and basic connectivity"""
-    return {
-        "success": True,
-        "message": "Backend is running",
-        "timestamp": datetime.now().isoformat(),
-        "cors_origins": allowed_origins
-    }
+# Debug endpoint removed from production
 
 # Note: Static file test endpoint removed - using Supabase Storage exclusively
 
@@ -1010,45 +1001,11 @@ async def get_public_templates():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/templates/test")
-async def test_templates_connection():
-    """Test templates table connection and basic operations"""
-    try:
-        if not db_manager.is_connected():
-            return {
-                "success": False,
-                "error": "Database not connected",
-                "supabase_url": os.getenv("SUPABASE_URL"),
-                "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
-            }
-        
-        # Test basic query to templates table
-        test_response = db_manager.supabase.table("banner_templates").select("id").limit(1).execute()
-        
-        # Test count query
-        count_response = db_manager.supabase.table("banner_templates").select("id", count="exact").execute()
-        
-        return {
-            "success": True,
-            "message": "Templates table connection successful",
-            "test_query_result": test_response.data is not None,
-            "table_exists": True,
-            "total_templates": count_response.count if hasattr(count_response, 'count') else 0,
-            "supabase_url": os.getenv("SUPABASE_URL"),
-            "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
-        }
-    except Exception as e:
-        error_msg = str(e)
-        return {
-            "success": False,
-            "error": error_msg,
-            "table_exists": "relation \"banner_templates\" does not exist" not in error_msg,
-            "supabase_url": os.getenv("SUPABASE_URL"),
-            "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
-        }
+# Templates test endpoint removed from production
 
-@app.get("/api/test/file-exists/{file_path:path}")
-async def test_file_exists(file_path: str):
+# File exists test endpoint removed from production
+# @app.get("/api/test/file-exists/{file_path:path}")
+# async def test_file_exists(file_path: str):
     """Test if a file exists on the server"""
     try:
         import os
@@ -1760,23 +1717,9 @@ async def test_canvas_table(current_user: dict = Depends(get_current_user)):
             "message": "Canvas states table not accessible - please run canvas_state_schema.sql"
         }
 
-@app.get("/api/debug/auth")
-async def debug_auth():
-    """Debug endpoint to test authentication without requiring auth"""
-    return {
-        "message": "This endpoint does not require authentication",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+# Debug auth endpoint removed from production
 
-@app.get("/api/debug/auth-required")
-async def debug_auth_required(current_user: dict = Depends(get_current_user)):
-    """Debug endpoint to test authentication with auth required"""
-    return {
-        "message": "Authentication successful",
-        "user_id": current_user.get('user_id'),
-        "user_email": current_user.get('email'),
-        "timestamp": datetime.utcnow().isoformat()
-    }
+# Debug auth required endpoint removed from production
 
 # Canvas State Management Endpoints
 class CanvasStateRequest(BaseModel):
@@ -1876,47 +1819,7 @@ async def clear_canvas_state(
         logger.error(f"Error clearing canvas state: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Cache management endpoints
-@app.get("/api/cache/stats")
-async def get_cache_stats():
-    """Get cache statistics"""
-    return {
-        "success": True,
-        "stats": cache.stats(),
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-@app.post("/api/cache/clear")
-async def clear_cache():
-    """Clear all cache entries"""
-    cache.clear()
-    return {
-        "success": True,
-        "message": "Cache cleared successfully",
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-@app.post("/api/cache/cleanup")
-async def cleanup_cache():
-    """Remove expired cache entries"""
-    removed_count = cache.cleanup()
-    return {
-        "success": True,
-        "removed_entries": removed_count,
-        "message": f"Removed {removed_count} expired cache entries",
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-@app.delete("/api/cache/invalidate/{cache_key}")
-async def invalidate_cache_key(cache_key: str):
-    """Invalidate a specific cache key"""
-    deleted = cache.delete(cache_key)
-    return {
-        "success": True,
-        "deleted": deleted,
-        "message": f"Cache key '{cache_key}' {'deleted' if deleted else 'not found'}",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+# Cache management endpoints removed from production
 
 @app.post("/api/templates/clear-cache")
 async def clear_templates_cache(current_user: dict = Depends(get_current_user)):
