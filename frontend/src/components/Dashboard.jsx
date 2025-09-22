@@ -107,7 +107,7 @@ const Dashboard = () => {
       // Load creator analytics and templates in parallel
       await Promise.all([
         loadCreatorAnalytics(),
-        loadCreatorTemplates()
+        loadCreatorTemplates(currentUser)
       ])
     } catch (error) {
       console.error('Error loading creator-specific data:', error)
@@ -353,14 +353,17 @@ const Dashboard = () => {
     }
   }
 
-  const loadCreatorTemplates = async () => {
-    if (!user?.id || !isCreator) {
-      console.log('Skipping loadCreatorTemplates: user?.id =', user?.id, 'isCreator =', isCreator)
+  const loadCreatorTemplates = async (userData = null) => {
+    const currentUser = userData || user
+    const currentIsCreator = userData ? userData.isCreator : isCreator
+    
+    if (!currentUser?.id || !currentIsCreator) {
+      console.log('Skipping loadCreatorTemplates: user?.id =', currentUser?.id, 'isCreator =', currentIsCreator)
       return
     }
     
     try {
-      console.log('Loading creator templates for user:', user.id)
+      console.log('Loading creator templates for user:', currentUser.id)
       setLoadingStates(prev => ({ ...prev, creatorTemplates: true }))
       const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates')
       const result = await response.json()
