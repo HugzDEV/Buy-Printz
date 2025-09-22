@@ -394,13 +394,23 @@ const TemplateUpload = () => {
                           onClick={() => setFormData(prev => ({ ...prev, productType: type.value }))}
                           className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                             formData.productType === type.value
-                              ? 'border-purple-500 bg-purple-50'
+                              ? 'border-green-500 bg-green-50'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
                           <div className="text-center">
-                            <IconComponent className="w-6 h-6 mx-auto mb-2 text-purple-600" />
-                            <div className="font-medium text-gray-800 text-sm">{type.label}</div>
+                            {type.value === 'tin_skinz' ? (
+                              <img 
+                                src="/assets/tin-skinz/Tin Skinz_logo_full color_Secondary logo.png" 
+                                alt="Tin Skinz Logo" 
+                                className="w-16 h-16 mx-auto mb-2 object-contain"
+                              />
+                            ) : (
+                              <IconComponent className="w-6 h-6 mx-auto mb-2 text-green-600" />
+                            )}
+                            {type.value !== 'tin_skinz' && (
+                              <div className="font-medium text-gray-800 text-sm">{type.label}</div>
+                            )}
                             <div className="text-xs text-gray-600 mt-1">{type.description}</div>
                           </div>
                         </button>
