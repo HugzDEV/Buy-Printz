@@ -211,44 +211,7 @@ async def debug_endpoint():
         "cors_origins": allowed_origins
     }
 
-@app.get("/api/test-static-files")
-async def test_static_files():
-    """Test endpoint to verify static file serving"""
-    import os
-    
-    # Check if uploads directory exists
-    uploads_dir = "uploads"
-    creator_logos_dir = "uploads/creator_logos"
-    
-    uploads_exists = os.path.exists(uploads_dir)
-    creator_logos_exists = os.path.exists(creator_logos_dir)
-    
-    # List files in uploads directory
-    uploads_files = []
-    creator_logos_files = []
-    
-    if uploads_exists:
-        try:
-            uploads_files = os.listdir(uploads_dir)
-        except Exception as e:
-            uploads_files = [f"Error listing uploads: {str(e)}"]
-    
-    if creator_logos_exists:
-        try:
-            creator_logos_files = os.listdir(creator_logos_dir)
-        except Exception as e:
-            creator_logos_files = [f"Error listing creator_logos: {str(e)}"]
-    
-    return {
-        "success": True,
-        "message": "Static file serving test",
-        "uploads_dir_exists": uploads_exists,
-        "creator_logos_dir_exists": creator_logos_exists,
-        "uploads_files": uploads_files,
-        "creator_logos_files": creator_logos_files,
-        "current_working_directory": os.getcwd(),
-        "absolute_uploads_path": os.path.abspath(uploads_dir) if uploads_exists else "N/A"
-    }
+# Note: Static file test endpoint removed - using Supabase Storage exclusively
 
 # Include creator marketplace routes if available
 if CREATOR_MARKETPLACE_AVAILABLE:
@@ -294,13 +257,8 @@ if BUSINESS_CARD_TIN_API_AVAILABLE:
 else:
     logger.warning("Business Card Tin API routes not available")
 
-# Mount static files - create uploads directory if it doesn't exist
-uploads_dir = "uploads"
-if not os.path.exists(uploads_dir):
-    os.makedirs(uploads_dir, exist_ok=True)
-    print(f"✅ Created uploads directory: {uploads_dir}")
-
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+# Note: Static file serving removed - using Supabase Storage for all file uploads
+# This ensures cloud-based persistence and eliminates Railway container restart issues
 
 # Configuration
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
@@ -320,8 +278,7 @@ if not STRIPE_PUBLISHABLE_KEY or STRIPE_PUBLISHABLE_KEY.startswith("pk_test_your
 # Initialize Stripe
 stripe.api_key = STRIPE_SECRET_KEY
 
-# Create uploads directory if it doesn't exist
-os.makedirs("uploads", exist_ok=True)
+# Note: No local uploads directory needed - using Supabase Storage exclusively
 
 # Pydantic models
 class UserRegistration(BaseModel):
@@ -660,40 +617,8 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
 # Canvas design management - REMOVED (using templates instead)
 
 
-# File upload
-@app.post("/api/upload-artwork")
-async def upload_artwork(
-    file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
-):
-    """Upload artwork file"""
-    if not file:
-        raise HTTPException(status_code=400, detail="No file provided")
-    
-    # Validate file type
-    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/svg+xml", "application/pdf"]
-    if file.content_type not in allowed_types:
-        raise HTTPException(status_code=400, detail="Invalid file type")
-    
-    # Generate unique filename
-    file_id = str(uuid.uuid4())
-    file_extension = file.filename.split(".")[-1] if "." in file.filename else "jpg"
-    filename = f"{file_id}.{file_extension}"
-    filepath = f"uploads/{filename}"
-    
-    # Save file
-    async with aiofiles.open(filepath, 'wb') as f:
-        content = await file.read()
-        await f.write(content)
-    
-    return {
-        "file_id": file_id,
-        "filename": filename,
-        "original_name": file.filename,
-        "file_url": f"/uploads/{filename}",
-        "size": len(content),
-        "content_type": file.content_type
-    }
+# Note: File upload endpoint removed - using Supabase Storage exclusively
+# All file uploads now go through creator marketplace or other specialized endpoints
 
 # Order management
 @app.post("/api/orders/create")

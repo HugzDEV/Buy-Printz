@@ -402,11 +402,7 @@ const Marketplace = () => {
                         <span className="flex items-center">
                           {template.creators?.profile_image_url ? (
         <img 
-          src={template.creators.profile_image_url.startsWith('http') 
-            ? template.creators.profile_image_url 
-            : template.creators.profile_image_url.startsWith('/uploads/')
-            ? `https://api.buyprintz.com${template.creators.profile_image_url}`
-            : template.creators.profile_image_url} 
+          src={template.creators.profile_image_url} 
           alt={template.creators.display_name}
           className="w-4 h-4 rounded-full mr-2 object-cover border border-white/30"
         />
@@ -490,11 +486,7 @@ const Marketplace = () => {
                           <span className="flex items-center">
                             {template.creators?.profile_image_url ? (
         <img 
-          src={template.creators.profile_image_url.startsWith('http') 
-            ? template.creators.profile_image_url 
-            : template.creators.profile_image_url.startsWith('/uploads/')
-            ? `https://api.buyprintz.com${template.creators.profile_image_url}`
-            : template.creators.profile_image_url} 
+          src={template.creators.profile_image_url} 
           alt={template.creators.display_name}
           className="w-4 h-4 rounded-full mr-2 object-cover border border-white/30"
         />

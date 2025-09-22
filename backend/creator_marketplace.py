@@ -421,56 +421,39 @@ async def upload_creator_logo(
         file_extension = logo.filename.split('.')[-1] if '.' in logo.filename else 'jpg'
         filename = f"creator_logo_{existing_creator['id']}_{uuid.uuid4().hex[:8]}.{file_extension}"
         
-        # Upload to Supabase Storage instead of local filesystem
-        # This ensures persistence across Railway container restarts
-        try:
-            # Upload to Supabase Storage
-            storage_path = f"creator_logos/{filename}"
-            print(f"🔍 Uploading to Supabase Storage: {storage_path}")
-            
-            # Upload file to Supabase Storage
-            upload_result = db_manager.supabase.storage.from_("creator-assets").upload(
-                storage_path,
-                content,
-                file_options={
-                    "content-type": logo.content_type,
-                    "cache-control": "3600"
-                }
+        # Upload to Supabase Storage - cloud-based storage for production
+        storage_path = f"creator_logos/{filename}"
+        print(f"🔍 Uploading to Supabase Storage: {storage_path}")
+        
+        # Upload file to Supabase Storage
+        upload_result = db_manager.supabase.storage.from_("creator-assets").upload(
+            storage_path,
+            content,
+            file_options={
+                "content-type": logo.content_type,
+                "cache-control": "3600"
+            }
+        )
+        
+        if upload_result.get('error'):
+            print(f"🔍 Supabase Storage upload error: {upload_result['error']}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to upload to Supabase Storage: {upload_result['error']}"
             )
-            
-            if upload_result.get('error'):
-                print(f"🔍 Supabase Storage upload error: {upload_result['error']}")
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Failed to upload to storage: {upload_result['error']}"
-                )
-            
-            # Get public URL from Supabase Storage
-            public_url_result = db_manager.supabase.storage.from_("creator-assets").get_public_url(storage_path)
-            logo_url = public_url_result.get('publicURL')
-            
-            if not logo_url:
-                print(f"🔍 Failed to get public URL from Supabase Storage")
-                raise HTTPException(
-                    status_code=500,
-                    detail="Failed to get public URL from storage"
-                )
-            
-            print(f"🔍 File uploaded successfully to Supabase Storage: {logo_url}")
-            
-        except Exception as storage_error:
-            print(f"🔍 Supabase Storage error: {storage_error}")
-            # Fallback to local storage for development
-            uploads_dir = "uploads/creator_logos"
-            os.makedirs(uploads_dir, exist_ok=True)
-            
-            file_path = os.path.join(uploads_dir, filename)
-            with open(file_path, "wb") as buffer:
-                buffer.write(content)
-            
-            # Generate URL for the uploaded file (local fallback)
-            logo_url = f"/uploads/creator_logos/{filename}"
-            print(f"🔍 Fallback to local storage: {logo_url}")
+        
+        # Get public URL from Supabase Storage
+        public_url_result = db_manager.supabase.storage.from_("creator-assets").get_public_url(storage_path)
+        logo_url = public_url_result.get('publicURL')
+        
+        if not logo_url:
+            print(f"🔍 Failed to get public URL from Supabase Storage")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to get public URL from Supabase Storage"
+            )
+        
+        print(f"🔍 File uploaded successfully to Supabase Storage: {logo_url}")
         
         # Update creator profile with logo URL
         update_data = {
@@ -489,10 +472,8 @@ async def upload_creator_logo(
                 "logo_url": logo_url
             }
         else:
-            # Clean up uploaded file if database update failed
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            print(f"🔍 Database update failed, cleaned up file: {file_path}")
+            # Note: No local file cleanup needed - using Supabase Storage exclusively
+            print(f"🔍 Database update failed")
             raise HTTPException(
                 status_code=500,
                 detail="Failed to update creator profile with logo"
