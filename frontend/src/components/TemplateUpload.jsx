@@ -10,10 +10,15 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
-  X
+  X,
+  File,
+  Monitor,
+  Package,
+  Tent
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 import authService from '../services/auth'
+import { toast } from 'sonner'
 
 const TemplateUpload = () => {
   const navigate = useNavigate()
@@ -26,11 +31,20 @@ const TemplateUpload = () => {
     description: '',
     category: '',
     price: 5.00,
-    tags: []
+    tags: [],
+    productType: 'banner' // New field for product type
   })
   
   const [tagInput, setTagInput] = useState('')
-  const [canvasData, setCanvasData] = useState(null)
+  const [uploadedFile, setUploadedFile] = useState(null)
+  const [filePreview, setFilePreview] = useState(null)
+  const [uploadMethod, setUploadMethod] = useState('file') // 'file' or 'canvas'
+
+  const productTypes = [
+    { value: 'banner', label: 'Vinyl Banners', icon: Monitor, description: 'Outdoor advertising banners' },
+    { value: 'tin', label: 'Business Card Tins', icon: Package, description: 'Custom tin designs' },
+    { value: 'tent', label: 'Tradeshow Tents', icon: Tent, description: 'Event and tradeshow tents' }
+  ]
 
   const categories = [
     'Restaurant & Food',
@@ -83,31 +97,36 @@ const TemplateUpload = () => {
     }
   }
 
-  const loadCanvasData = () => {
-    // In a real implementation, this would load the current canvas state
-    // For now, we'll create a mock canvas data structure
-    const mockCanvasData = {
-      version: "1.0",
-      elements: [
-        {
-          id: "text_1",
-          type: "text",
-          x: 100,
-          y: 100,
-          text: "Sample Text",
-          fontSize: 24,
-          fontFamily: "Arial",
-          fill: "#000000"
-        }
-      ],
-      canvas: {
-        width: 800,
-        height: 600,
-        backgroundColor: "#ffffff"
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please upload a valid image file (JPEG, PNG, GIF, WebP, or SVG)')
+        return
       }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB')
+        return
+      }
+
+      setUploadedFile(file)
+      
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setFilePreview(e.target.result)
+      }
+      reader.readAsDataURL(file)
     }
-    
-    setCanvasData(mockCanvasData)
+  }
+
+  const removeFile = () => {
+    setUploadedFile(null)
+    setFilePreview(null)
   }
 
   const validateForm = () => {
@@ -116,28 +135,23 @@ const TemplateUpload = () => {
       return false
     }
     
-    if (formData.name.length < 3) {
-      setError('Template name must be at least 3 characters')
-      return false
-    }
-    
     if (!formData.description.trim()) {
-      setError('Template description is required')
-      return false
-    }
-    
-    if (formData.description.length < 10) {
-      setError('Template description must be at least 10 characters')
+      setError('Description is required')
       return false
     }
     
     if (!formData.category) {
-      setError('Please select a category')
+      setError('Category is required')
       return false
     }
     
-    if (!canvasData) {
-      setError('Please load your design from the canvas editor')
+    if (uploadMethod === 'file' && !uploadedFile) {
+      setError('Please upload a design file')
+      return false
+    }
+    
+    if (formData.tags.length === 0) {
+      setError('At least one tag is required')
       return false
     }
     
@@ -155,34 +169,67 @@ const TemplateUpload = () => {
     setIsLoading(true)
     
     try {
-      const uploadData = {
-        name: formData.name.trim(),
-        description: formData.description.trim(),
-        category: formData.category,
-        price: formData.price,
-        canvas_data: canvasData,
-        tags: formData.tags
-      }
-      
-      const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(uploadData)
-      })
-      
-      if (response.ok) {
-        const result = await response.json()
-        setSuccess(true)
+      if (uploadMethod === 'file') {
+        // Upload file-based template
+        const formDataToSend = new FormData()
+        formDataToSend.append('name', formData.name.trim())
+        formDataToSend.append('description', formData.description.trim())
+        formDataToSend.append('category', formData.category)
+        formDataToSend.append('price', formData.price.toString())
+        formDataToSend.append('productType', formData.productType)
+        formDataToSend.append('tags', JSON.stringify(formData.tags))
+        formDataToSend.append('file', uploadedFile)
         
-        // Redirect to creator dashboard after a short delay
-        setTimeout(() => {
-          navigate('/dashboard?tab=creator')
-        }, 2000)
+        const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/upload-file', {
+          method: 'POST',
+          body: formDataToSend
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          setSuccess(true)
+          toast.success('Template uploaded successfully!')
+          
+          // Redirect to creator dashboard after a short delay
+          setTimeout(() => {
+            navigate('/dashboard?tab=creator')
+          }, 2000)
+        } else {
+          const errorData = await response.json()
+          setError(errorData.detail || 'Failed to upload template')
+        }
       } else {
-        const errorData = await response.json()
-        setError(errorData.detail || 'Failed to upload template')
+        // Canvas-based upload (existing functionality)
+        const uploadData = {
+          name: formData.name.trim(),
+          description: formData.description.trim(),
+          category: formData.category,
+          price: formData.price,
+          productType: formData.productType,
+          canvas_data: null, // This would be loaded from canvas
+          tags: formData.tags
+        }
+        
+        const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(uploadData)
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          setSuccess(true)
+          toast.success('Template uploaded successfully!')
+          
+          setTimeout(() => {
+            navigate('/dashboard?tab=creator')
+          }, 2000)
+        } else {
+          const errorData = await response.json()
+          setError(errorData.detail || 'Failed to upload template')
+        }
       }
     } catch (error) {
       console.error('Template upload error:', error)
@@ -195,7 +242,7 @@ const TemplateUpload = () => {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <GlassCard className="max-w-md w-full p-8 text-center">
+        <GlassCard className="max-w-md mx-auto text-center">
           <div className="flex justify-center mb-6">
             <div className="p-4 bg-green-100 rounded-full">
               <CheckCircle className="w-12 h-12 text-green-600" />
@@ -227,7 +274,7 @@ const TemplateUpload = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-purple-700 to-blue-600 bg-clip-text text-transparent">
-                Upload Template
+                Upload Design
               </h1>
               <p className="text-gray-600 mt-1">
                 Share your design with the community and start earning
@@ -244,250 +291,308 @@ const TemplateUpload = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Upload Form */}
+          {/* Upload Method Selection */}
+          <div className="lg:col-span-1">
+            <GlassCard className="h-fit">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Upload Method</h3>
+              
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setUploadMethod('file')}
+                  className={`w-full p-4 rounded-xl border-2 transition-all duration-200 ${
+                    uploadMethod === 'file'
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <File className="w-5 h-5 mr-3 text-purple-600" />
+                    <div className="text-left">
+                      <div className="font-medium text-gray-800">Upload File</div>
+                      <div className="text-sm text-gray-600">From computer (Canva, Photoshop, etc.)</div>
+                    </div>
+                  </div>
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setUploadMethod('canvas')}
+                  className={`w-full p-4 rounded-xl border-2 transition-all duration-200 ${
+                    uploadMethod === 'canvas'
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <Monitor className="w-5 h-5 mr-3 text-blue-600" />
+                    <div className="text-left">
+                      <div className="font-medium text-gray-800">Canvas Editor</div>
+                      <div className="text-sm text-gray-600">Create in our editor</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* Main Form */}
           <div className="lg:col-span-2">
-            <GlassCard className="p-8">
-              {/* Error Message */}
-              {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center">
-                  <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0" />
-                  <p className="text-red-700">{error}</p>
-                </div>
-              )}
-
-              {/* Upload Form */}
+            <GlassCard>
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Template Name */}
+                {/* Product Type Selection */}
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Template Name *
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Product Type
                   </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Enter a catchy name for your template"
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
-                    maxLength={100}
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {formData.name.length}/100 characters
-                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {productTypes.map((type) => {
+                      const IconComponent = type.icon
+                      return (
+                        <button
+                          key={type.value}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, productType: type.value }))}
+                          className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                            formData.productType === type.value
+                              ? 'border-purple-500 bg-purple-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="text-center">
+                            <IconComponent className="w-6 h-6 mx-auto mb-2 text-purple-600" />
+                            <div className="font-medium text-gray-800 text-sm">{type.label}</div>
+                            <div className="text-xs text-gray-600 mt-1">{type.description}</div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
 
-                {/* Description */}
+                {/* File Upload Section */}
+                {uploadMethod === 'file' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Design File
+                    </label>
+                    
+                    {!uploadedFile ? (
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          id="file-upload"
+                        />
+                        <label htmlFor="file-upload" className="cursor-pointer">
+                          <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                          <div className="text-lg font-medium text-gray-700 mb-2">
+                            Click to upload your design
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Supports JPEG, PNG, GIF, WebP, SVG (max 10MB)
+                          </div>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <div className="border-2 border-gray-200 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center">
+                              <Image className="w-5 h-5 text-green-600 mr-2" />
+                              <span className="font-medium text-gray-800">{uploadedFile.name}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={removeFile}
+                              className="text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          
+                          {filePreview && (
+                            <div className="mt-3">
+                              <img 
+                                src={filePreview} 
+                                alt="Preview" 
+                                className="max-w-full max-h-48 rounded-lg mx-auto"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Canvas Upload Section */}
+                {uploadMethod === 'canvas' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Canvas Design
+                    </label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
+                      <Monitor className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <div className="text-lg font-medium text-gray-700 mb-2">
+                        Canvas Editor Integration
+                      </div>
+                      <div className="text-sm text-gray-500 mb-4">
+                        Create your design using our canvas editor
+                      </div>
+                      <GlassButton
+                        type="button"
+                        onClick={() => navigate('/editor')}
+                        variant="outline"
+                      >
+                        Open Canvas Editor
+                      </GlassButton>
+                    </div>
+                  </div>
+                )}
+
+                {/* Template Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Template Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Enter template name"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category *
+                    </label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select category</option>
+                      {categories.map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Description *
                   </label>
                   <textarea
-                    id="description"
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    placeholder="Describe your template and what makes it special..."
                     rows={4}
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200 resize-none"
-                    maxLength={500}
+                    className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Describe your template..."
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {formData.description.length}/500 characters
-                  </p>
                 </div>
 
-                {/* Category */}
-                <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                    Category *
-                  </label>
-                  <select
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
-                    required
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Price */}
-                <div>
-                  <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                    <DollarSign className="w-4 h-4 inline mr-1" />
-                    Price ($3 - $25) *
-                  </label>
-                  <input
-                    type="number"
-                    id="price"
-                    name="price"
-                    value={formData.price}
-                    onChange={handlePriceChange}
-                    min="3.00"
-                    max="25.00"
-                    step="0.01"
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200"
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    You'll earn 80% of this price (${(formData.price * 0.8).toFixed(2)})
-                  </p>
-                </div>
-
-                {/* Tags */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Tag className="w-4 h-4 inline mr-1" />
-                    Tags
+                    Price *
                   </label>
-                  <div className="flex gap-2 mb-3">
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handlePriceChange}
+                      min="3.00"
+                      max="25.00"
+                      step="0.01"
+                      className="w-full pl-10 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">Price range: $3.00 - $25.00</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tags *
+                  </label>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {formData.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full"
+                      >
+                        <Tag className="w-3 h-3 mr-1" />
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="ml-2 text-purple-600 hover:text-purple-800"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Add a tag and press Enter"
-                      className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200 text-sm"
+                      className="flex-1 px-4 py-2 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Add a tag..."
                     />
                     <GlassButton
                       type="button"
                       onClick={addTag}
-                      size="sm"
+                      variant="outline"
                     >
                       Add
                     </GlassButton>
                   </div>
-                  
-                  {formData.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {formData.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
-                        >
-                          {tag}
-                          <button
-                            type="button"
-                            onClick={() => removeTag(tag)}
-                            className="ml-2 text-purple-500 hover:text-purple-700"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
-                {/* Canvas Data */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Image className="w-4 h-4 inline mr-1" />
-                    Design Data
-                  </label>
-                  
-                  {!canvasData ? (
-                    <div className="p-6 border-2 border-dashed border-gray-300 rounded-xl text-center">
-                      <Image className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600 mb-4">
-                        Load your design from the canvas editor
-                      </p>
-                      <GlassButton
-                        type="button"
-                        onClick={loadCanvasData}
-                        variant="outline"
-                      >
-                        Load Current Design
-                      </GlassButton>
-                    </div>
-                  ) : (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-                      <div className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                        <span className="text-green-700 font-medium">Design loaded successfully</span>
-                      </div>
-                      <p className="text-sm text-green-600 mt-1">
-                        {canvasData.elements?.length || 0} elements ready to upload
-                      </p>
-                    </div>
-                  )}
-                </div>
+                {error && (
+                  <div className="flex items-center p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <AlertCircle className="w-5 h-5 text-red-600 mr-3" />
+                    <span className="text-red-800">{error}</span>
+                  </div>
+                )}
 
-                {/* Submit Button */}
-                <div className="flex gap-4">
+                <div className="flex justify-end">
                   <GlassButton
                     type="submit"
-                    disabled={isLoading || !canvasData}
-                    className="flex-1 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    disabled={isLoading}
+                    className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-3"
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Uploading...
                       </>
                     ) : (
                       <>
-                        <Upload className="w-5 h-5 mr-2" />
+                        <Upload className="w-4 h-4 mr-2" />
                         Upload Template
                       </>
                     )}
                   </GlassButton>
                 </div>
               </form>
-            </GlassCard>
-          </div>
-
-          {/* Guidelines Sidebar */}
-          <div className="lg:col-span-1">
-            <GlassCard className="p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Upload Guidelines</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Quality Standards</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• High-resolution designs (300 DPI)</li>
-                    <li>• Professional appearance</li>
-                    <li>• Clear, readable text</li>
-                    <li>• Proper color contrast</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Content Rules</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Original designs only</li>
-                    <li>• No copyrighted material</li>
-                    <li>• Appropriate for business use</li>
-                    <li>• No offensive content</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Pricing Tips</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Start with $5-10 for simple designs</li>
-                    <li>• Complex designs can go up to $25</li>
-                    <li>• Consider your time investment</li>
-                    <li>• You can adjust prices later</li>
-                  </ul>
-                </div>
-                
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                  <h4 className="font-semibold text-blue-800 mb-2">Review Process</h4>
-                  <p className="text-sm text-blue-700">
-                    All templates are reviewed within 24-48 hours. You'll be notified once approved!
-                  </p>
-                </div>
-              </div>
             </GlassCard>
           </div>
         </div>

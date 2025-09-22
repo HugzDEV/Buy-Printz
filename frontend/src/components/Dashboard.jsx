@@ -1499,7 +1499,7 @@ const Dashboard = () => {
                       className="flex items-center p-3 sm:p-4 bg-white/30 rounded-xl hover:bg-white/40 transition-all duration-200"
                     >
                       <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 sm:mr-3 flex-shrink-0" />
-                      <span className="font-medium text-gray-800 text-sm sm:text-base">Upload Template</span>
+                      <span className="font-medium text-gray-800 text-sm sm:text-base">Uploads</span>
                     </Link>
                     
                     <Link

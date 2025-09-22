@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { Toaster } from 'react-hot-toast'
+import { Toaster as SonnerToaster } from 'sonner'
 import App from './App.jsx'
 import './index.css'
 import { addGlobalDownloadProtection } from './utils/downloadProtection'
@@ -38,6 +39,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               color: '#fff',
             },
           }}
+        />
+        <SonnerToaster 
+          position="top-right"
+          richColors
+          closeButton
         />
       </Elements>
     </BrowserRouter>

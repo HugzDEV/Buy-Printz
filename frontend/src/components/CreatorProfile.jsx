@@ -19,19 +19,32 @@ import {
   Users,
   DollarSign
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import authService from '../services/auth';
 import { toast } from 'sonner';
 import SEOHead from './SEOHead';
 
 const CreatorProfile = () => {
   const { creatorId } = useParams();
-  const { user, authenticatedRequest } = useAuth();
+  const [user, setUser] = useState(null);
   const [creator, setCreator] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Error getting current user:', error);
+        setUser(null);
+      }
+    };
+    getCurrentUser();
+  }, []);
 
   useEffect(() => {
     if (creatorId) {
@@ -86,7 +99,7 @@ const CreatorProfile = () => {
     if (!user || !creatorId) return;
     
     try {
-      const response = await authenticatedRequest(`/api/creator-marketplace/creators/${creatorId}/follow-status`);
+      const response = await authService.authenticatedRequest(`/api/creator-marketplace/creators/${creatorId}/follow-status`);
       if (response.ok) {
         const data = await response.json();
         setIsFollowing(data.is_following);
@@ -105,11 +118,11 @@ const CreatorProfile = () => {
     try {
       let response;
       if (isFollowing) {
-        response = await authenticatedRequest(`/api/creator-marketplace/creators/${creatorId}/follow`, {
+        response = await authService.authenticatedRequest(`/api/creator-marketplace/creators/${creatorId}/follow`, {
           method: 'DELETE',
         });
       } else {
-        response = await authenticatedRequest(`/api/creator-marketplace/creators/${creatorId}/follow`, {
+        response = await authService.authenticatedRequest(`/api/creator-marketplace/creators/${creatorId}/follow`, {
           method: 'POST',
         });
       }
