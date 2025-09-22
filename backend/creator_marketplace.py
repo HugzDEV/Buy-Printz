@@ -550,7 +550,7 @@ async def upload_template(
         # Insert into database
         result = await db_manager.create_creator_template(template_record)
         
-        if result:
+        if result["success"]:
             return {
                 "success": True,
                 "message": "Template uploaded successfully and is pending review",
@@ -558,8 +558,8 @@ async def upload_template(
             }
         else:
             raise HTTPException(
-                status_code=500,
-                detail="Failed to upload template"
+                status_code=400,
+                detail=result["error"]
             )
             
     except HTTPException:

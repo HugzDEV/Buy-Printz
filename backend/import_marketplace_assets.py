@@ -174,12 +174,12 @@ async def import_template(creator_id: str, category_data: dict, asset_data: dict
         "rating_count": 1
     }
     
-    success = await db_manager.create_creator_template(template_data)
-    if success:
+    result = await db_manager.create_creator_template(template_data)
+    if result["success"]:
         print(f"✅ Imported: {asset_data['name']} (${category_data['base_price']})")
         return True
     else:
-        print(f"❌ Failed to import: {asset_data['name']}")
+        print(f"❌ Failed to import: {asset_data['name']} - {result['error']}")
         return False
 
 async def main():
