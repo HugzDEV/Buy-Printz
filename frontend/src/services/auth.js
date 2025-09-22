@@ -158,16 +158,23 @@ class AuthService {
     })
 
     try {
+      // Test connectivity first
+      console.log('Testing connectivity before login...')
+      const isConnected = await this.testConnectivity()
+      if (!isConnected) {
+        throw new Error('Unable to connect to authentication server. Please check your internet connection.')
+      }
+      
       console.log('Calling Supabase signInWithPassword...')
       
-      // Add timeout to prevent hanging
+      // Add timeout to prevent hanging (reduced to 15 seconds for faster feedback)
       const loginPromise = this.supabase.auth.signInWithPassword({
         email,
         password
       })
       
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Login request timeout')), 30000)
+        setTimeout(() => reject(new Error('Login request timeout - please check your internet connection')), 15000)
       )
       
       const { data, error } = await Promise.race([loginPromise, timeoutPromise])
@@ -199,6 +206,17 @@ class AuthService {
         access_token: data.session?.access_token
       }
     } catch (error) {
+      console.error('Login error:', error)
+      
+      // Provide more specific error messages
+      if (error.message.includes('timeout')) {
+        throw new Error('Login request timed out. Please check your internet connection and try again.')
+      } else if (error.message.includes('message port closed')) {
+        throw new Error('Network connection interrupted. Please try again.')
+      } else if (error.message.includes('Failed to fetch')) {
+        throw new Error('Unable to connect to authentication server. Please check your internet connection.')
+      }
+      
       throw error
     }
   }
@@ -389,6 +407,19 @@ class AuthService {
     const cacheKey = `user_templates_${userId}`
     localStorage.removeItem(cacheKey)
     console.log('User templates cache invalidated for user:', userId)
+  }
+
+  // Test Supabase connectivity
+  async testConnectivity() {
+    try {
+      console.log('Testing Supabase connectivity...')
+      const { data, error } = await this.supabase.auth.getSession()
+      console.log('Connectivity test result:', { hasData: !!data, hasError: !!error })
+      return !error
+    } catch (error) {
+      console.error('Connectivity test failed:', error)
+      return false
+    }
   }
 
   // Check if user is authenticated with simplified mobile handling
