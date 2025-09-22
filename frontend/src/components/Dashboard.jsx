@@ -199,9 +199,10 @@ const Dashboard = () => {
         }
       }
 
-      // Add timeout to prevent infinite loading (increased to 60 seconds)
+      // Add timeout to prevent infinite loading (shorter for non-critical data)
+      const timeoutDuration = loadingKey === 'orders' ? 10000 : 60000 // 10s for orders, 60s for others
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 60000)
+        setTimeout(() => reject(new Error('Request timeout')), timeoutDuration)
       )
       
       const response = await Promise.race([apiCall(), timeoutPromise])
@@ -273,7 +274,7 @@ const Dashboard = () => {
   }
 
   const loadDataProgressively = async () => {
-    // Load core data first (orders)
+    // Load core data first (orders) - with shorter timeout for better UX
     await Promise.all([
       loadDataSafely(
         () => authService.authenticatedRequest('/api/orders'),
