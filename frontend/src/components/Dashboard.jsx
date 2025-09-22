@@ -84,17 +84,14 @@ const Dashboard = () => {
   }, [location.search])
 
   // Load creator-specific data (analytics, templates, etc.)
-  const loadCreatorSpecificData = async (userData = null) => {
-    const currentUser = userData || user
-    const currentIsCreator = userData ? userData.isCreator : isCreator
-    
-    if (!currentUser?.id || !currentIsCreator) {
-      console.log('Skipping loadCreatorSpecificData: user?.id =', currentUser?.id, 'isCreator =', currentIsCreator)
+  const loadCreatorSpecificData = async () => {
+    if (!user?.id || !isCreator) {
+      console.log('Skipping loadCreatorSpecificData: user?.id =', user?.id, 'isCreator =', isCreator)
       return
     }
     
     try {
-      console.log('Loading creator-specific data for user:', currentUser.id)
+      console.log('Loading creator-specific data for user:', user.id)
       
       // Load creator analytics and templates in parallel
       await Promise.all([
@@ -167,7 +164,7 @@ const Dashboard = () => {
       
       // Load creator-specific data if user is a creator
       if (currentUser.isCreator) {
-        await loadCreatorSpecificData(currentUser)
+        await loadCreatorSpecificData()
       }
 
     } catch (error) {
@@ -199,10 +196,9 @@ const Dashboard = () => {
         }
       }
 
-      // Add timeout to prevent infinite loading (shorter for non-critical data)
-      const timeoutDuration = loadingKey === 'orders' ? 10000 : 60000 // 10s for orders, 60s for others
+      // Add timeout to prevent infinite loading
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), timeoutDuration)
+        setTimeout(() => reject(new Error('Request timeout')), 30000)
       )
       
       const response = await Promise.race([apiCall(), timeoutPromise])
@@ -213,13 +209,13 @@ const Dashboard = () => {
         let processedData = null
         
         // Handle different response formats
-        if (data?.templates) {
+        if (data.templates) {
           processedData = data.templates
-        } else if (data?.designs) {
+        } else if (data.designs) {
           processedData = data.designs
-        } else if (data?.orders) {
+        } else if (data.orders) {
           processedData = data.orders
-        } else if (data?.preferences) {
+        } else if (data.preferences) {
           processedData = data.preferences
         } else if (Array.isArray(data)) {
           processedData = data
@@ -244,25 +240,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.warn(`API call failed for ${loadingKey}, using fallback:`, error)
-      
-      // Set appropriate fallback based on loading key if fallback is null
-      if (fallback !== null) {
-        setter(fallback)
-      } else {
-        switch (loadingKey) {
-          case 'orders':
-            setter([])
-            break
-          case 'stats':
-            setter(null)
-            break
-          case 'preferences':
-            setter(null)
-            break
-          default:
-            setter(null)
-        }
-      }
+      setter(fallback)
       
       // Only show error toast for critical data
       if (['designs', 'orders'].includes(loadingKey)) {
@@ -274,7 +252,7 @@ const Dashboard = () => {
   }
 
   const loadDataProgressively = async () => {
-    // Load core data first (orders) - with shorter timeout for better UX
+    // Load core data first (orders)
     await Promise.all([
       loadDataSafely(
         () => authService.authenticatedRequest('/api/orders'),
@@ -306,7 +284,7 @@ const Dashboard = () => {
       ),
       loadDataSafely(
         () => authService.authenticatedRequest('/api/user/preferences'),
-        (data) => setPreferences(data?.preferences || null),
+        (data) => setPreferences(data.preferences || null),
         null,
         'preferences'
       )

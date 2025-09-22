@@ -150,42 +150,15 @@ class AuthService {
       throw new Error('Supabase not initialized. Please check your environment variables.')
     }
 
-    console.log('Attempting login with:', { 
-      email, 
-      supabaseUrl: this.supabase.supabaseUrl,
-      hasSupabase: !!this.supabase,
-      hasAuth: !!this.supabase.auth
-    })
+    console.log('Attempting login with:', { email, supabaseUrl: this.supabase.supabaseUrl })
 
     try {
-      // Test connectivity first
-      console.log('Testing connectivity before login...')
-      const isConnected = await this.testConnectivity()
-      if (!isConnected) {
-        throw new Error('Authentication service is temporarily unavailable. Please try again in a few minutes.')
-      }
-      
-      console.log('Calling Supabase signInWithPassword...')
-      
-      // Add timeout to prevent hanging (reduced to 15 seconds for faster feedback)
-      const loginPromise = this.supabase.auth.signInWithPassword({
+      const { data, error } = await this.supabase.auth.signInWithPassword({
         email,
         password
       })
-      
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Login request timeout - please check your internet connection')), 15000)
-      )
-      
-      const { data, error } = await Promise.race([loginPromise, timeoutPromise])
 
-      console.log('Login response received:', { 
-        hasData: !!data, 
-        hasError: !!error, 
-        hasUser: !!data?.user,
-        hasSession: !!data?.session,
-        errorMessage: error?.message 
-      })
+      console.log('Login response:', { data, error })
 
       if (error) {
         console.error('Login error details:', error)
@@ -206,23 +179,6 @@ class AuthService {
         access_token: data.session?.access_token
       }
     } catch (error) {
-      console.error('Login error:', error)
-      
-      // Provide more specific error messages
-      if (error.message.includes('timeout')) {
-        throw new Error('Login request timed out. Please check your internet connection and try again.')
-      } else if (error.message.includes('message port closed')) {
-        throw new Error('Network connection interrupted. Please try again.')
-      } else if (error.message.includes('Failed to fetch')) {
-        throw new Error('Unable to connect to authentication server. Please check your internet connection.')
-      } else if (error.message.includes('503') || error.message.includes('Service Unavailable')) {
-        throw new Error('Authentication service is temporarily unavailable. Please try again in a few minutes.')
-      } else if (error.message.includes('502') || error.message.includes('Bad Gateway')) {
-        throw new Error('Authentication service is experiencing issues. Please try again later.')
-      } else if (error.message.includes('504') || error.message.includes('Gateway Timeout')) {
-        throw new Error('Authentication service is slow to respond. Please try again.')
-      }
-      
       throw error
     }
   }
@@ -359,6 +315,13 @@ class AuthService {
     }
   }
 
+  // Invalidate creator status cache
+  invalidateCreatorStatusCache(userId) {
+    const cacheKey = `creator_status_${userId}`
+    localStorage.removeItem(cacheKey)
+    console.log('Creator status cache invalidated for user:', userId)
+  }
+
   // Get user templates with caching
   async getUserTemplates(userId) {
     // Check cache first
@@ -367,8 +330,8 @@ class AuthService {
     if (cached) {
       try {
         const cachedData = JSON.parse(cached)
-        // Cache for 3 minutes (templates change more frequently than creator status)
-        if (Date.now() - cachedData.timestamp < 3 * 60 * 1000) {
+        // Cache for 5 minutes
+        if (Date.now() - cachedData.timestamp < 5 * 60 * 1000) {
           console.log('Using cached templates for user:', userId)
           return cachedData.data
         }
@@ -401,45 +364,11 @@ class AuthService {
     }
   }
 
-  // Invalidate creator status cache
-  invalidateCreatorStatusCache(userId) {
-    const cacheKey = `creator_status_${userId}`
-    localStorage.removeItem(cacheKey)
-    console.log('Creator status cache invalidated for user:', userId)
-  }
-
   // Invalidate user templates cache
   invalidateUserTemplatesCache(userId) {
     const cacheKey = `user_templates_${userId}`
     localStorage.removeItem(cacheKey)
     console.log('User templates cache invalidated for user:', userId)
-  }
-
-  // Test Supabase connectivity
-  async testConnectivity() {
-    try {
-      console.log('Testing Supabase connectivity...')
-      const { data, error } = await this.supabase.auth.getSession()
-      console.log('Connectivity test result:', { hasData: !!data, hasError: !!error })
-      
-      // Check for service unavailability
-      if (error && (error.message.includes('503') || error.message.includes('Service Unavailable'))) {
-        console.error('Supabase service is unavailable (503)')
-        return false
-      }
-      
-      return !error
-    } catch (error) {
-      console.error('Connectivity test failed:', error)
-      
-      // Check for service unavailability in catch block too
-      if (error.message.includes('503') || error.message.includes('Service Unavailable')) {
-        console.error('Supabase service is unavailable (503)')
-        return false
-      }
-      
-      return false
-    }
   }
 
   // Check if user is authenticated with simplified mobile handling
