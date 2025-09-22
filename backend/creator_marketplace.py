@@ -372,6 +372,13 @@ async def upload_creator_logo(
         existing_creator = await db_manager.get_creator_by_user_id(user_id)
         print(f"🔍 Creator lookup for logo upload: {existing_creator}")
         
+        # Also try to get all creators to debug
+        try:
+            all_creators = db_manager.supabase.table("creators").select("*").execute()
+            print(f"🔍 All creators in database: {all_creators.data}")
+        except Exception as e:
+            print(f"🔍 Error getting all creators: {e}")
+        
         if not existing_creator:
             # Check if database tables exist
             try:
@@ -735,6 +742,13 @@ async def get_creator_analytics(
         # Check if user is a creator
         creator = await db_manager.get_creator_by_user_id(user_id)
         print(f"🔍 Creator lookup for analytics: {creator}")
+        
+        # Also try to get all creators to debug
+        try:
+            all_creators = db_manager.supabase.table("creators").select("*").execute()
+            print(f"🔍 All creators in database for analytics: {all_creators.data}")
+        except Exception as e:
+            print(f"🔍 Error getting all creators for analytics: {e}")
         
         if not creator:
             # Check if database tables exist
