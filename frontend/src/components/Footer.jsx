@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Palette, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react'
+import { Palette, Mail, Phone, MapPin, Facebook, Instagram } from 'lucide-react'
 
 const Footer = () => {
   return (
@@ -22,13 +22,10 @@ const Footer = () => {
               Create banners, business card tins, and tradeshow tents with our integrated marketplace and checkout system.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://facebook.com/buyprintz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://instagram.com/buyprintzboston" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>
@@ -59,14 +56,14 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="/#products" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/products" className="text-gray-300 hover:text-white transition-colors">
                   Products
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -99,9 +96,9 @@ const Footer = () => {
             <Link to="/privacy" className="text-gray-300 hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <a href="mailto:order@buyprintz.com" className="text-gray-300 hover:text-white transition-colors">
+            <Link to="/support" className="text-gray-300 hover:text-white transition-colors">
               Support
-            </a>
+            </Link>
           </div>
           <p>&copy; 2025 Buy Printz. All rights reserved. | Complete Business Branding Platform</p>
         </div>
