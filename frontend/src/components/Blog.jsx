@@ -18,15 +18,15 @@ const Blog = () => {
       excerpt: "The average business professional receives 2,000 business cards per year. Where do most end up? Landfills. That's 4 billion business cards annually contributing to waste. Discover how our Business Card Tins offer a revolutionary sustainable alternative.",
       content: `The average business professional receives 2,000 business cards per year. Where do most end up? Landfills. That's 4 billion business cards annually contributing to waste.
 
-## The Environmental Cost of Traditional Marketing
+The Environmental Cost of Traditional Marketing
 
 Traditional business cards represent one of the most wasteful aspects of professional networking. Consider these staggering statistics:
 
-- **4 billion business cards** are printed annually in the US alone
-- **88% of business cards** are thrown away within a week
-- **10 billion business cards** end up in landfills each year globally
-- **Paper production** for business cards consumes millions of trees annually
-- **Chemical inks and coatings** contribute to environmental pollution
+- 4 billion business cards are printed annually in the US alone
+- 88% of business cards are thrown away within a week
+- 10 billion business cards end up in landfills each year globally
+- Paper production for business cards consumes millions of trees annually
+- Chemical inks and coatings contribute to environmental pollution
 
 The environmental impact extends beyond just paper waste. The production process involves:
 - Deforestation for paper pulp
@@ -35,111 +35,111 @@ The environmental impact extends beyond just paper waste. The production process
 - Plastic lamination materials
 - Non-recyclable coatings and finishes
 
-## A Sustainable Solution
+A Sustainable Solution
 
 Our Business Card Tins offer a revolutionary alternative that aligns with modern environmental values:
 
-### **Reusable**: 
+Reusable: 
 Long after first impressions, tins find new purposes. Unlike paper cards that serve one function and get discarded, aluminum tins become valuable containers for years to come.
 
-### **Durable**: 
+Durable: 
 Quality construction means years of use, not minutes. Made from premium aluminum, these tins withstand daily use and maintain their professional appearance.
 
-### **Eco-Conscious**: 
+Eco-Conscious: 
 Recipients repurpose tins for candy, small items, travel containers, and countless other uses, extending their lifecycle far beyond traditional business cards.
 
-## Beyond Environmental Benefits
+Beyond Environmental Benefits
 
 While environmental responsibility is crucial, our Business Card Tins deliver additional marketing advantages:
 
-### **Brand Longevity**: 
+Brand Longevity: 
 Your message stays visible every time they reuse the tin. Unlike paper cards that disappear, your branding remains in their daily life.
 
-### **Quality Association**: 
+Quality Association: 
 Premium materials reflect your commitment to excellence. The weight and feel of aluminum conveys professionalism and attention to detail.
 
-### **Conversation Starters**: 
+Conversation Starters: 
 Unique approach generates organic word-of-mouth marketing. People naturally want to share and discuss innovative networking tools.
 
-### **Cost-Effective Long-Term**: 
+Cost-Effective Long-Term: 
 While initial investment may be higher than paper cards, the extended lifespan and multiple touchpoints provide superior ROI.
 
-## Real-World Reuse Stories
+Real-World Reuse Stories
 
 Our customers tell us their tins become:
 
-### **Desk Organizers**
+Desk Organizers
 - Paper clips and thumb tacks storage
 - USB drive containers
 - Business card holders for others
 - Pen and pencil organizers
 
-### **Travel Containers**
+Travel Containers
 - Pills and medication storage
 - Small electronics protection
 - Travel-sized toiletries
 - Emergency cash storage
 
-### **Automotive Uses**
+Automotive Uses
 - Emergency mint storage for cars
 - Spare change containers
 - Small tool storage
 - First aid item containers
 
-### **Home Organization**
+Home Organization
 - Craft supply storage for kids
 - Sewing kit containers
 - Small hardware storage
 - Jewelry organization
 
-### **Gift Applications**
+Gift Applications
 - Small jewelry or gift cards
 - Homemade treats and candies
 - Personalized gift containers
 - Wedding favor boxes
 
-## The Ripple Effect
+The Ripple Effect
 
 Every reuse is a brand impression. Every repurpose extends your marketing reach. Every eco-conscious choice builds brand reputation.
 
-### **Multiplier Effect**:
+Multiplier Effect:
 - **Initial Exchange**: Memorable first impression
 - **Daily Use**: Ongoing brand visibility
 - **Conversation Generation**: Word-of-mouth marketing
 - **Social Sharing**: Social media content opportunities
 - **Referral Potential**: Recipients recommend to others
 
-### **Environmental Impact**:
+Environmental Impact:
 - **Waste Reduction**: One tin replaces hundreds of paper cards
 - **Resource Conservation**: Aluminum is infinitely recyclable
 - **Carbon Footprint**: Reduced transportation and production emissions
 - **Circular Economy**: Promotes reuse over disposal
 
-## Making the Switch
+Making the Switch
 
 Ready to align your marketing with your values? Our sustainable Tin Skinz prove that environmental responsibility and effective marketing aren't mutually exclusive.
 
-### **Getting Started**:
-1. **Choose Your Style**: Silver, black, or gold aluminum finish
-2. **Design Your Branding**: Custom vinyl stickers with your information
-3. **Select Your Mints**: Fresh mints that create positive associations
-4. **Order Your Tins**: 100-unit minimum for testing and small businesses
-5. **Launch Your Campaign**: Start making sustainable impressions
+Getting Started:
+1. Choose Your Style: Silver, black, or gold aluminum finish
+2. Design Your Branding: Custom vinyl stickers with your information
+3. Select Your Mints: Fresh mints that create positive associations
+4. Order Your Tins: 100-unit minimum for testing and small businesses
+5. Launch Your Campaign: Start making sustainable impressions
 
-### **Why Choose BuyPrintz**:
-- **Quality Materials**: Premium aluminum construction
-- **Custom Design**: Professional vinyl sticker application
-- **Fast Delivery**: 2-3 business day turnaround
-- **Eco-Friendly Process**: Sustainable printing and packaging
-- **Expert Support**: Design assistance and consultation
+Why Choose BuyPrintz:
+- Quality Materials: Premium aluminum construction
+- Custom Design: Professional vinyl sticker application
+- Fast Delivery: 2-3 business day turnaround
+- Eco-Friendly Process: Sustainable printing and packaging
+- Expert Support: Design assistance and consultation
 
-## The Bottom Line
+The Bottom Line
 
 In an era where consumers increasingly value environmental responsibility, your choice of marketing materials speaks volumes about your brand values. Business Card Tins demonstrate that you're forward-thinking, quality-focused, and environmentally conscious.
 
 Don't let your marketing contribute to the waste problem. Make the switch to sustainable networking tools that work harder, last longer, and align with modern values.
 
-**Ready to make your marketing more sustainable?** Contact BuyPrintz today to discuss your eco-friendly Business Card Tin design. Let's create marketing tools that your contacts will keep, use, and remember.`,
+Ready to make your marketing more sustainable? Contact BuyPrintz today to discuss your eco-friendly Business Card Tin design. Let's create marketing tools that your contacts will keep, use, and remember.`,
       author: "BuyPrintz Team",
       date: "2025-09-22",
       readTime: "6 min read",
@@ -154,83 +154,83 @@ Don't let your marketing contribute to the waste problem. Make the switch to sus
       excerpt: "Starting a business? Before you dump thousands into Facebook ads or Google campaigns, make sure you have these three physical marketing essentials that create lasting impressions and build genuine connections.",
       content: `Starting a business? Before you dump thousands into Facebook ads or Google campaigns, make sure you have these three physical marketing essentials that create lasting impressions and build genuine connections.
 
-## 1. Premium Business Card Tins
+1. Premium Business Card Tins
 
 Your first impression tool that actually gets kept, not thrown away. Unlike traditional cards, our Tin Skinz create memorable encounters that people talk about.
 
-**Startup Benefit**: Low MOQ requirements mean you can test your branding without massive upfront costs.
+Startup Benefit: Low MOQ requirements mean you can test your branding without massive upfront costs.
 
-### Why Business Card Tins Work for Startups:
-- **Memorable First Impressions**: When you hand someone a sleek tin instead of a paper card, you immediately differentiate yourself from every other entrepreneur they'll meet
-- **Practical Value**: Recipients use them to hold mints, small items, or as conversation starters - ensuring your brand stays visible
-- **Cost-Effective Testing**: With 100-unit minimums, you can test different designs and messaging without breaking the bank
-- **Eco-Friendly Appeal**: Shows you care about sustainability, which resonates with modern consumers
+Why Business Card Tins Work for Startups:
+- Memorable First Impressions: When you hand someone a sleek tin instead of a paper card, you immediately differentiate yourself from every other entrepreneur they'll meet
+- Practical Value: Recipients use them to hold mints, small items, or as conversation starters - ensuring your brand stays visible
+- Cost-Effective Testing: With 100-unit minimums, you can test different designs and messaging without breaking the bank
+- Eco-Friendly Appeal: Shows you care about sustainability, which resonates with modern consumers
 
-## 2. Professional Trade Show Tents (10x10)
+2. Professional Trade Show Tents (10x10)
 
 Even if you're just starting out, you need to get in front of people. Our 10x10 trade show tents are perfect for:
 
-- **Local farmers markets**
-- **Community events**
-- **Pop-up shops**
-- **Networking events**
+- Local farmers markets
+- Community events
+- Pop-up shops
+- Networking events
 
-**Startup Benefit**: Portable, professional presence that establishes credibility instantly.
+Startup Benefit: Portable, professional presence that establishes credibility instantly.
 
-### Why Trade Show Tents Are Essential:
-- **Professional Credibility**: A branded tent immediately signals you're a serious business, not just a hobby
-- **Versatile Marketing**: Works for outdoor events, markets, festivals, and even indoor trade shows
-- **Cost-Effective Exposure**: One tent can generate hundreds of face-to-face interactions
-- **Brand Visibility**: Your logo and messaging are visible from a distance, drawing people in
-- **Weather Protection**: Ensures you can market regardless of conditions
+Why Trade Show Tents Are Essential:
+- Professional Credibility: A branded tent immediately signals you're a serious business, not just a hobby
+- Versatile Marketing: Works for outdoor events, markets, festivals, and even indoor trade shows
+- Cost-Effective Exposure: One tent can generate hundreds of face-to-face interactions
+- Brand Visibility: Your logo and messaging are visible from a distance, drawing people in
+- Weather Protection: Ensures you can market regardless of conditions
 
-## 3. Custom Banners for Every Occasion
+3. Custom Banners for Every Occasion
 
 From grand openings to special promotions, banners announce your presence and drive foot traffic.
 
-**Startup Benefit**: Versatile marketing that works for both physical and digital marketing campaigns.
+Startup Benefit: Versatile marketing that works for both physical and digital marketing campaigns.
 
-### Banner Applications for Startups:
-- **Grand Opening Announcements**: Create excitement and draw crowds to your launch
-- **Special Promotions**: Highlight sales, new products, or limited-time offers
-- **Event Marketing**: Use at trade shows, markets, and community events
-- **Social Media Content**: Banners make great backgrounds for photos and videos
-- **Storefront Signage**: Professional window displays that attract walk-in customers
+Banner Applications for Startups:
+- Grand Opening Announcements: Create excitement and draw crowds to your launch
+- Special Promotions: Highlight sales, new products, or limited-time offers
+- Event Marketing: Use at trade shows, markets, and community events
+- Social Media Content: Banners make great backgrounds for photos and videos
+- Storefront Signage: Professional window displays that attract walk-in customers
 
-## Why Physical Marketing Still Matters
+Why Physical Marketing Still Matters
 
 In our digital-first world, physical touchpoints create stronger emotional connections. When someone can hold, touch, and interact with your brand, they're more likely to remember and trust you.
 
-### The Psychology Behind Physical Marketing:
-- **Tangible Trust**: Physical items feel more "real" and trustworthy than digital ads
-- **Memory Retention**: People remember physical interactions 3x longer than digital ones
-- **Emotional Connection**: Touch and interaction create deeper emotional bonds
-- **Word-of-Mouth**: Unique physical marketing tools get people talking
-- **Longevity**: Physical marketing materials work 24/7 without ongoing costs
+The Psychology Behind Physical Marketing:
+- Tangible Trust: Physical items feel more "real" and trustworthy than digital ads
+- Memory Retention: People remember physical interactions 3x longer than digital ones
+- Emotional Connection: Touch and interaction create deeper emotional bonds
+- Word-of-Mouth: Unique physical marketing tools get people talking
+- Longevity: Physical marketing materials work 24/7 without ongoing costs
 
-## Your Starter Marketing Kit
+Your Starter Marketing Kit
 
 All three essentials for less than most businesses spend on one month of digital advertising—but with results that last for years, not days.
 
-### Cost Comparison:
-- **Digital Ads**: $2,000-5,000/month with results that disappear when you stop paying
-- **Physical Marketing Kit**: $500-1,500 one-time investment with lasting impact
+Cost Comparison:
+- Digital Ads: $2,000-5,000/month with results that disappear when you stop paying
+- Physical Marketing Kit: $500-1,500 one-time investment with lasting impact
 
-### ROI Benefits:
-- **Business Card Tins**: $399 for 100 units = $3.99 per memorable interaction
-- **Trade Show Tent**: $200-400 one-time cost for years of professional presence
-- **Custom Banners**: $25-100 each for versatile, reusable marketing
+ROI Benefits:
+- Business Card Tins: $399 for 100 units = $3.99 per memorable interaction
+- Trade Show Tent: $200-400 one-time cost for years of professional presence
+- Custom Banners: $25-100 each for versatile, reusable marketing
 
-## Getting Started
+Getting Started
 
 Ready to build your startup's marketing foundation? Here's your action plan:
 
-1. **Start with Business Card Tins**: Test your branding with a small order
-2. **Invest in a Trade Show Tent**: Choose a design that reflects your brand
-3. **Create Essential Banners**: Grand opening, promotion, and event banners
-4. **Plan Your Launch**: Use all three tools together for maximum impact
+1. Start with Business Card Tins: Test your branding with a small order
+2. Invest in a Trade Show Tent: Choose a design that reflects your brand
+3. Create Essential Banners: Grand opening, promotion, and event banners
+4. Plan Your Launch: Use all three tools together for maximum impact
 
-## The Bottom Line
+The Bottom Line
 
 While digital marketing has its place, physical marketing tools create the foundation for genuine business relationships. They're the difference between being just another online business and becoming a memorable, trusted brand in your community.
 
@@ -251,39 +251,39 @@ Ready to get started? Contact BuyPrintz today to discuss your startup marketing 
       excerpt: "Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers.",
       content: `Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers.
 
-## The Problem
+The Problem
 
 Traditional business cards have a 90% failure rate. They're easily lost, forgotten, and provide zero lasting value to recipients. In today's digital world, a piece of paper with your contact info just doesn't cut it anymore.
 
 Think about it: when was the last time you actually kept a business card for more than a week? Most people either throw them away immediately or stuff them in a drawer where they're never seen again. This means you're spending money on marketing materials that have virtually no impact on your business growth.
 
-## The Solution: Business Card Tins
+The Solution: Business Card Tins
 
 Enter the Business Card Tin—a revolutionary approach that transforms networking forever. Instead of another forgettable card, you're giving prospects:
 
-**A premium, reusable tin with your branding** - The tin itself becomes a valuable item they'll actually use and keep.
+A premium, reusable tin with your branding - The tin itself becomes a valuable item they'll actually use and keep.
 
-**All your contact information and QR code prominently displayed** - Multiple surfaces mean more opportunities to share your details.
+All your contact information and QR code prominently displayed - Multiple surfaces mean more opportunities to share your details.
 
-**Fresh mints that create an immediate positive association** - Every time they reach for a mint, they're reminded of your business.
+Fresh mints that create an immediate positive association - Every time they reach for a mint, they're reminded of your business.
 
-**An eco-friendly container they'll actually keep and reuse** - Unlike paper cards that end up in the trash, tins have lasting utility.
+An eco-friendly container they'll actually keep and reuse - Unlike paper cards that end up in the trash, tins have lasting utility.
 
-## Why It Works
+Why It Works
 
-### Memorability
+Memorability
 When someone receives a tin instead of a card, it's an instant conversation starter. "Wow, I've never seen anything like this!" This immediate reaction creates a memorable moment that traditional cards simply cannot match.
 
-### Longevity
+Longevity
 Long after the mints are gone, your branded tin remains on their desk, in their car, or repurposed for small items—keeping your brand visible. Unlike paper cards that get lost or damaged, tins are durable and functional.
 
-### Professional Impact
+Professional Impact
 It signals that your business thinks differently and invests in quality presentation. This premium approach shows you value your professional relationships and are willing to invest in making a lasting impression.
 
-### Practical Value
+Practical Value
 The tin serves multiple purposes beyond just holding your contact information. Recipients can use it to store small items, making it a genuinely useful item they'll want to keep.
 
-## Real-World Success Stories
+Real-World Success Stories
 
 Entrepreneurs who've switched to Business Card Tins report:
 - 300% increase in follow-up conversations
@@ -291,7 +291,7 @@ Entrepreneurs who've switched to Business Card Tins report:
 - 40% improvement in brand recall
 - Significant reduction in marketing waste
 
-## The Environmental Advantage
+The Environmental Advantage
 
 Traditional business cards contribute to massive paper waste. By choosing reusable tins, you're:
 - Reducing paper consumption
@@ -299,7 +299,7 @@ Traditional business cards contribute to massive paper waste. By choosing reusab
 - Supporting sustainable business practices
 - Appealing to environmentally conscious clients
 
-## Getting Started
+Getting Started
 
 Ready to make your first impression unforgettable? Our Business Card Tins start with low minimum orders, making them perfect for startups and established businesses alike.
 
@@ -310,7 +310,7 @@ The process is simple:
 4. Place your order
 5. Start making unforgettable impressions
 
-## Call to Action
+Call to Action
 
 Don't let another networking opportunity slip away with a forgettable paper card. Transform your professional networking with Business Card Tins that actually work.
 
@@ -426,6 +426,65 @@ The practical value ensures your contact information stays visible and accessibl
           </div>
         )}
 
+        {/* All Blog Posts Section */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">All Articles</h2>
+          <p className="text-gray-600 text-lg">
+            Explore our complete collection of insights, tips, and industry expertise.
+          </p>
+        </div>
+
+        {/* All Blog Posts Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {blogPosts.map((post) => (
+            <Link
+              key={post.id}
+              to={`/blog/${post.id}`}
+              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow group"
+            >
+              <img
+                src={post.thumbnail}
+                alt={post.title}
+                className="w-full h-48 object-contain bg-gray-50 group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  e.target.src = '/assets/images/Blog/placeholder.jpg'
+                }}
+              />
+              <div className="p-6">
+                <div className="flex items-center gap-4 mb-3">
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    {post.category}
+                  </span>
+                  {post.featured && (
+                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                      Featured
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                  {post.title}
+                </h3>
+                <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
+                  {post.excerpt}
+                </p>
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <User className="w-4 h-4" />
+                    {post.author}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(post.date).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {post.readTime}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
 
         {/* Newsletter Signup */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-8 text-white text-center mt-12">
