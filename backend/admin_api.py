@@ -57,9 +57,9 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
                 detail="Admin access required"
             )
         
-        # Get total users count
-        users_response = db_manager.supabase.table("auth.users").select("id", count="exact").execute()
-        total_users = users_response.count or 0
+        # Get total users count - we can't directly access auth.users, so we'll estimate from other tables
+        # For now, we'll use a different approach or get this from a different source
+        total_users = 0  # TODO: Implement proper user count
         
         # Get total creators count
         creators_response = db_manager.supabase.table("creators").select("id", count="exact").execute()
@@ -81,9 +81,9 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
         revenue_response = db_manager.supabase.table("orders").select("total_amount").eq("status", "completed").execute()
         total_revenue = sum(order.get("total_amount", 0) for order in revenue_response.data or [])
         
-        # Get recent signups (last 7 days)
+        # Get recent signups (last 7 days) - estimate from creators table
         week_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
-        recent_signups_response = db_manager.supabase.table("auth.users").select("id", count="exact").gte("created_at", week_ago).execute()
+        recent_signups_response = db_manager.supabase.table("creators").select("id", count="exact").gte("created_at", week_ago).execute()
         recent_signups = recent_signups_response.count or 0
         
         # Get active creators (creators with approved templates)
@@ -129,26 +129,22 @@ async def get_all_users(
                 detail="Admin access required"
             )
         
-        # Get users with pagination
-        users_response = db_manager.supabase.table("auth.users").select(
-            "id, email, user_metadata, created_at, last_sign_in_at"
+        # Get users with pagination - we'll get creators and estimate from there
+        # Since we can't access auth.users directly, we'll work with what we have
+        users_response = db_manager.supabase.table("creators").select(
+            "user_id, display_name, created_at, is_active"
         ).order("created_at", desc=True).range(offset, offset + limit - 1).execute()
         
         users = []
-        for user in users_response.data or []:
-            # Check if user is a creator
-            creator_response = db_manager.supabase.table("creators").select("id, is_active").eq("user_id", user["id"]).execute()
-            is_creator = bool(creator_response.data)
-            is_active = creator_response.data[0].get("is_active", True) if creator_response.data else True
-            
+        for creator in users_response.data or []:
             users.append(UserManagement(
-                user_id=user["id"],
-                email=user["email"],
-                full_name=user.get("user_metadata", {}).get("full_name"),
-                created_at=user["created_at"],
-                is_creator=is_creator,
-                is_active=is_active,
-                last_login=user.get("last_sign_in_at")
+                user_id=creator["user_id"],
+                email=f"user_{creator['user_id'][:8]}@example.com",  # Placeholder since we can't access email
+                full_name=creator.get("display_name"),
+                created_at=creator["created_at"],
+                is_creator=True,  # All users in this list are creators
+                is_active=creator.get("is_active", True),
+                last_login=None  # We can't access this from auth.users
             ))
         
         return users
@@ -177,15 +173,14 @@ async def ban_user(
                 detail="Admin access required"
             )
         
-        # Update user metadata to mark as banned
-        ban_response = db_manager.supabase.table("auth.users").update({
-            "user_metadata": {
-                "banned": True,
-                "ban_reason": reason,
-                "banned_at": datetime.utcnow().isoformat(),
-                "banned_by": current_user["user_id"]
-            }
-        }).eq("id", user_id).execute()
+        # Since we can't access auth.users directly, we'll mark the creator as inactive
+        # This is a workaround - in a real implementation, you'd need proper user management
+        ban_response = db_manager.supabase.table("creators").update({
+            "is_active": False,
+            "ban_reason": reason,
+            "banned_at": datetime.utcnow().isoformat(),
+            "banned_by": current_user["user_id"]
+        }).eq("user_id", user_id).execute()
         
         if ban_response.data:
             print(f"✅ User {user_id} banned by admin {current_user['user_id']} - Reason: {reason}")
@@ -222,14 +217,12 @@ async def unban_user(
                 detail="Admin access required"
             )
         
-        # Update user metadata to remove ban
-        unban_response = db_manager.supabase.table("auth.users").update({
-            "user_metadata": {
-                "banned": False,
-                "unbanned_at": datetime.utcnow().isoformat(),
-                "unbanned_by": current_user["user_id"]
-            }
-        }).eq("id", user_id).execute()
+        # Since we can't access auth.users directly, we'll mark the creator as active
+        unban_response = db_manager.supabase.table("creators").update({
+            "is_active": True,
+            "unbanned_at": datetime.utcnow().isoformat(),
+            "unbanned_by": current_user["user_id"]
+        }).eq("user_id", user_id).execute()
         
         if unban_response.data:
             print(f"✅ User {user_id} unbanned by admin {current_user['user_id']}")
@@ -447,7 +440,7 @@ async def get_user_analytics(
         # Get user signup data for the specified period
         start_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
         
-        users_response = db_manager.supabase.table("auth.users").select(
+        users_response = db_manager.supabase.table("creators").select(
             "created_at"
         ).gte("created_at", start_date).execute()
         

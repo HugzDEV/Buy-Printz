@@ -95,12 +95,12 @@ const Admin = () => {
       
       if (result) {
         setAdminStats({
-          totalUsers: result.total_users,
-          totalCreators: result.total_creators,
-          totalTemplates: result.total_templates,
-          pendingTemplates: result.pending_templates,
-          totalOrders: result.total_orders,
-          totalRevenue: result.total_revenue
+          totalUsers: result.total_users || 0,
+          totalCreators: result.total_creators || 0,
+          totalTemplates: result.total_templates || 0,
+          pendingTemplates: result.pending_templates || 0,
+          totalOrders: result.total_orders || 0,
+          totalRevenue: result.total_revenue || 0
         })
       }
     } catch (error) {
@@ -280,7 +280,7 @@ const Admin = () => {
                 { label: 'Total Templates', value: adminStats.totalTemplates, icon: FileText, color: 'purple' },
                 { label: 'Pending Templates', value: adminStats.pendingTemplates, icon: AlertTriangle, color: 'yellow' },
                 { label: 'Total Orders', value: adminStats.totalOrders, icon: Package, color: 'indigo' },
-                { label: 'Total Revenue', value: `$${adminStats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: 'emerald' }
+                { label: 'Total Revenue', value: `$${(adminStats.totalRevenue || 0).toLocaleString()}`, icon: DollarSign, color: 'emerald' }
               ].map((stat) => {
                 const Icon = stat.icon
                 return (
