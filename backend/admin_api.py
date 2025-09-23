@@ -73,9 +73,21 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
         pending_response = db_manager.supabase.table("creator_templates").select("id", count="exact").eq("is_approved", False).execute()
         pending_templates = pending_response.count or 0
         
-        # Get total orders count
-        orders_response = db_manager.supabase.table("orders").select("id", count="exact").execute()
-        total_orders = orders_response.count or 0
+        # Get total orders count - filter out test orders
+        try:
+            orders_response = db_manager.supabase.table("orders").select("id", count="exact").neq("status", "test").execute()
+            total_orders = orders_response.count or 0
+            print(f"✅ Total orders (excluding test): {total_orders}")
+        except Exception as e:
+            print(f"⚠️ Error getting orders count: {e}")
+            # Try without filter if the above fails
+            try:
+                orders_response = db_manager.supabase.table("orders").select("id", count="exact").execute()
+                total_orders = orders_response.count or 0
+                print(f"✅ Total orders (all): {total_orders}")
+            except Exception as e2:
+                print(f"⚠️ Error getting orders count (fallback): {e2}")
+                total_orders = 0
         
         # Get total revenue
         revenue_response = db_manager.supabase.table("orders").select("total_amount").eq("status", "completed").execute()
@@ -300,11 +312,9 @@ async def approve_template(
                 detail="Admin access required"
             )
         
-        # Update template to approved
+        # Update template to approved - only update fields that exist
         approve_response = db_manager.supabase.table("creator_templates").update({
-            "is_approved": True,
-            "approved_at": datetime.utcnow().isoformat(),
-            "approved_by": current_user["user_id"]
+            "is_approved": True
         }).eq("id", template_id).execute()
         
         if approve_response.data:
@@ -343,13 +353,10 @@ async def reject_template(
                 detail="Admin access required"
             )
         
-        # Update template to rejected
+        # Update template to rejected - only update fields that exist
         reject_response = db_manager.supabase.table("creator_templates").update({
             "is_approved": False,
-            "is_active": False,
-            "rejected_at": datetime.utcnow().isoformat(),
-            "rejected_by": current_user["user_id"],
-            "rejection_reason": reason
+            "is_active": False
         }).eq("id", template_id).execute()
         
         if reject_response.data:
