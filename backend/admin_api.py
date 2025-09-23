@@ -1,0 +1,477 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List, Dict, Any, Optional
+from datetime import datetime, timedelta
+from backend.database import db_manager
+from backend.auth import get_current_user
+from pydantic import BaseModel
+
+router = APIRouter()
+
+class AdminStats(BaseModel):
+    total_users: int
+    total_creators: int
+    total_templates: int
+    pending_templates: int
+    total_orders: int
+    total_revenue: float
+    recent_signups: int
+    active_creators: int
+
+class UserManagement(BaseModel):
+    user_id: str
+    email: str
+    full_name: Optional[str]
+    created_at: str
+    is_creator: bool
+    is_active: bool
+    last_login: Optional[str]
+
+# =============================================
+# ADMIN ACCESS CONTROL
+# =============================================
+
+async def verify_admin_access(current_user: dict) -> bool:
+    """Verify if the current user has admin privileges"""
+    user_id = current_user["user_id"]
+    
+    # TODO: Implement proper admin check - for now using hardcoded list
+    admin_users = [
+        "7be0211e-34c8-4357-946a-60b835586a89",  # Brainboxjp - for testing
+        # Add other admin user IDs here
+    ]
+    
+    return user_id in admin_users
+
+# =============================================
+# PLATFORM STATISTICS
+# =============================================
+
+@router.get("/admin/stats", response_model=AdminStats)
+async def get_admin_stats(current_user: dict = Depends(get_current_user)):
+    """Get comprehensive platform statistics for admin dashboard"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Get total users count
+        users_response = db_manager.supabase.table("auth.users").select("id", count="exact").execute()
+        total_users = users_response.count or 0
+        
+        # Get total creators count
+        creators_response = db_manager.supabase.table("creators").select("id", count="exact").execute()
+        total_creators = creators_response.count or 0
+        
+        # Get total templates count
+        templates_response = db_manager.supabase.table("creator_templates").select("id", count="exact").execute()
+        total_templates = templates_response.count or 0
+        
+        # Get pending templates count
+        pending_response = db_manager.supabase.table("creator_templates").select("id", count="exact").eq("is_approved", False).execute()
+        pending_templates = pending_response.count or 0
+        
+        # Get total orders count
+        orders_response = db_manager.supabase.table("orders").select("id", count="exact").execute()
+        total_orders = orders_response.count or 0
+        
+        # Get total revenue
+        revenue_response = db_manager.supabase.table("orders").select("total_amount").eq("status", "completed").execute()
+        total_revenue = sum(order.get("total_amount", 0) for order in revenue_response.data or [])
+        
+        # Get recent signups (last 7 days)
+        week_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
+        recent_signups_response = db_manager.supabase.table("auth.users").select("id", count="exact").gte("created_at", week_ago).execute()
+        recent_signups = recent_signups_response.count or 0
+        
+        # Get active creators (creators with approved templates)
+        active_creators_response = db_manager.supabase.table("creators").select("id", count="exact").eq("is_active", True).execute()
+        active_creators = active_creators_response.count or 0
+        
+        return AdminStats(
+            total_users=total_users,
+            total_creators=total_creators,
+            total_templates=total_templates,
+            pending_templates=pending_templates,
+            total_orders=total_orders,
+            total_revenue=total_revenue,
+            recent_signups=recent_signups,
+            active_creators=active_creators
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting admin stats: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+# =============================================
+# USER MANAGEMENT
+# =============================================
+
+@router.get("/admin/users", response_model=List[UserManagement])
+async def get_all_users(
+    limit: int = 50,
+    offset: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all users for admin management"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Get users with pagination
+        users_response = db_manager.supabase.table("auth.users").select(
+            "id, email, user_metadata, created_at, last_sign_in_at"
+        ).order("created_at", desc=True).range(offset, offset + limit - 1).execute()
+        
+        users = []
+        for user in users_response.data or []:
+            # Check if user is a creator
+            creator_response = db_manager.supabase.table("creators").select("id, is_active").eq("user_id", user["id"]).execute()
+            is_creator = bool(creator_response.data)
+            is_active = creator_response.data[0].get("is_active", True) if creator_response.data else True
+            
+            users.append(UserManagement(
+                user_id=user["id"],
+                email=user["email"],
+                full_name=user.get("user_metadata", {}).get("full_name"),
+                created_at=user["created_at"],
+                is_creator=is_creator,
+                is_active=is_active,
+                last_login=user.get("last_sign_in_at")
+            ))
+        
+        return users
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting users: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+@router.put("/admin/users/{user_id}/ban")
+async def ban_user(
+    user_id: str,
+    reason: str = "Platform abuse",
+    current_user: dict = Depends(get_current_user)
+):
+    """Ban a user from the platform"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Update user metadata to mark as banned
+        ban_response = db_manager.supabase.table("auth.users").update({
+            "user_metadata": {
+                "banned": True,
+                "ban_reason": reason,
+                "banned_at": datetime.utcnow().isoformat(),
+                "banned_by": current_user["user_id"]
+            }
+        }).eq("id", user_id).execute()
+        
+        if ban_response.data:
+            print(f"✅ User {user_id} banned by admin {current_user['user_id']} - Reason: {reason}")
+            return {
+                "success": True,
+                "message": f"User {user_id} has been banned"
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error banning user: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+@router.put("/admin/users/{user_id}/unban")
+async def unban_user(
+    user_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Unban a user from the platform"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Update user metadata to remove ban
+        unban_response = db_manager.supabase.table("auth.users").update({
+            "user_metadata": {
+                "banned": False,
+                "unbanned_at": datetime.utcnow().isoformat(),
+                "unbanned_by": current_user["user_id"]
+            }
+        }).eq("id", user_id).execute()
+        
+        if unban_response.data:
+            print(f"✅ User {user_id} unbanned by admin {current_user['user_id']}")
+            return {
+                "success": True,
+                "message": f"User {user_id} has been unbanned"
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error unbanning user: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+# =============================================
+# TEMPLATE MANAGEMENT
+# =============================================
+
+@router.get("/admin/templates/pending")
+async def get_pending_templates(
+    limit: int = 20,
+    offset: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all pending templates for admin review"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Get pending templates with creator info
+        templates_response = db_manager.supabase.table("creator_templates").select(
+            "*, creators(display_name, profile_image_url)"
+        ).eq("is_approved", False).eq("is_active", True).order(
+            "created_at", desc=True
+        ).range(offset, offset + limit - 1).execute()
+        
+        return {
+            "success": True,
+            "templates": templates_response.data or [],
+            "total": len(templates_response.data or [])
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting pending templates: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+@router.post("/admin/templates/{template_id}/approve")
+async def approve_template(
+    template_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Approve a pending template"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Update template to approved
+        approve_response = db_manager.supabase.table("creator_templates").update({
+            "is_approved": True,
+            "approved_at": datetime.utcnow().isoformat(),
+            "approved_by": current_user["user_id"]
+        }).eq("id", template_id).execute()
+        
+        if approve_response.data:
+            print(f"✅ Template {template_id} approved by admin {current_user['user_id']}")
+            return {
+                "success": True,
+                "message": "Template approved successfully"
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Template not found"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error approving template: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+@router.post("/admin/templates/{template_id}/reject")
+async def reject_template(
+    template_id: str,
+    reason: str = "Does not meet platform standards",
+    current_user: dict = Depends(get_current_user)
+):
+    """Reject a pending template"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Update template to rejected
+        reject_response = db_manager.supabase.table("creator_templates").update({
+            "is_approved": False,
+            "is_active": False,
+            "rejected_at": datetime.utcnow().isoformat(),
+            "rejected_by": current_user["user_id"],
+            "rejection_reason": reason
+        }).eq("id", template_id).execute()
+        
+        if reject_response.data:
+            print(f"✅ Template {template_id} rejected by admin {current_user['user_id']} - Reason: {reason}")
+            return {
+                "success": True,
+                "message": "Template rejected successfully"
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Template not found"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error rejecting template: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+# =============================================
+# PLATFORM ANALYTICS
+# =============================================
+
+@router.get("/admin/analytics/revenue")
+async def get_revenue_analytics(
+    days: int = 30,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get revenue analytics for the specified period"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Get revenue data for the specified period
+        start_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
+        
+        revenue_response = db_manager.supabase.table("orders").select(
+            "total_amount, created_at, status"
+        ).gte("created_at", start_date).eq("status", "completed").execute()
+        
+        # Process revenue data by day
+        daily_revenue = {}
+        for order in revenue_response.data or []:
+            date = order["created_at"][:10]  # Get YYYY-MM-DD
+            if date not in daily_revenue:
+                daily_revenue[date] = 0
+            daily_revenue[date] += order.get("total_amount", 0)
+        
+        return {
+            "success": True,
+            "period_days": days,
+            "total_revenue": sum(daily_revenue.values()),
+            "daily_revenue": daily_revenue,
+            "average_daily": sum(daily_revenue.values()) / len(daily_revenue) if daily_revenue else 0
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting revenue analytics: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
+@router.get("/admin/analytics/users")
+async def get_user_analytics(
+    days: int = 30,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get user analytics for the specified period"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Get user signup data for the specified period
+        start_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
+        
+        users_response = db_manager.supabase.table("auth.users").select(
+            "created_at"
+        ).gte("created_at", start_date).execute()
+        
+        # Process signup data by day
+        daily_signups = {}
+        for user in users_response.data or []:
+            date = user["created_at"][:10]  # Get YYYY-MM-DD
+            if date not in daily_signups:
+                daily_signups[date] = 0
+            daily_signups[date] += 1
+        
+        return {
+            "success": True,
+            "period_days": days,
+            "total_signups": sum(daily_signups.values()),
+            "daily_signups": daily_signups,
+            "average_daily": sum(daily_signups.values()) / len(daily_signups) if daily_signups else 0
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting user analytics: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )

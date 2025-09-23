@@ -90,8 +90,22 @@ const Admin = () => {
     try {
       setLoadingStates(prev => ({ ...prev, stats: true }))
       
-      // TODO: Implement actual admin stats API calls
-      // For now, using mock data
+      const response = await authService.authenticatedRequest('/api/admin/stats')
+      const result = await response.json()
+      
+      if (result) {
+        setAdminStats({
+          totalUsers: result.total_users,
+          totalCreators: result.total_creators,
+          totalTemplates: result.total_templates,
+          pendingTemplates: result.pending_templates,
+          totalOrders: result.total_orders,
+          totalRevenue: result.total_revenue
+        })
+      }
+    } catch (error) {
+      console.error('Error loading admin stats:', error)
+      // Fallback to mock data if API fails
       const mockStats = {
         totalUsers: 1247,
         totalCreators: 89,
@@ -100,10 +114,7 @@ const Admin = () => {
         totalOrders: 2341,
         totalRevenue: 45678.90
       }
-      
       setAdminStats(mockStats)
-    } catch (error) {
-      console.error('Error loading admin stats:', error)
     } finally {
       setLoadingStates(prev => ({ ...prev, stats: false }))
     }
@@ -113,7 +124,7 @@ const Admin = () => {
     try {
       setLoadingStates(prev => ({ ...prev, pendingTemplates: true }))
       
-      const response = await authService.authenticatedRequest('/api/creator-marketplace/admin/pending-templates')
+      const response = await authService.authenticatedRequest('/api/admin/templates/pending')
       const result = await response.json()
       
       if (result.success) {
@@ -147,7 +158,7 @@ const Admin = () => {
 
   const handleApproveTemplate = async (templateId) => {
     try {
-      const response = await authService.authenticatedRequest(`/api/creator-marketplace/admin/templates/${templateId}/approve`, {
+      const response = await authService.authenticatedRequest(`/api/admin/templates/${templateId}/approve`, {
         method: 'POST'
       })
       
@@ -166,7 +177,7 @@ const Admin = () => {
 
   const handleRejectTemplate = async (templateId) => {
     try {
-      const response = await authService.authenticatedRequest(`/api/creator-marketplace/admin/templates/${templateId}/reject`, {
+      const response = await authService.authenticatedRequest(`/api/admin/templates/${templateId}/reject`, {
         method: 'POST'
       })
       

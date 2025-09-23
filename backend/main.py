@@ -36,6 +36,14 @@ except ImportError:
     CREATOR_FOLLOWER_AVAILABLE = False
     print("Warning: Creator follower module not available")
 
+# Import admin API routes
+try:
+    from backend.admin_api import router as admin_router
+    ADMIN_API_AVAILABLE = True
+except ImportError:
+    ADMIN_API_AVAILABLE = False
+    print("Warning: Admin API module not available")
+
 # Old shipping API routes removed - using Playwright integration only
 
 # Import shipping costs API routes - B2Sign integration with Playwright
@@ -217,6 +225,13 @@ if CREATOR_FOLLOWER_AVAILABLE:
     logger.info("Creator follower routes loaded successfully")
 else:
     logger.warning("Creator follower routes not available - module not found")
+
+# Include admin API routes if available
+if ADMIN_API_AVAILABLE:
+    app.include_router(admin_router, prefix="/api", tags=["admin"])
+    logger.info("Admin API routes loaded successfully")
+else:
+    logger.warning("Admin API routes not available - module not found")
 
 # Old shipping API routes removed - using Playwright integration only
 
