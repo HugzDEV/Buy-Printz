@@ -96,13 +96,16 @@ const Dashboard = () => {
     const currentUser = userData || user
     const currentIsCreator = userData ? userData.isCreator : isCreator
     
-    if (!currentUser?.id || !currentIsCreator) {
-      console.log('Skipping loadCreatorSpecificData: user?.id =', currentUser?.id, 'isCreator =', currentIsCreator, 'userData =', userData)
+    // Check for both id and user_id properties
+    const userId = currentUser?.id || currentUser?.user_id
+    
+    if (!userId || !currentIsCreator) {
+      console.log('Skipping loadCreatorSpecificData: userId =', userId, 'isCreator =', currentIsCreator, 'userData =', userData)
       return
     }
     
     try {
-      console.log('Loading creator-specific data for user:', currentUser.id)
+      console.log('Loading creator-specific data for user:', userId)
       
       // Load creator analytics and templates in parallel
       await Promise.all([
@@ -357,13 +360,16 @@ const Dashboard = () => {
     const currentUser = userData || user
     const currentIsCreator = userData ? userData.isCreator : isCreator
     
-    if (!currentUser?.id || !currentIsCreator) {
-      console.log('Skipping loadCreatorTemplates: user?.id =', currentUser?.id, 'isCreator =', currentIsCreator)
+    // Check for both id and user_id properties
+    const userId = currentUser?.id || currentUser?.user_id
+    
+    if (!userId || !currentIsCreator) {
+      console.log('Skipping loadCreatorTemplates: userId =', userId, 'isCreator =', currentIsCreator)
       return
     }
     
     try {
-      console.log('Loading creator templates for user:', currentUser.id)
+      console.log('Loading creator templates for user:', userId)
       setLoadingStates(prev => ({ ...prev, creatorTemplates: true }))
       const response = await authService.authenticatedRequest('/api/creator-marketplace/templates/my-templates')
       const result = await response.json()
