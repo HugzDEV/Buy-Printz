@@ -57,20 +57,11 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
                 detail="Admin access required"
             )
         
-        # Get total users count - estimate from creators + orders (unique user_ids)
+        # Get total users count from users table
         try:
-            # Get unique user IDs from orders table
-            orders_users_response = db_manager.supabase.table("orders").select("user_id").execute()
-            orders_user_ids = set(order.get("user_id") for order in orders_users_response.data or [])
-            
-            # Get unique user IDs from creators table
-            creators_users_response = db_manager.supabase.table("creators").select("user_id").execute()
-            creators_user_ids = set(creator.get("user_id") for creator in creators_users_response.data or [])
-            
-            # Combine and count unique users
-            all_user_ids = orders_user_ids.union(creators_user_ids)
-            total_users = len(all_user_ids)
-            print(f"✅ Total unique users: {total_users} (from orders: {len(orders_user_ids)}, from creators: {len(creators_user_ids)})")
+            users_response = db_manager.supabase.table("users").select("id", count="exact").execute()
+            total_users = users_response.count or 0
+            print(f"✅ Total users: {total_users}")
         except Exception as e:
             print(f"⚠️ Error getting users count: {e}")
             total_users = 0
@@ -175,47 +166,22 @@ async def get_all_users(
                 detail="Admin access required"
             )
         
-        # Get real users from orders and creators tables
-        users = []
-        
-        # Get recent creators
-        creators_response = db_manager.supabase.table("creators").select(
-            "user_id, display_name, created_at, is_active"
+        # Get real users from the users table
+        users_response = db_manager.supabase.table("users").select(
+            "user_id, email, full_name, created_at, is_creator, is_active, last_login"
         ).order("created_at", desc=True).range(offset, offset + limit - 1).execute()
         
-        for creator in creators_response.data or []:
+        users = []
+        for user in users_response.data or []:
             users.append(UserManagement(
-                user_id=creator["user_id"],
-                email=f"creator_{creator['user_id'][:8]}@buyprintz.com",  # Better placeholder
-                full_name=creator.get("display_name"),
-                created_at=creator["created_at"],
-                is_creator=True,
-                is_active=creator.get("is_active", True),
-                last_login=None
+                user_id=user["user_id"],
+                email=user.get("email", f"user_{user['user_id'][:8]}@buyprintz.com"),
+                full_name=user.get("full_name"),
+                created_at=user["created_at"],
+                is_creator=user.get("is_creator", False),
+                is_active=user.get("is_active", True),
+                last_login=user.get("last_login")
             ))
-        
-        # If we need more users, get from orders table
-        if len(users) < limit:
-            remaining_limit = limit - len(users)
-            orders_response = db_manager.supabase.table("orders").select(
-                "user_id, created_at"
-            ).order("created_at", desc=True).range(0, remaining_limit - 1).execute()
-            
-            # Get unique user IDs from orders
-            seen_user_ids = {user.user_id for user in users}
-            for order in orders_response.data or []:
-                user_id = order.get("user_id")
-                if user_id and user_id not in seen_user_ids:
-                    users.append(UserManagement(
-                        user_id=user_id,
-                        email=f"user_{user_id[:8]}@buyprintz.com",
-                        full_name=None,
-                        created_at=order["created_at"],
-                        is_creator=False,
-                        is_active=True,
-                        last_login=None
-                    ))
-                    seen_user_ids.add(user_id)
         
         return users
         

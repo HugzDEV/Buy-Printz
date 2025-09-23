@@ -233,6 +233,14 @@ if ADMIN_API_AVAILABLE:
 else:
     logger.warning("Admin API routes not available - module not found")
 
+# Include database diagnostic routes
+try:
+    from backend.database_diagnostic import router as diagnostic_router
+    app.include_router(diagnostic_router, prefix="/api", tags=["diagnostic"])
+    logger.info("Database diagnostic routes loaded successfully")
+except ImportError:
+    logger.warning("Database diagnostic routes not available - module not found")
+
 # Old shipping API routes removed - using Playwright integration only
 
 # Include shipping costs API routes if available

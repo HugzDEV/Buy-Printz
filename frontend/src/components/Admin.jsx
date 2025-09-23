@@ -141,16 +141,18 @@ const Admin = () => {
     try {
       setLoadingStates(prev => ({ ...prev, recentUsers: true }))
       
-      // TODO: Implement actual recent users API
-      const mockUsers = [
-        { id: '1', email: 'user1@example.com', created_at: '2025-09-23T10:30:00Z', is_creator: false },
-        { id: '2', email: 'creator1@example.com', created_at: '2025-09-23T09:15:00Z', is_creator: true },
-        { id: '3', email: 'user2@example.com', created_at: '2025-09-23T08:45:00Z', is_creator: false }
-      ]
+      const response = await authService.authenticatedRequest('/api/admin/users?limit=5')
+      const users = await response.json()
       
-      setRecentUsers(mockUsers)
+      if (users && Array.isArray(users)) {
+        setRecentUsers(users)
+      } else {
+        console.error('Invalid users response:', users)
+        setRecentUsers([])
+      }
     } catch (error) {
       console.error('Error loading recent users:', error)
+      setRecentUsers([])
     } finally {
       setLoadingStates(prev => ({ ...prev, recentUsers: false }))
     }
@@ -400,7 +402,7 @@ const Admin = () => {
                 ) : recentUsers.length > 0 ? (
                   <div className="space-y-3">
                     {recentUsers.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
+                      <div key={user.user_id} className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                             <Users className="w-4 h-4 text-gray-400" />
@@ -410,6 +412,7 @@ const Admin = () => {
                             <p className="text-sm text-gray-600">
                               {new Date(user.created_at).toLocaleDateString()}
                               {user.is_creator && <span className="ml-2 text-green-600">Creator</span>}
+                              {user.full_name && <span className="ml-2 text-gray-500">({user.full_name})</span>}
                             </p>
                           </div>
                         </div>
