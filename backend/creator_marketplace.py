@@ -1635,3 +1635,64 @@ async def get_creator_public_templates(creator_id: str, limit: int = 20, offset:
             status_code=500,
             detail="Internal server error"
         )
+
+@router.delete("/templates/{template_id}")
+async def delete_creator_template(
+    template_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a creator template (only by the creator who owns it)"""
+    try:
+        user_id = current_user["user_id"]
+        
+        # Check if user is a creator
+        creator = await db_manager.get_creator_by_user_id(user_id)
+        if not creator:
+            raise HTTPException(
+                status_code=403,
+                detail="User must be a registered creator to delete templates"
+            )
+        
+        # Get the template to verify ownership
+        template_response = db_manager.supabase.table("creator_templates").select("*").eq("id", template_id).eq("creator_id", creator["id"]).execute()
+        
+        if not template_response.data:
+            raise HTTPException(
+                status_code=404,
+                detail="Template not found or you don't have permission to delete it"
+            )
+        
+        template = template_response.data[0]
+        
+        # Check if template has any sales (optional: prevent deletion of templates with sales)
+        if template.get("sales_count", 0) > 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot delete template with existing sales. Contact support if needed."
+            )
+        
+        # Delete the template
+        delete_response = db_manager.supabase.table("creator_templates").delete().eq("id", template_id).eq("creator_id", creator["id"]).execute()
+        
+        if delete_response.data:
+            print(f"✅ Creator template {template_id} deleted by creator {creator['id']}")
+            return {
+                "success": True,
+                "message": "Template deleted successfully"
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to delete template"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error deleting creator template: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error"
+        )

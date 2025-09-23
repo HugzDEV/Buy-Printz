@@ -657,6 +657,28 @@ const Dashboard = () => {
     }
   }
 
+  const deleteCreatorTemplate = async (templateId) => {
+    if (!confirm('Are you sure you want to delete this creator template? This action cannot be undone.')) return
+    
+    try {
+      const response = await authService.authenticatedRequest(`/api/creator-marketplace/templates/${templateId}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        toast.success('Creator template deleted successfully')
+        setCreatorTemplates(creatorTemplates.filter(t => t.id !== templateId))
+        // Refresh creator analytics to update template count
+        await loadCreatorAnalytics()
+      } else {
+        throw new Error('Failed to delete creator template')
+      }
+    } catch (error) {
+      console.error('Error deleting creator template:', error)
+      toast.error('Failed to delete creator template')
+    }
+  }
+
   const refreshTemplates = async () => {
     if (!user?.id) return
     
@@ -1730,8 +1752,17 @@ const Dashboard = () => {
                               <h4 className="font-medium text-gray-900 text-sm truncate">{template.name}</h4>
                               <p className="text-xs text-gray-600 mt-1">{template.category}</p>
                               <div className="flex items-center justify-between mt-2">
-                                <span className="text-sm font-bold text-green-600">${template.price}</span>
-                                <span className="text-xs text-gray-500">{template.sales_count} sales</span>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm font-bold text-green-600">${template.price}</span>
+                                  <span className="text-xs text-gray-500">{template.sales_count} sales</span>
+                                </div>
+                                <button
+                                  onClick={() => deleteCreatorTemplate(template.id)}
+                                  className="p-1.5 bg-white/20 hover:bg-red-50/80 rounded-lg text-red-500 hover:text-red-600 transition-all duration-300 shadow-sm hover:shadow-md border border-white/30 hover:border-red-200/50"
+                                  title="Delete template"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
                               </div>
                             </div>
                           </div>
