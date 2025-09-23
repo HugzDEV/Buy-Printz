@@ -97,7 +97,7 @@ const Dashboard = () => {
     const currentIsCreator = userData ? userData.isCreator : isCreator
     
     if (!currentUser?.id || !currentIsCreator) {
-      console.log('Skipping loadCreatorSpecificData: user?.id =', currentUser?.id, 'isCreator =', currentIsCreator)
+      console.log('Skipping loadCreatorSpecificData: user?.id =', currentUser?.id, 'isCreator =', currentIsCreator, 'userData =', userData)
       return
     }
     
