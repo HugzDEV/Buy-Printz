@@ -343,7 +343,7 @@ const Dashboard = () => {
       if (creatorStatus.isCreator) {
         setCreatorProfile(creatorStatus.creatorProfile)
         setIsCreator(true)
-        await loadCreatorSpecificData()
+        await loadCreatorSpecificData(creatorStatus)
       } else {
         setIsCreator(false)
         setCreatorProfile(null)
