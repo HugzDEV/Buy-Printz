@@ -75,6 +75,14 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
         
         # Get total orders count - filter out test orders
         try:
+            # First, let's see what status values exist
+            status_response = db_manager.supabase.table("orders").select("status").execute()
+            status_counts = {}
+            for order in status_response.data or []:
+                status = order.get("status", "unknown")
+                status_counts[status] = status_counts.get(status, 0) + 1
+            print(f"🔍 Order status breakdown: {status_counts}")
+            
             orders_response = db_manager.supabase.table("orders").select("id", count="exact").neq("status", "test").execute()
             total_orders = orders_response.count or 0
             print(f"✅ Total orders (excluding test): {total_orders}")
