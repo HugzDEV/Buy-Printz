@@ -1173,7 +1173,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {console.log('Templates section render - loadingStates.templates:', loadingStates.templates, 'templates.length:', templates.length)}
             {loadingStates.templates ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -1690,7 +1689,6 @@ const Dashboard = () => {
                   </div>
 
                   {/* Portfolio Templates Grid */}
-                  {console.log('Portfolio render - loadingStates.creatorTemplates:', loadingStates.creatorTemplates, 'creatorTemplates.length:', creatorTemplates.length)}
                   {loadingStates.creatorTemplates ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {[1, 2, 3].map((i) => (
