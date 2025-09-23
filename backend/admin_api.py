@@ -346,18 +346,37 @@ async def reject_template(
 ):
     """Reject a pending template"""
     try:
+        print(f"🔍 Reject template request: {template_id} by user: {current_user['user_id']}")
+        
         # Verify admin access
         if not await verify_admin_access(current_user):
+            print(f"❌ Admin access denied for user: {current_user['user_id']}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Admin access required"
             )
         
+        print(f"✅ Admin access verified for user: {current_user['user_id']}")
+        
+        # First, check if template exists
+        check_response = db_manager.supabase.table("creator_templates").select("id, is_approved, is_active").eq("id", template_id).execute()
+        print(f"🔍 Template check response: {check_response.data}")
+        
+        if not check_response.data:
+            print(f"❌ Template not found: {template_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Template not found"
+            )
+        
         # Update template to rejected - only update fields that exist
+        print(f"🔄 Updating template {template_id} to rejected...")
         reject_response = db_manager.supabase.table("creator_templates").update({
             "is_approved": False,
             "is_active": False
         }).eq("id", template_id).execute()
+        
+        print(f"🔍 Reject response: {reject_response.data}")
         
         if reject_response.data:
             print(f"✅ Template {template_id} rejected by admin {current_user['user_id']} - Reason: {reason}")
@@ -366,18 +385,21 @@ async def reject_template(
                 "message": "Template rejected successfully"
             }
         else:
+            print(f"❌ No data returned from reject update for template: {template_id}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template not found"
+                detail="Template not found or update failed"
             )
             
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error rejecting template: {e}")
+        print(f"❌ Error rejecting template: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error"
+            detail=f"Internal server error: {str(e)}"
         )
 
 # =============================================
