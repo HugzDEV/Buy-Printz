@@ -37,6 +37,7 @@ import TinSkinzDemo from './components/TinSkinzDemo'
 import TinSkinzCheckout from './components/TinSkinzCheckout'
 import TinSkinzSuccess from './components/TinSkinzSuccess'
 import CreatorProfile from './components/CreatorProfile'
+import Admin from './components/Admin'
 import authService from './services/auth'
 
 // Protected Route Component with Optimized Mobile Handling
@@ -335,6 +336,13 @@ function App() {
         <Route path="/creator/earnings" element={
           <ProtectedRoute>
             <CreatorEarnings />
+          </ProtectedRoute>
+        } />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <Admin />
           </ProtectedRoute>
         } />
 
