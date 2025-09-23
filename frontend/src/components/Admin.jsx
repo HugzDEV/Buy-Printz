@@ -206,70 +206,91 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
       <SEOHead 
         title="Admin Portal - BuyPrintz"
         description="Administrative dashboard for platform management"
         keywords="admin, management, platform, buyprintz"
       />
       
-      {/* Header */}
-      <div className="backdrop-blur-xl bg-white/80 border-b border-white/30 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-gradient-to-br from-red-100 to-orange-100 rounded-xl shadow-lg border border-white/30">
-                <Shield className="w-8 h-8 text-red-600" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Admin Portal</h1>
-                <p className="text-sm text-gray-600">Platform Management Dashboard</p>
-              </div>
+      {/* Sidebar */}
+      <div className="w-64 backdrop-blur-xl bg-white/80 border-r border-white/30 shadow-lg flex flex-col">
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-white/30">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-gradient-to-br from-red-100 to-orange-100 rounded-xl shadow-lg border border-white/30">
+              <Shield className="w-6 h-6 text-red-600" />
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {user?.full_name || user?.email}</span>
-              <Link
-                to="/dashboard"
-                className="px-4 py-2 bg-white/30 hover:bg-white/50 rounded-lg text-gray-700 transition-all duration-200"
-              >
-                Back to Dashboard
-              </Link>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Admin Portal</h1>
+              <p className="text-xs text-gray-600">Platform Management</p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex space-x-1 bg-white/30 rounded-xl p-1 backdrop-blur-sm border border-white/30">
-          {[
-            { id: 'overview', label: 'Overview', icon: BarChart3 },
-            { id: 'templates', label: 'Templates', icon: FileText },
-            { id: 'users', label: 'Users', icon: Users },
-            { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-            { id: 'settings', label: 'Settings', icon: Settings }
-          ].map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-white shadow-lg text-blue-600'
-                    : 'text-gray-600 hover:bg-white/50'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span className="font-medium">{tab.label}</span>
-              </button>
-            )
-          })}
+        {/* Navigation */}
+        <div className="flex-1 p-4">
+          <nav className="space-y-2">
+            {[
+              { id: 'overview', label: 'Overview', icon: BarChart3 },
+              { id: 'templates', label: 'Templates', icon: FileText },
+              { id: 'users', label: 'Users', icon: Users },
+              { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+              { id: 'settings', label: 'Settings', icon: Settings }
+            ].map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                    activeTab === tab.id
+                      ? 'bg-blue-50 text-blue-600 shadow-md border border-blue-200'
+                      : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-white/30">
+          <div className="text-xs text-gray-500 mb-2">
+            Welcome, {user?.full_name || user?.email}
+          </div>
+          <Link
+            to="/dashboard"
+            className="w-full flex items-center justify-center px-4 py-2 bg-white/30 hover:bg-white/50 rounded-lg text-gray-700 transition-all duration-200 text-sm"
+          >
+            Back to Dashboard
+          </Link>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <div className="flex-1 flex flex-col">
+        {/* Top Header */}
+        <div className="backdrop-blur-xl bg-white/80 border-b border-white/30 shadow-sm">
+          <div className="px-6 py-4">
+            <h2 className="text-2xl font-bold text-gray-900 capitalize">
+              {activeTab === 'overview' ? 'Dashboard Overview' : activeTab}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {activeTab === 'overview' && 'Platform statistics and recent activity'}
+              {activeTab === 'templates' && 'Manage and approve template submissions'}
+              {activeTab === 'users' && 'User management and moderation tools'}
+              {activeTab === 'analytics' && 'Platform analytics and reporting'}
+              {activeTab === 'settings' && 'Admin settings and configuration'}
+            </p>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 p-6 overflow-auto">
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Stats Grid */}
@@ -438,6 +459,7 @@ const Admin = () => {
             <p className="text-gray-600">Admin settings coming soon...</p>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

@@ -57,17 +57,43 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
                 detail="Admin access required"
             )
         
-        # Get total users count - we can't directly access auth.users, so we'll estimate from other tables
-        # For now, we'll use a different approach or get this from a different source
-        total_users = 0  # TODO: Implement proper user count
+        # Get total users count - estimate from creators + orders (unique user_ids)
+        try:
+            # Get unique user IDs from orders table
+            orders_users_response = db_manager.supabase.table("orders").select("user_id").execute()
+            orders_user_ids = set(order.get("user_id") for order in orders_users_response.data or [])
+            
+            # Get unique user IDs from creators table
+            creators_users_response = db_manager.supabase.table("creators").select("user_id").execute()
+            creators_user_ids = set(creator.get("user_id") for creator in creators_users_response.data or [])
+            
+            # Combine and count unique users
+            all_user_ids = orders_user_ids.union(creators_user_ids)
+            total_users = len(all_user_ids)
+            print(f"✅ Total unique users: {total_users} (from orders: {len(orders_user_ids)}, from creators: {len(creators_user_ids)})")
+        except Exception as e:
+            print(f"⚠️ Error getting users count: {e}")
+            total_users = 0
         
         # Get total creators count
         creators_response = db_manager.supabase.table("creators").select("id", count="exact").execute()
         total_creators = creators_response.count or 0
         
-        # Get total templates count
-        templates_response = db_manager.supabase.table("creator_templates").select("id", count="exact").execute()
-        total_templates = templates_response.count or 0
+        # Get total templates count - both user templates and creator templates
+        try:
+            # Get creator templates count
+            creator_templates_response = db_manager.supabase.table("creator_templates").select("id", count="exact").execute()
+            creator_templates_count = creator_templates_response.count or 0
+            
+            # Get user templates count (banner_templates table)
+            user_templates_response = db_manager.supabase.table("banner_templates").select("id", count="exact").execute()
+            user_templates_count = user_templates_response.count or 0
+            
+            total_templates = creator_templates_count + user_templates_count
+            print(f"✅ Total templates: {total_templates} (creator: {creator_templates_count}, user: {user_templates_count})")
+        except Exception as e:
+            print(f"⚠️ Error getting templates count: {e}")
+            total_templates = 0
         
         # Get pending templates count
         pending_response = db_manager.supabase.table("creator_templates").select("id", count="exact").eq("is_approved", False).execute()
@@ -149,23 +175,47 @@ async def get_all_users(
                 detail="Admin access required"
             )
         
-        # Get users with pagination - we'll get creators and estimate from there
-        # Since we can't access auth.users directly, we'll work with what we have
-        users_response = db_manager.supabase.table("creators").select(
+        # Get real users from orders and creators tables
+        users = []
+        
+        # Get recent creators
+        creators_response = db_manager.supabase.table("creators").select(
             "user_id, display_name, created_at, is_active"
         ).order("created_at", desc=True).range(offset, offset + limit - 1).execute()
         
-        users = []
-        for creator in users_response.data or []:
+        for creator in creators_response.data or []:
             users.append(UserManagement(
                 user_id=creator["user_id"],
-                email=f"user_{creator['user_id'][:8]}@example.com",  # Placeholder since we can't access email
+                email=f"creator_{creator['user_id'][:8]}@buyprintz.com",  # Better placeholder
                 full_name=creator.get("display_name"),
                 created_at=creator["created_at"],
-                is_creator=True,  # All users in this list are creators
+                is_creator=True,
                 is_active=creator.get("is_active", True),
-                last_login=None  # We can't access this from auth.users
+                last_login=None
             ))
+        
+        # If we need more users, get from orders table
+        if len(users) < limit:
+            remaining_limit = limit - len(users)
+            orders_response = db_manager.supabase.table("orders").select(
+                "user_id, created_at"
+            ).order("created_at", desc=True).range(0, remaining_limit - 1).execute()
+            
+            # Get unique user IDs from orders
+            seen_user_ids = {user.user_id for user in users}
+            for order in orders_response.data or []:
+                user_id = order.get("user_id")
+                if user_id and user_id not in seen_user_ids:
+                    users.append(UserManagement(
+                        user_id=user_id,
+                        email=f"user_{user_id[:8]}@buyprintz.com",
+                        full_name=None,
+                        created_at=order["created_at"],
+                        is_creator=False,
+                        is_active=True,
+                        last_login=None
+                    ))
+                    seen_user_ids.add(user_id)
         
         return users
         
