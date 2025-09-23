@@ -165,9 +165,11 @@ const Dashboard = () => {
       if (currentUser.templates) {
         console.log('Setting templates from auth service:', currentUser.templates.length, 'templates')
         setTemplates(currentUser.templates)
+        setLoadingStates(prev => ({ ...prev, templates: false }))
       } else {
         console.log('No templates found in auth service')
         setTemplates([])
+        setLoadingStates(prev => ({ ...prev, templates: false }))
       }
 
       // Load essential data first to show basic dashboard
