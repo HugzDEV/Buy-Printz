@@ -5,7 +5,7 @@ import {
   CheckCircle, XCircle, AlertTriangle, Eye, 
   Trash2, Ban, UserCheck, TrendingUp, DollarSign,
   Package, Palette, Calendar, Activity, RefreshCw,
-  Menu, X, ChevronLeft, ChevronRight, Search, Filter, Crown, User, ChevronDown, ChevronUp, Edit, Save, X as XIcon
+  Menu, X, ChevronLeft, ChevronRight, Search, Filter, Crown, User, ChevronDown, ChevronUp, Edit, Save, X as XIcon, Truck, Package2
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import authService from '../services/auth'
@@ -40,7 +40,11 @@ const Admin = () => {
     recentUsers: true,
     allTemplates: true,
     users: true,
-    analytics: false
+    analytics: false,
+    shipping: false,
+    quote: false,
+    lookup: false,
+    detailedTracking: false
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -54,6 +58,25 @@ const Admin = () => {
     bestSellingRegions: null
   })
   const [isAdmin, setIsAdmin] = useState(false)
+  const [shippingData, setShippingData] = useState({
+    orders: null,
+    analytics: null,
+    quoteResults: null
+  })
+  const [quoteForm, setQuoteForm] = useState({
+    zip_code: '',
+    product_type: 'banner',
+    quantity: 1,
+    address: '',
+    city: '',
+    state: 'CA'
+  })
+  const [packageLookup, setPackageLookup] = useState({
+    tracking_number: '',
+    order_number: '',
+    customer_email: ''
+  })
+  const [trackingResults, setTrackingResults] = useState(null)
 
   const navigate = useNavigate()
 
@@ -64,6 +87,12 @@ const Admin = () => {
   useEffect(() => {
     if (activeTab === 'analytics' && isAdmin && !analyticsData.productTypes) {
       loadAnalyticsData()
+    }
+  }, [activeTab, isAdmin])
+
+  useEffect(() => {
+    if (activeTab === 'shipping' && isAdmin && !shippingData.orders) {
+      loadShippingData()
     }
   }, [activeTab, isAdmin])
 
@@ -553,6 +582,141 @@ const Admin = () => {
     }
   }
 
+  const loadShippingData = async () => {
+    try {
+      setLoadingStates(prev => ({ ...prev, shipping: true }))
+      
+      const [ordersResponse, analyticsResponse] = await Promise.all([
+        authService.authenticatedRequest('/api/admin/shipping/orders'),
+        authService.authenticatedRequest('/api/admin/shipping/analytics')
+      ])
+      
+      const orders = await ordersResponse.json()
+      const analytics = await analyticsResponse.json()
+      
+      setShippingData({
+        orders,
+        analytics,
+        quoteResults: shippingData.quoteResults // Keep existing quote results
+      })
+    } catch (error) {
+      console.error('Error loading shipping data:', error)
+      toast.error('Failed to load shipping data')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, shipping: false }))
+    }
+  }
+
+  const getShippingQuote = async () => {
+    try {
+      setLoadingStates(prev => ({ ...prev, quote: true }))
+      
+      const response = await authService.authenticatedRequest('/api/admin/shipping/quote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(quoteForm)
+      })
+      
+      const result = await response.json()
+      setShippingData(prev => ({
+        ...prev,
+        quoteResults: result
+      }))
+      
+      if (result.success) {
+        toast.success('Shipping quote retrieved successfully')
+      } else {
+        toast.error('Failed to get shipping quote')
+      }
+    } catch (error) {
+      console.error('Error getting shipping quote:', error)
+      toast.error('Failed to get shipping quote')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, quote: false }))
+    }
+  }
+
+  const trackOrder = async (orderId) => {
+    try {
+      const response = await authService.authenticatedRequest(`/api/admin/shipping/orders/${orderId}/track`)
+      const result = await response.json()
+      
+      // Show tracking info in a modal or toast
+      if (result.tracking_info) {
+        toast.success(`Tracking: ${result.tracking_number}`)
+      } else {
+        toast.info(result.message || 'No tracking information available')
+      }
+      
+      return result
+    } catch (error) {
+      console.error('Error tracking order:', error)
+      toast.error('Failed to track order')
+    }
+  }
+
+  const lookupPackage = async () => {
+    try {
+      setLoadingStates(prev => ({ ...prev, lookup: true }))
+      
+      // Try different lookup methods
+      let response
+      if (packageLookup.tracking_number) {
+        // Lookup by tracking number
+        response = await authService.authenticatedRequest(`/api/admin/shipping/lookup/tracking/${packageLookup.tracking_number}`)
+      } else if (packageLookup.order_number) {
+        // Lookup by order number
+        response = await authService.authenticatedRequest(`/api/admin/shipping/lookup/order/${packageLookup.order_number}`)
+      } else if (packageLookup.customer_email) {
+        // Lookup by customer email
+        response = await authService.authenticatedRequest(`/api/admin/shipping/lookup/customer/${packageLookup.customer_email}`)
+      } else {
+        toast.error('Please enter a tracking number, order number, or customer email')
+        return
+      }
+      
+      const result = await response.json()
+      setTrackingResults(result)
+      
+      if (result.success) {
+        toast.success('Package found successfully')
+      } else {
+        toast.error(result.message || 'Package not found')
+      }
+    } catch (error) {
+      console.error('Error looking up package:', error)
+      toast.error('Failed to lookup package')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, lookup: false }))
+    }
+  }
+
+  const getDetailedTracking = async (trackingNumber) => {
+    try {
+      setLoadingStates(prev => ({ ...prev, detailedTracking: true }))
+      
+      const response = await authService.authenticatedRequest(`/api/admin/shipping/track/${trackingNumber}`)
+      const result = await response.json()
+      
+      if (result.success) {
+        setTrackingResults(prev => ({
+          ...prev,
+          detailed_tracking: result.tracking_details
+        }))
+        toast.success('Detailed tracking information retrieved')
+      } else {
+        toast.error('Failed to get detailed tracking information')
+      }
+    } catch (error) {
+      console.error('Error getting detailed tracking:', error)
+      toast.error('Failed to get detailed tracking information')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, detailedTracking: false }))
+    }
+  }
+
   const getFilteredTemplates = () => {
     let filtered = allTemplates
 
@@ -659,6 +823,7 @@ const Admin = () => {
               { id: 'templates', label: 'Templates', icon: FileText },
               { id: 'users', label: 'Users', icon: Users },
               { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+              { id: 'shipping', label: 'Shipping', icon: Truck },
               { id: 'settings', label: 'Settings', icon: Settings }
             ].map((tab) => {
               const Icon = tab.icon
@@ -714,6 +879,7 @@ const Admin = () => {
                   {activeTab === 'templates' && 'Manage and approve template submissions'}
                   {activeTab === 'users' && 'User management and moderation tools'}
                   {activeTab === 'analytics' && 'Platform analytics and reporting'}
+                  {activeTab === 'shipping' && 'UPS shipping integration and order tracking'}
                   {activeTab === 'settings' && 'Admin settings and configuration'}
                 </p>
               </div>
@@ -1654,6 +1820,391 @@ const Admin = () => {
                     </div>
                   ) : (
                     <p className="text-gray-500 text-center py-4">No design sales data available</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'shipping' && (
+          <div className="space-y-6">
+            {/* Shipping Header */}
+            <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                  <Truck className="w-5 h-5 mr-2 text-[#00D755]" />
+                  UPS Shipping Integration
+                </h2>
+                <button
+                  onClick={loadShippingData}
+                  disabled={loadingStates.shipping}
+                  className="px-4 py-2 bg-[#00D755] hover:bg-[#00D755]/90 text-white rounded-lg transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${loadingStates.shipping ? 'animate-spin' : ''}`} />
+                  Refresh Data
+                </button>
+              </div>
+            </div>
+
+            {loadingStates.shipping ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00D755]"></div>
+                <span className="ml-2 text-gray-600">Loading shipping data...</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Shipping Analytics */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Package2 className="w-5 h-5 mr-2 text-blue-600" />
+                    Shipping Analytics
+                  </h3>
+                  {shippingData.analytics ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="text-center p-3 bg-white/30 rounded-lg">
+                          <div className="text-2xl font-bold text-[#00D755]">
+                            {shippingData.analytics.shipped_orders || 0}
+                          </div>
+                          <div className="text-sm text-gray-600">Shipped Orders</div>
+                        </div>
+                        <div className="text-center p-3 bg-white/30 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {shippingData.analytics.pending_shipment || 0}
+                          </div>
+                          <div className="text-sm text-gray-600">Pending Shipment</div>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="p-3 bg-white/30 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium text-gray-900">Total Shipping Cost</span>
+                            <span className="text-sm font-bold text-[#00D755]">
+                              ${shippingData.analytics.total_shipping_cost?.toLocaleString() || 0}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span>Average Cost</span>
+                            <span>${shippingData.analytics.average_shipping_cost || 0}</span>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-white/30 rounded-lg">
+                          <div className="font-medium text-gray-900 mb-2">Shipping Methods</div>
+                          <div className="space-y-1">
+                            {Object.entries(shippingData.analytics.shipping_methods || {}).map(([method, count]) => (
+                              <div key={method} className="flex justify-between text-sm">
+                                <span className="text-gray-600 capitalize">{method}</span>
+                                <span className="font-medium">{count}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No shipping analytics available</p>
+                  )}
+                </div>
+
+                {/* Shipping Quote Tool */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Package className="w-5 h-5 mr-2 text-purple-600" />
+                    UPS Quote Tool
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
+                        <input
+                          type="text"
+                          value={quoteForm.zip_code}
+                          onChange={(e) => setQuoteForm(prev => ({ ...prev, zip_code: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00D755]/50"
+                          placeholder="90210"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                        <input
+                          type="number"
+                          value={quoteForm.quantity}
+                          onChange={(e) => setQuoteForm(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00D755]/50"
+                          min="1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Product Type</label>
+                      <select
+                        value={quoteForm.product_type}
+                        onChange={(e) => setQuoteForm(prev => ({ ...prev, product_type: e.target.value }))}
+                        className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00D755]/50"
+                      >
+                        <option value="banner">Banner</option>
+                        <option value="tin-skinz">Tin Skinz</option>
+                        <option value="tent">Tent</option>
+                        <option value="business-card">Business Card</option>
+                      </select>
+                    </div>
+                    <button
+                      onClick={getShippingQuote}
+                      disabled={loadingStates.quote || !quoteForm.zip_code}
+                      className="w-full px-4 py-2 bg-[#00D755] hover:bg-[#00D755]/90 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {loadingStates.quote ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          Getting Quote...
+                        </>
+                      ) : (
+                        <>
+                          <Truck className="w-4 h-4" />
+                          Get UPS Quote
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Quote Results */}
+                  {shippingData.quoteResults && (
+                    <div className="mt-4 p-4 bg-white/30 rounded-lg">
+                      <h4 className="font-medium text-gray-900 mb-3">Quote Results</h4>
+                      {shippingData.quoteResults.success ? (
+                        <div className="space-y-2">
+                          {shippingData.quoteResults.shipping_options?.map((option, index) => (
+                            <div key={index} className="p-2 bg-white/50 rounded border">
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium text-sm">{option.service_name}</span>
+                                <span className="text-sm font-bold text-[#00D755]">${option.total_cost}</span>
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {option.delivery_time} • {option.delivery_date}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-red-600 text-sm">
+                          {shippingData.quoteResults.errors?.join(', ') || 'Failed to get quote'}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Package Lookup Tool */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg lg:col-span-2">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Search className="w-5 h-5 mr-2 text-green-600" />
+                    Customer Package Lookup
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Tracking Number</label>
+                        <input
+                          type="text"
+                          value={packageLookup.tracking_number}
+                          onChange={(e) => setPackageLookup(prev => ({ ...prev, tracking_number: e.target.value, order_number: '', customer_email: '' }))}
+                          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00D755]/50"
+                          placeholder="1Z999AA1234567890"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Order Number</label>
+                        <input
+                          type="text"
+                          value={packageLookup.order_number}
+                          onChange={(e) => setPackageLookup(prev => ({ ...prev, order_number: e.target.value, tracking_number: '', customer_email: '' }))}
+                          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00D755]/50"
+                          placeholder="ORD-12345"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Customer Email</label>
+                        <input
+                          type="email"
+                          value={packageLookup.customer_email}
+                          onChange={(e) => setPackageLookup(prev => ({ ...prev, customer_email: e.target.value, tracking_number: '', order_number: '' }))}
+                          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00D755]/50"
+                          placeholder="customer@example.com"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      onClick={lookupPackage}
+                      disabled={loadingStates.lookup || (!packageLookup.tracking_number && !packageLookup.order_number && !packageLookup.customer_email)}
+                      className="w-full px-4 py-2 bg-[#00D755] hover:bg-[#00D755]/90 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {loadingStates.lookup ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          Looking up package...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="w-4 h-4" />
+                          Lookup Package
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Lookup Results */}
+                  {trackingResults && (
+                    <div className="mt-6 p-4 bg-white/30 rounded-lg border border-white/50">
+                      <h4 className="font-medium text-gray-900 mb-3">Lookup Results</h4>
+                      {trackingResults.success ? (
+                        <div className="space-y-4">
+                          {/* Single Order Result */}
+                          {trackingResults.order && (
+                            <div className="p-4 bg-white/50 rounded-lg">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <h5 className="font-medium text-gray-900">Order #{trackingResults.order.order_number}</h5>
+                                  <p className="text-sm text-gray-600 capitalize">{trackingResults.order.product_type}</p>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-sm font-medium text-gray-900">${trackingResults.order.total_amount}</div>
+                                  <div className={`text-xs px-2 py-1 rounded-full ${
+                                    trackingResults.order.status === 'shipped' ? 'bg-green-100 text-green-800' :
+                                    trackingResults.order.status === 'delivered' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-yellow-100 text-yellow-800'
+                                  }`}>
+                                    {trackingResults.order.status}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {trackingResults.tracking_number && (
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-gray-700">Tracking Number:</span>
+                                    <span className="text-sm font-mono text-gray-900">{trackingResults.tracking_number}</span>
+                                  </div>
+                                  {trackingResults.tracking_info && (
+                                    <div className="mt-3">
+                                      <button
+                                        onClick={() => getDetailedTracking(trackingResults.tracking_number)}
+                                        disabled={loadingStates.detailedTracking}
+                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs transition-colors flex items-center gap-1"
+                                      >
+                                        {loadingStates.detailedTracking ? (
+                                          <RefreshCw className="w-3 h-3 animate-spin" />
+                                        ) : (
+                                          <Eye className="w-3 h-3" />
+                                        )}
+                                        View Detailed Tracking
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Multiple Orders Result (Customer Email Lookup) */}
+                          {trackingResults.orders && trackingResults.orders.length > 0 && (
+                            <div className="space-y-3">
+                              <div className="text-sm text-gray-600 mb-3">
+                                Found {trackingResults.total_orders} orders for {trackingResults.customer_email}
+                              </div>
+                              {trackingResults.orders.map((orderData, index) => (
+                                <div key={index} className="p-3 bg-white/50 rounded-lg">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div>
+                                      <h6 className="font-medium text-gray-900">Order #{orderData.order.order_number}</h6>
+                                      <p className="text-xs text-gray-600 capitalize">{orderData.order.product_type}</p>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="text-sm font-medium text-gray-900">${orderData.order.total_amount}</div>
+                                      <div className={`text-xs px-2 py-1 rounded-full ${
+                                        orderData.order.status === 'shipped' ? 'bg-green-100 text-green-800' :
+                                        orderData.order.status === 'delivered' ? 'bg-blue-100 text-blue-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                      }`}>
+                                        {orderData.order.status}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {orderData.tracking_number && (
+                                    <div className="flex items-center justify-between text-xs text-gray-600">
+                                      <span>Tracking: {orderData.tracking_number}</span>
+                                      <button
+                                        onClick={() => getDetailedTracking(orderData.tracking_number)}
+                                        className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs transition-colors"
+                                      >
+                                        Track
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-red-600 text-sm">{trackingResults.message}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Recent Orders */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg lg:col-span-2">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Package2 className="w-5 h-5 mr-2 text-orange-600" />
+                    Recent Orders
+                  </h3>
+                  {shippingData.orders?.orders?.length > 0 ? (
+                    <div className="space-y-3">
+                      {shippingData.orders.orders.slice(0, 10).map((order) => (
+                        <div key={order.id} className="p-4 bg-white/30 rounded-lg border border-white/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-[#00D755]/20 rounded-full flex items-center justify-center">
+                                <Package2 className="w-4 h-4 text-[#00D755]" />
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-900">#{order.order_number}</div>
+                                <div className="text-sm text-gray-600 capitalize">{order.product_type}</div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-medium text-gray-900">${order.total_amount}</div>
+                              <div className={`text-xs px-2 py-1 rounded-full ${
+                                order.status === 'shipped' ? 'bg-green-100 text-green-800' :
+                                order.status === 'delivered' ? 'bg-blue-100 text-blue-800' :
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {order.status}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between text-sm text-gray-600">
+                            <div>
+                              {order.shipping_address?.city}, {order.shipping_address?.state} {order.shipping_address?.zipCode}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {order.tracking_number && (
+                                <button
+                                  onClick={() => trackOrder(order.id)}
+                                  className="px-3 py-1 bg-[#00D755] text-white rounded text-xs hover:bg-[#00D755]/90 transition-colors"
+                                >
+                                  Track
+                                </button>
+                              )}
+                              <span>{new Date(order.created_at).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No orders found</p>
                   )}
                 </div>
               </div>

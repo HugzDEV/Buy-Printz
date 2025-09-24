@@ -862,3 +862,392 @@ async def get_best_selling_regions(current_user: dict = Depends(get_current_user
     except Exception as e:
         logger.error(f"Error getting best selling regions: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get best selling regions")
+
+
+# Shipping Admin Endpoints
+@router.get("/admin/shipping/orders")
+async def get_shipping_orders(current_user: dict = Depends(get_current_user)):
+    """Get all orders with shipping information"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get orders with shipping details
+        orders_result = supabase.table("orders").select(
+            "id, order_number, status, total_amount, shipping_address, tracking_number, "
+            "shipping_method, shipping_cost, created_at, updated_at, product_type"
+        ).order("created_at", desc=True).limit(100).execute()
+        
+        return {"orders": orders_result.data}
+        
+    except Exception as e:
+        logger.error(f"Error getting shipping orders: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get shipping orders")
+
+
+@router.get("/admin/shipping/orders/{order_id}/track")
+async def track_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Track a specific order using UPS API"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get order details
+        order_result = supabase.table("orders").select("*").eq("id", order_id).execute()
+        
+        if not order_result.data:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        order = order_result.data[0]
+        tracking_number = order.get("tracking_number")
+        
+        if not tracking_number:
+            return {
+                "order_id": order_id,
+                "tracking_number": None,
+                "status": "No tracking number available",
+                "message": "This order does not have a tracking number yet"
+            }
+        
+        # Import UPS service here to avoid circular imports
+        from backend.ups_shipping_service import ups_shipping_service
+        
+        # Track the package
+        tracking_result = await ups_shipping_service.track_package(tracking_number)
+        
+        return {
+            "order_id": order_id,
+            "tracking_number": tracking_number,
+            "tracking_info": tracking_result
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error tracking order {order_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to track order")
+
+
+@router.post("/admin/shipping/quote")
+async def get_shipping_quote(
+    quote_request: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get shipping quote for admin testing"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Import UPS service here to avoid circular imports
+        from backend.ups_shipping_service import ups_shipping_service
+        
+        # Validate required fields
+        required_fields = ["zip_code", "product_type", "quantity"]
+        for field in required_fields:
+            if field not in quote_request:
+                raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
+        
+        # Prepare customer info for UPS
+        customer_info = {
+            "zipCode": quote_request["zip_code"],
+            "address": quote_request.get("address", "123 Admin St"),
+            "city": quote_request.get("city", "Admin City"),
+            "state": quote_request.get("state", "CA")
+        }
+        
+        # Prepare order data
+        order_data = {
+            "total_quantity": quote_request["quantity"],
+            "product_type": quote_request["product_type"],
+            "dimensions": quote_request.get("dimensions", {}),
+            "weight": quote_request.get("weight", 1.0)
+        }
+        
+        # Get UPS shipping rates
+        result = await ups_shipping_service.get_multiple_service_rates(order_data, customer_info)
+        
+        return {
+            "quote_request": quote_request,
+            "shipping_options": result.get("shipping_options", []),
+            "success": result.get("success", False),
+            "errors": result.get("errors", [])
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting shipping quote: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get shipping quote")
+
+
+@router.get("/admin/shipping/analytics")
+async def get_shipping_analytics(current_user: dict = Depends(get_current_user)):
+    """Get shipping analytics and performance metrics"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get orders with shipping data
+        orders_result = supabase.table("orders").select(
+            "status, shipping_method, shipping_cost, total_amount, created_at, shipping_address"
+        ).execute()
+        
+        # Process analytics
+        analytics = {
+            "total_orders": len(orders_result.data),
+            "shipped_orders": 0,
+            "pending_shipment": 0,
+            "total_shipping_cost": 0,
+            "average_shipping_cost": 0,
+            "shipping_methods": {},
+            "shipping_by_state": {},
+            "recent_shipments": []
+        }
+        
+        for order in orders_result.data:
+            if order["status"] in ["shipped", "delivered"]:
+                analytics["shipped_orders"] += 1
+                analytics["total_shipping_cost"] += float(order.get("shipping_cost", 0))
+                
+                # Track shipping methods
+                method = order.get("shipping_method", "Unknown")
+                analytics["shipping_methods"][method] = analytics["shipping_methods"].get(method, 0) + 1
+                
+                # Track by state
+                shipping_address = order.get("shipping_address", {})
+                state = shipping_address.get("state", "Unknown")
+                analytics["shipping_by_state"][state] = analytics["shipping_by_state"].get(state, 0) + 1
+                
+                # Recent shipments (last 10)
+                if len(analytics["recent_shipments"]) < 10:
+                    analytics["recent_shipments"].append({
+                        "order_id": order.get("id"),
+                        "status": order["status"],
+                        "shipping_method": method,
+                        "shipping_cost": order.get("shipping_cost"),
+                        "created_at": order["created_at"]
+                    })
+            elif order["status"] in ["processing", "confirmed"]:
+                analytics["pending_shipment"] += 1
+        
+        # Calculate averages
+        if analytics["shipped_orders"] > 0:
+            analytics["average_shipping_cost"] = round(
+                analytics["total_shipping_cost"] / analytics["shipped_orders"], 2
+            )
+        
+        # Sort recent shipments by date
+        analytics["recent_shipments"].sort(
+            key=lambda x: x["created_at"], reverse=True
+        )
+        
+        return analytics
+        
+    except Exception as e:
+        logger.error(f"Error getting shipping analytics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get shipping analytics")
+
+
+@router.put("/admin/shipping/orders/{order_id}/update-tracking")
+async def update_order_tracking(
+    order_id: str,
+    tracking_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update tracking information for an order"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Validate tracking data
+        tracking_number = tracking_data.get("tracking_number")
+        shipping_method = tracking_data.get("shipping_method")
+        
+        if not tracking_number:
+            raise HTTPException(status_code=400, detail="Tracking number is required")
+        
+        # Update order with tracking information
+        update_data = {
+            "tracking_number": tracking_number,
+            "shipping_method": shipping_method,
+            "status": "shipped",
+            "updated_at": datetime.now().isoformat()
+        }
+        
+        result = supabase.table("orders").update(update_data).eq("id", order_id).execute()
+        
+        if not result.data:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        return {
+            "message": "Tracking information updated successfully",
+            "order_id": order_id,
+            "tracking_number": tracking_number
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating tracking for order {order_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update tracking information")
+
+
+# Package Lookup Endpoints
+@router.get("/admin/shipping/lookup/tracking/{tracking_number}")
+async def lookup_by_tracking_number(tracking_number: str, current_user: dict = Depends(get_current_user)):
+    """Lookup package by tracking number"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Find order by tracking number
+        order_result = supabase.table("orders").select("*").eq("tracking_number", tracking_number).execute()
+        
+        if not order_result.data:
+            return {
+                "success": False,
+                "message": "No order found with this tracking number",
+                "tracking_number": tracking_number
+            }
+        
+        order = order_result.data[0]
+        
+        # Get detailed tracking from UPS
+        from backend.ups_shipping_service import ups_shipping_service
+        tracking_info = await ups_shipping_service.track_package(tracking_number)
+        
+        return {
+            "success": True,
+            "order": order,
+            "tracking_info": tracking_info,
+            "tracking_number": tracking_number
+        }
+        
+    except Exception as e:
+        logger.error(f"Error looking up package by tracking number {tracking_number}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to lookup package")
+
+
+@router.get("/admin/shipping/lookup/order/{order_number}")
+async def lookup_by_order_number(order_number: str, current_user: dict = Depends(get_current_user)):
+    """Lookup package by order number"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Find order by order number
+        order_result = supabase.table("orders").select("*").eq("order_number", order_number).execute()
+        
+        if not order_result.data:
+            return {
+                "success": False,
+                "message": "No order found with this order number",
+                "order_number": order_number
+            }
+        
+        order = order_result.data[0]
+        tracking_number = order.get("tracking_number")
+        
+        tracking_info = None
+        if tracking_number:
+            # Get detailed tracking from UPS
+            from backend.ups_shipping_service import ups_shipping_service
+            tracking_info = await ups_shipping_service.track_package(tracking_number)
+        
+        return {
+            "success": True,
+            "order": order,
+            "tracking_info": tracking_info,
+            "tracking_number": tracking_number
+        }
+        
+    except Exception as e:
+        logger.error(f"Error looking up package by order number {order_number}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to lookup package")
+
+
+@router.get("/admin/shipping/lookup/customer/{customer_email}")
+async def lookup_by_customer_email(customer_email: str, current_user: dict = Depends(get_current_user)):
+    """Lookup packages by customer email"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Find orders by customer email (assuming email is stored in shipping_address or customer_info)
+        orders_result = supabase.table("orders").select("*").ilike("shipping_address->>email", f"%{customer_email}%").execute()
+        
+        if not orders_result.data:
+            return {
+                "success": False,
+                "message": "No orders found for this customer email",
+                "customer_email": customer_email,
+                "orders": []
+            }
+        
+        orders = orders_result.data
+        
+        # Get tracking info for orders with tracking numbers
+        orders_with_tracking = []
+        for order in orders:
+            tracking_number = order.get("tracking_number")
+            tracking_info = None
+            
+            if tracking_number:
+                try:
+                    from backend.ups_shipping_service import ups_shipping_service
+                    tracking_info = await ups_shipping_service.track_package(tracking_number)
+                except Exception as e:
+                    logger.warning(f"Failed to get tracking info for {tracking_number}: {e}")
+            
+            orders_with_tracking.append({
+                "order": order,
+                "tracking_info": tracking_info,
+                "tracking_number": tracking_number
+            })
+        
+        return {
+            "success": True,
+            "customer_email": customer_email,
+            "orders": orders_with_tracking,
+            "total_orders": len(orders_with_tracking)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error looking up packages by customer email {customer_email}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to lookup packages")
+
+
+@router.get("/admin/shipping/track/{tracking_number}")
+async def get_detailed_tracking(tracking_number: str, current_user: dict = Depends(get_current_user)):
+    """Get detailed tracking information from UPS"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get detailed tracking from UPS
+        from backend.ups_shipping_service import ups_shipping_service
+        tracking_details = await ups_shipping_service.track_package(tracking_number)
+        
+        # Also get order information
+        order_result = supabase.table("orders").select("*").eq("tracking_number", tracking_number).execute()
+        order = order_result.data[0] if order_result.data else None
+        
+        return {
+            "success": True,
+            "tracking_number": tracking_number,
+            "tracking_details": tracking_details,
+            "order": order
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting detailed tracking for {tracking_number}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get detailed tracking information")
