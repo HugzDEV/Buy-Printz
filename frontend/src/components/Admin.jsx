@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { 
-  Shield, Users, FileText, BarChart3, Settings, 
+  Users, FileText, BarChart3, Settings, 
   CheckCircle, XCircle, AlertTriangle, Eye, 
   Trash2, Ban, UserCheck, TrendingUp, DollarSign,
-  Package, Palette, Calendar, Activity, RefreshCw
+  Package, Palette, Calendar, Activity, RefreshCw,
+  Menu, X, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import authService from '../services/auth'
@@ -32,6 +33,7 @@ const Admin = () => {
     search: ''
   })
   const [selectedTemplates, setSelectedTemplates] = useState([])
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [loadingStates, setLoadingStates] = useState({
     stats: true,
     pendingTemplates: true,
@@ -408,7 +410,7 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex">
       <SEOHead 
         title="Admin Portal - BuyPrintz"
         description="Administrative dashboard for platform management"
@@ -416,17 +418,34 @@ const Admin = () => {
       />
       
       {/* Sidebar */}
-      <div className="w-64 backdrop-blur-xl bg-white/80 border-r border-white/30 shadow-lg flex flex-col">
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 ease-in-out bg-gradient-to-b from-blue-600 via-purple-600 to-indigo-700 backdrop-blur-xl border-r border-white/20 shadow-2xl flex flex-col relative`}>
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-white/30">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-br from-red-100 to-orange-100 rounded-xl shadow-lg border border-white/30">
-              <Shield className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">Admin Portal</h1>
-              <p className="text-xs text-gray-600">Platform Management</p>
-            </div>
+        <div className="p-4 border-b border-white/20">
+          <div className="flex items-center justify-between">
+            {!sidebarCollapsed && (
+              <div className="flex items-center justify-center w-full">
+                <div className="w-24 h-24 rounded-xl shadow-lg flex items-center justify-center">
+                    <img 
+                      src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                      alt="BuyPrintz Logo" 
+                      className="w-20 h-20 object-contain"
+                      onError={(e) => {
+                        e.target.style.display = 'none'
+                        e.target.nextSibling.style.display = 'block'
+                      }}
+                    />
+                  <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center text-[#00D755] font-bold text-2xl" style={{display: 'none'}}>
+                    BP
+                  </div>
+                </div>
+              </div>
+            )}
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 text-white hover:text-white/80"
+            >
+              {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            </button>
           </div>
         </div>
 
@@ -445,14 +464,15 @@ const Admin = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-3 rounded-xl transition-all duration-200 group ${
                     activeTab === tab.id
-                      ? 'bg-blue-50 text-blue-600 shadow-md border border-blue-200'
-                      : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
+                      ? 'bg-white/20 text-white shadow-lg border border-white/30 backdrop-blur-sm'
+                      : 'text-white/80 hover:bg-white/10 hover:text-white hover:shadow-md'
                   }`}
+                  title={sidebarCollapsed ? tab.label : ''}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{tab.label}</span>
+                  {!sidebarCollapsed && <span className="font-medium">{tab.label}</span>}
                 </button>
               )
             })}
@@ -460,15 +480,19 @@ const Admin = () => {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-white/30">
-          <div className="text-xs text-gray-500 mb-2">
-            Welcome, {user?.full_name || user?.email}
-          </div>
+        <div className="p-4 border-t border-white/20">
+          {!sidebarCollapsed && (
+            <div className="text-xs text-white/60 mb-3">
+              Welcome, {user?.full_name || user?.email}
+            </div>
+          )}
           <Link
             to="/dashboard"
-            className="w-full flex items-center justify-center px-4 py-2 bg-white/30 hover:bg-white/50 rounded-lg text-gray-700 transition-all duration-200 text-sm"
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'justify-center space-x-2'} px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-white transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md border border-white/20`}
+            title={sidebarCollapsed ? 'Back to Dashboard' : ''}
           >
-            Back to Dashboard
+            <span>←</span>
+            {!sidebarCollapsed && <span>Back to Dashboard</span>}
           </Link>
         </div>
       </div>
@@ -476,18 +500,26 @@ const Admin = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Top Header */}
-        <div className="backdrop-blur-xl bg-white/80 border-b border-white/30 shadow-sm">
+        <div className="backdrop-blur-xl bg-white/70 border-b border-white/40 shadow-lg">
           <div className="px-6 py-4">
-            <h2 className="text-2xl font-bold text-gray-900 capitalize">
-              {activeTab === 'overview' ? 'Dashboard Overview' : activeTab}
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              {activeTab === 'overview' && 'Platform statistics and recent activity'}
-              {activeTab === 'templates' && 'Manage and approve template submissions'}
-              {activeTab === 'users' && 'User management and moderation tools'}
-              {activeTab === 'analytics' && 'Platform analytics and reporting'}
-              {activeTab === 'settings' && 'Admin settings and configuration'}
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 capitalize">
+                  {activeTab === 'overview' ? 'Dashboard Overview' : activeTab}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {activeTab === 'overview' && 'Platform statistics and recent activity'}
+                  {activeTab === 'templates' && 'Manage and approve template submissions'}
+                  {activeTab === 'users' && 'User management and moderation tools'}
+                  {activeTab === 'analytics' && 'Platform analytics and reporting'}
+                  {activeTab === 'settings' && 'Admin settings and configuration'}
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-[#00D755] rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-600">Admin Online</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -498,23 +530,23 @@ const Admin = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { label: 'Total Users', value: adminStats.totalUsers, icon: Users, color: 'blue' },
-                { label: 'Total Creators', value: adminStats.totalCreators, icon: UserCheck, color: 'green' },
-                { label: 'Total Templates', value: adminStats.totalTemplates, icon: FileText, color: 'purple' },
-                { label: 'Pending Templates', value: adminStats.pendingTemplates, icon: AlertTriangle, color: 'yellow' },
-                { label: 'Total Orders', value: adminStats.totalOrders, icon: Package, color: 'indigo' },
-                { label: 'Total Revenue', value: `$${(adminStats.totalRevenue || 0).toLocaleString()}`, icon: DollarSign, color: 'emerald' }
+                { label: 'Total Users', value: adminStats.totalUsers, icon: Users, color: 'blue', bgGradient: 'from-blue-50 to-blue-100' },
+                { label: 'Total Creators', value: adminStats.totalCreators, icon: UserCheck, color: 'green', bgGradient: 'from-[#00D755]/10 to-[#00D755]/20' },
+                { label: 'Total Templates', value: adminStats.totalTemplates, icon: FileText, color: 'purple', bgGradient: 'from-purple-50 to-purple-100' },
+                { label: 'Pending Templates', value: adminStats.pendingTemplates, icon: AlertTriangle, color: 'yellow', bgGradient: 'from-yellow-50 to-yellow-100' },
+                { label: 'Total Orders', value: adminStats.totalOrders, icon: Package, color: 'indigo', bgGradient: 'from-indigo-50 to-indigo-100' },
+                { label: 'Total Revenue', value: `$${(adminStats.totalRevenue || 0).toLocaleString()}`, icon: DollarSign, color: 'emerald', bgGradient: 'from-[#00D755]/10 to-[#00D755]/20' }
               ].map((stat) => {
                 const Icon = stat.icon
                 return (
-                  <div key={stat.label} className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+                  <div key={stat.label} className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">{stat.label}</p>
+                        <p className="text-sm font-medium text-gray-600 mb-1">{stat.label}</p>
                         <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                       </div>
-                      <div className={`p-3 bg-${stat.color}-100 rounded-xl`}>
-                        <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+                      <div className={`p-3 bg-gradient-to-br ${stat.bgGradient} rounded-xl shadow-md border border-white/50`}>
+                        <Icon className={`w-6 h-6 ${stat.color === 'green' || stat.color === 'emerald' ? 'text-[#00D755]' : `text-${stat.color}-600`}`} />
                       </div>
                     </div>
                   </div>
@@ -525,12 +557,12 @@ const Admin = () => {
             {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Pending Templates */}
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Pending Templates</h3>
                   <button
                     onClick={loadPendingTemplates}
-                    className="p-2 hover:bg-white/30 rounded-lg transition-colors"
+                    className="p-2 hover:bg-white/60 rounded-lg transition-all duration-200 hover:shadow-md"
                   >
                     <RefreshCw className="w-4 h-4 text-gray-600" />
                   </button>
@@ -546,27 +578,35 @@ const Admin = () => {
                 ) : pendingTemplates.length > 0 ? (
                   <div className="space-y-3">
                     {pendingTemplates.slice(0, 5).map((template) => (
-                      <div key={template.id} className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
+                      <div key={template.id} className="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-white/50 shadow-sm hover:shadow-md transition-all duration-200">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                            <Palette className="w-5 h-5 text-gray-400" />
+                          <div className="w-10 h-10 bg-gradient-to-br from-[#00D755]/20 to-[#00D755]/30 rounded-lg flex items-center justify-center shadow-sm">
+                            <Palette className="w-5 h-5 text-[#00D755]" />
                           </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{template.name}</p>
-                            <p className="text-sm text-gray-600">by {template.creator?.display_name}</p>
-                          </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{template.name}</p>
+                              <div className="text-sm text-gray-600">
+                                <span>by {template.creator?.display_name || 'Unknown'}</span>
+                                {/* Debug info - remove after fixing */}
+                                {process.env.NODE_ENV === 'development' && (
+                                  <span className="text-xs text-gray-400 ml-2">
+                                    (Debug: {template.creator ? 'Has creator data' : 'No creator data'})
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                         </div>
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handleApproveTemplate(template.id)}
-                            className="p-2 bg-green-100 hover:bg-green-200 rounded-lg text-green-600 transition-colors"
+                            className="p-2 bg-gradient-to-br from-[#00D755]/20 to-[#00D755]/30 hover:from-[#00D755]/30 hover:to-[#00D755]/40 rounded-lg text-[#00D755] transition-all duration-200 shadow-sm hover:shadow-md"
                             title="Approve"
                           >
                             <CheckCircle className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleRejectTemplate(template.id)}
-                            className="p-2 bg-red-100 hover:bg-red-200 rounded-lg text-red-600 transition-colors"
+                            className="p-2 bg-gradient-to-br from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 rounded-lg text-red-600 transition-all duration-200 shadow-sm hover:shadow-md"
                             title="Reject"
                           >
                             <XCircle className="w-4 h-4" />
@@ -581,12 +621,12 @@ const Admin = () => {
               </div>
 
               {/* Recent Users */}
-              <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Recent Users</h3>
                   <button
                     onClick={loadRecentUsers}
-                    className="p-2 hover:bg-white/30 rounded-lg transition-colors"
+                    className="p-2 hover:bg-white/60 rounded-lg transition-all duration-200 hover:shadow-md"
                   >
                     <RefreshCw className="w-4 h-4 text-gray-600" />
                   </button>
@@ -602,23 +642,23 @@ const Admin = () => {
                 ) : recentUsers.length > 0 ? (
                   <div className="space-y-3">
                     {recentUsers.map((user) => (
-                      <div key={user.user_id} className="flex items-center justify-between p-3 bg-white/30 rounded-lg">
+                      <div key={user.user_id} className="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-white/50 shadow-sm hover:shadow-md transition-all duration-200">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                            <Users className="w-4 h-4 text-gray-400" />
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center shadow-sm">
+                            <Users className="w-4 h-4 text-blue-600" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">{user.email}</p>
                             <p className="text-sm text-gray-600">
                               {new Date(user.created_at).toLocaleDateString()}
-                              {user.is_creator && <span className="ml-2 text-green-600">Creator</span>}
+                              {user.is_creator && <span className="ml-2 text-[#00D755] font-medium">Creator</span>}
                               {user.full_name && <span className="ml-2 text-gray-500">({user.full_name})</span>}
                             </p>
                           </div>
                         </div>
                         <div className="flex space-x-2">
                           <button
-                            className="p-2 bg-blue-100 hover:bg-blue-200 rounded-lg text-blue-600 transition-colors"
+                            className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 hover:from-blue-200 hover:to-indigo-200 rounded-lg text-blue-600 transition-all duration-200 shadow-sm hover:shadow-md"
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />
@@ -638,14 +678,14 @@ const Admin = () => {
         {activeTab === 'templates' && (
           <div className="space-y-6">
             {/* Template Filters and Actions */}
-            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+            <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Template Management</h2>
                 <div className="flex gap-2">
                   <button
                     onClick={handleBulkApprove}
                     disabled={selectedTemplates.length === 0}
-                    className="px-4 py-2 bg-green-100 hover:bg-green-200 disabled:bg-gray-100 disabled:text-gray-400 text-green-700 rounded-lg transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-gradient-to-r from-[#00D755]/20 to-[#00D755]/30 hover:from-[#00D755]/30 hover:to-[#00D755]/40 disabled:bg-gray-100 disabled:text-gray-400 text-[#00D755] rounded-lg transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md font-medium"
                   >
                     <CheckCircle className="w-4 h-4" />
                     Approve Selected ({selectedTemplates.length})
@@ -653,7 +693,7 @@ const Admin = () => {
                   <button
                     onClick={handleBulkReject}
                     disabled={selectedTemplates.length === 0}
-                    className="px-4 py-2 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 disabled:text-gray-400 text-red-700 rounded-lg transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-gradient-to-r from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 disabled:bg-gray-100 disabled:text-gray-400 text-red-700 rounded-lg transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md font-medium"
                   >
                     <XCircle className="w-4 h-4" />
                     Reject Selected ({selectedTemplates.length})
@@ -661,14 +701,14 @@ const Admin = () => {
                   <button
                     onClick={handleBulkDelete}
                     disabled={selectedTemplates.length === 0}
-                    className="px-4 py-2 bg-red-200 hover:bg-red-300 disabled:bg-gray-100 disabled:text-gray-400 text-red-800 rounded-lg transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-gradient-to-r from-red-200 to-red-300 hover:from-red-300 hover:to-red-400 disabled:bg-gray-100 disabled:text-gray-400 text-red-800 rounded-lg transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md font-medium"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete Selected ({selectedTemplates.length})
                   </button>
                   <button
                     onClick={loadAllTemplates}
-                    className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 hover:from-blue-200 hover:to-indigo-200 text-blue-700 rounded-lg transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md font-medium"
                   >
                     <RefreshCw className="w-4 h-4" />
                     Refresh
@@ -738,7 +778,7 @@ const Admin = () => {
             </div>
 
             {/* Templates Grid */}
-            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+            <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
               {loadingStates.allTemplates ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -765,7 +805,7 @@ const Admin = () => {
                   {/* Templates Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {getFilteredTemplates().map((template) => (
-                      <div key={template.id} className="bg-white/30 rounded-xl p-4 border border-white/30 hover:shadow-lg transition-shadow">
+                      <div key={template.id} className="bg-white/70 rounded-xl p-4 border border-white/50 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105">
                         <div className="flex items-start justify-between mb-3">
                           <input
                             type="checkbox"
@@ -777,7 +817,7 @@ const Admin = () => {
                             !template.is_approved && template.is_active 
                               ? 'bg-yellow-100 text-yellow-800' 
                               : template.is_approved && template.is_active
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-[#00D755]/20 text-[#00D755]'
                               : 'bg-red-100 text-red-800'
                           }`}>
                             {!template.is_approved && template.is_active 
@@ -806,10 +846,18 @@ const Admin = () => {
                         <div className="space-y-2">
                           <h3 className="font-semibold text-gray-900 truncate">{template.name}</h3>
                           <p className="text-sm text-gray-600 line-clamp-2">{template.description}</p>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span>by {template.creator?.display_name || 'Unknown'}</span>
-                            <span>${template.price}</span>
-                          </div>
+                            <div className="flex items-center justify-between text-sm text-gray-500">
+                              <div className="flex items-center space-x-2">
+                                <span>by {template.creator?.display_name || 'Unknown'}</span>
+                                {/* Debug info - remove after fixing */}
+                                {process.env.NODE_ENV === 'development' && (
+                                  <span className="text-xs text-gray-400">
+                                    (Debug: {template.creator ? 'Has creator data' : 'No creator data'})
+                                  </span>
+                                )}
+                              </div>
+                              <span>${template.price}</span>
+                            </div>
                           <div className="text-xs text-gray-500">
                             {template.category} • {new Date(template.created_at).toLocaleDateString()}
                           </div>
@@ -820,7 +868,7 @@ const Admin = () => {
                           <button
                             onClick={() => handleApproveTemplate(template.id)}
                             disabled={template.is_approved}
-                            className="flex-1 px-3 py-2 bg-green-100 hover:bg-green-200 disabled:bg-gray-100 disabled:text-gray-400 text-green-700 rounded-lg transition-colors text-sm flex items-center justify-center gap-1"
+                            className="flex-1 px-3 py-2 bg-gradient-to-r from-[#00D755]/20 to-[#00D755]/30 hover:from-[#00D755]/30 hover:to-[#00D755]/40 disabled:bg-gray-100 disabled:text-gray-400 text-[#00D755] rounded-lg transition-all duration-200 text-sm flex items-center justify-center gap-1 shadow-sm hover:shadow-md font-medium"
                           >
                             <CheckCircle className="w-4 h-4" />
                             Approve
@@ -828,14 +876,14 @@ const Admin = () => {
                           <button
                             onClick={() => handleRejectTemplate(template.id)}
                             disabled={!template.is_active}
-                            className="flex-1 px-3 py-2 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 disabled:text-gray-400 text-red-700 rounded-lg transition-colors text-sm flex items-center justify-center gap-1"
+                            className="flex-1 px-3 py-2 bg-gradient-to-r from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 disabled:bg-gray-100 disabled:text-gray-400 text-red-700 rounded-lg transition-all duration-200 text-sm flex items-center justify-center gap-1 shadow-sm hover:shadow-md font-medium"
                           >
                             <XCircle className="w-4 h-4" />
                             Reject
                           </button>
                           <button
                             onClick={() => handleDeleteTemplate(template.id)}
-                            className="px-3 py-2 bg-red-200 hover:bg-red-300 text-red-800 rounded-lg transition-colors text-sm flex items-center justify-center gap-1"
+                            className="px-3 py-2 bg-gradient-to-r from-red-200 to-red-300 hover:from-red-300 hover:to-red-400 text-red-800 rounded-lg transition-all duration-200 text-sm flex items-center justify-center gap-1 shadow-sm hover:shadow-md font-medium"
                             title="Delete Template"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -859,21 +907,21 @@ const Admin = () => {
         )}
 
         {activeTab === 'users' && (
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">User Management</h2>
             <p className="text-gray-600">User management features coming soon...</p>
           </div>
         )}
 
         {activeTab === 'analytics' && (
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Platform Analytics</h2>
             <p className="text-gray-600">Analytics dashboard coming soon...</p>
           </div>
         )}
 
         {activeTab === 'settings' && (
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin Settings</h2>
             <p className="text-gray-600">Admin settings coming soon...</p>
           </div>
