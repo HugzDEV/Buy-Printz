@@ -322,6 +322,41 @@ async def get_pending_templates(
             detail="Internal server error"
         )
 
+@router.get("/admin/templates/all")
+async def get_all_templates(
+    limit: int = 100,
+    offset: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all templates for admin management"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        # Get all templates with creator info
+        templates_response = db_manager.supabase.table("creator_templates").select(
+            "*, creators(display_name, profile_image_url)"
+        ).order("created_at", desc=True).range(offset, offset + limit - 1).execute()
+        
+        return {
+            "success": True,
+            "templates": templates_response.data or [],
+            "total": len(templates_response.data or [])
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting all templates: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
 @router.post("/admin/templates/{template_id}/approve")
 async def approve_template(
     template_id: str,

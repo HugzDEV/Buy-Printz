@@ -24,10 +24,19 @@ const Admin = () => {
   })
   const [pendingTemplates, setPendingTemplates] = useState([])
   const [recentUsers, setRecentUsers] = useState([])
+  const [allTemplates, setAllTemplates] = useState([])
+  const [templateFilters, setTemplateFilters] = useState({
+    status: 'all', // all, pending, approved, rejected
+    category: 'all',
+    creator: 'all',
+    search: ''
+  })
+  const [selectedTemplates, setSelectedTemplates] = useState([])
   const [loadingStates, setLoadingStates] = useState({
     stats: true,
     pendingTemplates: true,
-    recentUsers: true
+    recentUsers: true,
+    allTemplates: true
   })
 
   const navigate = useNavigate()
@@ -78,7 +87,8 @@ const Admin = () => {
       await Promise.all([
         loadAdminStats(),
         loadPendingTemplates(),
-        loadRecentUsers()
+        loadRecentUsers(),
+        loadAllTemplates()
       ])
     } catch (error) {
       console.error('Error loading admin data:', error)
@@ -158,6 +168,27 @@ const Admin = () => {
     }
   }
 
+  const loadAllTemplates = async () => {
+    try {
+      setLoadingStates(prev => ({ ...prev, allTemplates: true }))
+      
+      const response = await authService.authenticatedRequest('/api/admin/templates/all')
+      const result = await response.json()
+      
+      if (result.success) {
+        setAllTemplates(result.templates || [])
+      } else {
+        console.error('Failed to load templates:', result)
+        setAllTemplates([])
+      }
+    } catch (error) {
+      console.error('Error loading all templates:', error)
+      setAllTemplates([])
+    } finally {
+      setLoadingStates(prev => ({ ...prev, allTemplates: false }))
+    }
+  }
+
   const handleApproveTemplate = async (templateId) => {
     try {
       const response = await authService.authenticatedRequest(`/api/admin/templates/${templateId}/approve`, {
@@ -186,6 +217,7 @@ const Admin = () => {
       if (response.ok) {
         toast.success('Template rejected successfully')
         await loadPendingTemplates()
+        await loadAllTemplates()
         await loadAdminStats()
       } else {
         throw new Error('Failed to reject template')
@@ -194,6 +226,120 @@ const Admin = () => {
       console.error('Error rejecting template:', error)
       toast.error('Failed to reject template')
     }
+  }
+
+  const handleBulkApprove = async () => {
+    if (selectedTemplates.length === 0) {
+      toast.error('Please select templates to approve')
+      return
+    }
+
+    try {
+      const promises = selectedTemplates.map(templateId => 
+        authService.authenticatedRequest(`/api/admin/templates/${templateId}/approve`, {
+          method: 'POST'
+        })
+      )
+      
+      await Promise.all(promises)
+      toast.success(`${selectedTemplates.length} templates approved successfully`)
+      setSelectedTemplates([])
+      await loadPendingTemplates()
+      await loadAllTemplates()
+      await loadAdminStats()
+    } catch (error) {
+      console.error('Error bulk approving templates:', error)
+      toast.error('Failed to approve templates')
+    }
+  }
+
+  const handleBulkReject = async () => {
+    if (selectedTemplates.length === 0) {
+      toast.error('Please select templates to reject')
+      return
+    }
+
+    try {
+      const promises = selectedTemplates.map(templateId => 
+        authService.authenticatedRequest(`/api/admin/templates/${templateId}/reject`, {
+          method: 'POST'
+        })
+      )
+      
+      await Promise.all(promises)
+      toast.success(`${selectedTemplates.length} templates rejected successfully`)
+      setSelectedTemplates([])
+      await loadPendingTemplates()
+      await loadAllTemplates()
+      await loadAdminStats()
+    } catch (error) {
+      console.error('Error bulk rejecting templates:', error)
+      toast.error('Failed to reject templates')
+    }
+  }
+
+  const handleTemplateSelect = (templateId) => {
+    setSelectedTemplates(prev => 
+      prev.includes(templateId) 
+        ? prev.filter(id => id !== templateId)
+        : [...prev, templateId]
+    )
+  }
+
+  const handleSelectAll = () => {
+    const filteredTemplates = getFilteredTemplates()
+    if (selectedTemplates.length === filteredTemplates.length) {
+      setSelectedTemplates([])
+    } else {
+      setSelectedTemplates(filteredTemplates.map(t => t.id))
+    }
+  }
+
+  const getFilteredTemplates = () => {
+    let filtered = allTemplates
+
+    // Filter by status
+    if (templateFilters.status !== 'all') {
+      if (templateFilters.status === 'pending') {
+        filtered = filtered.filter(t => !t.is_approved && t.is_active)
+      } else if (templateFilters.status === 'approved') {
+        filtered = filtered.filter(t => t.is_approved && t.is_active)
+      } else if (templateFilters.status === 'rejected') {
+        filtered = filtered.filter(t => !t.is_approved && !t.is_active)
+      }
+    }
+
+    // Filter by category
+    if (templateFilters.category !== 'all') {
+      filtered = filtered.filter(t => t.category === templateFilters.category)
+    }
+
+    // Filter by creator
+    if (templateFilters.creator !== 'all') {
+      filtered = filtered.filter(t => t.creator?.display_name === templateFilters.creator)
+    }
+
+    // Filter by search
+    if (templateFilters.search) {
+      const searchLower = templateFilters.search.toLowerCase()
+      filtered = filtered.filter(t => 
+        t.name.toLowerCase().includes(searchLower) ||
+        t.description?.toLowerCase().includes(searchLower) ||
+        t.creator?.display_name?.toLowerCase().includes(searchLower)
+      )
+    }
+
+    return filtered
+  }
+
+  const getUniqueCategories = () => {
+    const categories = [...new Set(allTemplates.map(t => t.category).filter(Boolean))]
+    return categories.sort()
+  }
+
+  const getUniqueCreators = () => {
+    const creators = [...new Set(allTemplates.map(t => t.creator?.display_name).filter(Boolean))]
+    return creators.sort()
   }
 
   if (loading) {
@@ -436,9 +582,210 @@ const Admin = () => {
         )}
 
         {activeTab === 'templates' && (
-          <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Template Management</h2>
-            <p className="text-gray-600">Template management features coming soon...</p>
+          <div className="space-y-6">
+            {/* Template Filters and Actions */}
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Template Management</h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleBulkApprove}
+                    disabled={selectedTemplates.length === 0}
+                    className="px-4 py-2 bg-green-100 hover:bg-green-200 disabled:bg-gray-100 disabled:text-gray-400 text-green-700 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Approve Selected ({selectedTemplates.length})
+                  </button>
+                  <button
+                    onClick={handleBulkReject}
+                    disabled={selectedTemplates.length === 0}
+                    className="px-4 py-2 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 disabled:text-gray-400 text-red-700 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Reject Selected ({selectedTemplates.length})
+                  </button>
+                  <button
+                    onClick={loadAllTemplates}
+                    className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Refresh
+                  </button>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                  <input
+                    type="text"
+                    placeholder="Search templates..."
+                    value={templateFilters.search}
+                    onChange={(e) => setTemplateFilters(prev => ({ ...prev, search: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Status Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    value={templateFilters.status}
+                    onChange={(e) => setTemplateFilters(prev => ({ ...prev, status: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Templates</option>
+                    <option value="pending">Pending Review</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+
+                {/* Category Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select
+                    value={templateFilters.category}
+                    onChange={(e) => setTemplateFilters(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Categories</option>
+                    {getUniqueCategories().map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Creator Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Creator</label>
+                  <select
+                    value={templateFilters.creator}
+                    onChange={(e) => setTemplateFilters(prev => ({ ...prev, creator: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Creators</option>
+                    {getUniqueCreators().map(creator => (
+                      <option key={creator} value={creator}>{creator}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Templates Grid */}
+            <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
+              {loadingStates.allTemplates ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="bg-gray-200 rounded-lg h-64"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {/* Select All */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedTemplates.length === getFilteredTemplates().length && getFilteredTemplates().length > 0}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-600">
+                      Select All ({getFilteredTemplates().length} templates)
+                    </span>
+                  </div>
+
+                  {/* Templates Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {getFilteredTemplates().map((template) => (
+                      <div key={template.id} className="bg-white/30 rounded-xl p-4 border border-white/30 hover:shadow-lg transition-shadow">
+                        <div className="flex items-start justify-between mb-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedTemplates.includes(template.id)}
+                            onChange={() => handleTemplateSelect(template.id)}
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            !template.is_approved && template.is_active 
+                              ? 'bg-yellow-100 text-yellow-800' 
+                              : template.is_approved && template.is_active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {!template.is_approved && template.is_active 
+                              ? 'Pending' 
+                              : template.is_approved && template.is_active
+                              ? 'Approved'
+                              : 'Rejected'
+                            }
+                          </div>
+                        </div>
+
+                        {/* Template Preview */}
+                        <div className="aspect-video bg-gray-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                          {template.preview_image_url ? (
+                            <img 
+                              src={template.preview_image_url} 
+                              alt={template.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Palette className="w-12 h-12 text-gray-400" />
+                          )}
+                        </div>
+
+                        {/* Template Info */}
+                        <div className="space-y-2">
+                          <h3 className="font-semibold text-gray-900 truncate">{template.name}</h3>
+                          <p className="text-sm text-gray-600 line-clamp-2">{template.description}</p>
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            <span>by {template.creator?.display_name || 'Unknown'}</span>
+                            <span>${template.price}</span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {template.category} • {new Date(template.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={() => handleApproveTemplate(template.id)}
+                            disabled={template.is_approved}
+                            className="flex-1 px-3 py-2 bg-green-100 hover:bg-green-200 disabled:bg-gray-100 disabled:text-gray-400 text-green-700 rounded-lg transition-colors text-sm flex items-center justify-center gap-1"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleRejectTemplate(template.id)}
+                            disabled={!template.is_active}
+                            className="flex-1 px-3 py-2 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 disabled:text-gray-400 text-red-700 rounded-lg transition-colors text-sm flex items-center justify-center gap-1"
+                          >
+                            <XCircle className="w-4 h-4" />
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {getFilteredTemplates().length === 0 && (
+                    <div className="text-center py-12">
+                      <Palette className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No templates found</h3>
+                      <p className="text-gray-600">Try adjusting your filters or search terms.</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         )}
 
