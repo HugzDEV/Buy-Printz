@@ -5,7 +5,7 @@ import {
   CheckCircle, XCircle, AlertTriangle, Eye, 
   Trash2, Ban, UserCheck, TrendingUp, DollarSign,
   Package, Palette, Calendar, Activity, RefreshCw,
-  Menu, X, ChevronLeft, ChevronRight
+  Menu, X, ChevronLeft, ChevronRight, Search, Filter, Crown, User, ChevronDown, ChevronUp, Edit, Save, X as XIcon
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import authService from '../services/auth'
@@ -38,8 +38,15 @@ const Admin = () => {
     stats: true,
     pendingTemplates: true,
     recentUsers: true,
-    allTemplates: true
+    allTemplates: true,
+    users: true
   })
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [expandedUser, setExpandedUser] = useState(null)
+  const [userDetails, setUserDetails] = useState({})
+  const [adminNotes, setAdminNotes] = useState({})
+  const [editingNotes, setEditingNotes] = useState(null)
 
   const navigate = useNavigate()
 
@@ -152,9 +159,9 @@ const Admin = () => {
 
   const loadRecentUsers = async () => {
     try {
-      setLoadingStates(prev => ({ ...prev, recentUsers: true }))
+      setLoadingStates(prev => ({ ...prev, users: true }))
       
-      const response = await authService.authenticatedRequest('/api/admin/users?limit=5')
+      const response = await authService.authenticatedRequest('/api/admin/users?limit=50')
       const users = await response.json()
       
       if (users && Array.isArray(users)) {
@@ -167,7 +174,7 @@ const Admin = () => {
       console.error('Error loading recent users:', error)
       setRecentUsers([])
     } finally {
-      setLoadingStates(prev => ({ ...prev, recentUsers: false }))
+      setLoadingStates(prev => ({ ...prev, users: false }))
     }
   }
 
@@ -349,6 +356,160 @@ const Admin = () => {
     } else {
       setSelectedTemplates(filteredTemplates.map(t => t.id))
     }
+  }
+
+  const handleBanUser = async (userId) => {
+    if (!confirm('Are you sure you want to ban this user?')) return
+    
+    try {
+      const response = await authService.authenticatedRequest(`/api/admin/users/${userId}/ban`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          reason: 'Platform abuse'
+        })
+      })
+      
+      if (response.ok) {
+        toast.success('User banned successfully')
+        await loadRecentUsers()
+        await loadAdminStats()
+      } else {
+        throw new Error('Failed to ban user')
+      }
+    } catch (error) {
+      console.error('Error banning user:', error)
+      toast.error('Failed to ban user')
+    }
+  }
+
+  const handleUnbanUser = async (userId) => {
+    if (!confirm('Are you sure you want to unban this user?')) return
+    
+    try {
+      const response = await authService.authenticatedRequest(`/api/admin/users/${userId}/unban`, {
+        method: 'PUT'
+      })
+      
+      if (response.ok) {
+        toast.success('User unbanned successfully')
+        await loadRecentUsers()
+        await loadAdminStats()
+      } else {
+        throw new Error('Failed to unban user')
+      }
+    } catch (error) {
+      console.error('Error unbanning user:', error)
+      toast.error('Failed to unban user')
+    }
+  }
+
+  const loadUserDetails = async (userId) => {
+    try {
+      // Load user's personal templates (banner_templates) and marketplace templates (creator_templates)
+      const [bannerTemplatesResponse, creatorTemplatesResponse] = await Promise.all([
+        authService.authenticatedRequest(`/api/templates?user_id=${userId}`), // Personal templates from banner_templates table
+        authService.authenticatedRequest(`/api/admin/templates/all`) // All creator templates to filter by user
+      ])
+      
+      const bannerTemplatesData = await bannerTemplatesResponse.json()
+      const creatorTemplatesData = await creatorTemplatesResponse.json()
+      
+      // Handle different possible response structures
+      const userBannerTemplates = Array.isArray(bannerTemplatesData) ? bannerTemplatesData : (bannerTemplatesData?.templates || [])
+      const allCreatorTemplates = Array.isArray(creatorTemplatesData) ? creatorTemplatesData : (creatorTemplatesData?.templates || [])
+      
+      // Filter creator templates by user ID to show only this user's marketplace uploads
+      const userCreatorTemplates = allCreatorTemplates.filter(template => template.creator_id === userId)
+      
+      setUserDetails(prev => ({
+        ...prev,
+        [userId]: {
+          userTemplates: userBannerTemplates, // Personal templates from banner_templates
+          creatorTemplates: userCreatorTemplates, // Marketplace uploads from creator_templates
+          lastLogin: recentUsers.find(u => u.user_id === userId)?.last_login
+        }
+      }))
+    } catch (error) {
+      console.error('Error loading user details:', error)
+      setUserDetails(prev => ({
+        ...prev,
+        [userId]: {
+          userTemplates: [],
+          creatorTemplates: [],
+          lastLogin: null,
+          error: 'Failed to load details'
+        }
+      }))
+    }
+  }
+
+  const loadAdminNotes = async (userId) => {
+    try {
+      const response = await authService.authenticatedRequest(`/api/admin/notes/${userId}`)
+      if (response.ok) {
+        const result = await response.json()
+        if (result.notes && result.notes.length > 0) {
+          setAdminNotes(prev => ({
+            ...prev,
+            [userId]: result.notes[0] // Get the most recent note
+          }))
+        }
+      }
+    } catch (error) {
+      console.error('Error loading admin notes:', error)
+    }
+  }
+
+  const toggleUserExpansion = (userId) => {
+    if (expandedUser === userId) {
+      setExpandedUser(null)
+    } else {
+      setExpandedUser(userId)
+      if (!userDetails[userId]) {
+        loadUserDetails(userId)
+      }
+      if (!adminNotes[userId]) {
+        loadAdminNotes(userId)
+      }
+    }
+  }
+
+  const saveAdminNote = async (userId, note) => {
+    try {
+      const response = await authService.authenticatedRequest(`/api/admin/notes/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ note })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setAdminNotes(prev => ({
+          ...prev,
+          [userId]: result.note
+        }))
+        setEditingNotes(null)
+        toast.success('Admin note saved successfully')
+      } else {
+        throw new Error('Failed to save admin note')
+      }
+    } catch (error) {
+      console.error('Error saving admin note:', error)
+      toast.error('Failed to save admin note')
+    }
+  }
+
+  const startEditingNotes = (userId) => {
+    setEditingNotes(userId)
+  }
+
+  const cancelEditingNotes = () => {
+    setEditingNotes(null)
   }
 
   const getFilteredTemplates = () => {
@@ -907,9 +1068,398 @@ const Admin = () => {
         )}
 
         {activeTab === 'users' && (
-          <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">User Management</h2>
-            <p className="text-gray-600">User management features coming soon...</p>
+          <div className="space-y-6">
+            {/* Users Header */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">User Management</h2>
+                <p className="text-gray-600">Manage platform users, creators, and permissions</p>
+              </div>
+              
+              {/* Search and Filter */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 w-full sm:w-64"
+                  />
+                </div>
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="pl-10 pr-8 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 appearance-none"
+                  >
+                    <option value="all">All Users</option>
+                    <option value="active">Active Users</option>
+                    <option value="banned">Banned Users</option>
+                    <option value="creators">Creators Only</option>
+                    <option value="regular">Regular Users</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* User Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Total Users</p>
+                    <p className="text-2xl font-bold text-gray-900">{adminStats.totalUsers || 0}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md border border-white/50">
+                    <Users className="w-6 h-6 text-blue-600" />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Active Users</p>
+                    <p className="text-2xl font-bold text-gray-900">{recentUsers.filter(u => u.is_active).length}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-[#00D755]/10 to-[#00D755]/20 rounded-xl shadow-md border border-white/50">
+                    <CheckCircle className="w-6 h-6 text-[#00D755]" />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Creators</p>
+                    <p className="text-2xl font-bold text-gray-900">{recentUsers.filter(u => u.is_creator).length}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md border border-white/50">
+                    <Crown className="w-6 h-6 text-purple-600" />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Banned Users</p>
+                    <p className="text-2xl font-bold text-gray-900">{recentUsers.filter(u => !u.is_active).length}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-red-50 to-red-100 rounded-xl shadow-md border border-white/50">
+                    <XCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Users List */}
+            <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">All Users</h3>
+                <button
+                  onClick={() => loadRecentUsers()}
+                  disabled={loadingStates.users}
+                  className="p-2 bg-white/20 hover:bg-white/40 rounded-lg text-gray-600 hover:text-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/30 hover:border-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Refresh users"
+                >
+                  <RefreshCw className={`w-4 h-4 ${loadingStates.users ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+
+              {loadingStates.users ? (
+                <div className="space-y-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="bg-gray-200 rounded-lg h-16 mb-2"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : recentUsers.length > 0 ? (
+                <div className="space-y-3">
+                  {recentUsers
+                    .filter(user => {
+                      const matchesSearch = searchTerm === '' || 
+                        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        user.user_id.toLowerCase().includes(searchTerm.toLowerCase())
+                      
+                      const matchesStatus = statusFilter === 'all' || 
+                        (statusFilter === 'active' && user.is_active) ||
+                        (statusFilter === 'banned' && !user.is_active) ||
+                        (statusFilter === 'creators' && user.is_creator) ||
+                        (statusFilter === 'regular' && !user.is_creator)
+                      
+                      return matchesSearch && matchesStatus
+                    })
+                    .map((user) => (
+                    <div key={user.user_id} className="bg-white/50 rounded-lg border border-white/50 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                      {/* User Header - Clickable */}
+                      <div 
+                        className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/30 transition-colors"
+                        onClick={() => toggleUserExpansion(user.user_id)}
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center shadow-sm">
+                            <User className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{user.email}</p>
+                            <p className="text-sm text-gray-600">
+                              {new Date(user.created_at).toLocaleDateString()}
+                              {user.is_creator && <span className="ml-2 text-[#00D755] font-medium">Creator</span>}
+                              {user.full_name && <span className="ml-2 text-gray-500">({user.full_name})</span>}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            user.is_active 
+                              ? 'bg-[#00D755]/20 text-[#00D755]' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {user.is_active ? 'Active' : 'Banned'}
+                          </span>
+                          <div className="flex space-x-1">
+                            {user.is_active ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleBanUser(user.user_id)
+                                }}
+                                className="p-2 bg-red-100 hover:bg-red-200 rounded-lg text-red-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                                title="Ban user"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleUnbanUser(user.user_id)
+                                }}
+                                className="p-2 bg-[#00D755]/20 hover:bg-[#00D755]/30 rounded-lg text-[#00D755] transition-all duration-200 shadow-sm hover:shadow-md"
+                                title="Unban user"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                          <button className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+                            {expandedUser === user.user_id ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Expanded User Details */}
+                      {expandedUser === user.user_id && (
+                        <div className="border-t border-white/30 bg-white/20 p-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Login & Activity Data */}
+                            <div className="space-y-4">
+                              <h4 className="font-semibold text-gray-900 flex items-center">
+                                <Activity className="w-4 h-4 mr-2 text-blue-600" />
+                                Login & Activity
+                              </h4>
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-center p-3 bg-white/30 rounded-lg">
+                                  <span className="text-sm text-gray-600">Last Login:</span>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {userDetails[user.user_id]?.lastLogin 
+                                      ? new Date(userDetails[user.user_id].lastLogin).toLocaleString()
+                                      : 'Never'
+                                    }
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-white/30 rounded-lg">
+                                  <span className="text-sm text-gray-600">Account Created:</span>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {new Date(user.created_at).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-white/30 rounded-lg">
+                                  <span className="text-sm text-gray-600">User ID:</span>
+                                  <span className="text-xs font-mono text-gray-500">
+                                    {user.user_id}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Template & Marketplace Stats */}
+                            <div className="space-y-4">
+                              <h4 className="font-semibold text-gray-900 flex items-center">
+                                <FileText className="w-4 h-4 mr-2 text-purple-600" />
+                                Templates & Uploads
+                              </h4>
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-center p-3 bg-white/30 rounded-lg">
+                                  <span className="text-sm text-gray-600">Personal Templates:</span>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {userDetails[user.user_id]?.userTemplates?.length || 0}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-white/30 rounded-lg">
+                                  <span className="text-sm text-gray-600">Marketplace Uploads:</span>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {userDetails[user.user_id]?.creatorTemplates?.length || 0}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-white/30 rounded-lg">
+                                  <span className="text-sm text-gray-600">Total Templates:</span>
+                                  <span className="text-sm font-bold text-[#00D755]">
+                                    {(userDetails[user.user_id]?.userTemplates?.length || 0) + 
+                                     (userDetails[user.user_id]?.creatorTemplates?.length || 0)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                        {/* Admin Notes Section */}
+                        <div className="mt-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="font-semibold text-gray-900 flex items-center">
+                              <Edit className="w-4 h-4 mr-2 text-orange-600" />
+                              Admin Notes
+                            </h4>
+                            {!editingNotes && (
+                              <button
+                                onClick={() => startEditingNotes(user.user_id)}
+                                className="p-2 bg-orange-100 hover:bg-orange-200 rounded-lg text-orange-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                                title="Add/Edit admin note"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+
+                          {editingNotes === user.user_id ? (
+                            <div className="space-y-3">
+                              <textarea
+                                placeholder="Add admin notes for customer service reference..."
+                                defaultValue={adminNotes[user.user_id]?.note || ''}
+                                className="w-full p-3 bg-white/30 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400/50 resize-none"
+                                rows={3}
+                                id={`admin-note-${user.user_id}`}
+                              />
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => {
+                                    const note = document.getElementById(`admin-note-${user.user_id}`).value
+                                    saveAdminNote(user.user_id, note)
+                                  }}
+                                  className="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                                >
+                                  <Save className="w-4 h-4" />
+                                  Save Note
+                                </button>
+                                <button
+                                  onClick={cancelEditingNotes}
+                                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                                >
+                                  <XIcon className="w-4 h-4" />
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="p-4 bg-white/30 rounded-lg border border-white/30">
+                              {adminNotes[user.user_id]?.note ? (
+                                <div>
+                                  <p className="text-sm text-gray-900 mb-2">{adminNotes[user.user_id].note}</p>
+                                  <div className="flex items-center justify-between text-xs text-gray-500">
+                                    <span>Last updated: {new Date(adminNotes[user.user_id].updated_at).toLocaleString()}</span>
+                                    <span>By: {adminNotes[user.user_id].updated_by || 'Admin'}</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="text-sm text-gray-500 italic">No admin notes yet. Click edit to add notes for customer service reference.</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Recent Templates Preview */}
+                          {userDetails[user.user_id]?.userTemplates?.length > 0 && (
+                            <div className="mt-6">
+                              <h5 className="font-medium text-gray-900 mb-3">Recent Personal Templates</h5>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {userDetails[user.user_id].userTemplates.slice(0, 4).map((template) => (
+                                  <div key={template.id} className="p-3 bg-white/30 rounded-lg border border-white/30">
+                                    <p className="text-sm font-medium text-gray-900 truncate">{template.name}</p>
+                                    <p className="text-xs text-gray-500">{template.category}</p>
+                                    <p className="text-xs text-gray-400">
+                                      {new Date(template.created_at).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Recent Marketplace Uploads Preview */}
+                          {userDetails[user.user_id]?.creatorTemplates?.length > 0 && (
+                            <div className="mt-6">
+                              <h5 className="font-medium text-gray-900 mb-3">Recent Marketplace Uploads</h5>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {userDetails[user.user_id].creatorTemplates.slice(0, 4).map((template) => (
+                                  <div key={template.id} className="p-3 bg-white/30 rounded-lg border border-white/30">
+                                    <p className="text-sm font-medium text-gray-900 truncate">{template.name}</p>
+                                    <p className="text-xs text-gray-500">{template.category}</p>
+                                    <div className="flex items-center justify-between mt-1">
+                                      <span className="text-xs text-gray-400">
+                                        {new Date(template.created_at).toLocaleDateString()}
+                                      </span>
+                                      <span className={`text-xs px-2 py-1 rounded-full ${
+                                        template.is_approved 
+                                          ? 'bg-[#00D755]/20 text-[#00D755]' 
+                                          : 'bg-yellow-100 text-yellow-800'
+                                      }`}>
+                                        {template.is_approved ? 'Approved' : 'Pending'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Loading State */}
+                          {!userDetails[user.user_id] && (
+                            <div className="flex items-center justify-center py-8">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                              <span className="ml-2 text-sm text-gray-600">Loading user details...</span>
+                            </div>
+                          )}
+
+                          {/* Error State */}
+                          {userDetails[user.user_id]?.error && (
+                            <div className="flex items-center justify-center py-8">
+                              <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+                              <span className="text-sm text-red-600">Failed to load user details</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                  <p className="text-gray-600">Try adjusting your filters or search terms.</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

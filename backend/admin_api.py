@@ -609,3 +609,86 @@ async def get_user_analytics(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
         )
+
+
+# Admin Notes Endpoints
+@router.get("/admin/notes/{user_id}")
+async def get_admin_notes(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Get admin notes for a specific user"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        result = supabase.table("admin_notes").select("*").eq("user_id", user_id).order("updated_at", desc=True).execute()
+        
+        return {"notes": result.data}
+        
+    except Exception as e:
+        logger.error(f"Error getting admin notes for user {user_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get admin notes")
+
+
+@router.post("/admin/notes/{user_id}")
+async def create_or_update_admin_note(
+    user_id: str, 
+    note_data: dict, 
+    current_user: dict = Depends(get_current_user)
+):
+    """Create or update admin note for a user"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        note_text = note_data.get("note", "").strip()
+        if not note_text:
+            raise HTTPException(status_code=400, detail="Note cannot be empty")
+        
+        # Check if note already exists for this user
+        existing_note = supabase.table("admin_notes").select("id").eq("user_id", user_id).execute()
+        
+        if existing_note.data:
+            # Update existing note
+            result = supabase.table("admin_notes").update({
+                "note": note_text,
+                "updated_by": current_user["id"]
+            }).eq("user_id", user_id).execute()
+        else:
+            # Create new note
+            result = supabase.table("admin_notes").insert({
+                "user_id": user_id,
+                "note": note_text,
+                "created_by": current_user["id"],
+                "updated_by": current_user["id"]
+            }).execute()
+        
+        return {"message": "Admin note saved successfully", "note": result.data[0] if result.data else None}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error saving admin note for user {user_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to save admin note")
+
+
+@router.delete("/admin/notes/{user_id}")
+async def delete_admin_note(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete admin note for a user"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        result = supabase.table("admin_notes").delete().eq("user_id", user_id).execute()
+        
+        if not result.data:
+            raise HTTPException(status_code=404, detail="No admin note found for this user")
+        
+        return {"message": "Admin note deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting admin note for user {user_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete admin note")
