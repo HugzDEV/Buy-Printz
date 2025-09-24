@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 from backend.database import db_manager
 from backend.auth import get_current_user
 from pydantic import BaseModel
+import logging
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -620,7 +624,7 @@ async def get_admin_notes(user_id: str, current_user: dict = Depends(get_current
         if current_user.get("email") != "Brainboxjp@gmail.com":
             raise HTTPException(status_code=403, detail="Admin access required")
         
-        result = supabase.table("admin_notes").select("*").eq("user_id", user_id).order("updated_at", desc=True).execute()
+        result = db_manager.supabase.table("admin_notes").select("*").eq("user_id", user_id).order("updated_at", desc=True).execute()
         
         return {"notes": result.data}
         
@@ -646,17 +650,17 @@ async def create_or_update_admin_note(
             raise HTTPException(status_code=400, detail="Note cannot be empty")
         
         # Check if note already exists for this user
-        existing_note = supabase.table("admin_notes").select("id").eq("user_id", user_id).execute()
+        existing_note = db_manager.supabase.table("admin_notes").select("id").eq("user_id", user_id).execute()
         
         if existing_note.data:
             # Update existing note
-            result = supabase.table("admin_notes").update({
+            result = db_manager.supabase.table("admin_notes").update({
                 "note": note_text,
                 "updated_by": current_user["id"]
             }).eq("user_id", user_id).execute()
         else:
             # Create new note
-            result = supabase.table("admin_notes").insert({
+            result = db_manager.supabase.table("admin_notes").insert({
                 "user_id": user_id,
                 "note": note_text,
                 "created_by": current_user["id"],
@@ -680,7 +684,7 @@ async def delete_admin_note(user_id: str, current_user: dict = Depends(get_curre
         if current_user.get("email") != "Brainboxjp@gmail.com":
             raise HTTPException(status_code=403, detail="Admin access required")
         
-        result = supabase.table("admin_notes").delete().eq("user_id", user_id).execute()
+        result = db_manager.supabase.table("admin_notes").delete().eq("user_id", user_id).execute()
         
         if not result.data:
             raise HTTPException(status_code=404, detail="No admin note found for this user")
@@ -704,7 +708,7 @@ async def get_product_type_analytics(current_user: dict = Depends(get_current_us
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Get orders with product type information
-        orders_result = supabase.table("orders").select("product_type, status, total_amount").execute()
+        orders_result = db_manager.supabase.table("orders").select("product_type, status, total_amount").execute()
         
         # Process the data
         product_stats = {}
@@ -753,12 +757,12 @@ async def get_best_selling_designs(current_user: dict = Depends(get_current_user
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Get template purchases with template details
-        purchases_result = supabase.table("template_purchases").select(
+        purchases_result = db_manager.supabase.table("template_purchases").select(
             "template_id, created_at, creators(display_name, profile_image_url)"
         ).execute()
         
         # Get creator templates for template details
-        templates_result = supabase.table("creator_templates").select(
+        templates_result = db_manager.supabase.table("creator_templates").select(
             "id, title, category, product_type, thumbnail_url, is_approved"
         ).execute()
         
@@ -812,7 +816,7 @@ async def get_best_selling_regions(current_user: dict = Depends(get_current_user
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Get orders with shipping address information
-        orders_result = supabase.table("orders").select(
+        orders_result = db_manager.supabase.table("orders").select(
             "shipping_address, status, total_amount, created_at"
         ).execute()
         
@@ -874,7 +878,7 @@ async def get_shipping_orders(current_user: dict = Depends(get_current_user)):
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Get orders with shipping details
-        orders_result = supabase.table("orders").select(
+        orders_result = db_manager.supabase.table("orders").select(
             "id, order_number, status, total_amount, shipping_address, tracking_number, "
             "shipping_method, shipping_cost, created_at, updated_at, product_type"
         ).order("created_at", desc=True).limit(100).execute()
@@ -895,7 +899,7 @@ async def track_order(order_id: str, current_user: dict = Depends(get_current_us
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Get order details
-        order_result = supabase.table("orders").select("*").eq("id", order_id).execute()
+        order_result = db_manager.supabase.table("orders").select("*").eq("id", order_id).execute()
         
         if not order_result.data:
             raise HTTPException(status_code=404, detail="Order not found")
@@ -992,7 +996,7 @@ async def get_shipping_analytics(current_user: dict = Depends(get_current_user))
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Get orders with shipping data
-        orders_result = supabase.table("orders").select(
+        orders_result = db_manager.supabase.table("orders").select(
             "status, shipping_method, shipping_cost, total_amount, created_at, shipping_address"
         ).execute()
         
@@ -1079,7 +1083,7 @@ async def update_order_tracking(
             "updated_at": datetime.now().isoformat()
         }
         
-        result = supabase.table("orders").update(update_data).eq("id", order_id).execute()
+        result = db_manager.supabase.table("orders").update(update_data).eq("id", order_id).execute()
         
         if not result.data:
             raise HTTPException(status_code=404, detail="Order not found")
@@ -1107,7 +1111,7 @@ async def lookup_by_tracking_number(tracking_number: str, current_user: dict = D
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Find order by tracking number
-        order_result = supabase.table("orders").select("*").eq("tracking_number", tracking_number).execute()
+        order_result = db_manager.supabase.table("orders").select("*").eq("tracking_number", tracking_number).execute()
         
         if not order_result.data:
             return {
@@ -1143,7 +1147,7 @@ async def lookup_by_order_number(order_number: str, current_user: dict = Depends
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Find order by order number
-        order_result = supabase.table("orders").select("*").eq("order_number", order_number).execute()
+        order_result = db_manager.supabase.table("orders").select("*").eq("order_number", order_number).execute()
         
         if not order_result.data:
             return {
@@ -1182,7 +1186,7 @@ async def lookup_by_customer_email(customer_email: str, current_user: dict = Dep
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Find orders by customer email (assuming email is stored in shipping_address or customer_info)
-        orders_result = supabase.table("orders").select("*").ilike("shipping_address->>email", f"%{customer_email}%").execute()
+        orders_result = db_manager.supabase.table("orders").select("*").ilike("shipping_address->>email", f"%{customer_email}%").execute()
         
         if not orders_result.data:
             return {
@@ -1238,7 +1242,7 @@ async def get_detailed_tracking(tracking_number: str, current_user: dict = Depen
         tracking_details = await ups_shipping_service.track_package(tracking_number)
         
         # Also get order information
-        order_result = supabase.table("orders").select("*").eq("tracking_number", tracking_number).execute()
+        order_result = db_manager.supabase.table("orders").select("*").eq("tracking_number", tracking_number).execute()
         order = order_result.data[0] if order_result.data else None
         
         return {
