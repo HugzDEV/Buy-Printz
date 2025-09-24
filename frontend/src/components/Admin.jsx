@@ -784,21 +784,24 @@ const Admin = () => {
       />
       
       {/* Mobile Header */}
-      <div className="sm:hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 p-4 flex items-center justify-between">
-        <div className="flex items-center">
+      <div className="sm:hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 p-3 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center min-w-0 flex-1">
           <img 
             src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
             alt="BuyPrintz" 
-            className="w-8 h-8 rounded-lg"
+            className="w-6 h-6 rounded-lg flex-shrink-0"
           />
-          <span className="ml-2 text-white font-semibold text-sm">Admin Portal</span>
+          <span className="ml-2 text-white font-semibold text-xs truncate">Admin Portal</span>
         </div>
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          <div className="w-2 h-2 bg-[#00D755] rounded-full animate-pulse"></div>
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -810,23 +813,23 @@ const Admin = () => {
       )}
       
       {/* Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-0 sm:w-16' : 'w-64'} transition-all duration-300 ease-in-out bg-gradient-to-b from-blue-600 via-purple-600 to-indigo-700 backdrop-blur-xl border-r border-white/20 shadow-2xl flex flex-col relative z-50 sm:relative sm:z-auto overflow-hidden`}>
+      <div className={`${sidebarCollapsed ? 'w-0 sm:w-16' : 'w-64 sm:w-64'} transition-all duration-300 ease-in-out bg-gradient-to-b from-blue-600 via-purple-600 to-indigo-700 backdrop-blur-xl border-r border-white/20 shadow-2xl flex flex-col relative z-50 sm:relative sm:z-auto overflow-hidden`}>
         {/* Sidebar Header */}
         <div className="p-2 sm:p-4 border-b border-white/20">
           <div className="flex items-center justify-between">
             {!sidebarCollapsed && (
               <div className="flex items-center justify-center w-full">
-                <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl shadow-lg flex items-center justify-center">
+                <div className="w-12 h-12 sm:w-24 sm:h-24 rounded-lg sm:rounded-xl shadow-lg flex items-center justify-center">
                     <img 
                       src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
                       alt="BuyPrintz Logo" 
-                      className="w-12 h-12 sm:w-20 sm:h-20 object-contain"
+                      className="w-8 h-8 sm:w-20 sm:h-20 object-contain"
                       onError={(e) => {
                         e.target.style.display = 'none'
                         e.target.nextSibling.style.display = 'block'
                       }}
                     />
-                  <div className="w-12 h-12 sm:w-20 sm:h-20 bg-white rounded-lg flex items-center justify-center text-[#00D755] font-bold text-lg sm:text-2xl" style={{display: 'none'}}>
+                  <div className="w-8 h-8 sm:w-20 sm:h-20 bg-white rounded-lg flex items-center justify-center text-[#00D755] font-bold text-sm sm:text-2xl" style={{display: 'none'}}>
                     BP
                   </div>
                 </div>
@@ -863,7 +866,7 @@ const Admin = () => {
                       setSidebarCollapsed(true)
                     }
                   }}
-                  className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'space-x-2 sm:space-x-3 px-2 sm:px-4'} py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 group text-sm sm:text-base ${
+                  className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'space-x-2 sm:space-x-3 px-2 sm:px-4'} py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 group text-xs sm:text-base ${
                     activeTab === tab.id
                       ? 'bg-white/20 text-white shadow-lg border border-white/30 backdrop-blur-sm'
                       : 'text-white/80 hover:bg-white/10 hover:text-white hover:shadow-md'
@@ -882,7 +885,7 @@ const Admin = () => {
         <div className="p-2 sm:p-4 border-t border-white/20">
           {!sidebarCollapsed && (
             <div className="text-xs text-white/60 mb-2 sm:mb-3">
-              <div className="truncate">Welcome, {user?.full_name || user?.email}</div>
+              <div className="truncate text-xs">Welcome, {user?.full_name || user?.email}</div>
             </div>
           )}
           <Link
@@ -890,8 +893,8 @@ const Admin = () => {
             className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'justify-center space-x-2'} px-2 sm:px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-white transition-all duration-200 text-xs sm:text-sm font-medium shadow-sm hover:shadow-md border border-white/20`}
             title={sidebarCollapsed ? 'Back to Dashboard' : ''}
           >
-            <span>←</span>
-            {!sidebarCollapsed && <span className="truncate">Back to Dashboard</span>}
+            <span className="text-xs sm:text-sm">←</span>
+            {!sidebarCollapsed && <span className="truncate text-xs sm:text-sm">Back to Dashboard</span>}
           </Link>
         </div>
       </div>
@@ -900,13 +903,13 @@ const Admin = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
         <div className="backdrop-blur-xl bg-white/70 border-b border-white/40 shadow-lg">
-          <div className="px-3 sm:px-6 py-3 sm:py-4">
+          <div className="px-3 sm:px-6 py-2 sm:py-4">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <h2 className="text-lg sm:text-2xl font-bold text-gray-900 capitalize truncate">
+                <h2 className="text-base sm:text-2xl font-bold text-gray-900 capitalize truncate">
                   {activeTab === 'overview' ? 'Dashboard Overview' : activeTab}
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-600 mt-1 truncate">
+                <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1 truncate">
                   {activeTab === 'overview' && 'Platform statistics and recent activity'}
                   {activeTab === 'templates' && 'Manage and approve template submissions'}
                   {activeTab === 'users' && 'User management and moderation tools'}
@@ -924,7 +927,7 @@ const Admin = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-3 sm:p-6 overflow-auto">
+        <div className="flex-1 p-2 sm:p-6 overflow-auto">
         {activeTab === 'overview' && (
           <div className="space-y-3 sm:space-y-6">
             {/* Stats Grid */}
@@ -939,14 +942,14 @@ const Admin = () => {
               ].map((stat) => {
                 const Icon = stat.icon
                 return (
-                  <div key={stat.label} className="bg-white/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <div key={stat.label} className="bg-white/60 backdrop-blur-xl rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{stat.label}</p>
-                        <p className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</p>
+                        <p className="text-lg sm:text-2xl font-bold text-gray-900">{stat.value}</p>
                       </div>
                       <div className={`p-2 sm:p-3 bg-gradient-to-br ${stat.bgGradient} rounded-lg sm:rounded-xl shadow-md border border-white/50 flex-shrink-0`}>
-                        <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color === 'green' || stat.color === 'emerald' ? 'text-[#00D755]' : `text-${stat.color}-600`}`} />
+                        <Icon className={`w-4 h-4 sm:w-6 sm:h-6 ${stat.color === 'green' || stat.color === 'emerald' ? 'text-[#00D755]' : `text-${stat.color}-600`}`} />
                       </div>
                     </div>
                   </div>
@@ -1705,9 +1708,9 @@ const Admin = () => {
         {activeTab === 'analytics' && (
           <div className="space-y-3 sm:space-y-6">
             {/* Analytics Header */}
-            <div className="bg-white/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg">
+            <div className="bg-white/60 backdrop-blur-xl rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-white/50 shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center">
+                <h2 className="text-base sm:text-xl font-semibold text-gray-900 flex items-center">
                   <BarChart3 className="w-5 h-5 mr-2 text-[#00D755]" />
                   Platform Analytics
                 </h2>
@@ -1730,8 +1733,8 @@ const Admin = () => {
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
                 {/* Product Type Analytics */}
-                <div className="bg-white/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                <div className="bg-white/60 backdrop-blur-xl rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center">
                     <Package className="w-5 h-5 mr-2 text-blue-600" />
                     Product Type Performance
                   </h3>
@@ -1778,8 +1781,8 @@ const Admin = () => {
                 </div>
 
                 {/* Best Selling Regions */}
-                <div className="bg-white/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                <div className="bg-white/60 backdrop-blur-xl rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center">
                     <TrendingUp className="w-5 h-5 mr-2 text-purple-600" />
                     Top Selling Regions
                   </h3>
@@ -1811,7 +1814,7 @@ const Admin = () => {
 
                 {/* Best Selling Designs */}
                 <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg lg:col-span-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center">
                     <Palette className="w-5 h-5 mr-2 text-orange-600" />
                     Best Selling Designs
                   </h3>
@@ -1862,9 +1865,9 @@ const Admin = () => {
         {activeTab === 'shipping' && (
           <div className="space-y-3 sm:space-y-6">
             {/* Shipping Header */}
-            <div className="bg-white/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg">
+            <div className="bg-white/60 backdrop-blur-xl rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-white/50 shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center">
+                <h2 className="text-base sm:text-xl font-semibold text-gray-900 flex items-center">
                   <Truck className="w-5 h-5 mr-2 text-[#00D755]" />
                   UPS Shipping Integration
                 </h2>
@@ -1887,8 +1890,8 @@ const Admin = () => {
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
                 {/* Shipping Analytics */}
-                <div className="bg-white/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                <div className="bg-white/60 backdrop-blur-xl rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center">
                     <Package2 className="w-5 h-5 mr-2 text-blue-600" />
                     Shipping Analytics
                   </h3>
@@ -1940,8 +1943,8 @@ const Admin = () => {
                 </div>
 
                 {/* Shipping Quote Tool */}
-                <div className="bg-white/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                <div className="bg-white/60 backdrop-blur-xl rounded-lg sm:rounded-2xl p-3 sm:p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center">
                     <Package className="w-5 h-5 mr-2 text-purple-600" />
                     UPS Quote Tool
                   </h3>
@@ -2029,7 +2032,7 @@ const Admin = () => {
 
                 {/* Package Lookup Tool */}
                 <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg lg:col-span-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center">
                     <Search className="w-5 h-5 mr-2 text-green-600" />
                     Customer Package Lookup
                   </h3>
@@ -2187,7 +2190,7 @@ const Admin = () => {
 
                 {/* Recent Orders */}
                 <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg lg:col-span-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center">
                     <Package2 className="w-5 h-5 mr-2 text-orange-600" />
                     Recent Orders
                   </h3>
