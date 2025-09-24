@@ -461,6 +461,59 @@ async def reject_template(
             detail=f"Internal server error: {str(e)}"
         )
 
+@router.delete("/admin/templates/{template_id}/delete")
+async def delete_template(
+    template_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Permanently delete a template (admin only)"""
+    try:
+        # Verify admin access
+        if not await verify_admin_access(current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        print(f"🗑️ Deleting template: {template_id}")
+        
+        # Check if template exists
+        template_result = db_manager.supabase.table("creator_templates").select("id, name").eq("id", template_id).execute()
+        
+        if not template_result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Template not found"
+            )
+        
+        # Check if template has any sales (optional safety check)
+        sales_result = db_manager.supabase.table("template_purchases").select("id").eq("template_id", template_id).execute()
+        
+        if sales_result.data:
+            print(f"⚠️ Template {template_id} has {len(sales_result.data)} sales, but proceeding with deletion")
+        
+        # Delete the template
+        delete_result = db_manager.supabase.table("creator_templates").delete().eq("id", template_id).execute()
+        
+        print(f"🗑️ Delete result: {delete_result}")
+        
+        if not delete_result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Template not found or already deleted"
+            )
+        
+        return {"success": True, "message": "Template deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error deleting template: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+
 # =============================================
 # PLATFORM ANALYTICS
 # =============================================

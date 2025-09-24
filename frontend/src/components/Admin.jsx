@@ -45,11 +45,6 @@ const Admin = () => {
     checkAdminAccess()
   }, [])
 
-  // Debug effect to monitor allTemplates state changes
-  useEffect(() => {
-    console.log('🔄 allTemplates state changed:', allTemplates.length, 'templates')
-    console.log('🔄 allTemplates data:', allTemplates)
-  }, [allTemplates])
 
   const checkAdminAccess = async () => {
     try {
@@ -176,33 +171,21 @@ const Admin = () => {
 
   const loadAllTemplates = async () => {
     try {
-      console.log('🔄 Loading all templates...')
       setLoadingStates(prev => ({ ...prev, allTemplates: true }))
       
       const response = await authService.authenticatedRequest('/api/admin/templates/all')
-      console.log('📡 Templates API response status:', response.status)
-      console.log('📡 Templates API response headers:', response.headers)
-      
       const result = await response.json()
-      console.log('📦 Templates API result:', result)
-      console.log('📦 Templates API result type:', typeof result)
-      console.log('📦 Templates API result.success:', result.success)
-      console.log('📦 Templates API result.templates:', result.templates)
       
       if (result.success) {
-        console.log('✅ Templates loaded successfully:', result.templates?.length || 0, 'templates')
-        console.log('📋 Setting allTemplates state with:', result.templates)
         setAllTemplates(result.templates || [])
-        console.log('📋 allTemplates state should now be set')
       } else {
-        console.error('❌ Failed to load templates:', result)
+        console.error('Failed to load templates:', result)
         setAllTemplates([])
       }
     } catch (error) {
-      console.error('💥 Error loading all templates:', error)
+      console.error('Error loading all templates:', error)
       setAllTemplates([])
     } finally {
-      console.log('🏁 Templates loading complete')
       setLoadingStates(prev => ({ ...prev, allTemplates: false }))
     }
   }
@@ -293,6 +276,59 @@ const Admin = () => {
     } catch (error) {
       console.error('Error bulk rejecting templates:', error)
       toast.error('Failed to reject templates')
+    }
+  }
+
+  const handleDeleteTemplate = async (templateId) => {
+    if (!window.confirm('Are you sure you want to permanently delete this template? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await authService.authenticatedRequest(`/api/admin/templates/${templateId}/delete`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        toast.success('Template deleted successfully')
+        await loadPendingTemplates()
+        await loadAllTemplates()
+        await loadAdminStats()
+      } else {
+        throw new Error('Failed to delete template')
+      }
+    } catch (error) {
+      console.error('Error deleting template:', error)
+      toast.error('Failed to delete template')
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedTemplates.length === 0) {
+      toast.error('Please select templates to delete')
+      return
+    }
+
+    if (!window.confirm(`Are you sure you want to permanently delete ${selectedTemplates.length} templates? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      const promises = selectedTemplates.map(templateId => 
+        authService.authenticatedRequest(`/api/admin/templates/${templateId}/delete`, {
+          method: 'DELETE'
+        })
+      )
+      
+      await Promise.all(promises)
+      toast.success(`${selectedTemplates.length} templates deleted successfully`)
+      setSelectedTemplates([])
+      await loadPendingTemplates()
+      await loadAllTemplates()
+      await loadAdminStats()
+    } catch (error) {
+      console.error('Error bulk deleting templates:', error)
+      toast.error('Failed to delete templates')
     }
   }
 
@@ -623,6 +659,14 @@ const Admin = () => {
                     Reject Selected ({selectedTemplates.length})
                   </button>
                   <button
+                    onClick={handleBulkDelete}
+                    disabled={selectedTemplates.length === 0}
+                    className="px-4 py-2 bg-red-200 hover:bg-red-300 disabled:bg-gray-100 disabled:text-gray-400 text-red-800 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Selected ({selectedTemplates.length})
+                  </button>
+                  <button
                     onClick={loadAllTemplates}
                     className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors flex items-center gap-2"
                   >
@@ -695,13 +739,6 @@ const Admin = () => {
 
             {/* Templates Grid */}
             <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-6 border border-white/30 shadow-xl">
-              {/* Debug Info */}
-              <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
-                Debug: Loading: {loadingStates.allTemplates ? 'true' : 'false'}, 
-                Templates: {allTemplates.length}, 
-                Filtered: {getFilteredTemplates().length}
-              </div>
-              
               {loadingStates.allTemplates ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -795,6 +832,13 @@ const Admin = () => {
                           >
                             <XCircle className="w-4 h-4" />
                             Reject
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTemplate(template.id)}
+                            className="px-3 py-2 bg-red-200 hover:bg-red-300 text-red-800 rounded-lg transition-colors text-sm flex items-center justify-center gap-1"
+                            title="Delete Template"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
