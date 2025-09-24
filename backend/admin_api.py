@@ -692,3 +692,173 @@ async def delete_admin_note(user_id: str, current_user: dict = Depends(get_curre
     except Exception as e:
         logger.error(f"Error deleting admin note for user {user_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to delete admin note")
+
+
+# Analytics Endpoints
+@router.get("/admin/analytics/product-types")
+async def get_product_type_analytics(current_user: dict = Depends(get_current_user)):
+    """Get sales analytics by product type"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get orders with product type information
+        orders_result = supabase.table("orders").select("product_type, status, total_amount").execute()
+        
+        # Process the data
+        product_stats = {}
+        total_revenue = 0
+        
+        for order in orders_result.data:
+            if order["status"] == "completed":
+                product_type = order["product_type"] or "Unknown"
+                amount = float(order["total_amount"] or 0)
+                
+                if product_type not in product_stats:
+                    product_stats[product_type] = {
+                        "count": 0,
+                        "revenue": 0,
+                        "percentage": 0
+                    }
+                
+                product_stats[product_type]["count"] += 1
+                product_stats[product_type]["revenue"] += amount
+                total_revenue += amount
+        
+        # Calculate percentages
+        for product_type in product_stats:
+            if total_revenue > 0:
+                product_stats[product_type]["percentage"] = round(
+                    (product_stats[product_type]["revenue"] / total_revenue) * 100, 2
+                )
+        
+        return {
+            "product_types": product_stats,
+            "total_revenue": total_revenue,
+            "total_orders": sum(stats["count"] for stats in product_stats.values())
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting product type analytics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get product type analytics")
+
+
+@router.get("/admin/analytics/best-selling-designs")
+async def get_best_selling_designs(current_user: dict = Depends(get_current_user)):
+    """Get best selling designs/templates"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get template purchases with template details
+        purchases_result = supabase.table("template_purchases").select(
+            "template_id, created_at, creators(display_name, profile_image_url)"
+        ).execute()
+        
+        # Get creator templates for template details
+        templates_result = supabase.table("creator_templates").select(
+            "id, title, category, product_type, thumbnail_url, is_approved"
+        ).execute()
+        
+        # Create template lookup
+        template_lookup = {t["id"]: t for t in templates_result.data}
+        
+        # Process sales data
+        design_stats = {}
+        
+        for purchase in purchases_result.data:
+            template_id = purchase["template_id"]
+            if template_id in template_lookup:
+                template = template_lookup[template_id]
+                template_key = f"{template_id}_{template['title']}"
+                
+                if template_key not in design_stats:
+                    design_stats[template_key] = {
+                        "template_id": template_id,
+                        "title": template["title"],
+                        "category": template["category"],
+                        "product_type": template["product_type"],
+                        "thumbnail_url": template["thumbnail_url"],
+                        "creator": purchase.get("creators", {}),
+                        "sales_count": 0,
+                        "last_sale": None
+                    }
+                
+                design_stats[template_key]["sales_count"] += 1
+                design_stats[template_key]["last_sale"] = purchase["created_at"]
+        
+        # Sort by sales count and return top 10
+        top_designs = sorted(
+            design_stats.values(), 
+            key=lambda x: x["sales_count"], 
+            reverse=True
+        )[:10]
+        
+        return {"top_designs": top_designs}
+        
+    except Exception as e:
+        logger.error(f"Error getting best selling designs: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get best selling designs")
+
+
+@router.get("/admin/analytics/best-selling-regions")
+async def get_best_selling_regions(current_user: dict = Depends(get_current_user)):
+    """Get sales analytics by region/state"""
+    try:
+        # TODO: Add proper admin role check
+        if current_user.get("email") != "Brainboxjp@gmail.com":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Get orders with shipping address information
+        orders_result = supabase.table("orders").select(
+            "shipping_address, status, total_amount, created_at"
+        ).execute()
+        
+        # Process the data
+        region_stats = {}
+        total_revenue = 0
+        
+        for order in orders_result.data:
+            if order["status"] == "completed":
+                shipping_address = order.get("shipping_address", {})
+                state = shipping_address.get("state", "Unknown")
+                amount = float(order["total_amount"] or 0)
+                
+                if state not in region_stats:
+                    region_stats[state] = {
+                        "count": 0,
+                        "revenue": 0,
+                        "percentage": 0,
+                        "last_order": None
+                    }
+                
+                region_stats[state]["count"] += 1
+                region_stats[state]["revenue"] += amount
+                region_stats[state]["last_order"] = order["created_at"]
+                total_revenue += amount
+        
+        # Calculate percentages
+        for state in region_stats:
+            if total_revenue > 0:
+                region_stats[state]["percentage"] = round(
+                    (region_stats[state]["revenue"] / total_revenue) * 100, 2
+                )
+        
+        # Sort by revenue and return top 15
+        top_regions = sorted(
+            region_stats.items(), 
+            key=lambda x: x[1]["revenue"], 
+            reverse=True
+        )[:15]
+        
+        return {
+            "regions": dict(top_regions),
+            "total_revenue": total_revenue,
+            "total_orders": sum(stats["count"] for stats in region_stats.values())
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting best selling regions: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get best selling regions")

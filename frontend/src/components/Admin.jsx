@@ -39,7 +39,8 @@ const Admin = () => {
     pendingTemplates: true,
     recentUsers: true,
     allTemplates: true,
-    users: true
+    users: true,
+    analytics: false
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -47,12 +48,24 @@ const Admin = () => {
   const [userDetails, setUserDetails] = useState({})
   const [adminNotes, setAdminNotes] = useState({})
   const [editingNotes, setEditingNotes] = useState(null)
+  const [analyticsData, setAnalyticsData] = useState({
+    productTypes: null,
+    bestSellingDesigns: null,
+    bestSellingRegions: null
+  })
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const navigate = useNavigate()
 
   useEffect(() => {
     checkAdminAccess()
   }, [])
+
+  useEffect(() => {
+    if (activeTab === 'analytics' && isAdmin && !analyticsData.productTypes) {
+      loadAnalyticsData()
+    }
+  }, [activeTab, isAdmin])
 
 
   const checkAdminAccess = async () => {
@@ -64,13 +77,14 @@ const Admin = () => {
       }
 
       // Check if user is admin (you can implement your own admin check logic)
-      const isAdmin = await checkIfAdmin(currentUser.user_id)
-      if (!isAdmin) {
+      const adminStatus = await checkIfAdmin(currentUser.user_id)
+      if (!adminStatus) {
         toast.error('Access denied. Admin privileges required.')
         navigate('/dashboard')
         return
       }
 
+      setIsAdmin(true)
       setUser(currentUser)
       await loadAdminData()
     } catch (error) {
@@ -510,6 +524,33 @@ const Admin = () => {
 
   const cancelEditingNotes = () => {
     setEditingNotes(null)
+  }
+
+  const loadAnalyticsData = async () => {
+    try {
+      setLoadingStates(prev => ({ ...prev, analytics: true }))
+      
+      const [productTypesResponse, bestSellingResponse, regionsResponse] = await Promise.all([
+        authService.authenticatedRequest('/api/admin/analytics/product-types'),
+        authService.authenticatedRequest('/api/admin/analytics/best-selling-designs'),
+        authService.authenticatedRequest('/api/admin/analytics/best-selling-regions')
+      ])
+      
+      const productTypes = await productTypesResponse.json()
+      const bestSelling = await bestSellingResponse.json()
+      const regions = await regionsResponse.json()
+      
+      setAnalyticsData({
+        productTypes,
+        bestSellingDesigns: bestSelling,
+        bestSellingRegions: regions
+      })
+    } catch (error) {
+      console.error('Error loading analytics data:', error)
+      toast.error('Failed to load analytics data')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, analytics: false }))
+    }
   }
 
   const getFilteredTemplates = () => {
@@ -1464,9 +1505,159 @@ const Admin = () => {
         )}
 
         {activeTab === 'analytics' && (
-          <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Platform Analytics</h2>
-            <p className="text-gray-600">Analytics dashboard coming soon...</p>
+          <div className="space-y-6">
+            {/* Analytics Header */}
+            <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                  <BarChart3 className="w-5 h-5 mr-2 text-[#00D755]" />
+                  Platform Analytics
+                </h2>
+                <button
+                  onClick={loadAnalyticsData}
+                  disabled={loadingStates.analytics}
+                  className="px-4 py-2 bg-[#00D755] hover:bg-[#00D755]/90 text-white rounded-lg transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${loadingStates.analytics ? 'animate-spin' : ''}`} />
+                  Refresh Data
+                </button>
+              </div>
+            </div>
+
+            {loadingStates.analytics ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00D755]"></div>
+                <span className="ml-2 text-gray-600">Loading analytics...</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Product Type Analytics */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Package className="w-5 h-5 mr-2 text-blue-600" />
+                    Product Type Performance
+                  </h3>
+                  {analyticsData.productTypes ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="text-center p-3 bg-white/30 rounded-lg">
+                          <div className="text-2xl font-bold text-[#00D755]">
+                            ${analyticsData.productTypes.total_revenue?.toLocaleString() || 0}
+                          </div>
+                          <div className="text-sm text-gray-600">Total Revenue</div>
+                        </div>
+                        <div className="text-center p-3 bg-white/30 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {analyticsData.productTypes.total_orders || 0}
+                          </div>
+                          <div className="text-sm text-gray-600">Total Orders</div>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        {Object.entries(analyticsData.productTypes.product_types || {}).map(([productType, stats]) => (
+                          <div key={productType} className="p-3 bg-white/30 rounded-lg">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-medium text-gray-900 capitalize">{productType}</span>
+                              <span className="text-sm text-gray-600">{stats.percentage}%</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-gray-600">
+                              <span>{stats.count} orders</span>
+                              <span>${stats.revenue.toLocaleString()}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                              <div 
+                                className="bg-[#00D755] h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${stats.percentage}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No product type data available</p>
+                  )}
+                </div>
+
+                {/* Best Selling Regions */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-2 text-purple-600" />
+                    Top Selling Regions
+                  </h3>
+                  {analyticsData.bestSellingRegions ? (
+                    <div className="space-y-3">
+                      {Object.entries(analyticsData.bestSellingRegions.regions || {}).slice(0, 8).map(([region, stats]) => (
+                        <div key={region} className="p-3 bg-white/30 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium text-gray-900">{region}</span>
+                            <span className="text-sm text-gray-600">{stats.percentage}%</span>
+                          </div>
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span>{stats.count} orders</span>
+                            <span>${stats.revenue.toLocaleString()}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div 
+                              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${stats.percentage}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No regional data available</p>
+                  )}
+                </div>
+
+                {/* Best Selling Designs */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/50 shadow-lg lg:col-span-2">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Palette className="w-5 h-5 mr-2 text-orange-600" />
+                    Best Selling Designs
+                  </h3>
+                  {analyticsData.bestSellingDesigns ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {analyticsData.bestSellingDesigns.top_designs?.slice(0, 6).map((design, index) => (
+                        <div key={design.template_id} className="p-4 bg-white/30 rounded-lg border border-white/50">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-[#00D755] text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+                                {index + 1}
+                              </div>
+                              <div>
+                                <h4 className="font-medium text-gray-900 text-sm">{design.title}</h4>
+                                <p className="text-xs text-gray-600 capitalize">{design.product_type}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold text-[#00D755]">{design.sales_count}</div>
+                              <div className="text-xs text-gray-600">sales</div>
+                            </div>
+                          </div>
+                          {design.thumbnail_url && (
+                            <div className="w-full h-20 bg-gray-100 rounded-lg mb-3 overflow-hidden">
+                              <img 
+                                src={design.thumbnail_url} 
+                                alt={design.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center text-xs text-gray-600">
+                            <span className="capitalize">{design.category}</span>
+                            <span>{design.creator?.display_name || 'Unknown Creator'}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No design sales data available</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
