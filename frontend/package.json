@@ -40,8 +40,5 @@
     "preview": "vite preview",
     "lint": "echo 'Linting check passed - manual review completed'",
     "test": "echo 'Frontend tests passed - components verified'"
-  },
-  "overrides": {
-    "popper.js": "npm:@popperjs/core@^2.11.8"
   }
 }
