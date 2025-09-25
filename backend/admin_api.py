@@ -772,14 +772,22 @@ async def get_best_selling_designs(current_user: dict = Depends(get_current_user
         # TODO: Implement proper admin role system in production
         
         # Get template purchases with template details
-        purchases_result = db_manager.supabase.table("template_purchases").select(
-            "template_id, created_at, creators(display_name, profile_image_url)"
-        ).execute()
+        try:
+            purchases_result = db_manager.supabase.table("template_purchases").select(
+                "template_id, purchased_at, price_paid, creator_earnings"
+            ).execute()
+        except Exception as e:
+            logger.warning(f"template_purchases table not found or accessible: {str(e)}")
+            purchases_result = type('obj', (object,), {'data': []})()
         
         # Get creator templates for template details
-        templates_result = db_manager.supabase.table("creator_templates").select(
-            "id, title, category, product_type, thumbnail_url, is_approved"
-        ).execute()
+        try:
+            templates_result = db_manager.supabase.table("creator_templates").select(
+                "id, title, category, product_type, thumbnail_url, is_approved"
+            ).execute()
+        except Exception as e:
+            logger.warning(f"creator_templates table not found or accessible: {str(e)}")
+            templates_result = type('obj', (object,), {'data': []})()
         
         # Create template lookup
         template_lookup = {t["id"]: t for t in templates_result.data}
@@ -806,7 +814,7 @@ async def get_best_selling_designs(current_user: dict = Depends(get_current_user
                     }
                 
                 design_stats[template_key]["sales_count"] += 1
-                design_stats[template_key]["last_sale"] = purchase["created_at"]
+                design_stats[template_key]["last_sale"] = purchase["purchased_at"]
         
         # Sort by sales count and return top 10
         top_designs = sorted(
@@ -815,7 +823,20 @@ async def get_best_selling_designs(current_user: dict = Depends(get_current_user
             reverse=True
         )[:10]
         
-        return {"top_designs": top_designs}
+        # If no data, return empty result with message
+        if not top_designs:
+            return {
+                "top_designs": [],
+                "total_designs": 0,
+                "total_sales": 0,
+                "message": "No template purchase data available. Create template_purchases table to track sales."
+            }
+        
+        return {
+            "top_designs": top_designs,
+            "total_designs": len(design_stats),
+            "total_sales": sum(d["sales_count"] for d in design_stats.values())
+        }
         
     except Exception as e:
         logger.error(f"Error getting best selling designs: {str(e)}")
