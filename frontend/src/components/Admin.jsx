@@ -787,7 +787,7 @@ const Admin = () => {
       <div className="sm:hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 p-3 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center min-w-0 flex-1">
           <img 
-            src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+            src="/assets/images/buyprintz_logo.avif" 
             alt="BuyPrintz" 
             className="w-6 h-6 rounded-lg flex-shrink-0"
           />
@@ -821,7 +821,7 @@ const Admin = () => {
               <div className="flex items-center justify-center w-full">
                 <div className="w-12 h-12 sm:w-24 sm:h-24 rounded-lg sm:rounded-xl shadow-lg flex items-center justify-center">
                     <img 
-                      src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                      src="/assets/images/buyprintz_logo.avif" 
                       alt="BuyPrintz Logo" 
                       className="w-8 h-8 sm:w-20 sm:h-20 object-contain"
                       onError={(e) => {

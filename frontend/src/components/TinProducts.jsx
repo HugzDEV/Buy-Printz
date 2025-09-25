@@ -169,7 +169,7 @@ const TinProducts = () => {
               {/* Product Image */}
               <div className="flex justify-center lg:justify-end">
                 <img
-                  src="/assets/images/Tins_BC_v2_new phone number.png"
+                  src="/assets/images/business_card_tin.avif"
                   alt="Finished Business Card Tin Product"
                   className="w-full max-w-md object-contain"
                 />

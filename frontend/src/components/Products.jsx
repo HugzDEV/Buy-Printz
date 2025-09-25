@@ -21,7 +21,7 @@ const Products = () => {
       name: "13oz Vinyl Banner",
       price: "$1.60/sqft",
       description: "Our most popular banner - perfect for outdoor use with weather resistance and vibrant colors",
-      image: "/assets/images/13oz Vinyl Banner.jpg",
+      image: "/assets/images/13oz Vinyl Banner.avif",
       features: ["Weather resistant", "Full color printing", "Grommets included", "UV resistant"],
       bestseller: true,
       specs: {

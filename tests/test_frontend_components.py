@@ -126,8 +126,8 @@ class TestAssets:
     def test_logo_assets_exist(self):
         """Test that logo assets exist"""
         logo_paths = [
-            os.path.join("frontend", "src", "assets", "images", "BuyPrintz_LOGO_Final-Social Media_Transparent.png"),
-            os.path.join("frontend", "public", "assets", "images", "BuyPrintz_LOGO_Final-Social Media_Transparent.png")
+            os.path.join("frontend", "src", "assets", "images", "buyprintz_logo.avif"),
+            os.path.join("frontend", "public", "assets", "images", "buyprintz_logo.avif")
         ]
         
         logo_exists = any(os.path.exists(path) for path in logo_paths)

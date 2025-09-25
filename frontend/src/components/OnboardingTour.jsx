@@ -138,7 +138,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           <div className="flex justify-center">
             <div className="p-3 bg-white rounded-full shadow-lg">
               <img 
-                src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                src="/assets/images/buyprintz_logo.avif" 
                 alt="BuyPrintz Logo" 
                 className="w-8 h-8 object-contain"
               />
@@ -215,7 +215,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           <div className="flex justify-center">
             <div className="p-3 bg-white rounded-full shadow-lg">
               <img 
-                src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                src="/assets/images/buyprintz_logo.avif" 
                 alt="BuyPrintz Logo" 
                 className="w-8 h-8 object-contain"
               />
@@ -427,7 +427,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
                      <div className="flex justify-center">
              <div className="p-4 bg-white rounded-full shadow-lg">
                <img 
-                 src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                 src="/assets/images/buyprintz_logo.avif" 
                  alt="BuyPrintz Logo" 
                  className="w-16 h-16 object-contain"
                />

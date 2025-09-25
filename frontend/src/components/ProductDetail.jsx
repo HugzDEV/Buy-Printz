@@ -10,7 +10,7 @@ const ProductDetail = () => {
     'vinyl-13oz': {
       name: "13oz Vinyl Banner",
       price: "From $25",
-      image: "/assets/images/13oz Vinyl Banner.jpg",
+      image: "/assets/images/13oz Vinyl Banner.avif",
       description: "We use a premium heavyweight 13 oz. scrim vinyl banner. This material looks great indoors, but designed to stand up to the elements outdoors. This material is typically used for billboards, building wraps, banners, event flags, trade show signage, parades, and more.\n\nStandard hems and grommets are no extra charge, and we offer a lineup of finishing options to satisfy specialty applications and city ordinances.\n\nPlease Note:\n• All banners 89\" or larger on their shortest side will be shipped folded.\n• All banners 88\" and under on their shortest side will be shipped rolled.",
       spec: {
         features: [
@@ -477,7 +477,7 @@ const ProductDetail = () => {
     'tent-10x10': {
       name: "10x10 Event Tent",
       price: "From $299",
-      image: "/assets/images/tent_complete-buyprintz.jpg",
+      image: "/assets/images/tent_complete-buyprintz.avif",
       description: "The 10x10 Event Tent is the next level in outdoor advertising. Achieve 360 degrees of branding with a custom full fabric dye sub canopy and hardware package.\n\nCanopy is printed and sewn weather resistant tent polyester. Print your brand message on each of the four peaks and valance panels. Our large format full color capabilities take artwork seam to seam unlike competitor tents that rely on small vinyl applications.\n\nHeavy duty hex shape 40 mm. aluminum hardware gives the tent extra strength when exhibited outdoors, our frame is a serious upgrade from steel framed tents that bend and buckle easily. Telescopic legs allow you to adjust the height, and the interior lattice expands the tent interior with the crank of a handle. Each leg has a foot plate ready to be staked to the ground. (Ropes, stakes, and standard carrying bag included with hardware).",
       spec: {
         features: [
@@ -588,7 +588,7 @@ const ProductDetail = () => {
     'tin-100-front-back': {
       name: "Business Card Tin - 100 Units (Front + Back)",
       price: "From $399",
-      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      image: "/assets/images/13oz Vinyl Banner.avif", // Placeholder - will need tin image
       description: "Premium aluminum business card tins with custom vinyl stickers on front and back surfaces. Perfect for professional networking and memorable business card storage.\n\nThese high-quality aluminum tins provide a premium feel and lasting impression. The custom vinyl stickers are professionally applied and designed to withstand daily use while maintaining their vibrant appearance.\n\nIdeal for real estate agents, financial advisors, consultants, and any professional who wants to make a lasting impression with their business cards.",
       spec: {
         features: [
@@ -634,7 +634,7 @@ const ProductDetail = () => {
     'tin-250-front-back': {
       name: "Business Card Tin - 250 Units (Front + Back)",
       price: "From $749",
-      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      image: "/assets/images/13oz Vinyl Banner.avif", // Placeholder - will need tin image
       description: "Premium aluminum business card tins with custom vinyl stickers - perfect for larger networking events and businesses with high client volume.\n\nThis larger quantity option provides excellent value for businesses that attend multiple trade shows, conferences, or networking events throughout the year. The same premium quality and professional application as our 100-unit option.\n\nPerfect for established businesses, franchises, or companies with large sales teams who need a consistent, professional branding solution.",
       spec: {
         features: [
@@ -681,7 +681,7 @@ const ProductDetail = () => {
     'tin-100-all-sides': {
       name: "Business Card Tin - 100 Units (All Sides)",
       price: "From $499",
-      image: "/assets/images/13oz Vinyl Banner.jpg", // Placeholder - will need tin image
+      image: "/assets/images/13oz Vinyl Banner.avif", // Placeholder - will need tin image
       description: "Complete tin branding with custom vinyl stickers on all surfaces - front, back, inside, and lid. The ultimate branding solution for maximum impact.\n\nThis comprehensive branding package ensures your business information is visible from every angle. Perfect for high-end networking events where you want to make the strongest possible impression.\n\nIdeal for luxury brands, premium services, and professionals who want to showcase attention to detail and quality in every aspect of their business presentation.",
       spec: {
         features: [

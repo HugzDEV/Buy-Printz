@@ -67,7 +67,7 @@ const Register = () => {
         {/* BuyPrintz Logo */}
         <div className="flex justify-center mb-6">
           <img 
-            src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+            src="/assets/images/buyprintz_logo.avif" 
             alt="BuyPrintz Logo" 
             className="h-32 w-auto"
           />

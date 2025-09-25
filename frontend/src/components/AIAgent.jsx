@@ -147,7 +147,7 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
           className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 p-3 rounded-full"
         >
           <img 
-            src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+            src="/assets/images/buyprintz_logo.avif" 
             alt="BuyPrintz Agent" 
             className="w-6 h-6 object-contain"
           />
@@ -165,7 +165,7 @@ const AIAgent = ({ onDesignGenerated, onDesignModified, currentDesignId }) => {
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center p-1">
               <img 
-                src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+                src="/assets/images/buyprintz_logo.avif" 
                 alt="BuyPrintz Agent" 
                 className="w-6 h-6 object-contain"
               />

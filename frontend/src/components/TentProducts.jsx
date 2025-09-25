@@ -44,7 +44,7 @@ const TentProducts = () => {
       name: "10x10 Complete Tent + Walls",
       price: "$750.00 - $900.00",
       description: "Complete tent with frame, canopy, and wall options. Enhanced coverage with sidewalls and/or backwall for maximum branding and protection.",
-      image: "/assets/images/tent_complete-buyprintz.jpg",
+      image: "/assets/images/tent_complete-buyprintz.avif",
       features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Canopy + wall graphics", "Complete package with accessories"],
       premium: true,
       specs: {
@@ -308,7 +308,7 @@ const TentProducts = () => {
               {
                 name: "Full Wall",
                 description: "Complete wall coverage for privacy",
-                image: "/assets/images/tent_complete-buyprintz.jpg"
+                image: "/assets/images/tent_complete-buyprintz.avif"
               },
               {
                 name: "Half Wall",

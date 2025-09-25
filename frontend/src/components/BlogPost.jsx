@@ -152,7 +152,7 @@ Ready to make your marketing more sustainable? Contact BuyPrintz today to discus
       readTime: "6 min read",
       category: "Sustainability",
       tags: ["eco-friendly marketing", "sustainable business", "business card tins", "environmental responsibility", "green marketing", "reusable marketing"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/business_card_tin.avif",
       excerpt: "The average business professional receives 2,000 business cards per year. Where do most end up? Landfills. That's 4 billion business cards annually contributing to waste. Discover how our Business Card Tins offer a revolutionary sustainable alternative."
     },
     {
@@ -248,7 +248,7 @@ Ready to get started? Contact BuyPrintz today to discuss your startup marketing 
       readTime: "7 min read",
       category: "Startup Marketing",
       tags: ["startup marketing", "business cards", "trade show tents", "banners", "entrepreneurship", "marketing tools"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/business_card_tin.avif",
       excerpt: "Starting a business? Before you dump thousands into Facebook ads or Google campaigns, make sure you have these three physical marketing essentials that create lasting impressions and build genuine connections."
     },
     {
@@ -325,7 +325,7 @@ Contact BuyPrintz today to discuss your custom Business Card Tin design. Let's c
       readTime: "6 min read",
       category: "Business Cards",
       tags: ["business cards", "networking", "entrepreneurship", "marketing", "innovation"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/business_card_tin.avif",
       excerpt: "Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers."
     },
     {
@@ -472,7 +472,7 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
       readTime: "8 min read",
       category: "Business Cards",
       tags: ["business cards", "networking", "sustainability", "innovation", "marketing"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/business_card_tin.avif",
       excerpt: "Gone are the days when business cards meant flimsy paper rectangles destined for the bottom of a briefcase. Today's professionals need networking tools that make lasting impressions, and we've discovered the perfect solution: custom Business Card Tins."
     }
   ]
@@ -530,7 +530,7 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
       "name": "BuyPrintz",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+        "url": "https://buyprintz.com/assets/images/buyprintz_logo.avif"
       }
     },
     "datePublished": post.date,

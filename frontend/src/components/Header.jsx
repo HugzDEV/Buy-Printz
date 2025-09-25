@@ -78,7 +78,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <img 
-              src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+              src="/assets/images/buyprintz_logo.avif" 
               alt="Buy Printz" 
               className="w-20 h-20 md:w-28 md:h-28 object-contain"
             />

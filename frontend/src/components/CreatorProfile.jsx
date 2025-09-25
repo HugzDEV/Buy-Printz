@@ -203,7 +203,7 @@ const CreatorProfile = () => {
     keywords: `${creator.display_name}, creator, designer, templates, marketplace, BuyPrintz, ${creator.bio || ''}`,
     ogTitle: `${creator.display_name} - Creator Profile`,
     ogDescription: `Check out ${creator.display_name}'s amazing designs on BuyPrintz!`,
-    ogImage: creator.profile_image_url || '/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png'
+    ogImage: creator.profile_image_url || '/assets/images/buyprintz_logo.avif'
   };
 
   return (

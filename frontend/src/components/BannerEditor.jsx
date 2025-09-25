@@ -4565,7 +4565,7 @@ const BannerEditorNew = () => {
             className="flex items-center hover:opacity-80 transition-opacity duration-200"
           >
             <img 
-              src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+              src="/assets/images/buyprintz_logo.avif" 
               alt="BuyPrintz" 
               className="h-16 md:h-24 w-auto"
             />
