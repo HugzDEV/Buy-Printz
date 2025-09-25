@@ -1,6 +1,8 @@
-module.exports = {
+import autoprefixer from 'autoprefixer'
+
+export default {
   plugins: {
-    autoprefixer: {},
+    autoprefixer
     // Uncomment to enable CSS purging (requires @fullhuman/postcss-purgecss)
     // '@fullhuman/postcss-purgecss': {
     //   content: [

@@ -78,32 +78,7 @@ export default defineConfig({
     },
     // CSS optimization
     cssCodeSplit: true,
-    cssMinify: true,
-    // Additional CSS optimization
-    css: {
-      postcss: {
-        plugins: [
-          // Add PostCSS plugins for CSS optimization
-          require('autoprefixer'),
-          // Uncomment the following for CSS purging (requires postcss-purgecss)
-          // require('@fullhuman/postcss-purgecss')({
-          //   content: [
-          //     './src/**/*.{js,jsx,ts,tsx}',
-          //     './index.html'
-          //   ],
-          //   defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
-          //   safelist: [
-          //     /^bg-/,
-          //     /^text-/,
-          //     /^border-/,
-          //     /^hover:/,
-          //     /^focus:/,
-          //     /^active:/
-          //   ]
-          // })
-        ]
-      }
-    }
+    cssMinify: true
   },
   preview: {
     port: 3000,
