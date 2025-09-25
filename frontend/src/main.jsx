@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
@@ -9,25 +9,9 @@ import App from './App.jsx'
 import './index.css'
 import { addGlobalDownloadProtection } from './utils/downloadProtection'
 
-// Lazy load non-critical components
-const LazyApp = React.lazy(() => import('./App.jsx'))
-
-// Initialize Stripe with optimized loading
+// Initialize Stripe
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-
-// Lazy load Stripe only when needed to improve initial page load
-let stripePromise = null
-const loadStripeWhenNeeded = () => {
-  if (!stripePromise && stripeKey) {
-    stripePromise = loadStripe(stripeKey, {
-      // Optimize Stripe loading
-      stripeAccount: undefined,
-      apiVersion: '2023-10-16', // Use stable API version
-      locale: 'en'
-    })
-  }
-  return stripePromise
-}
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null
 
 if (!stripeKey) {
   console.warn('VITE_STRIPE_PUBLISHABLE_KEY not found. Payment functionality will be disabled.')
@@ -44,20 +28,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         v7_relativeSplatPath: true
       }}
     >
-      <Elements stripe={loadStripeWhenNeeded()}>
-        <Suspense fallback={
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            fontFamily: 'Inter, system-ui, sans-serif'
-          }}>
-            <div>Loading BuyPrintz...</div>
-          </div>
-        }>
-          <App />
-        </Suspense>
+      <Elements stripe={stripePromise}>
+        <App />
         <Toaster 
           position="top-right"
           toastOptions={{

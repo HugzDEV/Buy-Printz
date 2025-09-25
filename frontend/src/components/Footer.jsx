@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
               <img 
-                src="/assets/images/buyprintz_logo.png" 
+                src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
                 alt="Buy Printz" 
                 className="w-24 h-24 object-contain"
               />

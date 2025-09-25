@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Star, Truck, Shield, Palette, Zap, Award, Users, Sparkles } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
 import Footer from './Footer'
-import OptimizedImage from './OptimizedImage'
 
 const LandingPage = () => {
   const features = [
@@ -35,8 +34,7 @@ const LandingPage = () => {
       name: "Vinyl Banners",
       price: "From $1.60/sqft",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
-      image: "/assets/images/13oz Vinyl Banner.avif",
-      fallbackImage: "/assets/images/original_pics/13oz Vinyl Banner.jpg",
+      image: "/assets/images/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included"],
       badge: "Best Seller",
       category: "banner",
@@ -46,22 +44,21 @@ const LandingPage = () => {
       name: "Business Card Tins",
       price: "From $399.99",
       description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking (100 unit minimum)",
-      image: "/assets/images/business_card_tin.png",
+      image: "/assets/images/Tins_BC_v2_new phone number.png",
       features: ["Premium aluminum", "Custom vinyl stickers", "100 unit minimum"],
       badge: "New",
       category: "tin",
-      link: "/business-card-tins"
+      link: "/tin-products"
     },
     {
       name: "Tradeshow Tents",
       price: "From $325.00",
       description: "Professional tradeshow tents with custom graphics for maximum event impact (canopy-only option available)",
-      image: "/assets/images/tent_complete-buyprintz.avif",
-      fallbackImage: "/assets/images/original_pics/tent_complete-buyprintz.jpg",
+      image: "/assets/images/tent_complete-buyprintz.jpg",
       features: ["10x10 & 10x20 sizes", "Custom graphics", "Canopy-only option"],
       badge: "New",
       category: "tent",
-      link: "/tradeshow-tents"
+      link: "/tent-products"
     }
   ]
 
@@ -75,8 +72,8 @@ const LandingPage = () => {
     "url": "https://buyprintz.com",
     "telephone": "+1-555-BUY-PRINT",
     "email": "orders@buyprintz.com",
-    "logo": "https://buyprintz.com/assets/images/buyprintz_logo.png",
-    "image": "https://buyprintz.com/assets/images/buyprintz_logo.png",
+    "logo": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
+    "image": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
     "priceRange": "$25-$500",
     "paymentAccepted": "Credit Card, Debit Card",
     "currenciesAccepted": "USD",

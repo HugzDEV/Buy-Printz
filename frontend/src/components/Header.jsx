@@ -50,21 +50,23 @@ const Header = () => {
   const productOptions = [
     { name: 'All Products', href: '/all-products' },
     { name: 'Vinyl Banners', href: '/banner-products' },
-    { name: 'Business Card Tins', href: '/business-card-tins' },
-    { name: 'Tradeshow Tents', href: '/tradeshow-tents' },
+    { name: 'Business Card Tins', href: '/tin-products' },
+    { name: 'Tradeshow Tents', href: '/tent-products' },
     { name: 'Tin Skinz', href: '/tin-skinz' }
   ]
 
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Design', href: '/editor' },
-    { name: 'Marketplace', href: '/marketplace' }
+    { name: 'Marketplace', href: '/marketplace' },
+    { name: 'Blog', href: '/blog' }
   ]
 
   const authenticatedNavigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Design', href: '/editor' },
-    { name: 'Marketplace', href: '/marketplace' }
+    { name: 'Marketplace', href: '/marketplace' },
+    { name: 'Blog', href: '/blog' }
   ]
 
   const currentNavigation = user ? authenticatedNavigation : navigation
@@ -75,17 +77,11 @@ const Header = () => {
         <div className="flex justify-between items-center h-20 md:h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
-            <picture>
-              <source srcSet="/assets/images/buyprintz_logo.avif" type="image/avif" />
-              <img 
-                src="/assets/images/original_pics/buyprintz_logo.png" 
-                alt="Buy Printz" 
-                className="w-20 h-20 md:w-28 md:h-28 object-contain"
-                loading="eager"
-                width="112"
-                height="112"
-              />
-            </picture>
+            <img 
+              src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
+              alt="Buy Printz" 
+              className="w-20 h-20 md:w-28 md:h-28 object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation - Aligned with buttons */}

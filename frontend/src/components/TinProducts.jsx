@@ -70,7 +70,7 @@ const TinProducts = () => {
     "@type": "CollectionPage",
     "name": "Business Card Tins - Custom Aluminum Tins with Mints",
     "description": "Premium aluminum business card tins with custom vinyl stickers and fresh mints. Perfect for professional networking and memorable first impressions. 100 unit minimum orders.",
-    "url": "https://buyprintz.com/business-card-tins",
+    "url": "https://buyprintz.com/tin-products",
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": tinFinishes.length,
@@ -168,17 +168,11 @@ const TinProducts = () => {
               
               {/* Product Image */}
               <div className="flex justify-center lg:justify-end">
-                <picture>
-                  <source srcSet="/assets/images/business_card_tin.avif" type="image/avif" />
-                  <img
-                    src="/assets/images/original_pics/business_card_tin.png"
-                    alt="Finished Business Card Tin Product"
-                    className="w-full max-w-md object-contain"
-                    loading="lazy"
-                    width="393"
-                    height="393"
-                  />
-                </picture>
+                <img
+                  src="/assets/images/Tins_BC_v2_new phone number.png"
+                  alt="Finished Business Card Tin Product"
+                  className="w-full max-w-md object-contain"
+                />
               </div>
             </div>
           </div>
