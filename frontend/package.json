@@ -3,19 +3,6 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "browserslist": [
-    "> 0.5%",
-    "last 2 versions",
-    "not dead",
-    "not IE 11",
-    "not IE_Mob 11",
-    "Chrome >= 80",
-    "Firefox >= 72",
-    "Safari >= 13.1",
-    "Edge >= 80",
-    "iOS >= 13.4",
-    "Android >= 80"
-  ],
   "dependencies": {
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.4.0",
@@ -53,5 +40,8 @@
     "preview": "vite preview",
     "lint": "echo 'Linting check passed - manual review completed'",
     "test": "echo 'Frontend tests passed - components verified'"
+  },
+  "overrides": {
+    "popper.js": "npm:@popperjs/core@^2.11.8"
   }
 }
