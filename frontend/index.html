@@ -75,6 +75,11 @@
     <link rel="dns-prefetch" href="//www.googletagmanager.com">
     <link rel="dns-prefetch" href="//www.google-analytics.com">
     
+    <!-- Image optimization hints -->
+    <link rel="preload" href="/assets/images/buyprintz_logo.avif" as="image" type="image/avif">
+    <link rel="preload" href="/assets/images/original_pics/buyprintz_logo.png" as="image" type="image/png">
+    <meta name="image-optimization" content="webp,avif">
+    
     <!-- Critical CSS to prevent layout shifts -->
     <style>
       /* Critical styles for above-the-fold content */
@@ -100,6 +105,24 @@
         font-family: 'Inter';
         font-display: swap;
         src: local('Inter'), local('Inter-Regular');
+      }
+      
+      /* Image optimization */
+      img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: optimize-contrast;
+        -ms-interpolation-mode: nearest-neighbor;
+      }
+      
+      /* Lazy loading optimization */
+      img[loading="lazy"] {
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      
+      img[loading="lazy"].loaded {
+        opacity: 1;
       }
     </style>
     
@@ -255,6 +278,34 @@
       
       // Initialize font loading fallback
       handleFontLoading();
+      
+      // Image loading optimization
+      function optimizeImageLoading() {
+        // Add loaded class to lazy images when they load
+        const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+        lazyImages.forEach(img => {
+          img.addEventListener('load', function() {
+            this.classList.add('loaded');
+          });
+        });
+        
+        // Preload critical images
+        const criticalImages = [
+          '/assets/images/buyprintz_logo.avif',
+          '/assets/images/original_pics/buyprintz_logo.png'
+        ];
+        
+        criticalImages.forEach(src => {
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.as = 'image';
+          link.href = src;
+          document.head.appendChild(link);
+        });
+      }
+      
+      // Initialize image optimization
+      optimizeImageLoading();
     </script>
   </body>
 </html>

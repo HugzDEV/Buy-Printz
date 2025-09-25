@@ -168,11 +168,17 @@ const TinProducts = () => {
               
               {/* Product Image */}
               <div className="flex justify-center lg:justify-end">
-                <img
-                  src="/assets/images/business_card_tin.png"
-                  alt="Finished Business Card Tin Product"
-                  className="w-full max-w-md object-contain"
-                />
+                <picture>
+                  <source srcSet="/assets/images/business_card_tin.avif" type="image/avif" />
+                  <img
+                    src="/assets/images/original_pics/business_card_tin.png"
+                    alt="Finished Business Card Tin Product"
+                    className="w-full max-w-md object-contain"
+                    loading="lazy"
+                    width="393"
+                    height="393"
+                  />
+                </picture>
               </div>
             </div>
           </div>

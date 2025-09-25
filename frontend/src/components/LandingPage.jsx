@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Star, Truck, Shield, Palette, Zap, Award, Users, Sparkles } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
 import Footer from './Footer'
+import OptimizedImage from './OptimizedImage'
 
 const LandingPage = () => {
   const features = [
@@ -34,7 +35,8 @@ const LandingPage = () => {
       name: "Vinyl Banners",
       price: "From $1.60/sqft",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
-      image: "/assets/images/13oz Vinyl Banner.jpg",
+      image: "/assets/images/13oz Vinyl Banner.avif",
+      fallbackImage: "/assets/images/original_pics/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included"],
       badge: "Best Seller",
       category: "banner",
@@ -54,7 +56,8 @@ const LandingPage = () => {
       name: "Tradeshow Tents",
       price: "From $325.00",
       description: "Professional tradeshow tents with custom graphics for maximum event impact (canopy-only option available)",
-      image: "/assets/images/tent_complete-buyprintz.jpg",
+      image: "/assets/images/tent_complete-buyprintz.avif",
+      fallbackImage: "/assets/images/original_pics/tent_complete-buyprintz.jpg",
       features: ["10x10 & 10x20 sizes", "Custom graphics", "Canopy-only option"],
       badge: "New",
       category: "tent",

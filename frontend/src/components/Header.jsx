@@ -77,11 +77,17 @@ const Header = () => {
         <div className="flex justify-between items-center h-20 md:h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
-            <img 
-              src="/assets/images/buyprintz_logo.png" 
-              alt="Buy Printz" 
-              className="w-20 h-20 md:w-28 md:h-28 object-contain"
-            />
+            <picture>
+              <source srcSet="/assets/images/buyprintz_logo.avif" type="image/avif" />
+              <img 
+                src="/assets/images/original_pics/buyprintz_logo.png" 
+                alt="Buy Printz" 
+                className="w-20 h-20 md:w-28 md:h-28 object-contain"
+                loading="eager"
+                width="112"
+                height="112"
+              />
+            </picture>
           </Link>
 
           {/* Desktop Navigation - Aligned with buttons */}
