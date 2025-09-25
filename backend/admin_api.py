@@ -945,7 +945,7 @@ async def get_shipping_orders(current_user: dict = Depends(get_current_user)):
         
         # Get orders with shipping details
         orders_result = db_manager.supabase.table("orders").select(
-            "id, order_number, status, total_amount, shipping_address, tracking_number, "
+            "id, order_number, status, total_amount, customer_info, tracking_number, "
             "shipping_method, shipping_cost, created_at, updated_at, product_type"
         ).order("created_at", desc=True).limit(100).execute()
         
@@ -1072,7 +1072,7 @@ async def get_shipping_analytics(current_user: dict = Depends(get_current_user))
         
         # Get orders with shipping data
         orders_result = db_manager.supabase.table("orders").select(
-            "status, shipping_method, shipping_cost, total_amount, created_at, shipping_address"
+            "status, shipping_method, shipping_cost, total_amount, created_at, customer_info"
         ).execute()
         
         # Process analytics
@@ -1097,8 +1097,15 @@ async def get_shipping_analytics(current_user: dict = Depends(get_current_user))
                 analytics["shipping_methods"][method] = analytics["shipping_methods"].get(method, 0) + 1
                 
                 # Track by state
-                shipping_address = order.get("shipping_address", {})
-                state = shipping_address.get("state", "Unknown")
+                customer_info = order.get("customer_info", {})
+                # Handle both JSON object and string formats
+                if isinstance(customer_info, str):
+                    try:
+                        import json
+                        customer_info = json.loads(customer_info)
+                    except:
+                        customer_info = {}
+                state = customer_info.get("state", "Unknown")
                 analytics["shipping_by_state"][state] = analytics["shipping_by_state"].get(state, 0) + 1
                 
                 # Recent shipments (last 10)
@@ -1272,8 +1279,8 @@ async def lookup_by_customer_email(customer_email: str, current_user: dict = Dep
             logger.warning(f"Admin access denied for user: {user_email} (ID: {current_user.get('id', 'unknown')})")
             raise HTTPException(status_code=403, detail="Admin access required")
         
-        # Find orders by customer email (assuming email is stored in shipping_address or customer_info)
-        orders_result = db_manager.supabase.table("orders").select("*").ilike("shipping_address->>email", f"%{customer_email}%").execute()
+        # Find orders by customer email (assuming email is stored in customer_info)
+        orders_result = db_manager.supabase.table("orders").select("*").ilike("customer_info->>email", f"%{customer_email}%").execute()
         
         if not orders_result.data:
             return {
