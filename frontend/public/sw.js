@@ -6,15 +6,11 @@ const DYNAMIC_CACHE = 'buyprintz-dynamic-v1.0.0';
 // Resources to cache immediately
 const STATIC_ASSETS = [
   '/',
-  '/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png',
-  '/assets/index.css',
-  '/src/main.jsx'
+  '/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png'
 ];
 
-// External resources with longer cache times
+// External resources with longer cache times (only cache when actually requested)
 const EXTERNAL_CACHE_STRATEGIES = {
-  'js.stripe.com': { cacheTime: 7 * 24 * 60 * 60 * 1000 }, // 7 days
-  'm.stripe.network': { cacheTime: 7 * 24 * 60 * 60 * 1000 }, // 7 days
   'fonts.googleapis.com': { cacheTime: 30 * 24 * 60 * 60 * 1000 }, // 30 days
   'fonts.gstatic.com': { cacheTime: 30 * 24 * 60 * 60 * 1000 } // 30 days
 };
@@ -26,7 +22,15 @@ self.addEventListener('install', (event) => {
     caches.open(STATIC_CACHE)
       .then((cache) => {
         console.log('Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
+        // Only cache assets that actually exist
+        return Promise.allSettled(
+          STATIC_ASSETS.map(asset => 
+            cache.add(asset).catch(error => {
+              console.warn(`Failed to cache ${asset}:`, error);
+              return null;
+            })
+          )
+        );
       })
       .then(() => self.skipWaiting())
   );
