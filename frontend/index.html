@@ -194,6 +194,81 @@
       .defer-loading.loaded {
         opacity: 1;
       }
+      
+      /* Critical above-the-fold CSS - inline to prevent render blocking */
+      .hero-section {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        padding: 5rem 1rem;
+      }
+      
+      .hero-title {
+        font-size: clamp(2.5rem, 6vw, 3.75rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        color: #ffffff;
+      }
+      
+      .hero-subtitle {
+        font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+        margin-bottom: 2rem;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 64rem;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      @media (min-width: 640px) {
+        .hero-buttons {
+          flex-direction: row;
+        }
+      }
+      
+      .btn-primary {
+        background-color: #00D755;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.2s;
+      }
+      
+      .btn-primary:hover {
+        background-color: #00C04B;
+      }
+      
+      .btn-secondary {
+        background-color: transparent;
+        color: white;
+        border: 2px solid white;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+      }
+      
+      .btn-secondary:hover {
+        background-color: white;
+        color: #1e3a8a;
+      }
     </style>
     
     <!-- Structured Data - Business -->
@@ -491,6 +566,53 @@
       
       // Initialize bundle optimization
       optimizeBundleLoading();
+      
+      // CSS optimization - defer non-critical CSS
+      function optimizeCSSLoading() {
+        // Defer non-critical CSS after page load
+        window.addEventListener('load', function() {
+          setTimeout(function() {
+            // Load additional CSS that's not critical for above-the-fold
+            const nonCriticalCSS = [
+              // Add any non-critical CSS files here
+            ];
+            
+            nonCriticalCSS.forEach(href => {
+              const link = document.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = href;
+              link.media = 'print';
+              link.onload = function() {
+                this.media = 'all';
+              };
+              document.head.appendChild(link);
+            });
+          }, 100);
+        });
+        
+        // Remove unused CSS classes (if any are detected)
+        function removeUnusedCSS() {
+          // This would typically be done at build time
+          // But we can add runtime detection for dynamic content
+          const unusedSelectors = [
+            // Add any known unused CSS selectors here
+          ];
+          
+          unusedSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            if (elements.length === 0) {
+              // Mark for removal (would need CSS-in-JS or build-time optimization)
+              console.log(`Unused CSS selector detected: ${selector}`);
+            }
+          });
+        }
+        
+        // Run unused CSS detection after page load
+        setTimeout(removeUnusedCSS, 2000);
+      }
+      
+      // Initialize CSS optimization
+      optimizeCSSLoading();
     </script>
   </body>
 </html>
