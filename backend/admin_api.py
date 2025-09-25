@@ -944,12 +944,16 @@ async def get_shipping_orders(current_user: dict = Depends(get_current_user)):
         # TODO: Implement proper admin role system in production
         
         # Get orders with shipping details
-        orders_result = db_manager.supabase.table("orders").select(
-            "id, order_number, status, total_amount, customer_info, tracking_number, "
-            "shipping_method, shipping_cost, created_at, updated_at, product_type"
-        ).order("created_at", desc=True).limit(100).execute()
-        
-        return {"orders": orders_result.data}
+        try:
+            orders_result = db_manager.supabase.table("orders").select(
+                "id, status, total_amount, customer_info, tracking_number, "
+                "shipping_method, shipping_cost, created_at, updated_at, product_type"
+            ).order("created_at", desc=True).limit(100).execute()
+            
+            return {"orders": orders_result.data or []}
+        except Exception as e:
+            logger.error(f"Error querying orders table: {str(e)}")
+            return {"orders": [], "error": str(e)}
         
     except Exception as e:
         logger.error(f"Error getting shipping orders: {str(e)}")
@@ -1071,9 +1075,23 @@ async def get_shipping_analytics(current_user: dict = Depends(get_current_user))
         # TODO: Implement proper admin role system in production
         
         # Get orders with shipping data
-        orders_result = db_manager.supabase.table("orders").select(
-            "status, shipping_method, shipping_cost, total_amount, created_at, customer_info"
-        ).execute()
+        try:
+            orders_result = db_manager.supabase.table("orders").select(
+                "status, shipping_method, shipping_cost, total_amount, created_at, customer_info"
+            ).execute()
+        except Exception as e:
+            logger.error(f"Error querying orders table for analytics: {str(e)}")
+            return {
+                "total_orders": 0,
+                "shipped_orders": 0,
+                "pending_shipment": 0,
+                "total_shipping_cost": 0,
+                "average_shipping_cost": 0,
+                "shipping_methods": {},
+                "shipping_by_state": {},
+                "recent_shipments": [],
+                "error": str(e)
+            }
         
         # Process analytics
         analytics = {
@@ -1237,8 +1255,8 @@ async def lookup_by_order_number(order_number: str, current_user: dict = Depends
             logger.warning(f"Admin access denied for user: {user_email} (ID: {current_user.get('id', 'unknown')})")
             raise HTTPException(status_code=403, detail="Admin access required")
         
-        # Find order by order number
-        order_result = db_manager.supabase.table("orders").select("*").eq("order_number", order_number).execute()
+        # Find order by ID (since order_number column doesn't exist, we'll search by ID)
+        order_result = db_manager.supabase.table("orders").select("*").eq("id", order_number).execute()
         
         if not order_result.data:
             return {
