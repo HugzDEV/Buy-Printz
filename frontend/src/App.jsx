@@ -150,7 +150,7 @@ function App() {
           </>
         } />
         
-        <Route path="/tin-products" element={
+        <Route path="/business-card-tins" element={
           <>
             <Header />
             <TinProducts />
@@ -158,7 +158,7 @@ function App() {
           </>
         } />
         
-        <Route path="/tent-products" element={
+        <Route path="/tradeshow-tents" element={
           <>
             <Header />
             <TentProducts />
@@ -257,7 +257,7 @@ function App() {
         
         {/* Blog Pages */}
         <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<BlogPost />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         
         {/* Email Confirmation */}
         <Route path="/email-confirmed" element={<EmailConfirmed />} />

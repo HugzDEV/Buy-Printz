@@ -6,7 +6,7 @@ const DYNAMIC_CACHE = 'buyprintz-dynamic-v1.0.0';
 // Resources to cache immediately
 const STATIC_ASSETS = [
   '/',
-  '/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png'
+  '/assets/images/buyprintz_logo.png'
 ];
 
 // External resources with longer cache times (only cache when actually requested)

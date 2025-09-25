@@ -44,11 +44,11 @@ const LandingPage = () => {
       name: "Business Card Tins",
       price: "From $399.99",
       description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking (100 unit minimum)",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
+      image: "/assets/images/business_card_tin.png",
       features: ["Premium aluminum", "Custom vinyl stickers", "100 unit minimum"],
       badge: "New",
       category: "tin",
-      link: "/tin-products"
+      link: "/business-card-tins"
     },
     {
       name: "Tradeshow Tents",
@@ -58,7 +58,7 @@ const LandingPage = () => {
       features: ["10x10 & 10x20 sizes", "Custom graphics", "Canopy-only option"],
       badge: "New",
       category: "tent",
-      link: "/tent-products"
+      link: "/tradeshow-tents"
     }
   ]
 
@@ -72,8 +72,8 @@ const LandingPage = () => {
     "url": "https://buyprintz.com",
     "telephone": "+1-555-BUY-PRINT",
     "email": "orders@buyprintz.com",
-    "logo": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
-    "image": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
+    "logo": "https://buyprintz.com/assets/images/buyprintz_logo.png",
+    "image": "https://buyprintz.com/assets/images/buyprintz_logo.png",
     "priceRange": "$25-$500",
     "paymentAccepted": "Credit Card, Debit Card",
     "currenciesAccepted": "USD",
