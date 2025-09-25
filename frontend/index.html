@@ -57,12 +57,12 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://buyprintz.com/" />
     
-    <!-- Optimized Google Fonts loading strategy -->
+    <!-- Optimized Google Fonts loading strategy with fallback -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Load font CSS with display=swap for better performance -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load font CSS with display=swap and fallback handling -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" onerror="this.onerror=null;this.href='data:text/css,body{font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}'">
     
     <!-- Preconnect to Stripe domains for faster loading -->
     <link rel="preconnect" href="https://js.stripe.com">
@@ -82,19 +82,29 @@
     <!-- Critical CSS to prevent layout shifts -->
     <style>
       /* Critical styles for above-the-fold content */
-      html { font-family: 'Inter', system-ui, sans-serif; }
+      html { 
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+      }
       body { 
         margin: 0; 
         padding: 0; 
         background-color: #f9fafb; 
         color: #111827; 
         line-height: 1.5;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       }
       #root { min-height: 100vh; }
       
       /* Prevent FOUC (Flash of Unstyled Content) */
       .loading { opacity: 0; }
       .loaded { opacity: 1; transition: opacity 0.3s ease-in; }
+      
+      /* Font loading optimization */
+      @font-face {
+        font-family: 'Inter';
+        font-display: swap;
+        src: local('Inter'), local('Inter-Regular');
+      }
     </style>
     
     <!-- Structured Data - Business -->
@@ -242,6 +252,21 @@
       
       // Run optimization immediately
       optimizeResourceLoading();
+      
+      // Font loading fallback
+      function handleFontLoading() {
+        // Check if fonts loaded successfully
+        setTimeout(() => {
+          if (!document.fonts || !document.fonts.check('16px Inter')) {
+            console.warn('Google Fonts failed to load, using system fonts');
+            // Apply system font fallback
+            document.documentElement.style.setProperty('--font-family', 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
+          }
+        }, 3000);
+      }
+      
+      // Initialize font loading fallback
+      handleFontLoading();
     </script>
   </body>
 </html>

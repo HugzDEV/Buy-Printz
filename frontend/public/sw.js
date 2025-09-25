@@ -82,31 +82,21 @@ async function handleExternalResource(request, url) {
     return fetch(request);
   }
 
-  const [, { cacheTime }] = strategy;
   const cache = await caches.open(DYNAMIC_CACHE);
   
   // Try cache first
   const cachedResponse = await cache.match(request);
   if (cachedResponse) {
-    // Check if cache is still valid
-    const cacheDate = new Date(cachedResponse.headers.get('sw-cache-date'));
-    const now = new Date();
-    
-    if (now - cacheDate < cacheTime) {
-      console.log('Serving from cache:', request.url);
-      return cachedResponse;
-    }
+    console.log('Serving from cache:', request.url);
+    return cachedResponse;
   }
 
   // Fetch from network and cache
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      // Clone response and add cache timestamp
-      const responseToCache = networkResponse.clone();
-      responseToCache.headers.set('sw-cache-date', new Date().toISOString());
-      
-      await cache.put(request, responseToCache);
+      // Simply cache the response without modifying headers
+      await cache.put(request, networkResponse.clone());
       console.log('Cached external resource:', request.url);
     }
     return networkResponse;
