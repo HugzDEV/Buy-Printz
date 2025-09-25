@@ -61,14 +61,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Preload the most critical font weights first (400, 500, 600) -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" as="font" type="font/woff2" crossorigin>
-    
-    <!-- Load font CSS asynchronously -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+    <!-- Load font CSS with display=swap for better performance -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Preconnect to Stripe domains for faster loading -->
     <link rel="preconnect" href="https://js.stripe.com">
@@ -78,7 +72,6 @@
     
     <!-- Preload critical resources to break request chain -->
     <link rel="preload" href="/src/main.jsx" as="script" crossorigin>
-    <link rel="preload" href="/assets/index.css" as="style">
     
     <!-- Resource hints for parallel loading -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -220,23 +213,30 @@
         });
       }
       
-      // Optimize critical resource loading
+      // Optimize critical resource loading with error handling
       function optimizeResourceLoading() {
-        // Preload critical resources in parallel
+        // Only preload resources that actually exist
         const criticalResources = [
-          '/src/main.jsx',
-          '/assets/index.css'
+          '/src/main.jsx'
         ];
         
         criticalResources.forEach(resource => {
-          const link = document.createElement('link');
-          link.rel = 'preload';
-          link.href = resource;
-          link.as = resource.endsWith('.jsx') || resource.endsWith('.js') ? 'script' : 'style';
-          if (resource.endsWith('.jsx') || resource.endsWith('.js')) {
+          try {
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.href = resource;
+            link.as = 'script';
             link.crossOrigin = 'anonymous';
+            
+            // Add error handling
+            link.onerror = function() {
+              console.warn('Failed to preload resource:', resource);
+            };
+            
+            document.head.appendChild(link);
+          } catch (error) {
+            console.warn('Error preloading resource:', resource, error);
           }
-          document.head.appendChild(link);
         });
       }
       
