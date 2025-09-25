@@ -44,7 +44,7 @@ const LandingPage = () => {
       name: "Business Card Tins",
       price: "From $399.99",
       description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking (100 unit minimum)",
-      image: "/assets/images/business_card_tin.avif",
+      image: "/assets/images/business_card_tin.png",
       features: ["Premium aluminum", "Custom vinyl stickers", "100 unit minimum"],
       badge: "New",
       category: "tin",
