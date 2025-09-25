@@ -369,6 +369,9 @@ The practical value ensures your contact information stays visible and accessibl
   ]
 
   const featuredPost = blogPosts.find(post => post.featured)
+  
+  // Debug logging
+  console.log('Blog - Available blog posts:', blogPosts.map(p => ({ id: p.id, title: p.title, slug: p.slug })))
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -17,6 +17,9 @@ import SEOHead from './SEOHead'
 
 const BlogPost = () => {
   const { slug } = useParams()
+  
+  // Debug logging
+  console.log('BlogPost - Received slug:', slug)
 
   // In a real app, this would fetch from an API
   const blogPosts = [
@@ -482,6 +485,10 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
   ]
 
   const post = blogPosts.find(p => p.slug === slug)
+  
+  // Debug logging
+  console.log('BlogPost - Available slugs:', blogPosts.map(p => p.slug))
+  console.log('BlogPost - Found post:', post)
 
   if (!post) {
     return (
