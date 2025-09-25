@@ -854,10 +854,14 @@ async def get_best_selling_regions(current_user: dict = Depends(get_current_user
         # For development: allow all authenticated users to access admin panel
         # TODO: Implement proper admin role system in production
         
-        # Get orders with shipping address information
-        orders_result = db_manager.supabase.table("orders").select(
-            "shipping_address, status, total_amount, created_at"
-        ).execute()
+        # Get orders with customer information
+        try:
+            orders_result = db_manager.supabase.table("orders").select(
+                "customer_info, status, total_amount, created_at"
+            ).execute()
+        except Exception as e:
+            logger.warning(f"Error accessing orders table: {str(e)}")
+            orders_result = type('obj', (object,), {'data': []})()
         
         # Process the data
         region_stats = {}
@@ -865,8 +869,19 @@ async def get_best_selling_regions(current_user: dict = Depends(get_current_user
         
         for order in orders_result.data:
             if order["status"] == "completed":
-                shipping_address = order.get("shipping_address", {})
-                state = shipping_address.get("state", "Unknown")
+                # Get state from customer_info
+                customer_info = order.get("customer_info", {})
+                
+                # Handle both JSON object and string formats
+                if isinstance(customer_info, str):
+                    try:
+                        import json
+                        customer_info = json.loads(customer_info)
+                    except:
+                        customer_info = {}
+                
+                # Get state from customer_info, with fallback to "Unknown"
+                state = customer_info.get("state") or "Unknown"
                 amount = float(order["total_amount"] or 0)
                 
                 if state not in region_stats:
@@ -895,6 +910,15 @@ async def get_best_selling_regions(current_user: dict = Depends(get_current_user
             key=lambda x: x[1]["revenue"], 
             reverse=True
         )[:15]
+        
+        # If no data, return empty result with message
+        if not top_regions:
+            return {
+                "regions": {},
+                "total_revenue": 0,
+                "total_orders": 0,
+                "message": "No regional sales data available. Orders need shipping address information."
+            }
         
         return {
             "regions": dict(top_regions),
