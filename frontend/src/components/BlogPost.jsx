@@ -655,7 +655,7 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
                   Get a Quote
                 </Link>
                 <Link
-                  to="/tin-products"
+                  to="/business-card-tins"
                   className="bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 px-6 py-3 rounded-lg font-medium transition-colors text-center"
                 >
                   View Tin Products

@@ -837,7 +837,7 @@ CREATE TABLE tin_skinz_creator_designs (
 
 **Major Achievements:**
 1. **Sitemap.xml Updates:**
-   - Added all product category pages (`/all-products`, `/banner-products`, `/tin-products`, `/tent-products`)
+   - Added all product category pages (`/all-products`, `/banner-products`, `/business-card-tins`, `/tradeshow-tents`)
    - Included checkout and order pages (`/checkout`, `/tin-checkout`, `/tent-checkout`, `/confirmation`)
    - Added TinSkinz marketplace pages (`/tinskinz-demo`, `/tin-skinz/checkout`, `/tin-skinz/success`)
    - Creator marketplace pages (`/creator/register`, `/creator/dashboard`, `/creator/upload`, `/creator/earnings`)

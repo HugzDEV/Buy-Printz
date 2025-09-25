@@ -50,8 +50,8 @@ const Header = () => {
   const productOptions = [
     { name: 'All Products', href: '/all-products' },
     { name: 'Vinyl Banners', href: '/banner-products' },
-    { name: 'Business Card Tins', href: '/tin-products' },
-    { name: 'Tradeshow Tents', href: '/tent-products' },
+    { name: 'Business Card Tins', href: '/business-card-tins' },
+    { name: 'Tradeshow Tents', href: '/tradeshow-tents' },
     { name: 'Tin Skinz', href: '/tin-skinz' }
   ]
 

@@ -150,7 +150,7 @@ function App() {
           </>
         } />
         
-        <Route path="/tin-products" element={
+        <Route path="/business-card-tins" element={
           <>
             <Header />
             <TinProducts />
@@ -158,7 +158,7 @@ function App() {
           </>
         } />
         
-        <Route path="/tent-products" element={
+        <Route path="/tradeshow-tents" element={
           <>
             <Header />
             <TentProducts />

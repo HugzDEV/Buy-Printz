@@ -48,7 +48,7 @@ const LandingPage = () => {
       features: ["Premium aluminum", "Custom vinyl stickers", "100 unit minimum"],
       badge: "New",
       category: "tin",
-      link: "/tin-products"
+      link: "/business-card-tins"
     },
     {
       name: "Tradeshow Tents",
@@ -58,7 +58,7 @@ const LandingPage = () => {
       features: ["10x10 & 10x20 sizes", "Custom graphics", "Canopy-only option"],
       badge: "New",
       category: "tent",
-      link: "/tent-products"
+      link: "/tradeshow-tents"
     }
   ]
 
