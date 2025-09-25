@@ -145,9 +145,9 @@ const LandingPage = () => {
       <SEOHead {...seoConfigs.home} structuredData={businessStructuredData} />
       <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900">
       {/* Hero Section */}
-      <section className="text-white py-20">
+      <section className="hero-section text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="hero-title text-5xl md:text-6xl font-bold mb-6">
             Professional Business Branding Solutions
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-primary-100">
@@ -180,7 +180,7 @@ const LandingPage = () => {
       <section id="products" className="py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{fontSize: 'clamp(2rem, 5vw, 3rem)', lineHeight: '1.2'}}>
               Our Business Branding Solutions
             </h2>
             <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">

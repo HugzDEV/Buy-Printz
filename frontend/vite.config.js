@@ -27,9 +27,29 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          supabase: ['@supabase/supabase-js']
+          // Core React libraries
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          // Supabase
+          'supabase': ['@supabase/supabase-js'],
+          // Heavy libraries
+          'jspdf': ['jspdf'],
+          'stripe': ['@stripe/stripe-js', '@stripe/react-stripe-js'],
+          // UI libraries
+          'ui-libs': ['lucide-react', 'react-hot-toast', 'sonner'],
+          // Canvas libraries
+          'canvas-libs': ['konva', 'react-konva'],
+          // QR Code
+          'qrcode': ['qrcode.react']
         }
+      }
+    },
+    // Optimize bundle size
+    chunkSizeWarningLimit: 1000,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
       }
     }
   },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import LandingPage from './components/LandingPage'
@@ -10,11 +10,6 @@ import ProductDetail from './components/ProductDetail'
 import Contact from './components/Contact'
 import Login from './components/Login'
 import Register from './components/Register'
-import Dashboard from './components/Dashboard'
-import BannerEditor from './components/BannerEditor'
-import Checkout from './components/Checkout'
-import TinCheckout from './components/TinCheckout'
-import TentCheckout from './components/TentCheckout'
 import OrderConfirmation from './components/OrderConfirmation'
 import TermsOfService from './components/TermsOfService'
 import PrivacyPolicy from './components/PrivacyPolicy'
@@ -28,17 +23,33 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import Marketplace from './components/Marketplace'
 import TemplateDetail from './components/TemplateDetail'
-import CreatorRegistration from './components/CreatorRegistration'
-import CreatorDashboard from './components/CreatorDashboard'
-import TemplateUpload from './components/TemplateUpload'
-import CreatorEarnings from './components/CreatorEarnings'
-import TinSkinzMarketplace from './components/TinSkinzMarketplace'
-import TinSkinzDemo from './components/TinSkinzDemo'
-import TinSkinzCheckout from './components/TinSkinzCheckout'
-import TinSkinzSuccess from './components/TinSkinzSuccess'
-import CreatorProfile from './components/CreatorProfile'
-import Admin from './components/Admin'
+
+// Lazy load heavy components to reduce initial bundle size
+const Dashboard = React.lazy(() => import('./components/Dashboard'))
+const BannerEditor = React.lazy(() => import('./components/BannerEditor'))
+const Checkout = React.lazy(() => import('./components/Checkout'))
+const TinCheckout = React.lazy(() => import('./components/TinCheckout'))
+const TentCheckout = React.lazy(() => import('./components/TentCheckout'))
+// Lazy load more heavy components
+const CreatorRegistration = React.lazy(() => import('./components/CreatorRegistration'))
+const CreatorDashboard = React.lazy(() => import('./components/CreatorDashboard'))
+const TemplateUpload = React.lazy(() => import('./components/TemplateUpload'))
+const CreatorEarnings = React.lazy(() => import('./components/CreatorEarnings'))
+const TinSkinzMarketplace = React.lazy(() => import('./components/TinSkinzMarketplace'))
+// Lazy load remaining heavy components
+const TinSkinzDemo = React.lazy(() => import('./components/TinSkinzDemo'))
+const TinSkinzCheckout = React.lazy(() => import('./components/TinSkinzCheckout'))
+const TinSkinzSuccess = React.lazy(() => import('./components/TinSkinzSuccess'))
+const CreatorProfile = React.lazy(() => import('./components/CreatorProfile'))
+const Admin = React.lazy(() => import('./components/Admin'))
 import authService from './services/auth'
+
+// Loading component for Suspense fallbacks
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+  </div>
+)
 
 // Protected Route Component with Optimized Mobile Handling
 const ProtectedRoute = ({ children }) => {
@@ -267,13 +278,17 @@ function App() {
         {/* Protected Routes */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <Dashboard />
+            <Suspense fallback={<LoadingSpinner />}>
+              <Dashboard />
+            </Suspense>
           </ProtectedRoute>
         } />
         
         <Route path="/editor" element={
           <ProtectedRoute>
-            <BannerEditor />
+            <Suspense fallback={<LoadingSpinner />}>
+              <BannerEditor />
+            </Suspense>
           </ProtectedRoute>
         } />
         

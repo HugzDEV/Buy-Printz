@@ -19,11 +19,17 @@ const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 let stripePromise = null
 const loadStripeWhenNeeded = () => {
   if (!stripePromise && stripeKey) {
-    stripePromise = loadStripe(stripeKey, {
-      // Optimize Stripe loading
-      stripeAccount: undefined,
-      apiVersion: '2023-10-16', // Use stable API version
-      locale: 'en'
+    // Defer Stripe loading to reduce initial bundle size
+    stripePromise = new Promise((resolve) => {
+      // Load Stripe asynchronously after page load
+      setTimeout(() => {
+        loadStripe(stripeKey, {
+          // Optimize Stripe loading
+          stripeAccount: undefined,
+          apiVersion: '2023-10-16', // Use stable API version
+          locale: 'en'
+        }).then(resolve)
+      }, 100) // Small delay to prioritize critical content
     })
   }
   return stripePromise

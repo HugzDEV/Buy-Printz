@@ -1,7 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import jsPDF from 'jspdf'
+// Dynamic jsPDF loading to reduce initial bundle size
+const loadJsPDF = async () => {
+  const { default: jsPDF } = await import('jspdf')
+  return jsPDF
+}
 import { QRCodeCanvas } from 'qrcode.react'
 import { createRoot } from 'react-dom/client'
 import { 
@@ -3232,18 +3236,26 @@ const BannerEditorNew = () => {
   }, [canvasSize])
 
   // Export as PDF
-  const exportToPDF = useCallback(() => {
-    // Implementation for PDF export
-    const pdf = new jsPDF({
-      orientation: canvasSize.width > canvasSize.height ? 'landscape' : 'portrait',
-      unit: 'px',
-      format: [canvasSize.width, canvasSize.height]
-    })
+  const exportToPDF = useCallback(async () => {
+    try {
+      // Load jsPDF dynamically
+      const jsPDF = await loadJsPDF()
+      
+      // Implementation for PDF export
+      const pdf = new jsPDF({
+        orientation: canvasSize.width > canvasSize.height ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [canvasSize.width, canvasSize.height]
+      })
     
-    // Add canvas content to PDF
-    // This is a simplified version - you'd need to implement proper canvas-to-PDF conversion
-    pdf.text('Banner Design', 20, 30)
-    pdf.save('banner-design.pdf')
+      // Add canvas content to PDF
+      // This is a simplified version - you'd need to implement proper canvas-to-PDF conversion
+      pdf.text('Banner Design', 20, 30)
+      pdf.save('banner-design.pdf')
+    } catch (error) {
+      console.error('Failed to export PDF:', error)
+      toast.error('Failed to export PDF. Please try again.')
+    }
   }, [canvasSize])
 
 

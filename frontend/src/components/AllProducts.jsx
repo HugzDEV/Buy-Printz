@@ -53,7 +53,7 @@ const AllProducts = () => {
           <div className="absolute inset-0 bg-black/20"></div>
           
           <div className="relative container mx-auto px-4 text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg" style={{fontSize: 'clamp(2.5rem, 6vw, 3.75rem)', lineHeight: '1.1'}}>
               Our Business Branding Solutions
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-4xl mx-auto drop-shadow-md">
