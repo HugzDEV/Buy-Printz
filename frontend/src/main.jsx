@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
@@ -8,6 +8,9 @@ import { Toaster as SonnerToaster } from 'sonner'
 import App from './App.jsx'
 import './index.css'
 import { addGlobalDownloadProtection } from './utils/downloadProtection'
+
+// Lazy load non-critical components
+const LazyApp = React.lazy(() => import('./App.jsx'))
 
 // Initialize Stripe with optimized loading
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
@@ -42,7 +45,19 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       }}
     >
       <Elements stripe={loadStripeWhenNeeded()}>
-        <App />
+        <Suspense fallback={
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            fontFamily: 'Inter, system-ui, sans-serif'
+          }}>
+            <div>Loading BuyPrintz...</div>
+          </div>
+        }>
+          <App />
+        </Suspense>
         <Toaster 
           position="top-right"
           toastOptions={{
