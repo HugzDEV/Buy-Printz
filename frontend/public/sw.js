@@ -54,6 +54,19 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Only handle GET requests for caching (Cache API limitation)
+  if (request.method !== 'GET') {
+    return; // Let the browser handle non-GET requests normally
+  }
+
+  // Skip caching for certain request types
+  if (request.headers.get('range') || 
+      request.url.includes('chrome-extension://') ||
+      request.url.includes('moz-extension://') ||
+      request.url.includes('safari-extension://')) {
+    return; // Let the browser handle these requests normally
+  }
+
   // Handle external resources with optimized caching
   if (isExternalResource(url.hostname)) {
     event.respondWith(handleExternalResource(request, url));
@@ -73,55 +86,65 @@ function isExternalResource(hostname) {
 
 // Handle external resources with long cache times
 async function handleExternalResource(request, url) {
-  const hostname = url.hostname;
-  const strategy = Object.entries(EXTERNAL_CACHE_STRATEGIES).find(([domain]) => 
-    hostname.includes(domain)
-  );
-
-  if (!strategy) {
-    return fetch(request);
-  }
-
-  const cache = await caches.open(DYNAMIC_CACHE);
-  
-  // Try cache first
-  const cachedResponse = await cache.match(request);
-  if (cachedResponse) {
-    console.log('Serving from cache:', request.url);
-    return cachedResponse;
-  }
-
-  // Fetch from network and cache
   try {
+    const hostname = url.hostname;
+    const strategy = Object.entries(EXTERNAL_CACHE_STRATEGIES).find(([domain]) => 
+      hostname.includes(domain)
+    );
+
+    if (!strategy) {
+      return fetch(request);
+    }
+
+    const cache = await caches.open(DYNAMIC_CACHE);
+    
+    // Try cache first
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      console.log('Serving from cache:', request.url);
+      return cachedResponse;
+    }
+
+    // Fetch from network and cache
     const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      // Simply cache the response without modifying headers
+    if (networkResponse.ok && request.method === 'GET') {
+      // Simply cache the response without modifying headers (only GET requests)
       await cache.put(request, networkResponse.clone());
       console.log('Cached external resource:', request.url);
     }
     return networkResponse;
   } catch (error) {
     console.error('Network error, serving from cache:', error);
-    return cachedResponse || new Response('Offline', { status: 503 });
+    // Try to serve from cache as fallback
+    try {
+      const cache = await caches.open(DYNAMIC_CACHE);
+      const cachedResponse = await cache.match(request);
+      return cachedResponse || new Response('Offline', { status: 503 });
+    } catch (cacheError) {
+      console.error('Cache error:', cacheError);
+      return new Response('Offline', { status: 503 });
+    }
   }
 }
 
 // Handle internal resources with cache-first strategy
 async function handleInternalResource(request) {
-  const cache = await caches.open(STATIC_CACHE);
-  
-  // Try cache first for static assets
-  const cachedResponse = await cache.match(request);
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-
-  // Fetch from network
   try {
+    const cache = await caches.open(STATIC_CACHE);
+    
+    // Try cache first for static assets
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // Fetch from network
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      // Cache successful responses
-      await cache.put(request, networkResponse.clone());
+      // Cache successful responses (only GET requests)
+      if (request.method === 'GET') {
+        await cache.put(request, networkResponse.clone());
+      }
     }
     return networkResponse;
   } catch (error) {
