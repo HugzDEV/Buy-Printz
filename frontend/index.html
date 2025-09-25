@@ -1,23 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) - Deferred loading for better performance -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-99V58BGRHS"></script>
     <script>
-      // Defer Google Analytics loading to improve initial page load
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
+
       gtag('config', 'G-99V58BGRHS');
-      
-      // Load Google Analytics after page load
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          const script = document.createElement('script');
-          script.async = true;
-          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-99V58BGRHS';
-          document.head.appendChild(script);
-        }, 1000); // 1 second delay to prioritize critical content
-      });
     </script>
     
     <meta charset="UTF-8" />
@@ -74,13 +65,9 @@
     <!-- Load font CSS with display=swap and fallback handling -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" onerror="this.onerror=null;this.href='data:text/css,body{font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}'">
     
-    <!-- Preload critical font files to prevent layout shifts -->
-    
-    <!-- Preload critical resources for LCP optimization -->
-    <link rel="preload" href="/assets/images/buyprintz_logo.avif" as="image" type="image/avif">
-    <link rel="preload" href="/assets/images/original_pics/buyprintz_logo.png" as="image" type="image/png">
-    
-    <!-- Defer Stripe preconnects to reduce initial load impact -->
+    <!-- Preconnect to Stripe domains for faster loading -->
+    <link rel="preconnect" href="https://js.stripe.com">
+    <link rel="preconnect" href="https://m.stripe.network">
     <link rel="dns-prefetch" href="https://js.stripe.com">
     <link rel="dns-prefetch" href="https://m.stripe.network">
     
@@ -120,18 +107,6 @@
         src: local('Inter'), local('Inter-Regular');
       }
       
-      /* Prevent layout shifts during font loading */
-      body {
-        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        font-display: swap;
-      }
-      
-      /* Ensure consistent font metrics */
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        font-display: swap;
-      }
-      
       /* Image optimization */
       img {
         image-rendering: -webkit-optimize-contrast;
@@ -148,141 +123,6 @@
       
       img[loading="lazy"].loaded {
         opacity: 1;
-      }
-      
-      /* Layout shift prevention */
-      h1, h2, h3, h4, h5, h6 {
-        contain: layout style;
-      }
-      
-      /* Prevent font loading layout shifts */
-      .font-loading {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      }
-      
-      /* Ensure consistent spacing for headings */
-      h1, h2 {
-        min-height: 1.2em;
-        overflow: hidden;
-      }
-      
-      /* Critical CSS for LCP element */
-      .hero-title {
-        font-size: clamp(2.5rem, 6vw, 3.75rem) !important;
-        line-height: 1.1 !important;
-        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
-        font-weight: 700 !important;
-        color: #ffffff !important;
-        margin-bottom: 1.5rem !important;
-        contain: layout style !important;
-        will-change: auto !important;
-      }
-      
-      /* Optimize hero section for LCP */
-      .hero-section {
-        contain: layout style;
-        will-change: auto;
-      }
-      
-      /* 3rd party optimization */
-      .defer-loading {
-        opacity: 0;
-        transition: opacity 0.3s ease-in;
-      }
-      
-      .defer-loading.loaded {
-        opacity: 1;
-      }
-      
-      /* Critical above-the-fold CSS - inline to prevent render blocking */
-      .hero-section {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        color: white;
-        padding: 5rem 1rem;
-      }
-      
-      .hero-title {
-        font-size: clamp(2.5rem, 6vw, 3.75rem);
-        font-weight: 700;
-        line-height: 1.1;
-        margin-bottom: 1.5rem;
-        color: #ffffff;
-      }
-      
-      .hero-subtitle {
-        font-size: clamp(1.25rem, 2.5vw, 1.5rem);
-        margin-bottom: 2rem;
-        color: rgba(255, 255, 255, 0.9);
-        max-width: 64rem;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      
-      .hero-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        justify-content: center;
-        align-items: center;
-      }
-      
-      @media (min-width: 640px) {
-        .hero-buttons {
-          flex-direction: row;
-        }
-      }
-      
-      .btn-primary {
-        background-color: #00D755;
-        color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: background-color 0.2s;
-      }
-      
-      .btn-primary:hover {
-        background-color: #00C04B;
-      }
-      
-      .btn-secondary {
-        background-color: transparent;
-        color: white;
-        border: 2px solid white;
-        padding: 0.75rem 2rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.2s;
-      }
-      
-      .btn-secondary:hover {
-        background-color: white;
-        color: #1e3a8a;
-      }
-      
-      /* Modern JavaScript optimizations */
-      :root {
-        --js-modern: 0;
-      }
-      
-      .modern-browser {
-        --js-modern: 1;
-      }
-      
-      /* Use modern features when available */
-      .modern-browser .hero-section {
-        /* Modern CSS features for modern browsers */
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
       }
     </style>
     
@@ -466,200 +306,6 @@
       
       // Initialize image optimization
       optimizeImageLoading();
-      
-      // Font loading optimization to prevent layout shifts
-      function optimizeFontLoading() {
-        // Add font-loading class initially
-        document.documentElement.classList.add('font-loading');
-        
-        // Check if fonts are loaded
-        if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(function() {
-            document.documentElement.classList.remove('font-loading');
-            document.documentElement.classList.add('fonts-loaded');
-          });
-        } else {
-          // Fallback for browsers without Font Loading API
-          setTimeout(function() {
-            document.documentElement.classList.remove('font-loading');
-            document.documentElement.classList.add('fonts-loaded');
-          }, 3000);
-        }
-      }
-      
-      // Initialize font loading optimization
-      optimizeFontLoading();
-      
-      // LCP optimization
-      function optimizeLCP() {
-        // Mark LCP element as critical
-        const lcpElement = document.querySelector('.hero-title');
-        if (lcpElement) {
-          lcpElement.style.willChange = 'auto';
-          lcpElement.style.contain = 'layout style';
-        }
-        
-        // Preload hero section resources
-        const heroSection = document.querySelector('.hero-section');
-        if (heroSection) {
-          heroSection.style.contain = 'layout style';
-        }
-        
-        // Optimize font loading for LCP
-        if (document.fonts && document.fonts.load) {
-          document.fonts.load('700 3rem Inter').then(function() {
-            console.log('LCP font loaded');
-          });
-        }
-      }
-      
-      // Initialize LCP optimization
-      optimizeLCP();
-      
-      // Conditional 3rd party loading optimization
-      function optimizeThirdPartyLoading() {
-        // Only preconnect to Stripe when payment is needed
-        const preconnectStripe = () => {
-          const link = document.createElement('link');
-          link.rel = 'preconnect';
-          link.href = 'https://js.stripe.com';
-          document.head.appendChild(link);
-          
-          const link2 = document.createElement('link');
-          link2.rel = 'preconnect';
-          link2.href = 'https://m.stripe.network';
-          document.head.appendChild(link2);
-        };
-        
-        // Preconnect to Stripe when user navigates to checkout/payment pages
-        const paymentRoutes = ['/checkout', '/tin-checkout', '/tent-checkout', '/tin-skinz-checkout'];
-        const currentPath = window.location.pathname;
-        
-        if (paymentRoutes.some(route => currentPath.includes(route))) {
-          preconnectStripe();
-        }
-        
-        // Preconnect to Stripe on hover over payment buttons
-        document.addEventListener('mouseover', function(e) {
-          if (e.target.matches('button[type="submit"], .checkout-button, .payment-button')) {
-            preconnectStripe();
-            // Remove listener after first use
-            document.removeEventListener('mouseover', arguments.callee);
-          }
-        });
-      }
-      
-      // Initialize 3rd party optimization
-      optimizeThirdPartyLoading();
-      
-      // Bundle optimization - preload critical chunks
-      function optimizeBundleLoading() {
-        // Preload critical route chunks on hover
-        const criticalRoutes = [
-          '/dashboard',
-          '/editor',
-          '/checkout'
-        ];
-        
-        criticalRoutes.forEach(route => {
-          const links = document.querySelectorAll(`a[href="${route}"]`);
-          links.forEach(link => {
-            link.addEventListener('mouseenter', function() {
-              // Preload the route chunk
-              const chunkName = route === '/dashboard' ? 'Dashboard' : 
-                               route === '/editor' ? 'BannerEditor' : 
-                               route === '/checkout' ? 'Checkout' : '';
-              
-              if (chunkName) {
-                // This will be handled by React's lazy loading
-                console.log(`Preloading ${chunkName} chunk`);
-              }
-            }, { once: true });
-          });
-        });
-      }
-      
-      // Initialize bundle optimization
-      optimizeBundleLoading();
-      
-      // CSS optimization - defer non-critical CSS
-      function optimizeCSSLoading() {
-        // Defer non-critical CSS after page load
-        window.addEventListener('load', function() {
-          setTimeout(function() {
-            // Load additional CSS that's not critical for above-the-fold
-            const nonCriticalCSS = [
-              // Add any non-critical CSS files here
-            ];
-            
-            nonCriticalCSS.forEach(href => {
-              const link = document.createElement('link');
-              link.rel = 'stylesheet';
-              link.href = href;
-              link.media = 'print';
-              link.onload = function() {
-                this.media = 'all';
-              };
-              document.head.appendChild(link);
-            });
-          }, 100);
-        });
-        
-        // Remove unused CSS classes (if any are detected)
-        function removeUnusedCSS() {
-          // This would typically be done at build time
-          // But we can add runtime detection for dynamic content
-          const unusedSelectors = [
-            // Add any known unused CSS selectors here
-          ];
-          
-          unusedSelectors.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            if (elements.length === 0) {
-              // Mark for removal (would need CSS-in-JS or build-time optimization)
-              console.log(`Unused CSS selector detected: ${selector}`);
-            }
-          });
-        }
-        
-        // Run unused CSS detection after page load
-        setTimeout(removeUnusedCSS, 2000);
-      }
-      
-      // Initialize CSS optimization
-      optimizeCSSLoading();
-      
-      // Modern JavaScript optimization
-      function optimizeModernJS() {
-        // Detect modern browser capabilities
-        const hasModernFeatures = {
-          es2020: typeof Symbol !== 'undefined' && Symbol.asyncIterator,
-          es2018: typeof Object.getOwnPropertyDescriptors !== 'undefined',
-          es2017: typeof Object.values !== 'undefined',
-          es2016: typeof Array.prototype.includes !== 'undefined',
-          es2015: typeof Promise !== 'undefined' && typeof Map !== 'undefined'
-        };
-        
-        // Log modern features for debugging
-        console.log('Modern JavaScript features detected:', hasModernFeatures);
-        
-        // Add modern browser class for CSS targeting
-        if (hasModernFeatures.es2020) {
-          document.documentElement.classList.add('modern-browser');
-        }
-        
-        // Optimize for modern browsers
-        if (hasModernFeatures.es2020) {
-          // Use modern JavaScript features
-          document.documentElement.style.setProperty('--js-modern', '1');
-        } else {
-          // Fallback for older browsers
-          document.documentElement.style.setProperty('--js-modern', '0');
-        }
-      }
-      
-      // Initialize modern JavaScript optimization
-      optimizeModernJS();
     </script>
   </body>
 </html>

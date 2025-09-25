@@ -212,10 +212,7 @@ class AuthService {
       const { data: { user }, error } = await this.supabase.auth.getUser()
       
       if (error) {
-        // Only log non-session-missing errors to avoid console spam
-        if (error.message && !error.message.includes('Auth session missing')) {
-          console.error('Error getting user:', error)
-        }
+        console.error('Error getting user:', error)
         return null
       }
 

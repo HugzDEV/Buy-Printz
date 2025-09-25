@@ -12,38 +12,6 @@ import { addGlobalDownloadProtection } from './utils/downloadProtection'
 // Lazy load non-critical components
 const LazyApp = React.lazy(() => import('./App.jsx'))
 
-// CSS optimization - defer non-critical styles
-const optimizeCSS = () => {
-  // Mark non-critical CSS for deferred loading
-  const nonCriticalSelectors = [
-    '.admin-panel',
-    '.creator-dashboard', 
-    '.checkout-form',
-    '.payment-modal',
-    '.template-upload',
-    '.marketplace-filters'
-  ];
-  
-  // Add CSS classes to defer loading
-  nonCriticalSelectors.forEach(selector => {
-    const style = document.createElement('style');
-    style.textContent = `${selector} { display: none; }`;
-    style.setAttribute('data-defer', 'true');
-    document.head.appendChild(style);
-  });
-  
-  // Load deferred CSS after page load
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const deferredStyles = document.querySelectorAll('style[data-defer]');
-      deferredStyles.forEach(style => style.remove());
-    }, 1000);
-  });
-};
-
-// Initialize CSS optimization
-optimizeCSS();
-
 // Initialize Stripe with optimized loading
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 
@@ -51,17 +19,11 @@ const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 let stripePromise = null
 const loadStripeWhenNeeded = () => {
   if (!stripePromise && stripeKey) {
-    // Defer Stripe loading to reduce initial bundle size
-    stripePromise = new Promise((resolve) => {
-      // Load Stripe asynchronously after page load
-      setTimeout(() => {
-        loadStripe(stripeKey, {
-          // Optimize Stripe loading
-          stripeAccount: undefined,
-          apiVersion: '2023-10-16', // Use stable API version
-          locale: 'en'
-        }).then(resolve)
-      }, 100) // Small delay to prioritize critical content
+    stripePromise = loadStripe(stripeKey, {
+      // Optimize Stripe loading
+      stripeAccount: undefined,
+      apiVersion: '2023-10-16', // Use stable API version
+      locale: 'en'
     })
   }
   return stripePromise

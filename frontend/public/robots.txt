@@ -1,31 +1,22 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
+# Important pages
 Sitemap: https://buyprintz.com/sitemap.xml
 
-# Allow important public pages
-Allow: /business-card-tins
-Allow: /tradeshow-tents
-Allow: /blog/
+# Allow all crawlers to access main content
+Allow: /products
+Allow: /editor
 Allow: /login
 Allow: /register
 
-# Disallow private/user-specific areas
+# Prevent crawling of user-specific content
 Disallow: /dashboard
 Disallow: /checkout
-Disallow: /editor
 Disallow: /api/
+
+# Prevent crawling of admin areas
 Disallow: /admin/
-Disallow: /creator/
-Disallow: /tin-skinz-checkout
-Disallow: /tent-checkout
-Disallow: /tin-checkout
 
-# Disallow temporary/development files
-Disallow: /*.json$
-Disallow: /*.js.map$
-Disallow: /*.css.map$
-
-# Crawl delay (be respectful to server)
+# Crawl delay (be respectful)
 Crawl-delay: 1

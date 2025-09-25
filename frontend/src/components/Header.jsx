@@ -58,13 +58,15 @@ const Header = () => {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Design', href: '/editor' },
-    { name: 'Marketplace', href: '/marketplace' }
+    { name: 'Marketplace', href: '/marketplace' },
+    { name: 'Blog', href: '/blog' }
   ]
 
   const authenticatedNavigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Design', href: '/editor' },
-    { name: 'Marketplace', href: '/marketplace' }
+    { name: 'Marketplace', href: '/marketplace' },
+    { name: 'Blog', href: '/blog' }
   ]
 
   const currentNavigation = user ? authenticatedNavigation : navigation
@@ -114,12 +116,9 @@ const Header = () => {
               <button
                 onClick={() => setProductDropdownOpen(!productDropdownOpen)}
                 className="flex items-center text-base font-medium text-gray-300 hover:text-white transition-colors"
-                aria-label="Products menu"
-                aria-expanded={productDropdownOpen}
-                aria-haspopup="true"
               >
                 Products
-                <ChevronDown className="w-4 h-4 ml-1" aria-hidden="true" />
+                <ChevronDown className="w-4 h-4 ml-1" />
               </button>
               
               {productDropdownOpen && (
@@ -147,9 +146,8 @@ const Header = () => {
                 <button
                   onClick={handleLogout}
                   className="flex items-center text-base text-gray-300 hover:text-white transition-colors"
-                  aria-label="Logout from account"
                 >
-                  <LogOut className="w-4 h-4 mr-1" aria-hidden="true" />
+                  <LogOut className="w-4 h-4 mr-1" />
                   Logout
                 </button>
               </>
@@ -175,21 +173,18 @@ const Header = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-blue-800 text-white transition-colors flex-shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center"
-            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-navigation"
           >
             {mobileMenuOpen ? (
-              <X className="w-5 h-5" aria-hidden="true" />
+              <X className="w-5 h-5" />
             ) : (
-              <Menu className="w-5 h-5" aria-hidden="true" />
+              <Menu className="w-5 h-5" />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div id="mobile-navigation" className="md:hidden py-4 border-t border-blue-700">
+          <div className="md:hidden py-4 border-t border-blue-700">
             <nav className="flex flex-col space-y-4">
               {currentNavigation.map((item) => (
                 <Link
@@ -233,7 +228,7 @@ const Header = () => {
               {user ? (
                 <div className="pt-4 border-t border-blue-700">
                   <div className="flex items-center text-base text-gray-300 mb-2">
-                    <User className="w-4 h-4 mr-2" aria-hidden="true" />
+                    <User className="w-4 h-4 mr-2" />
                     {user.email}
                   </div>
                   <button
@@ -242,9 +237,8 @@ const Header = () => {
                       setMobileMenuOpen(false)
                     }}
                     className="flex items-center text-base text-gray-300 hover:text-white transition-colors"
-                    aria-label="Logout from account"
                   >
-                    <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
+                    <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </button>
                 </div>
