@@ -56,25 +56,10 @@ export default defineConfig({
     },
     // Optimize bundle size
     chunkSizeWarningLimit: 1000,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        // Modern JavaScript optimizations
-        ecma: 2020,
-        module: true
-      },
-      mangle: {
-        // Preserve modern JavaScript features
-        keep_fnames: false,
-        module: true
-      },
-      format: {
-        // Output modern JavaScript
-        ecma: 2020,
-        comments: false
-      }
+    minify: 'esbuild', // Use esbuild instead of terser for better compatibility
+    esbuild: {
+      drop: ['console', 'debugger'], // Remove console and debugger statements
+      target: 'es2020' // Target modern browsers
     },
     // CSS optimization
     cssCodeSplit: true,
