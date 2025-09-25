@@ -9,9 +9,22 @@ import App from './App.jsx'
 import './index.css'
 import { addGlobalDownloadProtection } from './utils/downloadProtection'
 
-// Initialize Stripe
+// Initialize Stripe with optimized loading
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-const stripePromise = stripeKey ? loadStripe(stripeKey) : null
+
+// Lazy load Stripe only when needed to improve initial page load
+let stripePromise = null
+const loadStripeWhenNeeded = () => {
+  if (!stripePromise && stripeKey) {
+    stripePromise = loadStripe(stripeKey, {
+      // Optimize Stripe loading
+      stripeAccount: undefined,
+      apiVersion: '2023-10-16', // Use stable API version
+      locale: 'en'
+    })
+  }
+  return stripePromise
+}
 
 if (!stripeKey) {
   console.warn('VITE_STRIPE_PUBLISHABLE_KEY not found. Payment functionality will be disabled.')
@@ -28,7 +41,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         v7_relativeSplatPath: true
       }}
     >
-      <Elements stripe={stripePromise}>
+      <Elements stripe={loadStripeWhenNeeded()}>
         <App />
         <Toaster 
           position="top-right"
