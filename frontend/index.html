@@ -269,6 +269,22 @@
         background-color: white;
         color: #1e3a8a;
       }
+      
+      /* Modern JavaScript optimizations */
+      :root {
+        --js-modern: 0;
+      }
+      
+      .modern-browser {
+        --js-modern: 1;
+      }
+      
+      /* Use modern features when available */
+      .modern-browser .hero-section {
+        /* Modern CSS features for modern browsers */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
     </style>
     
     <!-- Structured Data - Business -->
@@ -613,6 +629,38 @@
       
       // Initialize CSS optimization
       optimizeCSSLoading();
+      
+      // Modern JavaScript optimization
+      function optimizeModernJS() {
+        // Detect modern browser capabilities
+        const hasModernFeatures = {
+          es2020: typeof Symbol !== 'undefined' && Symbol.asyncIterator,
+          es2018: typeof Object.getOwnPropertyDescriptors !== 'undefined',
+          es2017: typeof Object.values !== 'undefined',
+          es2016: typeof Array.prototype.includes !== 'undefined',
+          es2015: typeof Promise !== 'undefined' && typeof Map !== 'undefined'
+        };
+        
+        // Log modern features for debugging
+        console.log('Modern JavaScript features detected:', hasModernFeatures);
+        
+        // Add modern browser class for CSS targeting
+        if (hasModernFeatures.es2020) {
+          document.documentElement.classList.add('modern-browser');
+        }
+        
+        // Optimize for modern browsers
+        if (hasModernFeatures.es2020) {
+          // Use modern JavaScript features
+          document.documentElement.style.setProperty('--js-modern', '1');
+        } else {
+          // Fallback for older browsers
+          document.documentElement.style.setProperty('--js-modern', '0');
+        }
+      }
+      
+      // Initialize modern JavaScript optimization
+      optimizeModernJS();
     </script>
   </body>
 </html>

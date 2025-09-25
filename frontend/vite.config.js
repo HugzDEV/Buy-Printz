@@ -6,6 +6,14 @@ export default defineConfig({
   plugins: [react()],
   envDir: '../', // Look for .env files in the parent directory (root)
   base: '/', // Ensure correct base path for routing
+  
+  // Modern browser support - avoid legacy JavaScript
+  esbuild: {
+    target: 'es2020', // Target modern browsers
+    supported: {
+      'top-level-await': true
+    }
+  },
   server: {
     host: '0.0.0.0', // Bind to all interfaces
     port: 3000,
@@ -25,6 +33,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    // Modern browser target - avoid legacy JavaScript
+    target: 'es2020',
     rollupOptions: {
       output: {
         manualChunks: {
@@ -50,7 +60,20 @@ export default defineConfig({
     terserOptions: {
       compress: {
         drop_console: true,
-        drop_debugger: true
+        drop_debugger: true,
+        // Modern JavaScript optimizations
+        ecma: 2020,
+        module: true
+      },
+      mangle: {
+        // Preserve modern JavaScript features
+        keep_fnames: false,
+        module: true
+      },
+      format: {
+        // Output modern JavaScript
+        ecma: 2020,
+        comments: false
       }
     },
     // CSS optimization
