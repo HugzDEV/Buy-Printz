@@ -50,6 +50,30 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://buyprintz.com/" />
     
+    <!-- Preload Google Fonts for better performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+    
+    <!-- Critical CSS to prevent layout shifts -->
+    <style>
+      /* Critical styles for above-the-fold content */
+      html { font-family: 'Inter', system-ui, sans-serif; }
+      body { 
+        margin: 0; 
+        padding: 0; 
+        background-color: #f9fafb; 
+        color: #111827; 
+        line-height: 1.5;
+      }
+      #root { min-height: 100vh; }
+      
+      /* Prevent FOUC (Flash of Unstyled Content) */
+      .loading { opacity: 0; }
+      .loaded { opacity: 1; transition: opacity 0.3s ease-in; }
+    </style>
+    
     <!-- Structured Data - Business -->
     <script type="application/ld+json">
     {
@@ -133,7 +157,25 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" class="loading"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- CSS Loading Optimization Script -->
+    <script>
+      // Mark as loaded when React app is ready
+      window.addEventListener('load', function() {
+        document.getElementById('root').classList.remove('loading');
+        document.getElementById('root').classList.add('loaded');
+      });
+      
+      // Fallback for slow loading
+      setTimeout(function() {
+        const root = document.getElementById('root');
+        if (root.classList.contains('loading')) {
+          root.classList.remove('loading');
+          root.classList.add('loaded');
+        }
+      }, 3000);
+    </script>
   </body>
 </html>
