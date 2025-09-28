@@ -368,8 +368,8 @@ const InlinePrintPreview = ({
                       // Desktop views were already perfect, so leave them untouched
                       transform: window.innerWidth < 640 ? (
                         productType === 'tent' 
-                          ? 'scale(3.48) translate(32%, 35%)' // adjusted 3% left to prevent right cropping
-                          : 'scale(2.375) translate(30%, 25%)' // reduced by 5%: 2.5 * 0.95
+                          ? 'scale(2.8) translate(25%, 30%)' // reduced scale from 3.48 to 2.8, adjusted positioning
+                          : 'scale(1.8) translate(20%, 20%)' // reduced scale from 2.375 to 1.8, adjusted positioning
                       ) : 'none',
                       transformOrigin: 'center center',
                       position: 'relative'
