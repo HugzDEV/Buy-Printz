@@ -175,12 +175,24 @@ const Dashboard = () => {
       // Set templates from auth service (already cached)
       if (currentUser.templates) {
         console.log('Setting templates from auth service:', currentUser.templates.length, 'templates')
+        console.log('Template details:', currentUser.templates.map(t => ({ id: t.id, name: t.name, created_at: t.created_at })))
         setTemplates(currentUser.templates)
         setLoadingStates(prev => ({ ...prev, templates: false }))
       } else {
         console.log('No templates found in auth service')
         setTemplates([])
         setLoadingStates(prev => ({ ...prev, templates: false }))
+      }
+
+      // Force refresh templates to get latest data (bypass cache)
+      console.log('🔄 Force refreshing templates to get latest data...')
+      try {
+        const freshTemplates = await authService.getUserTemplates(currentUser.id)
+        console.log('🔄 Fresh templates from API:', freshTemplates.length, 'templates')
+        console.log('🔄 Fresh template details:', freshTemplates.map(t => ({ id: t.id, name: t.name, created_at: t.created_at })))
+        setTemplates(freshTemplates)
+      } catch (error) {
+        console.error('Error refreshing templates:', error)
       }
 
       // Load essential data first to show basic dashboard
@@ -290,7 +302,11 @@ const Dashboard = () => {
     await Promise.all([
       loadDataSafely(
         () => authService.authenticatedRequest('/api/user/stats'),
-        (data) => setUserStats(data),
+        (data) => {
+          console.log('📊 User stats loaded:', data)
+          console.log('📊 Total templates from stats:', data?.total_templates)
+          setUserStats(data)
+        },
         null,
         'stats'
       ),
@@ -1051,6 +1067,10 @@ const Dashboard = () => {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Templates</p>
                     <p className="text-2xl sm:text-3xl font-bold text-gray-800">{templates.length}</p>
+                    {/* Debug info */}
+                    <p className="text-xs text-gray-500 mt-1">
+                      Debug: templates.length={templates.length}, userStats.total_templates={userStats?.total_templates || 0}
+                    </p>
                     <p className="text-xs text-purple-600 flex items-center mt-1">
                       <Star className="w-3 h-3 mr-1" />
                       Custom saved
