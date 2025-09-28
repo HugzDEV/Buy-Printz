@@ -3290,6 +3290,7 @@ const BannerEditorNew = () => {
           console.log('🎨 Sending image to thumbnail service...')
           
           // Send to backend thumbnail service (similar to marketplace approach)
+          console.log('🎨 Sending thumbnail request to backend...')
           const thumbnailResponse = await authService.authenticatedRequest('/api/templates/generate-thumbnail', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -3299,11 +3300,15 @@ const BannerEditorNew = () => {
             })
           })
           
+          console.log('🎨 Thumbnail response status:', thumbnailResponse.status)
+          
           if (thumbnailResponse.ok) {
             const thumbnailResult = await thumbnailResponse.json()
             thumbnailUrl = thumbnailResult.thumbnail_url
             console.log(`✅ Generated template thumbnail: ${thumbnailUrl}`)
           } else {
+            const errorText = await thumbnailResponse.text()
+            console.error('❌ Thumbnail service failed:', thumbnailResponse.status, errorText)
             console.warn('⚠️ Thumbnail service failed, template will be saved without thumbnail')
           }
         }
@@ -3354,6 +3359,7 @@ const BannerEditorNew = () => {
       
       const result = await response.json()
       console.log('Template save result:', result)
+      console.log('Template saved with thumbnail URL:', result.thumbnail_url || 'NO THUMBNAIL URL')
       
       if (result.success) {
         setShowSaveModal(false)
