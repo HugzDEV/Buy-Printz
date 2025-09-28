@@ -22,10 +22,10 @@ const Footer = () => {
               Create banners, business card tins, and tradeshow tents with our integrated marketplace and checkout system.
             </p>
             <div className="flex space-x-4">
-              <a href="https://facebook.com/buyprintz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://facebook.com/buyprintz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Follow us on Facebook">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="https://instagram.com/buyprintzboston" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://instagram.com/buyprintzboston" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Follow us on Instagram">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>

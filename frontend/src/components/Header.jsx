@@ -165,6 +165,8 @@ const Header = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-blue-800 text-white transition-colors flex-shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center"
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
               <X className="w-5 h-5" />

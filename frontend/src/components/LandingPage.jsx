@@ -157,7 +157,7 @@ const LandingPage = () => {
                 sessionStorage.setItem('newDesign', 'true')
                 sessionStorage.setItem('fromLandingPage', 'true')
               }}
-              className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
+              className="neumorphic-button-hero bg-buyprint-700 text-white hover:bg-buyprint-800 text-xl px-12 py-6 inline-flex items-center justify-center gap-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[240px]"
             >
               Start Designing
               <ArrowRight className="w-6 h-6" />
@@ -330,7 +330,7 @@ const LandingPage = () => {
                   sessionStorage.setItem('newDesign', 'true')
                   sessionStorage.setItem('fromLandingPage', 'true')
                 }}
-                className="neumorphic-button-hero bg-buyprint-brand text-white hover:bg-buyprint-600 text-2xl px-14 py-7 inline-flex items-center justify-center gap-4 rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[280px] hover:scale-105"
+                className="neumorphic-button-hero bg-buyprint-700 text-white hover:bg-buyprint-800 text-2xl px-14 py-7 inline-flex items-center justify-center gap-4 rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 min-w-[280px] hover:scale-105"
               >
                 Start Designing Now
                 <ArrowRight className="w-7 h-7" />
