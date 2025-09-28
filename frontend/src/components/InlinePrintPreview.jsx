@@ -179,6 +179,12 @@ const InlinePrintPreview = ({
 
     // Stored surface images for any selected surface - check all possible locations
     const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images || orderDetails?.canvas_data?.surface_images
+    console.log(`🎨 DEBUG: Looking for surface image for ${selectedSurface}`)
+    console.log(`🎨 DEBUG: surfaceImages:`, surfaceImages)
+    console.log(`🎨 DEBUG: orderDetails?.surface_images:`, orderDetails?.surface_images)
+    console.log(`🎨 DEBUG: canvasData?.surface_images:`, canvasData?.surface_images)
+    console.log(`🎨 DEBUG: orderDetails?.canvas_data?.surface_images:`, orderDetails?.canvas_data?.surface_images)
+    
     if (surfaceImages && selectedSurface && surfaceImages[selectedSurface]) {
       console.log(`🎨 Using stored surface image for ${selectedSurface}`)
       processAndSet(surfaceImages[selectedSurface])
@@ -195,8 +201,17 @@ const InlinePrintPreview = ({
 
     // Additional fallback: try to use canvas_image if available
     const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+    console.log(`🎨 DEBUG: canvasImage available:`, !!canvasImage)
+    console.log(`🎨 DEBUG: selectedSurface === currentSurface:`, selectedSurface === currentSurface)
     if (selectedSurface === currentSurface && canvasImage) {
       console.log(`🎨 Using canvas image for ${selectedSurface}`)
+      processAndSet(canvasImage)
+      return
+    }
+    
+    // For tin products, if we have a canvas_image, use it for any surface since it's the tin surface area
+    if (productType === 'tin' && canvasImage) {
+      console.log(`🎨 Using canvas image for tin product (any surface)`)
       processAndSet(canvasImage)
       return
     }
@@ -269,11 +284,11 @@ const InlinePrintPreview = ({
             </div>
           )}
         </div>
-        <div className="relative w-full h-[200px] sm:h-[400px] lg:h-[500px] bg-white rounded-md overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-[300px] sm:h-[500px] lg:h-[600px] bg-white rounded-md overflow-hidden flex items-center justify-center">
           {previewImage ? (
             <>
               {productType === 'tin' ? (
-                // Realistic Tin Preview with Product Masking
+                // Realistic Tin Preview - Display design at exact tin surface dimensions
                 <div className="relative w-full h-full flex items-center justify-center">
                   {/* Base Tin Surface Image */}
                   <img
@@ -289,41 +304,34 @@ const InlinePrintPreview = ({
                     onContextMenu={(e) => e.preventDefault()}
                   />
                   
-                  {/* Design Overlay with Masking */}
+                  {/* Design Overlay with Tin Surface Clipping Mask */}
                   <div 
-                    className="absolute inset-0 flex items-center justify-center"
+                    className="absolute"
                     style={{
-                      // Create a mask effect by positioning the design over the tin surface
-                      maskImage: `url('/assets/images/Tin Surfaces/Tin_${
-                        selectedSurface === 'back' ? 'Back' : 
-                        selectedSurface === 'inside' ? 'Front' : // Use Front for inside as fallback
-                        selectedSurface === 'lid' ? 'Front' : // Use Front for lid as fallback
-                        'Front'
-                      }.png')`,
-                      maskSize: 'contain',
-                      maskRepeat: 'no-repeat',
-                      maskPosition: 'center',
-                      WebkitMaskImage: `url('/assets/images/Tin Surfaces/Tin_${
-                        selectedSurface === 'back' ? 'Back' : 
-                        selectedSurface === 'inside' ? 'Front' : // Use Front for inside as fallback
-                        selectedSurface === 'lid' ? 'Front' : // Use Front for lid as fallback
-                        'Front'
-                      }.png')`,
-                      WebkitMaskSize: 'contain',
-                      WebkitMaskRepeat: 'no-repeat',
-                      WebkitMaskPosition: 'center'
+                      // Increase canvas size by 1% more to show more design area
+                      width: '464px', // 459px + 1% = 463.59px ≈ 464px
+                      height: '289px', // 286px + 1% = 288.86px ≈ 289px
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      // Apply tin surface clipping mask with rounded corners
+                      clipPath: 'inset(0 round 31px)',
+                      WebkitClipPath: 'inset(0 round 31px)',
+                      backgroundColor: 'transparent',
+                      overflow: 'hidden'
                     }}
                   >
                     <img
                       src={previewImage}
                       alt="Design Preview"
-                      className="w-full h-full object-contain"
                       style={{
-                        // Scale and position the design to fit the tin surface
-                        transform: window.innerWidth < 640 
-                          ? 'scale(0.8) translate(0%, 0%)' 
-                          : 'scale(0.9) translate(0%, 0%)',
-                        transformOrigin: 'center center'
+                        // The preview image is exactly 374x225 pixels from canvas export
+                        // Display at native size and let the clipping mask handle the boundaries
+                        transform: 'none',
+                        transformOrigin: 'center center',
+                        objectFit: 'fill', // Fill the container completely so clipping works properly
+                        width: '100%',
+                        height: '100%'
                       }}
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}

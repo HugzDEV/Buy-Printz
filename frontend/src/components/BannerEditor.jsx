@@ -171,70 +171,6 @@ const BannerEditorNew = () => {
   // Store captured surface images (Konva exports for each surface)
   const [surfaceImages, setSurfaceImages] = useState({})
   
-  // Generate canvas image data for preview - MOVED UP for use in handleSurfaceChange
-  const generateCanvasImage = useCallback(() => {
-    try {
-      // PRIORITY 1: Use Konva native export for perfect alignment
-      if (stageRef.current && typeof stageRef.current.toDataURL === 'function') {
-        console.log('🎨 Using Konva native export (toDataURL) - eliminates alignment issues')
-        const imageData = stageRef.current.toDataURL({
-          pixelRatio: 3, // Higher quality export for better print quality
-          mimeType: 'image/png',
-          quality: 1.0 // Maximum quality for print
-        })
-        console.log('🎨 Konva image generated successfully, length:', imageData.length)
-        
-        // Check if image is too large (limit to 10MB for high quality)
-        if (imageData.length > 10 * 1024 * 1024) {
-          console.warn('🎨 Konva image too large, reducing quality')
-          return stageRef.current.toDataURL({
-            pixelRatio: 1, // Reduce pixel ratio for smaller file
-            mimeType: 'image/png',
-            quality: 0.5
-          })
-        }
-        
-        return imageData
-      }
-      
-      // FALLBACK: Canvas method if Konva fails
-      const selectors = [
-        '.konvajs-content canvas',
-        'canvas[data-konva-stage]',
-        'canvas',
-        '[data-konva-stage] canvas'
-      ]
-      
-      let stageElement = null
-      for (const selector of selectors) {
-        stageElement = document.querySelector(selector)
-        if (stageElement) {
-          console.log('Found canvas with selector:', selector)
-          break
-        }
-      }
-      
-      if (stageElement) {
-        console.log('🎨 Falling back to canvas export method')
-        const imageData = stageElement.toDataURL('image/png', 0.8)
-        console.log('Canvas image generated successfully, length:', imageData.length)
-        
-        // Check if image is too large (limit to 5MB)
-        if (imageData.length > 5 * 1024 * 1024) {
-          console.warn('Canvas image too large, reducing quality')
-          return stageElement.toDataURL('image/png', 0.5)
-        }
-        
-        return imageData
-      }
-      
-      console.warn('No canvas element found for image generation')
-      return null
-    } catch (error) {
-      console.error('Failed to generate canvas image:', error)
-      return null
-    }
-  }, [stageRef])
   
   // Function to copy design elements between surfaces
   const copyDesignToSurface = useCallback((sourceSurface, targetSurface) => {
@@ -391,10 +327,99 @@ const BannerEditorNew = () => {
   // Canvas configuration - Initialize based on product type
   const [canvasSize, setCanvasSize] = useState(() => {
     const urlProduct = searchParams.get('product')
-    if (urlProduct === 'tin') return { width: 374, height: 225 } // tin default
+    if (urlProduct === 'tin') return { width: 393, height: 236 } // tin canvas 5% larger than tin surface (374x225)
     if (urlProduct === 'tent') return { width: 1160, height: 1049 } // tent canopy+valence default (canopy 789px + gap 20px + valence 200px + padding 40px)
     return { width: 800, height: 400 } // banner default
   })
+
+  // Generate canvas image data for preview - MOVED HERE after canvasSize definition
+  const generateCanvasImage = useCallback(() => {
+    try {
+      // PRIORITY 1: Use Konva native export for perfect alignment
+      if (stageRef.current && typeof stageRef.current.toDataURL === 'function') {
+        console.log('🎨 Using Konva native export (toDataURL) - eliminates alignment issues')
+        
+        // For tin products, export only the tin surface area (374x225) centered in canvas
+        if (productType === 'tin') {
+          console.log('🎨 Tin product detected - exporting tin surface area for alignment')
+          const tinSurfaceWidth = 374
+          const tinSurfaceHeight = 225
+          const offsetX = (canvasSize.width - tinSurfaceWidth) / 2  // Center horizontally: (393-374)/2 = 9.5
+          const offsetY = (canvasSize.height - tinSurfaceHeight) / 2 // Center vertically: (236-225)/2 = 5.5
+          
+          const imageData = stageRef.current.toDataURL({
+            pixelRatio: 3, // Higher quality export for better print quality
+            mimeType: 'image/png',
+            quality: 1.0, // Maximum quality for print
+            // Export only the tin surface area (374x225) centered in canvas
+            x: offsetX,
+            y: offsetY,
+            width: tinSurfaceWidth,  // 374 - actual tin surface width
+            height: tinSurfaceHeight // 225 - actual tin surface height
+          })
+          console.log('🎨 Tin surface area exported, length:', imageData.length)
+          return imageData
+        }
+        
+        // Standard export for other products
+        const imageData = stageRef.current.toDataURL({
+          pixelRatio: 3, // Higher quality export for better print quality
+          mimeType: 'image/png',
+          quality: 1.0 // Maximum quality for print
+        })
+        console.log('🎨 Konva image generated successfully, length:', imageData.length)
+        
+        // Check if image is too large (limit to 10MB for high quality)
+        if (imageData.length > 10 * 1024 * 1024) {
+          console.warn('🎨 Konva image too large, reducing quality')
+          return stageRef.current.toDataURL({
+            pixelRatio: 1, // Reduce pixel ratio for smaller file
+            mimeType: 'image/png',
+            quality: 0.5
+          })
+        }
+        
+        return imageData
+      }
+      
+      // FALLBACK: Canvas method if Konva fails
+      const selectors = [
+        '.konvajs-content canvas',
+        'canvas[data-konva-stage]',
+        'canvas',
+        '[data-konva-stage] canvas'
+      ]
+      
+      let stageElement = null
+      for (const selector of selectors) {
+        stageElement = document.querySelector(selector)
+        if (stageElement) {
+          console.log('Found canvas with selector:', selector)
+          break
+        }
+      }
+      
+      if (stageElement) {
+        console.log('🎨 Falling back to canvas export method')
+        const imageData = stageElement.toDataURL('image/png', 0.8)
+        console.log('Canvas image generated successfully, length:', imageData.length)
+        
+        // Check if image is too large (limit to 5MB)
+        if (imageData.length > 5 * 1024 * 1024) {
+          console.warn('Canvas image too large, reducing quality')
+          return stageElement.toDataURL('image/png', 0.5)
+        }
+        
+        return imageData
+      }
+      
+      console.warn('No canvas element found for image generation')
+      return null
+    } catch (error) {
+      console.error('Failed to generate canvas image:', error)
+      return null
+    }
+  }, [stageRef, productType, canvasSize])
 
   // Triangular clipping function for tent canopy
   const getTentCanopyClipFunc = () => {
@@ -490,11 +515,17 @@ const BannerEditorNew = () => {
     },
     tin: {
       name: 'Business Card Tin',
-      defaultSize: { width: 374, height: 225 }, // 3.74" x 2.25" at 100 DPI
+      defaultSize: { width: 393, height: 236 }, // Canvas 5% larger than tin surface (374x225)
       sizes: [
-        { name: 'Business Card Tin', width: 374, height: 225, orientation: 'landscape', category: 'standard' }
+        { name: 'Business Card Tin', width: 393, height: 236, orientation: 'landscape', category: 'standard' }
       ],
-      description: 'Premium aluminum business card tins with custom vinyl stickers'
+      description: 'Premium aluminum business card tins with custom vinyl stickers',
+      // Safe zone is the actual tin surface area (374x225) centered in larger canvas
+      safeZone: {
+        margin: 9.5, // (393-374)/2 = 9.5px margin to center tin surface in canvas
+        width: 374,   // Actual tin surface width
+        height: 225   // Actual tin surface height
+      }
     },
     tent: {
       name: 'Tradeshow Tent',

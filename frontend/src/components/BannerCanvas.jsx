@@ -2620,6 +2620,99 @@ const BannerCanvas = forwardRef(({
                           listening={false}
                         />
                       </>
+                    ) : productType === 'tin' ? (
+                      // Tin-specific safe zone - shows actual tin surface area (374x225) centered in canvas
+                      <>
+                        {/* Calculate tin surface position (centered in canvas) */}
+                        {(() => {
+                          const tinSurfaceWidth = 374
+                          const tinSurfaceHeight = 225
+                          const offsetX = (canvasSize.width - tinSurfaceWidth) / 2  // (393-374)/2 = 9.5
+                          const offsetY = (canvasSize.height - tinSurfaceHeight) / 2 // (236-225)/2 = 5.5
+                          
+                          return (
+                            <>
+                              {/* Top border */}
+                              <Line
+                                points={[offsetX, offsetY, offsetX + tinSurfaceWidth, offsetY]}
+                                stroke="#dc2626"
+                                strokeWidth={1}
+                                dash={[5, 3]}
+                                lineCap="round"
+                                listening={false}
+                              />
+                              {/* Right border */}
+                              <Line
+                                points={[offsetX + tinSurfaceWidth, offsetY, offsetX + tinSurfaceWidth, offsetY + tinSurfaceHeight]}
+                                stroke="#dc2626"
+                                strokeWidth={1}
+                                dash={[5, 3]}
+                                lineCap="round"
+                                listening={false}
+                              />
+                              {/* Bottom border */}
+                              <Line
+                                points={[offsetX + tinSurfaceWidth, offsetY + tinSurfaceHeight, offsetX, offsetY + tinSurfaceHeight]}
+                                stroke="#dc2626"
+                                strokeWidth={1}
+                                dash={[5, 3]}
+                                lineCap="round"
+                                listening={false}
+                              />
+                              {/* Left border */}
+                              <Line
+                                points={[offsetX, offsetY + tinSurfaceHeight, offsetX, offsetY]}
+                                stroke="#dc2626"
+                                strokeWidth={1}
+                                dash={[5, 3]}
+                                lineCap="round"
+                                listening={false}
+                              />
+                              
+                              {/* Corner indicators */}
+                              <Circle
+                                x={offsetX}
+                                y={offsetY}
+                                radius={2}
+                                fill="#dc2626"
+                                listening={false}
+                              />
+                              <Circle
+                                x={offsetX + tinSurfaceWidth}
+                                y={offsetY}
+                                radius={2}
+                                fill="#dc2626"
+                                listening={false}
+                              />
+                              <Circle
+                                x={offsetX + tinSurfaceWidth}
+                                y={offsetY + tinSurfaceHeight}
+                                radius={2}
+                                fill="#dc2626"
+                                listening={false}
+                              />
+                              <Circle
+                                x={offsetX}
+                                y={offsetY + tinSurfaceHeight}
+                                radius={2}
+                                fill="#dc2626"
+                                listening={false}
+                              />
+                              
+                              {/* Tin Surface Label */}
+                              <Text
+                                x={offsetX + 5}
+                                y={offsetY + tinSurfaceHeight - 5}
+                                text="Tin Surface Area"
+                                fontSize={10}
+                                fontFamily="Arial"
+                                fill="#dc2626"
+                                listening={false}
+                              />
+                            </>
+                          )
+                        })()}
+                      </>
                     ) : (
                       // Rectangular safe zone for other products
                       <>
