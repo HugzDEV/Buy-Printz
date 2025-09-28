@@ -73,7 +73,7 @@ const BannerCanvas = forwardRef(({
   // Create a separate ref for the actual Konva Stage
   const konvaStageRef = useRef(null)
   
-  // Expose clearTransformer function through ref
+  // Expose clearTransformer function and Konva stage through ref
   useImperativeHandle(stageRef, () => ({
     clearTransformer: () => {
       if (transformerRef.current) {
@@ -93,6 +93,15 @@ const BannerCanvas = forwardRef(({
         
         console.log('🔧 Transformer handles cleared')
       }
+    },
+    // Expose the actual Konva stage for thumbnail generation
+    getStage: () => konvaStageRef.current,
+    // Direct access to toDataURL method
+    toDataURL: (options) => {
+      if (konvaStageRef.current && typeof konvaStageRef.current.toDataURL === 'function') {
+        return konvaStageRef.current.toDataURL(options)
+      }
+      return null
     }
   }), [])
   const transformerRef = useRef()

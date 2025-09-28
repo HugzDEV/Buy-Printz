@@ -175,7 +175,7 @@ const BannerEditorNew = () => {
   const generateCanvasImage = useCallback(() => {
     try {
       // PRIORITY 1: Use Konva native export for perfect alignment
-      if (stageRef.current) {
+      if (stageRef.current && typeof stageRef.current.toDataURL === 'function') {
         console.log('🎨 Using Konva native export (toDataURL) - eliminates alignment issues')
         const imageData = stageRef.current.toDataURL({
           pixelRatio: 3, // Higher quality export for better print quality
@@ -3262,32 +3262,15 @@ const BannerEditorNew = () => {
       // Generate thumbnail using marketplace-style service (stores as file, not base64 in DB)
       let thumbnailUrl = null
       try {
-        if (stageRef.current) {
-          // Generate high-quality image for server-side thumbnail creation
-          // Use higher pixelRatio for mobile to compensate for smaller screen designs
-          const isMobile = window.innerWidth < 768
-          const pixelRatio = isMobile ? 3 : 2 // Higher quality for mobile captures
-          
-          const fullQualityImage = stageRef.current.toDataURL({
-            mimeType: 'image/png',
-            quality: 1.0,
-            pixelRatio: pixelRatio // Adaptive resolution based on device
-          })
-          
-          console.log(`🎨 Generated template image - Mobile: ${isMobile}, PixelRatio: ${pixelRatio}`)
-          
-          // Log image details for debugging mobile vs desktop differences
-          const img = new Image()
-          img.onload = () => {
-            console.log(`🔍 FRONTEND DEBUG - Generated image dimensions: ${img.width} x ${img.height}`)
-            console.log(`🔍 FRONTEND DEBUG - Canvas size setting: ${canvasSize.width} x ${canvasSize.height}`)
-            console.log(`🔍 FRONTEND DEBUG - Pixel ratio used: ${pixelRatio}`)
-            console.log(`🔍 FRONTEND DEBUG - Expected final size: ${canvasSize.width * pixelRatio} x ${canvasSize.height * pixelRatio}`)
-            console.log(`🔍 FRONTEND DEBUG - Image data length: ${fullQualityImage.length} characters`)
-          }
-          img.src = fullQualityImage
-          
-          console.log('🎨 Sending image to thumbnail service...')
+        // Wait a bit to ensure stage is fully rendered
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // Use the existing generateCanvasImage function which has proper fallbacks
+        console.log('🎨 Generating thumbnail using existing generateCanvasImage function...')
+        const fullQualityImage = generateCanvasImage()
+        
+        if (fullQualityImage) {
+          console.log(`🎨 Generated template image successfully, length: ${fullQualityImage.length}`)
           
           // Send to backend thumbnail service (similar to marketplace approach)
           console.log('🎨 Sending thumbnail request to backend...')
@@ -3311,6 +3294,8 @@ const BannerEditorNew = () => {
             console.error('❌ Thumbnail service failed:', thumbnailResponse.status, errorText)
             console.warn('⚠️ Thumbnail service failed, template will be saved without thumbnail')
           }
+        } else {
+          console.warn('⚠️ Failed to generate canvas image - generateCanvasImage returned null')
         }
       } catch (error) {
         console.warn('Failed to generate thumbnail via service:', error)
