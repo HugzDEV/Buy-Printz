@@ -12,7 +12,7 @@ const Footer = () => {
             <Link to="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
               <img 
                 src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
-                alt="Buy Printz" 
+                alt="BuyPrintz Logo" 
                 className="w-24 h-24 object-contain"
               />
               <span className="text-xl font-bold">Buy Printz</span>

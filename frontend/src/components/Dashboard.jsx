@@ -1017,7 +1017,7 @@ const Dashboard = () => {
               <Link to="/" className="flex items-center">
                 <img 
                   src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
-                  alt="Buy Printz" 
+                  alt="BuyPrintz Logo" 
                   className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain hover:opacity-80 transition-opacity cursor-pointer flex-shrink-0"
                 />
               </Link>
