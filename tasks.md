@@ -968,6 +968,92 @@ const mobileTourSteps = [
 
 ---
 
+### 20. **Thumbnail Generation & Print Preview Fix**
+**Problem:** Template thumbnails were failing to generate (showing `null` URLs) and print preview was not displaying Konva stage content properly.
+
+**Root Cause Analysis:**
+- `stageRef.current.toDataURL is not a function` error in canvas editor
+- `stageRef` was pointing to React component wrapper, not actual Konva stage
+- Print preview couldn't access Konva stage data for image generation
+- Thumbnail generation service was failing due to invalid stage access
+
+**Solution Architecture:**
+1. **BannerCanvas Ref Exposure:**
+   ```javascript
+   // Modified useImperativeHandle in BannerCanvas.jsx
+   useImperativeHandle(stageRef, () => ({
+     clearTransformer: () => { /* existing logic */ },
+     // NEW: Expose actual Konva stage for thumbnail generation
+     getStage: () => konvaStageRef.current,
+     toDataURL: (options) => {
+       if (konvaStageRef.current && typeof konvaStageRef.current.toDataURL === 'function') {
+         return konvaStageRef.current.toDataURL(options)
+       }
+       return null
+     }
+   }), [])
+   ```
+
+2. **BannerEditor Thumbnail Generation:**
+   ```javascript
+   // Updated generateCanvasImage function
+   if (stageRef.current && typeof stageRef.current.toDataURL === 'function') {
+     console.log('🎨 Using Konva native export (toDataURL) - eliminates alignment issues')
+     const imageData = stageRef.current.toDataURL({
+       pixelRatio: 3, // Higher quality export for better print quality
+       mimeType: 'image/png',
+       quality: 1.0 // Maximum quality for print
+     })
+     return imageData
+   }
+   ```
+
+3. **Print Preview Enhancement:**
+   - Enhanced Konva canvas detection with multiple selectors
+   - Added retry mechanism with 500ms delay for canvas loading
+   - Improved data access paths for `surfaceImages` and `konvaStageImage`
+   - Added fallback to `canvas_image` if available
+
+**Technical Implementation:**
+```javascript
+// Enhanced canvas detection in InlinePrintPreview.jsx
+const findKonvaCanvas = () => {
+  const stageSelectors = [
+    '.konvajs-content canvas',
+    'canvas[data-konva-stage]', 
+    '[data-konva-stage] canvas',
+    'canvas[data-konva]',
+    '.konvajs-content canvas[data-konva]',
+    'canvas'
+  ]
+  
+  for (const selector of stageSelectors) {
+    const elements = document.querySelectorAll(selector)
+    for (const element of elements) {
+      if (element.width > 0 && element.height > 0 && element.offsetWidth > 0) {
+        return element
+      }
+    }
+  }
+  return null
+}
+```
+
+**Results:**
+- ✅ **Thumbnail Generation Fixed**: New templates now generate proper thumbnail URLs instead of `null`
+- ✅ **Print Preview Working**: Konva stage content displays correctly in checkout preview
+- ✅ **Canvas Access Resolved**: Proper Konva stage access through exposed ref methods
+- ✅ **Image Quality Improved**: Higher pixelRatio (3x) for better thumbnail quality
+- ✅ **Fallback System**: Multiple data access paths ensure preview works reliably
+
+**Impact:**
+- Template thumbnails now appear in dashboard templates tab
+- Print preview shows actual canvas content instead of blank areas
+- User experience significantly improved for template saving and checkout
+- All canvas export functionality now works consistently
+
+---
+
 ## 🎯 Current Status & Next Phase
 
 ### **Recently Completed (September 2025):**
@@ -976,6 +1062,8 @@ const mobileTourSteps = [
 - ✅ **SEO Optimization**: Comprehensive sitemap, meta tags, and content management
 - ✅ **Navigation Fixes**: Working footer links and social media integration
 - ✅ **Tour Updates**: Updated onboarding tour for new UI components
+- ✅ **Thumbnail Generation Fix**: Template thumbnails now generate properly with proper Konva stage access
+- ✅ **Print Preview Enhancement**: Checkout preview now displays canvas content correctly
 
 ### **Next Phase: Advanced Features**
 1. **Creator Monetization:**
@@ -1004,13 +1092,15 @@ const mobileTourSteps = [
 
 ---
 
-*Last Updated: September 21, 2025*
-*Development Period: August 8, 2025 - September 21, 2025*
-*Total Issues Resolved: 19 major categories*
+*Last Updated: September 28, 2025*
+*Development Period: August 8, 2025 - September 28, 2025*
+*Total Issues Resolved: 20 major categories*
 *Lines of Code: 8,000+ across frontend components + 6,000+ backend automation*
-*User Experience Improvements: 35+ enhancements*
+*User Experience Improvements: 40+ enhancements*
 *Creator System: Complete marketplace with followers, earnings, and analytics*
 *SEO & Content: Comprehensive sitemap, meta tags, and blog system*
 *Tin Skinz Integration: Creator functionality for tin designs*
 *Mobile Optimization: Complete responsive design overhaul*
+*Canvas & Thumbnails: Fixed Konva stage access and thumbnail generation*
+*Print Preview: Enhanced checkout preview with proper canvas content display*
 *Database Schema: 15+ tables with RLS, triggers, and indexes*

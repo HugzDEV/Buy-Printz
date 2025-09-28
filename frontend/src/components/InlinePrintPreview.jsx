@@ -272,42 +272,121 @@ const InlinePrintPreview = ({
         <div className="relative w-full h-[200px] sm:h-[400px] lg:h-[500px] bg-white rounded-md overflow-hidden flex items-center justify-center">
           {previewImage ? (
             <>
-              <img
-                src={previewImage}
-                alt="Design Preview"
-                className="w-full h-full object-contain bg-white"
-                style={{
-                  // Only apply scaling transforms on mobile (screen width < 640px)
-                  // Desktop views were already perfect, so leave them untouched
-                  transform: window.innerWidth < 640 ? (
-                    productType === 'tent' 
-                      ? 'scale(3.48) translate(32%, 35%)' // adjusted 3% left to prevent right cropping
-                      : productType === 'tin'
-                      ? 'scale(0.95) translate(2.5%, 0%)' // reduced by 5%: 1.0 * 0.95
-                      : 'scale(2.375) translate(30%, 25%)' // reduced by 5%: 2.5 * 0.95
-                  ) : 'none',
-                  transformOrigin: 'center center',
-                  position: 'relative'
-                }}
-                draggable={false}
-                onContextMenu={(e) => e.preventDefault()}
-              />
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage: "url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center',
-                  backgroundSize: 'cover',
-                  opacity: 0.3,
-                  mixBlendMode: 'multiply',
-                  zIndex: 9999
-                }}
-                onError={(e) => {
-                  console.warn('🎨 Watermark failed to load in production')
-                  e.target.style.display = 'none'
-                }}
-              />
+              {productType === 'tin' ? (
+                // Realistic Tin Preview with Product Masking
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {/* Base Tin Surface Image */}
+                  <img
+                    src={`/assets/images/Tin Surfaces/Tin_${
+                      selectedSurface === 'back' ? 'Back' : 
+                      selectedSurface === 'inside' ? 'Front' : // Use Front for inside as fallback
+                      selectedSurface === 'lid' ? 'Front' : // Use Front for lid as fallback
+                      'Front'
+                    }.png`}
+                    alt={`Tin ${selectedSurface === 'back' ? 'Back' : 'Front'} Surface`}
+                    className="absolute inset-0 w-full h-full object-contain"
+                    draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  
+                  {/* Design Overlay with Masking */}
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{
+                      // Create a mask effect by positioning the design over the tin surface
+                      maskImage: `url('/assets/images/Tin Surfaces/Tin_${
+                        selectedSurface === 'back' ? 'Back' : 
+                        selectedSurface === 'inside' ? 'Front' : // Use Front for inside as fallback
+                        selectedSurface === 'lid' ? 'Front' : // Use Front for lid as fallback
+                        'Front'
+                      }.png')`,
+                      maskSize: 'contain',
+                      maskRepeat: 'no-repeat',
+                      maskPosition: 'center',
+                      WebkitMaskImage: `url('/assets/images/Tin Surfaces/Tin_${
+                        selectedSurface === 'back' ? 'Back' : 
+                        selectedSurface === 'inside' ? 'Front' : // Use Front for inside as fallback
+                        selectedSurface === 'lid' ? 'Front' : // Use Front for lid as fallback
+                        'Front'
+                      }.png')`,
+                      WebkitMaskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center'
+                    }}
+                  >
+                    <img
+                      src={previewImage}
+                      alt="Design Preview"
+                      className="w-full h-full object-contain"
+                      style={{
+                        // Scale and position the design to fit the tin surface
+                        transform: window.innerWidth < 640 
+                          ? 'scale(0.8) translate(0%, 0%)' 
+                          : 'scale(0.9) translate(0%, 0%)',
+                        transformOrigin: 'center center'
+                      }}
+                      draggable={false}
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                  </div>
+                  
+                  {/* Watermark Overlay */}
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      backgroundImage: "url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')",
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center',
+                      backgroundSize: 'cover',
+                      opacity: 0.2,
+                      mixBlendMode: 'multiply',
+                      zIndex: 9999
+                    }}
+                    onError={(e) => {
+                      console.warn('🎨 Watermark failed to load in production')
+                      e.target.style.display = 'none'
+                    }}
+                  />
+                </div>
+              ) : (
+                // Standard Preview for Banners and Tents
+                <>
+                  <img
+                    src={previewImage}
+                    alt="Design Preview"
+                    className="w-full h-full object-contain bg-white"
+                    style={{
+                      // Only apply scaling transforms on mobile (screen width < 640px)
+                      // Desktop views were already perfect, so leave them untouched
+                      transform: window.innerWidth < 640 ? (
+                        productType === 'tent' 
+                          ? 'scale(3.48) translate(32%, 35%)' // adjusted 3% left to prevent right cropping
+                          : 'scale(2.375) translate(30%, 25%)' // reduced by 5%: 2.5 * 0.95
+                      ) : 'none',
+                      transformOrigin: 'center center',
+                      position: 'relative'
+                    }}
+                    draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      backgroundImage: "url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')",
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center',
+                      backgroundSize: 'cover',
+                      opacity: 0.3,
+                      mixBlendMode: 'multiply',
+                      zIndex: 9999
+                    }}
+                    onError={(e) => {
+                      console.warn('🎨 Watermark failed to load in production')
+                      e.target.style.display = 'none'
+                    }}
+                  />
+                </>
+              )}
             </>
           ) : (
             <div className="text-center space-y-2">
