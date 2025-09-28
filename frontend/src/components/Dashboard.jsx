@@ -2116,15 +2116,17 @@ const Dashboard = () => {
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
-                  <Palette className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">{templates.length}</p>
-                  <p className="text-xs text-gray-600">Total Designs</p>
-                </div>
-                <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <Layout className="w-6 h-6 text-purple-600 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-gray-800">{templates.length}</p>
-                  <p className="text-xs text-gray-600">Templates Saved</p>
+                  <p className="text-xs text-gray-600">My Templates</p>
                 </div>
+                {isCreator && (
+                  <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
+                    <Crown className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-gray-800">{creatorTemplates.length}</p>
+                    <p className="text-xs text-gray-600">Creator Templates</p>
+                  </div>
+                )}
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <ShoppingBag className="w-6 h-6 text-green-600 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-gray-800">{userStats?.total_orders || 0}</p>
