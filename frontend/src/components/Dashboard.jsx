@@ -183,6 +183,17 @@ const Dashboard = () => {
         setLoadingStates(prev => ({ ...prev, templates: false }))
       }
 
+      // Force refresh templates to ensure we have the latest count
+      // This will invalidate cache and fetch fresh data from API
+      setTimeout(async () => {
+        try {
+          console.log('🔄 Force refreshing templates to get latest count...')
+          await refreshTemplates()
+        } catch (error) {
+          console.warn('Failed to refresh templates on dashboard load:', error)
+        }
+      }, 1000) // Small delay to let dashboard render first
+
       // Load essential data first to show basic dashboard
       setLoading(false)
 
@@ -1050,7 +1061,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Templates</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{templates.length + (isCreator ? creatorTemplates.length : 0)}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
                     <p className="text-xs text-purple-600 flex items-center mt-1">
                       <Star className="w-3 h-3 mr-1" />
                       Custom saved
@@ -2053,12 +2064,12 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <Palette className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">{templates.length + (isCreator ? creatorTemplates.length : 0)}</p>
+                  <p className="text-2xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
                   <p className="text-xs text-gray-600">Total Designs</p>
                 </div>
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
                   <Layout className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">{templates.length + (isCreator ? creatorTemplates.length : 0)}</p>
+                  <p className="text-2xl font-bold text-gray-800">{userStats?.total_templates || templates.length}</p>
                   <p className="text-xs text-gray-600">Templates Saved</p>
                 </div>
                 <div className="backdrop-blur-sm bg-white/30 p-4 rounded-xl text-center border border-white/30">
