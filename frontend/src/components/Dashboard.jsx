@@ -45,6 +45,14 @@ const Dashboard = () => {
     preferences: true
   })
   const [activeTab, setActiveTab] = useState('overview')
+
+  // Handle tab changes with URL updates
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId)
+    const searchParams = new URLSearchParams(location.search)
+    searchParams.set('tab', tabId)
+    navigate(`?${searchParams.toString()}`, { replace: true })
+  }
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedOrder, setSelectedOrder] = useState(null)
@@ -88,6 +96,9 @@ const Dashboard = () => {
     const tabParam = searchParams.get('tab')
     if (tabParam && ['overview', 'templates', 'orders', 'creator', 'profile'].includes(tabParam)) {
       setActiveTab(tabParam)
+    } else if (!tabParam) {
+      // If no tab parameter, set default and update URL
+      handleTabChange('overview')
     }
   }, [location.search])
 
@@ -984,7 +995,7 @@ const Dashboard = () => {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center py-2 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
                   activeTab === tab.id
                     ? 'bg-white/50 text-blue-700 shadow-lg border border-white/40'

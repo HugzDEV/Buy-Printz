@@ -86,19 +86,50 @@ const InlinePrintPreview = ({
     }
 
     if (selectedSurface === currentSurface) {
-      // Try to find the Konva stage using multiple selectors
-      const stageSelectors = [
-        '.konvajs-content canvas',
-        'canvas[data-konva-stage]', 
-        '[data-konva-stage] canvas',
-        'canvas'
-      ]
-      
-      let stageCanvas = null
-      for (const selector of stageSelectors) {
-        stageCanvas = document.querySelector(selector)
-        if (stageCanvas) break
+      // Try to find the Konva stage using multiple approaches
+      const findKonvaCanvas = () => {
+        // Method 1: Try multiple selectors with better targeting
+        const stageSelectors = [
+          '.konvajs-content canvas',
+          'canvas[data-konva-stage]', 
+          '[data-konva-stage] canvas',
+          'canvas[data-konva]',
+          '.konvajs-content canvas[data-konva]',
+          'canvas'
+        ]
+        
+        for (const selector of stageSelectors) {
+          const elements = document.querySelectorAll(selector)
+          for (const element of elements) {
+            // Check if this canvas has Konva content (has width/height and is visible)
+            if (element.width > 0 && element.height > 0 && element.offsetWidth > 0) {
+              console.log(`🎨 Found Konva canvas with selector: ${selector}`)
+              return element
+            }
+          }
+        }
+        
+        // Method 2: Try to find any canvas with Konva-specific attributes
+        const allCanvases = document.querySelectorAll('canvas')
+        for (const canvas of allCanvases) {
+          if (canvas.width > 0 && canvas.height > 0 && canvas.offsetWidth > 0) {
+            // Check if this looks like a Konva canvas (has specific dimensions or attributes)
+            const parent = canvas.parentElement
+            if (parent && (
+              parent.classList.contains('konvajs-content') ||
+              parent.hasAttribute('data-konva-stage') ||
+              canvas.hasAttribute('data-konva')
+            )) {
+              console.log(`🎨 Found Konva canvas by parent attributes`)
+              return canvas
+            }
+          }
+        }
+        
+        return null
       }
+      
+      const stageCanvas = findKonvaCanvas()
       
       if (stageCanvas) {
         try {
@@ -108,6 +139,7 @@ const InlinePrintPreview = ({
           const exportPixelRatio = Math.max(devicePixelRatio, isMobile ? 3 : 2)
           
           console.log(`🎨 Konva Export - Mobile: ${isMobile}, DevicePixelRatio: ${devicePixelRatio}, ExportRatio: ${exportPixelRatio}`)
+          console.log(`🎨 Canvas dimensions: ${stageCanvas.width}x${stageCanvas.height}`)
           
           const fresh = stageCanvas.toDataURL({ 
             mimeType: 'image/png', 
@@ -123,25 +155,63 @@ const InlinePrintPreview = ({
           console.error('🎨 Konva canvas export failed:', e)
           // fall through to stored images
         }
+      } else {
+        console.warn('🎨 No valid Konva canvas found for export')
+        // Try to wait a bit and retry (in case canvas is still loading)
+        setTimeout(() => {
+          const retryCanvas = findKonvaCanvas()
+          if (retryCanvas) {
+            console.log('🎨 Found Konva canvas on retry')
+            try {
+              const fresh = retryCanvas.toDataURL({ 
+                mimeType: 'image/png', 
+                quality: 1.0, 
+                pixelRatio: 2
+              })
+              processAndSet(fresh)
+            } catch (e) {
+              console.error('🎨 Retry canvas export failed:', e)
+            }
+          }
+        }, 500)
       }
     }
 
-    // Stored surface images for any selected surface
-    const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images
+    // Stored surface images for any selected surface - check all possible locations
+    const surfaceImages = orderDetails?.surface_images || canvasData?.surface_images || orderDetails?.canvas_data?.surface_images
     if (surfaceImages && selectedSurface && surfaceImages[selectedSurface]) {
       console.log(`🎨 Using stored surface image for ${selectedSurface}`)
       processAndSet(surfaceImages[selectedSurface])
       return
     }
 
-    // Stored single-surface stage image as last resort (only for current surface)
-    if (selectedSurface === currentSurface && canvasData?.konvaStageImage) {
+    // Stored single-surface stage image as last resort (only for current surface) - check all possible locations
+    const konvaStageImage = canvasData?.konvaStageImage || orderDetails?.canvas_data?.konvaStageImage
+    if (selectedSurface === currentSurface && konvaStageImage) {
       console.log(`🎨 Using stored stage image for ${selectedSurface}`)
-      processAndSet(canvasData.konvaStageImage)
+      processAndSet(konvaStageImage)
+      return
+    }
+
+    // Additional fallback: try to use canvas_image if available
+    const canvasImage = orderDetails?.canvas_image || canvasData?.canvas_image
+    if (selectedSurface === currentSurface && canvasImage) {
+      console.log(`🎨 Using canvas image for ${selectedSurface}`)
+      processAndSet(canvasImage)
       return
     }
 
     console.warn(`🎨 No preview image available for surface: ${selectedSurface}`)
+    console.log('🎨 Available data:', {
+      orderDetails: !!orderDetails,
+      canvasData: !!canvasData,
+      surfaceImages: orderDetails?.surface_images || canvasData?.surface_images || orderDetails?.canvas_data?.surface_images,
+      konvaStageImage: canvasData?.konvaStageImage || orderDetails?.canvas_data?.konvaStageImage,
+      canvasImage: orderDetails?.canvas_image || canvasData?.canvas_image,
+      selectedSurface,
+      orderDetailsKeys: orderDetails ? Object.keys(orderDetails) : [],
+      canvasDataKeys: canvasData ? Object.keys(canvasData) : []
+    })
     setPreviewImage(null)
   }, [orderDetails, canvasData, selectedSurface, currentSurface])
 
