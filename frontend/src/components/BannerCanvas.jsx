@@ -2224,11 +2224,26 @@ const BannerCanvas = forwardRef(({
           
           
 
-          {/* Surface Indicator for Tins and Tents - Moved to bottom */}
+          {/* Safe Print Zone Legend - Top Left, Mobile Responsive */}
+          <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
+            <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-lg max-w-[200px] sm:max-w-none">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-3 sm:w-4 h-0.5 bg-red-500 border-t-2 border-dashed border-red-500"></div>
+                <span className="text-xs font-medium text-gray-700">
+                  Safe Print Zone
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 mt-1 hidden sm:block">
+                Keep designs within the red dotted lines
+              </p>
+            </div>
+          </div>
+
+          {/* Surface Indicator for Tins and Tents - Top Left, below Safe Print Zone, Mobile Responsive */}
           {(productType === 'tin' || productType === 'tent') && (
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-              <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-2 shadow-lg">
-                <div className="text-sm font-medium text-gray-800">
+            <div className="absolute top-16 sm:top-20 left-2 sm:left-4 z-10">
+              <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-lg">
+                <div className="text-xs sm:text-sm font-medium text-gray-800">
                   Editing: <span className="text-blue-600 capitalize">
                     {productType === 'tin' 
                       ? currentSurface 
@@ -2699,10 +2714,10 @@ const BannerCanvas = forwardRef(({
                                 listening={false}
                               />
                               
-                              {/* Tin Surface Label */}
+                              {/* Tin Surface Label - positioned outside safe zone */}
                               <Text
                                 x={offsetX + 5}
-                                y={offsetY + tinSurfaceHeight - 5}
+                                y={offsetY + tinSurfaceHeight + 15}
                                 text="Tin Surface Area"
                                 fontSize={10}
                                 fontFamily="Arial"
