@@ -73,15 +73,20 @@ const Dashboard = () => {
     loadDashboardData()
   }, [])
 
+  // Track if templates are currently being refreshed to prevent duplicate calls
+  const [isRefreshingTemplates, setIsRefreshingTemplates] = useState(false)
+  const [lastRefreshTime, setLastRefreshTime] = useState(0)
+
   // Refresh templates when returning from editor (detect new template creation)
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'newDesign' && e.newValue === 'true') {
+      if (e.key === 'newDesign' && e.newValue === 'true' && !isRefreshingTemplates) {
         // Template was just created, refresh the list
         console.log('🔄 New template detected, refreshing templates...')
         if (user?.id) {
+          setIsRefreshingTemplates(true)
           authService.invalidateUserTemplatesCache(user.id)
-          refreshTemplates()
+          refreshTemplates().finally(() => setIsRefreshingTemplates(false))
         }
         // Clear the flag
         sessionStorage.removeItem('newDesign')
@@ -90,12 +95,16 @@ const Dashboard = () => {
 
     window.addEventListener('storage', handleStorageChange)
     
-    // Also check on focus (when user returns from editor)
+    // Also check on focus (when user returns from editor) - but only if not already refreshing
     const handleFocus = () => {
-      if (user?.id) {
+      const now = Date.now()
+      // Debounce focus events - only refresh if it's been more than 5 seconds since last refresh
+      if (user?.id && !isRefreshingTemplates && (now - lastRefreshTime > 5000)) {
         console.log('🔄 Dashboard focused, checking for template updates...')
+        setLastRefreshTime(now)
+        setIsRefreshingTemplates(true)
         authService.invalidateUserTemplatesCache(user.id)
-        refreshTemplates()
+        refreshTemplates().finally(() => setIsRefreshingTemplates(false))
       }
     }
 
@@ -105,7 +114,7 @@ const Dashboard = () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('focus', handleFocus)
     }
-  }, [user?.id])
+  }, [user?.id, isRefreshingTemplates, lastRefreshTime])
 
   // Refresh creator templates when creator tab becomes active (only if needed)
   useEffect(() => {
@@ -742,8 +751,10 @@ const Dashboard = () => {
   }
 
   const refreshTemplates = async () => {
-    if (!user?.id) return
+    if (!user?.id || isRefreshingTemplates) return
     
+    console.log('🔄 Refreshing templates...')
+    setIsRefreshingTemplates(true)
     setLoadingStates(prev => ({ ...prev, templates: true }))
     
     try {
@@ -752,6 +763,7 @@ const Dashboard = () => {
       
       const templates = await authService.getUserTemplates(user.id)
       setTemplates(templates)
+      console.log('✅ Templates refreshed successfully:', templates.length, 'templates')
       toast.success('Templates refreshed')
     } catch (error) {
       console.error('Error refreshing templates:', error)
@@ -759,6 +771,7 @@ const Dashboard = () => {
       setTemplates([])
     } finally {
       setLoadingStates(prev => ({ ...prev, templates: false }))
+      setIsRefreshingTemplates(false)
     }
   }
 
