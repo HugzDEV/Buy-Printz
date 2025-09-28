@@ -16,12 +16,13 @@ import Footer from './Footer'
 import SEOHead from './SEOHead'
 
 const BlogPost = () => {
-  const { id } = useParams()
+  const { slug } = useParams()
 
   // In a real app, this would fetch from an API
   const blogPosts = [
     {
       id: 4,
+      slug: "eco-friendly-marketing-reusable-tins-beat-disposable-business-cards",
       title: "Eco-Friendly Marketing: How Reusable Tins Beat Disposable Business Cards",
       content: `The average business professional receives 2,000 business cards per year. Where do most end up? Landfills. That's 4 billion business cards annually contributing to waste.
 
@@ -157,6 +158,7 @@ Ready to make your marketing more sustainable? Contact BuyPrintz today to discus
     },
     {
       id: 3,
+      slug: "3-essential-marketing-tools-every-startup-needs-before-digital-ads",
       title: "3 Essential Marketing Tools Every Startup Needs (Before You Spend a Fortune on Digital Ads)",
       content: `Starting a business? Before you dump thousands into Facebook ads or Google campaigns, make sure you have these three physical marketing essentials that create lasting impressions and build genuine connections.
 
@@ -253,6 +255,7 @@ Ready to get started? Contact BuyPrintz today to discuss your startup marketing 
     },
     {
       id: 2,
+      slug: "why-your-business-card-is-failing-you-and-what-smart-entrepreneurs-do-instead",
       title: "Why Your Business Card is Failing You (And What Smart Entrepreneurs Do Instead)",
       content: `Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers.
 
@@ -330,6 +333,7 @@ Contact BuyPrintz today to discuss your custom Business Card Tin design. Let's c
     },
     {
       id: 1,
+      slug: "revolutionary-business-cards-why-business-card-tins-are-the-future-of-professional-networking",
       title: "Revolutionary Business Cards: Why Business Card Tins Are the Future of Professional Networking",
       content: `Gone are the days when business cards meant flimsy paper rectangles destined for the bottom of a briefcase or, worse, the washing machine. Today's professionals need networking tools that make lasting impressions, and we've discovered the perfect solution: custom Business Card Tins.
 
@@ -477,7 +481,8 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
     }
   ]
 
-  const post = blogPosts.find(p => p.id === parseInt(id))
+  // Find blog post by slug instead of id for SEO-friendly URLs
+  const post = blogPosts.find(p => p.slug === slug)
 
   if (!post) {
     return (
@@ -537,7 +542,7 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
     "dateModified": post.date,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://buyprintz.com/blog/${post.id}`
+      "@id": `https://buyprintz.com/blog/${post.slug}`
     },
     "keywords": post.tags.join(", "),
     "articleSection": post.category,
@@ -552,7 +557,7 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
         description={post.excerpt}
         keywords={post.tags.join(", ")}
         image={`https://buyprintz.com${post.thumbnail}`}
-        url={`https://buyprintz.com/blog/${post.id}`}
+        url={`https://buyprintz.com/blog/${post.slug}`}
         type="article"
         author={post.author}
         structuredData={structuredData}
@@ -655,7 +660,7 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
                   Get a Quote
                 </Link>
                 <Link
-                  to="/tin-products"
+                  to="/business-card-tins"
                   className="bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 px-6 py-3 rounded-lg font-medium transition-colors text-center"
                 >
                   View Tin Products

@@ -14,6 +14,7 @@ const Blog = () => {
   const blogPosts = [
     {
       id: 4,
+      slug: "eco-friendly-marketing-reusable-tins-beat-disposable-business-cards",
       title: "Eco-Friendly Marketing: How Reusable Tins Beat Disposable Business Cards",
       excerpt: "The average business professional receives 2,000 business cards per year. Where do most end up? Landfills. That's 4 billion business cards annually contributing to waste. Discover how our Business Card Tins offer a revolutionary sustainable alternative.",
       content: `The average business professional receives 2,000 business cards per year. Where do most end up? Landfills. That's 4 billion business cards annually contributing to waste.
@@ -150,6 +151,7 @@ Ready to make your marketing more sustainable? Contact BuyPrintz today to discus
     },
     {
       id: 3,
+      slug: "3-essential-marketing-tools-every-startup-needs-before-digital-ads",
       title: "3 Essential Marketing Tools Every Startup Needs (Before You Spend a Fortune on Digital Ads)",
       excerpt: "Starting a business? Before you dump thousands into Facebook ads or Google campaigns, make sure you have these three physical marketing essentials that create lasting impressions and build genuine connections.",
       content: `Starting a business? Before you dump thousands into Facebook ads or Google campaigns, make sure you have these three physical marketing essentials that create lasting impressions and build genuine connections.
@@ -247,6 +249,7 @@ Ready to get started? Contact BuyPrintz today to discuss your startup marketing 
     },
     {
       id: 2,
+      slug: "why-your-business-card-is-failing-you-and-what-smart-entrepreneurs-do-instead",
       title: "Why Your Business Card is Failing You (And What Smart Entrepreneurs Do Instead)",
       excerpt: "Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers.",
       content: `Every day, thousands of business cards end up in glove compartments, forgotten in wallets, or worse—thrown away. If you're still handing out traditional paper cards, you're literally watching your marketing budget disappear into junk drawers.
@@ -325,6 +328,7 @@ Contact BuyPrintz today to discuss your custom Business Card Tin design. Let's c
     },
     {
       id: 1,
+      slug: "revolutionary-business-cards-why-business-card-tins-are-the-future-of-professional-networking",
       title: "Revolutionary Business Cards: Why Business Card Tins Are the Future of Professional Networking",
       excerpt: "Gone are the days when business cards meant flimsy paper rectangles destined for the bottom of a briefcase. Today's professionals need networking tools that make lasting impressions, and we've discovered the perfect solution: custom Business Card Tins.",
       content: `Every year, billions of paper business cards are printed, exchanged, and ultimately discarded. Studies show that 90% of traditional business cards are thrown away within a week of receiving them. Our innovative custom Business Card Tins transform classic hinged containers into memorable, sustainable networking tools that your contacts will actually keep and use.
@@ -415,7 +419,7 @@ The practical value ensures your contact information stays visible and accessibl
                   </div>
                 </div>
                 <Link
-                  to={`/blog/${featuredPost.id}`}
+                  to={`/blog/${featuredPost.slug}`}
                   className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
                 >
                   Read Full Article
@@ -439,7 +443,7 @@ The practical value ensures your contact information stays visible and accessibl
           {blogPosts.map((post) => (
             <Link
               key={post.id}
-              to={`/blog/${post.id}`}
+              to={`/blog/${post.slug}`}
               className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow group"
             >
               <img
