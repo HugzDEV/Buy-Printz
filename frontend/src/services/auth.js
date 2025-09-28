@@ -209,6 +209,19 @@ class AuthService {
     }
 
     try {
+      // First check if there's an active session
+      const { data: { session }, error: sessionError } = await this.supabase.auth.getSession()
+      
+      if (sessionError) {
+        console.log('No active session found:', sessionError.message)
+        return null
+      }
+      
+      if (!session) {
+        console.log('No active session found')
+        return null
+      }
+
       const { data: { user }, error } = await this.supabase.auth.getUser()
       
       if (error) {
