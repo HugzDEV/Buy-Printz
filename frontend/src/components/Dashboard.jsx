@@ -73,6 +73,40 @@ const Dashboard = () => {
     loadDashboardData()
   }, [])
 
+  // Refresh templates when returning from editor (detect new template creation)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'newDesign' && e.newValue === 'true') {
+        // Template was just created, refresh the list
+        console.log('🔄 New template detected, refreshing templates...')
+        if (user?.id) {
+          authService.invalidateUserTemplatesCache(user.id)
+          refreshTemplates()
+        }
+        // Clear the flag
+        sessionStorage.removeItem('newDesign')
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Also check on focus (when user returns from editor)
+    const handleFocus = () => {
+      if (user?.id) {
+        console.log('🔄 Dashboard focused, checking for template updates...')
+        authService.invalidateUserTemplatesCache(user.id)
+        refreshTemplates()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [user?.id])
+
   // Refresh creator templates when creator tab becomes active (only if needed)
   useEffect(() => {
     if (activeTab === 'creator' && isCreator && user?.id && creatorTemplates.length === 0) {
@@ -172,27 +206,27 @@ const Dashboard = () => {
         setCreatorProfile(null)
       }
 
-      // Set templates from auth service (already cached)
-      if (currentUser.templates) {
-        console.log('Setting templates from auth service:', currentUser.templates.length, 'templates')
-        console.log('Template details:', currentUser.templates.map(t => ({ id: t.id, name: t.name, created_at: t.created_at })))
-        setTemplates(currentUser.templates)
-        setLoadingStates(prev => ({ ...prev, templates: false }))
-      } else {
-        console.log('No templates found in auth service')
-        setTemplates([])
-        setLoadingStates(prev => ({ ...prev, templates: false }))
-      }
-
-      // Force refresh templates to get latest data (bypass cache)
-      console.log('🔄 Force refreshing templates to get latest data...')
+      // Always fetch fresh templates to ensure accurate count (bypass cache)
+      console.log('🔄 Fetching fresh templates to ensure accurate count...')
       try {
+        // Invalidate cache first to ensure fresh data
+        authService.invalidateUserTemplatesCache(currentUser.id)
+        
         const freshTemplates = await authService.getUserTemplates(currentUser.id)
         console.log('🔄 Fresh templates from API:', freshTemplates.length, 'templates')
         console.log('🔄 Fresh template details:', freshTemplates.map(t => ({ id: t.id, name: t.name, created_at: t.created_at })))
         setTemplates(freshTemplates)
+        setLoadingStates(prev => ({ ...prev, templates: false }))
       } catch (error) {
-        console.error('Error refreshing templates:', error)
+        console.error('Error fetching fresh templates:', error)
+        // Fallback to cached data if API fails
+        if (currentUser.templates) {
+          console.log('Using cached templates as fallback:', currentUser.templates.length, 'templates')
+          setTemplates(currentUser.templates)
+        } else {
+          setTemplates([])
+        }
+        setLoadingStates(prev => ({ ...prev, templates: false }))
       }
 
       // Load essential data first to show basic dashboard
@@ -670,10 +704,11 @@ const Dashboard = () => {
         toast.success('Template deleted successfully')
         setTemplates(templates.filter(t => t.id !== templateId))
         
-        // Invalidate cache
+        // Invalidate cache and refresh auth service cache
         if (user?.id) {
           cacheService.invalidateTemplates(user.id)
           cacheService.invalidateTemplate(templateId)
+          authService.invalidateUserTemplatesCache(user.id)
         }
       } else {
         throw new Error('Failed to delete template')
@@ -1067,10 +1102,6 @@ const Dashboard = () => {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Templates</p>
                     <p className="text-2xl sm:text-3xl font-bold text-gray-800">{templates.length}</p>
-                    {/* Debug info */}
-                    <p className="text-xs text-gray-500 mt-1">
-                      Debug: templates.length={templates.length}, userStats.total_templates={userStats?.total_templates || 0}
-                    </p>
                     <p className="text-xs text-purple-600 flex items-center mt-1">
                       <Star className="w-3 h-3 mr-1" />
                       Custom saved
