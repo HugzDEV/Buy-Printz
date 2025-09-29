@@ -303,6 +303,14 @@ class OrderRequest(BaseModel):
     print_options: Optional[Dict[str, Any]] = {}
     total_amount: Optional[float] = 0.0
     marketplace_templates: Optional[list] = []  # List of marketplace templates used
+    # Business card tin specific fields
+    tin_options: Optional[Dict[str, Any]] = None
+    customer_info: Optional[Dict[str, Any]] = None
+    shipping_option: Optional[Dict[str, Any]] = None
+    subtotal: Optional[float] = None
+    tax_amount: Optional[float] = None
+    shipping_cost: Optional[float] = None
+    amount_cents: Optional[int] = None
 
 class AddressData(BaseModel):
     full_name: str
@@ -619,27 +627,41 @@ async def create_order(
 ):
     """Create a new order"""
     try:
-        # Calculate total amount based on product type and quantity
-        base_prices = {
-            "banner": 25.00,
-            "sign": 35.00,
-            "sticker": 15.00,
-            "custom": 50.00
-        }
-        
-        base_price = base_prices.get(order_data.product_type, 50.00)
-        total_amount = base_price * order_data.quantity
-        
-        # Add marketplace template costs
-        marketplace_cost = 0.0
-        if order_data.marketplace_templates:
-            for template in order_data.marketplace_templates:
-                if isinstance(template, dict) and 'price' in template:
-                    marketplace_cost += float(template['price'])
-                elif isinstance(template, (int, float)):
-                    marketplace_cost += float(template)
-        
-        total_amount += marketplace_cost
+        # Use frontend-calculated total if provided, otherwise calculate backend total
+        if order_data.total_amount and order_data.total_amount > 0:
+            # Use frontend-calculated total (for business card tins, etc.)
+            total_amount = order_data.total_amount
+            print(f"💰 Using frontend-calculated total: ${total_amount}")
+        elif order_data.product_type == "business_card_tin":
+            # Business card tins must use frontend pricing - error if not provided
+            raise HTTPException(
+                status_code=400, 
+                detail="Business card tin orders must include total_amount from frontend calculation"
+            )
+        else:
+            # Calculate total amount based on product type and quantity (legacy logic)
+            base_prices = {
+                "banner": 25.00,
+                "sign": 35.00,
+                "sticker": 15.00,
+                "custom": 50.00,
+                "business_card_tin": 0.00  # Business card tins should use frontend pricing
+            }
+            
+            base_price = base_prices.get(order_data.product_type, 50.00)
+            total_amount = base_price * order_data.quantity
+            
+            # Add marketplace template costs
+            marketplace_cost = 0.0
+            if order_data.marketplace_templates:
+                for template in order_data.marketplace_templates:
+                    if isinstance(template, dict) and 'price' in template:
+                        marketplace_cost += float(template['price'])
+                    elif isinstance(template, (int, float)):
+                        marketplace_cost += float(template)
+            
+            total_amount += marketplace_cost
+            print(f"💰 Using backend-calculated total: ${total_amount}")
         
         # Create comprehensive order data
         order_payload = {
