@@ -395,11 +395,7 @@ const TinCheckout = () => {
     checkAuth()
   }, [navigate])
 
-  useEffect(() => {
-    if (orderData && isAuthenticated && !authLoading) {
-      createOrder()
-    }
-  }, [orderData, isAuthenticated, authLoading])
+  // Remove automatic order creation - orders should only be created when user submits
 
   // Get shipping rates when customer info changes
   useEffect(() => {
@@ -537,7 +533,7 @@ const TinCheckout = () => {
     setCheckoutStep('processing')
 
     try {
-      // Use the orderData from sessionStorage (from BannerEditor) and update it
+      // Create order with all the data
       const updatedOrderData = {
         ...orderData, // This contains canvas_data, dimensions, etc. from BannerEditor
         product_type: 'business_card_tin',
@@ -561,7 +557,22 @@ const TinCheckout = () => {
         throw new Error(errorData.detail || 'Failed to create order')
       }
 
-      const { client_secret } = await orderResponse.json()
+      const orderData = await orderResponse.json()
+      console.log('Order created successfully:', orderData)
+
+      // Create payment intent
+      const paymentIntentResponse = await authService.authenticatedRequest('/api/payments/create-intent', {
+        method: 'POST',
+        body: JSON.stringify({ order_id: orderData.order_id })
+      })
+
+      if (!paymentIntentResponse.ok) {
+        const errorData = await paymentIntentResponse.json()
+        throw new Error(errorData.detail || 'Failed to create payment intent')
+      }
+
+      const paymentIntent = await paymentIntentResponse.json()
+      console.log('Payment intent created:', paymentIntent)
 
       // Get card element
       const cardElement = elements.getElement(CardElement)
@@ -570,7 +581,7 @@ const TinCheckout = () => {
       }
 
       // Confirm payment with Stripe
-      const { error } = await stripe.confirmCardPayment(client_secret, {
+      const { error } = await stripe.confirmCardPayment(paymentIntent.client_secret, {
         payment_method: {
           card: cardElement,
           billing_details: {
@@ -693,7 +704,7 @@ const TinCheckout = () => {
     )
   }
 
-  if (!orderData || !paymentIntent) {
+  if (!orderData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-8 border border-white/30 shadow-xl">
