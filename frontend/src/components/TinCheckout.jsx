@@ -557,13 +557,13 @@ const TinCheckout = () => {
         throw new Error(errorData.detail || 'Failed to create order')
       }
 
-      const orderData = await orderResponse.json()
-      console.log('Order created successfully:', orderData)
+      const orderResponseData = await orderResponse.json()
+      console.log('Order created successfully:', orderResponseData)
 
       // Create payment intent
       const paymentIntentResponse = await authService.authenticatedRequest('/api/payments/create-intent', {
         method: 'POST',
-        body: JSON.stringify({ order_id: orderData.order_id })
+        body: JSON.stringify({ order_id: orderResponseData.order_id })
       })
 
       if (!paymentIntentResponse.ok) {
