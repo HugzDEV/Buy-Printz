@@ -410,7 +410,9 @@ const Checkout = () => {
       if (!response.ok) {
         const errorData = await response.json()
         console.error('Order creation failed:', errorData)
-        throw new Error(errorData.detail || 'Failed to create order')
+        console.error('Full error details:', JSON.stringify(errorData, null, 2))
+        console.error('Order data being sent:', JSON.stringify(updatedOrderData, null, 2))
+        throw new Error(JSON.stringify(errorData.detail || 'Failed to create order'))
       }
       
       const data = await response.json()
