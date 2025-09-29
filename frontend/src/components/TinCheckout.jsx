@@ -142,7 +142,6 @@ const TinCheckout = () => {
     quantity: 100,
     tinFinish: 'silver',
     printingMethod: 'premium-vinyl',
-    surfaceCoverage: 'front-back', // Add surface coverage
     jobName: '',
     showAdvancedOptions: false,
     candyId: '', // Add candy selection
@@ -308,7 +307,7 @@ const TinCheckout = () => {
   // Calculate tin pricing
   const calculateTinPrice = () => {
     const baseQuantity = tinConfig.quantities.find(q => q.value === tinOptions.quantity)
-    const surfaceCoverage = tinConfig.surfaceCoverage.find(s => s.value === tinOptions.surfaceCoverage)
+    const surfaceCoverage = tinConfig.surfaceCoverage.find(s => s.value === (orderData?.tin_surface_coverage || 'front-back'))
     const tinFinish = tinConfig.tinFinishes.find(f => f.value === tinOptions.tinFinish)
     const printingMethod = tinConfig.printingMethods.find(p => p.value === tinOptions.printingMethod)
     
@@ -538,65 +537,27 @@ const TinCheckout = () => {
     setCheckoutStep('processing')
 
     try {
-      // Create order with pricing - match backend API schema
-      const orderData = {
-        // Tin Configuration (required fields)
+      // Use the orderData from sessionStorage (from BannerEditor) and update it
+      const updatedOrderData = {
+        ...orderData, // This contains canvas_data, dimensions, etc. from BannerEditor
+        product_type: 'business_card_tin',
         quantity: tinOptions.quantity,
-        tin_finish: tinOptions.tinFinish,
-        printing_method: tinOptions.printingMethod,
-        surface_coverage: tinOptions.surfaceCoverage,
-        job_name: tinOptions.jobName || `Tin Order ${Date.now()}`,
-        
-        // Candy Selection
-        candy_id: tinOptions.candyId || null,
-        candy_quantity: tinOptions.candyId ? tinOptions.quantity : 0,
-        
-        // Custom Message
-        custom_message: tinOptions.customMessage || null,
-        
-        // Customer Information (required)
-        customer_name: customerInfo.name,
-        customer_email: customerInfo.email,
-        customer_phone: customerInfo.phone || null,
-        billing_address: {
-          street: customerInfo.address,
-          city: customerInfo.city,
-          state: customerInfo.state,
-          zip_code: customerInfo.zipCode,
-          country: 'US'
-        },
-        shipping_address: {
-          street: customerInfo.address,
-          city: customerInfo.city,
-          state: customerInfo.state,
-          zip_code: customerInfo.zipCode,
-          country: 'US'
-        },
-        
-        // Shipping Information
-        shipping_method: shippingOption,
-        shipping_service_code: shippingOption
+        tin_options: tinOptions,
+        customer_info: customerInfo,
+        shipping_option: {
+          service_code: shippingOption,
+          cost: shippingCost
+        }
       }
 
       // Create order
-      console.log('Creating tin order with data:', orderData)
-      const orderResponse = await authService.authenticatedRequest('/api/business-card-tins/create', {
+      const orderResponse = await authService.authenticatedRequest('/api/orders/create', {
         method: 'POST',
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(updatedOrderData)
       })
 
       if (!orderResponse.ok) {
         const errorData = await orderResponse.json()
-        console.error('Order creation failed:', errorData)
-        
-        // Handle validation errors
-        if (errorData.detail && Array.isArray(errorData.detail)) {
-          const validationErrors = errorData.detail.map(err => 
-            `${err.loc ? err.loc.join('.') : 'field'}: ${err.msg || err.type || 'Invalid value'}`
-          ).join(', ')
-          throw new Error(`Validation errors: ${validationErrors}`)
-        }
-        
         throw new Error(errorData.detail || 'Failed to create order')
       }
 
