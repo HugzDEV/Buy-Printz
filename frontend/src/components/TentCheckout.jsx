@@ -422,6 +422,11 @@ const TentCheckout = () => {
         ...orderData, // This contains canvas_data, dimensions, etc. from BannerEditor
         product_type: 'tradeshow_tent',
         quantity: 1,
+        tent_size: tentSpecs.tentSize, // Required for database trigger validation
+        tent_type: tentSpecs.tentType || 'event-tent',
+        tent_material: tentSpecs.material || '6oz-tent-fabric',
+        tent_frame_type: tentSpecs.frameType || '40mm-aluminum-hex',
+        tent_print_method: tentSpecs.printMethod || 'dye-sublimation',
         tent_specs: tentSpecs,
         selected_accessories: selectedAccessories,
         customer_info: customerInfo,
