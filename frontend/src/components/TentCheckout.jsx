@@ -424,7 +424,7 @@ const TentCheckout = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authService.getToken()}`
+          'Authorization': `Bearer ${authService.getAccessToken()}`
         },
         body: JSON.stringify({
           amount: Math.round(finalTotalPrice * 100), // Convert to cents
