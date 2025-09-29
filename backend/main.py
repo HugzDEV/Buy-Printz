@@ -636,11 +636,11 @@ async def create_order(
             # Use frontend-calculated total (for business card tins, etc.)
             total_amount = order_data.total_amount
             print(f"💰 Using frontend-calculated total: ${total_amount}")
-        elif order_data.product_type == "business_card_tin":
-            # Business card tins must use frontend pricing - error if not provided
+        elif order_data.product_type in ["business_card_tin", "tradeshow-tents"]:
+            # Business card tins and tradeshow tents must use frontend pricing - error if not provided
             raise HTTPException(
                 status_code=400, 
-                detail="Business card tin orders must include total_amount from frontend calculation"
+                detail=f"{order_data.product_type} orders must include total_amount from frontend calculation"
             )
         else:
             # Calculate total amount based on product type and quantity (legacy logic)
@@ -649,7 +649,8 @@ async def create_order(
                 "sign": 35.00,
                 "sticker": 15.00,
                 "custom": 50.00,
-                "business_card_tin": 0.00  # Business card tins should use frontend pricing
+                "business_card_tin": 0.00,  # Business card tins should use frontend pricing
+                "tradeshow-tents": 0.00     # Tradeshow tents should use frontend pricing
             }
             
             base_price = base_prices.get(order_data.product_type, 50.00)
