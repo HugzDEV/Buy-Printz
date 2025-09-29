@@ -507,7 +507,9 @@ const TentCheckout = () => {
       })
 
       if (error) {
-        toast.error(error.message)
+        console.error('Payment failed:', error)
+        toast.error('Payment failed. Please try again.')
+        return
       } else if (paymentIntent.status === 'succeeded') {
         toast.success('Payment successful! Your tent order has been placed.')
         navigate('/order-confirmation', { 
