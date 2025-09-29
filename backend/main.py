@@ -1876,7 +1876,7 @@ async def create_business_card_tin_order(
             }
         }
         
-        order_result = await db_manager.create_order(order_data)
+        order_result = await db_manager.create_order(current_user["user_id"], order_data)
         if not order_result.get("success"):
             raise HTTPException(status_code=400, detail=order_result.get("error", "Failed to create order"))
         
