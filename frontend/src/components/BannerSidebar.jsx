@@ -227,7 +227,6 @@ const BannerSidebar = ({
   const sidebarRef = useRef(null)
   const templatesScrollRef = useRef(null)
   const [scrollPositions, setScrollPositions] = useState({})
-  const [isPreservingScroll, setIsPreservingScroll] = useState(false)
   
   // Count open sections to adjust timing
   const openSectionsCount = Object.values(expandedSections).filter(Boolean).length
@@ -311,32 +310,8 @@ const BannerSidebar = ({
     }
   }, [marketplaceSearchTerm, selectedMarketplaceCategory])
 
-  // Handle scroll restoration after layout changes
-  useLayoutEffect(() => {
-    if (isPreservingScroll) {
-      const sidebar = sidebarRef.current
-      const templates = templatesScrollRef.current
-      
-      if (sidebar && scrollPositions.sidebar !== undefined) {
-        sidebar.scrollTop = scrollPositions.sidebar
-        // Additional fallback for mobile devices
-        setTimeout(() => {
-          if (sidebar && scrollPositions.sidebar !== undefined) {
-            sidebar.scrollTop = scrollPositions.sidebar
-          }
-        }, 50)
-      }
-      if (templates && scrollPositions.templates !== undefined) {
-        templates.scrollTop = scrollPositions.templates
-        // Additional fallback for mobile devices
-        setTimeout(() => {
-          if (templates && scrollPositions.templates !== undefined) {
-            templates.scrollTop = scrollPositions.templates
-          }
-        }, 50)
-      }
-    }
-  }, [expandedSections, isPreservingScroll, scrollPositions])
+  // Handle scroll restoration after layout changes - REMOVED to prevent conflicts
+  // The preserveScrollPosition function now handles all scroll restoration
 
   // Function to remove uploaded image
   const removeUploadedImage = (index) => {
@@ -678,55 +653,28 @@ const BannerSidebar = ({
     }
   }
 
+  // Simple scroll preservation - store and restore scroll positions
   const preserveScrollPosition = useCallback((callback) => {
-    const currentScrollTop = sidebarRef.current?.scrollTop || 0
-    const templatesScrollTop = templatesScrollRef.current?.scrollTop || 0
-    
-    // Store scroll positions in state for useLayoutEffect
-    setScrollPositions({
-      sidebar: currentScrollTop,
-      templates: templatesScrollTop
-    })
-    
-    setIsPreservingScroll(true)
-    
-    // Temporarily disable scroll events
     const sidebar = sidebarRef.current
-    const templates = templatesScrollRef.current
+    if (!sidebar) return
     
-    if (sidebar) {
-      sidebar.style.pointerEvents = 'none'
-    }
-    if (templates) {
-      templates.style.pointerEvents = 'none'
-    }
+    // Store current scroll position
+    const currentScrollTop = sidebar.scrollTop
+    setScrollPositions(prev => ({
+      ...prev,
+      sidebar: currentScrollTop
+    }))
     
     // Execute the callback
     callback()
     
-    // Use longer delay for mobile devices
-    const isMobile = window.innerWidth < 768
-    const delay = isMobile ? 300 : 150
-    
-    // Re-enable pointer events after a delay
+    // Restore scroll position after a brief delay
     setTimeout(() => {
-      if (sidebar) {
-        sidebar.style.pointerEvents = 'auto'
-        // Force scroll restoration as fallback
-        if (currentScrollTop > 0) {
-          sidebar.scrollTop = currentScrollTop
-        }
+      if (sidebar && currentScrollTop > 0) {
+        sidebar.scrollTop = currentScrollTop
       }
-      if (templates) {
-        templates.style.pointerEvents = 'auto'
-        // Force scroll restoration as fallback
-        if (templatesScrollTop > 0) {
-          templates.scrollTop = templatesScrollTop
-        }
-      }
-      setIsPreservingScroll(false)
-    }, delay)
-  }, [openSectionsCount])
+    }, 10)
+  }, [])
 
   const toggleSection = (sectionKey) => {
     preserveScrollPosition(() => {
@@ -1223,25 +1171,16 @@ const BannerSidebar = ({
   return (
     <div 
       ref={sidebarRef}
-      className={`
-      w-full sm:w-80 lg:w-96 
-      h-full 
-      backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10
-      border-r border-white/20
-      overflow-y-auto
-      relative
-      ${isPreservingScroll ? 'scroll-preserve' : ''}
-      `}
+      className="w-full sm:w-80 lg:w-96 h-full backdrop-blur-xl bg-gradient-to-b from-white/20 to-white/10 border-r border-white/20 overflow-y-auto relative"
       onScroll={() => {
         const sidebar = sidebarRef.current
         if (!sidebar) return
 
         const scrollTop = sidebar.scrollTop
-        const scrollHeight = sidebar.scrollHeight
-        const clientHeight = sidebar.clientHeight
+        const lastScrollTop = sidebar.lastScrollTop || 0
         
         // Determine scroll direction
-        if (scrollTop > (sidebar.lastScrollTop || 0)) {
+        if (scrollTop > lastScrollTop) {
           setScrollDirection('down')
         } else {
           setScrollDirection('up')
@@ -1623,7 +1562,7 @@ const BannerSidebar = ({
                 )
 
                 {/* Size Options */}
-                <div className="space-y-2 max-h-32 overflow-y-auto">
+                <div className="space-y-2">
                   {bannerSizes
                     .filter(size => productType === 'banner' ? size.category === sizeCategory : true)
                     .map((size) => (
@@ -1955,7 +1894,7 @@ const BannerSidebar = ({
               {uploadedImages.length > 0 && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Uploaded Images</h4>
-                  <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-2">
                     {uploadedImages.map((image, index) => (
                       <div key={index} className="relative group">
                         <button
@@ -2912,7 +2851,7 @@ const BannerSidebar = ({
                       {userTemplates.length} saved
                     </span>
                   </div>
-                  <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                  <div className="space-y-2">
                     {userTemplates.map((template) => (
                         <button
                           key={template.id}
@@ -3030,7 +2969,7 @@ const BannerSidebar = ({
                     </div>
 
                     {/* Template List Based on Selected Orientation */}
-                    <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                    <div className="grid grid-cols-1 gap-2">
                       {bannerTemplates.filter(t => t.orientation === selectedBannerOrientation).map((template) => (
                         <button
                           key={template.id}
@@ -3112,7 +3051,7 @@ const BannerSidebar = ({
                       <span>🥫</span>
                       Business Card Tin Templates
                     </h5>
-                    <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                    <div className="grid grid-cols-1 gap-2">
                       {bannerTemplates.filter(t => t.category === 'Business Card Tins').map((template) => (
                         <button
                           key={template.id}
@@ -3218,7 +3157,7 @@ const BannerSidebar = ({
               </div>
 
               {/* Designs Grid */}
-              <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-3 gap-2">
                 {getFilteredAssets(assetCategories.skins.assets).map((asset, index) => {
                   const isActive = activeDesignAssets.has(asset.name)
                   return (
@@ -3319,7 +3258,7 @@ const BannerSidebar = ({
 
               {/* Templates Grid */}
               {!marketplaceLoading && !marketplaceError && (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+                <div className="space-y-3">
                   {marketplaceTemplates.length === 0 ? (
                     <div className="text-center py-8">
                       <Store className="w-12 h-12 text-gray-300 mx-auto mb-3" />
