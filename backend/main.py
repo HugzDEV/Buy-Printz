@@ -636,7 +636,7 @@ async def create_order(
             # Use frontend-calculated total (for business card tins, etc.)
             total_amount = order_data.total_amount
             print(f"💰 Using frontend-calculated total: ${total_amount}")
-        elif order_data.product_type in ["business_card_tin", "tradeshow-tents"]:
+        elif order_data.product_type in ["business_card_tin", "tradeshow_tent"]:
             # Business card tins and tradeshow tents must use frontend pricing - error if not provided
             raise HTTPException(
                 status_code=400, 
@@ -650,7 +650,7 @@ async def create_order(
                 "sticker": 15.00,
                 "custom": 50.00,
                 "business_card_tin": 0.00,  # Business card tins should use frontend pricing
-                "tradeshow-tents": 0.00     # Tradeshow tents should use frontend pricing
+                "tradeshow_tent": 0.00      # Tradeshow tents should use frontend pricing
             }
             
             base_price = base_prices.get(order_data.product_type, 50.00)

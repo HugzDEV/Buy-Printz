@@ -420,7 +420,7 @@ const TentCheckout = () => {
       // First create the order
       const tentOrderData = {
         ...orderData, // This contains canvas_data, dimensions, etc. from BannerEditor
-        product_type: 'tradeshow-tents',
+        product_type: 'tradeshow_tent',
         quantity: 1,
         tent_specs: tentSpecs,
         selected_accessories: selectedAccessories,
