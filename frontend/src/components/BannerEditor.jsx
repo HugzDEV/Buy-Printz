@@ -1699,8 +1699,8 @@ const BannerEditorNew = () => {
       const scaledElements = scaleTemplateElements(
         selectedTemplate.elements, 
         canvasSize.width, 
-        canvasSize.height,
-        selectedTemplate.canvasSize || { width: 800, height: 400 } // Banner templates use 800x400
+          canvasSize.height,
+          selectedTemplate.canvasSize || { width: 800, height: 400 } // Banner templates use 800x400
       ).map(element => {
         // Generate new ID for each element to avoid conflicts
         const elementWithId = {

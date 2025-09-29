@@ -11,14 +11,14 @@ export const bannerTemplates = [
       recommendedSizes: ['2x3', '3x4', '4x5', '5x6'],
       elements: [
         {
-          id: 'template_rect_placeholder',
+          id: 'template_background',
           type: 'rect',
           x: 0, y: 0,
           width: 800, height: 400,
           fill: '#1e3a8a'
         },
         {
-          id: 'template_star_placeholder',
+          id: 'template_star_burst',
           type: 'star',
           x: 400, y: 200,
           numPoints: 16,
@@ -31,11 +31,11 @@ export const bannerTemplates = [
           height: 240
         },
         {
-          id: 'template_text_placeholder',
+          id: 'template_main_text',
           type: 'text',
-          x: 400, y: 160,
+          x: 197, y: 160,
           text: 'GRAND OPENING',
-          fontSize: 36,
+          fontSize: 48,
           fontFamily: 'Impact',
           fontStyle: 'bold',
           fill: '#ffffff',
@@ -46,27 +46,96 @@ export const bannerTemplates = [
           height: 60,
           wrap: 'none',
           lineHeight: 1.2,
-          verticalAlign: 'middle',
-          padding: 0
+          verticalAlign: 'middle'
         },
         {
-          id: 'template_text_placeholder',
+          id: 'template_subtitle',
           type: 'text',
-          x: 400, y: 240,
+          x: 243, y: 235,
           text: 'NOW OPEN!',
-          fontSize: 28,
+          fontSize: 36,
           fontFamily: 'Arial Black',
           fontStyle: 'bold',
           fill: '#dc2626',
           align: 'center',
           strokeWidth: 2,
           stroke: '#ffffff',
-          width: 250,
-          height: 50,
+          width: 300,
+          height: 45,
           wrap: 'none',
           lineHeight: 1.2,
-          verticalAlign: 'middle',
-          padding: 0
+          verticalAlign: 'middle'
+        },
+        {
+          id: 'template_company_name',
+          type: 'text',
+          x: 30, y: 30,
+          text: 'BUYPRINTZ',
+          fontSize: 24,
+          fontFamily: 'Arial Black',
+          fontStyle: 'bold',
+          fill: '#fbbf24',
+          align: 'left',
+          width: 200,
+          height: 30,
+          wrap: 'none',
+          lineHeight: 1.2,
+          verticalAlign: 'middle'
+        },
+        {
+          id: 'template_tagline',
+          type: 'text',
+          x: 30, y: 60,
+          text: 'Custom Printing Solutions',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#ffffff',
+          align: 'left',
+          width: 250,
+          height: 25,
+          wrap: 'none',
+          lineHeight: 1.2,
+          verticalAlign: 'middle'
+        },
+        {
+          id: 'template_contact_info',
+          type: 'text',
+          x: 490, y: 304,
+          text: '📞 (617) 505-0603\n📧 order@buyprintz.com\n🌐 www.buyprintz.com',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#ffffff',
+          align: 'right',
+          width: 275,
+          height: 80,
+          wrap: 'word',
+          lineHeight: 1.4,
+          verticalAlign: 'top'
+        },
+        {
+          id: 'template_qr_placeholder',
+          type: 'rect',
+          x: 30, y: 288,
+          width: 80, height: 80,
+          fill: '#ffffff',
+          stroke: '#1e3a8a',
+          strokeWidth: 2
+        },
+        {
+          id: 'template_qr_label',
+          type: 'text',
+          x: 120, y: 350,
+          text: 'SCAN ME',
+          fontSize: 12,
+          fontFamily: 'Arial',
+          fontStyle: 'bold',
+          fill: '#ffffff',
+          align: 'left',
+          width: 100,
+          height: 15,
+          wrap: 'none',
+          lineHeight: 1.2,
+          verticalAlign: 'middle'
         }
       ]
     },
@@ -203,7 +272,7 @@ export const bannerTemplates = [
           id: 'template_text_placeholder',
           type: 'text',
           x: 550, y: 200,
-          text: 'CALL TODAY\n(555) 123-4567',
+          text: 'CALL TODAY\n(617) 505-0603',
           fontSize: 20,
           fontFamily: 'Arial',
           fill: '#0f172a',
@@ -570,7 +639,7 @@ export const bannerTemplates = [
           id: 'template_text_placeholder',
           type: 'text',
           x: 200, y: 500,
-          text: 'CALL TODAY\n(555) 123-4567',
+          text: 'CALL TODAY\n(617) 505-0603',
           fontSize: 16,
           fontFamily: 'Arial',
           fill: '#0f172a',
@@ -756,7 +825,7 @@ export const bannerTemplates = [
           id: 'template_text4_placeholder',
           type: 'text',
           x: 300, y: 250,
-          text: 'Call: (555) 123-PIZZA',
+          text: 'Call: (617) 505-0603',
           fontSize: 18,
           fontFamily: 'Inter',
           fill: '#FFFFFF'
@@ -767,7 +836,7 @@ export const bannerTemplates = [
           x: 600, y: 250,
           width: 120, height: 120,
           qrData: {
-            text: 'https://yourrestaurant.com/menu',
+            text: 'https://www.buyprintz.com',
             color: '#FFFFFF',
             backgroundColor: '#000000'
           }
@@ -929,7 +998,7 @@ export const bannerTemplates = [
           id: 'template_text5_placeholder',
           type: 'text',
           x: 300, y: 250,
-          text: 'Call: (555) 123-BUILD',
+          text: 'Call: (617) 505-0603',
           fontSize: 18,
           fontFamily: 'Inter',
           fill: '#000000',
@@ -939,7 +1008,7 @@ export const bannerTemplates = [
           id: 'template_text6_placeholder',
           type: 'text',
           x: 300, y: 280,
-          text: 'www.buildrightconstruction.com',
+          text: 'www.buyprintz.com',
           fontSize: 16,
           fontFamily: 'Inter',
           fill: '#000000'
@@ -1028,7 +1097,7 @@ export const bannerTemplates = [
           id: 'template_website_text',
           type: 'text',
           x: 350, y: 260,
-          text: 'www.technovate.ai',
+          text: 'www.buyprintz.com',
           fontSize: 16,
           fontFamily: 'Inter',
           fill: '#FFFFFF'
@@ -1127,7 +1196,7 @@ export const bannerTemplates = [
           id: 'template_contact_text',
           type: 'text',
           x: 250, y: 260,
-          text: 'Call: (555) 123-FIT',
+          text: 'Call: (617) 505-0603',
           fontSize: 18,
           fontFamily: 'Inter',
           fill: '#FFFFFF',
@@ -1148,7 +1217,7 @@ export const bannerTemplates = [
           x: 600, y: 220,
           width: 120, height: 120,
           qrData: {
-            text: 'https://powergym.com/signup',
+            text: 'https://www.buyprintz.com',
             color: '#FFFFFF',
             backgroundColor: '#DC2626'
           }
@@ -1246,7 +1315,7 @@ export const bannerTemplates = [
           id: 'template_contact_text',
           type: 'text',
           x: 250, y: 290,
-          text: 'Call: (555) 123-LUXE',
+          text: 'Call: (617) 505-0603',
           fontSize: 16,
           fontFamily: 'Inter',
           fill: '#FFFFFF'
@@ -1257,7 +1326,7 @@ export const bannerTemplates = [
           x: 600, y: 200,
           width: 120, height: 120,
           qrData: {
-            text: 'https://luxuryrealestate.com/property/123',
+            text: 'https://www.buyprintz.com',
             color: '#FFFFFF',
             backgroundColor: '#0F172A'
           }
@@ -1374,7 +1443,7 @@ export const bannerTemplates = [
           x: 600, y: 200,
           width: 120, height: 120,
           qrData: {
-            text: 'https://sarahandmichael.com/rsvp',
+            text: 'https://www.buyprintz.com',
             color: '#DC2626',
             backgroundColor: '#FFFFFF'
           }
