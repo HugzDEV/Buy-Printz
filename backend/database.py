@@ -179,6 +179,16 @@ class DatabaseManager:
                 "banner_size": order_data.get("banner_size"),
                 "banner_category": order_data.get("banner_category"),
                 "print_options": json.dumps(order_data.get("print_options", {})),
+                # Tent-specific fields
+                "tent_size": order_data.get("tent_size"),
+                "tent_type": order_data.get("tent_type"),
+                "tent_material": order_data.get("tent_material"),
+                "tent_frame_type": order_data.get("tent_frame_type"),
+                "tent_print_method": order_data.get("tent_print_method"),
+                "tent_accessories": order_data.get("tent_accessories"),
+                "tent_reinforced_strip_color": order_data.get("tent_reinforced_strip_color"),
+                "tent_package": order_data.get("tent_package"),
+                "tent_wall_option": order_data.get("tent_wall_option"),
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat()
             }
