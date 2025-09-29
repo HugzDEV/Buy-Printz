@@ -1546,7 +1546,7 @@ const BannerEditorNew = () => {
           text: 'FOR SALE',
           fontSize: 36,
           fontFamily: 'Arial Black',
-          fill: '#1e40af',
+          fill: '#0f172a',
           align: 'center'
         },
         {
@@ -1564,7 +1564,7 @@ const BannerEditorNew = () => {
           text: 'CALL TODAY\n(555) 123-4567',
           fontSize: 20,
           fontFamily: 'Arial',
-          fill: '#1e40af',
+          fill: '#0f172a',
           align: 'center',
           lineHeight: 1.2
         }
@@ -1902,7 +1902,7 @@ const BannerEditorNew = () => {
           text: 'FOR SALE',
           fontSize: 28,
           fontFamily: 'Arial Black',
-          fill: '#1e40af',
+          fill: '#0f172a',
           align: 'center'
         },
         {
@@ -1920,7 +1920,7 @@ const BannerEditorNew = () => {
           text: 'BEAUTIFUL HOME\n3 BED • 2 BATH\n1,500 SQ FT',
           fontSize: 18,
           fontFamily: 'Arial Black',
-          fill: '#1e40af',
+          fill: '#0f172a',
           align: 'center',
           lineHeight: 1.3
         },
@@ -1931,7 +1931,7 @@ const BannerEditorNew = () => {
           text: 'CALL TODAY\n(555) 123-4567',
           fontSize: 16,
           fontFamily: 'Arial',
-          fill: '#1e40af',
+          fill: '#0f172a',
           align: 'center',
           lineHeight: 1.2
         },
@@ -2740,16 +2740,14 @@ const BannerEditorNew = () => {
       ]
     },
 
-    // BUSINESS CARD TIN TEMPLATES - 9 DESIGNS, 3 OF EACH ALIGNMENT
-    
-    // CENTERED ALIGNMENT TEMPLATES (3 designs: 3, 4, 5)
-    // SKINS Design 3 - Centered
+    // BUSINESS CARD TIN TEMPLATES - CLEAN ORGANIZATION
+    // MARKER TEMPLATE: SKINS Design 3 - Right Justified (Front)
     {
       id: 'business-card-tin-design-3-front',
-      name: 'Design 3 - Front (Centered)',
+      name: 'Design 3 - Front (Right Justified)',
       category: 'Business Card Tins',
-      description: 'Professional centered design with SKINS Design 3 front',
-      tags: ['centered', 'professional', 'business', 'contact'],
+      description: 'Professional right-justified design with SKINS Design 3 front',
+      tags: ['right-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
       canvasSize: { width: 393, height: 236 },
@@ -2765,50 +2763,59 @@ const BannerEditorNew = () => {
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 46, y: 60,
+          x: 93, y: 50,
           text: 'BUYPRINTZ',
           fontSize: 24,
           fontFamily: 'Arial Black',
           fontStyle: 'bold',
-          fill: '#1e40af',
-          align: 'center',
+          fill: '#0f172a',
+          align: 'right',
           width: 300,
           height: 40
         },
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 46, y: 100,
+          x: 93, y: 85,
           text: 'Custom Printing Solutions',
           fontSize: 16,
           fontFamily: 'Arial',
           fill: '#374151',
-          align: 'center',
+          align: 'right',
           width: 300,
           height: 25
         },
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 46, y: 140,
-          text: '📧 order@buyprintz.com\n📞 (617) 505-0603\n🌐 www.buyprintz.com',
+          x: 93, y: 120,
+          text: 'Sarah Sample\nMarketing Director\n📞 (617) 505-0603\n📧 order@buyprintz.com',
           fontSize: 14,
           fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'center',
+          fill: '#0f172a',
+          align: 'right',
           lineHeight: 1.4,
           width: 300,
-          height: 60
+          height: 80
+        },
+        {
+          id: 'template_picture_placeholder',
+          type: 'rect',
+          x: 50, y: 50,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#1e40af',
+          strokeWidth: 2
         }
       ]
     },
-    // SKINS Design 3 - Back (Centered)
+    // MARKER TEMPLATE: SKINS Design 3 - Right Justified (Back)
     {
       id: 'business-card-tin-design-3-back',
-      name: 'Design 3 - Back (Centered)',
+      name: 'Design 3 - Back (Right Justified)',
       category: 'Business Card Tins',
-      description: 'Professional centered design with SKINS Design 3 back',
-      tags: ['centered', 'professional', 'business', 'contact'],
+      description: 'Professional right-justified design with SKINS Design 3 back',
+      tags: ['right-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
       canvasSize: { width: 393, height: 236 },
@@ -2822,53 +2829,35 @@ const BannerEditorNew = () => {
           alt: 'SKINS Design 3 Back Background'
         },
         {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 46, y: 60,
-          text: 'BUYPRINTZ',
-          fontSize: 24,
-          fontFamily: 'Arial Black',
-          fontStyle: 'bold',
-          fill: '#1e40af',
-          align: 'center',
-          width: 300,
-          height: 40
+          id: 'template_qr_placeholder',
+          type: 'rect',
+          x: 156, y: 60,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#1e40af',
+          strokeWidth: 2
         },
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 46, y: 100,
-          text: 'Banners • Business Card Tins • Tradeshow Tents',
-          fontSize: 14,
+          x: 46, y: 150,
+          text: 'www.buyprintz.com',
+          fontSize: 16,
           fontFamily: 'Arial',
           fill: '#374151',
           align: 'center',
           width: 300,
-          height: 20
-        },
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 46, y: 140,
-          text: '📧 order@buyprintz.com\n📞 (617) 505-0603\n🌐 www.buyprintz.com',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'center',
-          lineHeight: 1.4,
-          width: 300,
-          height: 60
+          height: 25
         }
       ]
     },
-
-    // SKINS Design 4 - Centered
+    // SKINS Design 4 - Left Justified (Front)
     {
       id: 'business-card-tin-design-4-front',
-      name: 'Design 4 - Front (Centered)',
+      name: 'Design 4 - Front (Left Justified)',
       category: 'Business Card Tins',
-      description: 'Professional centered design with SKINS Design 4 front',
-      tags: ['centered', 'professional', 'business', 'contact'],
+      description: 'Professional left-justified design with SKINS Design 4 front',
+      tags: ['left-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
       canvasSize: { width: 393, height: 236 },
@@ -2881,75 +2870,116 @@ const BannerEditorNew = () => {
           src: '/assets/images/SKINS_DESIGN 4_FRONT.png',
           alt: 'SKINS Design 4 Front Background'
         },
-        // Company Name - Large and bold
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 50,
+          x: 20, y: 50,
           text: 'BUYPRINTZ',
-          fontSize: 28,
-          fontFamily: 'Helvetica',
+          fontSize: 24,
+          fontFamily: 'Arial Black',
           fontStyle: 'bold',
-          fill: '#1e40af',
-          align: 'center',
-          width: 300,
-          height: 35
-        },
-        // Tagline
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 90,
-          text: 'Premium Custom Printing Solutions',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#6b7280',
-          align: 'center',
-          width: 300,
-          height: 20
-        },
-        // Contact Details
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 130,
-          text: 'order@buyprintz.com\n(617) 505-0603',
-          fontSize: 13,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'center',
-          lineHeight: 1.3,
+          fill: '#0f172a',
+          align: 'left',
           width: 300,
           height: 40
         },
-        // Website
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 180,
+          x: 20, y: 85,
+          text: 'Custom Printing Solutions',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#374151',
+          align: 'left',
+          width: 300,
+          height: 25
+        },
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 20, y: 120,
+          text: 'Sarah Sample\nMarketing Director\n📞 (617) 505-0603\n📧 order@buyprintz.com',
+          fontSize: 14,
+          fontFamily: 'Arial',
+          fill: '#0f172a',
+          align: 'left',
+          lineHeight: 1.4,
+          width: 300,
+          height: 80
+        },
+        {
+          id: 'template_picture_placeholder',
+          type: 'rect',
+          x: 263, y: 50,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#1e40af',
+          strokeWidth: 2
+        }
+      ]
+    },
+    // SKINS Design 4 - Right Justified (Back)
+    {
+      id: 'business-card-tin-design-4-back',
+      name: 'Design 4 - Back (Right Justified)',
+      category: 'Business Card Tins',
+      description: 'Professional right-justified design with SKINS Design 4 back',
+      tags: ['right-justified', 'professional', 'business', 'contact'],
+      orientation: 'landscape',
+      recommendedSizes: ['Business Card Tin'],
+      canvasSize: { width: 393, height: 236 },
+      elements: [
+        {
+          id: 'template_image_placeholder',
+          type: 'image',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          src: '/assets/images/SKINS_DESIGN 4_BACK.png',
+          alt: 'SKINS Design 4 Back Background'
+        },
+        {
+          id: 'template_qr_placeholder',
+          type: 'rect',
+          x: 156, y: 60,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#1e40af',
+          strokeWidth: 2
+        },
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 46, y: 150,
           text: 'www.buyprintz.com',
-          fontSize: 12,
+          fontSize: 16,
           fontFamily: 'Arial',
           fill: '#374151',
           align: 'center',
           width: 300,
-          height: 20
+          height: 25
         }
       ]
     },
-
-    // Creative Business Card Tin - Artistic
+    // SKINS Design 5 - Center Justified (Front)
     {
-      id: 'business-card-tin-creative',
-      name: 'Creative Business Card Tin',
+      id: 'business-card-tin-design-5-front',
+      name: 'Design 5 - Front (Center Justified)',
       category: 'Business Card Tins',
-      description: 'Creative design perfect for artists, designers, and creative professionals',
-      tags: ['creative', 'artistic', 'design', 'professional'],
+      description: 'Professional center-justified design with SKINS Design 5 front',
+      tags: ['center-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
+      canvasSize: { width: 393, height: 236 },
       elements: [
-        // Background image using SKINS Design 1 Front
+        {
+          id: 'template_background_placeholder',
+          type: 'rect',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          fill: '#0f172a',
+          opacity: 0.8
+        },
         {
           id: 'template_image_placeholder',
           type: 'image',
@@ -2958,88 +2988,124 @@ const BannerEditorNew = () => {
           src: '/assets/images/SKINS_DESIGN 5_FRONT.png',
           alt: 'SKINS Design 5 Front Background'
         },
-        // Creative Title
+        {
+          id: 'template_picture_placeholder',
+          type: 'rect',
+          x: 20, y: 20,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#ffffff',
+          strokeWidth: 2
+        },
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 40,
+          x: 46, y: 50,
           text: 'BUYPRINTZ',
-          fontSize: 22,
-          fontFamily: 'Georgia',
+          fontSize: 24,
+          fontFamily: 'Arial Black',
           fontStyle: 'bold',
-          fill: '#1e40af',
+          fill: '#ffffff',
           align: 'center',
           width: 300,
-          height: 30
+          height: 40
         },
-        // Name
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 75,
+          x: 46, y: 85,
           text: 'Custom Printing Solutions',
-          fontSize: 18,
-          fontFamily: 'Georgia',
-          fill: '#374151',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#e5e7eb',
           align: 'center',
           width: 300,
           height: 25
         },
-        // Services
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 110,
-          text: 'Banners • Business Card Tins • Tradeshow Tents',
-          fontSize: 12,
+          x: 46, y: 120,
+          text: 'Sarah Sample\nMarketing Director\n📞 (617) 505-0603\n📧 order@buyprintz.com',
+          fontSize: 14,
           fontFamily: 'Arial',
-          fill: '#6b7280',
+          fill: '#ffffff',
           align: 'center',
+          lineHeight: 1.4,
           width: 300,
-          height: 20
-        },
-        // Contact
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 140,
-          text: 'order@buyprintz.com\n(617) 505-0603',
-          fontSize: 13,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'center',
-          lineHeight: 1.3,
-          width: 300,
-          height: 35
-        },
-        // Website
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 185,
-          text: 'www.buyprintz.com',
-          fontSize: 11,
-          fontFamily: 'Arial',
-          fill: '#374151',
-          align: 'center',
-          width: 300,
-          height: 15
+          height: 80
         }
       ]
     },
-
-    // Medical Professional Business Card Tin
+    // SKINS Design 5 - Center Justified (Back)
     {
-      id: 'business-card-tin-medical',
-      name: 'Medical Professional Tin',
+      id: 'business-card-tin-design-5-back',
+      name: 'Design 5 - Back (Center Justified)',
       category: 'Business Card Tins',
-      description: 'Professional design for healthcare providers',
-      tags: ['medical', 'healthcare', 'professional', 'doctor'],
+      description: 'Professional center-justified design with SKINS Design 5 back',
+      tags: ['center-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
+      canvasSize: { width: 393, height: 236 },
       elements: [
-        // Background image using SKINS Design 1 Front
+        {
+          id: 'template_background_placeholder',
+          type: 'rect',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          fill: '#0f172a',
+          opacity: 0.8
+        },
+        {
+          id: 'template_image_placeholder',
+          type: 'image',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          src: '/assets/images/SKINS_DESIGN 5_BACK.png',
+          alt: 'SKINS Design 5 Back Background'
+        },
+        {
+          id: 'template_qr_placeholder',
+          type: 'rect',
+          x: 156, y: 60,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#ffffff',
+          strokeWidth: 2
+        },
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 46, y: 150,
+          text: 'www.buyprintz.com',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#ffffff',
+          align: 'center',
+          width: 300,
+          height: 25
+        }
+      ]
+    },
+    // SKINS Design 6 - Left Justified (Front)
+    {
+      id: 'business-card-tin-design-6-front',
+      name: 'Design 6 - Front (Left Justified)',
+      category: 'Business Card Tins',
+      description: 'Professional left-justified design with SKINS Design 6 front',
+      tags: ['left-justified', 'professional', 'business', 'contact'],
+      orientation: 'landscape',
+      recommendedSizes: ['Business Card Tin'],
+      canvasSize: { width: 393, height: 236 },
+      elements: [
+        {
+          id: 'template_background_placeholder',
+          type: 'rect',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          fill: '#0f172a',
+          opacity: 0.8
+        },
         {
           id: 'template_image_placeholder',
           type: 'image',
@@ -3048,88 +3114,116 @@ const BannerEditorNew = () => {
           src: '/assets/images/SKINS_DESIGN 6_FRONT.png',
           alt: 'SKINS Design 6 Front Background'
         },
-        // Medical Practice Name
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 50,
+          x: 20, y: 50,
           text: 'BUYPRINTZ',
-          fontSize: 20,
+          fontSize: 24,
           fontFamily: 'Arial Black',
-          fill: '#1e40af',
-          align: 'center',
-          width: 300,
-          height: 25
-        },
-        // Doctor Name
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 80,
-          text: 'Custom Printing Solutions',
-          fontSize: 18,
-          fontFamily: 'Arial',
           fontStyle: 'bold',
-          fill: '#374151',
-          align: 'center',
+          fill: '#ffffff',
+          align: 'left',
+          width: 300,
+          height: 40
+        },
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 20, y: 85,
+          text: 'Custom Printing Solutions',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#e5e7eb',
+          align: 'left',
           width: 300,
           height: 25
         },
-        // Specialty
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 110,
-          text: 'Banners • Business Card Tins • Tradeshow Tents',
-          fontSize: 12,
+          x: 20, y: 120,
+          text: 'Sarah Sample\nMarketing Director\n(617) 505-0603 📞\norder@buyprintz.com 📧',
+          fontSize: 14,
           fontFamily: 'Arial',
-          fill: '#6b7280',
-          align: 'center',
+          fill: '#ffffff',
+          align: 'left',
+          lineHeight: 1.4,
           width: 300,
-          height: 20
+          height: 80
         },
-        // Contact Info
         {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 140,
-          text: '📞 (617) 505-0603\n📧 order@buyprintz.com',
-          fontSize: 13,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'center',
-          lineHeight: 1.3,
-          width: 300,
-          height: 35
-        },
-        // Address
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 185,
-          text: 'www.buyprintz.com',
-          fontSize: 10,
-          fontFamily: 'Arial',
-          fill: '#374151',
-          align: 'center',
-          width: 300,
-          height: 15
+          id: 'template_picture_placeholder',
+          type: 'rect',
+          x: 263, y: 50,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#ffffff',
+          strokeWidth: 2
         }
       ]
     },
-
-    // Real Estate Business Card Tin
+    // SKINS Design 6 - Center Justified (Back)
     {
-      id: 'business-card-tin-real-estate',
-      name: 'Real Estate Professional Tin',
+      id: 'business-card-tin-design-6-back',
+      name: 'Design 6 - Back (Center Justified)',
       category: 'Business Card Tins',
-      description: 'Professional design for real estate agents',
-      tags: ['real estate', 'agent', 'property', 'professional'],
+      description: 'Professional center-justified design with SKINS Design 6 back',
+      tags: ['center-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
+      canvasSize: { width: 393, height: 236 },
       elements: [
-        // Background image using SKINS Design 1 Front
+        {
+          id: 'template_background_placeholder',
+          type: 'rect',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          fill: '#0f172a',
+          opacity: 0.8
+        },
+        {
+          id: 'template_image_placeholder',
+          type: 'image',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          src: '/assets/images/SKINS_DESIGN 6_BACK.png',
+          alt: 'SKINS Design 6 Back Background'
+        },
+        {
+          id: 'template_qr_placeholder',
+          type: 'rect',
+          x: 156, y: 60,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#ffffff',
+          strokeWidth: 2
+        },
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 46, y: 150,
+          text: 'www.buyprintz.com',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#ffffff',
+          align: 'center',
+          width: 300,
+          height: 25
+        }
+      ]
+    },
+    // SKINS Design 8 - Right Justified (Front)
+    {
+      id: 'business-card-tin-design-8-front',
+      name: 'Design 8 - Front (Right Justified)',
+      category: 'Business Card Tins',
+      description: 'Professional right-justified design with SKINS Design 8 front',
+      tags: ['right-justified', 'professional', 'business', 'contact'],
+      orientation: 'landscape',
+      recommendedSizes: ['Business Card Tin'],
+      canvasSize: { width: 393, height: 236 },
+      elements: [
         {
           id: 'template_image_placeholder',
           type: 'image',
@@ -3138,89 +3232,124 @@ const BannerEditorNew = () => {
           src: '/assets/images/SKINS_DESIGN 8_FRONT.png',
           alt: 'SKINS Design 8 Front Background'
         },
-        // Real Estate Company
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 40,
+          x: 93, y: 50,
           text: 'BUYPRINTZ',
-          fontSize: 18,
+          fontSize: 24,
           fontFamily: 'Arial Black',
-          fill: '#1e40af',
-          align: 'center',
-          width: 300,
-          height: 25
-        },
-        // Agent Name
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 70,
-          text: 'Custom Printing Solutions',
-          fontSize: 20,
-          fontFamily: 'Arial',
           fontStyle: 'bold',
+          fill: '#000000',
+          align: 'right',
+          width: 300,
+          height: 40
+        },
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 93, y: 85,
+          text: 'Custom Printing Solutions',
+          fontSize: 16,
+          fontFamily: 'Arial',
           fill: '#374151',
-          align: 'center',
+          align: 'right',
           width: 300,
           height: 25
         },
-        // License Info
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 200, y: 100,
-          text: 'Banners • Business Card Tins • Tradeshow Tents',
-          fontSize: 12,
+          x: 93, y: 120,
+          text: 'Sarah Sample\nMarketing Director\n📞 (617) 505-0603\n📧 order@buyprintz.com',
+          fontSize: 14,
           fontFamily: 'Arial',
-          fill: '#6b7280',
-          align: 'center',
+          fill: '#000000',
+          align: 'right',
+          lineHeight: 1.4,
           width: 300,
-          height: 20
+          height: 80
         },
-        // Contact
         {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 130,
-          text: '📞 (617) 505-0603\n📧 order@buyprintz.com',
-          fontSize: 13,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'center',
-          lineHeight: 1.3,
-          width: 300,
-          height: 35
-        },
-        // Website
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 200, y: 175,
-          text: 'www.buyprintz.com',
-          fontSize: 11,
-          fontFamily: 'Arial',
-          fill: '#374151',
-          align: 'center',
-          width: 300,
-          height: 15
+          id: 'template_picture_placeholder',
+          type: 'rect',
+          x: 50, y: 50,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#000000',
+          strokeWidth: 2
         }
       ]
     },
-
-    // LEFT-ALIGNED BUSINESS CARD TIN TEMPLATES
-    // Left-Aligned Professional Tin
+    // SKINS Design 8 - Center Justified (Back)
     {
-      id: 'business-card-tin-left-aligned',
-      name: 'Left-Aligned Professional Tin',
+      id: 'business-card-tin-design-8-back',
+      name: 'Design 8 - Back (Center Justified)',
       category: 'Business Card Tins',
-      description: 'Left-aligned layout with professional BuyPrintz branding',
-      tags: ['left-aligned', 'professional', 'business', 'contact'],
+      description: 'Professional center-justified design with SKINS Design 8 back',
+      tags: ['center-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
+      canvasSize: { width: 393, height: 236 },
       elements: [
-        // Background image using SKINS Design 1 Front
+        {
+          id: 'template_background_placeholder',
+          type: 'rect',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          fill: '#0f172a',
+          opacity: 0.8
+        },
+        {
+          id: 'template_image_placeholder',
+          type: 'image',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          src: '/assets/images/SKINS_DESIGN 8_BACK.png',
+          alt: 'SKINS Design 8 Back Background'
+        },
+        {
+          id: 'template_qr_placeholder',
+          type: 'rect',
+          x: 156, y: 60,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#ffffff',
+          strokeWidth: 2
+        },
+        {
+          id: 'template_text_placeholder',
+          type: 'text',
+          x: 46, y: 150,
+          text: 'www.buyprintz.com',
+          fontSize: 16,
+          fontFamily: 'Arial',
+          fill: '#ffffff',
+          align: 'center',
+          width: 300,
+          height: 25
+        }
+      ]
+    },
+    // SKINS Design 9 - Left Justified (Front)
+    {
+      id: 'business-card-tin-design-9-front',
+      name: 'Design 9 - Front (Left Justified)',
+      category: 'Business Card Tins',
+      description: 'Professional left-justified design with SKINS Design 9 front',
+      tags: ['left-justified', 'professional', 'business', 'contact'],
+      orientation: 'landscape',
+      recommendedSizes: ['Business Card Tin'],
+      canvasSize: { width: 393, height: 236 },
+      elements: [
+        {
+          id: 'template_background_placeholder',
+          type: 'rect',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          fill: '#0f172a',
+          opacity: 0.8
+        },
         {
           id: 'template_image_placeholder',
           type: 'image',
@@ -3229,304 +3358,102 @@ const BannerEditorNew = () => {
           src: '/assets/images/SKINS_DESIGN 9_FRONT.png',
           alt: 'SKINS Design 9 Front Background'
         },
-        // Company Name - Left aligned
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 50, y: 50,
+          x: 20, y: 50,
           text: 'BUYPRINTZ',
           fontSize: 24,
           fontFamily: 'Arial Black',
           fontStyle: 'bold',
-          fill: '#1e40af',
+          fill: '#ffffff',
           align: 'left',
           width: 300,
-          height: 30
+          height: 40
         },
-        // Job Title - Left aligned
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 50, y: 85,
+          x: 20, y: 85,
           text: 'Custom Printing Solutions',
           fontSize: 16,
           fontFamily: 'Arial',
-          fill: '#374151',
+          fill: '#e5e7eb',
           align: 'left',
           width: 300,
-          height: 20
+          height: 25
         },
-        // Contact Info - Left aligned
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 50, y: 120,
-          text: '📧 order@buyprintz.com\n📞 (617) 505-0603\n🌐 www.buyprintz.com',
+          x: 20, y: 120,
+          text: 'Sarah Sample\nMarketing Director\n📞 (617) 505-0603\n📧 order@buyprintz.com',
           fontSize: 14,
           fontFamily: 'Arial',
-          fill: '#1e40af',
+          fill: '#ffffff',
           align: 'left',
           lineHeight: 1.4,
           width: 300,
-          height: 60
+          height: 80
+        },
+        {
+          id: 'template_picture_placeholder',
+          type: 'rect',
+          x: 263, y: 50,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#ffffff',
+          strokeWidth: 2
         }
       ]
     },
-
-    // RIGHT-ALIGNED BUSINESS CARD TIN TEMPLATES
-    // Right-Aligned Professional Tin
+    // SKINS Design 9 - Center Justified (Back)
     {
-      id: 'business-card-tin-right-aligned',
-      name: 'Right-Aligned Professional Tin',
+      id: 'business-card-tin-design-9-back',
+      name: 'Design 9 - Back (Center Justified)',
       category: 'Business Card Tins',
-      description: 'Right-aligned layout with professional BuyPrintz branding',
-      tags: ['right-aligned', 'professional', 'business', 'contact'],
+      description: 'Professional center-justified design with SKINS Design 9 back',
+      tags: ['center-justified', 'professional', 'business', 'contact'],
       orientation: 'landscape',
       recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
+      canvasSize: { width: 393, height: 236 },
       elements: [
-        // Background image using SKINS Design 1 Front
+        {
+          id: 'template_background_placeholder',
+          type: 'rect',
+          x: 0, y: 0,
+          width: 393, height: 236,
+          fill: '#0f172a',
+          opacity: 0.8
+        },
         {
           id: 'template_image_placeholder',
           type: 'image',
           x: 0, y: 0,
           width: 393, height: 236,
-          src: '/assets/images/SKINS_DESIGN 10_FRONT.png',
-          alt: 'SKINS Design 10 Front Background'
+          src: '/assets/images/SKINS_DESIGN 9_BACK.png',
+          alt: 'SKINS Design 9 Back Background'
         },
-        // Company Name - Right aligned
+        {
+          id: 'template_qr_placeholder',
+          type: 'rect',
+          x: 156, y: 60,
+          width: 80, height: 80,
+          fill: '#f3f4f6',
+          stroke: '#ffffff',
+          strokeWidth: 2
+        },
         {
           id: 'template_text_placeholder',
           type: 'text',
-          x: 93, y: 50, // x: 393 - 300 = 93 (canvas width - text width)
-          text: 'BUYPRINTZ',
-          fontSize: 24,
-          fontFamily: 'Arial Black',
-          fontStyle: 'bold',
-          fill: '#1e40af',
-          align: 'right',
-          width: 300,
-          height: 30
-        },
-        // Job Title - Right aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 93, y: 85, // x: 393 - 300 = 93 (canvas width - text width)
-          text: 'Custom Printing Solutions',
+          x: 46, y: 150,
+          text: 'www.buyprintz.com',
           fontSize: 16,
           fontFamily: 'Arial',
-          fill: '#374151',
-          align: 'right',
-          width: 300,
-          height: 20
-        },
-        // Contact Info - Right aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 93, y: 120, // x: 393 - 300 = 93 (canvas width - text width)
-          text: '📧 order@buyprintz.com\n📞 (617) 505-0603\n🌐 www.buyprintz.com',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'right',
-          lineHeight: 1.4,
-          width: 300,
-          height: 60
-        }
-      ]
-    },
-
-    // BACK DESIGN TEMPLATES
-    // Business Card Tin Back - Professional
-    {
-      id: 'business-card-tin-back-professional',
-      name: 'Professional Tin Back',
-      category: 'Business Card Tins',
-      description: 'Professional back design with BuyPrintz branding',
-      tags: ['back-design', 'professional', 'business', 'contact'],
-      orientation: 'landscape',
-      recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
-      elements: [
-        // Background image using SKINS Design 1 Back
-        {
-          id: 'template_image_placeholder',
-          type: 'image',
-          x: 0, y: 0,
-          width: 393, height: 236,
-          src: '/assets/images/SKINS_DESIGN 11_BACK.png',
-          alt: 'SKINS Design 11 Back Background'
-        },
-        // Company Name
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 46, y: 60, // x: (393 - 300) / 2 = 46.5 ≈ 46 (center the 300px wide text box)
-          text: 'BUYPRINTZ',
-          fontSize: 24,
-          fontFamily: 'Arial Black',
-          fontStyle: 'bold',
-          fill: '#1e40af',
+          fill: '#ffffff',
           align: 'center',
           width: 300,
-          height: 30
-        },
-        // Services
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 46, y: 100, // x: (393 - 300) / 2 = 46.5 ≈ 46 (center the 300px wide text box)
-          text: 'Banners • Business Card Tins • Tradeshow Tents',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#374151',
-          align: 'center',
-          width: 300,
-          height: 20
-        },
-        // Contact Info
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 46, y: 140, // x: (393 - 300) / 2 = 46.5 ≈ 46 (center the 300px wide text box)
-          text: '📧 order@buyprintz.com\n📞 (617) 505-0603\n🌐 www.buyprintz.com',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'center',
-          lineHeight: 1.4,
-          width: 300,
-          height: 60
-        }
-      ]
-    },
-
-    // Business Card Tin Back - Left Aligned
-    {
-      id: 'business-card-tin-back-left',
-      name: 'Tin Back - Left Aligned',
-      category: 'Business Card Tins',
-      description: 'Left-aligned back design with BuyPrintz branding',
-      tags: ['back-design', 'left-aligned', 'professional', 'business'],
-      orientation: 'landscape',
-      recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
-      elements: [
-        // Background image using SKINS Design 1 Back
-        {
-          id: 'template_image_placeholder',
-          type: 'image',
-          x: 0, y: 0,
-          width: 393, height: 236,
-          src: '/assets/images/SKINS_DESIGN 12_BACK.png',
-          alt: 'SKINS Design 12 Back Background'
-        },
-        // Company Name - Left aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 50, y: 50,
-          text: 'BUYPRINTZ',
-          fontSize: 24,
-          fontFamily: 'Arial Black',
-          fontStyle: 'bold',
-          fill: '#1e40af',
-          align: 'left',
-          width: 300,
-          height: 30
-        },
-        // Services - Left aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 50, y: 90,
-          text: 'Banners • Business Card Tins • Tradeshow Tents',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#374151',
-          align: 'left',
-          width: 300,
-          height: 20
-        },
-        // Contact Info - Left aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 50, y: 130,
-          text: '📧 order@buyprintz.com\n📞 (617) 505-0603\n🌐 www.buyprintz.com',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'left',
-          lineHeight: 1.4,
-          width: 300,
-          height: 60
-        }
-      ]
-    },
-
-    // Business Card Tin Back - Right Aligned
-    {
-      id: 'business-card-tin-back-right',
-      name: 'Tin Back - Right Aligned',
-      category: 'Business Card Tins',
-      description: 'Right-aligned back design with BuyPrintz branding',
-      tags: ['back-design', 'right-aligned', 'professional', 'business'],
-      orientation: 'landscape',
-      recommendedSizes: ['Business Card Tin'],
-      canvasSize: { width: 393, height: 236 }, // Business Card Tin canvas size
-      elements: [
-        // Background image using SKINS Design 1 Back
-        {
-          id: 'template_image_placeholder',
-          type: 'image',
-          x: 0, y: 0,
-          width: 393, height: 236,
-          src: '/assets/images/SKINS_DESIGN 3_BACK.png',
-          alt: 'SKINS Design 3 Back Background'
-        },
-        // Company Name - Right aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 93, y: 50, // x: 393 - 300 = 93 (canvas width - text width)
-          text: 'BUYPRINTZ',
-          fontSize: 24,
-          fontFamily: 'Arial Black',
-          fontStyle: 'bold',
-          fill: '#1e40af',
-          align: 'right',
-          width: 300,
-          height: 30
-        },
-        // Services - Right aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 93, y: 90, // x: 393 - 300 = 93 (canvas width - text width)
-          text: 'Banners • Business Card Tins • Tradeshow Tents',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#374151',
-          align: 'right',
-          width: 300,
-          height: 20
-        },
-        // Contact Info - Right aligned
-        {
-          id: 'template_text_placeholder',
-          type: 'text',
-          x: 93, y: 130, // x: 393 - 300 = 93 (canvas width - text width)
-          text: '📧 order@buyprintz.com\n📞 (617) 505-0603\n🌐 www.buyprintz.com',
-          fontSize: 14,
-          fontFamily: 'Arial',
-          fill: '#1e40af',
-          align: 'right',
-          lineHeight: 1.4,
-          width: 300,
-          height: 60
+          height: 25
         }
       ]
     }
