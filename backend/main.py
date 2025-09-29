@@ -627,8 +627,9 @@ async def create_order(
 ):
     """Create a new order"""
     try:
-        # Initialize marketplace_cost for all paths
+        # Initialize variables for all paths
         marketplace_cost = 0.0
+        base_price = 0.0  # Initialize base_price
         
         # Use frontend-calculated total if provided, otherwise calculate backend total
         if order_data.total_amount and order_data.total_amount > 0:
