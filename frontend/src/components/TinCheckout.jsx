@@ -547,7 +547,9 @@ const TinCheckout = () => {
         total_amount: totalAmount, // Include the calculated total amount
         subtotal: subtotal,
         tax_amount: taxAmount,
-        shipping_cost: shippingCost
+        shipping_cost: shippingCost,
+        // Also send amount in cents for backend compatibility
+        amount_cents: Math.round(totalAmount * 100)
       }
 
       // Debug pricing calculation
@@ -561,6 +563,14 @@ const TinCheckout = () => {
         shippingCost,
         totalAmount,
         quantity: tinOptions.quantity
+      })
+
+      console.log('📤 Sending to backend:', {
+        total_amount: totalAmount,
+        amount_cents: Math.round(totalAmount * 100),
+        subtotal,
+        tax_amount: taxAmount,
+        shipping_cost: shippingCost
       })
 
       // Create order
