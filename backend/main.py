@@ -627,6 +627,9 @@ async def create_order(
 ):
     """Create a new order"""
     try:
+        # Initialize marketplace_cost for all paths
+        marketplace_cost = 0.0
+        
         # Use frontend-calculated total if provided, otherwise calculate backend total
         if order_data.total_amount and order_data.total_amount > 0:
             # Use frontend-calculated total (for business card tins, etc.)
@@ -652,7 +655,6 @@ async def create_order(
             total_amount = base_price * order_data.quantity
             
             # Add marketplace template costs
-            marketplace_cost = 0.0
             if order_data.marketplace_templates:
                 for template in order_data.marketplace_templates:
                     if isinstance(template, dict) and 'price' in template:
@@ -662,6 +664,14 @@ async def create_order(
             
             total_amount += marketplace_cost
             print(f"💰 Using backend-calculated total: ${total_amount}")
+        
+        # Calculate marketplace costs for frontend-calculated totals too
+        if order_data.marketplace_templates and order_data.total_amount and order_data.total_amount > 0:
+            for template in order_data.marketplace_templates:
+                if isinstance(template, dict) and 'price' in template:
+                    marketplace_cost += float(template['price'])
+                elif isinstance(template, (int, float)):
+                    marketplace_cost += float(template)
         
         # Create comprehensive order data
         order_payload = {
