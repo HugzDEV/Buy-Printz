@@ -317,7 +317,7 @@ const TentCheckout = () => {
     }
   }, [selectedShippingOption, selectedShippingQuote, shippingCost])
   
-  const finalTotalPrice = totalPrice + marketplaceCost + shippingCost + taxAmount
+  const finalTotalPrice = Math.round((totalPrice + marketplaceCost + shippingCost + taxAmount) * 100) / 100
   
   // Force recalculation when shipping changes
   console.log('🔄 Tent total calculation:', { 

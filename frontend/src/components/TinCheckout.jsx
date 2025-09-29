@@ -349,7 +349,7 @@ const TinCheckout = () => {
   const taxRate = 0.0625
   const taxAmount = subtotal * taxRate
   
-  const totalAmount = subtotal + taxAmount + shippingCost
+  const totalAmount = Math.round((subtotal + taxAmount + shippingCost) * 100) / 100
 
   useEffect(() => {
     const savedOrderData = sessionStorage.getItem('orderData')
