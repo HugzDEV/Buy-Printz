@@ -1864,7 +1864,7 @@ async def create_business_card_tin_order(
     try:
         # First create a basic order
         order_data = {
-            "user_id": current_user["id"],
+            "user_id": current_user["user_id"],
             "product_type": "business_card_tin",
             "status": "pending",
             "total_amount": 0,  # Will be calculated by tin creation
@@ -1893,7 +1893,7 @@ async def create_business_card_tin_order(
         }
         
         tin_result = await db_manager.create_business_card_tin_order(
-            current_user["id"], 
+            current_user["user_id"], 
             order_id, 
             tin_data
         )
@@ -1932,7 +1932,7 @@ async def get_business_card_tin(
             raise HTTPException(status_code=404, detail="Business card tin not found")
         
         # Verify user owns this tin
-        if tin["user_id"] != current_user["id"]:
+        if tin["user_id"] != current_user["user_id"]:
             raise HTTPException(status_code=403, detail="Access denied")
         
         return {
@@ -1952,7 +1952,7 @@ async def get_user_business_card_tins(
 ):
     """Get all business card tins for the current user"""
     try:
-        tins = await db_manager.get_user_business_card_tins(current_user["id"])
+        tins = await db_manager.get_user_business_card_tins(current_user["user_id"])
         return {
             "success": True,
             "tins": tins
@@ -1975,7 +1975,7 @@ async def update_business_card_tin_design(
         if not tin:
             raise HTTPException(status_code=404, detail="Business card tin not found")
         
-        if tin["user_id"] != current_user["id"]:
+        if tin["user_id"] != current_user["user_id"]:
             raise HTTPException(status_code=403, detail="Access denied")
         
         success = await db_manager.update_business_card_tin_design(
@@ -2010,7 +2010,7 @@ async def update_business_card_tin_status(
         if not tin:
             raise HTTPException(status_code=404, detail="Business card tin not found")
         
-        if tin["user_id"] != current_user["id"]:
+        if tin["user_id"] != current_user["user_id"]:
             raise HTTPException(status_code=403, detail="Access denied")
         
         success = await db_manager.update_business_card_tin_status(
@@ -2045,7 +2045,7 @@ async def delete_business_card_tin(
         if not tin:
             raise HTTPException(status_code=404, detail="Business card tin not found")
         
-        if tin["user_id"] != current_user["id"]:
+        if tin["user_id"] != current_user["user_id"]:
             raise HTTPException(status_code=403, detail="Access denied")
         
         success = await db_manager.delete_business_card_tin(tin_id)
@@ -2076,7 +2076,7 @@ async def get_business_card_tin_by_order(
             raise HTTPException(status_code=404, detail="Business card tin not found for this order")
         
         # Verify user owns this tin
-        if tin["user_id"] != current_user["id"]:
+        if tin["user_id"] != current_user["user_id"]:
             raise HTTPException(status_code=403, detail="Access denied")
         
         return {
