@@ -687,6 +687,19 @@ async def create_order(
                 elif isinstance(template, (int, float)):
                     marketplace_cost += float(template)
         
+        # Debug logging for tent orders
+        if order_data.product_type == 'tradeshow_tent':
+            print(f"🏕️ Tent Order Debug:")
+            print(f"  - tent_size: {order_data.tent_size}")
+            print(f"  - tent_type: {order_data.tent_type}")
+            print(f"  - tent_material: {order_data.tent_material}")
+            print(f"  - tent_frame_type: {order_data.tent_frame_type}")
+            print(f"  - tent_print_method: {order_data.tent_print_method}")
+            print(f"  - tent_accessories: {order_data.tent_accessories}")
+            print(f"  - tent_reinforced_strip_color: {order_data.tent_reinforced_strip_color}")
+            print(f"  - tent_package: {order_data.tent_package}")
+            print(f"  - tent_wall_option: {order_data.tent_wall_option}")
+        
         # Create comprehensive order data
         order_payload = {
             "product_type": order_data.product_type,
@@ -716,6 +729,19 @@ async def create_order(
             "tent_package": order_data.tent_package,
             "tent_wall_option": order_data.tent_wall_option
         }
+        
+        # Debug the final payload
+        if order_data.product_type == 'tradeshow_tent':
+            print(f"🏕️ Final order payload tent fields:")
+            print(f"  - tent_size: {order_payload.get('tent_size')}")
+            print(f"  - tent_type: {order_payload.get('tent_type')}")
+            print(f"  - tent_material: {order_payload.get('tent_material')}")
+            print(f"  - tent_frame_type: {order_payload.get('tent_frame_type')}")
+            print(f"  - tent_print_method: {order_payload.get('tent_print_method')}")
+            print(f"  - tent_accessories: {order_payload.get('tent_accessories')}")
+            print(f"  - tent_reinforced_strip_color: {order_payload.get('tent_reinforced_strip_color')}")
+            print(f"  - tent_package: {order_payload.get('tent_package')}")
+            print(f"  - tent_wall_option: {order_payload.get('tent_wall_option')}")
         
         # Create order in database
         order_result = await db_manager.create_order(
