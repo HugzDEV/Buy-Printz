@@ -399,7 +399,7 @@ const Checkout = () => {
       const updatedOrderData = {
         ...orderData,
         print_options: bannerOptions,
-        shipping_option: shippingOption
+        shipping_option: shippingOption ? { name: shippingOption, cost: shippingQuotes.find(q => q.name === shippingOption)?.cost || 0 } : null
       }
       
       const response = await authService.authenticatedRequest('/api/orders/create', {
