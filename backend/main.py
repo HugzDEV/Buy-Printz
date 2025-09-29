@@ -743,11 +743,30 @@ async def create_order(
             print(f"  - tent_package: {order_payload.get('tent_package')}")
             print(f"  - tent_wall_option: {order_payload.get('tent_wall_option')}")
         
-        # Create order in database
-        order_result = await db_manager.create_order(
-            current_user["user_id"],
-            order_payload
-        )
+        # Create order in database with additional debugging
+        try:
+            print(f"🏕️ Attempting to create tent order with payload:")
+            print(f"  - product_type: {order_payload.get('product_type')}")
+            print(f"  - tent_size: {order_payload.get('tent_size')}")
+            print(f"  - tent_type: {order_payload.get('tent_type')}")
+            print(f"  - tent_material: {order_payload.get('tent_material')}")
+            print(f"  - tent_frame_type: {order_payload.get('tent_frame_type')}")
+            print(f"  - tent_print_method: {order_payload.get('tent_print_method')}")
+            print(f"  - tent_accessories: {order_payload.get('tent_accessories')}")
+            print(f"  - tent_reinforced_strip_color: {order_payload.get('tent_reinforced_strip_color')}")
+            print(f"  - tent_package: {order_payload.get('tent_package')}")
+            print(f"  - tent_wall_option: {order_payload.get('tent_wall_option')}")
+            
+            order_result = await db_manager.create_order(
+                current_user["user_id"],
+                order_payload
+            )
+            print(f"✅ Tent order created successfully: {order_result}")
+        except Exception as db_error:
+            print(f"❌ Database error creating tent order: {db_error}")
+            print(f"❌ Error type: {type(db_error)}")
+            print(f"❌ Error details: {str(db_error)}")
+            raise db_error
         
         if order_result["success"]:
             return {
