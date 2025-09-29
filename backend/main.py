@@ -624,6 +624,7 @@ async def create_order(
             "banner": 25.00,
             "sign": 35.00,
             "sticker": 15.00,
+            "tradeshow_tent": 325.00,  # Starting price for tents
             "custom": 50.00
         }
         
@@ -1868,6 +1869,8 @@ async def create_business_card_tin_order(
             "product_type": "business_card_tin",
             "status": "pending",
             "total_amount": 0,  # Will be calculated by tin creation
+            "dimensions": {"width": 374, "height": 225},  # Standard tin dimensions
+            "canvas_data": {},  # Empty canvas data for tins
             "order_details": {
                 "quantity": tin_request.quantity,
                 "surface_coverage": tin_request.surface_coverage,
