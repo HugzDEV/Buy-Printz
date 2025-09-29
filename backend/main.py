@@ -311,6 +311,18 @@ class OrderRequest(BaseModel):
     tax_amount: Optional[float] = None
     shipping_cost: Optional[float] = None
     amount_cents: Optional[int] = None
+    # Tradeshow tent specific fields
+    tent_size: Optional[str] = None
+    tent_type: Optional[str] = None
+    tent_material: Optional[str] = None
+    tent_frame_type: Optional[str] = None
+    tent_print_method: Optional[str] = None
+    tent_accessories: Optional[str] = None
+    tent_reinforced_strip_color: Optional[str] = None
+    tent_package: Optional[str] = None
+    tent_wall_option: Optional[str] = None
+    tent_specs: Optional[Dict[str, Any]] = None
+    selected_accessories: Optional[list] = None
 
 class AddressData(BaseModel):
     full_name: str
@@ -692,7 +704,17 @@ async def create_order(
             "marketplace_templates": order_data.marketplace_templates,
             "marketplace_cost": marketplace_cost,
             "total_amount": total_amount,
-            "status": "pending"
+            "status": "pending",
+            # Tent-specific fields
+            "tent_size": order_data.tent_size,
+            "tent_type": order_data.tent_type,
+            "tent_material": order_data.tent_material,
+            "tent_frame_type": order_data.tent_frame_type,
+            "tent_print_method": order_data.tent_print_method,
+            "tent_accessories": order_data.tent_accessories,
+            "tent_reinforced_strip_color": order_data.tent_reinforced_strip_color,
+            "tent_package": order_data.tent_package,
+            "tent_wall_option": order_data.tent_wall_option
         }
         
         # Create order in database
