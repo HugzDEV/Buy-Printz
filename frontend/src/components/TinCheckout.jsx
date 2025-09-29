@@ -543,8 +543,25 @@ const TinCheckout = () => {
         shipping_option: {
           service_code: shippingOption,
           cost: shippingCost
-        }
+        },
+        total_amount: totalAmount, // Include the calculated total amount
+        subtotal: subtotal,
+        tax_amount: taxAmount,
+        shipping_cost: shippingCost
       }
+
+      // Debug pricing calculation
+      console.log('🔍 Frontend Pricing Debug:', {
+        tinBasePrice,
+        marketplaceCost,
+        candyCost,
+        customMessageCost,
+        subtotal,
+        taxAmount,
+        shippingCost,
+        totalAmount,
+        quantity: tinOptions.quantity
+      })
 
       // Create order
       const orderResponse = await authService.authenticatedRequest('/api/orders/create', {
