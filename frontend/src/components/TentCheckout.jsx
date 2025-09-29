@@ -417,35 +417,63 @@ const TentCheckout = () => {
 
     setIsLoading(true)
     try {
-      const cardElement = elements.getElement(CardElement)
-      
-      // Create payment intent
-      const response = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authService.getAccessToken()}`
+      // First create the order
+      const tentOrderData = {
+        ...orderData, // This contains canvas_data, dimensions, etc. from BannerEditor
+        product_type: 'tradeshow-tents',
+        quantity: 1,
+        tent_specs: tentSpecs,
+        selected_accessories: selectedAccessories,
+        customer_info: customerInfo,
+        shipping_option: {
+          service_code: selectedShippingOption,
+          cost: shippingCost
         },
-        body: JSON.stringify({
-          amount: Math.round(finalTotalPrice * 100), // Convert to cents
-          currency: 'usd',
-          metadata: {
-            product_type: 'tradeshow_tent',
-            tent_size: tentSpecs.tentSize,
-            tent_type: tentSpecs.tentType,
-            material: tentSpecs.material,
-            frame_type: tentSpecs.frameType,
-            print_method: tentSpecs.printMethod,
-            accessories: JSON.stringify(selectedAccessories),
-            shipping_info: JSON.stringify(customerInfo)
-          }
-        })
+        total_amount: finalTotalPrice,
+        subtotal: totalPrice + marketplaceCost,
+        tax_amount: taxAmount,
+        shipping_cost: shippingCost,
+        amount_cents: Math.round(finalTotalPrice * 100)
+      }
+
+      console.log('📤 Creating tent order with data:', tentOrderData)
+
+      // Create order
+      const orderResponse = await authService.authenticatedRequest('/api/orders/create', {
+        method: 'POST',
+        body: JSON.stringify(tentOrderData)
       })
 
-      const { client_secret } = await response.json()
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json()
+        throw new Error(errorData.detail || 'Failed to create order')
+      }
+
+      const orderResponseData = await orderResponse.json()
+      console.log('Order created successfully:', orderResponseData)
+
+      // Create payment intent
+      const paymentIntentResponse = await authService.authenticatedRequest('/api/payments/create-intent', {
+        method: 'POST',
+        body: JSON.stringify({ order_id: orderResponseData.order_id })
+      })
+
+      if (!paymentIntentResponse.ok) {
+        const errorData = await paymentIntentResponse.json()
+        throw new Error(errorData.detail || 'Failed to create payment intent')
+      }
+
+      const paymentIntentData = await paymentIntentResponse.json()
+      console.log('Payment intent created:', paymentIntentData)
+
+      // Get card element
+      const cardElement = elements.getElement(CardElement)
+      if (!cardElement) {
+        throw new Error('Payment form not found')
+      }
 
       // Confirm payment
-      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(paymentIntentData.client_secret, {
         payment_method: {
           card: cardElement,
           billing_details: {
