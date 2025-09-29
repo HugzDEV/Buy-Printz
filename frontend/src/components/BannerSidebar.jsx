@@ -3110,12 +3110,56 @@ const BannerSidebar = ({
                   <div className="mb-6">
                     <h5 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                       <span>🥫</span>
-                      Tin Designs
+                      Business Card Tin Templates
                     </h5>
-                    <div className="text-center py-8 bg-white/10 rounded-lg border border-white/20">
-                      <div className="text-gray-400 text-4xl mb-2">🥫</div>
-                      <p className="text-gray-500 text-sm">Tin designs coming soon!</p>
-                      <p className="text-gray-400 text-xs mt-1">Professional business card tin designs</p>
+                    <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                      {bannerTemplates.filter(t => t.category === 'Business Card Tins').map((template) => (
+                        <button
+                          key={template.id}
+                          onClick={() => handleTemplateClick(template)}
+                          className={`w-full text-left p-3 rounded-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 group ${
+                            currentTemplateId === template.id
+                              ? 'bg-blue-100 border-blue-300 shadow-md'
+                              : 'bg-white/10 hover:bg-white/20 active:bg-white/30 border-white/20 hover:border-white/30'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="font-semibold text-gray-800 text-sm group-hover:text-blue-700 transition-colors duration-200 flex-1 truncate">
+                              {template.name}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {currentTemplateId === template.id && (
+                                <span className="text-blue-600 text-sm font-bold">✓</span>
+                              )}
+                              <div className="flex gap-1">
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                                  🥫
+                                </span>
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                                  {template.category.split(' ')[0]}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-600 leading-relaxed line-clamp-2 mb-2">
+                            {template.description}
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-500">Business Card Tin</span>
+                              {template.tags && template.tags.length > 0 && (
+                                <>
+                                  <span className="text-gray-400">•</span>
+                                  <span className="text-gray-500">{template.tags[0]}</span>
+                                </>
+                              )}
+                            </div>
+                            <span className="text-gray-400 group-hover:text-blue-500 transition-colors duration-200">
+                              →
+                            </span>
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 ) : null}
