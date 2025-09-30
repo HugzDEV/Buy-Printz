@@ -748,7 +748,9 @@ const Checkout = () => {
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const selectedShippingQuote = shippingQuotes.find(q => q.name === shippingOption)
   const shippingCost = parseFloat(selectedShippingQuote?.cost?.replace('$', '') || '0') || 0
-  const taxAmount = parseFloat(selectedShippingQuote?.tax?.replace('$', '') || '0') || 0
+  
+  // Calculate proper tax (6.25% for Massachusetts)
+  const TAX_RATE = 0.0625 // 6.25%
   console.log('🔄 Shipping cost calculation:', { 
     shippingOption, 
     selectedShippingQuote, 
@@ -794,6 +796,9 @@ const Checkout = () => {
   // Calculate total options cost including all percentage-based options
   const optionsTotal = sidesCost + polePocketCost + grommetCost + webbingCost + cornersCost + ropeCost + windSlitCost + turnaroundCost
   const subtotal = basePrice * bannerOptions.quantity + optionsTotal + marketplaceCost
+  
+  // Calculate proper tax on subtotal + shipping (6.25% for Massachusetts)
+  const taxAmount = Math.round((subtotal + shippingCost) * TAX_RATE * 100) / 100
   const totalAmount = subtotal + shippingCost + taxAmount
   
   // Force recalculation when shipping changes
@@ -827,20 +832,51 @@ const Checkout = () => {
           <div className="flex items-center justify-between">
             <button
               onClick={() => {
-                // Save current order data to sessionStorage before going back
+                // Use the same efficient approach as Marketplace.jsx - store only essential navigation data
                 if (orderData) {
-                  // Store only essential data for canvas restoration, not the large images
-                  const restorationData = {
-                    canvas_data: orderData.canvas_data,
-                    surface_elements: orderData.surface_elements,
-                    marketplace_templates: orderData.marketplace_templates,
-                    product_type: orderData.product_type,
-                    design_option: orderData.design_option,
-                    tent_design_option: orderData.tent_design_option,
-                    tin_surface_coverage: orderData.tin_surface_coverage
+                  try {
+                    // Store only essential navigation metadata - no canvas data, no large objects
+                    const navigationData = {
+                      product_type: orderData.product_type,
+                      design_option: orderData.design_option,
+                      tent_design_option: orderData.tent_design_option,
+                      tin_surface_coverage: orderData.tin_surface_coverage,
+                      banner_type: orderData.banner_type,
+                      tin_options: orderData.tin_options,
+                      tent_size: orderData.tent_size,
+                      // Add timestamp for cache management
+                      timestamp: Date.now()
+                    }
+                    
+                    // Clear existing data first (same pattern as Marketplace)
+                    sessionStorage.removeItem('cancelledOrder')
+                    
+                    // Store only essential navigation data
+                    const dataString = JSON.stringify(navigationData)
+                    
+                    // Additional safety check for data size
+                    if (dataString.length > 1024) { // 1KB limit for navigation data
+                      console.warn('Navigation data too large, storing minimal data only')
+                      const minimalData = {
+                        product_type: orderData.product_type,
+                        banner_type: orderData.banner_type,
+                        timestamp: Date.now()
+                      }
+                      sessionStorage.setItem('cancelledOrder', JSON.stringify(minimalData))
+                    } else {
+                      sessionStorage.setItem('cancelledOrder', dataString)
+                    }
+                    
+                    console.log('Saved navigation data for editor restoration')
+                  } catch (error) {
+                    console.warn('Storage quota exceeded, continuing without saving:', error.message)
+                    // Clear any existing data and continue
+                    try {
+                      sessionStorage.removeItem('cancelledOrder')
+                    } catch (clearError) {
+                      console.warn('Failed to clear storage:', clearError.message)
+                    }
                   }
-                  sessionStorage.setItem('cancelledOrder', JSON.stringify(restorationData))
-                  console.log('Saved cancelled order data for restoration')
                 }
                 // Route back to banner editor with product parameter
                 const productParam = orderData?.banner_type ? `?product=${orderData.banner_type}` : ''
@@ -1661,7 +1697,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax:</span>
                     <span className="font-medium">
-                      {selectedShippingQuote && selectedShippingQuote.tax ? selectedShippingQuote.tax : '$0.00'}
+                      ${taxAmount.toFixed(2)}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -1835,7 +1871,7 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax:</span>
                     <span className="font-medium">
-                      {selectedShippingQuote && selectedShippingQuote.tax ? selectedShippingQuote.tax : '$0.00'}
+                      ${taxAmount.toFixed(2)}
                     </span>
                   </div>
                   
