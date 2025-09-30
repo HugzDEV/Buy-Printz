@@ -157,7 +157,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
   // Mobile tour steps
   const mobileTourSteps = [
     {
-      target: '.final-step',
+      target: 'body',
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
@@ -185,7 +185,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Design Tools Sidebar</h3>
           <p className="text-gray-600">
-            Tap this button to access all design tools - text, shapes, icons, templates, and more! The sidebar slides in from the left with organized categories.
+            Tap this hamburger menu to access all design tools - text, shapes, icons, templates, and more! The sidebar slides in from the left with organized categories.
           </p>
         </div>
       ),
@@ -202,14 +202,31 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Mobile Toolbar</h3>
           <p className="text-gray-600">
-            Double-wide mobile toolbar with zoom controls, undo/redo, magnet tool, and surface navigation. All essential tools are easily accessible!
+            This toolbar contains zoom controls, undo/redo, magnet tool, and surface navigation. All essential tools are easily accessible on mobile!
           </p>
         </div>
       ),
       placement: 'top',
     },
     {
-      target: '.final-step',
+      target: '.sidebar-tools',
+      content: (
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="p-3 bg-green-100 rounded-full">
+              <Wrench className="w-8 h-8 text-green-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Design Tools Panel</h3>
+          <p className="text-gray-600">
+            This sidebar contains all your design tools organized by category. Scroll through to find text, shapes, icons, templates, and more!
+          </p>
+        </div>
+      ),
+      placement: 'right',
+    },
+    {
+      target: 'body',
       content: (
         <div className="text-center space-y-3">
           <div className="flex justify-center">
@@ -223,7 +240,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           </div>
           <h3 className="text-lg font-semibold text-gray-900">You're Ready!</h3>
           <p className="text-gray-600">
-            Start creating your amazing design! Select any element to see the compact status bar with editing options! 🎨
+            Start creating your amazing design! Tap elements to select them, use the toolbar for actions, and access tools via the hamburger menu! 🎨
           </p>
         </div>
       ),
@@ -287,6 +304,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           if (missingTargets.length === 1 && missingTargets[0] === '.mobile-hamburger' && isMobile) {
             // Try to find the button by alternative means
             const alternativeSelectors = [
+              'button[data-tour="mobile-hamburger"]',
               'button[class*="hamburger"]',
               'button[class*="mobile"]',
               'button:has(svg[data-lucide="menu"])',
@@ -323,6 +341,7 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
           if (missingTargets.includes('.sidebar-tools')) {
             // Try to find the sidebar by alternative means
             const sidebarSelectors = [
+              'div[data-tour="sidebar-tools"]',
               'div[class*="sidebar"]',
               'div[class*="tools"]',
               '.BannerSidebar',
@@ -380,6 +399,42 @@ const OnboardingTour = ({ isFirstTimeUser, showTour, onTourComplete, onSkipTour 
             if (foundSelector) {
               // Add the product-selector class to the found element
               foundSelector.classList.add('product-selector')
+              
+              // Wait a bit for the class to be applied, then retry
+              setTimeout(() => {
+                checkTargets()
+              }, 100)
+              return
+            }
+          }
+          
+          // Special handling for zoom-controls if it's missing
+          if (missingTargets.includes('.zoom-controls')) {
+            // Try to find the zoom controls by alternative means
+            const zoomSelectors = [
+              'div[data-tour="zoom-controls"]',
+              'div[class*="zoom-controls"]',
+              'div[class*="zoom"]',
+              '.toolbar',
+              '[class*="toolbar"]'
+            ]
+            
+            let foundZoom = null
+            for (const selector of zoomSelectors) {
+              try {
+                const element = document.querySelector(selector)
+                if (element) {
+                  foundZoom = element
+                  break
+                }
+              } catch (e) {
+                // Selector failed, continue to next
+              }
+            }
+            
+            if (foundZoom) {
+              // Add the zoom-controls class to the found element
+              foundZoom.classList.add('zoom-controls')
               
               // Wait a bit for the class to be applied, then retry
               setTimeout(() => {

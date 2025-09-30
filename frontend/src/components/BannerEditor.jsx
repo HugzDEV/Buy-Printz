@@ -3328,6 +3328,7 @@ const BannerEditorNew = () => {
           <button
             onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
             className="mobile-hamburger md:hidden p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center z-50 relative flex-shrink-0"
+            data-tour="mobile-hamburger"
           >
             {isMobileSidebarOpen ? <X className="w-4 h-4 text-gray-800" /> : <Menu className="w-4 h-4 text-gray-800" />}
           </button>
@@ -3352,6 +3353,7 @@ const BannerEditorNew = () => {
           ${isMobileSidebarOpen ? 'fixed inset-0 z-50' : 'hidden'}
           md:block md:relative md:inset-auto md:z-auto
           transition-all duration-300 ease-in-out
+          data-tour="sidebar-tools"
         `}>
           <BannerSidebar
             isMobileOpen={isMobileSidebarOpen}

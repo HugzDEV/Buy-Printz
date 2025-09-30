@@ -1966,7 +1966,7 @@ const BannerCanvas = forwardRef(({
         <GlassPanel className="flex items-center justify-between gap-1">
           
           {/* Left Section - Zoom Controls */}
-          <div className="zoom-controls flex items-center gap-1">
+          <div className="zoom-controls flex items-center gap-1" data-tour="zoom-controls">
             {/* Desktop: Undo/Redo + Zoom OR Surface Navigation for Tins/Tents */}
             <div className="hidden sm:flex items-center gap-1">
               {(productType === 'tin' || productType === 'tent') ? (
