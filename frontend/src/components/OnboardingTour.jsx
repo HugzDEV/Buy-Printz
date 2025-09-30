@@ -12,7 +12,8 @@ import {
   CheckCircle,
   Sparkles,
   Menu,
-  Package
+  Package,
+  Wrench
 } from 'lucide-react'
 import { GlassCard, GlassButton } from './ui'
 
