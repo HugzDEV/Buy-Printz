@@ -1,0 +1,41 @@
+-- QUICK FUNCTION SECURITY FIXES
+-- Run this in your Supabase SQL Editor to fix all function search_path warnings
+
+-- Fix all functions with mutable search_path
+ALTER FUNCTION update_pending_orders_updated_at() SET search_path = '';
+ALTER FUNCTION update_business_card_tins_updated_at() SET search_path = '';
+ALTER FUNCTION get_creator_asset_url() SET search_path = '';
+ALTER FUNCTION update_creator_stats_on_purchase() SET search_path = '';
+ALTER FUNCTION move_pending_to_orders() SET search_path = '';
+ALTER FUNCTION cleanup_expired_pending_orders() SET search_path = '';
+ALTER FUNCTION update_blog_category_count() SET search_path = '';
+ALTER FUNCTION calculate_tent_price() SET search_path = '';
+ALTER FUNCTION check_design_limit() SET search_path = '';
+ALTER FUNCTION get_user_design_count() SET search_path = '';
+ALTER FUNCTION delete_user_design() SET search_path = '';
+ALTER FUNCTION get_tent_pricing() SET search_path = '';
+ALTER FUNCTION cleanup_expired_canvas_states() SET search_path = '';
+ALTER FUNCTION update_tradeshow_tents_updated_at() SET search_path = '';
+ALTER FUNCTION update_creator_followers_count() SET search_path = '';
+ALTER FUNCTION calculate_banner_price() SET search_path = '';
+ALTER FUNCTION get_material_price() SET search_path = '';
+ALTER FUNCTION get_option_price() SET search_path = '';
+ALTER FUNCTION notify_followers_new_template() SET search_path = '';
+ALTER FUNCTION calculate_tin_skinz_price() SET search_path = '';
+ALTER FUNCTION calculate_candy_discount() SET search_path = '';
+ALTER FUNCTION validate_tent_order() SET search_path = '';
+ALTER FUNCTION update_tin_skinz_creator_stats() SET search_path = '';
+ALTER FUNCTION update_tin_skinz_design_view_count() SET search_path = '';
+ALTER FUNCTION sync_auth_users() SET search_path = '';
+ALTER FUNCTION update_user_login() SET search_path = '';
+ALTER FUNCTION get_user_by_auth_id() SET search_path = '';
+ALTER FUNCTION sync_auth_users_to_public() SET search_path = '';
+ALTER FUNCTION handle_new_user() SET search_path = '';
+ALTER FUNCTION get_tent_order_summary() SET search_path = '';
+ALTER FUNCTION handle_user_update() SET search_path = '';
+ALTER FUNCTION handle_user_delete() SET search_path = '';
+ALTER FUNCTION sync_user_from_auth() SET search_path = '';
+ALTER FUNCTION sync_all_auth_users() SET search_path = '';
+ALTER FUNCTION ensure_single_default_address() SET search_path = '';
+ALTER FUNCTION update_updated_at_column() SET search_path = '';
+ALTER FUNCTION update_admin_notes_updated_at() SET search_path = '';
