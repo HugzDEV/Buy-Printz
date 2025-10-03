@@ -61,7 +61,7 @@ export const tentTemplates = [
           {
             id: 'corporate-headline',
             type: 'text',
-            x: 372, // Moved 1.5% more to the right (367 + 5 = 372)
+            x: 335, // Moved 10% to the left (372 - 37 = 335)
             y: 540, // Moved 20% more down (450 + 90 = 540)
             text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
             fontSize: 36,
@@ -77,7 +77,7 @@ export const tentTemplates = [
           {
             id: 'corporate-contact',
             type: 'text',
-            x: 419, // Moved 1% more to the right (415 + 4 = 419)
+            x: 436, // Moved 2% more to the right (427 + 9 = 436)
             y: 680, // Moved 20% more down (569 + 111 = 680)
             text: 'www.buyprintz.com\n617-505-0603',
             fontSize: 18,
