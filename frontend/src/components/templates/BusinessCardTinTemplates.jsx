@@ -31,7 +31,7 @@ export const businessCardTinTemplates = [
             fill: '#0f172a',
             align: 'right',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -43,7 +43,7 @@ export const businessCardTinTemplates = [
             fill: '#374151',
             align: 'right',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -56,7 +56,7 @@ export const businessCardTinTemplates = [
             align: 'right',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           },
           {
             id: 'template_picture_placeholder',
@@ -107,7 +107,7 @@ export const businessCardTinTemplates = [
             fill: '#374151',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -141,7 +141,7 @@ export const businessCardTinTemplates = [
             fill: '#0f172a',
             align: 'left',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -153,7 +153,7 @@ export const businessCardTinTemplates = [
             fill: '#374151',
             align: 'left',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -166,7 +166,7 @@ export const businessCardTinTemplates = [
             align: 'left',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           },
           {
             id: 'template_picture_placeholder',
@@ -217,7 +217,7 @@ export const businessCardTinTemplates = [
             fill: '#374151',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -268,7 +268,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -280,7 +280,7 @@ export const businessCardTinTemplates = [
             fill: '#e5e7eb',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -293,7 +293,7 @@ export const businessCardTinTemplates = [
             align: 'center',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           }
         ]
       },
@@ -343,7 +343,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -385,7 +385,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'left',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -397,7 +397,7 @@ export const businessCardTinTemplates = [
             fill: '#e5e7eb',
             align: 'left',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -410,7 +410,7 @@ export const businessCardTinTemplates = [
             align: 'left',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           },
           {
             id: 'template_picture_placeholder',
@@ -469,7 +469,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -503,7 +503,7 @@ export const businessCardTinTemplates = [
             fill: '#000000',
             align: 'right',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -515,7 +515,7 @@ export const businessCardTinTemplates = [
             fill: '#374151',
             align: 'right',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -528,7 +528,7 @@ export const businessCardTinTemplates = [
             align: 'right',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           },
           {
             id: 'template_picture_placeholder',
@@ -587,7 +587,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -629,7 +629,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'left',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -641,7 +641,7 @@ export const businessCardTinTemplates = [
             fill: '#e5e7eb',
             align: 'left',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -654,7 +654,7 @@ export const businessCardTinTemplates = [
             align: 'left',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           },
           {
             id: 'template_picture_placeholder',
@@ -713,7 +713,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -764,7 +764,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'right',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -776,7 +776,7 @@ export const businessCardTinTemplates = [
             fill: '#e5e7eb',
             align: 'right',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -789,7 +789,7 @@ export const businessCardTinTemplates = [
             align: 'right',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           }
         ]
       },
@@ -839,7 +839,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -881,7 +881,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -893,7 +893,7 @@ export const businessCardTinTemplates = [
             fill: '#e5e7eb',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -906,7 +906,7 @@ export const businessCardTinTemplates = [
             align: 'center',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           }
         ]
       },
@@ -956,7 +956,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -990,7 +990,7 @@ export const businessCardTinTemplates = [
             fill: '#000000',
             align: 'right',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -1002,7 +1002,7 @@ export const businessCardTinTemplates = [
             fill: '#374151',
             align: 'right',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -1015,7 +1015,7 @@ export const businessCardTinTemplates = [
             align: 'right',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           },
           {
             id: 'template_picture_placeholder',
@@ -1066,7 +1066,7 @@ export const businessCardTinTemplates = [
             fill: '#000000',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -1108,7 +1108,7 @@ export const businessCardTinTemplates = [
             fill: '#fbbf24',
             align: 'center',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -1120,7 +1120,7 @@ export const businessCardTinTemplates = [
             fill: '#f59e0b',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -1133,7 +1133,7 @@ export const businessCardTinTemplates = [
             align: 'center',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           }
         ]
       },
@@ -1183,7 +1183,7 @@ export const businessCardTinTemplates = [
             fill: '#fbbf24',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       },
@@ -1234,7 +1234,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'right',
             width: 300,
-            height: 40
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -1246,7 +1246,7 @@ export const businessCardTinTemplates = [
             fill: '#e5e7eb',
             align: 'right',
             width: 300,
-            height: 25
+            height: 'auto'
           },
           {
             id: 'template_text_placeholder',
@@ -1259,7 +1259,7 @@ export const businessCardTinTemplates = [
             align: 'right',
             lineHeight: 1.4,
             width: 300,
-            height: 80
+            height: 'auto'
           }
         ]
       },
@@ -1309,7 +1309,7 @@ export const businessCardTinTemplates = [
             fill: '#ffffff',
             align: 'center',
             width: 300,
-            height: 25
+            height: 'auto'
           }
         ]
       }

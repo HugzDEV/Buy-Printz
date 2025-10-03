@@ -3110,11 +3110,60 @@ const BannerSidebar = ({
                       <span>⛺</span>
                       Tent Designs
                     </h5>
-                    <div className="text-center py-8 bg-white/10 rounded-lg border border-white/20">
-                      <div className="text-gray-400 text-4xl mb-2">⛺</div>
-                      <p className="text-gray-500 text-sm">Tent designs coming soon!</p>
-                      <p className="text-gray-400 text-xs mt-1">Professional tradeshow tent designs</p>
+                    
+                    {/* Template List for Tents */}
+                    <div className="grid grid-cols-1 gap-2">
+                      {bannerTemplates.map((template) => (
+                        <button
+                          key={template.id}
+                          onClick={() => handleTemplateClick(template)}
+                          className={`w-full text-left p-3 rounded-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-blue-500/50 group ${
+                            currentTemplateId === template.id
+                              ? 'bg-blue-100 border-blue-300 shadow-md'
+                              : 'bg-white/10 hover:bg-white/20 active:bg-white/30 border-white/20 hover:border-white/30'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="font-semibold text-gray-800 text-sm group-hover:text-blue-700 transition-colors duration-200 flex-1 truncate">
+                              {template.name}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {currentTemplateId === template.id && (
+                                <span className="text-blue-600 text-sm font-bold">✓</span>
+                              )}
+                              <div className="flex gap-1">
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                                  {template.category}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-600 leading-relaxed line-clamp-2 mb-2">
+                            {template.description}
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2 text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <span>⛺</span>
+                                Tent Template
+                              </span>
+                            </div>
+                            <div className="text-blue-600 font-medium">
+                              Use Template
+                            </div>
+                          </div>
+                        </button>
+                      ))}
                     </div>
+
+                    {/* No templates message */}
+                    {bannerTemplates.length === 0 && (
+                      <div className="text-center py-8 bg-white/10 rounded-lg border border-white/20">
+                        <div className="text-gray-400 text-4xl mb-2">⛺</div>
+                        <p className="text-gray-500 text-sm">Tent designs coming soon!</p>
+                        <p className="text-gray-400 text-xs mt-1">Professional tradeshow tent designs</p>
+                      </div>
+                    )}
                   </div>
                 ) : null}
               </div>

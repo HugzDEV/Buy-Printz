@@ -43,7 +43,7 @@ export const bannerTemplates = [
           strokeWidth: 3,
           stroke: '#1e3a8a',
           width: 400,
-          height: 60,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -61,7 +61,7 @@ export const bannerTemplates = [
           strokeWidth: 2,
           stroke: '#ffffff',
           width: 300,
-          height: 45,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -77,7 +77,7 @@ export const bannerTemplates = [
           fill: '#fbbf24',
           align: 'left',
           width: 200,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -92,7 +92,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -107,7 +107,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -132,7 +132,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 100,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -177,7 +177,7 @@ export const bannerTemplates = [
           strokeWidth: 3,
           stroke: '#991b1b',
           width: 400,
-          height: 80,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -195,7 +195,7 @@ export const bannerTemplates = [
           strokeWidth: 2,
           stroke: '#dc2626',
           width: 300,
-          height: 45,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -211,7 +211,7 @@ export const bannerTemplates = [
           fill: '#fbbf24',
           align: 'left',
           width: 200,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -226,7 +226,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -241,7 +241,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -266,7 +266,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 100,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -311,7 +311,7 @@ export const bannerTemplates = [
           strokeWidth: 2,
           stroke: '#ffffff',
           width: 400,
-          height: 60,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -327,7 +327,7 @@ export const bannerTemplates = [
           fill: '#1e40af',
           align: 'center',
           width: 300,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -340,7 +340,7 @@ export const bannerTemplates = [
           fontSize: 64,
           align: 'center',
           width: 100,
-          height: 80,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -356,7 +356,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 200,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -371,7 +371,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -386,7 +386,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -411,7 +411,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 100,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -449,7 +449,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#fbbf24',
           width: 350,
-          height: 60,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -467,7 +467,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#ffffff',
           width: 400,
-          height: 40,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -485,7 +485,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#fbbf24',
           width: 200,
-          height: 45,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -501,7 +501,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 200,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -516,7 +516,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -531,7 +531,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -556,7 +556,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 100,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -601,7 +601,7 @@ export const bannerTemplates = [
           strokeWidth: 2,
           stroke: '#1f2937',
           width: 450,
-          height: 60,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -617,7 +617,7 @@ export const bannerTemplates = [
           fill: '#1f2937',
           align: 'center',
           width: 400,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -635,7 +635,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#05D327',
           width: 200,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -650,7 +650,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -665,7 +665,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -690,7 +690,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 100,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -735,7 +735,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#ffffff',
           width: 400,
-          height: 60,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -753,7 +753,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#ffffff',
           width: 350,
-          height: 40,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -771,7 +771,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#ffffff',
           width: 350,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -789,7 +789,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#ffffff',
           width: 200,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -804,7 +804,7 @@ export const bannerTemplates = [
           fill: '#1e40af',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -819,7 +819,7 @@ export const bannerTemplates = [
           fill: '#1e40af',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -846,7 +846,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#000000',
           width: 100,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -859,7 +859,7 @@ export const bannerTemplates = [
           fontSize: 80,
           align: 'center',
           width: 100,
-          height: 80,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -897,7 +897,7 @@ export const bannerTemplates = [
           strokeWidth: 2,
           stroke: '#2563eb',
           width: 550,
-          height: 50,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -915,7 +915,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#ffffff',
           width: 500,
-          height: 40,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -931,7 +931,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 600,
-          height: 63,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.3,
           verticalAlign: 'top'
@@ -947,7 +947,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 300,
-          height: 40,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -962,7 +962,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -977,7 +977,7 @@ export const bannerTemplates = [
           fill: '#2563eb',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -1002,7 +1002,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 100,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -1015,7 +1015,7 @@ export const bannerTemplates = [
           fontSize: 80,
           align: 'center',
           width: 100,
-          height: 80,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -1243,7 +1243,7 @@ export const bannerTemplates = [
           strokeWidth: 2,
           stroke: '#000000',
           width: 275,
-          height: 120,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.2,
           verticalAlign: 'top'
@@ -1261,7 +1261,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#000000',
           width: 335,
-          height: 50,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -1277,7 +1277,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'right',
           width: 275,
-          height: 40,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -1295,7 +1295,7 @@ export const bannerTemplates = [
           strokeWidth: 1,
           stroke: '#FFD700',
           width: 200,
-          height: 30,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -1310,7 +1310,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 250,
-          height: 25,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -1325,7 +1325,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'right',
           width: 275,
-          height: 80,
+          height: 'auto',
           wrap: 'word',
           lineHeight: 1.4,
           verticalAlign: 'top'
@@ -1350,7 +1350,7 @@ export const bannerTemplates = [
           fill: '#ffffff',
           align: 'left',
           width: 80,
-          height: 15,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'
@@ -1363,7 +1363,7 @@ export const bannerTemplates = [
           fontSize: 80,
           align: 'center',
           width: 100,
-          height: 80,
+          height: 'auto',
           wrap: 'none',
           lineHeight: 1.2,
           verticalAlign: 'middle'

@@ -50,45 +50,43 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 110,
-            text: 'YOUR COMPANY',
+            text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#1e3a8a',
-            align: 'center',
-            width: 200,
-            height: 40
+            align: 'center'
           },
           // Main headline (center of canopy)
           {
             id: 'corporate-headline',
             type: 'text',
-            x: 580,
-            y: 200,
-            text: 'INNOVATION\nLEADERSHIP\nEXCELLENCE',
+            x: 372, // Moved 1.5% more to the right (367 + 5 = 372)
+            y: 540, // Moved 20% more down (450 + 90 = 540)
+            text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
             fontSize: 36,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 400,
-            height: 120,
-            lineHeight: 1.2
+            lineHeight: 1.2,
+            width: 500, // Fixed width like new text elements
+            height: 'auto' // Auto height like new text elements
           },
           // Contact information (bottom of canopy)
           {
             id: 'corporate-contact',
             type: 'text',
-            x: 580,
-            y: 350,
-            text: 'Visit us at Booth #123\nwww.yourcompany.com\n(555) 123-4567',
+            x: 419, // Moved 1% more to the right (415 + 4 = 419)
+            y: 680, // Moved 20% more down (569 + 111 = 680)
+            text: 'www.buyprintz.com\n617-505-0603',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 300,
-            height: 80,
-            lineHeight: 1.4
+            lineHeight: 1.4,
+            width: 250, // Fixed width like new text elements
+            height: 'auto' // Auto height like new text elements
           },
           // Valence section (rectangular area below canopy)
           {
@@ -104,16 +102,16 @@ export const tentTemplates = [
           {
             id: 'corporate-valence-text',
             type: 'text',
-            x: 580,
+            x: 290, // Moved 50% to the left (580 - 290 = 290px left)
             y: 900,
-            text: 'EXPERIENCE THE DIFFERENCE',
+            text: 'FAST 2-3 DAY DELIVERY',
             fontSize: 28,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 600,
-            height: 40
+            width: 400, // Fixed width like new text elements
+            height: 'auto' // Auto height like new text elements
           },
           // QR code placeholder (bottom right of valence)
           {
@@ -131,16 +129,41 @@ export const tentTemplates = [
           {
             id: 'corporate-qr-label',
             type: 'text',
-            x: 1060,
-            y: 980,
-            text: 'SCAN FOR\nMORE INFO',
-            fontSize: 12,
+            x: 910, // Moved 1% more to the left (913 - 3 = 910)
+            y: 900, // Same line as delivery text
+            text: 'SCAN ME',
+            fontSize: 16,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
-            align: 'center',
+            align: 'left',
+            width: 100, // Fixed width like new text elements
+            height: 'auto' // Auto height like new text elements
+          },
+          // Second QR code placeholder (bottom left of valence)
+          {
+            id: 'corporate-qr-code-left',
+            type: 'rect',
+            x: 40,
+            y: 850,
             width: 120,
-            height: 40,
-            lineHeight: 1.2
+            height: 120,
+            fill: '#ffffff',
+            stroke: '#1e40af',
+            strokeWidth: 2,
+            cornerRadius: 8
+          },
+          {
+            id: 'corporate-qr-label-left',
+            type: 'text',
+            x: 180, // Moved additional 50% to the right (130 + 50 = 180)
+            y: 900, // Same line as delivery text
+            text: 'SCAN ME',
+            fontSize: 16,
+            fontFamily: 'Arial, sans-serif',
+            fill: '#ffffff',
+            align: 'right',
+            width: 100, // Fixed width like new text elements
+            height: 'auto' // Auto height like new text elements
           }
         ]
       },
@@ -187,7 +210,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 110,
-            text: 'YOUR COMPANY',
+            text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -202,7 +225,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 200,
-            text: 'SOLUTIONS\nTHAT WORK\nFOR YOU',
+            text: 'PROFESSIONAL\nPRINTING\nSERVICES',
             fontSize: 36,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -218,7 +241,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 350,
-            text: 'Visit us at Booth #123\nwww.yourcompany.com\n(555) 123-4567',
+            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
@@ -324,7 +347,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 170,
-            text: 'YOUR COMPANY',
+            text: 'BUYPRINTZ',
             fontSize: 32,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -339,7 +362,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 250,
-            text: 'PROFESSIONAL\nSERVICES',
+            text: 'BANNER PRINTING\nSERVICES',
             fontSize: 42,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -355,7 +378,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 400,
-            text: 'Visit us at Booth #123\nwww.yourcompany.com\n(555) 123-4567',
+            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603',
             fontSize: 20,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
@@ -461,7 +484,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 170,
-            text: 'YOUR COMPANY',
+            text: 'BUYPRINTZ',
             fontSize: 32,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -476,7 +499,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 250,
-            text: 'INNOVATION\nLEADERSHIP',
+            text: 'FAST DELIVERY\nQUALITY',
             fontSize: 42,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -492,7 +515,7 @@ export const tentTemplates = [
             type: 'text',
             x: 580,
             y: 400,
-            text: 'Visit us at Booth #123\nwww.yourcompany.com\n(555) 123-4567',
+            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603',
             fontSize: 20,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
@@ -589,7 +612,7 @@ export const tentTemplates = [
             type: 'text',
             x: 150,
             y: 100,
-            text: 'YOUR COMPANY',
+            text: 'BUYPRINTZ',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -604,7 +627,7 @@ export const tentTemplates = [
             type: 'text',
             x: 300,
             y: 100,
-            text: 'PROFESSIONAL SERVICES\nINNOVATION & EXCELLENCE\nVisit us at Booth #123',
+            text: 'BANNER PRINTING\nFAST DELIVERY & QUALITY\nVisit us at Booth #123',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -620,7 +643,7 @@ export const tentTemplates = [
             type: 'text',
             x: 300,
             y: 250,
-            text: 'www.yourcompany.com | (555) 123-4567',
+            text: 'www.buyprintz.com | 617-505-0603',
             fontSize: 16,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
@@ -690,7 +713,7 @@ export const tentTemplates = [
             type: 'text',
             x: 150,
             y: 100,
-            text: 'YOUR COMPANY',
+            text: 'BUYPRINTZ',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -705,7 +728,7 @@ export const tentTemplates = [
             type: 'text',
             x: 300,
             y: 100,
-            text: 'SOLUTIONS THAT WORK\nLEADERSHIP & INNOVATION\nConnect with us today',
+            text: 'CUSTOM PRINTING\nPROFESSIONAL SERVICE\nConnect with us today',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -721,7 +744,7 @@ export const tentTemplates = [
             type: 'text',
             x: 300,
             y: 250,
-            text: 'www.yourcompany.com | (555) 123-4567',
+            text: 'www.buyprintz.com | 617-505-0603',
             fontSize: 16,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
@@ -792,7 +815,7 @@ export const tentTemplates = [
             type: 'text',
             x: 200,
             y: 120,
-            text: 'YOUR COMPANY',
+            text: 'BUYPRINTZ',
             fontSize: 28,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -807,7 +830,7 @@ export const tentTemplates = [
             type: 'text',
             x: 400,
             y: 150,
-            text: 'INNOVATION\nLEADERSHIP\nEXCELLENCE',
+            text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
             fontSize: 48,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -823,7 +846,7 @@ export const tentTemplates = [
             type: 'text',
             x: 400,
             y: 350,
-            text: 'We provide innovative solutions that drive\nbusiness success and create lasting value\nfor our clients and partners.',
+            text: 'We provide custom printing solutions that drive\nbusiness success with fast 2-3 day delivery\nand professional quality for all your needs.',
             fontSize: 20,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
@@ -838,7 +861,7 @@ export const tentTemplates = [
             type: 'text',
             x: 400,
             y: 500,
-            text: 'Visit us at Booth #123\nwww.yourcompany.com\n(555) 123-4567\ninfo@yourcompany.com',
+            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603\norder@buyprintz.com',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',

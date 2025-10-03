@@ -1415,7 +1415,8 @@ const BannerEditorNew = () => {
         if (!element.fontFamily) element.fontFamily = 'Arial'
         // Ensure text always has numeric dimensions for proper transformation
         if (!element.width || element.width === 'auto') element.width = 200
-        if (!element.height || element.height === 'auto') element.height = 50
+        // Preserve 'auto' height for dynamic text sizing, only set default if missing
+        if (!element.height) element.height = 'auto'
         if (element.stroke === undefined) element.stroke = null
         if (element.strokeWidth === undefined) element.strokeWidth = 0
         if (!element.wrap) element.wrap = 'word'
@@ -1687,6 +1688,78 @@ const BannerEditorNew = () => {
         alert('Marketplace template data not available. Please try again.')
       }
     } else {
+      // Handle tent template with surfaces
+      if (productType === 'tent' && template.surfaces) {
+        console.log('🎨 Loading tent template:', template.name)
+        console.log('🎨 Tent template surfaces:', Object.keys(template.surfaces))
+        
+        // Update tent specs based on template surfaces
+        const templateSurfaceKeys = Object.keys(template.surfaces)
+        const hasSidewalls = templateSurfaceKeys.includes('sidewall_left') || templateSurfaceKeys.includes('sidewall_right')
+        const hasBackwall = templateSurfaceKeys.includes('backwall')
+        
+        // Update tent specs to match template surfaces
+        const updatedTentSpecs = {
+          tentSize: '10x10',
+          surfaces: {
+            canopy: true, // Always true for canopy surfaces
+            sidewalls: hasSidewalls,
+            backwall: hasBackwall
+          },
+          withFrame: true,
+          reinforcedStripColor: 'white'
+        }
+        
+        console.log('🎨 Updating tent specs for template:', updatedTentSpecs)
+        setTentSpecs(updatedTentSpecs)
+        
+        // Clear existing surface elements
+        setSurfaceElements({
+          front: [],
+          back: [],
+          inside: [],
+          lid: [],
+          canopy_front: [],
+          canopy_back: [],
+          canopy_left: [],
+          canopy_right: [],
+          sidewall_left: [],
+          sidewall_right: [],
+          backwall: []
+        })
+        
+        // Load elements for each surface
+        const newSurfaceElements = {}
+        Object.keys(template.surfaces).forEach(surfaceKey => {
+          const surfaceData = template.surfaces[surfaceKey]
+          if (surfaceData && surfaceData.elements) {
+            // Scale elements for the current surface
+            const scaledElements = scaleTemplateElements(
+              surfaceData.elements,
+              canvasSize.width,
+              canvasSize.height,
+              canvasSize // Use current canvas size for tent surfaces
+            ).map(element => {
+              // Generate new ID for each element to avoid conflicts
+              const elementWithId = {
+                ...element,
+                id: generateId(element.type)
+              }
+              // Ensure all required properties are present
+              return ensureElementProperties(elementWithId)
+            })
+            
+            newSurfaceElements[surfaceKey] = scaledElements
+            console.log(`🎨 Loaded ${scaledElements.length} elements for surface: ${surfaceKey}`)
+          }
+        })
+        
+        setSurfaceElements(newSurfaceElements)
+        setSelectedId(null)
+        console.log(`🎨 Loaded tent template: ${template.name}`)
+        return
+      }
+      
       // Handle regular banner template
       console.log('🎨 Loading regular template:', template.name)
     const selectedTemplate = templates.find(t => t.id === template.id)
