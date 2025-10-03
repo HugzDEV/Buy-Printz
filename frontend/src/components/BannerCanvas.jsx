@@ -1928,8 +1928,8 @@ const BannerCanvas = forwardRef(({
     const newElement = {
       id: `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type: 'icon', // Use a special 'icon' type
-      x: x || 100,
-      y: y || 100,
+      x: x || 100 + (Math.random() - 0.5) * 100,
+      y: y || 100 + (Math.random() - 0.5) * 100,
       width: 60,
       height: 60,
       iconName: iconName,

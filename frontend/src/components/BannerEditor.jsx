@@ -1088,10 +1088,10 @@ const BannerEditorNew = () => {
       const img = new window.Image()
       img.onload = () => {
         const newIcon = {
-          id: 'template_image_placeholder',
+          id: generateId('icon'),
           type: 'image',
-          x: canvasSize.width / 2 - 50,
-          y: canvasSize.height / 2 - 50,
+          x: canvasSize.width / 2 - 50 + (Math.random() - 0.5) * 100,
+          y: canvasSize.height / 2 - 50 + (Math.random() - 0.5) * 100,
           width: 100,
           height: 100,
           image: img,
@@ -1114,10 +1114,10 @@ const BannerEditorNew = () => {
         console.error('Failed to load icon image:', imagePath)
         // Fallback to text element with emoji
         const newIcon = {
-          id: 'template_text_placeholder',
+          id: generateId('icon'),
           type: 'text',
-          x: canvasSize.width / 2 - 50,
-          y: canvasSize.height / 2 - 50,
+          x: canvasSize.width / 2 - 50 + (Math.random() - 0.5) * 100,
+          y: canvasSize.height / 2 - 50 + (Math.random() - 0.5) * 100,
           text: symbol,
           fontSize: 100,
           fontFamily: 'Arial',
@@ -1140,10 +1140,10 @@ const BannerEditorNew = () => {
     } else {
       // Create text element for emoji-based icons
       const newIcon = {
-        id: generateId('text'),
+        id: generateId('icon'),
         type: 'text',
-        x: canvasSize.width / 2 - 50,
-        y: canvasSize.height / 2 - 50,
+        x: canvasSize.width / 2 - 50 + (Math.random() - 0.5) * 100,
+        y: canvasSize.height / 2 - 50 + (Math.random() - 0.5) * 100,
         text: symbol,
         fontSize: 100,
         fontFamily: 'Arial',
