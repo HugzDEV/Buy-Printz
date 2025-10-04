@@ -35,7 +35,7 @@ export const tentTemplates = [
             id: 'corporate-logo-bg',
             type: 'rect',
             x: 480,
-            y: 50,
+            y: 175, // Moved down 20% (50 + 10 = 60)
             width: 200,
             height: 120,
             fill: '#ffffff',
@@ -49,7 +49,7 @@ export const tentTemplates = [
             id: 'corporate-company-name',
             type: 'text',
             x: 580,
-            y: 110,
+            y: 180, // Moved down 20% (110 + 22 = 132)
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
@@ -62,7 +62,7 @@ export const tentTemplates = [
             id: 'corporate-headline',
             type: 'text',
             x: 335, // Moved 10% to the left (372 - 37 = 335)
-            y: 540, // Moved 20% more down (450 + 90 = 540)
+            y: 416, // Moved down 10% (378 + 38 = 416)
             text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
             fontSize: 36,
             fontFamily: 'Arial, sans-serif',
@@ -77,7 +77,7 @@ export const tentTemplates = [
           {
             id: 'corporate-contact',
             type: 'text',
-            x: 436, // Moved 2% more to the right (427 + 9 = 436)
+            x: 454, // Moved 2% more to the right (445 + 9 = 454)
             y: 680, // Moved 20% more down (569 + 111 = 680)
             text: 'www.buyprintz.com\n617-505-0603',
             fontSize: 18,
