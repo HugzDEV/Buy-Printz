@@ -48,8 +48,8 @@ export const tentTemplates = [
           {
             id: 'corporate-company-name',
             type: 'text',
-            x: 480,
-            y: 215, // Moved down 20% (110 + 22 = 132)
+            x: 508,
+            y: 260, // Moved down 20% (110 + 22 = 132)
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
@@ -73,11 +73,11 @@ export const tentTemplates = [
             width: 500, // Fixed width like new text elements
             height: 'auto' // Auto height like new text elements
           },
-          // Contact information (bottom of canopy)
+          // Corporate Tagline (bottom of canopy)
           {
             id: 'corporate-contact',
             type: 'text',
-            x: 454, // Moved 2% more to the right (445 + 9 = 454)
+            x: 278, // Moved 2% more to the right (445 + 9 = 454)
             y: 680, // Moved 20% more down (569 + 111 = 680)
             text: 'BRANDING, MARKETING, PRINTING',
             fontSize: 36,
@@ -88,7 +88,7 @@ export const tentTemplates = [
             width: 250, // Fixed width like new text elements
             height: 'auto' // Auto height like new text elements
           },
-          // Valence section (rectangular area below canopy)
+          // Valence section - Contact Information (rectangular area below canopy)
           {
             id: 'corporate-valence-bg',
             type: 'rect',
@@ -98,12 +98,12 @@ export const tentTemplates = [
             height: 200,
             fill: '#1e40af'
           },
-          // Valence text
+          // Valence text - Contact Information
           {
             id: 'corporate-valence-text',
             type: 'text',
-            x: 390, // Moved 50% to the left (580 - 290 = 290px left)
-            y: 900,
+            x: 270, // Moved 50% to the left (580 - 290 = 290px left)
+            y: 875,
             text: 'WWW.BUYPRINTZ.COM\n617-505-0603',
             fontSize: 36,
             fontFamily: 'Arial, sans-serif',
@@ -114,7 +114,7 @@ export const tentTemplates = [
             height: 'auto', // Auto height for dynamic sizing
             wrap: 'word' // Allow word wrapping for multi-line text
           },
-          // QR code placeholder (bottom right of valence)
+          // QR code placeholder - Contact Information (bottom right of valence)
           {
             id: 'corporate-qr-code',
             type: 'rect',
@@ -141,7 +141,7 @@ export const tentTemplates = [
             height: 'auto',
             wrap: 'none' // No wrapping for single-line text
           },
-          // Second QR code placeholder (bottom left of valence)
+          // Second QR code placeholder - Contact Information (bottom left of valence)
           {
             id: 'corporate-qr-code-left',
             type: 'rect',
@@ -211,15 +211,15 @@ export const tentTemplates = [
           {
             id: 'corporate-company-name-back',
             type: 'text',
-            x: 480,
-            y: 215, // Exact same as front
+            x: 508, // Exact same as front
+            y: 260, // Exact same as front
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#1e3a8a',
             align: 'center',
-            width: 200,
+            width: 'auto',
             height: 'auto'
           },
           // Main headline (same as front)
@@ -238,20 +238,21 @@ export const tentTemplates = [
             width: 500,
             height: 'auto'
           },
-          // Contact information (exact same as front)
+          // Corporate Tagline (bottom of canopy) - exact same as front
           {
             id: 'corporate-contact-back',
             type: 'text',
-            x: 454, // Exact same as front
+            x: 278, // Exact same as front
             y: 680, // Exact same as front
-            text: 'www.buyprintz.com\n617-505-0603',
-            fontSize: 18,
+            text: 'BRANDING, MARKETING, PRINTING',
+            fontSize: 36,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
             lineHeight: 1.4,
-            width: 250,
-            height: 'auto'
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // Valence section
           {
@@ -263,76 +264,72 @@ export const tentTemplates = [
             height: 200,
             fill: '#1e40af'
           },
-          // Valence text (exact same as front)
+          // Valence text - Contact Information (exact same as front)
           {
             id: 'corporate-valence-text-back',
             type: 'text',
-            x: 290, // Exact same as front
-            y: 900,
-            text: 'FAST 2-3 DAY DELIVERY',
-            fontSize: 24,
+            x: 270, // Exact same as front
+            y: 875, // Exact same as front
+            text: 'WWW.BUYPRINTZ.COM\n617-505-0603',
+            fontSize: 36,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
+            width: 600, // Increased width to accommodate full website address
+            height: 'auto',
+            wrap: 'word' // Allow word wrapping for multi-line text
+          },
+          // QR code placeholder - Contact Information (bottom right of valence) - exact same as front
+          {
+            id: 'corporate-qr-code-back',
+            type: 'rect',
+            x: 1000, // Exact same as front
+            y: 850, // Exact same as front
+            width: 120, // Exact same as front
+            height: 120, // Exact same as front
+            fill: '#ffffff',
+            stroke: '#1e40af', // Exact same as front
+            strokeWidth: 2,
+            cornerRadius: 8
+          },
+          {
+            id: 'corporate-qr-label-back',
+            type: 'text',
+            x: 910, // Exact same as front
+            y: 900, // Exact same as front
+            text: 'SCAN ME',
+            fontSize: 16, // Exact same as front
+            fontFamily: 'Arial, sans-serif',
+            fill: '#ffffff',
+            align: 'left', // Exact same as front
             width: 'auto', // Auto width for single-line text
             height: 'auto',
             wrap: 'none' // No wrapping for single-line text
           },
-          // QR code placeholder (left side - exact same as front)
+          // Second QR code placeholder - Contact Information (bottom left of valence) - exact same as front
           {
-            id: 'corporate-qr-left-back',
+            id: 'corporate-qr-code-left-back',
             type: 'rect',
             x: 40, // Exact same as front
-            y: 850,
-            width: 80,
-            height: 80,
+            y: 850, // Exact same as front
+            width: 120, // Exact same as front
+            height: 120, // Exact same as front
             fill: '#ffffff',
-            cornerRadius: 8,
-            stroke: '#1e3a8a',
-            strokeWidth: 2
+            stroke: '#1e40af', // Exact same as front
+            strokeWidth: 2,
+            cornerRadius: 8
           },
-          // QR code label (left side - exact same as front)
           {
             id: 'corporate-qr-label-left-back',
             type: 'text',
             x: 180, // Exact same as front
-            y: 940,
+            y: 900, // Exact same as front
             text: 'SCAN ME',
-            fontSize: 14,
+            fontSize: 16, // Exact same as front
             fontFamily: 'Arial, sans-serif',
-            fontStyle: 'bold',
             fill: '#ffffff',
-            align: 'center',
-            width: 'auto', // Auto width for single-line text
-            height: 'auto',
-            wrap: 'none' // No wrapping for single-line text
-          },
-          // QR code placeholder (right side - exact same as front)
-          {
-            id: 'corporate-qr-right-back',
-            type: 'rect',
-            x: 1040, // Exact same as front
-            y: 850,
-            width: 80,
-            height: 80,
-            fill: '#ffffff',
-            cornerRadius: 8,
-            stroke: '#1e3a8a',
-            strokeWidth: 2
-          },
-          // QR code label (right side - exact same as front)
-          {
-            id: 'corporate-qr-label-right-back',
-            type: 'text',
-            x: 910, // Exact same as front
-            y: 940,
-            text: 'SCAN ME',
-            fontSize: 14,
-            fontFamily: 'Arial, sans-serif',
-            fontStyle: 'bold',
-            fill: '#ffffff',
-            align: 'center',
+            align: 'right', // Exact same as front
             width: 'auto', // Auto width for single-line text
             height: 'auto',
             wrap: 'none' // No wrapping for single-line text
@@ -362,65 +359,66 @@ export const tentTemplates = [
             },
             clipFunc: 'triangular'
           },
-          // Company logo (larger for side view)
+          // Company logo area (top center of canopy) - same as front
           {
             id: 'corporate-logo-bg-left',
             type: 'rect',
-            x: 430,
-            y: 100,
-            width: 300,
-            height: 150,
+            x: 480, // Same as front
+            y: 215, // Same as front
+            width: 200, // Same as front
+            height: 120, // Same as front
             fill: '#ffffff',
-            cornerRadius: 12,
+            cornerRadius: 8,
             shadowColor: 'rgba(0, 0, 0, 0.3)',
-            shadowBlur: 15,
-            shadowOffset: { x: 0, y: 6 }
+            shadowBlur: 10,
+            shadowOffset: { x: 0, y: 4 }
           },
-          // Company name (larger for side view)
+          // Company name - same as front
           {
             id: 'corporate-company-name-left',
             type: 'text',
-            x: 580,
-            y: 170,
+            x: 508, // Same as front
+            y: 260, // Same as front
             text: 'BUYPRINTZ',
-            fontSize: 32,
+            fontSize: 24, // Same as front
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#1e3a8a',
             align: 'center',
-            width: 300,
-            height: 50
+            width: 'auto',
+            height: 'auto'
           },
-          // Side headline
+          // Main headline (center of canopy) - same as front
           {
             id: 'corporate-headline-left',
             type: 'text',
-            x: 580,
-            y: 250,
-            text: 'BANNER PRINTING\nSERVICES',
-            fontSize: 42,
+            x: 333, // Same as front
+            y: 416, // Same as front
+            text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
+            fontSize: 36, // Same as front
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 400,
-            height: 100,
-            lineHeight: 1.2
+            lineHeight: 1.2,
+            width: 500, // Same as front
+            height: 'auto'
           },
-          // Contact info
+          // Corporate Tagline (bottom of canopy) - same as front
           {
             id: 'corporate-contact-left',
             type: 'text',
-            x: 580,
-            y: 400,
-            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603',
-            fontSize: 20,
+            x: 278, // Same as front
+            y: 680, // Same as front
+            text: 'BRANDING, MARKETING, PRINTING',
+            fontSize: 36, // Same as front
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 350,
-            height: 80,
-            lineHeight: 1.4
+            lineHeight: 1.4,
+            width: 'auto',
+            height: 'auto',
+            wrap: 'none'
           },
           // Valence section
           {
@@ -432,49 +430,77 @@ export const tentTemplates = [
             height: 200,
             fill: '#1e40af'
           },
-          // Valence text
+          // Valence text - Contact Information (same as front)
           {
             id: 'corporate-valence-text-left',
             type: 'text',
-            x: 580,
-            y: 900,
-            text: 'EXPERIENCE THE DIFFERENCE',
-            fontSize: 28,
+            x: 270, // Same as front
+            y: 875, // Same as front
+            text: 'WWW.BUYPRINTZ.COM\n617-505-0603',
+            fontSize: 36, // Same as front
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 'auto', // Auto width for single-line text
+            width: 600, // Same as front
             height: 'auto',
-            wrap: 'none' // No wrapping for single-line text
+            wrap: 'word' // Same as front
           },
-          // QR code placeholder
+          // Instagram logo placeholder (left side - same coordinates as QR codes)
           {
-            id: 'corporate-qr-code-left',
+            id: 'corporate-instagram-left',
             type: 'rect',
-            x: 1000,
-            y: 850,
-            width: 120,
-            height: 120,
-            fill: '#ffffff',
-            stroke: '#1e40af',
+            x: 40, // Same as left QR code
+            y: 850, // Same as QR codes
+            width: 120, // Same as QR codes
+            height: 120, // Same as QR codes
+            fill: '#E4405F', // Instagram brand color
+            stroke: '#ffffff',
             strokeWidth: 2,
             cornerRadius: 8
           },
           {
-            id: 'corporate-qr-label-left',
+            id: 'corporate-instagram-label-left',
             type: 'text',
-            x: 1060,
-            y: 980,
-            text: 'SCAN FOR\nMORE INFO',
-            fontSize: 12,
+            x: 180, // Same as left QR label
+            y: 900, // Same as QR labels
+            text: 'INSTAGRAM',
+            fontSize: 16, // Same as QR labels
             fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
             fill: '#ffffff',
-            align: 'center',
-            width: 120, // Fixed width for multi-line text
+            align: 'right', // Same as left QR label
+            width: 'auto',
             height: 'auto',
-            lineHeight: 1.2,
-            wrap: 'word' // Allow word wrapping for multi-line text
+            wrap: 'none'
+          },
+          // Facebook logo placeholder (right side - same coordinates as QR codes)
+          {
+            id: 'corporate-facebook-left',
+            type: 'rect',
+            x: 1000, // Same as right QR code
+            y: 850, // Same as QR codes
+            width: 120, // Same as QR codes
+            height: 120, // Same as QR codes
+            fill: '#1877F2', // Facebook brand color
+            stroke: '#ffffff',
+            strokeWidth: 2,
+            cornerRadius: 8
+          },
+          {
+            id: 'corporate-facebook-label-left',
+            type: 'text',
+            x: 910, // Same as right QR label
+            y: 900, // Same as QR labels
+            text: 'FACEBOOK',
+            fontSize: 16, // Same as QR labels
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            fill: '#ffffff',
+            align: 'left', // Same as right QR label
+            width: 'auto',
+            height: 'auto',
+            wrap: 'none'
           }
         ]
       },
@@ -501,65 +527,66 @@ export const tentTemplates = [
             },
             clipFunc: 'triangular'
           },
-          // Company logo
+          // Company logo area (top center of canopy) - same as front
           {
             id: 'corporate-logo-bg-right',
             type: 'rect',
-            x: 430,
-            y: 100,
-            width: 300,
-            height: 150,
+            x: 480, // Same as front
+            y: 215, // Same as front
+            width: 200, // Same as front
+            height: 120, // Same as front
             fill: '#ffffff',
-            cornerRadius: 12,
+            cornerRadius: 8,
             shadowColor: 'rgba(0, 0, 0, 0.3)',
-            shadowBlur: 15,
-            shadowOffset: { x: 0, y: 6 }
+            shadowBlur: 10,
+            shadowOffset: { x: 0, y: 4 }
           },
-          // Company name
+          // Company name - same as front
           {
             id: 'corporate-company-name-right',
             type: 'text',
-            x: 580,
-            y: 170,
+            x: 508, // Same as front
+            y: 260, // Same as front
             text: 'BUYPRINTZ',
-            fontSize: 32,
+            fontSize: 24, // Same as front
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#1e3a8a',
             align: 'center',
-            width: 300,
-            height: 50
+            width: 'auto',
+            height: 'auto'
           },
-          // Side headline
+          // Main headline (center of canopy) - same as front
           {
             id: 'corporate-headline-right',
             type: 'text',
-            x: 580,
-            y: 250,
-            text: 'FAST DELIVERY\nQUALITY',
-            fontSize: 42,
+            x: 333, // Same as front
+            y: 416, // Same as front
+            text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
+            fontSize: 36, // Same as front
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 400,
-            height: 100,
-            lineHeight: 1.2
+            lineHeight: 1.2,
+            width: 500, // Same as front
+            height: 'auto'
           },
-          // Contact info
+          // Corporate Tagline (bottom of canopy) - same as front
           {
             id: 'corporate-contact-right',
             type: 'text',
-            x: 580,
-            y: 400,
-            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603',
-            fontSize: 20,
+            x: 278, // Same as front
+            y: 680, // Same as front
+            text: 'BRANDING, MARKETING, PRINTING',
+            fontSize: 36, // Same as front
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 350,
-            height: 80,
-            lineHeight: 1.4
+            lineHeight: 1.4,
+            width: 'auto',
+            height: 'auto',
+            wrap: 'none'
           },
           // Valence section
           {
@@ -571,49 +598,77 @@ export const tentTemplates = [
             height: 200,
             fill: '#1e40af'
           },
-          // Valence text
+          // Valence text - Contact Information (same as front)
           {
             id: 'corporate-valence-text-right',
             type: 'text',
-            x: 580,
-            y: 900,
-            text: 'CONNECT WITH US TODAY',
-            fontSize: 28,
+            x: 270, // Same as front
+            y: 875, // Same as front
+            text: 'WWW.BUYPRINTZ.COM\n617-505-0603',
+            fontSize: 36, // Same as front
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 'auto', // Auto width for single-line text
+            width: 600, // Same as front
             height: 'auto',
-            wrap: 'none' // No wrapping for single-line text
+            wrap: 'word' // Same as front
           },
-          // QR code placeholder
+          // Instagram logo placeholder (left side - same coordinates as QR codes)
           {
-            id: 'corporate-qr-code-right',
+            id: 'corporate-instagram-right',
             type: 'rect',
-            x: 1000,
-            y: 850,
-            width: 120,
-            height: 120,
-            fill: '#ffffff',
-            stroke: '#1e40af',
+            x: 40, // Same as left QR code
+            y: 850, // Same as QR codes
+            width: 120, // Same as QR codes
+            height: 120, // Same as QR codes
+            fill: '#E4405F', // Instagram brand color
+            stroke: '#ffffff',
             strokeWidth: 2,
             cornerRadius: 8
           },
           {
-            id: 'corporate-qr-label-right',
+            id: 'corporate-instagram-label-right',
             type: 'text',
-            x: 1060,
-            y: 980,
-            text: 'SCAN FOR\nMORE INFO',
-            fontSize: 12,
+            x: 180, // Same as left QR label
+            y: 900, // Same as QR labels
+            text: 'INSTAGRAM',
+            fontSize: 16, // Same as QR labels
             fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
             fill: '#ffffff',
-            align: 'center',
-            width: 120, // Fixed width for multi-line text
+            align: 'right', // Same as left QR label
+            width: 'auto',
             height: 'auto',
-            lineHeight: 1.2,
-            wrap: 'word' // Allow word wrapping for multi-line text
+            wrap: 'none'
+          },
+          // Facebook logo placeholder (right side - same coordinates as QR codes)
+          {
+            id: 'corporate-facebook-right',
+            type: 'rect',
+            x: 1000, // Same as right QR code
+            y: 850, // Same as QR codes
+            width: 120, // Same as QR codes
+            height: 120, // Same as QR codes
+            fill: '#1877F2', // Facebook brand color
+            stroke: '#ffffff',
+            strokeWidth: 2,
+            cornerRadius: 8
+          },
+          {
+            id: 'corporate-facebook-label-right',
+            type: 'text',
+            x: 910, // Same as right QR label
+            y: 900, // Same as QR labels
+            text: 'FACEBOOK',
+            fontSize: 16, // Same as QR labels
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            fill: '#ffffff',
+            align: 'left', // Same as right QR label
+            width: 'auto',
+            height: 'auto',
+            wrap: 'none'
           }
         ]
       },
