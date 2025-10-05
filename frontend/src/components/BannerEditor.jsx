@@ -1248,13 +1248,20 @@ const BannerEditorNew = () => {
           updatedElement[property] = value
         }
         
-          // Special handling for text elements when font size changes
-          if (property === 'fontSize' && value !== el.fontSize) {
-            // When font size changes, set a reasonable width to allow expansion
-            // This prevents text from wrapping to new lines when font size increases
-            updatedElement.width = Math.max(200, updatedElement.width || 200)
-            updatedElement.wrap = 'none'
-          }
+        // Special handling for text content changes
+        if (property === 'text') {
+          // Update wrap behavior and width based on whether text contains line breaks
+          updatedElement.wrap = value.includes('\n') ? 'word' : 'none'
+          updatedElement.width = value.includes('\n') ? (updatedElement.width || 200) : 'auto'
+        }
+        
+        // Special handling for text elements when font size changes
+        if (property === 'fontSize' && value !== el.fontSize) {
+          // When font size changes, set a reasonable width to allow expansion
+          // This prevents text from wrapping to new lines when font size increases
+          updatedElement.width = Math.max(200, updatedElement.width || 200)
+          updatedElement.wrap = 'none'
+        }
         
         return updatedElement
       }
@@ -1413,13 +1420,15 @@ const BannerEditorNew = () => {
         if (!element.text) element.text = 'Text'
         if (!element.fontSize) element.fontSize = 24
         if (!element.fontFamily) element.fontFamily = 'Arial'
-        // Ensure text always has numeric dimensions for proper transformation
-        if (!element.width || element.width === 'auto') element.width = 200
+        // Set width based on text content - auto for single line, fixed for multi-line
+        if (!element.width || element.width === 'auto') {
+          element.width = element.text && element.text.includes('\n') ? 200 : 'auto'
+        }
         // Preserve 'auto' height for dynamic text sizing, only set default if missing
         if (!element.height) element.height = 'auto'
         if (element.stroke === undefined) element.stroke = null
         if (element.strokeWidth === undefined) element.strokeWidth = 0
-        if (!element.wrap) element.wrap = 'word'
+        if (!element.wrap) element.wrap = element.text && element.text.includes('\n') ? 'word' : 'none'
         if (!element.lineHeight) element.lineHeight = 1.2
         if (!element.fontStyle) element.fontStyle = 'normal'
         if (!element.align) element.align = 'left'

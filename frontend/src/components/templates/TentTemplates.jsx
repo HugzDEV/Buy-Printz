@@ -79,8 +79,8 @@ export const tentTemplates = [
             type: 'text',
             x: 454, // Moved 2% more to the right (445 + 9 = 454)
             y: 680, // Moved 20% more down (569 + 111 = 680)
-            text: 'www.buyprintz.com\n617-505-0603',
-            fontSize: 18,
+            text: 'BRANDING, MARKETING, PRINTING',
+            fontSize: 36,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
@@ -104,14 +104,15 @@ export const tentTemplates = [
             type: 'text',
             x: 390, // Moved 50% to the left (580 - 290 = 290px left)
             y: 900,
-            text: 'FAST 2-3 DAY DELIVERY',
-            fontSize: 28,
+            text: 'WWW.BUYPRINTZ.COM\n617-505-0603',
+            fontSize: 36,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 400, // Fixed width like new text elements
-            height: 'auto' // Auto height like new text elements
+            width: 600, // Increased width to accommodate full website address
+            height: 'auto', // Auto height for dynamic sizing
+            wrap: 'word' // Allow word wrapping for multi-line text
           },
           // QR code placeholder (bottom right of valence)
           {
@@ -136,8 +137,9 @@ export const tentTemplates = [
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'left',
-            width: 100, // Fixed width like new text elements
-            height: 'auto' // Auto height like new text elements
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // Second QR code placeholder (bottom left of valence)
           {
@@ -162,8 +164,9 @@ export const tentTemplates = [
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'right',
-            width: 100, // Fixed width like new text elements
-            height: 'auto' // Auto height like new text elements
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           }
         ]
       },
@@ -195,7 +198,7 @@ export const tentTemplates = [
             id: 'corporate-logo-bg-back',
             type: 'rect',
             x: 480,
-            y: 175, // Same as front
+            y: 215, // Same as front
             width: 200,
             height: 120,
             fill: '#ffffff',
@@ -272,8 +275,9 @@ export const tentTemplates = [
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 400,
-            height: 'auto'
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // QR code placeholder (left side - exact same as front)
           {
@@ -300,8 +304,9 @@ export const tentTemplates = [
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 80,
-            height: 'auto'
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // QR code placeholder (right side - exact same as front)
           {
@@ -328,8 +333,9 @@ export const tentTemplates = [
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 80,
-            height: 'auto'
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           }
         ]
       },
@@ -438,8 +444,9 @@ export const tentTemplates = [
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 600,
-            height: 40
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // QR code placeholder
           {
@@ -464,9 +471,10 @@ export const tentTemplates = [
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 120,
-            height: 40,
-            lineHeight: 1.2
+            width: 120, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.2,
+            wrap: 'word' // Allow word wrapping for multi-line text
           }
         ]
       },
@@ -575,8 +583,9 @@ export const tentTemplates = [
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 600,
-            height: 40
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // QR code placeholder
           {
@@ -601,9 +610,10 @@ export const tentTemplates = [
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 120,
-            height: 40,
-            lineHeight: 1.2
+            width: 120, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.2,
+            wrap: 'word' // Allow word wrapping for multi-line text
           }
         ]
       },
@@ -703,9 +713,10 @@ export const tentTemplates = [
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 100,
-            height: 40,
-            lineHeight: 1.2
+            width: 100, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.2,
+            wrap: 'word' // Allow word wrapping for multi-line text
           }
         ]
       },
@@ -804,9 +815,10 @@ export const tentTemplates = [
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 100,
-            height: 40,
-            lineHeight: 1.2
+            width: 100, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.2,
+            wrap: 'word' // Allow word wrapping for multi-line text
           }
         ]
       },
@@ -922,9 +934,10 @@ export const tentTemplates = [
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 150,
-            height: 50,
-            lineHeight: 1.2
+            width: 150, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.2,
+            wrap: 'word' // Allow word wrapping for multi-line text
           }
         ]
       }

@@ -255,7 +255,12 @@ const BannerCanvas = forwardRef(({
       const element = elements.find(el => el.id === editingTextId);
       if (element && element.text !== editingTextValue) {
         const updatedElements = elements.map(el => 
-          el.id === editingTextId ? { ...el, text: editingTextValue } : el
+          el.id === editingTextId ? { 
+            ...el, 
+            text: editingTextValue,
+            wrap: editingTextValue.includes('\n') ? 'word' : 'none',
+            width: editingTextValue.includes('\n') ? (el.width || 200) : 'auto'
+          } : el
         );
         setElements(updatedElements);
         saveToHistory();
@@ -1374,11 +1379,11 @@ const BannerCanvas = forwardRef(({
         if (!element.text) element.text = 'Text'
         if (!element.fontSize) element.fontSize = 24
         if (!element.fontFamily) element.fontFamily = 'Arial'
-        if (!element.width) element.width = 200
+        if (!element.width) element.width = element.text && element.text.includes('\n') ? 200 : 'auto'
         if (!element.height) element.height = 'auto'
         if (element.stroke === undefined) element.stroke = null
         if (element.strokeWidth === undefined) element.strokeWidth = 0
-        if (!element.wrap) element.wrap = 'word'
+        if (!element.wrap) element.wrap = element.text && element.text.includes('\n') ? 'word' : 'none'
         if (!element.lineHeight) element.lineHeight = 1.2
         if (!element.fontStyle) element.fontStyle = 'normal'
         break
@@ -1486,10 +1491,10 @@ const BannerCanvas = forwardRef(({
             strokeWidth={safeElement.strokeWidth || 0}
             align={safeElement.align || 'left'}
             verticalAlign={safeElement.verticalAlign || 'top'}
-            width={safeElement.width || 200}
+            width={safeElement.text && safeElement.text.includes('\n') ? (safeElement.width || 200) : 'auto'}
             height={safeElement.height || 50}
             padding={safeElement.padding || 0}
-            wrap={safeElement.wrap || 'word'}
+            wrap={safeElement.text && safeElement.text.includes('\n') ? 'word' : 'none'}
             lineHeight={safeElement.lineHeight || 1.2}
             textDecoration={safeElement.textDecoration || 'none'}
             letterSpacing={safeElement.letterSpacing || 0}
