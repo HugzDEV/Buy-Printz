@@ -35,7 +35,7 @@ export const tentTemplates = [
             id: 'corporate-logo-bg',
             type: 'rect',
             x: 480,
-            y: 175, // Moved down 20% (50 + 10 = 60)
+            y: 215, // Moved down 20% (50 + 10 = 60)
             width: 200,
             height: 120,
             fill: '#ffffff',
@@ -48,8 +48,8 @@ export const tentTemplates = [
           {
             id: 'corporate-company-name',
             type: 'text',
-            x: 580,
-            y: 180, // Moved down 20% (110 + 22 = 132)
+            x: 480,
+            y: 215, // Moved down 20% (110 + 22 = 132)
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
@@ -61,7 +61,7 @@ export const tentTemplates = [
           {
             id: 'corporate-headline',
             type: 'text',
-            x: 335, // Moved 10% to the left (372 - 37 = 335)
+            x: 333, // Moved 10% to the left (372 - 37 = 335)
             y: 416, // Moved down 10% (378 + 38 = 416)
             text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
             fontSize: 36,
@@ -102,7 +102,7 @@ export const tentTemplates = [
           {
             id: 'corporate-valence-text',
             type: 'text',
-            x: 290, // Moved 50% to the left (580 - 290 = 290px left)
+            x: 390, // Moved 50% to the left (580 - 290 = 290px left)
             y: 900,
             text: 'FAST 2-3 DAY DELIVERY',
             fontSize: 28,
@@ -195,7 +195,7 @@ export const tentTemplates = [
             id: 'corporate-logo-bg-back',
             type: 'rect',
             x: 480,
-            y: 50,
+            y: 175, // Same as front
             width: 200,
             height: 120,
             fill: '#ffffff',
@@ -208,8 +208,8 @@ export const tentTemplates = [
           {
             id: 'corporate-company-name-back',
             type: 'text',
-            x: 580,
-            y: 110,
+            x: 480,
+            y: 215, // Exact same as front
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
@@ -217,38 +217,38 @@ export const tentTemplates = [
             fill: '#1e3a8a',
             align: 'center',
             width: 200,
-            height: 40
+            height: 'auto'
           },
-          // Main headline (different for back)
+          // Main headline (same as front)
           {
             id: 'corporate-headline-back',
             type: 'text',
-            x: 580,
-            y: 200,
-            text: 'PROFESSIONAL\nPRINTING\nSERVICES',
+            x: 333, // Exact same as front
+            y: 416, // Same as front
+            text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
             fontSize: 36,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 400,
-            height: 120,
-            lineHeight: 1.2
+            lineHeight: 1.2,
+            width: 500,
+            height: 'auto'
           },
-          // Contact information
+          // Contact information (exact same as front)
           {
             id: 'corporate-contact-back',
             type: 'text',
-            x: 580,
-            y: 350,
-            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603',
+            x: 454, // Exact same as front
+            y: 680, // Exact same as front
+            text: 'www.buyprintz.com\n617-505-0603',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 300,
-            height: 80,
-            lineHeight: 1.4
+            lineHeight: 1.4,
+            width: 250,
+            height: 'auto'
           },
           // Valence section
           {
@@ -260,47 +260,76 @@ export const tentTemplates = [
             height: 200,
             fill: '#1e40af'
           },
-          // Valence text (different for back)
+          // Valence text (exact same as front)
           {
             id: 'corporate-valence-text-back',
             type: 'text',
-            x: 580,
+            x: 290, // Exact same as front
             y: 900,
-            text: 'CONNECT WITH US TODAY',
-            fontSize: 28,
+            text: 'FAST 2-3 DAY DELIVERY',
+            fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 600,
-            height: 40
+            width: 400,
+            height: 'auto'
           },
-          // QR code placeholder
+          // QR code placeholder (left side - exact same as front)
           {
-            id: 'corporate-qr-code-back',
+            id: 'corporate-qr-left-back',
             type: 'rect',
-            x: 1000,
+            x: 40, // Exact same as front
             y: 850,
-            width: 120,
-            height: 120,
+            width: 80,
+            height: 80,
             fill: '#ffffff',
-            stroke: '#1e40af',
-            strokeWidth: 2,
-            cornerRadius: 8
+            cornerRadius: 8,
+            stroke: '#1e3a8a',
+            strokeWidth: 2
           },
+          // QR code label (left side - exact same as front)
           {
-            id: 'corporate-qr-label-back',
+            id: 'corporate-qr-label-left-back',
             type: 'text',
-            x: 1060,
-            y: 980,
-            text: 'SCAN FOR\nMORE INFO',
-            fontSize: 12,
+            x: 180, // Exact same as front
+            y: 940,
+            text: 'SCAN ME',
+            fontSize: 14,
             fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
-            width: 120,
-            height: 40,
-            lineHeight: 1.2
+            width: 80,
+            height: 'auto'
+          },
+          // QR code placeholder (right side - exact same as front)
+          {
+            id: 'corporate-qr-right-back',
+            type: 'rect',
+            x: 1040, // Exact same as front
+            y: 850,
+            width: 80,
+            height: 80,
+            fill: '#ffffff',
+            cornerRadius: 8,
+            stroke: '#1e3a8a',
+            strokeWidth: 2
+          },
+          // QR code label (right side - exact same as front)
+          {
+            id: 'corporate-qr-label-right-back',
+            type: 'text',
+            x: 910, // Exact same as front
+            y: 940,
+            text: 'SCAN ME',
+            fontSize: 14,
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            fill: '#ffffff',
+            align: 'center',
+            width: 80,
+            height: 'auto'
           }
         ]
       },
