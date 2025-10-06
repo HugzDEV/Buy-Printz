@@ -105,7 +105,10 @@ The tent template system uses a standardized coordinate system across all surfac
 }
 ```
 
-### Backwall Surface (Full Height Layout)
+### Backwall Surface (Hero Layout - Full Height)
+
+**Hero Messaging Strategy:**
+The backwall serves as the primary conversion surface with powerful hero messaging designed to grab attention and drive action.
 
 ```javascript
 // Logo Background (Large)
@@ -120,22 +123,22 @@ The tent template system uses a standardized coordinate system across all surfac
   text: 'BUYPRINTZ', align: 'center'
 }
 
-// Main Headline
+// Hero Title
 {
-  x: 400, y: 150, fontSize: 48, width: 500,
-  text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE'
+  x: 400, y: 150, fontSize: 52, width: 500,
+  text: 'YOUR BRAND\nDESERVES\nEXCELLENCE'
 }
 
-// Description
+// Hero Slogan
 {
-  x: 400, y: 350, fontSize: 20, width: 500,
-  text: 'We provide custom printing solutions that drive\nbusiness success with fast 2-3 day delivery\nand professional quality for all your needs.'
+  x: 400, y: 350, fontSize: 24, width: 500,
+  text: 'FAST 2-3 DAY DELIVERY\nPROFESSIONAL QUALITY\nCUSTOM PRINTING SOLUTIONS'
 }
 
-// Contact Information
+// Call to Action
 {
-  x: 400, y: 500, fontSize: 18, width: 400,
-  text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603\norder@buyprintz.com'
+  x: 400, y: 500, fontSize: 20, width: 400,
+  text: 'GET YOUR QUOTE TODAY!\nwww.buyprintz.com\n617-505-0603\norder@buyprintz.com'
 }
 
 // QR Code (Large)
@@ -147,7 +150,7 @@ The tent template system uses a standardized coordinate system across all surfac
 // QR Label
 {
   x: 975, y: 320, fontSize: 14,
-  text: 'SCAN FOR\nMORE INFO', align: 'center'
+  text: 'SCAN FOR\nQUOTE', align: 'center'
 }
 ```
 
@@ -185,8 +188,11 @@ The tent template system uses a standardized coordinate system across all surfac
 ## Typography Guidelines
 
 ### Font Hierarchy
+- **Hero Titles**: 52px, Arial Bold (Backwall only)
 - **Main Headlines**: 36-48px, Arial Bold
+- **Hero Slogans**: 24px, Arial Bold (Backwall only)
 - **Company Names**: 18-28px, Arial Bold
+- **Call to Action**: 20px, Arial Bold (Backwall only)
 - **Body Text**: 16-20px, Arial Regular
 - **Contact Info**: 16-18px, Arial Regular
 - **Labels**: 12-14px, Arial Regular
@@ -204,6 +210,13 @@ The tent template system uses a standardized coordinate system across all surfac
 - **Description to Contact**: ~150px vertical spacing
 - **Side Margins**: 50px minimum
 - **QR Code Spacing**: 20px from edges
+
+### Hero Messaging Strategy (Backwall)
+- **Hero Title**: Large, bold, customer-focused messaging
+- **Hero Slogan**: Key value propositions in bold statements
+- **Call to Action**: Direct, urgent, actionable language
+- **QR Code**: Direct connection to the CTA ("SCAN FOR QUOTE")
+- **Visual Hierarchy**: Title → Slogan → CTA → QR Code
 
 ### Alignment Rules
 - **Company Names**: Center-aligned
