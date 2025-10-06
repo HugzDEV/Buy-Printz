@@ -3173,6 +3173,59 @@ const BannerCanvas = forwardRef(({
             </div>
           )}
           
+          {/* Shape Properties - Fill Color and Stroke Controls */}
+          {selectedId && selectedElement?.type && ['rect', 'circle', 'triangle', 'hexagon', 'octagon', 'polygon', 'line'].includes(selectedElement.type) && (
+            <div className="space-y-2 sm:space-y-3">
+              {/* Fill Color */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Fill:</span>
+                <input
+                  type="color"
+                  value={selectedElement?.fill || '#666666'}
+                  onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                  title="Choose fill color"
+                />
+              </div>
+              
+              {/* Stroke Controls */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Outline:</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      const hasStroke = selectedElement?.stroke && selectedElement?.strokeWidth > 0
+                      if (hasStroke) {
+                        handleElementChange(selectedId, { stroke: null, strokeWidth: 0 })
+                      } else {
+                        handleElementChange(selectedId, { stroke: '#000000', strokeWidth: 2 })
+                      }
+                    }}
+                    className={`w-5 h-5 sm:w-6 sm:h-6 rounded text-xs transition-colors duration-200 ${
+                      selectedElement?.stroke && selectedElement?.strokeWidth > 0
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                    title={selectedElement?.stroke && selectedElement?.strokeWidth > 0 ? "Disable Outline" : "Enable Outline"}
+                  >
+                    ⭕
+                  </button>
+                  
+                  {/* Stroke Color (only show if stroke is enabled) */}
+                  {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
+                    <input
+                      type="color"
+                      value={selectedElement?.stroke || '#000000'}
+                      onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                      title="Choose outline color"
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Universal Action Buttons - Apply to all element types */}
           {(selectedId || selectedIds.length > 0) && (
             <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 border-t border-gray-200">
