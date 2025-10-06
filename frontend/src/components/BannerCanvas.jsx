@@ -2051,66 +2051,60 @@ const BannerCanvas = forwardRef(({
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
             {/* Mobile: Organized toolbar with better UX */}
             <div className="sm:hidden flex flex-col gap-2 min-w-0 flex-shrink-0 flex-1 justify-end">
-              {/* Row 1: Zoom + Undo/Redo Controls */}
-              <div className="flex items-center gap-1 justify-end">
+              {/* Row 1: Surfaces + Zoom Controls */}
+              <div className="flex items-center gap-1 justify-between">
+                {/* Surface Navigation - Only for Tins/Tents */}
+                {(productType === 'tin' || productType === 'tent') ? (
+                  <div className="flex items-center gap-1">
+                    <GlassButton 
+                      onClick={() => handleSurfaceNavigation('prev')} 
+                      disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
+                      className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
+                      title="Previous Surface"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </GlassButton>
+                    
+                    {/* Surface Indicator */}
+                    <div className="px-3 py-2 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-sm font-medium text-gray-800 min-w-[80px] text-center flex-shrink-0 h-9 flex items-center justify-center">
+                      {productType === 'tin' 
+                        ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
+                        : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+                      }
+                    </div>
+                    
+                    <GlassButton 
+                      onClick={() => handleSurfaceNavigation('next')} 
+                      disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
+                      className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
+                      title="Next Surface"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </GlassButton>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
+                
                 {/* Zoom Controls */}
-                <GlassButton onClick={zoomOut} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
-                  <ZoomOut className="w-4 h-4" />
-                </GlassButton>
-                
-                <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[50px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
-                  {Math.round(scale * 100)}%
-                </GlassButton>
-                
-                <GlassButton onClick={zoomIn} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom In">
-                  <ZoomIn className="w-4 h-4" />
-                </GlassButton>
-                
-                <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
-                
-                {/* Undo/Redo Controls */}
-                <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Undo">
-                  <Undo2 className="w-4 h-4" />
-                </GlassButton>
-                
-                <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Redo">
-                  <Redo2 className="w-4 h-4" />
-                </GlassButton>
-              </div>
-              
-              {/* Row 2: Surface Navigation - Only for Tins/Tents */}
-              {(productType === 'tin' || productType === 'tent') && (
-                <div className="flex items-center gap-1 justify-center">
-                  <GlassButton 
-                    onClick={() => handleSurfaceNavigation('prev')} 
-                    disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
-                    className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                    title="Previous Surface"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
+                <div className="flex items-center gap-1">
+                  <GlassButton onClick={zoomOut} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
+                    <ZoomOut className="w-4 h-4" />
                   </GlassButton>
                   
-                  {/* Surface Indicator */}
-                  <div className="px-3 py-2 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-sm font-medium text-gray-800 min-w-[80px] text-center flex-shrink-0 h-9 flex items-center justify-center">
-                    {productType === 'tin' 
-                      ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
-                      : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-                    }
-                  </div>
+                  <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[50px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
+                    {Math.round(scale * 100)}%
+                  </GlassButton>
                   
-                  <GlassButton 
-                    onClick={() => handleSurfaceNavigation('next')} 
-                    disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
-                    className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                    title="Next Surface"
-                  >
-                    <ArrowRight className="w-4 h-4" />
+                  <GlassButton onClick={zoomIn} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom In">
+                    <ZoomIn className="w-4 h-4" />
                   </GlassButton>
                 </div>
-              )}
+              </div>
               
-              {/* Row 3: Tool Controls */}
+              {/* Row 2: Tool Controls + Clear/Download + Undo/Redo */}
               <div className="flex items-center gap-1 justify-end">
+                {/* Tool Controls */}
                 <GlassButton 
                   onClick={() => setSnapToElements(!snapToElements)}
                   variant={snapToElements ? "primary" : "default"}
@@ -2146,21 +2140,41 @@ const BannerCanvas = forwardRef(({
                 >
                   {showGuides ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 </GlassButton>
+                
+                <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
+                
+                {/* Clear All Button */}
+                <GlassButton 
+                  onClick={handleClearCanvas} 
+                  disabled={!hasElements}
+                  variant="warning" 
+                  className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" 
+                  title="Clear Canvas"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </GlassButton>
+                
+                {/* Download Button */}
+                <GlassButton 
+                  onClick={onExport} 
+                  variant="primary" 
+                  className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" 
+                  title="Export PDF"
+                >
+                  <Download className="w-4 h-4" />
+                </GlassButton>
+                
+                <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
+                
+                {/* Undo/Redo Controls */}
+                <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Undo">
+                  <Undo2 className="w-4 h-4" />
+                </GlassButton>
+                
+                <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Redo">
+                  <Redo2 className="w-4 h-4" />
+                </GlassButton>
               </div>
-              
-              <GlassButton 
-                onClick={handleClearCanvas} 
-                disabled={!hasElements}
-                variant="warning" 
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border border-orange-400/50 flex-shrink-0" 
-                title="Clear Canvas"
-              >
-                <Eraser className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton onClick={onExport} variant="primary" className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Export PDF">
-                <Download className="w-4 h-4" />
-              </GlassButton>
             </div>
             
             {/* Desktop: Full controls */}
