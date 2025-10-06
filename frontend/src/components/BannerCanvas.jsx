@@ -3160,6 +3160,34 @@ const BannerCanvas = forwardRef(({
                 </div>
               </div>
               
+              {/* Text Rotation Controls */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Rotate:</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) - 15 })}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    title="Rotate Left 15°"
+                  >
+                    ↶
+                  </button>
+                  <button
+                    onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) + 15 })}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    title="Rotate Right 15°"
+                  >
+                    ↷
+                  </button>
+                  <button
+                    onClick={() => handleElementChange(selectedId, { rotation: 0 })}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    title="Reset Rotation"
+                  >
+                    ↺
+                  </button>
+                </div>
+              </div>
+              
               {/* Text Edit Button */}
               <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
                 <button
@@ -3223,6 +3251,35 @@ const BannerCanvas = forwardRef(({
                   )}
                 </div>
               </div>
+              
+              {/* Rotation Controls */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs font-medium text-gray-600">Rotate:</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) - 15 })}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    title="Rotate Left 15°"
+                  >
+                    ↶
+                  </button>
+                  <button
+                    onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) + 15 })}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    title="Rotate Right 15°"
+                  >
+                    ↷
+                  </button>
+                  <button
+                    onClick={() => handleElementChange(selectedId, { rotation: 0 })}
+                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    title="Reset Rotation"
+                  >
+                    ↺
+                  </button>
+                </div>
+              </div>
+              
             </div>
           )}
           
