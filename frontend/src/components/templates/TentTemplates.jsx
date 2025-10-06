@@ -490,7 +490,7 @@ export const tentTemplates = [
           {
             id: 'corporate-facebook-label-left',
             type: 'text',
-            x: 910, // Same as right QR label
+            x: 880, // Same as right QR label
             y: 900, // Same as QR labels
             text: 'FACEBOOK',
             fontSize: 16, // Same as QR labels
@@ -658,7 +658,7 @@ export const tentTemplates = [
           {
             id: 'corporate-facebook-label-right',
             type: 'text',
-            x: 910, // Same as right QR label
+            x: 880, // Same as right QR label
             y: 900, // Same as QR labels
             text: 'FACEBOOK',
             fontSize: 16, // Same as QR labels
@@ -704,55 +704,58 @@ export const tentTemplates = [
           {
             id: 'corporate-sidewall-company',
             type: 'text',
-            x: 150,
-            y: 100,
+            x: 100,
+            y: 90,
             text: 'BUYPRINTZ',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#1e40af',
             align: 'center',
-            width: 200,
-            height: 30
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // Main text
           {
             id: 'corporate-sidewall-text',
             type: 'text',
-            x: 300,
-            y: 100,
-            text: 'BANNER PRINTING\nFAST DELIVERY & QUALITY\nVisit us at Booth #123',
+            x: 50,
+            y: 300,
+            text: 'DESIGN\nFAST DELIVERY & QUALITY\nBRANDING, MARKETING & PRINTING',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'left',
-            width: 500,
-            height: 120,
-            lineHeight: 1.3
+            width: 500, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.3,
+            wrap: 'word' // Allow word wrapping for multi-line text
           },
           // Contact info
           {
             id: 'corporate-sidewall-contact',
             type: 'text',
-            x: 300,
-            y: 250,
+            x: 835,
+            y: 385,
             text: 'www.buyprintz.com | 617-505-0603',
             fontSize: 16,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'left',
-            width: 400,
-            height: 30
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // QR code
           {
             id: 'corporate-sidewall-qr',
             type: 'rect',
-            x: 900,
+            x: 880,
             y: 50,
-            width: 100,
-            height: 100,
+            width: 200,
+            height: 200,
             fill: '#ffffff',
             stroke: '#1e40af',
             strokeWidth: 2,
@@ -761,9 +764,9 @@ export const tentTemplates = [
           {
             id: 'corporate-sidewall-qr-label',
             type: 'text',
-            x: 950,
-            y: 170,
-            text: 'SCAN\nHERE',
+            x: 805,
+            y: 150,
+            text: 'SCAN ME',
             fontSize: 12,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
@@ -806,55 +809,58 @@ export const tentTemplates = [
           {
             id: 'corporate-sidewall-company-right',
             type: 'text',
-            x: 150,
-            y: 100,
+            x: 100,
+            y: 90,
             text: 'BUYPRINTZ',
             fontSize: 18,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#1e40af',
             align: 'center',
-            width: 200,
-            height: 30
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // Main text
           {
             id: 'corporate-sidewall-text-right',
             type: 'text',
-            x: 300,
-            y: 100,
-            text: 'CUSTOM PRINTING\nPROFESSIONAL SERVICE\nConnect with us today',
+            x: 50,
+            y: 300,
+            text: 'DESIGN\nFAST DELIVERY & QUALITY\nBRANDING, MARKETING & PRINTING',
             fontSize: 24,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'left',
-            width: 500,
-            height: 120,
-            lineHeight: 1.3
+            width: 500, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.3,
+            wrap: 'word' // Allow word wrapping for multi-line text
           },
           // Contact info
           {
             id: 'corporate-sidewall-contact-right',
             type: 'text',
-            x: 300,
-            y: 250,
+            x: 835,
+            y: 385,
             text: 'www.buyprintz.com | 617-505-0603',
             fontSize: 16,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'left',
-            width: 400,
-            height: 30
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
           // QR code
           {
             id: 'corporate-sidewall-qr-right',
             type: 'rect',
-            x: 900,
+            x: 880,
             y: 50,
-            width: 100,
-            height: 100,
+            width: 200,
+            height: 200,
             fill: '#ffffff',
             stroke: '#1e40af',
             strokeWidth: 2,
@@ -863,17 +869,17 @@ export const tentTemplates = [
           {
             id: 'corporate-sidewall-qr-label-right',
             type: 'text',
-            x: 950,
-            y: 170,
-            text: 'SCAN\nHERE',
+            x: 805,
+            y: 150,
+            text: 'SCAN ME',
             fontSize: 12,
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',
             align: 'center',
-            width: 100, // Fixed width for multi-line text
+            width: 'auto', // Auto width for single-line text
             height: 'auto',
             lineHeight: 1.2,
-            wrap: 'word' // Allow word wrapping for multi-line text
+            wrap: 'none' // No wrapping for single-line text
           }
         ]
       },
@@ -917,54 +923,60 @@ export const tentTemplates = [
             fontStyle: 'bold',
             fill: '#1e40af',
             align: 'center',
-            width: 300,
-            height: 40
+            width: 'auto', // Auto width for single-line text
+            height: 'auto',
+            wrap: 'none' // No wrapping for single-line text
           },
-          // Main headline
+          // Hero Title
           {
             id: 'corporate-backwall-headline',
             type: 'text',
             x: 400,
             y: 150,
-            text: 'CUSTOM PRINTING\nSOLUTIONS\nEXCELLENCE',
-            fontSize: 48,
+            text: 'YOUR BRAND\nDESERVES\nEXCELLENCE',
+            fontSize: 52,
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
             fill: '#ffffff',
             align: 'left',
-            width: 500,
-            height: 180,
-            lineHeight: 1.2
+            width: 500, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.1,
+            wrap: 'word' // Allow word wrapping for multi-line text
           },
-          // Description
+          // Hero Slogan
           {
             id: 'corporate-backwall-description',
             type: 'text',
             x: 400,
             y: 350,
-            text: 'We provide custom printing solutions that drive\nbusiness success with fast 2-3 day delivery\nand professional quality for all your needs.',
-            fontSize: 20,
+            text: 'FAST 2-3 DAY DELIVERY\nPROFESSIONAL QUALITY\nCUSTOM PRINTING SOLUTIONS',
+            fontSize: 24,
             fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
             fill: '#ffffff',
             align: 'left',
-            width: 500,
-            height: 120,
-            lineHeight: 1.4
+            width: 500, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.3,
+            wrap: 'word' // Allow word wrapping for multi-line text
           },
-          // Contact information
+          // Call to Action
           {
             id: 'corporate-backwall-contact',
             type: 'text',
             x: 400,
             y: 500,
-            text: 'Visit us at Booth #123\nwww.buyprintz.com\n617-505-0603\norder@buyprintz.com',
-            fontSize: 18,
+            text: 'GET YOUR QUOTE TODAY!\nwww.buyprintz.com\n617-505-0603\norder@buyprintz.com',
+            fontSize: 20,
             fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
             fill: '#ffffff',
             align: 'left',
-            width: 400,
-            height: 120,
-            lineHeight: 1.4
+            width: 400, // Fixed width for multi-line text
+            height: 'auto',
+            lineHeight: 1.4,
+            wrap: 'word' // Allow word wrapping for multi-line text
           },
           // QR code (large)
           {
@@ -984,9 +996,10 @@ export const tentTemplates = [
             type: 'text',
             x: 975,
             y: 320,
-            text: 'SCAN FOR\nMORE INFO',
+            text: 'SCAN FOR\nQUOTE',
             fontSize: 14,
             fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
             fill: '#ffffff',
             align: 'center',
             width: 150, // Fixed width for multi-line text

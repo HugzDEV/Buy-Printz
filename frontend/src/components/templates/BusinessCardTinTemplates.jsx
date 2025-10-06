@@ -23,7 +23,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 50,
+            x: 225, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -36,7 +36,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 85,
+            x: 225, y: 85,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -61,7 +61,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_picture_placeholder',
             type: 'rect',
-            x: 50, y: 50,
+            x: 30, y: 50,
             width: 80, height: 80,
             fill: '#f3f4f6',
             stroke: '#1e40af',
@@ -100,7 +100,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -210,7 +210,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -260,7 +260,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 50,
+            x: 123, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -273,7 +273,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 85,
+            x: 108, y: 85,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -336,7 +336,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -462,7 +462,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 160,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -495,7 +495,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 50,
+            x: 225, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -508,7 +508,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 85,
+            x: 225, y: 85,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -580,7 +580,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -706,7 +706,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -756,7 +756,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 50,
+            x: 225, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -769,7 +769,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 85,
+            x: 225, y: 85,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -832,7 +832,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+                x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -873,7 +873,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 50,
+            x: 125, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -886,7 +886,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 85,
+            x: 107, y: 85,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -949,7 +949,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -982,7 +982,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 50,
+            x: 225, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -995,7 +995,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 85,
+            x: 225, y: 85,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -1020,7 +1020,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_picture_placeholder',
             type: 'rect',
-            x: 50, y: 50,
+            x: 30, y: 50,
             width: 80, height: 80,
             fill: '#f3f4f6',
             stroke: '#000000',
@@ -1059,7 +1059,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -1100,7 +1100,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 50,
+            x: 125, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -1113,7 +1113,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 85,
+            x: 108, y: 85,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -1176,7 +1176,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 150,
+            x: 125, y: 150,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -1226,7 +1226,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 50,
+            x: 225, y: 50,
             text: 'BUYPRINTZ',
             fontSize: 24,
             fontFamily: 'Arial Black',
@@ -1239,7 +1239,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 93, y: 80,
+            x: 225, y: 80,
             text: 'Custom Printing Solutions',
             fontSize: 16,
             fontFamily: 'Arial',
@@ -1302,7 +1302,7 @@ export const businessCardTinTemplates = [
           {
             id: 'template_text_placeholder',
             type: 'text',
-            x: 46, y: 160,
+            x: 125, y: 160,
             text: 'www.buyprintz.com',
             fontSize: 16,
             fontFamily: 'Arial',

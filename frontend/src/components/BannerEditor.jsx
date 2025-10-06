@@ -1255,13 +1255,13 @@ const BannerEditorNew = () => {
           updatedElement.width = value.includes('\n') ? (updatedElement.width || 200) : 'auto'
         }
         
-        // Special handling for text elements when font size changes
-        if (property === 'fontSize' && value !== el.fontSize) {
-          // When font size changes, set a reasonable width to allow expansion
-          // This prevents text from wrapping to new lines when font size increases
-          updatedElement.width = Math.max(200, updatedElement.width || 200)
-          updatedElement.wrap = 'none'
-        }
+          // Special handling for text elements when font size changes
+          if (property === 'fontSize' && value !== el.fontSize) {
+            // When font size changes, set a reasonable width to allow expansion
+            // This prevents text from wrapping to new lines when font size increases
+            updatedElement.width = Math.max(200, updatedElement.width || 200)
+            updatedElement.wrap = 'none'
+          }
         
         return updatedElement
       }
