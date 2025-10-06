@@ -2049,103 +2049,110 @@ const BannerCanvas = forwardRef(({
 
           {/* Right Section - Action Buttons */}
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
-            {/* Mobile: Double-wide toolbar tools */}
-            <div className="sm:hidden flex items-center gap-1 min-w-0 flex-shrink-0 flex-1 justify-end flex-wrap">
-              {/* Mobile: Zoom Controls - Available for all product types */}
-              <GlassButton onClick={zoomOut} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
-                <ZoomOut className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[50px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
-                {Math.round(scale * 100)}%
-              </GlassButton>
-              
-              <GlassButton onClick={zoomIn} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom In">
-                <ZoomIn className="w-4 h-4" />
-              </GlassButton>
+            {/* Mobile: Optimized toolbar with horizontal scroll */}
+            <div className="sm:hidden flex items-center gap-1 min-w-0 flex-shrink-0 flex-1 justify-end overflow-x-auto scrollbar-hide">
+              {/* Mobile: Essential Controls - Always Visible */}
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {/* Zoom Controls */}
+                <GlassButton onClick={zoomOut} className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
+                  <ZoomOut className="w-3.5 h-3.5" />
+                </GlassButton>
+                
+                <GlassButton onClick={resetZoom} className="px-2 py-1.5 text-xs min-w-[45px] min-h-[32px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
+                  {Math.round(scale * 100)}%
+                </GlassButton>
+                
+                <GlassButton onClick={zoomIn} className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0" title="Zoom In">
+                  <ZoomIn className="w-3.5 h-3.5" />
+                </GlassButton>
+                
+                <div className="w-px h-4 bg-white/20 mx-1 flex-shrink-0" />
+                
+                {/* Undo/Redo - Essential for all product types */}
+                <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0" title="Undo">
+                  <Undo2 className="w-3.5 h-3.5" />
+                </GlassButton>
+                
+                <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0" title="Redo">
+                  <Redo2 className="w-3.5 h-3.5" />
+                </GlassButton>
+              </div>
               
               {/* Mobile: Surface Navigation - Only for Tins/Tents */}
               {(productType === 'tin' || productType === 'tent') && (
                 <>
-                  <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
+                  <div className="w-px h-4 bg-white/20 mx-1 flex-shrink-0" />
                   
-                  <GlassButton 
-                    onClick={() => handleSurfaceNavigation('prev')} 
-                    disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
-                    className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                    title="Previous Surface"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                  </GlassButton>
-                  
-                  {/* Surface Indicator */}
-                  <div className="px-3 py-2 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-sm font-medium text-gray-800 min-w-[60px] text-center flex-shrink-0 h-9 flex items-center justify-center">
-                    {productType === 'tin' 
-                      ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
-                      : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-                    }
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <GlassButton 
+                      onClick={() => handleSurfaceNavigation('prev')} 
+                      disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
+                      className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                      title="Previous Surface"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                    </GlassButton>
+                    
+                    {/* Compact Surface Indicator */}
+                    <div className="px-2 py-1.5 bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg text-xs font-medium text-gray-800 min-w-[50px] text-center flex-shrink-0 h-8 flex items-center justify-center">
+                      {productType === 'tin' 
+                        ? currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1)
+                        : currentSurface.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+                      }
+                    </div>
+                    
+                    <GlassButton 
+                      onClick={() => handleSurfaceNavigation('next')} 
+                      disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
+                      className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                      title="Next Surface"
+                    >
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </GlassButton>
                   </div>
-                  
-                  <GlassButton 
-                    onClick={() => handleSurfaceNavigation('next')} 
-                    disabled={productType === 'tin' ? currentSurface === 'lid' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[availableSurfaces.length - 1] : currentSurface === 'backwall')}
-                    className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                    title="Next Surface"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                  </GlassButton>
                 </>
               )}
               
-              {/* Mobile: Add Undo/Redo for all product types */}
-              <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
-              
-              <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Undo">
-                <Undo2 className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Redo">
-                <Redo2 className="w-4 h-4" />
-              </GlassButton>
-              
-              <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
-              
-              {/* Mobile: Snap to Elements (Magnet) */}
-              <GlassButton 
-                onClick={() => setSnapToElements(!snapToElements)}
-                variant={snapToElements ? "primary" : "default"}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                title={snapToElements ? 'Disable Element Snapping' : 'Enable Element Snapping'}
-              >
-                <Magnet className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={() => setAutoScaling(!autoScaling)} 
-                variant={autoScaling ? "primary" : "default"}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
-              >
-                <Maximize2 className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={() => setShowGrid(!showGrid)} 
-                variant={showGrid ? "primary" : "default"}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                title={showGrid ? "Hide Grid" : "Show Grid"}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </GlassButton>
-              
-              <GlassButton 
-                onClick={() => setShowGuides(!showGuides)} 
-                variant={showGuides ? "primary" : "default"}
-                className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0"
-                title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
-              >
-                {showGuides ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-              </GlassButton>
+              {/* Mobile: Secondary Controls - Scrollable */}
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <div className="w-px h-4 bg-white/20 mx-1 flex-shrink-0" />
+                
+                <GlassButton 
+                  onClick={() => setSnapToElements(!snapToElements)}
+                  variant={snapToElements ? "primary" : "default"}
+                  className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                  title={snapToElements ? 'Disable Snapping' : 'Enable Snapping'}
+                >
+                  <Magnet className="w-3.5 h-3.5" />
+                </GlassButton>
+                
+                <GlassButton 
+                  onClick={() => setAutoScaling(!autoScaling)} 
+                  variant={autoScaling ? "primary" : "default"}
+                  className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                  title={autoScaling ? "Auto-scaling ON" : "Auto-scaling OFF"}
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                </GlassButton>
+                
+                <GlassButton 
+                  onClick={() => setShowGrid(!showGrid)} 
+                  variant={showGrid ? "primary" : "default"}
+                  className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                  title={showGrid ? "Hide Grid" : "Show Grid"}
+                >
+                  <Grid3X3 className="w-3.5 h-3.5" />
+                </GlassButton>
+                
+                <GlassButton 
+                  onClick={() => setShowGuides(!showGuides)} 
+                  variant={showGuides ? "primary" : "default"}
+                  className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center flex-shrink-0"
+                  title={showGuides ? "Hide Safe Zone" : "Show Safe Zone"}
+                >
+                  {showGuides ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                </GlassButton>
+              </div>
               
               <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
               
@@ -2869,8 +2876,8 @@ const BannerCanvas = forwardRef(({
       >
         <div className="
           bg-white/90 backdrop-blur-xl border border-white/30
-          rounded-2xl shadow-2xl p-2 sm:p-4 max-w-[240px] sm:max-w-xs
-          neumorphic-compact
+          rounded-2xl shadow-2xl p-3 sm:p-4 max-w-[280px] sm:max-w-xs
+          neumorphic-compact touch-manipulation
         ">
           {/* Header with Close Button */}
           <div className="flex items-center justify-between mb-2 sm:mb-3">
@@ -2912,10 +2919,10 @@ const BannerCanvas = forwardRef(({
             </div>
           )}
           
-          {/* Text Properties - Compact */}
+          {/* Text Properties - Mobile Optimized */}
           {selectedId && selectedElement?.type === 'text' && (
             <div className="space-y-2 sm:space-y-3">
-              {/* Color and Size Row */}
+              {/* Color and Size Row - Mobile Optimized */}
               <div className="flex items-center justify-between gap-2 sm:gap-3">
                 <div className="flex items-center gap-1 sm:gap-2">
                   <span className="text-xs font-medium text-gray-600">Color:</span>
@@ -2923,8 +2930,9 @@ const BannerCanvas = forwardRef(({
                     type="color"
                     value={selectedElement?.fill || '#000000'}
                     onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded border border-gray-300 cursor-pointer touch-manipulation"
                     title="Choose text color"
+                    style={{ minWidth: '24px', minHeight: '24px' }}
                   />
                 </div>
                 <div className="flex items-center gap-1">
@@ -3149,41 +3157,45 @@ const BannerCanvas = forwardRef(({
                     ⭕
                   </button>
                   
-                  {/* Stroke Color (only show if stroke is enabled) */}
+                  {/* Stroke Color (only show if stroke is enabled) - Mobile Optimized */}
                   {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
                     <input
                       type="color"
                       value={selectedElement?.stroke || '#000000'}
                       onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                      className="w-6 h-6 sm:w-7 sm:h-7 rounded border border-gray-300 cursor-pointer touch-manipulation"
                       title="Choose outline color"
+                      style={{ minWidth: '24px', minHeight: '24px' }}
                     />
                   )}
                 </div>
               </div>
               
-              {/* Text Rotation Controls */}
+              {/* Text Rotation Controls - Mobile Optimized */}
               <div className="flex items-center gap-1 sm:gap-2">
                 <span className="text-xs font-medium text-gray-600">Rotate:</span>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) - 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-sm font-bold touch-manipulation"
                     title="Rotate Left 15°"
+                    style={{ minWidth: '24px', minHeight: '24px' }}
                   >
                     ↶
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) + 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-sm font-bold touch-manipulation"
                     title="Rotate Right 15°"
+                    style={{ minWidth: '24px', minHeight: '24px' }}
                   >
                     ↷
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: 0 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-sm font-bold touch-manipulation"
                     title="Reset Rotation"
+                    style={{ minWidth: '24px', minHeight: '24px' }}
                   >
                     ↺
                   </button>
@@ -3203,18 +3215,19 @@ const BannerCanvas = forwardRef(({
             </div>
           )}
           
-          {/* Shape Properties - Fill Color and Stroke Controls */}
+          {/* Shape Properties - Mobile Optimized */}
           {selectedId && selectedElement?.type && ['rect', 'circle', 'triangle', 'hexagon', 'octagon', 'polygon', 'line'].includes(selectedElement.type) && (
             <div className="space-y-2 sm:space-y-3">
-              {/* Fill Color */}
+              {/* Fill Color - Mobile Optimized */}
               <div className="flex items-center gap-1 sm:gap-2">
                 <span className="text-xs font-medium text-gray-600">Fill:</span>
                 <input
                   type="color"
                   value={selectedElement?.fill || '#666666'}
                   onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                  className="w-6 h-6 sm:w-7 sm:h-7 rounded border border-gray-300 cursor-pointer touch-manipulation"
                   title="Choose fill color"
+                  style={{ minWidth: '24px', minHeight: '24px' }}
                 />
               </div>
               
@@ -3241,41 +3254,45 @@ const BannerCanvas = forwardRef(({
                     ⭕
                   </button>
                   
-                  {/* Stroke Color (only show if stroke is enabled) */}
+                  {/* Stroke Color (only show if stroke is enabled) - Mobile Optimized */}
                   {selectedElement?.stroke && selectedElement?.strokeWidth > 0 && (
                     <input
                       type="color"
                       value={selectedElement?.stroke || '#000000'}
                       onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                      className="w-6 h-6 sm:w-7 sm:h-7 rounded border border-gray-300 cursor-pointer touch-manipulation"
                       title="Choose outline color"
+                      style={{ minWidth: '24px', minHeight: '24px' }}
                     />
                   )}
                 </div>
               </div>
               
-              {/* Rotation Controls */}
+              {/* Rotation Controls - Mobile Optimized */}
               <div className="flex items-center gap-1 sm:gap-2">
                 <span className="text-xs font-medium text-gray-600">Rotate:</span>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) - 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-sm font-bold touch-manipulation"
                     title="Rotate Left 15°"
+                    style={{ minWidth: '24px', minHeight: '24px' }}
                   >
                     ↶
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) + 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-sm font-bold touch-manipulation"
                     title="Rotate Right 15°"
+                    style={{ minWidth: '24px', minHeight: '24px' }}
                   >
                     ↷
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: 0 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-sm font-bold touch-manipulation"
                     title="Reset Rotation"
+                    style={{ minWidth: '24px', minHeight: '24px' }}
                   >
                     ↺
                   </button>
