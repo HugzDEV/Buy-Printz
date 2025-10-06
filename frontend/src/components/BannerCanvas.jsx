@@ -1972,10 +1972,22 @@ const BannerCanvas = forwardRef(({
           
           {/* Left Section - Zoom Controls */}
           <div className="zoom-controls flex items-center gap-1" data-tour="zoom-controls">
-            {/* Desktop: Undo/Redo + Zoom OR Surface Navigation for Tins/Tents */}
+            {/* Desktop: Undo/Redo + Surface Navigation for Tins/Tents OR Undo/Redo for Banners */}
             <div className="hidden sm:flex items-center gap-1">
-              {(productType === 'tin' || productType === 'tent') ? (
+              {/* Undo/Redo Controls - Available for all product types */}
+              <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Undo">
+                <Undo2 className="w-3.5 h-3.5" />
+              </GlassButton>
+              
+              <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Redo">
+                <Redo2 className="w-3.5 h-3.5" />
+              </GlassButton>
+              
+              {/* Surface Navigation - Only for Tins/Tents */}
+              {(productType === 'tin' || productType === 'tent') && (
                 <>
+                  <div className="w-px h-5 bg-white/20 mx-1" />
+                  
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('prev')} 
                     disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
@@ -2000,16 +2012,6 @@ const BannerCanvas = forwardRef(({
                     title="Next Surface"
                   >
                     <ArrowRight className="w-3.5 h-3.5" />
-                  </GlassButton>
-                </>
-              ) : (
-                <>
-                  <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
-                    <Undo2 className="w-3.5 h-3.5" />
-            </GlassButton>
-            
-                  <GlassButton onClick={redo} disabled={historyStep >= history.length - 1} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
-                    <Redo2 className="w-3.5 h-3.5" />
                   </GlassButton>
                 </>
               )}
@@ -2049,9 +2051,24 @@ const BannerCanvas = forwardRef(({
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
             {/* Mobile: Double-wide toolbar tools */}
             <div className="sm:hidden flex items-center gap-1 min-w-0 flex-shrink-0 flex-1 justify-end flex-wrap">
-              {/* Mobile: Surface Navigation for Tins/Tents OR Zoom Controls for Banners */}
-              {(productType === 'tin' || productType === 'tent') ? (
+              {/* Mobile: Zoom Controls - Available for all product types */}
+              <GlassButton onClick={zoomOut} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
+                <ZoomOut className="w-4 h-4" />
+              </GlassButton>
+              
+              <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[50px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
+                {Math.round(scale * 100)}%
+              </GlassButton>
+              
+              <GlassButton onClick={zoomIn} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom In">
+                <ZoomIn className="w-4 h-4" />
+              </GlassButton>
+              
+              {/* Mobile: Surface Navigation - Only for Tins/Tents */}
+              {(productType === 'tin' || productType === 'tent') && (
                 <>
+                  <div className="w-px h-6 bg-white/20 mx-1 flex-shrink-0" />
+                  
                   <GlassButton 
                     onClick={() => handleSurfaceNavigation('prev')} 
                     disabled={productType === 'tin' ? currentSurface === 'front' : (availableSurfaces.length > 0 ? currentSurface === availableSurfaces[0] : currentSurface === 'canopy_front')}
@@ -2076,21 +2093,6 @@ const BannerCanvas = forwardRef(({
                     title="Next Surface"
                   >
                     <ArrowRight className="w-4 h-4" />
-                  </GlassButton>
-                </>
-              ) : (
-                <>
-                  {/* Mobile: Compact Zoom Controls for Banners */}
-                  <GlassButton onClick={zoomOut} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom Out">
-                    <ZoomOut className="w-4 h-4" />
-                  </GlassButton>
-                  
-                  <GlassButton onClick={resetZoom} className="px-3 py-2 text-sm min-w-[50px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Reset Zoom">
-                    {Math.round(scale * 100)}%
-                  </GlassButton>
-                  
-                  <GlassButton onClick={zoomIn} className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0" title="Zoom In">
-                    <ZoomIn className="w-4 h-4" />
                   </GlassButton>
                 </>
               )}
