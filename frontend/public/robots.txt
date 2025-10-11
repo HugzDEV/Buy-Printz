@@ -1,22 +1,57 @@
 User-agent: *
 Allow: /
 
-# Important pages
+# Sitemap
 Sitemap: https://buyprintz.com/sitemap.xml
 
-# Allow all crawlers to access main content
-Allow: /products
-Allow: /editor
-Allow: /login
-Allow: /register
-
-# Prevent crawling of user-specific content
-Disallow: /dashboard
-Disallow: /checkout
-Disallow: /api/
-
-# Prevent crawling of admin areas
-Disallow: /admin/
-
-# Crawl delay (be respectful)
+# Crawl-delay for better server performance
 Crawl-delay: 1
+
+# Allow all major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Block common bot patterns that might cause issues
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Block access to admin and API endpoints
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /node_modules/
+
+# Allow access to important files
+Allow: /assets/
+Allow: /images/
+Allow: /css/
+Allow: /js/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
