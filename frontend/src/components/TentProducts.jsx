@@ -139,7 +139,7 @@ const TentProducts = () => {
           "offers": {
             "@type": "Offer",
             "url": `https://www.buyprintz.com/tradeshow-tents#${tent.id}`,
-            "price": tent.price.replace(/[^\d.]/g, '').split('-')[0],
+            "price": tent.price.match(/\$?(\d+\.?\d*)/)?.[1] || "325.00",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "priceValidUntil": "2025-12-31",
@@ -182,7 +182,11 @@ const TentProducts = () => {
             "ratingValue": "4.9",
             "reviewCount": "156",
             "bestRating": "5",
-            "worstRating": "1"
+            "worstRating": "1",
+            "itemReviewed": {
+              "@type": "Product",
+              "name": tent.name
+            }
           },
           "review": [
             {
@@ -251,53 +255,7 @@ const TentProducts = () => {
     }
   }
 
-  // FAQ Schema for Tradeshow Tents
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "What tent options do you offer?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We offer canopy-only tents starting at $325.00 and complete tent packages with walls up to $900.00. All tents include heavy-duty aluminum frames, weatherproof fabric, and custom dye sublimated graphics."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How long does tent production take?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Standard production time is 5-7 business days for tent manufacturing. Rush orders may be available for an additional fee - contact us for expedited service options."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What's included with the tent?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "All tents include the aluminum frame, custom canopy, carrying bag, sandbags, ropes & stakes. Upgraded wheeled carrying bags are available for easier transport."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can I customize the tent graphics?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes! Our canvas editor allows you to design custom graphics for the canopy and walls. All graphics are dye sublimated for vibrant, long-lasting colors that won't fade."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What are the tent dimensions?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Our tents are 10x10 feet (120\"w x 120\"d) with adjustable height from 124.5\" to 137\". The canopy-only option weighs 51 lbs, while complete packages with walls weigh 58-65 lbs."
-        }
-      }
-    ]
-  }
+  // FAQ Schema removed to avoid duplication with global FAQPage in index.html
 
   // How-To Schema for ordering tents
   const howToSchema = {
@@ -350,7 +308,6 @@ const TentProducts = () => {
     "@context": "https://schema.org",
     "@graph": [
       tentProductsStructuredData,
-      faqSchema,
       howToSchema
     ]
   }
