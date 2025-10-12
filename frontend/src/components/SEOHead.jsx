@@ -65,119 +65,119 @@ export const seoConfigs = {
     title: "BuyPrintz - Business Card Tins, Tradeshow Tents & Banner Printing | 2-3 Day Delivery",
     description: "Revolutionary Business Card Tins with fresh mints, professional Tradeshow Tents, and custom banner printing with lightning-fast 2-3 business day delivery. Premium networking tools and trade show displays.",
     keywords: "business card tins, business cards, custom business cards, tradeshow tents, banner printing, custom tins, trade show displays, networking tools, promotional products, business card printing, business card design, business card templates, fresh mints, aluminum tins, fast printing",
-    url: "https://buyprintz.com"
+    url: "https://www.buyprintz.com"
   },
   
   products: {
     title: "All Products - Business Card Tins, Tradeshow Tents & Banners | BuyPrintz",
     description: "Browse our complete catalog: Revolutionary Business Card Tins, professional Tradeshow Tents, and custom banner printing. Premium networking tools and trade show displays with fast 2-3 day delivery.",
     keywords: "business card tins, business cards, custom business cards, tradeshow tents, banner products, custom tins, trade show displays, networking tools, promotional products, business card printing, business card design, aluminum tins, fast printing",
-    url: "https://buyprintz.com/products"
+    url: "https://www.buyprintz.com/products"
   },
   
   businessCardTins: {
     title: "Business Card Tins - Custom Aluminum Tins with Mints | BuyPrintz",
     description: "Revolutionary Business Card Tins with custom vinyl stickers and fresh mints. Premium aluminum tins that make lasting impressions. Perfect for networking, events, and professional marketing. 100 unit minimum orders.",
     keywords: "business card tins, business cards, custom business cards, aluminum business cards, business card printing, business card design, business card templates, business card ideas, business card alternatives, networking cards, professional business cards, custom business card tins, promotional business cards, business card holders, business card storage, business card cases, custom tins, aluminum tins, fresh mints, networking tools, promotional tins, professional networking, custom vinyl stickers",
-    url: "https://buyprintz.com/business-card-tins"
+    url: "https://www.buyprintz.com/business-card-tins"
   },
   
   tradeshowTents: {
     title: "Tradeshow Tents - Custom Pop-Up Displays | BuyPrintz",
     description: "Professional tradeshow tents and pop-up displays for trade shows, events, and exhibitions. Custom graphics, durable construction, and easy setup. Perfect for trade shows, farmers markets, and outdoor events.",
     keywords: "tradeshow tents, pop-up displays, trade show booths, custom tents, exhibition displays, event tents, trade show marketing, pop-up tents",
-    url: "https://buyprintz.com/tradeshow-tents"
+    url: "https://www.buyprintz.com/tradeshow-tents"
   },
   
   editor: {
     title: "Design Tool - Create Business Card Tins, Tents & Banners Online | BuyPrintz",
     description: "Use our advanced design tool to create custom Business Card Tins, Tradeshow Tents, and banners online. Professional canvas editor with text, shapes, and color tools. Real-time preview and instant pricing.",
     keywords: "design tool, business card tin designer, business card designer, business card design tool, tradeshow tent designer, banner design tool, online creator, custom design, canvas editor, design software, business card maker, business card creator",
-    url: "https://buyprintz.com/editor"
+    url: "https://www.buyprintz.com/editor"
   },
   
   login: {
     title: "Sign In to Your Account | BuyPrintz - Business Card Tins, Tents & Banners",
     description: "Sign in to your BuyPrintz account to access your designs, track orders, and manage your Business Card Tins, Tradeshow Tents, and banner printing projects.",
     keywords: "login, sign in, account access, BuyPrintz account, business card tins, tradeshow tents, banner printing account",
-    url: "https://buyprintz.com/login"
+    url: "https://www.buyprintz.com/login"
   },
   
   register: {
     title: "Create Account - Get Started | BuyPrintz - Business Card Tins, Tents & Banners",
     description: "Create your free BuyPrintz account and start designing Business Card Tins, Tradeshow Tents, and banners today. Save designs, track orders, and get fast 2-3 day delivery.",
     keywords: "create account, sign up, register, new account, BuyPrintz registration, business card tins, tradeshow tents, banner printing account",
-    url: "https://buyprintz.com/register"
+    url: "https://www.buyprintz.com/register"
   },
   
   dashboard: {
     title: "Dashboard - Manage Your Orders | BuyPrintz",
     description: "Manage your Business Card Tins, Tradeshow Tents, and banner printing orders. Track delivery status and access your saved designs from your BuyPrintz dashboard.",
     keywords: "dashboard, order management, track orders, saved designs, business card tins, tradeshow tents, banner orders, account dashboard",
-    url: "https://buyprintz.com/dashboard"
+    url: "https://www.buyprintz.com/dashboard"
   },
   
   marketplace: {
     title: "Creator Marketplace - Professional Templates | BuyPrintz",
     description: "Browse and purchase professional templates for Business Card Tins, Tradeshow Tents, and banners from our creator marketplace. High-quality designs for business, events, and promotional use.",
     keywords: "templates, marketplace, creator designs, business card tin templates, business card templates, tradeshow tent templates, banner templates, professional designs, custom templates, business card design templates",
-    url: "https://buyprintz.com/marketplace"
+    url: "https://www.buyprintz.com/marketplace"
   },
   
   tinskinz: {
     title: "TinSkinz Marketplace - Custom Tin Designs | BuyPrintz",
     description: "Discover unique tin designs in our TinSkinz marketplace. Custom tin wraps, business card tins, and promotional tin products.",
     keywords: "tin designs, tin wraps, business card tins, promotional tins, custom tin products, TinSkinz",
-    url: "https://buyprintz.com/tinskinz"
+    url: "https://www.buyprintz.com/tinskinz"
   },
   
   contact: {
     title: "Contact Us - Business Card Tins, Tents & Banner Support | BuyPrintz",
     description: "Get in touch with our professional team for Business Card Tins, Tradeshow Tents, and banner printing support. Expert assistance for custom designs, fast delivery, and quality services.",
     keywords: "contact, support, business card tins help, tradeshow tents help, banner printing help, custom design assistance, printing questions",
-    url: "https://buyprintz.com/contact"
+    url: "https://www.buyprintz.com/contact"
   },
   
   blog: {
     title: "Blog - Business Card Tins, Tents & Marketing Tips | BuyPrintz",
     description: "Read our latest blog posts about Business Card Tins, Tradeshow Tents, banner printing, design tips, marketing strategies, and industry insights to help your business grow.",
     keywords: "business card tins blog, tradeshow tents blog, banner printing blog, design tips, marketing insights, networking tools, promotional products, business tips",
-    url: "https://buyprintz.com/blog"
+    url: "https://www.buyprintz.com/blog"
   },
   
   terms: {
     title: "Terms of Service | BuyPrintz - Business Card Tins, Tents & Banners",
     description: "Read our terms of service for BuyPrintz Business Card Tins, Tradeshow Tents, and banner printing services. Clear policies for orders, delivery, and customer rights.",
     keywords: "terms of service, legal terms, business card tins terms, tradeshow tents terms, banner printing terms, BuyPrintz policies",
-    url: "https://buyprintz.com/terms"
+    url: "https://www.buyprintz.com/terms"
   },
   
   privacy: {
     title: "Privacy Policy | BuyPrintz - Business Card Tins, Tents & Banners",
     description: "Learn how BuyPrintz protects your privacy and handles your personal information for Business Card Tins, Tradeshow Tents, and banner printing services. Our commitment to data security and privacy.",
     keywords: "privacy policy, data protection, privacy rights, BuyPrintz privacy, business card tins privacy, tradeshow tents privacy, information security",
-    url: "https://buyprintz.com/privacy"
+    url: "https://www.buyprintz.com/privacy"
   },
   
   support: {
     title: "Support Center - Help & FAQ | BuyPrintz",
     description: "Get help with your Business Card Tins, Tradeshow Tents, and banner printing orders. Design questions, technical support, and comprehensive FAQ resources.",
     keywords: "support, help, FAQ, customer service, business card tins help, tradeshow tents help, banner printing help, technical support",
-    url: "https://buyprintz.com/support"
+    url: "https://www.buyprintz.com/support"
   },
   
   checkout: {
     title: "Checkout - Complete Your Order | BuyPrintz",
     description: "Complete your Business Card Tins, Tradeshow Tents, or banner printing order with secure checkout. Review your design, select options, and place your order for fast delivery.",
     keywords: "checkout, order completion, secure payment, business card tins order, tradeshow tents order, banner order, fast delivery",
-    url: "https://buyprintz.com/checkout"
+    url: "https://www.buyprintz.com/checkout"
   },
   
   confirmation: {
     title: "Order Confirmation - Thank You | BuyPrintz",
     description: "Your Business Card Tins, Tradeshow Tents, or banner printing order has been confirmed. Track your order status and expect fast 2-3 business day delivery.",
     keywords: "order confirmation, thank you, order tracking, business card tins delivery, tradeshow tents delivery, banner delivery confirmation",
-    url: "https://buyprintz.com/confirmation"
+    url: "https://www.buyprintz.com/confirmation"
   }
 }
 
