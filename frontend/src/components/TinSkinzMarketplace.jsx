@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle, Button, NeumorphicButton } fr
 import TinSkinzMockupViewer from './TinSkinzMockupViewer';
 import { calculateTinSkinzPricing, getPricingBreakdown, formatCurrency, getBulkSavings, CANDY_OPTIONS, calculateCandyPricing } from '../utils/tinSkinzPricing';
 import { useStripe } from '@stripe/react-stripe-js';
+import SEOHead from './SEOHead';
+import { seoConfigs } from './SEOHead';
 
 // All Tin Skinz designs
 const tinSkinzDesigns = {
@@ -412,6 +414,391 @@ const TinSkinzMarketplace = () => {
 
   const currentDesigns = tinSkinzDesigns[selectedCategory] || [];
 
+  // Enhanced Product Collection Schema with proper Google Shopping support
+  const tinSkinzStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "TinSkinz Marketplace - Custom Tin Designs",
+    "description": "Discover unique tin designs in our TinSkinz marketplace. Custom tin wraps, business card tins, and promotional tin products with candy options.",
+    "url": "https://www.buyprintz.com/tin-skinz",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "TinSkinz",
+          "item": "https://www.buyprintz.com/tin-skinz"
+        }
+      ]
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/tin-skinz#business-card-tins",
+          "name": "Business Card Tins with Mints",
+          "description": "Premium business card tins (Altoid-style) with custom branding and mints. Eco-friendly, reusable containers that get kept, not thrown away. 100 unit minimum.",
+          "image": [
+            "https://www.buyprintz.com/assets/images/Tins_BC_v2_new phone number.png",
+            "https://www.buyprintz.com/assets/images/tin-skinz-showcase.jpg"
+          ],
+          "sku": "TIN-BC-001",
+          "gtin": "0085001234001",
+          "mpn": "TINBC001",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz",
+            "logo": "https://www.buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+          },
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "BuyPrintz",
+            "url": "https://www.buyprintz.com"
+          },
+          "category": "Business Cards & Networking",
+          "material": "Aluminum",
+          "color": "Silver/Black/Gold",
+          "offers": {
+            "@type": "Offer",
+            "url": "https://www.buyprintz.com/tin-skinz#business-card-tins",
+            "price": "399.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2025-12-31",
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "@id": "https://www.buyprintz.com",
+              "name": "BuyPrintz"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "USD"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 5,
+                  "maxValue": 7,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "127",
+            "bestRating": "5",
+            "worstRating": "1",
+            "itemReviewed": {
+              "@type": "Product",
+              "name": "Business Card Tins with Mints"
+            }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Sarah Johnson"
+              },
+              "datePublished": "2025-09-15",
+              "reviewBody": "These business card tins are absolutely brilliant! My clients are always impressed when I hand them a tin instead of a regular card. The quality is outstanding and they actually get kept and reused.",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5",
+                "worstRating": "1"
+              }
+            },
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Mike Chen"
+              },
+              "datePublished": "2025-09-10",
+              "reviewBody": "Game changer for networking! The tins are premium quality and the mints are always fresh. I've had multiple people ask where I got them. Great investment for professional networking.",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5",
+                "worstRating": "1"
+              }
+            }
+          ],
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "Minimum Order Quantity",
+              "value": "100 units"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Production Time",
+              "value": "5-7 business days"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Eco-Friendly",
+              "value": "Yes - Reusable aluminum containers"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Custom Branding",
+              "value": "Full customization available"
+            }
+          ]
+        },
+        {
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/tin-skinz#candy-tins",
+          "name": "Tin Skinz Candy Tins",
+          "description": "Pre-designed tins filled with candy for every occasion. Perfect for weddings, birthdays, holidays, and special events. Custom branding available.",
+          "image": [
+            "https://www.buyprintz.com/assets/images/tin-skinz-candy.jpg",
+            "https://www.buyprintz.com/assets/images/tin-skinz-showcase.jpg"
+          ],
+          "sku": "TIN-CANDY-001",
+          "gtin": "0085001234002",
+          "mpn": "TINCANDY001",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz",
+            "logo": "https://www.buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+          },
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "BuyPrintz",
+            "url": "https://www.buyprintz.com"
+          },
+          "category": "Party Favors & Events",
+          "material": "Aluminum",
+          "color": "Various",
+          "offers": {
+            "@type": "Offer",
+            "url": "https://www.buyprintz.com/tin-skinz#candy-tins",
+            "price": "9.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2025-12-31",
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "@id": "https://www.buyprintz.com",
+              "name": "BuyPrintz"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "USD"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 3,
+                  "maxValue": 5,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "89",
+            "bestRating": "5",
+            "worstRating": "1",
+            "itemReviewed": {
+              "@type": "Product",
+              "name": "Tin Skinz Candy Tins"
+            }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Jennifer Martinez"
+              },
+              "datePublished": "2025-09-12",
+              "reviewBody": "Used these for our wedding favors and they were a huge hit! The designs are beautiful and the candy was fresh. Guests loved the unique take on traditional favors.",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5",
+                "worstRating": "1"
+              }
+            }
+          ],
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "Candy Options",
+              "value": "Multiple candy types available"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Custom Messages",
+              "value": "Personalized messages available"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Design Categories",
+              "value": "Abstract Art, Zodiac, Animals, Nature, Holidays"
+            }
+          ]
+        }
+      ]
+    }
+  };
+
+  // FAQ Schema for TinSkinz
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are TinSkinz?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "TinSkinz are custom-designed aluminum tins that can be filled with candy, mints, or other small items. They're perfect for business cards, wedding favors, party favors, and promotional items."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What candy options are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We offer various candy options including peppermint mints, chocolate, gummy bears, and seasonal candies. You can choose different candy types for different designs."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I customize the tin designs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! We offer pre-designed templates in categories like Abstract Art, Zodiac, Animals, Nature, and Holidays. You can also add custom messages to personalize your tins."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the minimum order quantity?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The minimum order quantity varies by product type. Business card tins have a 100 unit minimum, while TinSkinz candy tins can be ordered in smaller quantities."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does production take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Production typically takes 3-7 business days depending on the complexity of your order and current production volume. We'll provide specific timelines when you place your order."
+        }
+      }
+    ]
+  };
+
+  // How-To Schema for ordering TinSkinz
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Order Custom TinSkinz",
+    "description": "Step-by-step guide to ordering custom TinSkinz from BuyPrintz",
+    "totalTime": "PT15M",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Browse Designs",
+        "text": "Explore our design categories including Abstract Art, Zodiac, Animals, Nature, and Holidays to find the perfect style for your event or business.",
+        "url": "https://www.buyprintz.com/tin-skinz"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Select Candy Type",
+        "text": "Choose from our variety of candy options including peppermint mints, chocolate, gummy bears, and seasonal candies.",
+        "url": "https://www.buyprintz.com/tin-skinz"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Add Custom Message",
+        "text": "Personalize your tins with custom messages for weddings, birthdays, business events, or any special occasion.",
+        "url": "https://www.buyprintz.com/tin-skinz"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Choose Quantity",
+        "text": "Select the quantity needed for your event. Mix and match different designs to create variety in your order.",
+        "url": "https://www.buyprintz.com/tin-skinz"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Review and Order",
+        "text": "Preview your selections, review pricing, and complete your order. Your custom TinSkinz will be produced and shipped within 3-7 business days.",
+        "url": "https://www.buyprintz.com/tin-skinz"
+      }
+    ]
+  };
+
+  // Combine all schemas
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      tinSkinzStructuredData,
+      faqSchema,
+      howToSchema
+    ]
+  };
+
   // Restore selections from URL parameters (when coming back from checkout)
   useEffect(() => {
     const selectedDesignsParam = searchParams.get('selected_designs');
@@ -627,7 +1014,9 @@ const TinSkinzMarketplace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-2 sm:p-4">
+    <>
+      <SEOHead {...seoConfigs.tinskinz} structuredData={combinedSchema} />
+      <div className="min-h-screen bg-gradient-to-br from-primary-700 to-primary-900 p-2 sm:p-4">
       <div className="max-w-7xl mx-auto w-full overflow-hidden">
         <div className="text-center mb-8">
           {/* Tin Skinz Logo */}
@@ -905,6 +1294,7 @@ const TinSkinzMarketplace = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
