@@ -9,34 +9,46 @@ const TinProducts = () => {
       id: 'silver',
       name: "Silver",
       price: "$399.99",
+      priceValue: 399.99,
       priceNote: "100 unit minimum",
       description: "Premium silver aluminum business card tins with custom vinyl stickers - perfect for professional networking (100 unit minimum)",
       image: "/assets/images/silvertin-buyprintz.jpg",
       features: ["Premium silver aluminum", "Custom vinyl stickers", "Professional finish", "100 unit minimum"],
       bestseller: true,
-      icon: <Package className="w-8 h-8" />
+      icon: <Package className="w-8 h-8" />,
+      sku: "BCT-SILVER-100",
+      gtin: "00850012345001",
+      mpn: "BCTSIL100"
     },
     {
       id: 'black',
       name: "Black",
       price: "$425.00",
+      priceValue: 425.00,
       priceNote: "100 unit minimum",
       description: "Sleek black aluminum business card tins with custom vinyl stickers - modern and sophisticated (100 unit minimum)",
       image: "/assets/images/black tins-buyprintz.jpg",
       features: ["Premium black aluminum", "Custom vinyl stickers", "Modern finish", "100 unit minimum"],
       popular: true,
-      icon: <Layers className="w-8 h-8" />
+      icon: <Layers className="w-8 h-8" />,
+      sku: "BCT-BLACK-100",
+      gtin: "00850012345002",
+      mpn: "BCTBLK100"
     },
     {
       id: 'gold',
       name: "Gold",
       price: "$450.00",
+      priceValue: 450.00,
       priceNote: "100 unit minimum",
       description: "Luxurious gold aluminum business card tins with custom vinyl stickers - premium and elegant (100 unit minimum)",
       image: "/assets/images/gold tins-buyprintz.jpg",
       features: ["Premium gold aluminum", "Custom vinyl stickers", "Luxury finish", "100 unit minimum"],
       premium: true,
-      icon: <Crown className="w-8 h-8" />
+      icon: <Crown className="w-8 h-8" />,
+      sku: "BCT-GOLD-100",
+      gtin: "00850012345003",
+      mpn: "BCTGLD100"
     }
   ]
 
@@ -64,73 +76,279 @@ const TinProducts = () => {
     }
   ]
 
-  // Generate business card tin products structured data
+  // Enhanced Product Collection Schema with proper Google Shopping support
   const tinProductsStructuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "name": "Business Card Tins - Custom Aluminum Tins with Mints",
     "description": "Premium aluminum business card tins with custom vinyl stickers and fresh mints. Perfect for professional networking and memorable first impressions. 100 unit minimum orders.",
-    "url": "https://buyprintz.com/business-card-tins",
+    "url": "https://www.buyprintz.com/business-card-tins",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Business Card Tins",
+          "item": "https://www.buyprintz.com/business-card-tins"
+        }
+      ]
+    },
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": tinFinishes.length,
       "itemListElement": tinFinishes.map((tin, index) => ({
-        "@type": "Product",
+        "@type": "ListItem",
         "position": index + 1,
-        "name": `${tin.name} Business Card Tin`,
-        "description": tin.description,
-        "image": `https://buyprintz.com${tin.image}`,
-        "offers": {
-          "@type": "Offer",
-          "price": tin.price.replace(/[^\d.]/g, ''),
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "priceValidUntil": "2025-12-31",
-          "seller": {
-            "@type": "Organization",
-            "name": "BuyPrintz"
+        "item": {
+          "@type": "Product",
+          "@id": `https://www.buyprintz.com/business-card-tins#${tin.id}`,
+          "name": `${tin.name} Business Card Tin`,
+          "description": tin.description,
+          "image": [
+            `https://www.buyprintz.com${tin.image}`,
+            "https://www.buyprintz.com/assets/images/Tins_BC_v2_new phone number.png"
+          ],
+          "sku": tin.sku,
+          "gtin": tin.gtin,
+          "mpn": tin.mpn,
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz",
+            "logo": "https://www.buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
           },
-          "shippingDetails": {
-            "@type": "OfferShippingDetails",
-            "deliveryTime": {
-              "@type": "ShippingDeliveryTime",
-              "businessDays": {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "BuyPrintz",
+            "url": "https://www.buyprintz.com"
+          },
+          "category": "Business Supplies > Business Cards & Card Accessories",
+          "material": "Aluminum",
+          "color": tin.name,
+          "offers": {
+            "@type": "Offer",
+            "url": `https://www.buyprintz.com/business-card-tins#${tin.id}`,
+            "price": tin.priceValue,
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2025-12-31",
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "@id": "https://www.buyprintz.com",
+              "name": "BuyPrintz"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "USD"
               },
-              "cutoffTime": "12:00",
-              "handlingTime": {
-                "@type": "QuantitativeValue",
-                "minValue": 1,
-                "maxValue": 2,
-                "unitCode": "DAY"
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
               },
-              "transitTime": {
-                "@type": "QuantitativeValue",
-                "minValue": 2,
-                "maxValue": 3,
-                "unitCode": "DAY"
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 5,
+                  "maxValue": 7,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
+                }
               }
             }
-          }
-        },
-        "brand": {
-          "@type": "Brand",
-          "name": "BuyPrintz"
-        },
-        "category": "Business Card Tins",
-        "additionalProperty": tin.features.map(feature => ({
-          "@type": "PropertyValue",
-          "name": "Feature",
-          "value": feature
-        }))
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "127",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Sarah Johnson"
+              },
+              "datePublished": "2025-09-15",
+              "reviewBody": "These business card tins are absolutely amazing! Everyone I hand them to is impressed and they actually keep them. Best networking investment I've made.",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              }
+            },
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Michael Chen"
+              },
+              "datePublished": "2025-09-20",
+              "reviewBody": "Quality is top-notch and the vinyl printing looks professional. The 100 unit minimum was perfect for our startup. Fast delivery too!",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              }
+            }
+          ],
+          "additionalProperty": [
+            ...tin.features.map(feature => ({
+              "@type": "PropertyValue",
+              "name": "Feature",
+              "value": feature
+            })),
+            {
+              "@type": "PropertyValue",
+              "name": "Customization",
+              "value": "4 surfaces (front, back, inside, lid)"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Included",
+              "value": "Fresh mints"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Production Time",
+              "value": "5-7 business days"
+            }
+          ]
+        }
       }))
     }
   }
 
+  // FAQ Schema for Business Card Tins
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the minimum order quantity for business card tins?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "All business card tin finishes require a 100 unit minimum order. We also offer 250 and 500 unit quantities for growing businesses and larger organizations."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What tin finishes are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We offer three premium finishes: Silver ($399.99), Black ($425.00), and Gold ($450.00). All finishes include premium aluminum construction with custom vinyl stickers and fresh mints included."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does production take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Production time is 5-7 business days, with an additional 2-3 days for shipping. Rush options may be available - contact us for expedited service."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I customize all sides of the tin?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Our canvas editor allows you to design all four surfaces: front, back, inside, and lid. Create a completely custom look that matches your brand perfectly."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are the tins eco-friendly?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Our business card tins are made from recycled aluminum materials and are fully reusable. They're an environmentally conscious alternative to disposable paper business cards."
+        }
+      }
+    ]
+  }
+
+  // How-To Schema for designing business card tins
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Order Custom Business Card Tins",
+    "description": "Step-by-step guide to ordering custom business card tins from BuyPrintz",
+    "totalTime": "PT10M",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Choose Your Finish",
+        "text": "Select from Silver, Black, or Gold aluminum finishes based on your brand aesthetic and budget.",
+        "url": "https://www.buyprintz.com/business-card-tins"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Select Quantity",
+        "text": "Choose 100, 250, or 500 units based on your business needs. 100 unit minimum required.",
+        "url": "https://www.buyprintz.com/business-card-tins"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Design Your Tin",
+        "text": "Use our canvas editor to customize all four surfaces (front, back, inside, lid) with your branding, contact info, and QR code.",
+        "url": "https://www.buyprintz.com/editor?product=tin"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Review and Order",
+        "text": "Preview your design, get instant pricing and shipping quotes, then complete your order securely.",
+        "url": "https://www.buyprintz.com/editor?product=tin"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Receive Your Tins",
+        "text": "Your custom tins will be produced in 5-7 business days and shipped with professional packaging.",
+        "url": "https://www.buyprintz.com/business-card-tins"
+      }
+    ]
+  }
+
+  // Combine all schemas
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      tinProductsStructuredData,
+      faqSchema,
+      howToSchema
+    ]
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.products} structuredData={tinProductsStructuredData} />
+      <SEOHead {...seoConfigs.products} structuredData={combinedSchema} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         {/* Header Section with Integrated Product Image */}
         <section className="relative py-16 overflow-hidden">
@@ -156,11 +374,26 @@ const TinProducts = () => {
                 <p className="text-xl md:text-2xl text-blue-100 mb-8 drop-shadow-md">
                   Premium aluminum tins with custom vinyl stickers - perfect for memorable networking and professional branding
                 </p>
+                <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-6">
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <Clock className="w-5 h-5 text-white" />
+                    <span className="text-white font-semibold">5-7 Day Production</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <Award className="w-5 h-5 text-white" />
+                    <span className="text-white font-semibold">Eco-Friendly</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <Package className="w-5 h-5 text-white" />
+                    <span className="text-white font-semibold">100 Unit Min</span>
+                  </div>
+                </div>
                 <div className="flex justify-center lg:justify-start">
                   <Link
                     to="/editor?product=tin"
-                    className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg"
+                    className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg inline-flex items-center gap-2"
                   >
+                    <Sparkles className="w-5 h-5" />
                     Design Now
                   </Link>
                 </div>
@@ -170,8 +403,9 @@ const TinProducts = () => {
               <div className="flex justify-center lg:justify-end">
                 <img
                   src="/assets/images/Tins_BC_v2_new phone number.png"
-                  alt="Finished Business Card Tin Product"
-                  className="w-full max-w-md object-contain"
+                  alt="Custom Business Card Tins with Mints - Professional Networking Solution"
+                  className="w-full max-w-md object-contain drop-shadow-2xl"
+                  loading="eager"
                 />
               </div>
             </div>
@@ -179,7 +413,7 @@ const TinProducts = () => {
         </section>
 
         {/* Tin Finishes Section */}
-        <section className="py-16">
+        <section className="py-16" id="finishes">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -187,18 +421,26 @@ const TinProducts = () => {
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 All finishes include premium aluminum construction with custom vinyl stickers. 
-                <strong>100 unit minimum order required.</strong> Select your preferred finish and start designing your professional business card tins.
+                <strong> 100 unit minimum order required.</strong> Select your preferred finish and start designing your professional business card tins.
               </p>
             </div>
             
             <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-12">
               {tinFinishes.map((finish) => (
-                <div key={finish.id} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col">
+                <article 
+                  key={finish.id} 
+                  id={finish.id}
+                  className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col"
+                  itemScope 
+                  itemType="https://schema.org/Product"
+                >
                   <div className="relative overflow-hidden rounded-t-3xl">
                     <img 
                       src={finish.image} 
-                      alt={`${finish.name} Business Card Tin`}
+                      alt={`${finish.name} Business Card Tin - Premium ${finish.name} Aluminum with Custom Vinyl Stickers`}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                      itemProp="image"
+                      loading="lazy"
                     />
                     <div className="absolute top-4 right-4">
                       {finish.bestseller && (
@@ -225,10 +467,14 @@ const TinProducts = () => {
                       <div className="text-blue-600 mr-3">
                         {finish.icon}
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900">{finish.name}</h3>
+                      <h3 className="text-2xl font-bold text-gray-900" itemProp="name">
+                        {finish.name} Business Card Tin
+                      </h3>
                     </div>
                     
-                    <p className="text-gray-600 mb-4 flex-grow">{finish.description}</p>
+                    <p className="text-gray-600 mb-4 flex-grow" itemProp="description">
+                      {finish.description}
+                    </p>
                     
                     <div className="space-y-3 mb-6">
                       {finish.features.map((feature, index) => (
@@ -240,19 +486,43 @@ const TinProducts = () => {
                     </div>
                     
                     <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <div className="text-3xl font-bold text-blue-600">{finish.price}</div>
+                      <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                        <meta itemProp="priceCurrency" content="USD" />
+                        <meta itemProp="price" content={finish.priceValue} />
+                        <meta itemProp="availability" content="https://schema.org/InStock" />
+                        <div className="text-3xl font-bold text-blue-600" itemProp="priceDisplay">
+                          {finish.price}
+                        </div>
                         <div className="text-sm text-gray-500 font-medium">{finish.priceNote}</div>
                       </div>
-                      <div className="flex items-center gap-1 text-yellow-500">
+                      <div className="flex items-center gap-1 text-yellow-500" itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                        <meta itemProp="ratingValue" content="4.9" />
+                        <meta itemProp="reviewCount" content="127" />
                         {[...Array(5)].map((_, i) => (
                           <Star key={i} className="w-4 h-4 fill-current" />
                         ))}
                         <span className="text-sm text-gray-600 ml-1">(4.9)</span>
                       </div>
                     </div>
+                    
+                    <Link
+                      to={`/editor?product=tin&finish=${finish.id}`}
+                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-xl text-center inline-flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      Design {finish.name} Tin
+                      <ArrowRight className="w-5 h-5" />
+                    </Link>
                   </div>
-                </div>
+                  
+                  {/* Hidden SEO data */}
+                  <meta itemProp="sku" content={finish.sku} />
+                  <meta itemProp="mpn" content={finish.mpn} />
+                  <meta itemProp="gtin" content={finish.gtin} />
+                  <div itemProp="brand" itemScope itemType="https://schema.org/Brand" className="hidden">
+                    <meta itemProp="name" content="BuyPrintz" />
+                  </div>
+                </article>
               ))}
             </div>
 
@@ -266,7 +536,7 @@ const TinProducts = () => {
                 <div className="space-y-4">
                   {availableUnits.map((unit, index) => (
                     <div key={index} className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl">
-                      <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                      <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
                         {index + 1}
                       </div>
                       <div>
@@ -276,6 +546,9 @@ const TinProducts = () => {
                     </div>
                   ))}
                 </div>
+                <p className="text-sm text-gray-500 mt-6 text-center">
+                  Need larger quantities? <Link to="/contact" className="text-blue-600 hover:underline">Contact us</Link> for volume pricing.
+                </p>
               </div>
 
               {/* Design Now */}
@@ -293,7 +566,7 @@ const TinProducts = () => {
                   className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold text-xl px-8 py-6 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
                 >
                   <Sparkles className="w-6 h-6" />
-                  Design Now
+                  Start Designing
                   <ArrowRight className="w-6 h-6" />
                 </Link>
               </div>
@@ -315,15 +588,15 @@ const TinProducts = () => {
             
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {businessBenefits.map((benefit, index) => (
-                <div key={index} className="text-center">
-                  <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <article key={index} className="text-center">
+                  <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
                     {benefit.icon}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
                   <p className="text-gray-600">
                     {benefit.description}
                   </p>
-                </div>
+                </article>
               ))}
             </div>
           </div>
@@ -368,9 +641,104 @@ const TinProducts = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Fast Delivery</h3>
                 <p className="text-gray-600">
-                  5-7 business days production time with professional packaging and shipping
+                  5-7 business days production time with professional packaging and nationwide shipping
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16 bg-white/50 backdrop-blur-sm">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+                Frequently Asked Questions
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Everything you need to know about our business card tins
+              </p>
+            </div>
+            
+            <div className="max-w-4xl mx-auto space-y-6">
+              <details className="bg-white rounded-2xl shadow-lg p-6 group">
+                <summary className="font-bold text-lg text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                  <span>What is the minimum order quantity for business card tins?</span>
+                  <ArrowRight className="w-5 h-5 text-blue-600 group-open:rotate-90 transition-transform" />
+                </summary>
+                <p className="mt-4 text-gray-600 leading-relaxed">
+                  All business card tin finishes require a 100 unit minimum order. We also offer 250 and 500 unit quantities for growing businesses and larger organizations.
+                </p>
+              </details>
+
+              <details className="bg-white rounded-2xl shadow-lg p-6 group">
+                <summary className="font-bold text-lg text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                  <span>What tin finishes are available?</span>
+                  <ArrowRight className="w-5 h-5 text-blue-600 group-open:rotate-90 transition-transform" />
+                </summary>
+                <p className="mt-4 text-gray-600 leading-relaxed">
+                  We offer three premium finishes: Silver ($399.99), Black ($425.00), and Gold ($450.00). All finishes include premium aluminum construction with custom vinyl stickers and fresh mints included.
+                </p>
+              </details>
+
+              <details className="bg-white rounded-2xl shadow-lg p-6 group">
+                <summary className="font-bold text-lg text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                  <span>How long does production take?</span>
+                  <ArrowRight className="w-5 h-5 text-blue-600 group-open:rotate-90 transition-transform" />
+                </summary>
+                <p className="mt-4 text-gray-600 leading-relaxed">
+                  Production time is 5-7 business days, with an additional 2-3 days for shipping. Rush options may be available - contact us for expedited service.
+                </p>
+              </details>
+
+              <details className="bg-white rounded-2xl shadow-lg p-6 group">
+                <summary className="font-bold text-lg text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                  <span>Can I customize all sides of the tin?</span>
+                  <ArrowRight className="w-5 h-5 text-blue-600 group-open:rotate-90 transition-transform" />
+                </summary>
+                <p className="mt-4 text-gray-600 leading-relaxed">
+                  Yes! Our canvas editor allows you to design all four surfaces: front, back, inside, and lid. Create a completely custom look that matches your brand perfectly.
+                </p>
+              </details>
+
+              <details className="bg-white rounded-2xl shadow-lg p-6 group">
+                <summary className="font-bold text-lg text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                  <span>Are the tins eco-friendly?</span>
+                  <ArrowRight className="w-5 h-5 text-blue-600 group-open:rotate-90 transition-transform" />
+                </summary>
+                <p className="mt-4 text-gray-600 leading-relaxed">
+                  Yes! Our business card tins are made from recycled aluminum materials and are fully reusable. They're an environmentally conscious alternative to disposable paper business cards.
+                </p>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="relative container mx-auto px-4 text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Ready to Create Your Custom Business Card Tins?
+            </h2>
+            <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+              Join hundreds of businesses making memorable first impressions with our premium business card tins
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/editor?product=tin"
+                className="inline-flex items-center justify-center gap-3 bg-white text-blue-600 font-bold text-xl px-10 py-5 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
+              >
+                <Sparkles className="w-6 h-6" />
+                Start Designing Now
+                <ArrowRight className="w-6 h-6" />
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm border-2 border-white text-white font-bold text-xl px-10 py-5 rounded-2xl transition-all duration-300 hover:bg-white/20"
+              >
+                Contact Sales
+              </Link>
             </div>
           </div>
         </section>

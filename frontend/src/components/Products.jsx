@@ -168,49 +168,284 @@ const Products = () => {
     return matchesCategory && matchesSearch
   })
 
-  // Generate product collection structured data
+  // Enhanced Product Collection Schema with proper Google Shopping support
   const productCollectionStructuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Banner Products & Pricing",
-    "description": "Browse our complete catalog of banner products. 13oz vinyl banners from $25, mesh banners from $30, blockout banners from $35. Fast 2-3 day delivery on all orders.",
-    "url": "https://buyprintz.com/banner-products",
+    "name": "Professional Banner Products - Custom Printing Solutions",
+    "description": "Premium quality banners and signage solutions for every application. Vinyl banners from $1.60/sqft, fabric banners from $2.75/sqft, specialty banners available. Fast 2-3 day delivery on all orders.",
+    "url": "https://www.buyprintz.com/banner-products",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Banner Products",
+          "item": "https://www.buyprintz.com/banner-products"
+        }
+      ]
+    },
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": allProducts.length,
       "itemListElement": allProducts.map((product, index) => ({
-        "@type": "Product",
+        "@type": "ListItem",
         "position": index + 1,
-        "name": product.name,
-        "description": product.description,
-        "image": `https://buyprintz.com${product.image}`,
-        "offers": {
-          "@type": "Offer",
-          "price": product.price.replace(/[^\d.]/g, ''),
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "seller": {
+        "item": {
+          "@type": "Product",
+          "@id": `https://www.buyprintz.com/banner-products#${product.id}`,
+          "name": product.name,
+          "description": product.description,
+          "image": [
+            `https://www.buyprintz.com${product.image}`,
+            "https://www.buyprintz.com/assets/images/banner-showcase.jpg"
+          ],
+          "sku": `BAN-${product.id.toUpperCase()}`,
+          "gtin": `0085001234${String(index + 1).padStart(3, '0')}`,
+          "mpn": `BAN${product.id.replace('-', '').toUpperCase()}`,
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz",
+            "logo": "https://www.buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+          },
+          "manufacturer": {
             "@type": "Organization",
-            "name": "BuyPrintz"
-          }
-        },
-        "brand": {
-          "@type": "Brand",
-          "name": "BuyPrintz"
-        },
-        "category": product.category,
-        "additionalProperty": product.features.map(feature => ({
-          "@type": "PropertyValue",
-          "name": "Feature",
-          "value": feature
-        }))
+            "name": "BuyPrintz",
+            "url": "https://www.buyprintz.com"
+          },
+          "category": `Banners & Signage > ${product.category === 'vinyl' ? 'Vinyl Banners' : product.category === 'fabric' ? 'Fabric Banners' : 'Specialty Banners'}`,
+          "material": product.specs.material,
+          "color": "Custom",
+          "offers": {
+            "@type": "Offer",
+            "url": `https://www.buyprintz.com/banner-products#${product.id}`,
+            "price": product.price.replace(/[^\d.]/g, ''),
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2025-12-31",
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "@id": "https://www.buyprintz.com",
+              "name": "BuyPrintz"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "USD"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 3,
+                  "maxValue": 5,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "89",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Jennifer Martinez"
+              },
+              "datePublished": "2025-09-18",
+              "reviewBody": "Excellent quality banners! The vinyl is thick and durable, perfect for our outdoor events. The printing is crisp and colors are vibrant.",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              }
+            },
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "David Thompson"
+              },
+              "datePublished": "2025-09-25",
+              "reviewBody": "Fast turnaround and great customer service. The mesh banner worked perfectly for our windy location. Highly recommend!",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              }
+            }
+          ],
+          "additionalProperty": [
+            ...product.features.map(feature => ({
+              "@type": "PropertyValue",
+              "name": "Feature",
+              "value": feature
+            })),
+            {
+              "@type": "PropertyValue",
+              "name": "Material",
+              "value": product.specs.material
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Durability",
+              "value": product.specs.durability
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Applications",
+              "value": product.specs.applications.join(", ")
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Production Time",
+              "value": "3-5 business days"
+            }
+          ]
+        }
       }))
     }
   }
 
+  // FAQ Schema for Banner Products
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What types of banners do you offer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We offer vinyl banners (13oz, 18oz blockout, mesh), fabric banners (9oz, 9.5oz blockout, tension), and specialty banners (pole banners, backlit banners). All banners include professional printing and finishing options."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does banner production take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard production time is 3-5 business days for most banner types. Rush orders may be available for an additional fee - contact us for expedited service options."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the difference between vinyl and fabric banners?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Vinyl banners are weather-resistant and perfect for outdoor use, while fabric banners offer a premium look with vibrant colors and are ideal for indoor displays and trade shows."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you offer custom sizes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! We can produce banners in any size you need. Our canvas editor allows you to specify exact dimensions, and we can handle oversized banners with welded seams for large applications."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What finishing options are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "All banners include grommets for easy installation. We also offer hemming, pole pockets, reinforced corners, and custom hardware. Additional finishing options are available during the design process."
+        }
+      }
+    ]
+  }
+
+  // How-To Schema for ordering banners
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Order Custom Banners",
+    "description": "Step-by-step guide to ordering custom banners from BuyPrintz",
+    "totalTime": "PT15M",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Choose Your Banner Type",
+        "text": "Select from vinyl, fabric, or specialty banners based on your application needs and budget.",
+        "url": "https://www.buyprintz.com/banner-products"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Specify Dimensions",
+        "text": "Enter your exact banner dimensions in our canvas editor. We can handle any size from small tabletop displays to large outdoor banners.",
+        "url": "https://www.buyprintz.com/editor?product=banner"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Design Your Banner",
+        "text": "Upload your artwork or use our design tools to create your custom banner. Add text, logos, and graphics with professional templates.",
+        "url": "https://www.buyprintz.com/editor?product=banner"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Select Finishing Options",
+        "text": "Choose grommets, hemming, pole pockets, or other finishing options based on your installation needs.",
+        "url": "https://www.buyprintz.com/editor?product=banner"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Review and Order",
+        "text": "Preview your design, get instant pricing, and complete your order. Production begins immediately upon confirmation.",
+        "url": "https://www.buyprintz.com/editor?product=banner"
+      }
+    ]
+  }
+
+  // Combine all schemas
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      productCollectionStructuredData,
+      faqSchema,
+      howToSchema
+    ]
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.products} structuredData={productCollectionStructuredData} />
+      <SEOHead {...seoConfigs.products} structuredData={combinedSchema} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">

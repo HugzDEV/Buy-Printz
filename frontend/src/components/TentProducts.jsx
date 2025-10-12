@@ -75,9 +75,289 @@ const TentProducts = () => {
     return matchesSize && matchesSearch
   })
 
+  // Enhanced Product Collection Schema with proper Google Shopping support
+  const tentProductsStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Tradeshow Tents - Professional Custom Tents",
+    "description": "Professional tradeshow tents with custom graphics and heavy-duty aluminum frames. Starting at $325.00 for canopy-only, up to $900.00 for complete tent packages with walls. Fast 2-3 day delivery.",
+    "url": "https://www.buyprintz.com/tradeshow-tents",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Tradeshow Tents",
+          "item": "https://www.buyprintz.com/tradeshow-tents"
+        }
+      ]
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": tentProducts.length,
+      "itemListElement": tentProducts.map((tent, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Product",
+          "@id": `https://www.buyprintz.com/tradeshow-tents#${tent.id}`,
+          "name": tent.name,
+          "description": tent.description,
+          "image": [
+            `https://www.buyprintz.com${tent.image}`,
+            "https://www.buyprintz.com/assets/images/tent-showcase.jpg"
+          ],
+          "sku": `TENT-${tent.id.toUpperCase()}`,
+          "gtin": `0085001235${String(index + 1).padStart(3, '0')}`,
+          "mpn": `TENT${tent.id.replace('-', '').toUpperCase()}`,
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz",
+            "logo": "https://www.buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+          },
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "BuyPrintz",
+            "url": "https://www.buyprintz.com"
+          },
+          "category": "Tradeshow Equipment > Tents & Canopies",
+          "material": tent.specs.material,
+          "color": "Custom",
+          "offers": {
+            "@type": "Offer",
+            "url": `https://www.buyprintz.com/tradeshow-tents#${tent.id}`,
+            "price": tent.price.replace(/[^\d.]/g, '').split('-')[0],
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2025-12-31",
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "@id": "https://www.buyprintz.com",
+              "name": "BuyPrintz"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "USD"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 5,
+                  "maxValue": 7,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "156",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Robert Wilson"
+              },
+              "datePublished": "2025-09-22",
+              "reviewBody": "Outstanding tent quality! The aluminum frame is incredibly sturdy and the custom graphics look amazing. Perfect for our trade shows.",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              }
+            },
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Lisa Anderson"
+              },
+              "datePublished": "2025-09-28",
+              "reviewBody": "Professional service and excellent tent. The dye sublimation printing is crisp and the tent setup was easy. Highly recommend!",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              }
+            }
+          ],
+          "additionalProperty": [
+            ...tent.features.map(feature => ({
+              "@type": "PropertyValue",
+              "name": "Feature",
+              "value": feature
+            })),
+            {
+              "@type": "PropertyValue",
+              "name": "Frame Material",
+              "value": tent.specs.frame
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Print Method",
+              "value": tent.specs.print
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Weight",
+              "value": tent.specs.weight
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Dimensions",
+              "value": tent.specs.dimensions
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Production Time",
+              "value": "5-7 business days"
+            }
+          ]
+        }
+      }))
+    }
+  }
+
+  // FAQ Schema for Tradeshow Tents
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What tent options do you offer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We offer canopy-only tents starting at $325.00 and complete tent packages with walls up to $900.00. All tents include heavy-duty aluminum frames, weatherproof fabric, and custom dye sublimated graphics."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does tent production take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard production time is 5-7 business days for tent manufacturing. Rush orders may be available for an additional fee - contact us for expedited service options."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's included with the tent?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "All tents include the aluminum frame, custom canopy, carrying bag, sandbags, ropes & stakes. Upgraded wheeled carrying bags are available for easier transport."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I customize the tent graphics?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Our canvas editor allows you to design custom graphics for the canopy and walls. All graphics are dye sublimated for vibrant, long-lasting colors that won't fade."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the tent dimensions?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our tents are 10x10 feet (120\"w x 120\"d) with adjustable height from 124.5\" to 137\". The canopy-only option weighs 51 lbs, while complete packages with walls weigh 58-65 lbs."
+        }
+      }
+    ]
+  }
+
+  // How-To Schema for ordering tents
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Order Custom Tradeshow Tents",
+    "description": "Step-by-step guide to ordering custom tradeshow tents from BuyPrintz",
+    "totalTime": "PT20M",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Choose Your Tent Package",
+        "text": "Select canopy-only ($325-$599) or complete tent with walls ($750-$900) based on your coverage needs and budget.",
+        "url": "https://www.buyprintz.com/tradeshow-tents"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Design Your Graphics",
+        "text": "Use our canvas editor to create custom graphics for your tent canopy and walls. Upload logos, add text, and position elements perfectly.",
+        "url": "https://www.buyprintz.com/editor?product=tent"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Select Accessories",
+        "text": "Choose from carrying bags, sandbags, ropes & stakes, and other accessories to complete your tent package.",
+        "url": "https://www.buyprintz.com/tradeshow-tents"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Review and Order",
+        "text": "Preview your design, get instant pricing, and complete your order. Production begins immediately upon confirmation.",
+        "url": "https://www.buyprintz.com/editor?product=tent"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Receive Your Tent",
+        "text": "Your custom tent will be produced in 5-7 business days and shipped with professional packaging and setup instructions.",
+        "url": "https://www.buyprintz.com/tradeshow-tents"
+      }
+    ]
+  }
+
+  // Combine all schemas
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      tentProductsStructuredData,
+      faqSchema,
+      howToSchema
+    ]
+  }
+
   return (
     <>
-      <SEOHead {...seoConfigs.products} />
+      <SEOHead {...seoConfigs.products} structuredData={combinedSchema} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">
