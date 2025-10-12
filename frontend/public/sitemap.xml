@@ -9,13 +9,6 @@
     <priority>1.0</priority>
   </url>
   
-  <!-- Dashboard -->
-  <url>
-    <loc>https://buyprintz.com/dashboard</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
   
   <!-- Products Page -->
   <url>
@@ -57,125 +50,17 @@
     <priority>0.8</priority>
   </url>
   
-  <!-- Design Tool -->
-  <url>
-    <loc>https://buyprintz.com/editor</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
   
-  <!-- Banner Editor -->
-  <url>
-    <loc>https://buyprintz.com/editor/banner</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
   
-  <!-- Tent Editor -->
-  <url>
-    <loc>https://buyprintz.com/editor/tent</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
   
-  <!-- Tin Editor -->
+  <!-- Tin Skinz -->
   <url>
-    <loc>https://buyprintz.com/editor/tin</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Templates -->
-  <url>
-    <loc>https://buyprintz.com/templates</loc>
+    <loc>https://buyprintz.com/tin-skinz</loc>
     <lastmod>2025-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
-  <!-- Creator Marketplace -->
-  <url>
-    <loc>https://buyprintz.com/marketplace</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <!-- Creator Registration -->
-  <url>
-    <loc>https://buyprintz.com/creator/register</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- Creator Dashboard -->
-  <url>
-    <loc>https://buyprintz.com/creator/dashboard</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <!-- Creator Upload -->
-  <url>
-    <loc>https://buyprintz.com/creator/upload</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- Creator Earnings -->
-  <url>
-    <loc>https://buyprintz.com/creator/earnings</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- TinSkinz Marketplace -->
-  <url>
-    <loc>https://buyprintz.com/tinskinz</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <!-- TinSkinz Demo -->
-  <url>
-    <loc>https://buyprintz.com/tin-skinz-demo</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <!-- TinSkinz Checkout -->
-  <url>
-    <loc>https://buyprintz.com/tin-skinz/checkout</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- TinSkinz Success -->
-  <url>
-    <loc>https://buyprintz.com/tin-skinz/success</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- Login -->
-  <url>
-    <loc>https://buyprintz.com/login</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
   
   <!-- Register -->
   <url>
@@ -193,37 +78,6 @@
     <priority>0.6</priority>
   </url>
   
-  <!-- Checkout -->
-  <url>
-    <loc>https://buyprintz.com/checkout</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- Tin Checkout -->
-  <url>
-    <loc>https://buyprintz.com/tin-checkout</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- Tent Checkout -->
-  <url>
-    <loc>https://buyprintz.com/tent-checkout</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- Order Confirmation -->
-  <url>
-    <loc>https://buyprintz.com/confirmation</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
   
   <!-- Support -->
   <url>
