@@ -246,53 +246,7 @@ const TinProducts = () => {
     }
   }
 
-  // FAQ Schema for Business Card Tins
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "What is the minimum order quantity for business card tins?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "All business card tin finishes require a 100 unit minimum order. We also offer 250 and 500 unit quantities for growing businesses and larger organizations."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What tin finishes are available?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We offer three premium finishes: Silver ($399.99), Black ($425.00), and Gold ($450.00). All finishes include premium aluminum construction with custom vinyl stickers and fresh mints included."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How long does production take?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Production time is 5-7 business days, with an additional 2-3 days for shipping. Rush options may be available - contact us for expedited service."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can I customize all sides of the tin?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes! Our canvas editor allows you to design all four surfaces: front, back, inside, and lid. Create a completely custom look that matches your brand perfectly."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Are the tins eco-friendly?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes! Our business card tins are made from recycled aluminum materials and are fully reusable. They're an environmentally conscious alternative to disposable paper business cards."
-        }
-      }
-    ]
-  }
+  // FAQ Schema removed to avoid duplication with global FAQPage in index.html
 
   // How-To Schema for designing business card tins
   const howToSchema = {
@@ -345,7 +299,6 @@ const TinProducts = () => {
     "@context": "https://schema.org",
     "@graph": [
       tinProductsStructuredData,
-      faqSchema,
       howToSchema
     ]
   }
