@@ -586,6 +586,60 @@ const TinProducts = () => {
               </p>
             </div>
             
+            {/* Related Blog Posts */}
+            <div className="max-w-4xl mx-auto mb-12">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                  Learn More About Business Card Tins
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <Link 
+                    to="/blog/eco-friendly-marketing-reusable-tins-beat-disposable-business-cards"
+                    className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="bg-green-100 p-3 rounded-lg">
+                        <Award className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                          Eco-Friendly Marketing Guide
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Discover how reusable tins beat disposable business cards and reduce environmental waste
+                        </p>
+                        <div className="flex items-center text-blue-600 text-sm font-medium">
+                          Read Article <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                  
+                  <Link 
+                    to="/blog/3-essential-marketing-tools-every-startup-needs-before-digital-ads"
+                    className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="bg-purple-100 p-3 rounded-lg">
+                        <Sparkles className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                          Startup Marketing Essentials
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Learn why business card tins are essential for startups before spending on digital ads
+                        </p>
+                        <div className="flex items-center text-blue-600 text-sm font-medium">
+                          Read Article <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {businessBenefits.map((benefit, index) => (
                 <article key={index} className="text-center">

@@ -147,7 +147,7 @@ In an era where consumers increasingly value environmental responsibility, your 
 
 Don't let your marketing contribute to the waste problem. Make the switch to sustainable networking tools that work harder, last longer, and align with modern values.
 
-Ready to make your marketing more sustainable? Contact BuyPrintz today to discuss your eco-friendly Business Card Tin design. Let's create marketing tools that your contacts will keep, use, and remember.`,
+Ready to make your marketing more sustainable? <Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link> today to discuss your eco-friendly design. Let's create marketing tools that your contacts will keep, use, and remember.`,
       author: "BuyPrintz Team",
       date: "2025-09-22",
       readTime: "6 min read",
@@ -233,9 +233,9 @@ Getting Started
 
 Ready to build your startup's marketing foundation? Here's your action plan:
 
-1. Start with Business Card Tins: Test your branding with a small order
-2. Invest in a Trade Show Tent: Choose a design that reflects your brand
-3. Create Essential Banners: Grand opening, promotion, and event banners
+1. Start with <Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Business Card Tins</Link>: Test your branding with a small order
+2. Invest in a <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">Trade Show Tent</Link>: Choose a design that reflects your brand
+3. Create Essential <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">Banners</Link>: Grand opening, promotion, and event banners
 4. Plan Your Launch: Use all three tools together for maximum impact
 
 The Bottom Line
@@ -244,7 +244,7 @@ While digital marketing has its place, physical marketing tools create the found
 
 Don't let your startup get lost in the digital noise. Invest in physical marketing tools that create real connections and lasting impressions.
 
-Ready to get started? Contact BuyPrintz today to discuss your startup marketing kit. Let's build the foundation for your business success.`,
+Ready to get started? <Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link>, <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">trade show tents</Link>, and <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">banner solutions</Link> today. Let's build the foundation for your business success.`,
       author: "BuyPrintz Team",
       date: "2025-09-21",
       readTime: "7 min read",
@@ -470,7 +470,7 @@ For printing companies and professionals ready to make lasting impressions, cust
 
 Ready to Transform Your Networking Game?
 
-Contact BuyPrintz.com today to discuss creating custom Business Card Tins that reflect your brand's innovation and environmental consciousness. Let's design networking tools that your contacts will remember, use, and talk about.`,
+<Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link> today to discuss creating custom solutions that reflect your brand's innovation and environmental consciousness. Let's design networking tools that your contacts will remember, use, and talk about.`,
       author: "BuyPrintz Team",
       date: "2025-09-09",
       readTime: "8 min read",
@@ -643,6 +643,80 @@ Contact BuyPrintz.com today to discuss creating custom Business Card Tins that r
             {/* Article Content */}
             <div className="prose prose-lg max-w-none">
               {formatContent(post.content)}
+            </div>
+
+            {/* Related Products Section */}
+            <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                Related Products
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <Link 
+                  to="/business-card-tins"
+                  className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="bg-blue-100 p-3 rounded-lg">
+                      <Package className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                        Business Card Tins
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Premium aluminum tins with custom vinyl stickers - perfect for memorable networking
+                      </p>
+                      <div className="flex items-center text-blue-600 text-sm font-medium">
+                        View Products <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+                
+                <Link 
+                  to="/tradeshow-tents"
+                  className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="bg-green-100 p-3 rounded-lg">
+                      <Layers className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                        Trade Show Tents
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Professional 10x10 tents with custom graphics for maximum brand visibility
+                      </p>
+                      <div className="flex items-center text-blue-600 text-sm font-medium">
+                        View Products <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+                
+                <Link 
+                  to="/banner-products"
+                  className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="bg-purple-100 p-3 rounded-lg">
+                      <Sparkles className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                        Custom Banners
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Professional banners for events, promotions, and grand openings
+                      </p>
+                      <div className="flex items-center text-blue-600 text-sm font-medium">
+                        View Products <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             </div>
 
             {/* Call to Action */}
