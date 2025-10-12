@@ -60,10 +60,10 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "LocalBusiness",
+      "@type": "Organization",
       "@id": "https://buyprintz.com",
       "name": "BuyPrintz",
-      "description": "Professional printing services with lightning-fast 2-3 business day delivery. Custom banners, business card tins, trade show displays, and outdoor signage with advanced design tools.",
+      "description": "Online print platform specializing in business branding, marketing, business card tins, trade show banners, and trade show tents with lightning-fast 2-3 business day delivery.",
       "url": "https://buyprintz.com",
       "telephone": "+1-617-505-0603",
       "email": "order@buyprintz.com",
@@ -73,7 +73,7 @@
       "paymentAccepted": "Credit Card, Debit Card",
       "currenciesAccepted": "USD",
       "areaServed": "United States",
-      "serviceType": "Professional Printing Services",
+      "serviceType": "Online Print Platform",
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
         "name": "Professional Printing Services",
@@ -83,9 +83,9 @@
             "itemOffered": {
               "@type": "Service",
               "name": "Business Card Tins",
-              "description": "Premium business card tins with custom printing and design tools"
+              "description": "Premium business card tins with custom printing and design tools (100 unit minimum)"
             },
-            "price": "25",
+            "price": "399.99",
             "priceCurrency": "USD",
             "availability": "InStock"
           },
@@ -94,10 +94,14 @@
             "itemOffered": {
               "@type": "Service",
               "name": "13oz Vinyl Banner Printing",
-              "description": "Weather resistant vinyl banners perfect for outdoor use"
+              "description": "Weather resistant vinyl banners perfect for outdoor use - priced per square foot"
             },
-            "price": "25",
-            "priceCurrency": "USD",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": "Starting from $1.60",
+              "priceCurrency": "USD",
+              "unitText": "per square foot"
+            },
             "availability": "InStock"
           },
           {
@@ -105,10 +109,14 @@
             "itemOffered": {
               "@type": "Service",
               "name": "Mesh Banner Printing",
-              "description": "Wind resistant mesh banners with 70% air flow"
+              "description": "Wind resistant mesh banners with 70% air flow - priced per square foot"
             },
-            "price": "30",
-            "priceCurrency": "USD",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": "Starting from $2.25",
+              "priceCurrency": "USD",
+              "unitText": "per square foot"
+            },
             "availability": "InStock"
           },
           {
@@ -116,10 +124,14 @@
             "itemOffered": {
               "@type": "Service", 
               "name": "18oz Blockout Banner Printing",
-              "description": "Premium double-sided blockout banners"
+              "description": "Premium double-sided blockout banners - priced per square foot"
             },
-            "price": "35",
-            "priceCurrency": "USD",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": "Starting from $2.25",
+              "priceCurrency": "USD",
+              "unitText": "per square foot"
+            },
             "availability": "InStock"
           },
           {
@@ -127,10 +139,14 @@
             "itemOffered": {
               "@type": "Service", 
               "name": "Trade Show Displays",
-              "description": "Professional trade show displays and tent graphics"
+              "description": "Professional trade show displays and tent graphics - priced per square foot"
             },
-            "price": "50",
-            "priceCurrency": "USD",
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": "Starting from $325.00",
+              "priceCurrency": "USD",
+              "unitText": "per tent"
+            },
             "availability": "InStock"
           }
         ]
@@ -165,16 +181,16 @@
     {
       "@context": "https://schema.org",
       "@type": "Service",
-      "name": "Professional Print and Design Services",
-      "description": "Comprehensive printing and design services including business card tins, trade show displays, banners, and custom signage with advanced design tools",
+      "name": "Online Print and Design Platform",
+      "description": "Comprehensive online printing and design services including business card tins, trade show displays, banners, and custom signage with advanced design tools",
       "provider": {
-        "@type": "LocalBusiness",
+        "@type": "Organization",
         "name": "BuyPrintz",
         "url": "https://buyprintz.com",
         "telephone": "+1-617-505-0603",
         "email": "order@buyprintz.com"
       },
-      "serviceType": "Print and Design Services",
+      "serviceType": "Online Print and Design Platform",
       "areaServed": "United States",
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -185,9 +201,9 @@
             "itemOffered": {
               "@type": "Service",
               "name": "Business Card Tins",
-              "description": "Premium business card tins with custom printing and advanced design tools"
+              "description": "Premium business card tins with custom printing and advanced design tools (100 unit minimum)"
             },
-            "price": "25",
+            "price": "399.99",
             "priceCurrency": "USD"
           },
           {
@@ -195,20 +211,28 @@
             "itemOffered": {
               "@type": "Service",
               "name": "Trade Show Displays",
-              "description": "Professional trade show displays, tents, and graphics with custom design"
+              "description": "Professional trade show displays, tents, and graphics with custom design - priced per square foot"
             },
-            "price": "50",
-            "priceCurrency": "USD"
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": "Starting from $325.00",
+              "priceCurrency": "USD",
+              "unitText": "per tent"
+            }
           },
           {
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
               "name": "Custom Banner Printing",
-              "description": "Professional banner printing with vinyl, mesh, and blockout options"
+              "description": "Professional banner printing with vinyl, mesh, and blockout options - priced per square foot"
             },
-            "price": "25",
-            "priceCurrency": "USD"
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": "Starting from $1.60",
+              "priceCurrency": "USD",
+              "unitText": "per square foot"
+            }
           }
         ]
       }
