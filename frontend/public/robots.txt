@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://buyprintz.com/sitemap.xml
+Sitemap: https://www.buyprintz.com/sitemap.xml
 
 # Crawl-delay for better server performance
 Crawl-delay: 1
@@ -41,6 +41,29 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /_next/
 Disallow: /node_modules/
+
+# Block removed URLs from sitemap (internal/editor pages)
+Disallow: /tin-skinz-demo
+Disallow: /tin-skinz/success
+Disallow: /creator/earnings
+Disallow: /creator/uploads
+Disallow: /creator/dashboard
+Disallow: /creator/register
+Disallow: /editor/tin
+Disallow: /editor/tent
+Disallow: /editor/banner
+Disallow: /editor
+Disallow: /dashboard
+
+# Block checkout and confirmation pages (internal only)
+Disallow: /confirmation
+Disallow: /tent-checkout
+Disallow: /tin-checkout
+Disallow: /checkout
+Disallow: /login
+
+# Block templates directory
+Disallow: /templates
 
 # Allow access to important files
 Allow: /assets/
