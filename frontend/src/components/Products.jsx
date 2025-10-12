@@ -275,7 +275,11 @@ const Products = () => {
             "ratingValue": "4.8",
             "reviewCount": "89",
             "bestRating": "5",
-            "worstRating": "1"
+            "worstRating": "1",
+            "itemReviewed": {
+              "@type": "Product",
+              "name": product.name
+            }
           },
           "review": [
             {
@@ -339,53 +343,7 @@ const Products = () => {
     }
   }
 
-  // FAQ Schema for Banner Products
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "What types of banners do you offer?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We offer vinyl banners (13oz, 18oz blockout, mesh), fabric banners (9oz, 9.5oz blockout, tension), and specialty banners (pole banners, backlit banners). All banners include professional printing and finishing options."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How long does banner production take?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Standard production time is 3-5 business days for most banner types. Rush orders may be available for an additional fee - contact us for expedited service options."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What's the difference between vinyl and fabric banners?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Vinyl banners are weather-resistant and perfect for outdoor use, while fabric banners offer a premium look with vibrant colors and are ideal for indoor displays and trade shows."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Do you offer custom sizes?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes! We can produce banners in any size you need. Our canvas editor allows you to specify exact dimensions, and we can handle oversized banners with welded seams for large applications."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What finishing options are available?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "All banners include grommets for easy installation. We also offer hemming, pole pockets, reinforced corners, and custom hardware. Additional finishing options are available during the design process."
-        }
-      }
-    ]
-  }
+  // FAQ Schema removed to avoid duplication with global FAQPage in index.html
 
   // How-To Schema for ordering banners
   const howToSchema = {
@@ -438,7 +396,6 @@ const Products = () => {
     "@context": "https://schema.org",
     "@graph": [
       productCollectionStructuredData,
-      faqSchema,
       howToSchema
     ]
   }

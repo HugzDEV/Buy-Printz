@@ -183,7 +183,11 @@ const TinProducts = () => {
             "ratingValue": "4.9",
             "reviewCount": "127",
             "bestRating": "5",
-            "worstRating": "1"
+            "worstRating": "1",
+            "itemReviewed": {
+              "@type": "Product",
+              "name": `${tin.name} Business Card Tin`
+            }
           },
           "review": [
             {
