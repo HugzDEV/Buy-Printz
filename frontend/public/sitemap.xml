@@ -1,152 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   
   <!-- Homepage -->
   <url>
-    <loc>https://buyprintz.com/</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://www.buyprintz.com/</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   
-  
-  <!-- Products Page -->
+  <!-- Main Product Categories -->
   <url>
-    <loc>https://buyprintz.com/products</loc>
-    <lastmod>2025-09-22</lastmod>
+    <loc>https://www.buyprintz.com/all-products</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.buyprintz.com/business-card-tins</loc>
+    <lastmod>2025-10-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
-  <!-- All Products -->
   <url>
-    <loc>https://buyprintz.com/all-products</loc>
-    <lastmod>2025-09-22</lastmod>
+    <loc>https://www.buyprintz.com/banner-products</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.buyprintz.com/tradeshow-tents</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.buyprintz.com/tin-skinz</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Blog Section -->
+  <url>
+    <loc>https://www.buyprintz.com/blog</loc>
+    <lastmod>2025-10-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Banner Products -->
+  <!-- Blog Posts (Most Recent First) -->
   <url>
-    <loc>https://buyprintz.com/banner-products</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Business Card Tins -->
-  <url>
-    <loc>https://buyprintz.com/business-card-tins</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Tradeshow Tents -->
-  <url>
-    <loc>https://buyprintz.com/tradeshow-tents</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  
-  
-  
-  <!-- Tin Skinz -->
-  <url>
-    <loc>https://buyprintz.com/tin-skinz</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  
-  <!-- Register -->
-  <url>
-    <loc>https://buyprintz.com/register</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- About -->
-  <url>
-    <loc>https://buyprintz.com/about</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  
-  <!-- Support -->
-  <url>
-    <loc>https://buyprintz.com/support</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <!-- Blog -->
-  <url>
-    <loc>https://buyprintz.com/blog</loc>
-    <lastmod>2025-09-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <!-- Blog Post: Eco-Friendly Marketing -->
-  <url>
-    <loc>https://buyprintz.com/blog/eco-friendly-marketing-reusable-tins-beat-disposable-business-cards</loc>
+    <loc>https://www.buyprintz.com/blog/eco-friendly-marketing-reusable-tins-beat-disposable-business-cards</loc>
     <lastmod>2025-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
-  <!-- Blog Post: 3 Essential Marketing Tools Every Startup Needs -->
   <url>
-    <loc>https://buyprintz.com/blog/3-essential-marketing-tools-every-startup-needs-before-digital-ads</loc>
+    <loc>https://www.buyprintz.com/blog/3-essential-marketing-tools-every-startup-needs-before-digital-ads</loc>
     <lastmod>2025-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
-  <!-- Blog Post: Why Your Business Card is Failing You -->
   <url>
-    <loc>https://buyprintz.com/blog/why-your-business-card-is-failing-you-and-what-smart-entrepreneurs-do-instead</loc>
+    <loc>https://www.buyprintz.com/blog/why-your-business-card-is-failing-you-and-what-smart-entrepreneurs-do-instead</loc>
     <lastmod>2025-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
-  <!-- Blog Post: Revolutionary Business Cards -->
   <url>
-    <loc>https://buyprintz.com/blog/revolutionary-business-cards-why-business-card-tins-are-the-future-of-professional-networking</loc>
+    <loc>https://www.buyprintz.com/blog/revolutionary-business-cards-why-business-card-tins-are-the-future-of-professional-networking</loc>
     <lastmod>2025-08-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
-  <!-- Contact -->
+  <!-- Company Pages -->
   <url>
-    <loc>https://buyprintz.com/contact</loc>
-    <lastmod>2025-09-22</lastmod>
+    <loc>https://www.buyprintz.com/about</loc>
+    <lastmod>2025-10-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
-  <!-- Terms of Service -->
   <url>
-    <loc>https://buyprintz.com/terms</loc>
-    <lastmod>2025-09-22</lastmod>
+    <loc>https://www.buyprintz.com/contact</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.buyprintz.com/support</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- User Pages -->
+  <url>
+    <loc>https://www.buyprintz.com/register</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Legal Pages -->
+  <url>
+    <loc>https://www.buyprintz.com/terms</loc>
+    <lastmod>2025-10-12</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
-  <!-- Privacy Policy -->
   <url>
-    <loc>https://buyprintz.com/privacy</loc>
-    <lastmod>2025-09-22</lastmod>
+    <loc>https://www.buyprintz.com/privacy</loc>
+    <lastmod>2025-10-12</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
