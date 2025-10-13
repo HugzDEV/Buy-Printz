@@ -1,0 +1,28 @@
+{
+  "name": "BuyPrintz - Professional Print Solutions",
+  "short_name": "BuyPrintz",
+  "description": "Complete business branding platform with professional design tools. Create banners, business card tins, and tradeshow tents with our integrated marketplace and checkout system.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "shopping"],
+  "lang": "en-US",
+  "scope": "/",
+  "id": "buyprintz-app"
+}
