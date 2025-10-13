@@ -695,53 +695,7 @@ const TinSkinzMarketplace = () => {
     }
   };
 
-  // FAQ Schema for TinSkinz
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "What are TinSkinz?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "TinSkinz are custom-designed aluminum tins that can be filled with candy, mints, or other small items. They're perfect for business cards, wedding favors, party favors, and promotional items."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What candy options are available?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We offer various candy options including peppermint mints, chocolate, gummy bears, and seasonal candies. You can choose different candy types for different designs."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can I customize the tin designs?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes! We offer pre-designed templates in categories like Abstract Art, Zodiac, Animals, Nature, and Holidays. You can also add custom messages to personalize your tins."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What's the minimum order quantity?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "The minimum order quantity varies by product type. Business card tins have a 100 unit minimum, while TinSkinz candy tins can be ordered in smaller quantities."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How long does production take?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Production typically takes 3-7 business days depending on the complexity of your order and current production volume. We'll provide specific timelines when you place your order."
-        }
-      }
-    ]
-  };
+  // FAQ Schema removed to avoid duplication with global FAQPage in index.html
 
   // How-To Schema for ordering TinSkinz
   const howToSchema = {
@@ -794,7 +748,6 @@ const TinSkinzMarketplace = () => {
     "@context": "https://schema.org",
     "@graph": [
       tinSkinzStructuredData,
-      faqSchema,
       howToSchema
     ]
   };
