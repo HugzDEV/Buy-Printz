@@ -9,7 +9,11 @@ import {
   Share2,
   Facebook,
   Twitter,
-  Linkedin
+  Linkedin,
+  Package,
+  Layers,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react'
 import Header from './Header'
 import Footer from './Footer'
@@ -580,8 +584,9 @@ Ready to Transform Your Networking Game?
             src={post.thumbnail}
             alt={post.title}
             className="w-full h-64 md:h-96 object-contain bg-gray-50"
+            loading="eager"
             onError={(e) => {
-              e.target.src = '/assets/images/Blog/placeholder.jpg'
+              e.target.src = '/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png'
             }}
           />
           
@@ -750,7 +755,7 @@ Ready to Transform Your Networking Game?
           <div className="grid md:grid-cols-2 gap-6">
             <Link to="/blog" className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <img
-                src="/assets/images/Blog/placeholder.jpg"
+                src="/assets/images/Tins_BC_v2_new phone number.png"
                 alt="Related article"
                 className="w-full h-32 object-cover"
               />
@@ -761,7 +766,7 @@ Ready to Transform Your Networking Game?
             </Link>
             <Link to="/blog" className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <img
-                src="/assets/images/Blog/placeholder.jpg"
+                src="/assets/images/Tins_BC_v2_new phone number.png"
                 alt="Related article"
                 className="w-full h-32 object-cover"
               />

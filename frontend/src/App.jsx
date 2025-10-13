@@ -255,7 +255,13 @@ function App() {
         <Route path="/support" element={<Support />} />
         
         {/* Blog Pages */}
-        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog" element={
+          <>
+            <Header />
+            <Blog />
+            <Footer />
+          </>
+        } />
         <Route path="/blog/:slug" element={<BlogPost />} />
         
         {/* Email Confirmation */}

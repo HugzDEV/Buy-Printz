@@ -6,8 +6,6 @@ import {
   ArrowRight, 
   Clock
 } from 'lucide-react'
-import Header from './Header'
-import Footer from './Footer'
 
 const Blog = () => {
 
@@ -363,8 +361,6 @@ The practical value ensures your contact information stays visible and accessibl
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
@@ -384,8 +380,9 @@ The practical value ensures your contact information stays visible and accessibl
                   src={featuredPost.thumbnail}
                   alt={featuredPost.title}
                   className="w-full h-64 md:h-80 object-contain bg-gray-50"
+                  loading="eager"
                   onError={(e) => {
-                    e.target.src = '/assets/images/Blog/placeholder.jpg'
+                    e.target.src = '/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png'
                   }}
                 />
               </div>
@@ -450,8 +447,9 @@ The practical value ensures your contact information stays visible and accessibl
                 src={post.thumbnail}
                 alt={post.title}
                 className="w-full h-48 object-contain bg-gray-50 group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
                 onError={(e) => {
-                  e.target.src = '/assets/images/Blog/placeholder.jpg'
+                  e.target.src = '/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png'
                 }}
               />
               <div className="p-6">
@@ -509,8 +507,6 @@ The practical value ensures your contact information stays visible and accessibl
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   )
 }
