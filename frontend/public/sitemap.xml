@@ -5,7 +5,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://www.buyprintz.com/</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -13,35 +13,35 @@
   <!-- Main Product Categories -->
   <url>
     <loc>https://www.buyprintz.com/all-products</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://www.buyprintz.com/business-card-tins</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://www.buyprintz.com/banner-products</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://www.buyprintz.com/tradeshow-tents</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://www.buyprintz.com/tin-skinz</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -49,7 +49,7 @@
   <!-- Blog Section -->
   <url>
     <loc>https://www.buyprintz.com/blog</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -86,21 +86,21 @@
   <!-- Company Pages -->
   <url>
     <loc>https://www.buyprintz.com/about</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.buyprintz.com/contact</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.buyprintz.com/support</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -108,7 +108,7 @@
   <!-- User Pages -->
   <url>
     <loc>https://www.buyprintz.com/register</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -116,14 +116,14 @@
   <!-- Legal Pages -->
   <url>
     <loc>https://www.buyprintz.com/terms</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://www.buyprintz.com/privacy</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>2025-10-14</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

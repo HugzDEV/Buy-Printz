@@ -235,7 +235,7 @@ const Products = () => {
             "price": product.price.replace(/[^\d.]/g, ''),
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
-            "priceValidUntil": "2025-12-31",
+            "priceValidUntil": "2026-12-31",
             "itemCondition": "https://schema.org/NewCondition",
             "seller": {
               "@type": "Organization",

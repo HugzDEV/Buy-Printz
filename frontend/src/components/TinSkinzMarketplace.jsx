@@ -478,7 +478,7 @@ const TinSkinzMarketplace = () => {
             "price": "399.99",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
-            "priceValidUntil": "2025-12-31",
+            "priceValidUntil": "2026-12-31",
             "itemCondition": "https://schema.org/NewCondition",
             "seller": {
               "@type": "Organization",
@@ -610,7 +610,7 @@ const TinSkinzMarketplace = () => {
             "price": "9.99",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
-            "priceValidUntil": "2025-12-31",
+            "priceValidUntil": "2026-12-31",
             "itemCondition": "https://schema.org/NewCondition",
             "seller": {
               "@type": "Organization",

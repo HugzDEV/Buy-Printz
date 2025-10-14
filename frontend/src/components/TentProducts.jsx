@@ -142,7 +142,7 @@ const TentProducts = () => {
             "price": tent.price.match(/\$?(\d+\.?\d*)/)?.[1] || "325.00",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
-            "priceValidUntil": "2025-12-31",
+            "priceValidUntil": "2026-12-31",
             "itemCondition": "https://schema.org/NewCondition",
             "seller": {
               "@type": "Organization",
