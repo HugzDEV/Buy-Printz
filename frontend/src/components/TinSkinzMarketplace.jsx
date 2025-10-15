@@ -524,11 +524,7 @@ const TinSkinzMarketplace = () => {
             "ratingValue": "4.9",
             "reviewCount": "127",
             "bestRating": "5",
-            "worstRating": "1",
-            "itemReviewed": {
-              "@type": "Product",
-              "name": "Business Card Tins with Mints"
-            }
+            "worstRating": "1"
           },
           "review": [
             {
@@ -662,11 +658,7 @@ const TinSkinzMarketplace = () => {
             "ratingValue": "4.8",
             "reviewCount": "89",
             "bestRating": "5",
-            "worstRating": "1",
-            "itemReviewed": {
-              "@type": "Product",
-              "name": "Tin Skinz Candy Tins"
-            }
+            "worstRating": "1"
           },
           "review": [
             {

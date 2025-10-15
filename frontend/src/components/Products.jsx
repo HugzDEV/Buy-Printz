@@ -281,11 +281,7 @@ const Products = () => {
             "ratingValue": "4.8",
             "reviewCount": "89",
             "bestRating": "5",
-            "worstRating": "1",
-            "itemReviewed": {
-              "@type": "Product",
-              "name": product.name
-            }
+            "worstRating": "1"
           },
           "review": [
             {
