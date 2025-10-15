@@ -323,7 +323,7 @@ const TentProducts = () => {
 
   return (
     <>
-      <SEOHead {...seoConfigs.products} structuredData={combinedSchema} />
+      <SEOHead {...seoConfigs.tradeshowTents} structuredData={combinedSchema} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">
