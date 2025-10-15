@@ -186,9 +186,11 @@ const Marketplace = () => {
       "itemListElement": templates.slice(0, 10).map((template, index) => ({
         "@type": "Product",
         "position": index + 1,
-        "name": template.title,
+        "name": template.name,
         "description": template.description,
-        "image": `https://buyprintz.com${template.thumbnail_url}`,
+        "image": template.thumbnail_url ? 
+          (template.thumbnail_url.startsWith('http') ? template.thumbnail_url : `https://buyprintz.com${template.thumbnail_url}`) :
+          "https://buyprintz.com/assets/images/marketplace-placeholder.jpg",
         "offers": {
           "@type": "Offer",
           "price": template.price,
@@ -214,7 +216,7 @@ const Marketplace = () => {
           "worstRating": "1",
           "itemReviewed": {
             "@type": "Product",
-            "name": template.title
+            "name": template.name
           }
         },
         "review": [

@@ -139,7 +139,10 @@ const TentProducts = () => {
           "offers": {
             "@type": "Offer",
             "url": `https://www.buyprintz.com/tradeshow-tents#${tent.id}`,
-            "price": tent.price.match(/\$?(\d+\.?\d*)/)?.[1] || "325.00",
+            "price": (() => {
+              const match = tent.price.match(/\$(\d+\.?\d*)/);
+              return match ? match[1] : "325.00";
+            })(),
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "priceValidUntil": "2026-12-31",
