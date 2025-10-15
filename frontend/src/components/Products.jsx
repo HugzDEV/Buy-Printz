@@ -242,6 +242,12 @@ const Products = () => {
               "@id": "https://www.buyprintz.com",
               "name": "BuyPrintz"
             },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "US",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+              "returnMethod": "https://schema.org/ReturnByMail"
+            },
             "shippingDetails": {
               "@type": "OfferShippingDetails",
               "shippingRate": {
