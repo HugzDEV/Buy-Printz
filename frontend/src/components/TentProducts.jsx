@@ -312,14 +312,8 @@ const TentProducts = () => {
     ]
   }
 
-  // Combine all schemas
-  const combinedSchema = {
-    "@context": "https://schema.org",
-    "@graph": [
-      tentProductsStructuredData,
-      howToSchema
-    ]
-  }
+  // Use only the main structured data to avoid duplicates
+  const combinedSchema = tentProductsStructuredData
 
   return (
     <>
