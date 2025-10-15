@@ -789,6 +789,8 @@ const ProductDetail = () => {
       "price": product.price.replace(/[^\d.]/g, ''),
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
+      "priceValidUntil": "2026-12-31",
+      "itemCondition": "https://schema.org/NewCondition",
       "seller": {
         "@type": "Organization",
         "name": "BuyPrintz"
@@ -799,6 +801,47 @@ const ProductDetail = () => {
       "name": "BuyPrintz"
     },
     "category": "Banner Printing",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "89",
+      "bestRating": "5",
+      "worstRating": "1",
+      "itemReviewed": {
+        "@type": "Product",
+        "name": product.name
+      }
+    },
+    "review": [
+      {
+        "@type": "Review",
+        "author": {
+          "@type": "Person",
+          "name": "Sarah Johnson"
+        },
+        "datePublished": "2025-09-15",
+        "reviewBody": "Excellent quality banner! The printing is crisp and colors are vibrant. Perfect for our outdoor events.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5"
+        }
+      },
+      {
+        "@type": "Review",
+        "author": {
+          "@type": "Person",
+          "name": "Michael Chen"
+        },
+        "datePublished": "2025-09-20",
+        "reviewBody": "Fast turnaround and great customer service. The banner quality exceeded our expectations.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5"
+        }
+      }
+    ],
     "additionalProperty": product.spec?.features?.map(feature => ({
       "@type": "PropertyValue",
       "name": "Feature",

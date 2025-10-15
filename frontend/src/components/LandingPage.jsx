@@ -90,7 +90,7 @@ const LandingPage = () => {
             "name": "13oz Vinyl Banner Printing",
             "description": "Weather resistant vinyl banners perfect for outdoor use"
           },
-          "price": "25",
+          "price": "25.00",
           "priceCurrency": "USD",
           "availability": "InStock"
         },
@@ -101,7 +101,7 @@ const LandingPage = () => {
             "name": "Mesh Banner Printing",
             "description": "Wind resistant mesh banners with 70% air flow"
           },
-          "price": "30",
+          "price": "30.00",
           "priceCurrency": "USD",
           "availability": "InStock"
         },
@@ -112,7 +112,7 @@ const LandingPage = () => {
             "name": "18oz Blockout Banner Printing",
             "description": "Premium double-sided blockout banners"
           },
-          "price": "35",
+          "price": "35.00",
           "priceCurrency": "USD",
           "availability": "InStock"
         },
@@ -123,7 +123,7 @@ const LandingPage = () => {
             "name": "Business Card Tins",
             "description": "Custom aluminum business card tins with mints"
           },
-          "price": "399",
+          "price": "399.00",
           "priceCurrency": "USD",
           "availability": "InStock"
         }

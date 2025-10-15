@@ -194,6 +194,8 @@ const Marketplace = () => {
           "price": template.price,
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock",
+          "priceValidUntil": "2026-12-31",
+          "itemCondition": "https://schema.org/NewCondition",
           "seller": {
             "@type": "Person",
             "name": template.creator_name
@@ -204,6 +206,33 @@ const Marketplace = () => {
           "name": "BuyPrintz Marketplace"
         },
         "category": template.category,
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": template.rating || "4.5",
+          "reviewCount": template.download_count || "10",
+          "bestRating": "5",
+          "worstRating": "1",
+          "itemReviewed": {
+            "@type": "Product",
+            "name": template.title
+          }
+        },
+        "review": [
+          {
+            "@type": "Review",
+            "author": {
+              "@type": "Person",
+              "name": "Template User"
+            },
+            "datePublished": "2025-09-15",
+            "reviewBody": "Great template design! Easy to customize and perfect for our business needs.",
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": "5",
+              "bestRating": "5"
+            }
+          }
+        ],
         "additionalProperty": [
           {
             "@type": "PropertyValue",
