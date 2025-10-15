@@ -118,7 +118,7 @@ const TinProducts = () => {
           "name": `${tin.name} Business Card Tin`,
           "description": tin.description,
           "image": [
-            `https://www.buyprintz.com${tin.image}`,
+            tin.image ? `https://www.buyprintz.com${tin.image}` : "https://www.buyprintz.com/assets/images/Tins_BC_v2_new phone number.png",
             "https://www.buyprintz.com/assets/images/Tins_BC_v2_new phone number.png"
           ],
           "sku": tin.sku,
