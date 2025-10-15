@@ -191,11 +191,7 @@ const TentProducts = () => {
             "ratingValue": "4.9",
             "reviewCount": "156",
             "bestRating": "5",
-            "worstRating": "1",
-            "itemReviewed": {
-              "@type": "Product",
-              "name": tent.name
-            }
+            "worstRating": "1"
           },
           "review": [
             {
