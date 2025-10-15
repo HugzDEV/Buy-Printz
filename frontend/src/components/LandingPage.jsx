@@ -70,11 +70,11 @@ const LandingPage = () => {
     "name": "BuyPrintz",
     "description": "Professional banner printing with lightning-fast 2-3 business day delivery. Custom vinyl banners, trade show displays, and outdoor signage with advanced design tools.",
     "url": "https://buyprintz.com",
-    "telephone": "+1-555-BUY-PRINT",
-    "email": "orders@buyprintz.com",
+    "telephone": "+1-617-505-0603",
+    "email": "order@buyprintz.com",
     "logo": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
     "image": "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
-    "priceRange": "$25-$500",
+    "priceRange": "$1.60-$7.00 per sqft",
     "paymentAccepted": "Credit Card, Debit Card",
     "currenciesAccepted": "USD",
     "areaServed": "United States",
@@ -88,10 +88,14 @@ const LandingPage = () => {
           "itemOffered": {
             "@type": "Service",
             "name": "13oz Vinyl Banner Printing",
-            "description": "Weather resistant vinyl banners perfect for outdoor use"
+            "description": "Weather resistant vinyl banners perfect for outdoor use. Priced per square foot."
           },
-          "price": "25.00",
-          "priceCurrency": "USD",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "1.60",
+            "priceCurrency": "USD",
+            "unitText": "square foot"
+          },
           "availability": "InStock"
         },
         {
@@ -99,10 +103,14 @@ const LandingPage = () => {
           "itemOffered": {
             "@type": "Service",
             "name": "Mesh Banner Printing",
-            "description": "Wind resistant mesh banners with 70% air flow"
+            "description": "Wind resistant mesh banners with 70% air flow. Priced per square foot."
           },
-          "price": "30.00",
-          "priceCurrency": "USD",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "1.80",
+            "priceCurrency": "USD",
+            "unitText": "square foot"
+          },
           "availability": "InStock"
         },
         {
@@ -110,10 +118,14 @@ const LandingPage = () => {
           "itemOffered": {
             "@type": "Service", 
             "name": "18oz Blockout Banner Printing",
-            "description": "Premium double-sided blockout banners"
+            "description": "Premium double-sided blockout banners. Priced per square foot."
           },
-          "price": "35.00",
-          "priceCurrency": "USD",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "2.50",
+            "priceCurrency": "USD",
+            "unitText": "square foot"
+          },
           "availability": "InStock"
         },
         {
