@@ -121,7 +121,7 @@ const TentProducts = () => {
             "https://www.buyprintz.com/assets/images/tent-showcase.jpg"
           ],
           "sku": `TENT-${tent.id.toUpperCase()}`,
-          "gtin": `008500123${String(index + 1).padStart(3, '0')}`,
+          "gtin": index === 0 ? "0085001230001" : "0085001230002",
           "mpn": `TENT${tent.id.replace('-', '').toUpperCase()}`,
           "brand": {
             "@type": "Brand",

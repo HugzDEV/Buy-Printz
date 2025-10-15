@@ -214,7 +214,7 @@ const Products = () => {
             "https://www.buyprintz.com/assets/images/banner-showcase.jpg"
           ],
           "sku": `BAN-${product.id.toUpperCase()}`,
-          "gtin": `0085001234${String(index + 1).padStart(3, '0')}`,
+          "gtin": `008500123${String(index + 1).padStart(3, '0')}`,
           "mpn": `BAN${product.id.replace('-', '').toUpperCase()}`,
           "brand": {
             "@type": "Brand",

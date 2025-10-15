@@ -17,7 +17,7 @@ const TinProducts = () => {
       bestseller: true,
       icon: <Package className="w-8 h-8" />,
       sku: "BCT-SILVER-100",
-      gtin: "00850012345001",
+      gtin: "0085001234001",
       mpn: "BCTSIL100"
     },
     {
@@ -32,7 +32,7 @@ const TinProducts = () => {
       popular: true,
       icon: <Layers className="w-8 h-8" />,
       sku: "BCT-BLACK-100",
-      gtin: "00850012345002",
+      gtin: "0085001234002",
       mpn: "BCTBLK100"
     },
     {
@@ -47,7 +47,7 @@ const TinProducts = () => {
       premium: true,
       icon: <Crown className="w-8 h-8" />,
       sku: "BCT-GOLD-100",
-      gtin: "00850012345003",
+      gtin: "0085001234003",
       mpn: "BCTGLD100"
     }
   ]
