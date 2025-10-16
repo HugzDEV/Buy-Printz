@@ -34,6 +34,7 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return 'tin'
     if (urlProduct === 'tent') return 'tent'
+    if (urlProduct === 'sticker') return 'sticker'
     return 'banner' // default
   })
   
@@ -98,6 +99,68 @@ const BannerEditorNew = () => {
       specs: 'Double-sided printing',
       description: 'Perfect for street poles and flagpoles',
       uses: ['Street Marketing', 'Events', 'Directional Signs']
+    }
+  ]
+
+  // Sticker specifications and materials
+  const stickerMaterials = [
+    {
+      id: 'premium-vinyl',
+      name: 'Premium Vinyl Stickers',
+      material: 'Premium Vinyl',
+      finish: 'White Back',
+      specs: 'Weather resistant, vibrant colors',
+      description: 'High-quality vinyl with white backing for maximum opacity',
+      uses: ['Outdoor Use', 'Vehicles', 'Signs', 'Equipment']
+    },
+    {
+      id: 'premium-clear-vinyl',
+      name: 'Premium Clear Vinyl Stickers',
+      material: 'Premium Clear Vinyl',
+      finish: 'Transparent',
+      specs: 'Clear background, see-through effect',
+      description: 'Transparent vinyl for glass and windows',
+      uses: ['Windows', 'Glass', 'Transparent Surfaces', 'Decals']
+    }
+  ]
+
+  // Sticker shape configurations with clipping paths
+  const stickerShapes = [
+    {
+      id: 'circle',
+      name: 'Circle',
+      description: 'Perfect round stickers',
+      sizes: ['1x1', '2x2', '3x3', '4x4', '5x5']
+    },
+    {
+      id: 'square',
+      name: 'Square',
+      description: 'Classic square stickers',
+      sizes: ['1x1', '2x2', '2.5x2.5', '3x3', '3.5x3.5', '4x4', '4.5x4.5', '5x5']
+    },
+    {
+      id: 'rectangle',
+      name: 'Rectangle',
+      description: 'Rectangular stickers for text and logos',
+      sizes: ['2x4', '2.5x3', '3x2', '3x5', '3.5x1.5', '4x2', '4x3', '4x6', '5x3', '6x4']
+    },
+    {
+      id: 'triangle',
+      name: 'Triangle',
+      description: 'Triangular stickers for directional use',
+      sizes: ['1x1', '2x1.5', '2x2', '3x2', '3x3', '4x2.5', '4x4', '5x3', '5x5', '6x4']
+    },
+    {
+      id: 'diamond',
+      name: 'Diamond',
+      description: 'Diamond-shaped stickers',
+      sizes: ['1x1', '2x2', '3x3', '4x4', '5x5']
+    },
+    {
+      id: 'oval',
+      name: 'Oval',
+      description: 'Oval stickers for elegant designs',
+      sizes: ['2x1.5', '3x2', '3x4', '4x3', '4x5', '5x4']
     }
   ]
 
@@ -477,6 +540,20 @@ const BannerEditorNew = () => {
     }
     return null // For non-tin products, return null
   })
+
+  // Sticker specifications state
+  const [stickerSpecs, setStickerSpecs] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'sticker') {
+      return {
+        material: 'premium-vinyl',
+        shape: 'square',
+        size: '3x3',
+        quantity: 100
+      }
+    }
+    return null // For non-sticker products, return null
+  })
   
   // Banner size presets - Standard banner dimensions (H x W format)
   const bannerSizes = [
@@ -536,6 +613,18 @@ const BannerEditorNew = () => {
         { name: 'Half Wall', width: 1110, height: 370, orientation: 'landscape', category: 'wall' }
       ],
       description: 'Professional tradeshow tents with custom graphics'
+    },
+    sticker: {
+      name: 'Custom Stickers',
+      defaultSize: { width: 300, height: 300 }, // 3x3 inch at 100 DPI
+      sizes: [
+        { name: '1x1 inch', width: 100, height: 100, orientation: 'square', category: 'small' },
+        { name: '2x2 inch', width: 200, height: 200, orientation: 'square', category: 'small' },
+        { name: '3x3 inch', width: 300, height: 300, orientation: 'square', category: 'medium' },
+        { name: '4x4 inch', width: 400, height: 400, orientation: 'square', category: 'medium' },
+        { name: '5x5 inch', width: 500, height: 500, orientation: 'square', category: 'large' }
+      ],
+      description: 'Custom vinyl stickers in various shapes and sizes'
     }
   }
   
@@ -570,6 +659,15 @@ const BannerEditorNew = () => {
         },
         withFrame: true,
         reinforcedStripColor: 'white'
+      })
+    } else if (newProductType === 'sticker') {
+      setCurrentSurface('front')
+      // Initialize sticker specs
+      setStickerSpecs({
+        material: 'premium-vinyl',
+        shape: 'square',
+        size: '3x3',
+        quantity: 100
       })
     } else {
       setCurrentSurface('front')
@@ -3384,6 +3482,7 @@ const BannerEditorNew = () => {
             <option value="banner">🏷️ Banner</option>
             <option value="tin">🗃️ Tin</option>
             <option value="tent">🏕️ Tent</option>
+            <option value="sticker">🏷️ Sticker</option>
           </select>
         </div>
 
@@ -3455,6 +3554,10 @@ const BannerEditorNew = () => {
             onTentDesignOptionChange={handleTentDesignOptionChange}
             tentSpecs={tentSpecs}
             onTentSpecChange={handleTentSpecChange}
+            stickerSpecs={stickerSpecs}
+            onStickerSpecChange={setStickerSpecs}
+            stickerMaterials={stickerMaterials}
+            stickerShapes={stickerShapes}
 
             onAddShape={addShape}
             onAddText={addText}
