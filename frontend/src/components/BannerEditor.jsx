@@ -400,6 +400,7 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return { width: 393, height: 236 } // tin canvas 5% larger than tin surface (374x225)
     if (urlProduct === 'tent') return { width: 1160, height: 1049 } // tent canopy+valence default (canopy 789px + gap 20px + valence 200px + padding 40px)
+    if (urlProduct === 'sticker') return { width: 300, height: 300 } // sticker default (square)
     return { width: 800, height: 400 } // banner default
   })
 
@@ -526,6 +527,68 @@ const BannerEditorNew = () => {
       ctx.lineTo(canvasSize.width, 789)   // Back to bottom right of triangle
       
       ctx.closePath()
+    }
+  }
+
+  // Sticker shape clipping function
+  const getStickerClipFunc = () => {
+    return (ctx) => {
+      const canvasWidth = canvasSize.width
+      const canvasHeight = canvasSize.height
+      const centerX = canvasWidth / 2
+      const centerY = canvasHeight / 2
+      
+      // Get sticker shape and size from specs
+      const currentShape = stickerSpecs?.shape || 'square'
+      const currentSize = stickerSpecs?.size || '3x3'
+      
+      // Parse size to get dimensions
+      const sizeMatch = currentSize.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)/)
+      if (!sizeMatch) return
+      
+      const width = parseFloat(sizeMatch[1])
+      const height = parseFloat(sizeMatch[2])
+      const dpi = 150
+      const pixelWidth = Math.round(width * dpi)
+      const pixelHeight = Math.round(height * dpi)
+      
+      ctx.beginPath()
+      
+      // Create clipping path based on sticker shape
+      switch (currentShape) {
+        case 'circle':
+          ctx.arc(centerX, centerY, Math.min(pixelWidth, pixelHeight) / 2, 0, 2 * Math.PI)
+          break
+        case 'square':
+          const squareSize = Math.min(pixelWidth, pixelHeight)
+          ctx.rect(centerX - squareSize / 2, centerY - squareSize / 2, squareSize, squareSize)
+          break
+        case 'rectangle':
+          ctx.rect(centerX - pixelWidth / 2, centerY - pixelHeight / 2, pixelWidth, pixelHeight)
+          break
+        case 'triangle':
+          ctx.moveTo(centerX, centerY - pixelHeight / 2)
+          ctx.lineTo(centerX - pixelWidth / 2, centerY + pixelHeight / 2)
+          ctx.lineTo(centerX + pixelWidth / 2, centerY + pixelHeight / 2)
+          ctx.closePath()
+          break
+        case 'diamond':
+          ctx.moveTo(centerX, centerY - pixelHeight / 2)
+          ctx.lineTo(centerX + pixelWidth / 2, centerY)
+          ctx.lineTo(centerX, centerY + pixelHeight / 2)
+          ctx.lineTo(centerX - pixelWidth / 2, centerY)
+          ctx.closePath()
+          break
+        case 'oval':
+          ctx.ellipse(centerX, centerY, pixelWidth / 2, pixelHeight / 2, 0, 0, 2 * Math.PI)
+          break
+        default:
+          // Default to square
+          const defaultSize = Math.min(pixelWidth, pixelHeight)
+          ctx.rect(centerX - defaultSize / 2, centerY - defaultSize / 2, defaultSize, defaultSize)
+      }
+      
+      ctx.clip()
     }
   }
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
@@ -718,6 +781,37 @@ const BannerEditorNew = () => {
     console.log('🎨 BannerEditor - Tin spec changed:', key, 'to', value)
   }, [])
 
+  // Handle sticker specification changes
+  const handleStickerSpecChange = useCallback((newSpecs) => {
+    setStickerSpecs(newSpecs)
+    
+    // Update canvas size when sticker specs change
+    if (productType === 'sticker') {
+      const currentShape = newSpecs?.shape || 'square'
+      const currentSize = newSpecs?.size || '3x3'
+      
+      // Parse size (e.g., "3x3" -> 3, "2x4" -> 2x4)
+      const sizeMatch = currentSize.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)/)
+      if (sizeMatch) {
+        const width = parseFloat(sizeMatch[1])
+        const height = parseFloat(sizeMatch[2])
+        
+        // Convert inches to pixels (assuming 150 DPI for print)
+        const dpi = 150
+        const pixelWidth = Math.round(width * dpi)
+        const pixelHeight = Math.round(height * dpi)
+        
+        // Add padding around the sticker (20% on each side)
+        const padding = Math.max(20, Math.min(pixelWidth, pixelHeight) * 0.2)
+        const canvasWidth = pixelWidth + (padding * 2)
+        const canvasHeight = pixelHeight + (padding * 2)
+        
+        console.log(`🎨 Sticker canvas size updated: ${canvasWidth}x${canvasHeight} (${currentShape} ${currentSize})`)
+        setCanvasSize({ width: canvasWidth, height: canvasHeight })
+      }
+    }
+  }, [productType])
+
   // Handle tent design option changes
   const handleTentDesignOptionChange = useCallback((value) => {
     const previousOption = tentDesignOption
@@ -835,6 +929,36 @@ const BannerEditorNew = () => {
         // Canopy surfaces: triangular canopy + rectangular valence below
         // Total height: canopy height (789px) + gap (20px) + valence height (200px) + bottom padding (40px) = 1049px
         setCanvasSize({ width: 1160, height: 1049 })
+      }
+    }
+    
+    // Update canvas size based on sticker shape and size
+    if (productType === 'sticker') {
+      // Get current sticker specs to determine size
+      const currentShape = stickerSpecs?.shape || 'square'
+      const currentSize = stickerSpecs?.size || '3x3'
+      
+      // Parse size (e.g., "3x3" -> 3, "2x4" -> 2x4)
+      const sizeMatch = currentSize.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)/)
+      if (sizeMatch) {
+        const width = parseFloat(sizeMatch[1])
+        const height = parseFloat(sizeMatch[2])
+        
+        // Convert inches to pixels (assuming 150 DPI for print)
+        const dpi = 150
+        const pixelWidth = Math.round(width * dpi)
+        const pixelHeight = Math.round(height * dpi)
+        
+        // Add padding around the sticker (20% on each side)
+        const padding = Math.max(20, Math.min(pixelWidth, pixelHeight) * 0.2)
+        const canvasWidth = pixelWidth + (padding * 2)
+        const canvasHeight = pixelHeight + (padding * 2)
+        
+        console.log(`🎨 Sticker canvas size: ${canvasWidth}x${canvasHeight} (${currentShape} ${currentSize})`)
+        setCanvasSize({ width: canvasWidth, height: canvasHeight })
+      } else {
+        // Fallback to square default
+        setCanvasSize({ width: 300, height: 300 })
       }
     }
   }, [productType, currentSurface, surfaceElements, generateCanvasImage])
@@ -3569,7 +3693,7 @@ const BannerEditorNew = () => {
             tentSpecs={tentSpecs}
             onTentSpecChange={handleTentSpecChange}
             stickerSpecs={stickerSpecs}
-            onStickerSpecChange={setStickerSpecs}
+            onStickerSpecChange={handleStickerSpecChange}
             stickerMaterials={stickerMaterials}
             stickerShapes={stickerShapes}
 
@@ -3621,7 +3745,13 @@ const BannerEditorNew = () => {
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
             availableSurfaces={availableSurfaces}
-            clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyValenceClipFunc() : null}
+            clipFunc={
+              productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') 
+                ? getTentCanopyValenceClipFunc() 
+                : productType === 'sticker' 
+                ? getStickerClipFunc() 
+                : null
+            }
             onRemoveAssetFromTracking={removeAssetFromTracking}
           />
           
