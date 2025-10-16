@@ -1404,44 +1404,46 @@ const BannerSidebar = ({
 
           {expandedSections.specifications && (
             <div className="px-4 pb-4 space-y-3">
-              {/* Product Type Selector */}
-              <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                <div className="text-sm font-medium text-gray-800 mb-3">
-                  {productType === 'banner' && 'Banner Type'}
-                  {productType === 'tin' && 'Tin Finish'}
-                  {productType === 'tent' && 'Tent Material'}
-                </div>
-                {productType === 'tent' ? (
-                  <div className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm text-gray-700">
-                    6oz Tent Fabric (600x600 denier)
+              {/* Product Type Selector - Only show for banner, tin, tent */}
+              {productType !== 'sticker' && (
+                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                  <div className="text-sm font-medium text-gray-800 mb-3">
+                    {productType === 'banner' && 'Banner Type'}
+                    {productType === 'tin' && 'Tin Finish'}
+                    {productType === 'tent' && 'Tent Material'}
                   </div>
-                ) : (
-                <select 
-                  value={productType === 'tin' ? (tinSpecs?.finish || '') : (bannerSpecs?.id || '')}
-                  onChange={(e) => {
-                    if (productType === 'tin') {
-                      handleTinSpecChange('finish', e.target.value)
-                    } else {
-                      onChangeBannerType?.(e.target.value)
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                >
-                  {productType === 'banner' && bannerTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                  {productType === 'tin' && (
-                    <>
-                      <option value="silver">Silver</option>
-                      <option value="black">Black</option>
-                      <option value="gold">Gold</option>
-                    </>
+                  {productType === 'tent' ? (
+                    <div className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm text-gray-700">
+                      6oz Tent Fabric (600x600 denier)
+                    </div>
+                  ) : (
+                  <select 
+                    value={productType === 'tin' ? (tinSpecs?.finish || '') : (bannerSpecs?.id || '')}
+                    onChange={(e) => {
+                      if (productType === 'tin') {
+                        handleTinSpecChange('finish', e.target.value)
+                      } else {
+                        onChangeBannerType?.(e.target.value)
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  >
+                    {productType === 'banner' && bannerTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                    {productType === 'tin' && (
+                      <>
+                        <option value="silver">Silver</option>
+                        <option value="black">Black</option>
+                        <option value="gold">Gold</option>
+                      </>
+                    )}
+                  </select>
                   )}
-                </select>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Tin-Specific Options */}
               {productType === 'tin' && (
@@ -1972,13 +1974,13 @@ const BannerSidebar = ({
                     <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                       <div className="text-sm font-medium text-gray-800 mb-3">Shape</div>
                       <select 
-                        value={stickerSpecs?.shape || 'square'}
+                        value={stickerShape}
                         onChange={(e) => handleShapeChange(e.target.value)}
                         className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       >
-                        {stickerShapes.map((shape) => (
-                          <option key={shape.id} value={shape.id}>
-                            {shape.name}
+                        {Object.keys(stickerShapeConfigs).map((shape) => (
+                          <option key={shape} value={shape}>
+                            {shape}
                           </option>
                         ))}
                       </select>
@@ -1988,13 +1990,13 @@ const BannerSidebar = ({
                     <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                       <div className="text-sm font-medium text-gray-800 mb-3">Size (inches)</div>
                       <select 
-                        value={stickerSpecs?.size || '3x3'}
+                        value={stickerSize}
                         onChange={(e) => handleSizeChange(e.target.value)}
                         className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       >
-                        {stickerShapes.find(s => s.id === stickerSpecs?.shape)?.sizes.map((size) => (
-                          <option key={size} value={size}>
-                            {size}
+                        {(stickerShapeConfigs[stickerShape]?.sizes || []).map(s => (
+                          <option key={s.label} value={s.label}>
+                            {s.label}
                           </option>
                         ))}
                       </select>
@@ -2027,16 +2029,6 @@ const BannerSidebar = ({
                       </div>
                     </div>
 
-                    {/* Add Sticker Shape Button */}
-                    <div className="pt-3">
-                      <button
-                        onClick={handleAddStickerAsset}
-                        className="w-full inline-flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors"
-                      >
-                        <Tag className="w-4 h-4" /> Add Sticker Shape
-                      </button>
-                      <p className="text-xs text-gray-500 mt-2 text-center">Add clipping path shape to canvas</p>
-                    </div>
                   </>
                 )}
 
