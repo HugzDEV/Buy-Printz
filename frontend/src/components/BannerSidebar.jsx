@@ -82,6 +82,7 @@ const BannerSidebar = ({
     templates: false,
     assets: false,
     upload: false,
+    stickers: false,
     marketplace: false
   })
 
@@ -652,6 +653,78 @@ const BannerSidebar = ({
       ]
     }
   }
+
+  // Sticker shapes and size-aware asset mapping (uses files in /public/assets/images)
+  // Filepaths are built explicitly to avoid runtime FS reads in the browser
+  const stickerShapeConfigs = {
+    Square: {
+      dir: '/assets/images/Square/Square/',
+      sizes: [
+        { label: '1x1', file: 'Square_1x1.png' },
+        { label: '2x2', file: 'Square_2x2.png' },
+        { label: '2.5x2.5', file: 'Square_2.5x2.5.png' },
+        { label: '3x3', file: 'Square_3x3.png' },
+        { label: '3.5x3.5', file: 'Square_3.5x3.5.png' },
+        { label: '4x4', file: 'Square_4x4.png' },
+        { label: '4.5x4.5', file: 'Square_4.5x4.5_round corners.png' },
+        { label: '5x5', file: 'Square_5x5_round corners.png' }
+      ]
+    },
+    Rectangle: {
+      dir: '/assets/images/Rectangle/Rectangle/',
+      sizes: [
+        { label: '2x4', file: 'Rectangle_2x4.png' },
+        { label: '2.5x3', file: 'Rectangle_2.5x3.png' },
+        { label: '3x2', file: 'Rectangle_3x2.png' },
+        { label: '3x5', file: 'Rectangle_3x5.png' },
+        { label: '3.5x1.5', file: 'Rectangle_3.5x1.5.png' },
+        { label: '4x2', file: 'Rectangle_4x2.png' },
+        { label: '4x3', file: 'Rectangle_4x3.png' },
+        { label: '4x6', file: 'Rectangle_4x6.png' },
+        { label: '5x3', file: 'Rectangle_5x3_ round corners.png' },
+        { label: '6x4', file: 'Rectangle_6x4_round corners.png' }
+      ]
+    },
+    Triangle: {
+      dir: '/assets/images/Triangle/Triangle/',
+      sizes: [
+        { label: '1x1', file: 'Triangle_1x1.png' },
+        { label: '2x1.5', file: 'Triangle_2x1.5.png' },
+        { label: '2x2', file: 'Triangle_2x2.png' },
+        { label: '3x2', file: 'Triangle_3x2.png' },
+        { label: '3x3', file: 'Triangle_3x3.png' },
+        { label: '4x2.5', file: 'Triangle_4x2.5.png' },
+        { label: '4x4', file: 'Triangle_4x4.png' },
+        { label: '5x3', file: 'Triangle_5x3.png' },
+        { label: '5x5', file: 'Triangle_5x5.png' },
+        { label: '6x4', file: 'Triangle_6x4.png' }
+      ]
+    },
+    Oval: {
+      dir: '/assets/images/Oval/Oval/',
+      sizes: [
+        { label: '2x1.5', file: 'Oval_2x1.5.png' },
+        { label: '3x2', file: 'Oval_3x2.png' },
+        { label: '3x4', file: 'Oval_3x4.png' },
+        { label: '4x3', file: 'Oval_4x3.png' },
+        { label: '4x5', file: 'Oval_4x5.png' },
+        { label: '5x4', file: 'Oval_5x4.png' }
+      ]
+    }
+    // Note: If Circle/Diamond assets are added under similar folders, we can extend here
+  }
+
+  const [stickerShape, setStickerShape] = useState('Square')
+  const [stickerSize, setStickerSize] = useState('3x3')
+  const [stickerMaterial, setStickerMaterial] = useState('premium-vinyl') // or premium-clear-vinyl
+
+  const handleAddStickerAsset = useCallback(() => {
+    const cfg = stickerShapeConfigs[stickerShape]
+    if (!cfg) return
+    const sizeEntry = cfg.sizes.find(s => s.label === stickerSize) || cfg.sizes[0]
+    const imagePath = `${cfg.dir}${sizeEntry.file}`
+    onAddAsset?.(imagePath, `${stickerShape} ${stickerSize}`)
+  }, [onAddAsset, stickerShape, stickerSize])
 
   // Simple scroll preservation - store and restore scroll positions
   const preserveScrollPosition = useCallback((callback) => {
