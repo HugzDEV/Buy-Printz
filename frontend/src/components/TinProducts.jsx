@@ -27,7 +27,7 @@ const TinProducts = () => {
       priceValue: 425.00,
       priceNote: "100 unit minimum",
       description: "Sleek black aluminum business card tins with custom vinyl stickers - modern and sophisticated (100 unit minimum)",
-      image: "/assets/images/black tins-buyprintz.jpg",
+      image: "/assets/images/black%20tins-buyprintz.jpg",
       features: ["Premium black aluminum", "Custom vinyl stickers", "Modern finish", "100 unit minimum"],
       popular: true,
       icon: <Layers className="w-8 h-8" />,
@@ -42,7 +42,7 @@ const TinProducts = () => {
       priceValue: 450.00,
       priceNote: "100 unit minimum",
       description: "Luxurious gold aluminum business card tins with custom vinyl stickers - premium and elegant (100 unit minimum)",
-      image: "/assets/images/gold tins-buyprintz.jpg",
+      image: "/assets/images/gold%20tins-buyprintz.jpg",
       features: ["Premium gold aluminum", "Custom vinyl stickers", "Luxury finish", "100 unit minimum"],
       premium: true,
       icon: <Crown className="w-8 h-8" />,
@@ -118,8 +118,8 @@ const TinProducts = () => {
           "name": `${tin.name} Business Card Tin`,
           "description": tin.description,
           "image": [
-            tin.image ? `https://www.buyprintz.com${tin.image}` : "https://www.buyprintz.com/assets/images/Tins_BC_v2_new phone number.png",
-            "https://www.buyprintz.com/assets/images/Tins_BC_v2_new phone number.png"
+            tin.image ? encodeURI(`https://www.buyprintz.com${tin.image}`) : "https://www.buyprintz.com/assets/images/Tins_BC_v2_new%20phone%20number.png",
+            "https://www.buyprintz.com/assets/images/Tins_BC_v2_new%20phone%20number.png"
           ],
           "sku": tin.sku,
           "gtin": tin.gtin,

@@ -19,7 +19,7 @@ const AllProducts = () => {
       name: "Business Card Tins",
       price: "From $399.99",
       description: "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging (100 unit minimum)",
-      image: "/assets/images/Tins_BC_v2_new phone number.png",
+      image: "/assets/images/Tins_BC_v2_new%20phone%20number.png",
       link: "/business-card-tins",
       badge: "New",
       badgeColor: "bg-green-500",

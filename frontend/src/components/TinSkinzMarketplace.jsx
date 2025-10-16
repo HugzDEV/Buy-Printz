@@ -453,7 +453,7 @@ const TinSkinzMarketplace = () => {
           "name": "Business Card Tins with Mints",
           "description": "Premium business card tins (Altoid-style) with custom branding and mints. Eco-friendly, reusable containers that get kept, not thrown away. 100 unit minimum.",
           "image": [
-            "https://www.buyprintz.com/assets/images/Tins_BC_v2_new phone number.png",
+            "https://www.buyprintz.com/assets/images/Tins_BC_v2_new%20phone%20number.png",
             "https://www.buyprintz.com/assets/images/tin-skinz-showcase.jpg"
           ],
           "sku": "TIN-BC-001",

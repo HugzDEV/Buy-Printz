@@ -144,7 +144,7 @@ Ready to make your marketing more sustainable? Contact BuyPrintz today to discus
       readTime: "6 min read",
       category: "Sustainability",
       tags: ["eco-friendly marketing", "sustainable business", "business card tins", "environmental responsibility", "green marketing", "reusable marketing"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/Tins_BC_v2_new%20phone%20number.png",
       featured: true
     },
     {
@@ -242,7 +242,7 @@ Ready to get started? Contact BuyPrintz today to discuss your startup marketing 
       readTime: "7 min read",
       category: "Startup Marketing",
       tags: ["startup marketing", "business cards", "trade show tents", "banners", "entrepreneurship", "marketing tools"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/Tins_BC_v2_new%20phone%20number.png",
       featured: true
     },
     {
@@ -321,7 +321,7 @@ Contact BuyPrintz today to discuss your custom Business Card Tin design. Let's c
       readTime: "6 min read",
       category: "Business Cards",
       tags: ["business cards", "networking", "entrepreneurship", "marketing", "innovation"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/Tins_BC_v2_new%20phone%20number.png",
       featured: true
     },
     {
@@ -352,7 +352,7 @@ The practical value ensures your contact information stays visible and accessibl
       readTime: "8 min read",
       category: "Business Cards",
       tags: ["business cards", "networking", "sustainability", "innovation", "marketing"],
-      thumbnail: "/assets/images/Tins_BC_v2_new phone number.png",
+      thumbnail: "/assets/images/Tins_BC_v2_new%20phone%20number.png",
       featured: false
     }
   ]
