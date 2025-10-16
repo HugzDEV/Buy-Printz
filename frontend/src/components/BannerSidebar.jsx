@@ -86,7 +86,6 @@ const BannerSidebar = ({
     templates: false,
     assets: false,
     upload: false,
-    stickers: false,
     marketplace: false
   })
 
@@ -718,9 +717,73 @@ const BannerSidebar = ({
     // Note: If Circle/Diamond assets are added under similar folders, we can extend here
   }
 
-  const [stickerShape, setStickerShape] = useState('Square')
-  const [stickerSize, setStickerSize] = useState('3x3')
-  const [stickerMaterial, setStickerMaterial] = useState('premium-vinyl') // or premium-clear-vinyl
+  // Sticker state - sync with stickerSpecs from props
+  const [stickerShape, setStickerShape] = useState(stickerSpecs?.shape || 'square')
+  const [stickerSize, setStickerSize] = useState(stickerSpecs?.size || '3x3')
+  const [stickerMaterial, setStickerMaterial] = useState(stickerSpecs?.material || 'premium-vinyl')
+  const [stickerQuantity, setStickerQuantity] = useState(stickerSpecs?.quantity || 10)
+
+  // Update local state when stickerSpecs change
+  useEffect(() => {
+    if (stickerSpecs) {
+      setStickerShape(stickerSpecs.shape || 'square')
+      setStickerSize(stickerSpecs.size || '3x3')
+      setStickerMaterial(stickerSpecs.material || 'premium-vinyl')
+      setStickerQuantity(stickerSpecs.quantity || 10)
+    }
+  }, [stickerSpecs])
+
+  // Handle shape change - reset size to first available size for new shape
+  const handleShapeChange = useCallback((newShape) => {
+    setStickerShape(newShape)
+    const shapeConfig = stickerShapeConfigs[newShape]
+    if (shapeConfig && shapeConfig.sizes.length > 0) {
+      const firstSize = shapeConfig.sizes[0].label
+      setStickerSize(firstSize)
+      // Update sticker specs
+      if (onStickerSpecChange) {
+        onStickerSpecChange({
+          ...stickerSpecs,
+          shape: newShape,
+          size: firstSize
+        })
+      }
+    }
+  }, [stickerSpecs, onStickerSpecChange])
+
+  // Handle size change
+  const handleSizeChange = useCallback((newSize) => {
+    setStickerSize(newSize)
+    if (onStickerSpecChange) {
+      onStickerSpecChange({
+        ...stickerSpecs,
+        size: newSize
+      })
+    }
+  }, [stickerSpecs, onStickerSpecChange])
+
+  // Handle material change
+  const handleMaterialChange = useCallback((newMaterial) => {
+    setStickerMaterial(newMaterial)
+    if (onStickerSpecChange) {
+      onStickerSpecChange({
+        ...stickerSpecs,
+        material: newMaterial
+      })
+    }
+  }, [stickerSpecs, onStickerSpecChange])
+
+  // Handle quantity change
+  const handleQuantityChange = useCallback((newQuantity) => {
+    const quantity = Math.max(10, newQuantity) // Minimum 10
+    setStickerQuantity(quantity)
+    if (onStickerSpecChange) {
+      onStickerSpecChange({
+        ...stickerSpecs,
+        quantity: quantity
+      })
+    }
+  }, [stickerSpecs, onStickerSpecChange])
 
   const handleAddStickerAsset = useCallback(() => {
     const cfg = stickerShapeConfigs[stickerShape]
@@ -1894,7 +1957,7 @@ const BannerSidebar = ({
                       <div className="text-sm font-medium text-gray-800 mb-3">Material</div>
                       <select 
                         value={stickerSpecs?.material || 'premium-vinyl'}
-                        onChange={(e) => onStickerSpecChange({...stickerSpecs, material: e.target.value})}
+                        onChange={(e) => handleMaterialChange(e.target.value)}
                         className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       >
                         {stickerMaterials.map((material) => (
@@ -1910,7 +1973,7 @@ const BannerSidebar = ({
                       <div className="text-sm font-medium text-gray-800 mb-3">Shape</div>
                       <select 
                         value={stickerSpecs?.shape || 'square'}
-                        onChange={(e) => onStickerSpecChange({...stickerSpecs, shape: e.target.value})}
+                        onChange={(e) => handleShapeChange(e.target.value)}
                         className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       >
                         {stickerShapes.map((shape) => (
@@ -1926,7 +1989,7 @@ const BannerSidebar = ({
                       <div className="text-sm font-medium text-gray-800 mb-3">Size (inches)</div>
                       <select 
                         value={stickerSpecs?.size || '3x3'}
-                        onChange={(e) => onStickerSpecChange({...stickerSpecs, size: e.target.value})}
+                        onChange={(e) => handleSizeChange(e.target.value)}
                         className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                       >
                         {stickerShapes.find(s => s.id === stickerSpecs?.shape)?.sizes.map((size) => (
@@ -1937,20 +2000,42 @@ const BannerSidebar = ({
                       </select>
                     </div>
 
-                    {/* Quantity */}
+                    {/* Quantity with up/down arrows */}
                     <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                      <div className="text-sm font-medium text-gray-800 mb-3">Quantity</div>
-                      <select 
-                        value={stickerSpecs?.quantity || 100}
-                        onChange={(e) => onStickerSpecChange({...stickerSpecs, quantity: parseInt(e.target.value)})}
-                        className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      <div className="text-sm font-medium text-gray-800 mb-3">Quantity (min 10)</div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleQuantityChange(stickerQuantity - 1)}
+                          disabled={stickerQuantity <= 10}
+                          className="p-2 bg-white/50 border border-white/30 rounded-lg hover:bg-white/70 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        >
+                          <ArrowDown className="w-3 h-3 text-gray-600" />
+                        </button>
+                        <input
+                          type="number"
+                          value={stickerQuantity}
+                          onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 10)}
+                          min="10"
+                          className="flex-1 text-center text-sm border rounded-lg px-3 py-2 bg-white/50 border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        />
+                        <button
+                          onClick={() => handleQuantityChange(stickerQuantity + 1)}
+                          className="p-2 bg-white/50 border border-white/30 rounded-lg hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        >
+                          <ArrowUp className="w-3 h-3 text-gray-600" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Add Sticker Shape Button */}
+                    <div className="pt-3">
+                      <button
+                        onClick={handleAddStickerAsset}
+                        className="w-full inline-flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors"
                       >
-                        <option value={50}>50 stickers</option>
-                        <option value={100}>100 stickers</option>
-                        <option value={250}>250 stickers</option>
-                        <option value={500}>500 stickers</option>
-                        <option value={1000}>1000 stickers</option>
-                      </select>
+                        <Tag className="w-4 h-4" /> Add Sticker Shape
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">Add clipping path shape to canvas</p>
                     </div>
                   </>
                 )}
@@ -3401,84 +3486,6 @@ const BannerSidebar = ({
             </div>
           )}
         </GlassCard>
-
-        {/* Sticker Shapes & Sizes Section - Only show for sticker product type */}
-        {productType === 'sticker' && (
-          <GlassCard className="mb-4">
-            <button
-              onClick={() => preserveScrollPosition(() => setExpandedSections(prev => ({ ...prev, stickers: !prev.stickers })))}
-              className="w-full flex items-center justify-between p-4 hover:bg-white/10 transition-colors duration-200 rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg shadow-lg">
-                  <Tag className="w-4 h-4 text-white" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold text-gray-800">Sticker Shapes & Sizes</h3>
-                  <p className="text-xs text-gray-500">Add clipping path shapes</p>
-                </div>
-              </div>
-              {expandedSections.stickers ? 
-                <ChevronUp className="w-4 h-4 text-gray-500" /> : 
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              }
-            </button>
-
-            {expandedSections.stickers && (
-              <div className="px-4 pb-4 space-y-3">
-                {/* Material */}
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Material</label>
-                  <select
-                    value={stickerMaterial}
-                    onChange={(e) => setStickerMaterial(e.target.value)}
-                    className="w-full text-sm border rounded-lg px-3 py-2 bg-white/50 border-white/30"
-                  >
-                    <option value="premium-vinyl">Premium Vinyl</option>
-                    <option value="premium-clear-vinyl">Premium Clear Vinyl</option>
-                  </select>
-                </div>
-
-                {/* Shape */}
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Shape</label>
-                  <select
-                    value={stickerShape}
-                    onChange={(e) => setStickerShape(e.target.value)}
-                    className="w-full text-sm border rounded-lg px-3 py-2 bg-white/50 border-white/30"
-                  >
-                    {Object.keys(stickerShapeConfigs).map(shape => (
-                      <option key={shape} value={shape}>{shape}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Size */}
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Size (inches)</label>
-                  <select
-                    value={stickerSize}
-                    onChange={(e) => setStickerSize(e.target.value)}
-                    className="w-full text-sm border rounded-lg px-3 py-2 bg-white/50 border-white/30"
-                  >
-                    {(stickerShapeConfigs[stickerShape]?.sizes || []).map(s => (
-                      <option key={s.label} value={s.label}>{s.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <button
-                  onClick={handleAddStickerAsset}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors"
-                >
-                  <Tag className="w-4 h-4" /> Add Sticker Shape
-                </button>
-
-                <p className="text-xs text-gray-500">Stickers are added at print scale. Use the gang sheet to layout multiple designs across 16" printable width on a 20" roll.</p>
-              </div>
-            )}
-          </GlassCard>
-        )}
 
         {/* Marketplace Section */}
         <GlassCard className="mb-4">
