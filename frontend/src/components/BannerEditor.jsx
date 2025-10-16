@@ -208,13 +208,14 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return 'front'
     if (urlProduct === 'tent') return 'canopy_front'
+    if (urlProduct === 'sticker') return 'square'
     return 'front'
   })
   
   // Available surfaces for multi-surface product navigation
   const [availableSurfaces, setAvailableSurfaces] = useState([])
   
-  // Core state - Multi-surface support for tins and tents
+  // Core state - Multi-surface support for tins, tents, and stickers
   const [surfaceElements, setSurfaceElements] = useState({
     // Tin surfaces
     front: [],
@@ -228,7 +229,14 @@ const BannerEditorNew = () => {
     canopy_right: [],
     sidewall_left: [],
     sidewall_right: [],
-    backwall: []
+    backwall: [],
+    // Sticker surfaces (different shapes)
+    circle: [],
+    square: [],
+    rectangle: [],
+    triangle: [],
+    diamond: [],
+    oval: []
   })
   
   // Store captured surface images (Konva exports for each surface)
@@ -247,10 +255,10 @@ const BannerEditorNew = () => {
   }, [surfaceElements])
   
   // Current elements based on product type and surface
-  const elements = (productType === 'tin' || productType === 'tent') 
+  const elements = (productType === 'tin' || productType === 'tent' || productType === 'sticker') 
     ? (surfaceElements[currentSurface] || []) 
     : (surfaceElements.front || [])
-  const setElements = (productType === 'tin' || productType === 'tent')
+  const setElements = (productType === 'tin' || productType === 'tent' || productType === 'sticker')
     ? (newElements) => {
         setSurfaceElements(prev => ({
           ...prev,
@@ -661,7 +669,7 @@ const BannerEditorNew = () => {
         reinforcedStripColor: 'white'
       })
     } else if (newProductType === 'sticker') {
-      setCurrentSurface('front')
+      setCurrentSurface('square')
       // Initialize sticker specs
       setStickerSpecs({
         material: 'premium-vinyl',
@@ -689,7 +697,13 @@ const BannerEditorNew = () => {
       canopy_right: [],
       sidewall_left: [],
       sidewall_right: [],
-      backwall: []
+      backwall: [],
+      circle: [],
+      square: [],
+      rectangle: [],
+      triangle: [],
+      diamond: [],
+      oval: []
     })
     
     console.log('🎨 Product type changed to:', newProductType)

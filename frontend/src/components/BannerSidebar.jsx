@@ -185,6 +185,18 @@ const BannerSidebar = ({
     }
   }, [tinSpecs?.surfaceCoverage])
 
+  // Memoized available sticker surfaces based on shape
+  const availableStickerSurfaces = useMemo(() => {
+    return [
+      { key: 'circle', name: 'Circle', group: 'shape' },
+      { key: 'square', name: 'Square', group: 'shape' },
+      { key: 'rectangle', name: 'Rectangle', group: 'shape' },
+      { key: 'triangle', name: 'Triangle', group: 'shape' },
+      { key: 'diamond', name: 'Diamond', group: 'shape' },
+      { key: 'oval', name: 'Oval', group: 'shape' }
+    ]
+  }, [])
+
   // Update currentSurface if it's not available in the new filtered surfaces
   useEffect(() => {
     if (productType === 'tent') {
@@ -212,8 +224,11 @@ const BannerSidebar = ({
     } else if (productType === 'tin' && onAvailableSurfacesChange) {
       const availableSurfaceKeys = availableTinSurfaces.map(s => s.key)
       onAvailableSurfacesChange(availableSurfaceKeys)
+    } else if (productType === 'sticker' && onAvailableSurfacesChange) {
+      const availableSurfaceKeys = availableStickerSurfaces.map(s => s.key)
+      onAvailableSurfacesChange(availableSurfaceKeys)
     }
-  }, [availableTentSurfaces, availableTinSurfaces, productType, onAvailableSurfacesChange])
+  }, [availableTentSurfaces, availableTinSurfaces, availableStickerSurfaces, productType, onAvailableSurfacesChange])
 
   // Note: Removed useEffect to prevent double render issues
 
@@ -660,6 +675,20 @@ const BannerSidebar = ({
   // Sticker shapes and size-aware asset mapping (uses files in /public/assets/images)
   // Filepaths are built explicitly to avoid runtime FS reads in the browser
   const stickerShapeConfigs = {
+    Circle: {
+      dir: '/assets/images/Circle/Circle/',
+      sizes: [
+        { label: '1x1', file: 'Circle_1x1.png' },
+        { label: '1.5x1.5', file: 'Circle_1.5x1.5.png' },
+        { label: '2x2', file: 'Circle_2x2.png' },
+        { label: '2.5x2.5', file: 'Circle_2.5x2.5.png' },
+        { label: '3x3', file: 'Circle_3x3.png' },
+        { label: '3.5x3.5', file: 'Circle_3.5x3.5.png' },
+        { label: '4x4', file: 'Circle_4x4.png' },
+        { label: '4.5x4.5', file: 'Circle_4.5x4.5.png' },
+        { label: '5x5', file: 'Circle_5x5.png' }
+      ]
+    },
     Square: {
       dir: '/assets/images/Square/Square/',
       sizes: [
@@ -703,6 +732,19 @@ const BannerSidebar = ({
         { label: '6x4', file: 'Triangle_6x4.png' }
       ]
     },
+    Diamond: {
+      dir: '/assets/images/Diamond/Diamond/',
+      sizes: [
+        { label: '1x1', file: 'Diamond_1x1.png' },
+        { label: '2x1', file: 'Diamond_2x1.png' },
+        { label: '2x2', file: 'Diamond_2x2.png' },
+        { label: '3x2', file: 'Diamond_3x2.png' },
+        { label: '3x3', file: 'Diamond_3x3.png' },
+        { label: '4x3', file: 'Diamond_4x3.png' },
+        { label: '4x4', file: 'Diamond_4x4.png' },
+        { label: '5x4', file: 'Diamond_5x4.png' }
+      ]
+    },
     Oval: {
       dir: '/assets/images/Oval/Oval/',
       sizes: [
@@ -714,7 +756,6 @@ const BannerSidebar = ({
         { label: '5x4', file: 'Oval_5x4.png' }
       ]
     }
-    // Note: If Circle/Diamond assets are added under similar folders, we can extend here
   }
 
   // Sticker state - sync with stickerSpecs from props
@@ -733,7 +774,7 @@ const BannerSidebar = ({
     }
   }, [stickerSpecs])
 
-  // Handle shape change - reset size to first available size for new shape
+  // Handle shape change - reset size to first available size for new shape and change surface
   const handleShapeChange = useCallback((newShape) => {
     setStickerShape(newShape)
     const shapeConfig = stickerShapeConfigs[newShape]
@@ -748,8 +789,10 @@ const BannerSidebar = ({
           size: firstSize
         })
       }
+      // Change the current surface to the new shape
+      onSurfaceChange?.(newShape)
     }
-  }, [stickerSpecs, onStickerSpecChange])
+  }, [stickerSpecs, onStickerSpecChange, onSurfaceChange])
 
   // Handle size change
   const handleSizeChange = useCallback((newSize) => {
@@ -2310,6 +2353,33 @@ const BannerSidebar = ({
                   
                   <div className="mt-2 text-xs text-gray-600 text-center">
                     Currently editing: <span className="font-medium capitalize">{currentSurface.replace('_', ' ')}</span> surface
+                  </div>
+                </div>
+              )}
+
+              {/* Surface Navigation for Stickers */}
+              {productType === 'sticker' && (
+                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                  <div className="text-sm font-medium text-gray-800 mb-3">🏷️ Shape Navigation</div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    {availableStickerSurfaces.map((surface) => (
+                      <button
+                        key={surface.key}
+                        onClick={() => handleSurfaceChange(surface.key)}
+                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                          currentSurface === surface.key
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
+                        }`}
+                      >
+                        {surface.name}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-2 text-xs text-gray-600 text-center">
+                    Currently editing: <span className="font-medium capitalize">{currentSurface}</span> shape
                   </div>
                 </div>
               )}
