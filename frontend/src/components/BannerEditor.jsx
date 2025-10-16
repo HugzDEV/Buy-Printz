@@ -798,7 +798,7 @@ const BannerEditorNew = () => {
   // Handle surface navigation with automatic image capture
   const handleSurfaceChange = useCallback((surface) => {
     // CAPTURE CURRENT SURFACE IMAGE BEFORE SWITCHING
-    if (productType === 'tin' || productType === 'tent') {
+    if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
       const currentElements = surfaceElements[currentSurface] || []
       
       // Only capture if current surface has elements

@@ -762,7 +762,6 @@ const BannerSidebar = ({
   const [stickerShape, setStickerShape] = useState(stickerSpecs?.shape || 'square')
   const [stickerSize, setStickerSize] = useState(stickerSpecs?.size || '3x3')
   const [stickerMaterial, setStickerMaterial] = useState(stickerSpecs?.material || 'premium-vinyl')
-  const [stickerQuantity, setStickerQuantity] = useState(stickerSpecs?.quantity || 10)
 
   // Update local state when stickerSpecs change
   useEffect(() => {
@@ -770,7 +769,6 @@ const BannerSidebar = ({
       setStickerShape(stickerSpecs.shape || 'square')
       setStickerSize(stickerSpecs.size || '3x3')
       setStickerMaterial(stickerSpecs.material || 'premium-vinyl')
-      setStickerQuantity(stickerSpecs.quantity || 10)
     }
   }, [stickerSpecs])
 
@@ -816,17 +814,6 @@ const BannerSidebar = ({
     }
   }, [stickerSpecs, onStickerSpecChange])
 
-  // Handle quantity change
-  const handleQuantityChange = useCallback((newQuantity) => {
-    const quantity = Math.max(10, newQuantity) // Minimum 10
-    setStickerQuantity(quantity)
-    if (onStickerSpecChange) {
-      onStickerSpecChange({
-        ...stickerSpecs,
-        quantity: quantity
-      })
-    }
-  }, [stickerSpecs, onStickerSpecChange])
 
   const handleAddStickerAsset = useCallback(() => {
     const cfg = stickerShapeConfigs[stickerShape]
@@ -2045,32 +2032,6 @@ const BannerSidebar = ({
                       </select>
                     </div>
 
-                    {/* Quantity with up/down arrows */}
-                    <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                      <div className="text-sm font-medium text-gray-800 mb-3">Quantity (min 10)</div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleQuantityChange(stickerQuantity - 1)}
-                          disabled={stickerQuantity <= 10}
-                          className="p-2 bg-white/50 border border-white/30 rounded-lg hover:bg-white/70 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                        >
-                          <ArrowDown className="w-3 h-3 text-gray-600" />
-                        </button>
-                        <input
-                          type="number"
-                          value={stickerQuantity}
-                          onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 10)}
-                          min="10"
-                          className="flex-1 text-center text-sm border rounded-lg px-3 py-2 bg-white/50 border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                        />
-                        <button
-                          onClick={() => handleQuantityChange(stickerQuantity + 1)}
-                          className="p-2 bg-white/50 border border-white/30 rounded-lg hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                        >
-                          <ArrowUp className="w-3 h-3 text-gray-600" />
-                        </button>
-                      </div>
-                    </div>
 
                   </>
                 )}
