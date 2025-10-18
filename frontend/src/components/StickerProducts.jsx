@@ -1,58 +1,119 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle, Filter, Search, Star, Truck, Award, Clock, Sparkles, Package, Layers, ArrowLeft } from 'lucide-react'
+import { ArrowRight, CheckCircle, Star, Truck, Award, Sparkles, Package, ArrowLeft } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
 
 const StickerProducts = () => {
-  const [selectedShape, setSelectedShape] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
-
-  const shapes = [
-    { id: 'all', name: 'All Shapes', count: 1 },
-    { id: 'circle', name: 'Circle', count: 1 }
-  ]
 
   const stickerProducts = [
     {
-      id: 'circle-sticker',
-      shape: 'circle',
-      name: "Circle Vinyl Stickers",
-      price: "$0.25 - $0.45",
-      description: "Professional vinyl stickers in perfect circles. Weather-resistant, durable, and perfect for branding, events, and promotional use.",
-      image: "/assets/images/circle-sticker-buyprintz.jpg",
-      features: ["Weather-resistant vinyl", "UV resistant", "Waterproof", "Custom sizes available"],
+      id: 'standard-shapes',
+      name: "Standard Shape Stickers",
+      price: "$0.25 - $0.50",
+      description: "Professional vinyl stickers in 7 standard shapes with die-cut or kiss-cut options. Perfect for branding, events, and promotional use.",
+      image: "/assets/images/standard-shapes-stickers-buyprintz.jpg",
+      features: [
+        "7 Standard Shapes: Circle, Square, Rectangle, Oval, Triangle, Diamond, Star",
+        "Die-cut or Kiss-cut options",
+        "Roland Premium Vinyl materials",
+        "Custom sizes 1\" to 6\"",
+        "Landscape or portrait options for Rectangle & Oval"
+      ],
       bestseller: true,
-      specs: {
-        material: "Premium Vinyl",
-        finish: "Matte or Glossy",
-        shape: "Circle",
-        size: "1\" - 6\" diameter",
-        printingMethod: "Digital Printing",
-        durability: "Outdoor rated (3-5 years)",
-        waterproof: true,
-        uvResistant: true,
-        removable: false,
-        indoorOutdoor: "Both"
-      },
-      accessories: [
-        "Die-cut to shape (FREE)",
-        "Matte finish (FREE)", 
-        "Glossy finish (FREE)",
-        "Clear vinyl option (Upgrade)"
+      materials: [
+        {
+          name: "Roland Premium Vinyl",
+          description: "Professional-grade vinyl with 3-5 year outdoor durability. Weather-resistant, UV resistant, and waterproof.",
+          bestFor: "Outdoor applications, long-term use"
+        },
+        {
+          name: "Roland Clear Vinyl",
+          description: "Transparent vinyl for window applications and see-through designs. Maintains clarity while providing durability.",
+          bestFor: "Window decals, transparent designs"
+        },
+        {
+          name: "Roland Paper",
+          description: "High-quality paper material for indoor use. Cost-effective option for temporary applications.",
+          bestFor: "Indoor use, temporary applications"
+        },
+        {
+          name: "Orajet Premium Vinyl",
+          description: "Premium vinyl with enhanced adhesive properties. Superior performance for challenging surfaces.",
+          bestFor: "Difficult surfaces, premium applications"
+        }
+      ],
+      cuttingOptions: [
+        {
+          name: "Die-Cut",
+          description: "Precisely cut to your exact shape with clean, professional edges. No background material around your design.",
+          bestFor: "Custom shapes, professional appearance"
+        },
+        {
+          name: "Kiss-Cut",
+          description: "Cut through the vinyl but not the backing paper. Easy to apply with transfer tape included.",
+          bestFor: "Easy application, bulk orders"
+        }
+      ],
+      sizes: [
+        "1\" - Perfect for small logos and details",
+        "2\" - Ideal for product labels and small branding",
+        "3\" - Most popular size for general use",
+        "4\" - Great for medium-sized applications",
+        "5\" - Perfect for larger branding needs",
+        "6\" - Maximum size for standard shapes"
+      ]
+    },
+    {
+      id: 'custom-gang-sheet',
+      name: "Custom Gang Sheet Stickers",
+      price: "$15.00 - $25.00",
+      description: "Large 20\" x 20\" gang sheets for custom die-cutting. Perfect for unique shapes, large quantities, and complex designs.",
+      image: "/assets/images/custom-gang-sheet-buyprintz.jpg",
+      features: [
+        "20\" x 20\" gang sheet with 17\" x 17\" printable area",
+        "Custom die-cutting for any shape",
+        "Perfect for large quantity orders",
+        "Unique shapes and complex designs",
+        "Professional gang sheet production"
+      ],
+      materials: [
+        {
+          name: "Roland Premium Vinyl",
+          description: "Professional-grade vinyl with 3-5 year outdoor durability. Weather-resistant, UV resistant, and waterproof.",
+          bestFor: "Outdoor applications, long-term use"
+        },
+        {
+          name: "Roland Clear Vinyl",
+          description: "Transparent vinyl for window applications and see-through designs. Maintains clarity while providing durability.",
+          bestFor: "Window decals, transparent designs"
+        },
+        {
+          name: "Roland Paper",
+          description: "High-quality paper material for indoor use. Cost-effective option for temporary applications.",
+          bestFor: "Indoor use, temporary applications"
+        },
+        {
+          name: "Orajet Premium Vinyl",
+          description: "Premium vinyl with enhanced adhesive properties. Superior performance for challenging surfaces.",
+          bestFor: "Difficult surfaces, premium applications"
+        }
+      ],
+      cuttingOptions: [
+        {
+          name: "Custom Die-Cut",
+          description: "Precisely cut to your exact custom shape with clean, professional edges. Perfect for unique designs and complex shapes.",
+          bestFor: "Custom shapes, unique designs"
+        }
+      ],
+      sizes: [
+        "20\" x 20\" gang sheet",
+        "17\" x 17\" printable area",
+        "1.5\" margins on all sides",
+        "Perfect for large quantity orders"
       ]
     }
   ]
 
-  // Filter products based on shape and search
-  const filteredProducts = stickerProducts.filter(product => {
-    const matchesShape = selectedShape === 'all' || product.shape === selectedShape
-    const matchesSearch = searchTerm === '' || 
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.features.some(feature => feature.toLowerCase().includes(searchTerm.toLowerCase()))
-    
-    return matchesShape && matchesSearch
-  })
 
   // Enhanced Product Collection Schema with proper Google Shopping support
   const stickerProductsStructuredData = {
@@ -113,7 +174,7 @@ const StickerProducts = () => {
             "url": "https://www.buyprintz.com"
           },
           "category": "Stickers & Decals > Vinyl Stickers",
-          "material": sticker.specs.material,
+          "material": "Roland Premium Vinyl",
           "color": "Custom",
           "offers": {
             "@type": "Offer",
@@ -208,22 +269,22 @@ const StickerProducts = () => {
             {
               "@type": "PropertyValue",
               "name": "Material",
-              "value": sticker.specs.material
+              "value": "Roland Premium Vinyl"
             },
             {
               "@type": "PropertyValue",
               "name": "Finish",
-              "value": sticker.specs.finish
+              "value": "Matte or Glossy"
             },
             {
               "@type": "PropertyValue",
               "name": "Shape",
-              "value": sticker.specs.shape
+              "value": sticker.id === 'standard-shapes' ? '7 Standard Shapes' : 'Custom Gang Sheet'
             },
             {
               "@type": "PropertyValue",
               "name": "Size Range",
-              "value": sticker.specs.size
+              "value": sticker.id === 'standard-shapes' ? '1" to 6"' : '20" x 20" gang sheet'
             },
             {
               "@type": "PropertyValue",
@@ -241,42 +302,49 @@ const StickerProducts = () => {
     "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "How to Order Custom Stickers",
-    "description": "Step-by-step guide to ordering custom stickers from BuyPrintz",
+    "description": "Step-by-step guide to ordering custom stickers from BuyPrintz with 8 shapes and Roland premium materials",
     "totalTime": "PT15M",
     "step": [
       {
         "@type": "HowToStep",
         "position": 1,
         "name": "Choose Your Sticker Shape",
-        "text": "Select from circle, square, rectangle, oval, triangle, diamond, or custom shapes. Each shape has different design considerations and applications.",
+        "text": "Select from 8 shapes: circle, square, rectangle, oval, triangle, diamond, star, or custom gang sheet. Each shape has different design considerations and applications.",
         "url": "https://www.buyprintz.com/stickers"
       },
       {
         "@type": "HowToStep",
         "position": 2,
         "name": "Design Your Sticker",
-        "text": "Use our canvas editor to create your custom sticker design. Upload logos, add text, and position elements within the circular safe zone.",
+        "text": "Use our custom editor to create your sticker design. Upload files in any format, use our design tools, or purchase assets from our creator marketplace.",
         "url": "https://www.buyprintz.com/editor?product=sticker"
       },
       {
         "@type": "HowToStep",
         "position": 3,
-        "name": "Select Specifications",
-        "text": "Choose material (vinyl, paper, clear), finish (matte, glossy), and size. Consider indoor vs outdoor use for durability requirements.",
+        "name": "Select Materials & Cutting",
+        "text": "Choose from Roland Premium Vinyl, Roland Clear Vinyl, Roland Paper, or Orajet Premium Vinyl. Select die-cut or kiss-cut options for professional finishing.",
         "url": "https://www.buyprintz.com/stickers"
       },
       {
         "@type": "HowToStep",
         "position": 4,
-        "name": "Review and Order",
-        "text": "Preview your design, get instant pricing based on quantity and size, then complete your order. Production begins immediately.",
+        "name": "Choose Size & Orientation",
+        "text": "Select size from 1\" to 6\" for standard shapes, or 20\" x 20\" gang sheets for custom shapes. Choose landscape or portrait for rectangles and ovals.",
         "url": "https://www.buyprintz.com/editor?product=sticker"
       },
       {
         "@type": "HowToStep",
         "position": 5,
+        "name": "Review and Order",
+        "text": "Preview your design, get instant pricing based on quantity, size, and materials, then complete your order. Production begins immediately.",
+        "url": "https://www.buyprintz.com/editor?product=sticker"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 6,
         "name": "Receive Your Stickers",
-        "text": "Your custom stickers will be produced in 2-3 business days and shipped with professional packaging and application instructions.",
+        "text": "Your custom stickers will be produced in 2-3 business days with professional die-cutting and shipped with application instructions.",
         "url": "https://www.buyprintz.com/stickers"
       }
     ]
@@ -315,39 +383,48 @@ const StickerProducts = () => {
           
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">
-              Custom Stickers
+              Custom Stickers & Decals
             </h1>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto drop-shadow-md">
-              Professional vinyl stickers and decals - starting at $0.25 per sticker with weather-resistant, durable materials
+              Professional vinyl stickers in 8 shapes with Roland premium materials. Die-cut, kiss-cut, and custom gang sheets available. Starting at $0.25 per sticker.
             </p>
           </div>
           
           {/* Quick Stats */}
-          <div className="grid md:grid-cols-3 gap-8 mt-12">
+          <div className="grid md:grid-cols-4 gap-6 mt-12">
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
                   <Award className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-white">Weather Resistant</span>
+                <span className="text-xl font-bold text-white">Roland Premium</span>
               </div>
-              <p className="text-primary-100">3-5 year outdoor durability</p>
+              <p className="text-primary-100">Professional vinyl materials</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-white">Custom Shapes</span>
+                <span className="text-xl font-bold text-white">8 Shapes</span>
               </div>
-              <p className="text-primary-100">Circle, square, custom die-cut</p>
+              <p className="text-primary-100">Circle to custom gang sheets</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
+                  <Package className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xl font-bold text-white">Die-Cut & Kiss-Cut</span>
+              </div>
+              <p className="text-primary-100">Professional cutting options</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mr-3">
                   <Truck className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-white">Fast Production</span>
+                <span className="text-xl font-bold text-white">Fast Production</span>
               </div>
               <p className="text-primary-100">2-3 business day turnaround</p>
             </div>
@@ -355,59 +432,16 @@ const StickerProducts = () => {
         </div>
       </section>
 
-      {/* Filters and Search */}
-      <section className="py-8 relative">
-        <div className="container mx-auto px-4">
-          <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-6">
-            <div className="flex flex-col lg:flex-row gap-6 items-center">
-              {/* Search */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search sticker products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-inner"
-                />
-              </div>
-              
-              {/* Shape Filters */}
-              <div className="flex flex-wrap gap-2">
-                {shapes.map((shape) => (
-                  <button
-                    key={shape.id}
-                    onClick={() => setSelectedShape(shape.id)}
-                    className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
-                      selectedShape === shape.id
-                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/30'
-                        : 'bg-white/80 backdrop-blur-sm border border-gray-200/50 text-gray-700 hover:bg-white hover:shadow-md'
-                    }`}
-                  >
-                    {shape.name} ({shape.count})
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Products Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="mb-6 flex justify-between items-center">
-            <p className="text-gray-600 font-medium">
-              Showing {filteredProducts.length} of {stickerProducts.length} sticker products
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {filteredProducts.map((product) => (
+          <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            {stickerProducts.map((product) => (
               <div key={product.id} className="group">
-                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:bg-white/80 h-full flex flex-col transform hover:scale-105 active:scale-95">
+                <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:bg-white/80 h-full flex flex-col">
                   {/* Product Image */}
-                  <div className="relative h-96">
+                  <div className="relative h-80">
                     <img 
                       src={product.image} 
                       alt={product.name}
@@ -431,12 +465,18 @@ const StickerProducts = () => {
                   </div>
                   
                   <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
                       {product.name}
                     </h3>
-                    <p className="text-gray-600 mb-4 text-sm flex-grow">
+                    <p className="text-gray-600 mb-6 text-base">
                       {product.description}
                     </p>
+                    
+                    {/* Price */}
+                    <div className="mb-6">
+                      <span className="text-2xl font-bold text-primary-600">{product.price}</span>
+                      <span className="text-gray-500 text-sm ml-2">starting price</span>
+                    </div>
                     
                     {/* Key Features */}
                     <div className="mb-4">
@@ -453,30 +493,53 @@ const StickerProducts = () => {
                       </div>
                     </div>
                     
-                    {/* Specifications */}
+                    {/* Quick Specs */}
                     <div className="mb-6 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50">
                       <h4 className="text-sm font-semibold text-gray-800 mb-2">Specifications</h4>
                       <div className="text-xs text-gray-600 space-y-1">
-                        <div><strong>Material:</strong> {product.specs.material}</div>
-                        <div><strong>Shape:</strong> {product.specs.shape}</div>
-                        <div><strong>Size:</strong> {product.specs.size}</div>
+                        <div><strong>Materials:</strong> Roland Premium Vinyl, Clear Vinyl, Paper</div>
+                        <div><strong>Cutting:</strong> Die-cut & Kiss-cut options</div>
+                        <div><strong>Sizes:</strong> {product.id === 'standard-shapes' ? '1" to 6"' : '20" x 20" gang sheet'}</div>
                       </div>
                     </div>
                     
                     <div className="flex gap-2 mt-auto">
                       <Link 
-                        to={`/product/${product.id}`}
+                        to={`/sticker-product/${product.id}`}
                         className="flex-1 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                       >
                         View Details
                       </Link>
-                      <Link 
-                        to="/editor?product=sticker"
-                        className="flex-1 bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:ring-offset-2"
-                      >
-                        Design Now
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
+                      {product.id === 'standard-shapes' ? (
+                        <div className="flex-1 relative">
+                          <select 
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                window.location.href = `/editor?product=sticker&shape=${e.target.value}`
+                              }
+                            }}
+                            className="w-full bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 appearance-none cursor-pointer text-center pr-8 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:ring-offset-2"
+                          >
+                            <option value="">Choose Shape</option>
+                            <option value="circle">Circle Stickers</option>
+                            <option value="square">Square Stickers</option>
+                            <option value="rectangle">Rectangle Stickers</option>
+                            <option value="oval">Oval Stickers</option>
+                            <option value="triangle">Triangle Stickers</option>
+                            <option value="diamond">Diamond Stickers</option>
+                            <option value="star">Star Stickers</option>
+                          </select>
+                          <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                        </div>
+                      ) : (
+                        <Link 
+                          to="/editor?product=sticker&shape=custom"
+                          className="flex-1 bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:ring-offset-2"
+                        >
+                          Design Now
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -498,7 +561,7 @@ const StickerProducts = () => {
               Ready to Create Your Perfect Stickers?
             </h2>
             <p className="text-xl mb-12 text-white/90 leading-relaxed">
-              Start designing with our professional tools and create lasting impressions with custom stickers
+              Choose from 8 professional shapes, Roland premium materials, and our custom editor. Upload your files or design from scratch with our creator marketplace assets.
             </p>
             <div className="flex flex-col sm:flex-row gap-8 justify-center">
               <Link 
