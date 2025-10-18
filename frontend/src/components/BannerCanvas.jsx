@@ -162,8 +162,15 @@ const BannerCanvas = forwardRef(({
           }
         }
         ctx.closePath()
+      } else if (stickerShape === 'custom') {
+        // Custom gang sheet clipping (17" x 17" printable area with 1.5" margins all around)
+        const margin = 150  // 1.5" at 100 DPI on all sides
+        
+        ctx.beginPath()
+        ctx.rect(margin, margin, canvasSize.width - (margin * 2), canvasSize.height - (margin * 2))
+        ctx.closePath()
       } else {
-        // Rectangular clipping for square, rectangle, custom
+        // Rectangular clipping for square, rectangle
         const clipX = margin
         const clipY = margin
         const clipWidth = canvasSize.width - (margin * 2)
@@ -3009,8 +3016,78 @@ const BannerCanvas = forwardRef(({
                                 />
                               </>
                             )
+                          } else if (stickerShape === 'custom') {
+                            // Custom gang sheet safe zone (17" x 17" printable area with 1.5" margins all around)
+                            const margin = 150  // 1.5" at 100 DPI on all sides
+                            
+                            return (
+                              <>
+                                <Rect
+                                  x={margin}
+                                  y={margin}
+                                  width={canvasSize.width - (margin * 2)}
+                                  height={canvasSize.height - (margin * 2)}
+                                  stroke="#dc2626"
+                                  strokeWidth={3}
+                                  dash={[12, 6]}
+                                  lineCap="round"
+                                  listening={false}
+                                />
+                                <Rect
+                                  x={margin}
+                                  y={margin}
+                                  width={canvasSize.width - (margin * 2)}
+                                  height={canvasSize.height - (margin * 2)}
+                                  stroke="#dc2626"
+                                  strokeWidth={1}
+                                  dash={[4, 4]}
+                                  listening={false}
+                                />
+                                {/* Add margin indicators */}
+                                <Text
+                                  x={margin / 2}
+                                  y={canvasSize.height / 2}
+                                  text="1.5 inch"
+                                  fontSize={16}
+                                  fill="#dc2626"
+                                  align="center"
+                                  verticalAlign="middle"
+                                  listening={false}
+                                />
+                                <Text
+                                  x={canvasSize.width - margin / 2}
+                                  y={canvasSize.height / 2}
+                                  text="1.5 inch"
+                                  fontSize={16}
+                                  fill="#dc2626"
+                                  align="center"
+                                  verticalAlign="middle"
+                                  listening={false}
+                                />
+                                <Text
+                                  x={canvasSize.width / 2}
+                                  y={margin / 2}
+                                  text="1.5 inch"
+                                  fontSize={16}
+                                  fill="#dc2626"
+                                  align="center"
+                                  verticalAlign="middle"
+                                  listening={false}
+                                />
+                                <Text
+                                  x={canvasSize.width / 2}
+                                  y={canvasSize.height - margin / 2}
+                                  text="1.5 inch"
+                                  fontSize={16}
+                                  fill="#dc2626"
+                                  align="center"
+                                  verticalAlign="middle"
+                                  listening={false}
+                                />
+                              </>
+                            )
                           } else {
-                            // Rectangular safe zone for square, rectangle, custom
+                            // Rectangular safe zone for square, rectangle
                             return (
                               <>
                                 <Rect

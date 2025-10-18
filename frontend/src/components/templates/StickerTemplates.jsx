@@ -1702,5 +1702,126 @@ export const stickerTemplates = [
     ],
     canvasSize: { width: 300, height: 300 },
     safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+  // Custom Gang Sheet Template
+  {
+    id: 'custom-gang-sheet',
+    name: 'Custom Gang Sheet',
+    description: '20" x 20" gang sheet with 17" x 17" printable area',
+    category: 'custom',
+    canvasSize: { width: 2000, height: 2000 }, // 20" x 20" at 100 DPI
+    safeZone: {
+      x: 150,    // 1.5" margin on all sides
+      y: 150,    // 1.5" margin on all sides
+      width: 1700, // 17" printable width
+      height: 1700 // 17" printable height
+    },
+    elements: [
+      {
+        id: 'gang-sheet-background',
+        type: 'rect',
+        x: 0,
+        y: 0,
+        width: 2000,
+        height: 2000,
+        fill: '#f8f9fa',
+        stroke: '#e9ecef',
+        strokeWidth: 2,
+        listening: false
+      },
+      {
+        id: 'printable-area-indicator',
+        type: 'rect',
+        x: 150,
+        y: 150,
+        width: 1700,
+        height: 1700,
+        fill: 'transparent',
+        stroke: '#28a745',
+        strokeWidth: 3,
+        dash: [20, 10],
+        listening: false
+      },
+      {
+        id: 'printable-area-label',
+        type: 'text',
+        x: 1000,
+        y: 1000,
+        text: '17" x 17" Printable Area',
+        fontSize: 32,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#28a745',
+        align: 'center',
+        verticalAlign: 'middle',
+        listening: false
+      },
+      {
+        id: 'margin-indicator-left',
+        type: 'text',
+        x: 75,
+        y: 1000,
+        text: '1.5"',
+        fontSize: 24,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#6c757d',
+        align: 'center',
+        verticalAlign: 'middle',
+        rotation: -90,
+        listening: false
+      },
+      {
+        id: 'margin-indicator-right',
+        type: 'text',
+        x: 1925,
+        y: 1000,
+        text: '1.5"',
+        fontSize: 24,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#6c757d',
+        align: 'center',
+        verticalAlign: 'middle',
+        rotation: 90,
+        listening: false
+      },
+      {
+        id: 'margin-indicator-top',
+        type: 'text',
+        x: 1000,
+        y: 75,
+        text: '1.5"',
+        fontSize: 24,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#6c757d',
+        align: 'center',
+        verticalAlign: 'middle',
+        listening: false
+      },
+      {
+        id: 'margin-indicator-bottom',
+        type: 'text',
+        x: 1000,
+        y: 1925,
+        text: '1.5"',
+        fontSize: 24,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#6c757d',
+        align: 'center',
+        verticalAlign: 'middle',
+        listening: false
+      },
+      {
+        id: 'upload-instructions',
+        type: 'text',
+        x: 1000,
+        y: 1800,
+        text: 'Upload your images, shapes, or icons to this 17" x 17" printable area',
+        fontSize: 28,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#495057',
+        align: 'center',
+        verticalAlign: 'middle',
+        listening: false
+      }
+    ]
   }
 ]

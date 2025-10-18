@@ -3504,8 +3504,12 @@ const BannerEditorNew = () => {
         } else if (stickerSpecs.shape === 'diamond') {
           // Diamond: keep square for diamond shape
           // No change needed
+        } else if (stickerSpecs.shape === 'custom') {
+          // Custom gang sheet: 20" x 20" canvas with 17" x 20" printable area
+          newSize.width = 2000  // 20" at 100 DPI
+          newSize.height = 2000 // 20" at 100 DPI
         }
-        // Circle and square keep the same dimensions
+        // Circle, square, triangle, diamond, and star keep the same dimensions
         
         setCanvasSize(newSize)
         

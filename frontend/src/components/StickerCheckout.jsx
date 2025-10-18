@@ -164,10 +164,13 @@ const StickerCheckout = () => {
         return `${baseSize}" × ${Math.round(baseSize / 2)}"`
       case 'oval':
         return `${baseSize}" × ${Math.round(baseSize * 2 / 3)}"`
+      case 'custom':
+        return `20" × 20" (17" × 17" printable)`
       case 'circle':
       case 'square':
       case 'triangle':
       case 'diamond':
+      case 'star':
       default:
         return `${baseSize}" × ${baseSize}"`
     }
