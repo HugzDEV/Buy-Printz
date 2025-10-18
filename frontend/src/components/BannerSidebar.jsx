@@ -48,10 +48,6 @@ const BannerSidebar = ({
   onAvailableSurfacesChange,
   onCopyDesignToSurface,
   tentDesignOption = 'canopy-only',
-  stickerSpecs = { material: 'premium-vinyl', shape: 'square', size: '3x3', quantity: 100 },
-  onStickerSpecChange,
-  stickerMaterials = [],
-  stickerShapes = [],
   onTentDesignOptionChange,
   tentSpecs = null,
   onTentSpecChange,
@@ -185,18 +181,6 @@ const BannerSidebar = ({
     }
   }, [tinSpecs?.surfaceCoverage])
 
-  // Memoized available sticker surfaces based on shape
-  const availableStickerSurfaces = useMemo(() => {
-    return [
-      { key: 'circle', name: 'Circle', group: 'shape' },
-      { key: 'square', name: 'Square', group: 'shape' },
-      { key: 'rectangle', name: 'Rectangle', group: 'shape' },
-      { key: 'triangle', name: 'Triangle', group: 'shape' },
-      { key: 'diamond', name: 'Diamond', group: 'shape' },
-      { key: 'oval', name: 'Oval', group: 'shape' }
-    ]
-  }, [])
-
   // Update currentSurface if it's not available in the new filtered surfaces
   useEffect(() => {
     if (productType === 'tent') {
@@ -224,11 +208,8 @@ const BannerSidebar = ({
     } else if (productType === 'tin' && onAvailableSurfacesChange) {
       const availableSurfaceKeys = availableTinSurfaces.map(s => s.key)
       onAvailableSurfacesChange(availableSurfaceKeys)
-    } else if (productType === 'sticker' && onAvailableSurfacesChange) {
-      const availableSurfaceKeys = availableStickerSurfaces.map(s => s.key)
-      onAvailableSurfacesChange(availableSurfaceKeys)
     }
-  }, [availableTentSurfaces, availableTinSurfaces, availableStickerSurfaces, productType, onAvailableSurfacesChange])
+  }, [availableTentSurfaces, availableTinSurfaces, productType, onAvailableSurfacesChange])
 
   // Note: Removed useEffect to prevent double render issues
 
@@ -671,157 +652,6 @@ const BannerSidebar = ({
       ]
     }
   }
-
-  // Sticker shapes and size-aware asset mapping (uses files in /public/assets/images)
-  // Filepaths are built explicitly to avoid runtime FS reads in the browser
-  const stickerShapeConfigs = {
-    Circle: {
-      dir: '/assets/images/Circle/Circle/',
-      sizes: [
-        { label: '1x1', file: 'Circle_1x1.png' },
-        { label: '1.5x1.5', file: 'Circle_1.5x1.5.png' },
-        { label: '2x2', file: 'Circle_2x2.png' },
-        { label: '2.5x2.5', file: 'Circle_2.5x2.5.png' },
-        { label: '3x3', file: 'Circle_3x3.png' },
-        { label: '3.5x3.5', file: 'Circle_3.5x3.5.png' },
-        { label: '4x4', file: 'Circle_4x4.png' },
-        { label: '4.5x4.5', file: 'Circle_4.5x4.5.png' },
-        { label: '5x5', file: 'Circle_5x5.png' }
-      ]
-    },
-    Square: {
-      dir: '/assets/images/Square/Square/',
-      sizes: [
-        { label: '1x1', file: 'Square_1x1.png' },
-        { label: '2x2', file: 'Square_2x2.png' },
-        { label: '2.5x2.5', file: 'Square_2.5x2.5.png' },
-        { label: '3x3', file: 'Square_3x3.png' },
-        { label: '3.5x3.5', file: 'Square_3.5x3.5.png' },
-        { label: '4x4', file: 'Square_4x4.png' },
-        { label: '4.5x4.5', file: 'Square_4.5x4.5_round corners.png' },
-        { label: '5x5', file: 'Square_5x5_round corners.png' }
-      ]
-    },
-    Rectangle: {
-      dir: '/assets/images/Rectangle/Rectangle/',
-      sizes: [
-        { label: '2x4', file: 'Rectangle_2x4.png' },
-        { label: '2.5x3', file: 'Rectangle_2.5x3.png' },
-        { label: '3x2', file: 'Rectangle_3x2.png' },
-        { label: '3x5', file: 'Rectangle_3x5.png' },
-        { label: '3.5x1.5', file: 'Rectangle_3.5x1.5.png' },
-        { label: '4x2', file: 'Rectangle_4x2.png' },
-        { label: '4x3', file: 'Rectangle_4x3.png' },
-        { label: '4x6', file: 'Rectangle_4x6.png' },
-        { label: '5x3', file: 'Rectangle_5x3_ round corners.png' },
-        { label: '6x4', file: 'Rectangle_6x4_round corners.png' }
-      ]
-    },
-    Triangle: {
-      dir: '/assets/images/Triangle/Triangle/',
-      sizes: [
-        { label: '1x1', file: 'Triangle_1x1.png' },
-        { label: '2x1.5', file: 'Triangle_2x1.5.png' },
-        { label: '2x2', file: 'Triangle_2x2.png' },
-        { label: '3x2', file: 'Triangle_3x2.png' },
-        { label: '3x3', file: 'Triangle_3x3.png' },
-        { label: '4x2.5', file: 'Triangle_4x2.5.png' },
-        { label: '4x4', file: 'Triangle_4x4.png' },
-        { label: '5x3', file: 'Triangle_5x3.png' },
-        { label: '5x5', file: 'Triangle_5x5.png' },
-        { label: '6x4', file: 'Triangle_6x4.png' }
-      ]
-    },
-    Diamond: {
-      dir: '/assets/images/Diamond/Diamond/',
-      sizes: [
-        { label: '1x1', file: 'Diamond_1x1.png' },
-        { label: '2x1', file: 'Diamond_2x1.png' },
-        { label: '2x2', file: 'Diamond_2x2.png' },
-        { label: '3x2', file: 'Diamond_3x2.png' },
-        { label: '3x3', file: 'Diamond_3x3.png' },
-        { label: '4x3', file: 'Diamond_4x3.png' },
-        { label: '4x4', file: 'Diamond_4x4.png' },
-        { label: '5x4', file: 'Diamond_5x4.png' }
-      ]
-    },
-    Oval: {
-      dir: '/assets/images/Oval/Oval/',
-      sizes: [
-        { label: '2x1.5', file: 'Oval_2x1.5.png' },
-        { label: '3x2', file: 'Oval_3x2.png' },
-        { label: '3x4', file: 'Oval_3x4.png' },
-        { label: '4x3', file: 'Oval_4x3.png' },
-        { label: '4x5', file: 'Oval_4x5.png' },
-        { label: '5x4', file: 'Oval_5x4.png' }
-      ]
-    }
-  }
-
-  // Sticker state - sync with stickerSpecs from props
-  const [stickerShape, setStickerShape] = useState(stickerSpecs?.shape || 'square')
-  const [stickerSize, setStickerSize] = useState(stickerSpecs?.size || '3x3')
-  const [stickerMaterial, setStickerMaterial] = useState(stickerSpecs?.material || 'premium-vinyl')
-
-  // Update local state when stickerSpecs change
-  useEffect(() => {
-    if (stickerSpecs) {
-      setStickerShape(stickerSpecs.shape || 'square')
-      setStickerSize(stickerSpecs.size || '3x3')
-      setStickerMaterial(stickerSpecs.material || 'premium-vinyl')
-    }
-  }, [stickerSpecs])
-
-  // Handle shape change - reset size to first available size for new shape and change surface
-  const handleShapeChange = useCallback((newShape) => {
-    setStickerShape(newShape)
-    const shapeConfig = stickerShapeConfigs[newShape]
-    if (shapeConfig && shapeConfig.sizes.length > 0) {
-      const firstSize = shapeConfig.sizes[0].label
-      setStickerSize(firstSize)
-      // Update sticker specs
-      if (onStickerSpecChange) {
-        onStickerSpecChange({
-          ...stickerSpecs,
-          shape: newShape,
-          size: firstSize
-        })
-      }
-      // Change the current surface to the new shape
-      onSurfaceChange?.(newShape)
-    }
-  }, [stickerSpecs, onStickerSpecChange, onSurfaceChange])
-
-  // Handle size change
-  const handleSizeChange = useCallback((newSize) => {
-    setStickerSize(newSize)
-    if (onStickerSpecChange) {
-      onStickerSpecChange({
-        ...stickerSpecs,
-        size: newSize
-      })
-    }
-  }, [stickerSpecs, onStickerSpecChange])
-
-  // Handle material change
-  const handleMaterialChange = useCallback((newMaterial) => {
-    setStickerMaterial(newMaterial)
-    if (onStickerSpecChange) {
-      onStickerSpecChange({
-        ...stickerSpecs,
-        material: newMaterial
-      })
-    }
-  }, [stickerSpecs, onStickerSpecChange])
-
-
-  const handleAddStickerAsset = useCallback(() => {
-    const cfg = stickerShapeConfigs[stickerShape]
-    if (!cfg) return
-    const sizeEntry = cfg.sizes.find(s => s.label === stickerSize) || cfg.sizes[0]
-    const imagePath = `${cfg.dir}${sizeEntry.file}`
-    onAddAsset?.(imagePath, `${stickerShape} ${stickerSize}`)
-  }, [onAddAsset, stickerShape, stickerSize])
 
   // Simple scroll preservation - store and restore scroll positions
   const preserveScrollPosition = useCallback((callback) => {
@@ -1416,13 +1246,11 @@ const BannerSidebar = ({
                   {productType === 'banner' && 'Specifications'}
                   {productType === 'tin' && 'Tin Specifications'}
                   {productType === 'tent' && 'Tent Specifications'}
-                  {productType === 'sticker' && 'Sticker Specifications'}
                 </h3>
                 <p className="text-xs text-gray-500">
                   {productType === 'banner' && 'Banner details'}
                   {productType === 'tin' && 'Tin details'}
                   {productType === 'tent' && 'Tent details'}
-                  {productType === 'sticker' && 'Sticker details'}
                 </p>
               </div>
             </div>
@@ -1434,46 +1262,44 @@ const BannerSidebar = ({
 
           {expandedSections.specifications && (
             <div className="px-4 pb-4 space-y-3">
-              {/* Product Type Selector - Only show for banner, tin, tent */}
-              {productType !== 'sticker' && (
-                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                  <div className="text-sm font-medium text-gray-800 mb-3">
-                    {productType === 'banner' && 'Banner Type'}
-                    {productType === 'tin' && 'Tin Finish'}
-                    {productType === 'tent' && 'Tent Material'}
-                  </div>
-                  {productType === 'tent' ? (
-                    <div className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm text-gray-700">
-                      6oz Tent Fabric (600x600 denier)
-                    </div>
-                  ) : (
-                  <select 
-                    value={productType === 'tin' ? (tinSpecs?.finish || '') : (bannerSpecs?.id || '')}
-                    onChange={(e) => {
-                      if (productType === 'tin') {
-                        handleTinSpecChange('finish', e.target.value)
-                      } else {
-                        onChangeBannerType?.(e.target.value)
-                      }
-                    }}
-                    className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  >
-                    {productType === 'banner' && bannerTypes.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
-                      </option>
-                    ))}
-                    {productType === 'tin' && (
-                      <>
-                        <option value="silver">Silver</option>
-                        <option value="black">Black</option>
-                        <option value="gold">Gold</option>
-                      </>
-                    )}
-                  </select>
-                  )}
+              {/* Product Type Selector */}
+              <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                <div className="text-sm font-medium text-gray-800 mb-3">
+                  {productType === 'banner' && 'Banner Type'}
+                  {productType === 'tin' && 'Tin Finish'}
+                  {productType === 'tent' && 'Tent Material'}
                 </div>
-              )}
+                {productType === 'tent' ? (
+                  <div className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm text-gray-700">
+                    6oz Tent Fabric (600x600 denier)
+                  </div>
+                ) : (
+                <select 
+                  value={productType === 'tin' ? (tinSpecs?.finish || '') : (bannerSpecs?.id || '')}
+                  onChange={(e) => {
+                    if (productType === 'tin') {
+                      handleTinSpecChange('finish', e.target.value)
+                    } else {
+                      onChangeBannerType?.(e.target.value)
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                >
+                  {productType === 'banner' && bannerTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                  {productType === 'tin' && (
+                    <>
+                      <option value="silver">Silver</option>
+                      <option value="black">Black</option>
+                      <option value="gold">Gold</option>
+                    </>
+                  )}
+                </select>
+                )}
+              </div>
 
               {/* Tin-Specific Options */}
               {productType === 'tin' && (
@@ -1980,73 +1806,6 @@ const BannerSidebar = ({
                     </div>
                   </div>
                 )}
-
-                {/* Sticker-Specific Options */}
-                {productType === 'sticker' && (
-                  <>
-                    {/* Material Selection */}
-                    <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                      <div className="text-sm font-medium text-gray-800 mb-3">Material</div>
-                      <select 
-                        value={stickerSpecs?.material || 'premium-vinyl'}
-                        onChange={(e) => handleMaterialChange(e.target.value)}
-                        className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                      >
-                        {stickerMaterials.map((material) => (
-                          <option key={material.id} value={material.id}>
-                            {material.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Shape Selection */}
-                    <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                      <div className="text-sm font-medium text-gray-800 mb-3">Shape</div>
-                      <select 
-                        value={stickerShape}
-                        onChange={(e) => handleShapeChange(e.target.value)}
-                        className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                      >
-                        {Object.keys(stickerShapeConfigs).map((shape) => (
-                          <option key={shape} value={shape}>
-                            {shape}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Size Selection */}
-                    <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                      <div className="text-sm font-medium text-gray-800 mb-3">Size (inches)</div>
-                      <select 
-                        value={stickerSize}
-                        onChange={(e) => handleSizeChange(e.target.value)}
-                        className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                      >
-                        {(stickerShapeConfigs[stickerShape]?.sizes || []).map(s => (
-                          <option key={s.label} value={s.label}>
-                            {s.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-
-                  </>
-                )}
-
-                {productType === 'sticker' && (
-                  <div className="pt-2 border-t border-white/20">
-                    <p className="text-xs font-medium text-gray-700 mb-1">Best for:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Branding</span>
-                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Marketing</span>
-                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Decals</span>
-                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Labels</span>
-                    </div>
-                  </div>
-                )}
               </div>
 
             </div>
@@ -2314,33 +2073,6 @@ const BannerSidebar = ({
                   
                   <div className="mt-2 text-xs text-gray-600 text-center">
                     Currently editing: <span className="font-medium capitalize">{currentSurface.replace('_', ' ')}</span> surface
-                  </div>
-                </div>
-              )}
-
-              {/* Surface Navigation for Stickers */}
-              {productType === 'sticker' && (
-                <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                  <div className="text-sm font-medium text-gray-800 mb-3">🏷️ Shape Navigation</div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    {availableStickerSurfaces.map((surface) => (
-                      <button
-                        key={surface.key}
-                        onClick={() => handleSurfaceChange(surface.key)}
-                        className={`px-3 py-2 rounded-lg text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                          currentSurface === surface.key
-                            ? 'bg-blue-500 text-white shadow-lg'
-                            : 'bg-white/20 text-gray-700 hover:bg-white/30 hover:shadow-md'
-                        }`}
-                      >
-                        {surface.name}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-2 text-xs text-gray-600 text-center">
-                    Currently editing: <span className="font-medium capitalize">{currentSurface}</span> shape
                   </div>
                 </div>
               )}

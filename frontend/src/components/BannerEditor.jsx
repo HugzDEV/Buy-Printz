@@ -34,7 +34,6 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return 'tin'
     if (urlProduct === 'tent') return 'tent'
-    if (urlProduct === 'sticker') return 'sticker'
     return 'banner' // default
   })
   
@@ -102,68 +101,6 @@ const BannerEditorNew = () => {
     }
   ]
 
-  // Sticker specifications and materials
-  const stickerMaterials = [
-    {
-      id: 'premium-vinyl',
-      name: 'Premium Vinyl Stickers',
-      material: 'Premium Vinyl',
-      finish: 'White Back',
-      specs: 'Weather resistant, vibrant colors',
-      description: 'High-quality vinyl with white backing for maximum opacity',
-      uses: ['Outdoor Use', 'Vehicles', 'Signs', 'Equipment']
-    },
-    {
-      id: 'premium-clear-vinyl',
-      name: 'Premium Clear Vinyl Stickers',
-      material: 'Premium Clear Vinyl',
-      finish: 'Transparent',
-      specs: 'Clear background, see-through effect',
-      description: 'Transparent vinyl for glass and windows',
-      uses: ['Windows', 'Glass', 'Transparent Surfaces', 'Decals']
-    }
-  ]
-
-  // Sticker shape configurations with clipping paths
-  const stickerShapes = [
-    {
-      id: 'circle',
-      name: 'Circle',
-      description: 'Perfect round stickers',
-      sizes: ['1x1', '2x2', '3x3', '4x4', '5x5']
-    },
-    {
-      id: 'square',
-      name: 'Square',
-      description: 'Classic square stickers',
-      sizes: ['1x1', '2x2', '2.5x2.5', '3x3', '3.5x3.5', '4x4', '4.5x4.5', '5x5']
-    },
-    {
-      id: 'rectangle',
-      name: 'Rectangle',
-      description: 'Rectangular stickers for text and logos',
-      sizes: ['2x4', '2.5x3', '3x2', '3x5', '3.5x1.5', '4x2', '4x3', '4x6', '5x3', '6x4']
-    },
-    {
-      id: 'triangle',
-      name: 'Triangle',
-      description: 'Triangular stickers for directional use',
-      sizes: ['1x1', '2x1.5', '2x2', '3x2', '3x3', '4x2.5', '4x4', '5x3', '5x5', '6x4']
-    },
-    {
-      id: 'diamond',
-      name: 'Diamond',
-      description: 'Diamond-shaped stickers',
-      sizes: ['1x1', '2x2', '3x3', '4x4', '5x5']
-    },
-    {
-      id: 'oval',
-      name: 'Oval',
-      description: 'Oval stickers for elegant designs',
-      sizes: ['2x1.5', '3x2', '3x4', '4x3', '4x5', '5x4']
-    }
-  ]
-
   // Initialize product specs based on URL parameter (only if not already initialized)
   useEffect(() => {
     const urlProduct = searchParams.get('product')
@@ -208,14 +145,13 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return 'front'
     if (urlProduct === 'tent') return 'canopy_front'
-    if (urlProduct === 'sticker') return 'square'
     return 'front'
   })
   
   // Available surfaces for multi-surface product navigation
   const [availableSurfaces, setAvailableSurfaces] = useState([])
   
-  // Core state - Multi-surface support for tins, tents, and stickers
+  // Core state - Multi-surface support for tins and tents
   const [surfaceElements, setSurfaceElements] = useState({
     // Tin surfaces
     front: [],
@@ -229,14 +165,7 @@ const BannerEditorNew = () => {
     canopy_right: [],
     sidewall_left: [],
     sidewall_right: [],
-    backwall: [],
-    // Sticker surfaces (different shapes)
-    circle: [],
-    square: [],
-    rectangle: [],
-    triangle: [],
-    diamond: [],
-    oval: []
+    backwall: []
   })
   
   // Store captured surface images (Konva exports for each surface)
@@ -255,10 +184,10 @@ const BannerEditorNew = () => {
   }, [surfaceElements])
   
   // Current elements based on product type and surface
-  const elements = (productType === 'tin' || productType === 'tent' || productType === 'sticker') 
+  const elements = (productType === 'tin' || productType === 'tent') 
     ? (surfaceElements[currentSurface] || []) 
     : (surfaceElements.front || [])
-  const setElements = (productType === 'tin' || productType === 'tent' || productType === 'sticker')
+  const setElements = (productType === 'tin' || productType === 'tent')
     ? (newElements) => {
         setSurfaceElements(prev => ({
           ...prev,
@@ -400,7 +329,6 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return { width: 393, height: 236 } // tin canvas 5% larger than tin surface (374x225)
     if (urlProduct === 'tent') return { width: 1160, height: 1049 } // tent canopy+valence default (canopy 789px + gap 20px + valence 200px + padding 40px)
-    if (urlProduct === 'sticker') return { width: 300, height: 300 } // sticker default (square)
     return { width: 800, height: 400 } // banner default
   })
 
@@ -529,68 +457,6 @@ const BannerEditorNew = () => {
       ctx.closePath()
     }
   }
-
-  // Sticker shape clipping function
-  const getStickerClipFunc = () => {
-    return (ctx) => {
-      const canvasWidth = canvasSize.width
-      const canvasHeight = canvasSize.height
-      const centerX = canvasWidth / 2
-      const centerY = canvasHeight / 2
-      
-      // Get sticker shape and size from specs
-      const currentShape = stickerSpecs?.shape || 'square'
-      const currentSize = stickerSpecs?.size || '3x3'
-      
-      // Parse size to get dimensions
-      const sizeMatch = currentSize.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)/)
-      if (!sizeMatch) return
-      
-      const width = parseFloat(sizeMatch[1])
-      const height = parseFloat(sizeMatch[2])
-      const dpi = 150
-      const pixelWidth = Math.round(width * dpi)
-      const pixelHeight = Math.round(height * dpi)
-      
-      ctx.beginPath()
-      
-      // Create clipping path based on sticker shape
-      switch (currentShape) {
-        case 'circle':
-          ctx.arc(centerX, centerY, Math.min(pixelWidth, pixelHeight) / 2, 0, 2 * Math.PI)
-          break
-        case 'square':
-          const squareSize = Math.min(pixelWidth, pixelHeight)
-          ctx.rect(centerX - squareSize / 2, centerY - squareSize / 2, squareSize, squareSize)
-          break
-        case 'rectangle':
-          ctx.rect(centerX - pixelWidth / 2, centerY - pixelHeight / 2, pixelWidth, pixelHeight)
-          break
-        case 'triangle':
-          ctx.moveTo(centerX, centerY - pixelHeight / 2)
-          ctx.lineTo(centerX - pixelWidth / 2, centerY + pixelHeight / 2)
-          ctx.lineTo(centerX + pixelWidth / 2, centerY + pixelHeight / 2)
-          ctx.closePath()
-          break
-        case 'diamond':
-          ctx.moveTo(centerX, centerY - pixelHeight / 2)
-          ctx.lineTo(centerX + pixelWidth / 2, centerY)
-          ctx.lineTo(centerX, centerY + pixelHeight / 2)
-          ctx.lineTo(centerX - pixelWidth / 2, centerY)
-          ctx.closePath()
-          break
-        case 'oval':
-          ctx.ellipse(centerX, centerY, pixelWidth / 2, pixelHeight / 2, 0, 0, 2 * Math.PI)
-          break
-        default:
-          // Default to square
-          const defaultSize = Math.min(pixelWidth, pixelHeight)
-          ctx.rect(centerX - defaultSize / 2, centerY - defaultSize / 2, defaultSize, defaultSize)
-      }
-      
-      ctx.clip()
-    }
-  }
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [canvasOrientation, setCanvasOrientation] = useState(() => {
     const urlProduct = searchParams.get('product')
@@ -610,20 +476,6 @@ const BannerEditorNew = () => {
       }
     }
     return null // For non-tin products, return null
-  })
-
-  // Sticker specifications state
-  const [stickerSpecs, setStickerSpecs] = useState(() => {
-    const urlProduct = searchParams.get('product')
-    if (urlProduct === 'sticker') {
-      return {
-        material: 'premium-vinyl',
-        shape: 'square',
-        size: '3x3',
-        quantity: 100
-      }
-    }
-    return null // For non-sticker products, return null
   })
   
   // Banner size presets - Standard banner dimensions (H x W format)
@@ -684,18 +536,6 @@ const BannerEditorNew = () => {
         { name: 'Half Wall', width: 1110, height: 370, orientation: 'landscape', category: 'wall' }
       ],
       description: 'Professional tradeshow tents with custom graphics'
-    },
-    sticker: {
-      name: 'Custom Stickers',
-      defaultSize: { width: 300, height: 300 }, // 3x3 inch at 100 DPI
-      sizes: [
-        { name: '1x1 inch', width: 100, height: 100, orientation: 'square', category: 'small' },
-        { name: '2x2 inch', width: 200, height: 200, orientation: 'square', category: 'small' },
-        { name: '3x3 inch', width: 300, height: 300, orientation: 'square', category: 'medium' },
-        { name: '4x4 inch', width: 400, height: 400, orientation: 'square', category: 'medium' },
-        { name: '5x5 inch', width: 500, height: 500, orientation: 'square', category: 'large' }
-      ],
-      description: 'Custom vinyl stickers in various shapes and sizes'
     }
   }
   
@@ -731,15 +571,6 @@ const BannerEditorNew = () => {
         withFrame: true,
         reinforcedStripColor: 'white'
       })
-    } else if (newProductType === 'sticker') {
-      setCurrentSurface('square')
-      // Initialize sticker specs
-      setStickerSpecs({
-        material: 'premium-vinyl',
-        shape: 'square',
-        size: '3x3',
-        quantity: 100
-      })
     } else {
       setCurrentSurface('front')
       // Initialize banner specs for banner products
@@ -760,13 +591,7 @@ const BannerEditorNew = () => {
       canopy_right: [],
       sidewall_left: [],
       sidewall_right: [],
-      backwall: [],
-      circle: [],
-      square: [],
-      rectangle: [],
-      triangle: [],
-      diamond: [],
-      oval: []
+      backwall: []
     })
     
     console.log('🎨 Product type changed to:', newProductType)
@@ -780,37 +605,6 @@ const BannerEditorNew = () => {
     }))
     console.log('🎨 BannerEditor - Tin spec changed:', key, 'to', value)
   }, [])
-
-  // Handle sticker specification changes
-  const handleStickerSpecChange = useCallback((newSpecs) => {
-    setStickerSpecs(newSpecs)
-    
-    // Update canvas size when sticker specs change
-    if (productType === 'sticker') {
-      const currentShape = newSpecs?.shape || 'square'
-      const currentSize = newSpecs?.size || '3x3'
-      
-      // Parse size (e.g., "3x3" -> 3, "2x4" -> 2x4)
-      const sizeMatch = currentSize.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)/)
-      if (sizeMatch) {
-        const width = parseFloat(sizeMatch[1])
-        const height = parseFloat(sizeMatch[2])
-        
-        // Convert inches to pixels (assuming 150 DPI for print)
-        const dpi = 150
-        const pixelWidth = Math.round(width * dpi)
-        const pixelHeight = Math.round(height * dpi)
-        
-        // Add padding around the sticker (20% on each side)
-        const padding = Math.max(20, Math.min(pixelWidth, pixelHeight) * 0.2)
-        const canvasWidth = pixelWidth + (padding * 2)
-        const canvasHeight = pixelHeight + (padding * 2)
-        
-        console.log(`🎨 Sticker canvas size updated: ${canvasWidth}x${canvasHeight} (${currentShape} ${currentSize})`)
-        setCanvasSize({ width: canvasWidth, height: canvasHeight })
-      }
-    }
-  }, [productType])
 
   // Handle tent design option changes
   const handleTentDesignOptionChange = useCallback((value) => {
@@ -892,7 +686,7 @@ const BannerEditorNew = () => {
   // Handle surface navigation with automatic image capture
   const handleSurfaceChange = useCallback((surface) => {
     // CAPTURE CURRENT SURFACE IMAGE BEFORE SWITCHING
-    if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
+    if (productType === 'tin' || productType === 'tent') {
       const currentElements = surfaceElements[currentSurface] || []
       
       // Only capture if current surface has elements
@@ -929,36 +723,6 @@ const BannerEditorNew = () => {
         // Canopy surfaces: triangular canopy + rectangular valence below
         // Total height: canopy height (789px) + gap (20px) + valence height (200px) + bottom padding (40px) = 1049px
         setCanvasSize({ width: 1160, height: 1049 })
-      }
-    }
-    
-    // Update canvas size based on sticker shape and size
-    if (productType === 'sticker') {
-      // Get current sticker specs to determine size
-      const currentShape = stickerSpecs?.shape || 'square'
-      const currentSize = stickerSpecs?.size || '3x3'
-      
-      // Parse size (e.g., "3x3" -> 3, "2x4" -> 2x4)
-      const sizeMatch = currentSize.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)/)
-      if (sizeMatch) {
-        const width = parseFloat(sizeMatch[1])
-        const height = parseFloat(sizeMatch[2])
-        
-        // Convert inches to pixels (assuming 150 DPI for print)
-        const dpi = 150
-        const pixelWidth = Math.round(width * dpi)
-        const pixelHeight = Math.round(height * dpi)
-        
-        // Add padding around the sticker (20% on each side)
-        const padding = Math.max(20, Math.min(pixelWidth, pixelHeight) * 0.2)
-        const canvasWidth = pixelWidth + (padding * 2)
-        const canvasHeight = pixelHeight + (padding * 2)
-        
-        console.log(`🎨 Sticker canvas size: ${canvasWidth}x${canvasHeight} (${currentShape} ${currentSize})`)
-        setCanvasSize({ width: canvasWidth, height: canvasHeight })
-      } else {
-        // Fallback to square default
-        setCanvasSize({ width: 300, height: 300 })
       }
     }
   }, [productType, currentSurface, surfaceElements, generateCanvasImage])
@@ -3620,7 +3384,6 @@ const BannerEditorNew = () => {
             <option value="banner">🏷️ Banner</option>
             <option value="tin">🗃️ Tin</option>
             <option value="tent">🏕️ Tent</option>
-            <option value="sticker">🏷️ Sticker</option>
           </select>
         </div>
 
@@ -3692,10 +3455,6 @@ const BannerEditorNew = () => {
             onTentDesignOptionChange={handleTentDesignOptionChange}
             tentSpecs={tentSpecs}
             onTentSpecChange={handleTentSpecChange}
-            stickerSpecs={stickerSpecs}
-            onStickerSpecChange={handleStickerSpecChange}
-            stickerMaterials={stickerMaterials}
-            stickerShapes={stickerShapes}
 
             onAddShape={addShape}
             onAddText={addText}
@@ -3745,13 +3504,7 @@ const BannerEditorNew = () => {
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
             availableSurfaces={availableSurfaces}
-            clipFunc={
-              productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') 
-                ? getTentCanopyValenceClipFunc() 
-                : productType === 'sticker' 
-                ? getStickerClipFunc() 
-                : null
-            }
+            clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyValenceClipFunc() : null}
             onRemoveAssetFromTracking={removeAssetFromTracking}
           />
           
