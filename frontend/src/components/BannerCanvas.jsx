@@ -122,8 +122,27 @@ const BannerCanvas = forwardRef(({
         ctx.beginPath()
         ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2)
         ctx.closePath()
+      } else if (stickerShape === 'diamond') {
+        // Diamond clipping for diamond stickers
+        const centerX = canvasSize.width / 2
+        const centerY = canvasSize.height / 2
+        const radius = Math.min(canvasSize.width, canvasSize.height) / 2 - margin
+        
+        ctx.beginPath()
+        // Draw diamond (rotated square) - start from top point
+        for (let i = 0; i < 4; i++) {
+          const angle = (i * Math.PI) / 2 - Math.PI / 2 // Start from top point
+          const x = centerX + radius * Math.cos(angle)
+          const y = centerY + radius * Math.sin(angle)
+          if (i === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+        ctx.closePath()
       } else {
-        // Rectangular clipping for square, rectangle, diamond, custom
+        // Rectangular clipping for square, rectangle, custom
         const clipX = margin
         const clipY = margin
         const clipWidth = canvasSize.width - (margin * 2)
@@ -2902,8 +2921,41 @@ const BannerCanvas = forwardRef(({
                                 />
                               </>
                             )
+                          } else if (stickerShape === 'diamond') {
+                            // Diamond safe zone for diamond stickers
+                            const centerX = canvasSize.width / 2
+                            const centerY = canvasSize.height / 2
+                            const size = Math.min(canvasSize.width, canvasSize.height) / 2 - margin
+                            
+                            return (
+                              <>
+                                <RegularPolygon
+                                  x={centerX}
+                                  y={centerY}
+                                  sides={4}
+                                  radius={size}
+                                  rotation={Math.PI / 4}
+                                  stroke="#dc2626"
+                                  strokeWidth={2}
+                                  dash={[8, 4]}
+                                  lineCap="round"
+                                  listening={false}
+                                />
+                                <RegularPolygon
+                                  x={centerX}
+                                  y={centerY}
+                                  sides={4}
+                                  radius={size}
+                                  rotation={Math.PI / 4}
+                                  stroke="#dc2626"
+                                  strokeWidth={1}
+                                  dash={[2, 2]}
+                                  listening={false}
+                                />
+                              </>
+                            )
                           } else {
-                            // Rectangular safe zone for square, rectangle, diamond, custom
+                            // Rectangular safe zone for square, rectangle, custom
                             return (
                               <>
                                 <Rect

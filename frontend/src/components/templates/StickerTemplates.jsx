@@ -1252,5 +1252,228 @@ export const stickerTemplates = [
     ],
     canvasSize: { width: 300, height: 200 },
     safeZone: { x: 20, y: 20, width: 260, height: 160 }
+  },
+
+  // Diamond Sticker Templates
+  {
+    id: 'diamond-business-logo',
+    name: 'Business Logo Diamond',
+    description: 'Professional business logo in a diamond format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/diamond-business-logo.jpg',
+    elements: [
+      {
+        id: 'diamond-logo-bg',
+        type: 'diamond',
+        x: 150,
+        y: 150,
+        width: 160,
+        height: 160,
+        fill: '#1e3a8a',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'diamond-logo-text',
+        type: 'text',
+        x: 150,
+        y: 150,
+        text: 'YOUR LOGO',
+        fontSize: 18,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'diamond-contact-info',
+    name: 'Contact Info Diamond',
+    description: 'Contact information in a diamond format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/diamond-contact-info.jpg',
+    elements: [
+      {
+        id: 'diamond-contact-bg',
+        type: 'diamond',
+        x: 150,
+        y: 150,
+        width: 160,
+        height: 160,
+        fill: '#f8fafc',
+        stroke: '#1e3a8a',
+        strokeWidth: 2
+      },
+      {
+        id: 'diamond-contact-name',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: 'JOHN SMITH',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#1e3a8a',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      },
+      {
+        id: 'diamond-contact-phone',
+        type: 'text',
+        x: 150,
+        y: 150,
+        text: '(555) 123-4567',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      },
+      {
+        id: 'diamond-contact-email',
+        type: 'text',
+        x: 150,
+        y: 170,
+        text: 'john@company.com',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'diamond-event-badge',
+    name: 'Event Badge Diamond',
+    description: 'Event badge in a diamond format',
+    category: 'events',
+    thumbnail: '/assets/images/templates/diamond-event-badge.jpg',
+    elements: [
+      {
+        id: 'diamond-event-bg',
+        type: 'diamond',
+        x: 150,
+        y: 150,
+        width: 160,
+        height: 160,
+        fill: '#dc2626',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'diamond-event-text',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: 'CONFERENCE 2024',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      },
+      {
+        id: 'diamond-event-name',
+        type: 'text',
+        x: 150,
+        y: 170,
+        text: 'ATTENDEE',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'diamond-warning-label',
+    name: 'Warning Label Diamond',
+    description: 'Warning label in a diamond format',
+    category: 'safety',
+    thumbnail: '/assets/images/templates/diamond-warning-label.jpg',
+    elements: [
+      {
+        id: 'diamond-warning-bg',
+        type: 'diamond',
+        x: 150,
+        y: 150,
+        width: 160,
+        height: 160,
+        fill: '#fef3c7',
+        stroke: '#f59e0b',
+        strokeWidth: 3
+      },
+      {
+        id: 'diamond-warning-icon',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: '⚠️',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#f59e0b',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 40,
+        height: 'auto'
+      },
+      {
+        id: 'diamond-warning-text',
+        type: 'text',
+        x: 150,
+        y: 150,
+        text: 'CAUTION',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      },
+      {
+        id: 'diamond-warning-desc',
+        type: 'text',
+        x: 150,
+        y: 170,
+        text: 'HOT SURFACE',
+        fontSize: 10,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 140,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
   }
 ]
