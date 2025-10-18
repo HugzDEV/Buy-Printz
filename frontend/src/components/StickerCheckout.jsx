@@ -271,7 +271,10 @@ const StickerCheckout = () => {
         selected_designs: [{
           design_id: 'custom-sticker',
           quantity: stickerOptions.quantity,
-          sticker_type: 'vinyl'
+          sticker_type: stickerOptions.material,
+          sticker_finish: stickerOptions.finish,
+          sticker_shape: stickerOptions.shape,
+          sticker_size: stickerOptions.size
         }]
       }
 
@@ -413,12 +416,12 @@ const StickerCheckout = () => {
     checkAuth()
   }, [navigate])
 
-  // Get shipping rates when customer info changes
+  // Get shipping rates when customer info or sticker options change
   useEffect(() => {
     if (customerInfo.zipCode && customerInfo.address && customerInfo.city && customerInfo.state) {
       getShippingRates()
     }
-  }, [customerInfo.zipCode, customerInfo.address, customerInfo.city, customerInfo.state, stickerOptions.quantity])
+  }, [customerInfo.zipCode, customerInfo.address, customerInfo.city, customerInfo.state, stickerOptions.quantity, stickerOptions.material, stickerOptions.finish, stickerOptions.shape, stickerOptions.size])
 
   const createOrder = async () => {
     try {
@@ -643,6 +646,46 @@ const StickerCheckout = () => {
         console.error('Payment failed:', error)
         toast.error('Payment failed. Please try again.')
         return
+      }
+
+      // Create shipment with UPS
+      const shippingOrderData = {
+        total_quantity: stickerOptions.quantity,
+        selected_designs: [{
+          design_id: 'custom-sticker',
+          quantity: stickerOptions.quantity,
+          sticker_type: stickerOptions.material,
+          sticker_finish: stickerOptions.finish,
+          sticker_shape: stickerOptions.shape,
+          sticker_size: stickerOptions.size
+        }]
+      }
+
+      const shippingCustomerInfo = {
+        name: customerInfo.name,
+        address: customerInfo.address,
+        city: customerInfo.city,
+        state: customerInfo.state,
+        zipCode: customerInfo.zipCode,
+        phone: customerInfo.phone || '5551234567'
+      }
+
+      // Create shipment
+      const shipmentResponse = await authService.authenticatedRequest('/api/stickers/shipping/create-shipment', {
+        method: 'POST',
+        body: JSON.stringify({
+          order_data: shippingOrderData,
+          customer_info: shippingCustomerInfo,
+          service_code: shippingOption
+        })
+      })
+
+      if (shipmentResponse.ok) {
+        const shipmentData = await shipmentResponse.json()
+        if (shipmentData.success && shipmentData.shipment_info?.tracking_number) {
+          console.log('Shipment created with tracking number:', shipmentData.shipment_info.tracking_number)
+          toast.success(`Order shipped! Tracking: ${shipmentData.shipment_info.tracking_number}`)
+        }
       }
 
       setCheckoutStep('completed')

@@ -66,6 +66,15 @@ except ImportError as e:
     TIN_SKINZ_SHIPPING_API_AVAILABLE = False
     print(f"❌ Tin Skinz API failed to load: {e}")
 
+# Import Sticker Shipping API routes
+try:
+    from backend.sticker_shipping_api import router as sticker_shipping_router
+    STICKER_SHIPPING_API_AVAILABLE = True
+    print("✅ Sticker Shipping API loaded successfully")
+except ImportError as e:
+    STICKER_SHIPPING_API_AVAILABLE = False
+    print(f"❌ Sticker Shipping API failed to load: {e}")
+
 # Import Business Card Tin API routes
 try:
     from backend.business_card_tin_api import router as business_card_tin_router
@@ -240,6 +249,13 @@ if TIN_SKINZ_SHIPPING_API_AVAILABLE:
     logger.info("Tin Skinz Shipping API routes loaded successfully")
 else:
     logger.warning("Tin Skinz Shipping API routes not available")
+
+# Include Sticker Shipping API routes if available
+if STICKER_SHIPPING_API_AVAILABLE:
+    app.include_router(sticker_shipping_router)
+    logger.info("Sticker Shipping API routes loaded successfully")
+else:
+    logger.warning("Sticker Shipping API routes not available")
 
 # Include Business Card Tin API routes if available
 if BUSINESS_CARD_TIN_API_AVAILABLE:

@@ -1,0 +1,421 @@
+#!/usr/bin/env python3
+"""
+Sticker Shipping API
+Handles shipping costs for Sticker orders using UPS API
+"""
+
+import logging
+import json
+from fastapi import APIRouter, HTTPException, Depends, Request
+from pydantic import BaseModel
+from typing import Dict, List, Optional, Any
+from datetime import datetime
+
+from backend.ups_shipping_service import ups_shipping_service
+
+# Setup logging
+logger = logging.getLogger(__name__)
+
+# API Router
+router = APIRouter(prefix="/api/stickers/shipping", tags=["sticker-shipping"])
+
+# Pydantic models
+class StickerShippingRequest(BaseModel):
+    """Request model for Sticker shipping costs"""
+    selected_designs: List[Dict[str, Any]]
+    total_quantity: int
+    customer_info: Dict[str, Any]
+    
+    class Config:
+        extra = "allow"
+
+class StickerShippingResponse(BaseModel):
+    """Response model for Sticker shipping costs"""
+    success: bool
+    shipping_options: List[Dict[str, Any]]
+    carrier: str
+    timestamp: str
+    errors: Optional[List[str]] = None
+
+@router.post("/get-rates", response_model=StickerShippingResponse)
+async def get_sticker_shipping_rates(request: StickerShippingRequest):
+    """
+    Get UPS shipping rates for Sticker orders
+    
+    Args:
+        request: Sticker shipping request with order details and customer info
+        
+    Returns:
+        Shipping rates from UPS API
+    """
+    try:
+        logger.info(f"🚚 Getting Sticker shipping rates for {request.total_quantity} stickers to {request.customer_info.get('zipCode', 'unknown zip')}")
+        
+        # Validate required fields
+        if not request.customer_info.get('zipCode'):
+            raise HTTPException(status_code=400, detail="Zip code is required for shipping rates")
+        
+        if not request.customer_info.get('address'):
+            raise HTTPException(status_code=400, detail="Address is required for shipping rates")
+        
+        if not request.customer_info.get('city'):
+            raise HTTPException(status_code=400, detail="City is required for shipping rates")
+        
+        if not request.customer_info.get('state'):
+            raise HTTPException(status_code=400, detail="State is required for shipping rates")
+        
+        # Prepare order data for UPS
+        order_data = {
+            'total_quantity': request.total_quantity,
+            'selected_designs': request.selected_designs,
+            'product_type': 'custom-sticker'
+        }
+        
+        # Get UPS shipping rates - using multiple services method
+        result = await ups_shipping_service.get_multiple_service_rates(order_data, request.customer_info)
+        
+        if result['success']:
+            logger.info(f"✅ Successfully retrieved {len(result['shipping_options'])} UPS shipping options")
+            return StickerShippingResponse(**result)
+        else:
+            logger.error(f"❌ Failed to get UPS shipping rates: {result.get('errors', [])}")
+            raise HTTPException(status_code=500, detail=f"Failed to get shipping rates: {', '.join(result.get('errors', ['Unknown error']))}")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error getting Sticker shipping rates: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.get("/health")
+async def health_check():
+    """Health check for Sticker shipping service"""
+    try:
+        # Check if UPS credentials are configured
+        has_credentials = all([
+            ups_shipping_service.client_id,
+            ups_shipping_service.client_secret,
+            ups_shipping_service.shipper_number
+        ])
+        
+        return {
+            "status": "healthy" if has_credentials else "unhealthy",
+            "service": "sticker-shipping",
+            "carrier": "UPS",
+            "credentials_configured": has_credentials,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"❌ Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "service": "sticker-shipping",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+@router.post("/ups-callback")
+async def ups_webhook_callback(request: Request):
+    """
+    Handle UPS webhook callbacks for shipping updates
+    """
+    try:
+        # Get the raw request body
+        body = await request.body()
+        
+        # Parse the webhook data
+        webhook_data = json.loads(body)
+        
+        logger.info(f"📨 Received UPS webhook: {webhook_data}")
+        
+        # Handle different webhook types
+        webhook_type = webhook_data.get('type', '')
+        
+        if webhook_type == 'shipping.rate.updated':
+            # Handle rate updates
+            await handle_shipping_rate_update(webhook_data)
+        elif webhook_type == 'shipping.tracking.updated':
+            # Handle tracking updates
+            await handle_tracking_update(webhook_data)
+        else:
+            logger.warning(f"Unknown UPS webhook type: {webhook_type}")
+        
+        return {"status": "success", "message": "Webhook processed"}
+        
+    except Exception as e:
+        logger.error(f"❌ Error processing UPS webhook: {e}")
+        raise HTTPException(status_code=500, detail=f"Webhook processing failed: {str(e)}")
+
+async def handle_shipping_rate_update(webhook_data: Dict[str, Any]):
+    """Handle shipping rate updates from UPS"""
+    try:
+        # Extract rate information
+        rate_data = webhook_data.get('data', {})
+        logger.info(f"📊 Processing rate update: {rate_data}")
+        
+        # Update cached rates or notify relevant orders
+        # This could update a database or cache with new rates
+        
+    except Exception as e:
+        logger.error(f"❌ Error handling rate update: {e}")
+
+async def handle_tracking_update(webhook_data: Dict[str, Any]):
+    """Handle tracking updates from UPS"""
+    try:
+        # Extract tracking information
+        tracking_data = webhook_data.get('data', {})
+        logger.info(f"📦 Processing tracking update: {tracking_data}")
+        
+        # Update order tracking status in database
+        # This could update order status and notify customers
+        
+    except Exception as e:
+        logger.error(f"❌ Error handling tracking update: {e}")
+
+@router.post("/create-shipment")
+async def create_shipment(request: Request):
+    """Create a UPS shipment and get tracking number"""
+    try:
+        data = await request.json()
+        
+        # Extract required data
+        order_data = data.get('order_data', {})
+        customer_info = data.get('customer_info', {})
+        service_code = data.get('service_code', '03')  # Default to Ground
+        
+        if not order_data or not customer_info:
+            return {
+                "success": False,
+                "message": "Order data and customer info are required",
+                "errors": ["Missing order_data or customer_info"]
+            }
+        
+        logger.info(f"📦 Creating shipment for {order_data.get('total_quantity', 0)} stickers...")
+        
+        # Create the shipment
+        result = await ups_shipping_service.create_shipment(order_data, customer_info, service_code)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Shipment created successfully",
+                "shipment_info": result.get('shipment_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to create shipment",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error creating shipment: {e}")
+        return {
+            "success": False,
+            "message": "Error creating shipment",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
+@router.post("/void-shipment")
+async def void_shipment(request: Request):
+    """Void/cancel a UPS shipment"""
+    try:
+        data = await request.json()
+        
+        # Extract required data
+        shipment_id = data.get('shipment_id')
+        tracking_numbers = data.get('tracking_numbers', [])
+        
+        if not shipment_id:
+            return {
+                "success": False,
+                "message": "Shipment ID is required",
+                "errors": ["Missing shipment_id"]
+            }
+        
+        logger.info(f"❌ Voiding shipment: {shipment_id}")
+        
+        # Void the shipment
+        result = await ups_shipping_service.void_shipment(shipment_id, tracking_numbers)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Shipment voided successfully",
+                "void_info": result.get('void_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to void shipment",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error voiding shipment: {e}")
+        return {
+            "success": False,
+            "message": "Error voiding shipment",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
+@router.post("/recover-label")
+async def recover_label(request: Request):
+    """Recover/retrieve a UPS shipping label"""
+    try:
+        data = await request.json()
+        
+        # Extract required data
+        tracking_number = data.get('tracking_number')
+        label_format = data.get('label_format', 'GIF')  # Default to GIF
+        
+        if not tracking_number:
+            return {
+                "success": False,
+                "message": "Tracking number is required",
+                "errors": ["Missing tracking_number"]
+            }
+        
+        logger.info(f"🏷️ Recovering label for tracking number: {tracking_number}")
+        
+        # Recover the label
+        result = await ups_shipping_service.recover_label(tracking_number, label_format)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Label recovered successfully",
+                "label_info": result.get('label_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to recover label",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error recovering label: {e}")
+        return {
+            "success": False,
+            "message": "Error recovering label",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
+@router.post("/track")
+async def track_shipment(request: Request):
+    """Track a UPS shipment"""
+    try:
+        data = await request.json()
+        tracking_number = data.get('tracking_number')
+        
+        if not tracking_number:
+            return {
+                "success": False,
+                "message": "Tracking number is required",
+                "errors": ["Missing tracking_number parameter"]
+            }
+        
+        logger.info(f"📦 Tracking shipment: {tracking_number}")
+        
+        # Track the shipment
+        result = await ups_shipping_service.track_shipment(tracking_number)
+        
+        if result['success']:
+            return {
+                "success": True,
+                "message": "Tracking information retrieved successfully",
+                "tracking_info": result.get('tracking_info'),
+                "carrier": result.get('carrier'),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to retrieve tracking information",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Error tracking shipment: {e}")
+        return {
+            "success": False,
+            "message": "Error tracking shipment",
+            "errors": [str(e)],
+            "timestamp": datetime.now().isoformat()
+        }
+
+@router.post("/test")
+async def test_ups_integration():
+    """Test UPS integration with sample data"""
+    try:
+        logger.info("🧪 Testing UPS integration for Stickers...")
+        
+        # Sample order data
+        test_order_data = {
+            'total_quantity': 100,
+            'selected_designs': [
+                {
+                    'design_id': 'custom-sticker',
+                    'quantity': 100,
+                    'sticker_type': 'vinyl',
+                    'sticker_finish': 'glossy',
+                    'sticker_shape': 'circle',
+                    'sticker_size': '3x3'
+                }
+            ],
+            'product_type': 'custom-sticker'
+        }
+        
+        # Sample customer info
+        test_customer_info = {
+            'name': 'Test Customer',
+            'email': 'test@example.com',
+            'phone': '555-123-4567',
+            'address': '123 Test Street',
+            'city': 'Boston',
+            'state': 'MA',
+            'zipCode': '02101'
+        }
+        
+        # Test UPS integration with single service first
+        result = await ups_shipping_service.get_single_service_rate(test_order_data, test_customer_info)
+        
+        if result['success']:
+            logger.info(f"✅ UPS integration test successful: {len(result['shipping_options'])} options")
+            return {
+                "success": True,
+                "message": "UPS integration test successful",
+                "shipping_options_count": len(result['shipping_options']),
+                "shipping_options": result['shipping_options'],
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            logger.error(f"❌ UPS integration test failed: {result.get('errors', [])}")
+            return {
+                "success": False,
+                "message": "UPS integration test failed",
+                "errors": result.get('errors', []),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ UPS integration test error: {e}")
+        return {
+            "success": False,
+            "message": f"UPS integration test error: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }
