@@ -483,6 +483,20 @@ const BannerEditorNew = () => {
   const [stickerSpecs, setStickerSpecs] = useState(() => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'sticker') {
+      // Check if we have restored sticker specs from cancelled order
+      const cancelledOrder = sessionStorage.getItem('cancelledOrder')
+      if (cancelledOrder) {
+        try {
+          const orderData = JSON.parse(cancelledOrder)
+          if (orderData.sticker_specs) {
+            return orderData.sticker_specs
+          }
+        } catch (error) {
+          console.error('Failed to parse cancelledOrder for sticker specs:', error)
+        }
+      }
+      
+      // Default initialization
       return {
         material: 'vinyl',
         finish: 'matte',
@@ -3207,6 +3221,12 @@ const BannerEditorNew = () => {
               setTentSpecs(orderData.tent_specs)
               console.log('🎨 Restored tent specs:', orderData.tent_specs)
             }
+            
+            // Restore sticker specs if available
+            if (orderData.sticker_specs) {
+              setStickerSpecs(orderData.sticker_specs)
+              console.log('🎨 Restored sticker specs:', orderData.sticker_specs)
+            }
           } else {
             // For single-surface products or fallback, restore image elements properly
           restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
@@ -3228,7 +3248,13 @@ const BannerEditorNew = () => {
               if (orderData.tent_specs) {
                 setTentSpecs(orderData.tent_specs)
                 console.log('🎨 Restored tent specs (fallback):', orderData.tent_specs)
-            }
+              }
+              
+              // Restore sticker specs if available
+              if (orderData.sticker_specs) {
+                setStickerSpecs(orderData.sticker_specs)
+                console.log('🎨 Restored sticker specs (fallback):', orderData.sticker_specs)
+              }
           }).catch(error => {
             console.error('Failed to restore image elements:', error)
             // Fallback to loading without images
@@ -3427,7 +3453,7 @@ const BannerEditorNew = () => {
         loadTemplateFromDatabase(templateId)
       }
     }
-  }, [restoreImageElements])
+  }, [restoreImageElements, searchParams])
 
   // Handle mobile sidebar close event
   useEffect(() => {
@@ -3448,6 +3474,26 @@ const BannerEditorNew = () => {
       setCanvasSize({ width: 1160, height: 1049 })
     }
   }, [productType, currentSurface]) // Run when productType or currentSurface changes
+
+  // Update canvas size when sticker specs change
+  useEffect(() => {
+    if (productType === 'sticker' && stickerSpecs?.size) {
+      const sizeMap = {
+        '1x1': { width: 100, height: 100 },
+        '2x2': { width: 200, height: 200 },
+        '3x3': { width: 300, height: 300 },
+        '4x4': { width: 400, height: 400 },
+        '5x5': { width: 500, height: 500 },
+        '6x6': { width: 600, height: 600 }
+      }
+      
+      const newSize = sizeMap[stickerSpecs.size]
+      if (newSize) {
+        setCanvasSize(newSize)
+        setCanvasOrientation('square') // Stickers are always square
+      }
+    }
+  }, [productType, stickerSpecs?.size]) // Run when productType or stickerSpecs.size changes
 
   // Glass UI Header Component
   const GlassHeader = () => (

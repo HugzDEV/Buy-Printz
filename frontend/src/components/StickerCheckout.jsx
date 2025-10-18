@@ -778,7 +778,8 @@ const StickerCheckout = () => {
                     product_type: orderData.product_type,
                     design_option: orderData.design_option,
                     tent_design_option: orderData.tent_design_option,
-                    tin_surface_coverage: orderData.tin_surface_coverage
+                    tin_surface_coverage: orderData.tin_surface_coverage,
+                    sticker_specs: orderData.sticker_specs
                   }
                   sessionStorage.setItem('cancelledOrder', JSON.stringify(restorationData))
                   console.log('Saved cancelled sticker order data for restoration')
