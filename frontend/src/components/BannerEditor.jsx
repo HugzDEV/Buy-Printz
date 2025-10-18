@@ -496,13 +496,20 @@ const BannerEditorNew = () => {
         }
       }
       
-      // Default initialization
+      // Check for URL parameters
+      const urlShape = searchParams.get('shape')
+      const urlSize = searchParams.get('size')
+      const urlMaterial = searchParams.get('material')
+      const urlFinish = searchParams.get('finish')
+      const urlOrientation = searchParams.get('orientation')
+      
+      // Default initialization with URL parameters
       return {
-        material: 'vinyl',
-        finish: 'matte',
-        shape: 'circle',
-        size: '3',
-        orientation: 'landscape', // Default orientation for rectangles and ovals
+        material: urlMaterial || 'vinyl',
+        finish: urlFinish || 'matte',
+        shape: urlShape || 'circle',
+        size: urlSize || '3',
+        orientation: urlOrientation || 'landscape', // Default orientation for rectangles and ovals
         printingMethod: 'digital',
         waterproof: true,
         uvResistant: true,

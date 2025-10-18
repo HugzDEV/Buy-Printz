@@ -1,10 +1,11 @@
 import React from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Star, Truck, Award, Clock, ArrowLeft, Package, Layers } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
 
 const StickerProductDetail = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
 
   const stickerProducts = [
     {
@@ -228,12 +229,12 @@ const StickerProductDetail = () => {
                   <div className="flex gap-4">
                     {product.id === 'standard-shapes' ? (
                       <div className="flex-1 relative">
-                        <select 
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              window.location.href = `/editor?product=sticker&shape=${e.target.value}`
-                            }
-                          }}
+                         <select 
+                           onChange={(e) => {
+                             if (e.target.value) {
+                               navigate(`/editor?product=sticker&shape=${e.target.value}`)
+                             }
+                           }}
                           className="w-full bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 appearance-none cursor-pointer text-center pr-10 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:ring-offset-2"
                         >
                           <option value="">Choose Shape & Start Designing</option>

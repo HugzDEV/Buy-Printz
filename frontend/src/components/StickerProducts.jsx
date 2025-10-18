@@ -1,9 +1,10 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Star, Truck, Award, Sparkles, Package, ArrowLeft } from 'lucide-react'
 import SEOHead, { seoConfigs } from './SEOHead'
 
 const StickerProducts = () => {
+  const navigate = useNavigate()
 
   const stickerProducts = [
     {
@@ -515,7 +516,7 @@ const StickerProducts = () => {
                           <select 
                             onChange={(e) => {
                               if (e.target.value) {
-                                window.location.href = `/editor?product=sticker&shape=${e.target.value}`
+                                navigate(`/editor?product=sticker&shape=${e.target.value}`)
                               }
                             }}
                             className="w-full bg-buyprint-brand hover:bg-buyprint-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 appearance-none cursor-pointer text-center pr-8 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-buyprint-brand/50 focus:ring-offset-2"
