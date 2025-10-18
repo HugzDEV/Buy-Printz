@@ -1773,8 +1773,36 @@ const BannerEditorNew = () => {
         alert('Marketplace template data not available. Please try again.')
       }
     } else {
+      // Handle sticker template with elements
+      if (productType === 'sticker' && template.elements) {
+        console.log('🎨 Loading sticker template:', template.name)
+        console.log('🎨 Sticker template elements:', template.elements.length)
+        
+        // Clear existing elements
+        setElements([])
+        
+        // Scale template elements to fit current canvas size
+        const scaledElements = scaleTemplateElements(
+          template.elements, 
+          canvasSize.width, 
+          canvasSize.height,
+          template.canvasSize || { width: 300, height: 300 } // Default sticker size
+        ).map(element => {
+          // Generate new ID for each element to avoid conflicts
+          const elementWithId = {
+            ...element,
+            id: generateId(element.type)
+          }
+          // Ensure all required properties are present for proper rendering and transformation
+          return ensureElementProperties(elementWithId)
+        })
+        
+        setElements(scaledElements)
+        setSelectedId(null)
+        console.log(`🎨 Loaded sticker template: ${template.name}`)
+      }
       // Handle tent template with surfaces
-      if (productType === 'tent' && template.surfaces) {
+      else if (productType === 'tent' && template.surfaces) {
         console.log('🎨 Loading tent template:', template.name)
         console.log('🎨 Tent template surfaces:', Object.keys(template.surfaces))
         
@@ -3544,6 +3572,7 @@ const BannerEditorNew = () => {
             onAddAsset={addAsset}
             onAddIcon={addIcon}
             onLoadTemplate={loadTemplate}
+            templates={templates}
             onImageUpload={handleImageUpload}
             onAddQRCode={addQRCode}
             onRemoveAssetFromTracking={removeAssetFromTracking}

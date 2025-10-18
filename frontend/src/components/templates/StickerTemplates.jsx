@@ -10,8 +10,8 @@ export const stickerTemplates = [
       {
         id: 'circle-logo-bg',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 80,
         fill: '#1e3a8a',
         stroke: '#ffffff',
@@ -20,8 +20,8 @@ export const stickerTemplates = [
       {
         id: 'circle-logo-text',
         type: 'text',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         text: 'YOUR LOGO',
         fontSize: 24,
         fontFamily: 'Arial, sans-serif',
@@ -34,8 +34,8 @@ export const stickerTemplates = [
         wrap: 'none'
       }
     ],
-    canvasSize: { width: 200, height: 200 },
-    safeZone: { x: 20, y: 20, width: 160, height: 160 }
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
   },
   {
     id: 'circle-contact-info',
@@ -47,8 +47,8 @@ export const stickerTemplates = [
       {
         id: 'circle-contact-bg',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 75,
         fill: '#ffffff',
         stroke: '#1e3a8a',
@@ -57,8 +57,8 @@ export const stickerTemplates = [
       {
         id: 'circle-contact-name',
         type: 'text',
-        x: 100,
-        y: 80,
+        x: 150,
+        y: 120,
         text: 'YOUR NAME',
         fontSize: 18,
         fontFamily: 'Arial, sans-serif',
@@ -73,8 +73,8 @@ export const stickerTemplates = [
       {
         id: 'circle-contact-phone',
         type: 'text',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         text: '(555) 123-4567',
         fontSize: 14,
         fontFamily: 'Arial, sans-serif',
@@ -88,8 +88,8 @@ export const stickerTemplates = [
       {
         id: 'circle-contact-email',
         type: 'text',
-        x: 100,
-        y: 120,
+        x: 150,
+        y: 180,
         text: 'email@company.com',
         fontSize: 12,
         fontFamily: 'Arial, sans-serif',
@@ -101,8 +101,8 @@ export const stickerTemplates = [
         wrap: 'none'
       }
     ],
-    canvasSize: { width: 200, height: 200 },
-    safeZone: { x: 25, y: 25, width: 150, height: 150 }
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 37, y: 37, width: 225, height: 225 }
   },
   {
     id: 'circle-event-badge',
@@ -114,8 +114,8 @@ export const stickerTemplates = [
       {
         id: 'circle-event-bg',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 85,
         fill: '#dc2626',
         stroke: '#ffffff',
@@ -124,8 +124,8 @@ export const stickerTemplates = [
       {
         id: 'circle-event-title',
         type: 'text',
-        x: 100,
-        y: 70,
+        x: 150,
+        y: 105,
         text: 'EVENT 2024',
         fontSize: 16,
         fontFamily: 'Arial, sans-serif',
@@ -140,8 +140,8 @@ export const stickerTemplates = [
       {
         id: 'circle-event-name',
         type: 'text',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         text: 'YOUR NAME',
         fontSize: 20,
         fontFamily: 'Arial, sans-serif',
@@ -156,8 +156,8 @@ export const stickerTemplates = [
       {
         id: 'circle-event-company',
         type: 'text',
-        x: 100,
-        y: 130,
+        x: 150,
+        y: 195,
         text: 'COMPANY NAME',
         fontSize: 14,
         fontFamily: 'Arial, sans-serif',
@@ -169,8 +169,8 @@ export const stickerTemplates = [
         wrap: 'none'
       }
     ],
-    canvasSize: { width: 200, height: 200 },
-    safeZone: { x: 15, y: 15, width: 170, height: 170 }
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 22, y: 22, width: 255, height: 255 }
   },
   {
     id: 'circle-social-media',
@@ -182,8 +182,8 @@ export const stickerTemplates = [
       {
         id: 'circle-social-bg',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 80,
         fill: '#3b82f6',
         stroke: '#ffffff',
@@ -192,8 +192,8 @@ export const stickerTemplates = [
       {
         id: 'circle-social-icon',
         type: 'text',
-        x: 100,
-        y: 80,
+        x: 150,
+        y: 120,
         text: '@',
         fontSize: 32,
         fontFamily: 'Arial, sans-serif',
@@ -208,8 +208,8 @@ export const stickerTemplates = [
       {
         id: 'circle-social-handle',
         type: 'text',
-        x: 100,
-        y: 120,
+        x: 150,
+        y: 180,
         text: 'YOURHANDLE',
         fontSize: 16,
         fontFamily: 'Arial, sans-serif',
@@ -222,8 +222,8 @@ export const stickerTemplates = [
         wrap: 'none'
       }
     ],
-    canvasSize: { width: 200, height: 200 },
-    safeZone: { x: 20, y: 20, width: 160, height: 160 }
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
   },
   {
     id: 'circle-warning',
@@ -235,8 +235,8 @@ export const stickerTemplates = [
       {
         id: 'circle-warning-bg',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 85,
         fill: '#fbbf24',
         stroke: '#000000',
@@ -245,8 +245,8 @@ export const stickerTemplates = [
       {
         id: 'circle-warning-symbol',
         type: 'text',
-        x: 100,
-        y: 80,
+        x: 150,
+        y: 120,
         text: '⚠',
         fontSize: 40,
         fontFamily: 'Arial, sans-serif',
@@ -260,8 +260,8 @@ export const stickerTemplates = [
       {
         id: 'circle-warning-text',
         type: 'text',
-        x: 100,
-        y: 120,
+        x: 150,
+        y: 180,
         text: 'WARNING',
         fontSize: 18,
         fontFamily: 'Arial, sans-serif',
@@ -274,8 +274,8 @@ export const stickerTemplates = [
         wrap: 'none'
       }
     ],
-    canvasSize: { width: 200, height: 200 },
-    safeZone: { x: 15, y: 15, width: 170, height: 170 }
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 22, y: 22, width: 255, height: 255 }
   },
   {
     id: 'circle-decorative',
@@ -287,8 +287,8 @@ export const stickerTemplates = [
       {
         id: 'circle-decorative-bg',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 80,
         fill: '#8b5cf6',
         stroke: '#ffffff',
@@ -297,8 +297,8 @@ export const stickerTemplates = [
       {
         id: 'circle-decorative-pattern',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 60,
         fill: 'transparent',
         stroke: '#ffffff',
@@ -307,16 +307,16 @@ export const stickerTemplates = [
       {
         id: 'circle-decorative-center',
         type: 'circle',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         radius: 20,
         fill: '#ffffff'
       },
       {
         id: 'circle-decorative-text',
         type: 'text',
-        x: 100,
-        y: 100,
+        x: 150,
+        y: 150,
         text: 'DESIGN',
         fontSize: 12,
         fontFamily: 'Arial, sans-serif',
@@ -329,7 +329,7 @@ export const stickerTemplates = [
         wrap: 'none'
       }
     ],
-    canvasSize: { width: 200, height: 200 },
-    safeZone: { x: 20, y: 20, width: 160, height: 160 }
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
   }
 ]

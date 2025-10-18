@@ -60,6 +60,7 @@ const BannerSidebar = ({
   onAddText,
   onAddQRCode,
   onLoadTemplate,
+  templates = [],
   onImageUpload,
   onClearCanvas,
   onTextPropertyChange,
@@ -3026,12 +3027,14 @@ const BannerSidebar = ({
                 <div className="mb-4">
                     <div className="flex items-center gap-2 p-3 bg-white/10 rounded-lg border border-white/20">
                       <span className="text-lg">
-                        {productType === 'banner' ? '🏷️' : productType === 'tin' ? '🥫' : '⛺'}
+                        {productType === 'banner' ? '🏷️' : productType === 'tin' ? '🥫' : productType === 'tent' ? '⛺' : '🏷️'}
                       </span>
                       <div>
                         <div className="text-sm font-medium text-gray-800">
                           {productType === 'banner' ? 'Banner Designs' : 
-                           productType === 'tin' ? 'Tin Designs' : 'Tent Designs'}
+                           productType === 'tin' ? 'Tin Designs' : 
+                           productType === 'tent' ? 'Tent Designs' :
+                           productType === 'sticker' ? 'Sticker Designs' : 'Designs'}
                         </div>
                         <div className="text-xs text-gray-600">
                           Showing designs for {productType} products
@@ -3228,6 +3231,50 @@ const BannerSidebar = ({
                         </button>
                       ))}
                     </div>
+                  </div>
+                ) : null}
+
+                {/* Sticker Designs */}
+                {productType === 'sticker' ? (
+                  <div className="mb-6">
+                    <h5 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>🏷️</span>
+                      Sticker Designs
+                    </h5>
+                    
+                    {/* Template List for Stickers */}
+                    <div className="grid grid-cols-1 gap-2">
+                      {templates.map((template) => (
+                        <button
+                          key={template.id}
+                          onClick={() => onLoadTemplate(template)}
+                          className="p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-all duration-200 text-left group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center text-white text-lg font-bold">
+                              {template.name.charAt(0)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-gray-800 truncate">
+                                {template.name}
+                              </div>
+                              <div className="text-xs text-gray-600 truncate">
+                                {template.description}
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {/* No templates message */}
+                    {templates.length === 0 && (
+                      <div className="text-center py-8 bg-white/10 rounded-lg border border-white/20">
+                        <div className="text-gray-400 text-4xl mb-2">🏷️</div>
+                        <div className="text-gray-600 text-sm font-medium">No sticker templates available</div>
+                        <p className="text-gray-400 text-xs mt-1">Professional sticker designs</p>
+                      </div>
+                    )}
                   </div>
                 ) : null}
 
