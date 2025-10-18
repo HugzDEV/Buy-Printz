@@ -1281,10 +1281,14 @@ const BannerSidebar = ({
                   </div>
                 ) : (
                 <select 
-                  value={productType === 'tin' ? (tinSpecs?.finish || '') : (bannerSpecs?.id || '')}
+                  value={productType === 'tin' ? (tinSpecs?.finish || '') : 
+                         productType === 'sticker' ? (stickerSpecs?.material || 'vinyl') : 
+                         (bannerSpecs?.id || '')}
                   onChange={(e) => {
                     if (productType === 'tin') {
                       handleTinSpecChange('finish', e.target.value)
+                    } else if (productType === 'sticker') {
+                      onStickerSpecChange?.({...stickerSpecs, material: e.target.value})
                     } else {
                       onChangeBannerType?.(e.target.value)
                     }
@@ -1303,6 +1307,13 @@ const BannerSidebar = ({
                       <option value="gold">Gold</option>
                     </>
                   )}
+                  {productType === 'sticker' && (
+                    <>
+                      <option value="vinyl">Vinyl</option>
+                      <option value="paper">Paper</option>
+                      <option value="clear">Clear Vinyl</option>
+                    </>
+                  )}
                 </select>
                 )}
               </div>
@@ -1310,19 +1321,6 @@ const BannerSidebar = ({
               {/* Sticker-Specific Options */}
               {productType === 'sticker' && (
                 <>
-                  {/* Sticker Material */}
-                  <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
-                    <div className="text-sm font-medium text-gray-800 mb-3">Material</div>
-                    <select 
-                      value={stickerSpecs?.material || 'vinyl'}
-                      onChange={(e) => onStickerSpecChange?.({...stickerSpecs, material: e.target.value})}
-                      className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    >
-                      <option value="vinyl">Vinyl</option>
-                      <option value="paper">Paper</option>
-                      <option value="clear">Clear Vinyl</option>
-                    </select>
-                  </div>
 
                   {/* Sticker Finish */}
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
@@ -1333,17 +1331,17 @@ const BannerSidebar = ({
                         const finish = e.target.value
                         // Set special properties based on finish type
                         const finishProperties = {
-                          'matte': { waterproof: false, uvResistant: false, removable: true },
+                          'matte': { waterproof: false, uvResistant: false, removable: false },
                           'glossy': { waterproof: true, uvResistant: true, removable: false },
-                          'satin': { waterproof: false, uvResistant: false, removable: true }
+                          'satin': { waterproof: false, uvResistant: false, removable: false }
                         }
                         onStickerSpecChange?.({...stickerSpecs, finish, ...finishProperties[finish]})
                       }}
                       className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     >
-                      <option value="matte">Matte (Removable)</option>
+                      <option value="matte">Matte</option>
                       <option value="glossy">Glossy (Waterproof, UV Resistant)</option>
-                      <option value="satin">Satin (Removable)</option>
+                      <option value="satin">Satin</option>
                     </select>
                   </div>
 

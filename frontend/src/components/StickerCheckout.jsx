@@ -114,8 +114,8 @@ const StickerCheckout = () => {
         value: 'matte', 
         label: 'Matte Finish', 
         priceModifier: 0.00, 
-        description: 'Removable, indoor/outdoor use',
-        properties: { waterproof: false, uvResistant: false, removable: true }
+        description: 'Indoor/outdoor use',
+        properties: { waterproof: false, uvResistant: false, removable: false }
       },
       { 
         value: 'glossy', 
@@ -128,8 +128,8 @@ const StickerCheckout = () => {
         value: 'satin', 
         label: 'Satin Finish', 
         priceModifier: 0.03, 
-        description: 'Semi-gloss, removable',
-        properties: { waterproof: false, uvResistant: false, removable: true }
+        description: 'Semi-gloss finish',
+        properties: { waterproof: false, uvResistant: false, removable: false }
       }
     ],
     
