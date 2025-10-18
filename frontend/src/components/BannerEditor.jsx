@@ -3620,6 +3620,7 @@ const BannerEditorNew = () => {
             availableSurfaces={availableSurfaces}
             clipFunc={productType === 'tent' && (currentSurface === 'canopy_front' || currentSurface === 'canopy_back' || currentSurface === 'canopy_left' || currentSurface === 'canopy_right') ? getTentCanopyValenceClipFunc() : null}
             onRemoveAssetFromTracking={removeAssetFromTracking}
+            stickerSpecs={stickerSpecs}
           />
           
                 {/* Mobile Overlay when sidebar is open */}
