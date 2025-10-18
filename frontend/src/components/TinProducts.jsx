@@ -449,6 +449,7 @@ const TinProducts = () => {
                         <meta itemProp="priceCurrency" content="USD" />
                         <meta itemProp="price" content={finish.priceValue} />
                         <meta itemProp="availability" content="https://schema.org/InStock" />
+                        <meta itemProp="priceValidUntil" content="2026-12-31" />
                         <div className="text-3xl font-bold text-blue-600" itemProp="priceDisplay">
                           {finish.price}
                         </div>
