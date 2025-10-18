@@ -165,51 +165,81 @@ class UPSShippingService:
     def _prepare_ups_rate_request(self, order_data: Dict[str, Any], customer_info: Dict[str, Any]) -> Dict[str, Any]:
         """Prepare UPS rate request payload"""
         
-        # Calculate total weight and dimensions for Tin Skinz order
-        # Tin weights: Empty tin = 1.18oz (0.074 lbs), With candy = 3.11oz (0.194 lbs)
-        tin_weight_empty = 0.074  # lbs per empty tin (1.18oz)
-        tin_weight_with_candy = 0.194  # lbs per tin with candy (3.11oz)
-        tin_length = 4.0  # inches
-        tin_width = 4.0   # inches
-        tin_height = 6.0  # inches
-        
+        product_type = order_data.get('product_type', 'tin-skinz')
         total_quantity = order_data.get('total_quantity', 1)
         selected_designs = order_data.get('selected_designs', [])
         
-        # Calculate total weight based on which tins have candy
-        total_weight = 0
-        tins_with_candy = 0
-        tins_without_candy = 0
-        
-        for design in selected_designs:
-            quantity = design.get('quantity', 1)
-            has_candy = design.get('candy_id') is not None
+        if product_type == 'custom-sticker':
+            # Sticker weight and dimensions
+            sticker_weight_per_unit = 0.001  # 0.001 lbs per sticker (very light)
+            total_weight = total_quantity * sticker_weight_per_unit
             
-            if has_candy:
-                total_weight += tin_weight_with_candy * quantity
-                tins_with_candy += quantity
+            # Calculate package dimensions for stickers
+            if total_quantity <= 50:
+                # Small envelope: 6" x 9" x 0.5"
+                package_length = 6.0
+                package_width = 9.0
+                package_height = 0.5
+            elif total_quantity <= 200:
+                # Medium envelope: 9" x 12" x 1"
+                package_length = 9.0
+                package_width = 12.0
+                package_height = 1.0
+            elif total_quantity <= 500:
+                # Large envelope: 12" x 15" x 1.5"
+                package_length = 12.0
+                package_width = 15.0
+                package_height = 1.5
             else:
-                total_weight += tin_weight_empty * quantity
-                tins_without_candy += quantity
-        
-        logger.info(f"📦 Tin Skinz weight calculation: {tins_with_candy} tins with candy ({tin_weight_with_candy}lbs each), {tins_without_candy} empty tins ({tin_weight_empty}lbs each), total weight: {total_weight:.3f}lbs")
-        
-        # Calculate package dimensions (assuming tins are packed efficiently)
-        if total_quantity <= 4:
-            # Small box for 1-4 tins
-            package_length = tin_length * 2
-            package_width = tin_width * 2
-            package_height = tin_height
-        elif total_quantity <= 12:
-            # Medium box for 5-12 tins
-            package_length = tin_length * 3
-            package_width = tin_width * 2
-            package_height = tin_height * 2
+                # Extra large package: 15" x 18" x 2"
+                package_length = 15.0
+                package_width = 18.0
+                package_height = 2.0
+            
+            logger.info(f"📦 Sticker weight calculation: {total_quantity} stickers, {total_weight:.3f}lbs total")
+            
         else:
-            # Large box for 13+ tins
-            package_length = tin_length * 4
-            package_width = tin_width * 3
-            package_height = tin_height * 2
+            # Tin Skinz weight and dimensions (existing logic)
+            tin_weight_empty = 0.074  # lbs per empty tin (1.18oz)
+            tin_weight_with_candy = 0.194  # lbs per tin with candy (3.11oz)
+            tin_length = 4.0  # inches
+            tin_width = 4.0   # inches
+            tin_height = 6.0  # inches
+            
+            # Calculate total weight based on which tins have candy
+            total_weight = 0
+            tins_with_candy = 0
+            tins_without_candy = 0
+            
+            for design in selected_designs:
+                quantity = design.get('quantity', 1)
+                has_candy = design.get('candy_id') is not None
+                
+                if has_candy:
+                    total_weight += tin_weight_with_candy * quantity
+                    tins_with_candy += quantity
+                else:
+                    total_weight += tin_weight_empty * quantity
+                    tins_without_candy += quantity
+            
+            logger.info(f"📦 Tin Skinz weight calculation: {tins_with_candy} tins with candy ({tin_weight_with_candy}lbs each), {tins_without_candy} empty tins ({tin_weight_empty}lbs each), total weight: {total_weight:.3f}lbs")
+            
+            # Calculate package dimensions (assuming tins are packed efficiently)
+            if total_quantity <= 4:
+                # Small box for 1-4 tins
+                package_length = tin_length * 2
+                package_width = tin_width * 2
+                package_height = tin_height
+            elif total_quantity <= 12:
+                # Medium box for 5-12 tins
+                package_length = tin_length * 3
+                package_width = tin_width * 2
+                package_height = tin_height * 2
+            else:
+                # Large box for 13+ tins
+                package_length = tin_length * 4
+                package_width = tin_width * 3
+                package_height = tin_height * 2
         
         # Ensure minimum dimensions for UPS
         package_length = max(package_length, 1.0)
@@ -682,44 +712,76 @@ class UPSShippingService:
             }
 
     def _calculate_package_details(self, order_data: Dict[str, Any]) -> tuple:
-        """Calculate package dimensions and weight for Tin Skinz order"""
+        """Calculate package dimensions and weight for Tin Skinz or Sticker orders"""
         try:
             total_quantity = order_data.get('total_quantity', 1)
             selected_designs = order_data.get('selected_designs', [])
+            product_type = order_data.get('product_type', 'tin-skinz')
             
-            # Calculate total weight
+            # Calculate total weight based on product type
             total_weight = 0.0
-            for design in selected_designs:
-                quantity = design.get('quantity', 1)
-                candy_id = design.get('candy_id')
+            
+            if product_type == 'custom-sticker':
+                # Sticker weight calculation
+                sticker_weight_per_unit = 0.001  # 0.001 lbs per sticker (very light)
+                total_weight = total_quantity * sticker_weight_per_unit
                 
-                if candy_id:
-                    # Tin with candy: 0.194 lbs each
-                    total_weight += quantity * 0.194
+                # Calculate package dimensions for stickers
+                # Stickers are flat and lightweight, so they can be packed in smaller envelopes
+                if total_quantity <= 50:
+                    # Small envelope: 6" x 9" x 0.5"
+                    package_length = 6.0
+                    package_width = 9.0
+                    package_height = 0.5
+                elif total_quantity <= 200:
+                    # Medium envelope: 9" x 12" x 1"
+                    package_length = 9.0
+                    package_width = 12.0
+                    package_height = 1.0
+                elif total_quantity <= 500:
+                    # Large envelope: 12" x 15" x 1.5"
+                    package_length = 12.0
+                    package_width = 15.0
+                    package_height = 1.5
                 else:
-                    # Empty tin: 0.074 lbs each
-                    total_weight += quantity * 0.074
-            
-            # Calculate package dimensions based on quantity
-            # Assume tins are roughly 3" x 3" x 2" each
-            # Package dimensions will scale with quantity
-            if total_quantity <= 4:
-                # Small package: 8" x 8" x 6"
-                package_length = 8.0
-                package_width = 8.0
-                package_height = 6.0
-            elif total_quantity <= 12:
-                # Medium package: 12" x 12" x 8"
-                package_length = 12.0
-                package_width = 12.0
-                package_height = 8.0
+                    # Extra large package: 15" x 18" x 2"
+                    package_length = 15.0
+                    package_width = 18.0
+                    package_height = 2.0
+                
+                logger.info(f"📦 Sticker package details: {total_quantity} stickers, {total_weight:.3f} lbs, {package_length}x{package_width}x{package_height} inches")
+                
             else:
-                # Large package: 16" x 16" x 10"
-                package_length = 16.0
-                package_width = 16.0
-                package_height = 10.0
-            
-            logger.info(f"📦 Package details: {total_quantity} tins, {total_weight:.3f} lbs, {package_length}x{package_width}x{package_height} inches")
+                # Tin Skinz weight calculation (existing logic)
+                for design in selected_designs:
+                    quantity = design.get('quantity', 1)
+                    candy_id = design.get('candy_id')
+                    
+                    if candy_id:
+                        # Tin with candy: 0.194 lbs each
+                        total_weight += quantity * 0.194
+                    else:
+                        # Empty tin: 0.074 lbs each
+                        total_weight += quantity * 0.074
+                
+                # Calculate package dimensions for tins
+                if total_quantity <= 4:
+                    # Small package: 8" x 8" x 6"
+                    package_length = 8.0
+                    package_width = 8.0
+                    package_height = 6.0
+                elif total_quantity <= 12:
+                    # Medium package: 12" x 12" x 8"
+                    package_length = 12.0
+                    package_width = 12.0
+                    package_height = 8.0
+                else:
+                    # Large package: 16" x 16" x 10"
+                    package_length = 16.0
+                    package_width = 16.0
+                    package_height = 10.0
+                
+                logger.info(f"📦 Tin Skinz package details: {total_quantity} tins, {total_weight:.3f} lbs, {package_length}x{package_width}x{package_height} inches")
             
             return package_length, package_width, package_height, total_weight
             
