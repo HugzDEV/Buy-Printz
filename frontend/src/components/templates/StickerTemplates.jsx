@@ -1029,5 +1029,228 @@ export const stickerTemplates = [
     ],
     canvasSize: { width: 300, height: 300 },
     safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  // Oval Sticker Templates
+  {
+    id: 'oval-business-logo',
+    name: 'Business Logo Oval',
+    description: 'Professional business logo in an oval format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/oval-business-logo.jpg',
+    elements: [
+      {
+        id: 'oval-logo-bg',
+        type: 'ellipse',
+        x: 150,
+        y: 100,
+        radiusX: 100,
+        radiusY: 67,
+        fill: '#1e3a8a',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'oval-logo-text',
+        type: 'text',
+        x: 150,
+        y: 100,
+        text: 'YOUR LOGO',
+        fontSize: 18,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 200 },
+    safeZone: { x: 20, y: 20, width: 260, height: 160 }
+  },
+
+  {
+    id: 'oval-contact-info',
+    name: 'Contact Info Oval',
+    description: 'Contact information in an oval format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/oval-contact-info.jpg',
+    elements: [
+      {
+        id: 'oval-contact-bg',
+        type: 'ellipse',
+        x: 150,
+        y: 100,
+        radiusX: 100,
+        radiusY: 67,
+        fill: '#f8fafc',
+        stroke: '#1e3a8a',
+        strokeWidth: 2
+      },
+      {
+        id: 'oval-contact-name',
+        type: 'text',
+        x: 150,
+        y: 80,
+        text: 'JOHN SMITH',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#1e3a8a',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'oval-contact-phone',
+        type: 'text',
+        x: 150,
+        y: 100,
+        text: '(555) 123-4567',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'oval-contact-email',
+        type: 'text',
+        x: 150,
+        y: 120,
+        text: 'john@company.com',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 200 },
+    safeZone: { x: 20, y: 20, width: 260, height: 160 }
+  },
+
+  {
+    id: 'oval-event-badge',
+    name: 'Event Badge Oval',
+    description: 'Event badge in an oval format',
+    category: 'events',
+    thumbnail: '/assets/images/templates/oval-event-badge.jpg',
+    elements: [
+      {
+        id: 'oval-event-bg',
+        type: 'ellipse',
+        x: 150,
+        y: 100,
+        radiusX: 100,
+        radiusY: 67,
+        fill: '#dc2626',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'oval-event-text',
+        type: 'text',
+        x: 150,
+        y: 90,
+        text: 'CONFERENCE 2024',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'oval-event-name',
+        type: 'text',
+        x: 150,
+        y: 110,
+        text: 'ATTENDEE',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 200 },
+    safeZone: { x: 20, y: 20, width: 260, height: 160 }
+  },
+
+  {
+    id: 'oval-warning-label',
+    name: 'Warning Label Oval',
+    description: 'Warning label in an oval format',
+    category: 'safety',
+    thumbnail: '/assets/images/templates/oval-warning-label.jpg',
+    elements: [
+      {
+        id: 'oval-warning-bg',
+        type: 'ellipse',
+        x: 150,
+        y: 100,
+        radiusX: 100,
+        radiusY: 67,
+        fill: '#fef3c7',
+        stroke: '#f59e0b',
+        strokeWidth: 3
+      },
+      {
+        id: 'oval-warning-icon',
+        type: 'text',
+        x: 150,
+        y: 85,
+        text: '⚠️',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#f59e0b',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 40,
+        height: 'auto'
+      },
+      {
+        id: 'oval-warning-text',
+        type: 'text',
+        x: 150,
+        y: 105,
+        text: 'CAUTION',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'oval-warning-desc',
+        type: 'text',
+        x: 150,
+        y: 125,
+        text: 'HOT SURFACE',
+        fontSize: 10,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 200 },
+    safeZone: { x: 20, y: 20, width: 260, height: 160 }
   }
 ]

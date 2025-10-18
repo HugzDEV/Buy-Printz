@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react'
-import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Transformer } from 'react-konva'
+import { Stage, Layer, Text, Image, Rect, Circle, Line, Star, RegularPolygon, Ellipse, Transformer } from 'react-konva'
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -112,8 +112,18 @@ const BannerCanvas = forwardRef(({
           }
         }
         ctx.closePath()
+      } else if (stickerShape === 'oval') {
+        // Oval clipping for oval stickers
+        const centerX = canvasSize.width / 2
+        const centerY = canvasSize.height / 2
+        const radiusX = (canvasSize.width / 2) - margin
+        const radiusY = (canvasSize.height / 2) - margin
+        
+        ctx.beginPath()
+        ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2)
+        ctx.closePath()
       } else {
-        // Rectangular clipping for square, rectangle, oval, diamond, custom
+        // Rectangular clipping for square, rectangle, diamond, custom
         const clipX = margin
         const clipY = margin
         const clipWidth = canvasSize.width - (margin * 2)
@@ -2860,8 +2870,40 @@ const BannerCanvas = forwardRef(({
                                 />
                               </>
                             )
+                          } else if (stickerShape === 'oval') {
+                            // Oval safe zone for oval stickers
+                            const centerX = canvasSize.width / 2
+                            const centerY = canvasSize.height / 2
+                            const radiusX = (canvasSize.width / 2) - margin
+                            const radiusY = (canvasSize.height / 2) - margin
+                            
+                            return (
+                              <>
+                                <Ellipse
+                                  x={centerX}
+                                  y={centerY}
+                                  radiusX={radiusX}
+                                  radiusY={radiusY}
+                                  stroke="#dc2626"
+                                  strokeWidth={2}
+                                  dash={[8, 4]}
+                                  lineCap="round"
+                                  listening={false}
+                                />
+                                <Ellipse
+                                  x={centerX}
+                                  y={centerY}
+                                  radiusX={radiusX}
+                                  radiusY={radiusY}
+                                  stroke="#dc2626"
+                                  strokeWidth={1}
+                                  dash={[2, 2]}
+                                  listening={false}
+                                />
+                              </>
+                            )
                           } else {
-                            // Rectangular safe zone for square, rectangle, oval, diamond, custom
+                            // Rectangular safe zone for square, rectangle, diamond, custom
                             return (
                               <>
                                 <Rect
