@@ -6,6 +6,7 @@ import AllProducts from './components/AllProducts'
 import Products from './components/Products'
 import TinProducts from './components/TinProducts'
 import TentProducts from './components/TentProducts'
+import StickerProducts from './components/StickerProducts'
 import ProductDetail from './components/ProductDetail'
 import Contact from './components/Contact'
 import Login from './components/Login'
@@ -161,6 +162,14 @@ function App() {
           <>
             <Header />
             <TentProducts />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/stickers" element={
+          <>
+            <Header />
+            <StickerProducts />
             <Footer />
           </>
         } />

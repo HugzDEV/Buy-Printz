@@ -52,6 +52,7 @@ const Header = () => {
     { name: 'Vinyl Banners', href: '/banner-products' },
     { name: 'Business Card Tins', href: '/business-card-tins' },
     { name: 'Tradeshow Tents', href: '/tradeshow-tents' },
+    { name: 'Custom Stickers', href: '/stickers' },
     { name: 'Tin Skinz', href: '/tin-skinz' }
   ]
 

@@ -89,6 +89,13 @@ export const seoConfigs = {
     url: "https://www.buyprintz.com/tradeshow-tents"
   },
   
+  stickers: {
+    title: "Custom Stickers - Vinyl Stickers & Decals | BuyPrintz",
+    description: "Professional custom stickers and vinyl decals. Weather-resistant, durable stickers for business, events, and personal use. Fast 2-3 day delivery.",
+    keywords: "custom stickers, vinyl stickers, decals, custom decals, sticker printing, vinyl decals, business stickers, promotional stickers",
+    url: "https://www.buyprintz.com/stickers"
+  },
+  
   editor: {
     title: "Design Tool - Create Business Card Tins, Tents & Banners Online | BuyPrintz",
     description: "Use our advanced design tool to create custom Business Card Tins, Tradeshow Tents, and banners online. Professional canvas editor with text, shapes, and color tools. Real-time preview and instant pricing.",

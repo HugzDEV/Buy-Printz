@@ -72,6 +72,21 @@ const BannerCanvas = forwardRef(({
   
   // Create a separate ref for the actual Konva Stage
   const konvaStageRef = useRef(null)
+
+  // Circle clipping function for stickers
+  const getCircleClipFunc = useCallback(() => {
+    if (productType !== 'sticker') return null
+    
+    return (ctx) => {
+        const centerX = canvasSize.width / 2
+        const centerY = canvasSize.height / 2
+        const radius = Math.min(canvasSize.width, canvasSize.height) / 2 - 10 // 10px margin - slightly wider than safe zone
+      
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false)
+      ctx.closePath()
+    }
+  }, [productType, canvasSize])
   
   // Expose clearTransformer function and Konva stage through ref
   useImperativeHandle(stageRef, () => ({
@@ -2357,7 +2372,7 @@ const BannerCanvas = forwardRef(({
                   }
                 }}
             >
-              <Layer clipFunc={clipFunc}>
+              <Layer clipFunc={clipFunc || getCircleClipFunc()}>
                 {/* Background */}
                 <Rect
                   width={canvasSize.width}
@@ -2743,6 +2758,33 @@ const BannerCanvas = forwardRef(({
                             </>
                           )
                         })()}
+                      </>
+                    ) : productType === 'sticker' ? (
+                      // Circular safe zone for stickers
+                      <>
+                        {/* Circular safe zone */}
+                        <Circle
+                          x={canvasSize.width / 2}
+                          y={canvasSize.height / 2}
+                          radius={Math.min(canvasSize.width, canvasSize.height) / 2 - 20}
+                          stroke="#dc2626"
+                          strokeWidth={2}
+                          dash={[8, 4]}
+                          lineCap="round"
+                          listening={false}
+                        />
+                        
+                        {/* Safe zone corners */}
+                        <Circle
+                          x={canvasSize.width / 2}
+                          y={canvasSize.height / 2}
+                          radius={Math.min(canvasSize.width, canvasSize.height) / 2 - 20}
+                          stroke="#dc2626"
+                          strokeWidth={1}
+                          dash={[2, 2]}
+                          listening={false}
+                        />
+                        
                       </>
                     ) : (
                       // Rectangular safe zone for other products

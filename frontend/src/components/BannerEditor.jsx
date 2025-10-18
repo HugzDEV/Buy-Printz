@@ -34,6 +34,7 @@ const BannerEditorNew = () => {
     const urlProduct = searchParams.get('product')
     if (urlProduct === 'tin') return 'tin'
     if (urlProduct === 'tent') return 'tent'
+    if (urlProduct === 'sticker') return 'sticker'
     return 'banner' // default
   })
   
@@ -184,10 +185,10 @@ const BannerEditorNew = () => {
   }, [surfaceElements])
   
   // Current elements based on product type and surface
-  const elements = (productType === 'tin' || productType === 'tent') 
+  const elements = (productType === 'tin' || productType === 'tent' || productType === 'sticker') 
     ? (surfaceElements[currentSurface] || []) 
     : (surfaceElements.front || [])
-  const setElements = (productType === 'tin' || productType === 'tent')
+  const setElements = (productType === 'tin' || productType === 'tent' || productType === 'sticker')
     ? (newElements) => {
         setSurfaceElements(prev => ({
           ...prev,
@@ -477,6 +478,47 @@ const BannerEditorNew = () => {
     }
     return null // For non-tin products, return null
   })
+
+  // Sticker specifications
+  const [stickerSpecs, setStickerSpecs] = useState(() => {
+    const urlProduct = searchParams.get('product')
+    if (urlProduct === 'sticker') {
+      return {
+        material: 'vinyl',
+        finish: 'matte',
+        shape: 'circle',
+        size: '3x3',
+        printingMethod: 'digital',
+        waterproof: true,
+        uvResistant: true,
+        removable: false,
+        indoorOutdoor: 'both'
+      }
+    }
+    return null // For non-sticker products, return null
+  })
+
+  // Handle sticker spec changes with size handling
+  const handleStickerSpecChange = useCallback((newSpecs) => {
+    setStickerSpecs(newSpecs)
+    
+    // Handle size changes for stickers
+    if (newSpecs.size && productType === 'sticker') {
+      const sizeMap = {
+        '1x1': { width: 100, height: 100 },
+        '2x2': { width: 200, height: 200 },
+        '3x3': { width: 300, height: 300 },
+        '4x4': { width: 400, height: 400 },
+        '5x5': { width: 500, height: 500 },
+        '6x6': { width: 600, height: 600 }
+      }
+      
+      const newSize = sizeMap[newSpecs.size]
+      if (newSize) {
+        setCanvasSize(newSize)
+      }
+    }
+  }, [productType])
   
   // Banner size presets - Standard banner dimensions (H x W format)
   const bannerSizes = [
@@ -536,6 +578,26 @@ const BannerEditorNew = () => {
         { name: 'Half Wall', width: 1110, height: 370, orientation: 'landscape', category: 'wall' }
       ],
       description: 'Professional tradeshow tents with custom graphics'
+    },
+          sticker: {
+            name: 'Custom Sticker',
+            defaultSize: { width: 300, height: 300 }, // Circle sticker default - 3x3 most popular
+      sizes: [
+        { name: '1" Circle', width: 100, height: 100, orientation: 'square', category: 'small' },
+        { name: '2" Circle', width: 200, height: 200, orientation: 'square', category: 'medium' },
+        { name: '3" Circle', width: 300, height: 300, orientation: 'square', category: 'large' },
+        { name: '4" Circle', width: 400, height: 400, orientation: 'square', category: 'large' },
+        { name: '5" Circle', width: 500, height: 500, orientation: 'square', category: 'large' },
+        { name: '6" Circle', width: 600, height: 600, orientation: 'square', category: 'large' }
+      ],
+      description: 'Professional vinyl stickers with custom graphics',
+      // Safe zone for circle stickers - circular clipping area
+      safeZone: {
+        margin: 10, // 10px margin from edge
+        width: 180,  // 200 - 20px margin
+        height: 180,  // 200 - 20px margin
+        shape: 'circle' // Circular safe zone for stickers
+      }
     }
   }
   
@@ -571,6 +633,20 @@ const BannerEditorNew = () => {
         withFrame: true,
         reinforcedStripColor: 'white'
       })
+        } else if (newProductType === 'sticker') {
+          setCurrentSurface('front')
+          // Initialize sticker specs
+          setStickerSpecs({
+            material: 'vinyl',
+            finish: 'matte',
+            shape: 'circle',
+            size: '3x3',
+            printingMethod: 'digital',
+            waterproof: true,
+            uvResistant: true,
+            removable: false,
+            indoorOutdoor: 'both'
+          })
     } else {
       setCurrentSurface('front')
       // Initialize banner specs for banner products
@@ -686,7 +762,7 @@ const BannerEditorNew = () => {
   // Handle surface navigation with automatic image capture
   const handleSurfaceChange = useCallback((surface) => {
     // CAPTURE CURRENT SURFACE IMAGE BEFORE SWITCHING
-    if (productType === 'tin' || productType === 'tent') {
+    if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
       const currentElements = surfaceElements[currentSurface] || []
       
       // Only capture if current surface has elements
@@ -1034,7 +1110,7 @@ const BannerEditorNew = () => {
     }
 
     // Use multi-surface logic for tin and tent products
-    if (productType === 'tin' || productType === 'tent') {
+    if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
       setSurfaceElements(prev => ({
         ...prev,
         [currentSurface]: [...prev[currentSurface], shape]
@@ -1070,7 +1146,7 @@ const BannerEditorNew = () => {
     }
     
     // Use multi-surface logic for tin and tent products
-    if (productType === 'tin' || productType === 'tent') {
+    if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
       setSurfaceElements(prev => ({
         ...prev,
         [currentSurface]: [...prev[currentSurface], newText]
@@ -1100,7 +1176,7 @@ const BannerEditorNew = () => {
           imagePath: imagePath // Store the actual image path for restoration
         }
         // Use multi-surface logic for tin and tent products
-        if (productType === 'tin' || productType === 'tent') {
+        if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
           setSurfaceElements(prev => ({
             ...prev,
             [currentSurface]: [...prev[currentSurface], newIcon]
@@ -1126,7 +1202,7 @@ const BannerEditorNew = () => {
           verticalAlign: 'middle'
         }
         // Use multi-surface logic for tin and tent products
-        if (productType === 'tin' || productType === 'tent') {
+        if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
           setSurfaceElements(prev => ({
             ...prev,
             [currentSurface]: [...prev[currentSurface], newIcon]
@@ -1152,7 +1228,7 @@ const BannerEditorNew = () => {
         verticalAlign: 'middle'
       }
       // Use multi-surface logic for tin and tent products
-      if (productType === 'tin' || productType === 'tent') {
+      if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
         setSurfaceElements(prev => ({
           ...prev,
           [currentSurface]: [...prev[currentSurface], newIcon]
@@ -1214,7 +1290,7 @@ const BannerEditorNew = () => {
             }
           }
           // Use multi-surface logic for tin and tent products
-          if (productType === 'tin' || productType === 'tent') {
+          if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
             setSurfaceElements(prev => ({
               ...prev,
               [currentSurface]: [...prev[currentSurface], newQRCode]
@@ -1953,7 +2029,7 @@ const BannerEditorNew = () => {
       setActiveDesignAssets(prev => new Set([...prev, assetName]))
       
       // Use multi-surface logic for tin and tent products
-      if (productType === 'tin' || productType === 'tent') {
+      if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
         setSurfaceElements(prev => ({
           ...prev,
           [currentSurface]: [...prev[currentSurface], newImage]
@@ -2119,7 +2195,7 @@ const BannerEditorNew = () => {
           bannerSpecs,
           productType, // Save current product type
           currentSurface, // Save current surface
-          surface_elements: (productType === 'tin' || productType === 'tent') ? surfaceElements : undefined, // Save multi-surface elements
+          surface_elements: (productType === 'tin' || productType === 'tent' || productType === 'sticker') ? surfaceElements : undefined, // Save multi-surface elements
           // Save design options for proper restoration
           tent_design_option: tentDesignOption,
           tin_surface_coverage: tinSpecs?.surfaceCoverage,
@@ -2196,7 +2272,7 @@ const BannerEditorNew = () => {
     // MULTI-SURFACE QUALITY CONTROL: Capture ALL surfaces for print preview
     // This is our "forced stop and check moment" - users MUST see all surfaces
     const captureAllSurfaceImages = async () => {
-      if (productType === 'tin' || productType === 'tent') {
+      if (productType === 'tin' || productType === 'tent' || productType === 'sticker') {
         console.log('🛡️ QUALITY CONTROL: Capturing ALL surfaces for mandatory review')
         const allCapturedImages = { ...surfaceImages } // Start with auto-captured images
         
@@ -2279,7 +2355,7 @@ const BannerEditorNew = () => {
     }
 
     // CAPTURE FINAL SURFACE IMAGE before checkout
-    if ((productType === 'tin' || productType === 'tent') && elements.length > 0) {
+    if ((productType === 'tin' || productType === 'tent' || productType === 'sticker') && elements.length > 0) {
       try {
         const finalSurfaceImage = generateCanvasImage()
         if (finalSurfaceImage) {
@@ -2335,7 +2411,7 @@ const BannerEditorNew = () => {
         // Compress to storage-friendly size/quality
         // JPEG is fine for preview; production PDF uses fresh export when downloading
         // Use slightly higher quality for tins (small art) and tents (details)
-        const q = productType === 'tin' ? 0.8 : productType === 'tent' ? 0.75 : 0.7
+        const q = productType === 'tin' ? 0.8 : productType === 'tent' ? 0.75 : productType === 'sticker' ? 0.8 : 0.7
         const compressed = await compressDataUrl(url, { maxWidth: 1400, maxHeight: 1400, quality: q })
         compressedEntries.push([key, compressed])
       }
@@ -2373,7 +2449,7 @@ const BannerEditorNew = () => {
       marketplace_templates: marketplaceTemplates,
       
       // Order metadata (required by backend)
-      product_type: productType === 'tin' ? 'business_card_tin' : productType === 'tent' ? 'tradeshow_tent' : 'banner',
+      product_type: productType === 'tin' ? 'business_card_tin' : productType === 'tent' ? 'tradeshow_tent' : productType === 'sticker' ? 'custom_sticker' : 'banner',
       quantity: 1,
               dimensions: {
           width: 2, // Default 2ft width
@@ -2896,13 +2972,15 @@ const BannerEditorNew = () => {
               setCurrentSurface('front')
             } else if (detectedProductType === 'tent') {
               setCurrentSurface('canopy_front')
+            } else if (detectedProductType === 'sticker') {
+              setCurrentSurface('front')
             } else {
               setCurrentSurface('front')
             }
           }
           
           // For multi-surface products, restore surface_elements if available
-          if (canvasData.surface_elements && (canvasData.productType === 'tin' || canvasData.productType === 'tent')) {
+          if (canvasData.surface_elements && (canvasData.productType === 'tin' || canvasData.productType === 'tent' || canvasData.productType === 'sticker')) {
             console.log('🎨 Restoring multi-surface elements from template:', canvasData.surface_elements)
             setSurfaceElements(canvasData.surface_elements)
           } else {
@@ -2980,7 +3058,7 @@ const BannerEditorNew = () => {
         const orderData = JSON.parse(cancelledOrder)
         if (orderData.canvas_data) {
           // For multi-surface products, restore surface_elements if available
-          if (orderData.surface_elements && (productType === 'tin' || productType === 'tent')) {
+          if (orderData.surface_elements && (productType === 'tin' || productType === 'tent' || productType === 'sticker')) {
             console.log('🎨 Restoring multi-surface elements from surface_elements')
             
             // Restore image elements properly for each surface
@@ -3038,12 +3116,12 @@ const BannerEditorNew = () => {
                 backwall: []
               })
             })
-          } else if ((productType === 'tin' || productType === 'tent')) {
+          } else if ((productType === 'tin' || productType === 'tent' || productType === 'sticker')) {
             console.log('🎨 Fallback: Restoring from canvas_data.elements (no surface_elements)')
             
             // Fallback: restore from canvas_data.elements and put on current surface
             restoreImageElements(orderData.canvas_data.elements || []).then(restoredElements => {
-              const currentSurface = productType === 'tin' ? 'front' : 'canopy_front'
+              const currentSurface = productType === 'tin' ? 'front' : productType === 'tent' ? 'canopy_front' : 'front'
               const restoredSurfaceElements = {
                 // Initialize all surfaces as empty
                 front: [],
@@ -3197,13 +3275,15 @@ const BannerEditorNew = () => {
               setCurrentSurface('front')
             } else if (detectedProductType === 'tent') {
               setCurrentSurface('canopy_front')
+            } else if (detectedProductType === 'sticker') {
+              setCurrentSurface('front')
             } else {
               setCurrentSurface('front')
             }
           }
           
           // For multi-surface products, restore surface_elements if available
-          if (canvasData.surface_elements && (canvasData.productType === 'tin' || canvasData.productType === 'tent')) {
+          if (canvasData.surface_elements && (canvasData.productType === 'tin' || canvasData.productType === 'tent' || canvasData.productType === 'sticker')) {
             console.log('🎨 Restoring multi-surface elements from sessionStorage:', canvasData.surface_elements)
             
             // Restore image elements properly for each surface
@@ -3384,6 +3464,7 @@ const BannerEditorNew = () => {
             <option value="banner">🏷️ Banner</option>
             <option value="tin">🗃️ Tin</option>
             <option value="tent">🏕️ Tent</option>
+            <option value="sticker">🏷️ Sticker</option>
           </select>
         </div>
 
@@ -3447,6 +3528,8 @@ const BannerEditorNew = () => {
             productType={productType}
             tinSpecs={tinSpecs}
             onTinSpecsChange={handleTinSpecChange}
+            stickerSpecs={stickerSpecs}
+            onStickerSpecChange={handleStickerSpecChange}
             currentSurface={currentSurface}
             onSurfaceChange={handleSurfaceChange}
             onAvailableSurfacesChange={handleAvailableSurfacesChange}
