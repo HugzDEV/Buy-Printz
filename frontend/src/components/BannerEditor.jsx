@@ -502,6 +502,7 @@ const BannerEditorNew = () => {
         finish: 'matte',
         shape: 'circle',
         size: '3',
+        orientation: 'landscape', // Default orientation for rectangles and ovals
         printingMethod: 'digital',
         waterproof: true,
         uvResistant: true,
@@ -3507,13 +3508,25 @@ const BannerEditorNew = () => {
       if (baseSize) {
         let newSize = { ...baseSize }
         
-        // Adjust canvas size based on shape
+        // Adjust canvas size based on shape and orientation
         if (stickerSpecs.shape === 'rectangle') {
-          // Rectangle: make it 2:1 aspect ratio (landscape)
-          newSize.height = Math.round(baseSize.width / 2)
+          // Rectangle: 2:1 aspect ratio, orientation determines which dimension is longer
+          if (stickerSpecs.orientation === 'landscape') {
+            newSize.height = Math.round(baseSize.width / 2)
+          } else {
+            // Portrait: swap dimensions
+            newSize.width = Math.round(baseSize.width / 2)
+            newSize.height = baseSize.width
+          }
         } else if (stickerSpecs.shape === 'oval') {
-          // Oval: make it 3:2 aspect ratio (landscape)
-          newSize.height = Math.round(baseSize.width * 2 / 3)
+          // Oval: 3:2 aspect ratio, orientation determines which dimension is longer
+          if (stickerSpecs.orientation === 'landscape') {
+            newSize.height = Math.round(baseSize.width * 2 / 3)
+          } else {
+            // Portrait: swap dimensions
+            newSize.width = Math.round(baseSize.width * 2 / 3)
+            newSize.height = baseSize.width
+          }
         } else if (stickerSpecs.shape === 'triangle') {
           // Triangle: keep square for equilateral triangle
           // No change needed
@@ -3539,7 +3552,7 @@ const BannerEditorNew = () => {
         }
       }
     }
-  }, [productType, stickerSpecs?.size, stickerSpecs?.shape]) // Run when productType, size, or shape changes
+  }, [productType, stickerSpecs?.size, stickerSpecs?.shape, stickerSpecs?.orientation]) // Run when productType, size, shape, or orientation changes
 
   // Glass UI Header Component
   const GlassHeader = () => (

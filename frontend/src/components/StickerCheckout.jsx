@@ -155,15 +155,23 @@ const StickerCheckout = () => {
     ]
   }
 
-  // Function to calculate dimensions based on shape and size
-  const calculateStickerDimensions = (size, shape) => {
+  // Function to calculate dimensions based on shape, size, and orientation
+  const calculateStickerDimensions = (size, shape, orientation = 'landscape') => {
     const baseSize = parseInt(size)
     
     switch (shape) {
       case 'rectangle':
-        return `${baseSize}" × ${Math.round(baseSize / 2)}"`
+        if (orientation === 'landscape') {
+          return `${baseSize}" × ${Math.round(baseSize / 2)}"`
+        } else {
+          return `${Math.round(baseSize / 2)}" × ${baseSize}"`
+        }
       case 'oval':
-        return `${baseSize}" × ${Math.round(baseSize * 2 / 3)}"`
+        if (orientation === 'landscape') {
+          return `${baseSize}" × ${Math.round(baseSize * 2 / 3)}"`
+        } else {
+          return `${Math.round(baseSize * 2 / 3)}" × ${baseSize}"`
+        }
       case 'custom':
         return `20" × 20" (17" × 17" printable)`
       case 'circle':
@@ -1041,7 +1049,7 @@ const StickerCheckout = () => {
                       <span className="font-medium text-gray-900">Size</span>
                     </div>
                     <p className="text-lg font-semibold text-gray-800">
-                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape)}
+                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape, stickerOptions.orientation)}
                     </p>
                     <p className="text-sm text-gray-600">Selected in editor</p>
                   </div>
@@ -1383,7 +1391,7 @@ const StickerCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Size:</span>
                     <span className="font-medium">
-                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape)} (Locked)
+                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape, stickerOptions.orientation)} (Locked)
                     </span>
                   </div>
                   
@@ -1553,7 +1561,7 @@ const StickerCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Size:</span>
                     <span className="font-medium">
-                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape)} (Locked)
+                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape, stickerOptions.orientation)} (Locked)
                     </span>
                   </div>
                   

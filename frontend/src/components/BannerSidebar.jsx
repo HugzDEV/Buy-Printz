@@ -1364,6 +1364,21 @@ const BannerSidebar = ({
                     </select>
                   </div>
 
+                  {/* Sticker Orientation - Only for rectangle and oval */}
+                  {(stickerSpecs?.shape === 'rectangle' || stickerSpecs?.shape === 'oval') && (
+                    <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
+                      <div className="text-sm font-medium text-gray-800 mb-3">Orientation</div>
+                      <select 
+                        value={stickerSpecs?.orientation || 'landscape'}
+                        onChange={(e) => onStickerSpecChange?.({...stickerSpecs, orientation: e.target.value})}
+                        className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      >
+                        <option value="landscape">Landscape (Wider)</option>
+                        <option value="portrait">Portrait (Taller)</option>
+                      </select>
+                    </div>
+                  )}
+
                   {/* Sticker Size - Hide for custom shape */}
                   {stickerSpecs?.shape !== 'custom' && (
                     <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
@@ -1870,7 +1885,11 @@ const BannerSidebar = ({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Shape:</span>
-                      <span className="font-medium text-gray-800 capitalize">{stickerSpecs?.shape || 'Circle'}</span>
+                      <span className="font-medium text-gray-800 capitalize">
+                        {stickerSpecs?.shape || 'Circle'}
+                        {(stickerSpecs?.shape === 'rectangle' || stickerSpecs?.shape === 'oval') && 
+                         ` (${stickerSpecs?.orientation || 'landscape'})`}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Size:</span>
