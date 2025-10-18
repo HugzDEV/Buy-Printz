@@ -163,11 +163,14 @@ const BannerCanvas = forwardRef(({
         }
         ctx.closePath()
       } else if (stickerShape === 'custom') {
-        // Custom gang sheet clipping (17" x 17" printable area with 1.5" margins all around)
+        // Custom gang sheet clipping (5% larger than safe zone to show full sheet)
         const margin = 150  // 1.5" at 100 DPI on all sides
+        const clipMargin = Math.round(margin * 0.05)  // 5% of margin (7.5px) to show the safe zone
         
         ctx.beginPath()
-        ctx.rect(margin, margin, canvasSize.width - (margin * 2), canvasSize.height - (margin * 2))
+        ctx.rect(margin - clipMargin, margin - clipMargin, 
+                 canvasSize.width - (margin * 2) + (clipMargin * 2), 
+                 canvasSize.height - (margin * 2) + (clipMargin * 2))
         ctx.closePath()
       } else {
         // Rectangular clipping for square, rectangle

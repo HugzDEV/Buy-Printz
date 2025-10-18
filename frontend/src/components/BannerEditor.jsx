@@ -518,18 +518,34 @@ const BannerEditorNew = () => {
     
     // Handle size changes for stickers
     if (newSpecs.size && productType === 'sticker') {
+      // Special handling for custom gang sheet
+      if (newSpecs.shape === 'custom') {
+        setCanvasSize({ width: 2000, height: 2000 }) // 20" x 20" at 100 DPI
+        setCanvasOrientation('square')
+        return
+      }
+      
       const sizeMap = {
-        '1x1': { width: 100, height: 100 },
-        '2x2': { width: 200, height: 200 },
-        '3x3': { width: 300, height: 300 },
-        '4x4': { width: 400, height: 400 },
-        '5x5': { width: 500, height: 500 },
-        '6x6': { width: 600, height: 600 }
+        '1': { width: 100, height: 100 },
+        '2': { width: 200, height: 200 },
+        '3': { width: 300, height: 300 },
+        '4': { width: 400, height: 400 },
+        '5': { width: 500, height: 500 },
+        '6': { width: 600, height: 600 }
       }
       
       const newSize = sizeMap[newSpecs.size]
       if (newSize) {
         setCanvasSize(newSize)
+        
+        // Set orientation based on dimensions
+        if (newSize.width > newSize.height) {
+          setCanvasOrientation('landscape')
+        } else if (newSize.height > newSize.width) {
+          setCanvasOrientation('portrait')
+        } else {
+          setCanvasOrientation('square')
+        }
       }
     }
   }, [productType])
