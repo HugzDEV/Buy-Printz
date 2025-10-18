@@ -806,5 +806,228 @@ export const stickerTemplates = [
     ],
     canvasSize: { width: 300, height: 150 },
     safeZone: { x: 20, y: 20, width: 260, height: 110 }
+  },
+
+  // Triangle Sticker Templates
+  {
+    id: 'triangle-business-logo',
+    name: 'Business Logo Triangle',
+    description: 'Professional business logo in a triangular format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/triangle-business-logo.jpg',
+    elements: [
+      {
+        id: 'triangle-logo-bg',
+        type: 'triangle',
+        x: 150,
+        y: 50,
+        width: 200,
+        height: 200,
+        fill: '#1e3a8a',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'triangle-logo-text',
+        type: 'text',
+        x: 150,
+        y: 120,
+        text: 'YOUR LOGO',
+        fontSize: 20,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'triangle-contact-info',
+    name: 'Contact Info Triangle',
+    description: 'Contact information in a triangular format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/triangle-contact-info.jpg',
+    elements: [
+      {
+        id: 'triangle-contact-bg',
+        type: 'triangle',
+        x: 150,
+        y: 50,
+        width: 200,
+        height: 200,
+        fill: '#f8fafc',
+        stroke: '#1e3a8a',
+        strokeWidth: 2
+      },
+      {
+        id: 'triangle-contact-name',
+        type: 'text',
+        x: 150,
+        y: 100,
+        text: 'JOHN SMITH',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#1e3a8a',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'triangle-contact-phone',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: '(555) 123-4567',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'triangle-contact-email',
+        type: 'text',
+        x: 150,
+        y: 160,
+        text: 'john@company.com',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'triangle-event-badge',
+    name: 'Event Badge Triangle',
+    description: 'Event badge in a triangular format',
+    category: 'events',
+    thumbnail: '/assets/images/templates/triangle-event-badge.jpg',
+    elements: [
+      {
+        id: 'triangle-event-bg',
+        type: 'triangle',
+        x: 150,
+        y: 50,
+        width: 200,
+        height: 200,
+        fill: '#dc2626',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'triangle-event-text',
+        type: 'text',
+        x: 150,
+        y: 100,
+        text: 'CONFERENCE 2024',
+        fontSize: 18,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'triangle-event-name',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: 'ATTENDEE',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'triangle-warning-label',
+    name: 'Warning Label Triangle',
+    description: 'Warning label in a triangular format',
+    category: 'safety',
+    thumbnail: '/assets/images/templates/triangle-warning-label.jpg',
+    elements: [
+      {
+        id: 'triangle-warning-bg',
+        type: 'triangle',
+        x: 150,
+        y: 50,
+        width: 200,
+        height: 200,
+        fill: '#fef3c7',
+        stroke: '#f59e0b',
+        strokeWidth: 3
+      },
+      {
+        id: 'triangle-warning-icon',
+        type: 'text',
+        x: 150,
+        y: 100,
+        text: '⚠️',
+        fontSize: 20,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#f59e0b',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 40,
+        height: 'auto'
+      },
+      {
+        id: 'triangle-warning-text',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: 'CAUTION',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      },
+      {
+        id: 'triangle-warning-desc',
+        type: 'text',
+        x: 150,
+        y: 160,
+        text: 'HOT SURFACE',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
   }
 ]

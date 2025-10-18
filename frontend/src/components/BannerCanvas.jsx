@@ -93,8 +93,27 @@ const BannerCanvas = forwardRef(({
         ctx.beginPath()
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false)
         ctx.closePath()
+      } else if (stickerShape === 'triangle') {
+        // Triangular clipping for triangle stickers
+        const centerX = canvasSize.width / 2
+        const centerY = canvasSize.height / 2
+        const radius = Math.min(canvasSize.width, canvasSize.height) / 2 - margin
+        
+        ctx.beginPath()
+        // Draw equilateral triangle
+        for (let i = 0; i < 3; i++) {
+          const angle = (i * 2 * Math.PI) / 3 - Math.PI / 2 // Start from top
+          const x = centerX + radius * Math.cos(angle)
+          const y = centerY + radius * Math.sin(angle)
+          if (i === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+        ctx.closePath()
       } else {
-        // Rectangular clipping for square, rectangle, oval, triangle, diamond, custom
+        // Rectangular clipping for square, rectangle, oval, diamond, custom
         const clipX = margin
         const clipY = margin
         const clipWidth = canvasSize.width - (margin * 2)
@@ -2810,8 +2829,39 @@ const BannerCanvas = forwardRef(({
                                 />
                               </>
                             )
+                          } else if (stickerShape === 'triangle') {
+                            // Triangular safe zone for triangle stickers
+                            const centerX = canvasSize.width / 2
+                            const centerY = canvasSize.height / 2
+                            const size = Math.min(canvasSize.width, canvasSize.height) / 2 - margin
+                            
+                            return (
+                              <>
+                                <RegularPolygon
+                                  x={centerX}
+                                  y={centerY}
+                                  sides={3}
+                                  radius={size}
+                                  stroke="#dc2626"
+                                  strokeWidth={2}
+                                  dash={[8, 4]}
+                                  lineCap="round"
+                                  listening={false}
+                                />
+                                <RegularPolygon
+                                  x={centerX}
+                                  y={centerY}
+                                  sides={3}
+                                  radius={size}
+                                  stroke="#dc2626"
+                                  strokeWidth={1}
+                                  dash={[2, 2]}
+                                  listening={false}
+                                />
+                              </>
+                            )
                           } else {
-                            // Rectangular safe zone for square, rectangle, oval, triangle, diamond, custom
+                            // Rectangular safe zone for square, rectangle, oval, diamond, custom
                             return (
                               <>
                                 <Rect
