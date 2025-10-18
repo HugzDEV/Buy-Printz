@@ -646,7 +646,7 @@ const BannerEditorNew = () => {
             uvResistant: true,
             removable: false,
             indoorOutdoor: 'both'
-          })
+      })
     } else {
       setCurrentSurface('front')
       // Initialize banner specs for banner products
@@ -2567,6 +2567,7 @@ const BannerEditorNew = () => {
 
       // Specs
       tent_specs: finalTentSpecs,
+      sticker_specs: productType === 'sticker' ? stickerSpecs : null,
 
       // Sanitize surface elements (remove image objects)
       surface_elements: Object.keys(surfaceElements).reduce((acc, surfaceKey) => {
