@@ -2644,6 +2644,8 @@ const BannerEditorNew = () => {
       navigate('/tin-checkout')
     } else if (orderData.product_type === 'tradeshow_tent') {
       navigate('/tent-checkout') // Future implementation
+    } else if (orderData.product_type === 'custom_sticker') {
+      navigate('/sticker-checkout')
     } else {
     navigate('/checkout')
     }

@@ -16,6 +16,7 @@ import BannerEditor from './components/BannerEditor'
 import Checkout from './components/Checkout'
 import TinCheckout from './components/TinCheckout'
 import TentCheckout from './components/TentCheckout'
+import StickerCheckout from './components/StickerCheckout'
 import OrderConfirmation from './components/OrderConfirmation'
 import TermsOfService from './components/TermsOfService'
 import PrivacyPolicy from './components/PrivacyPolicy'
@@ -314,6 +315,16 @@ function App() {
             <>
               <Header />
               <TentCheckout />
+            </>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/sticker-checkout" element={
+          <ProtectedRoute>
+            <>
+              <Header />
+              <StickerCheckout />
+              <Footer />
             </>
           </ProtectedRoute>
         } />
