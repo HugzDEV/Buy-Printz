@@ -144,15 +144,33 @@ const StickerCheckout = () => {
       { value: 'custom', label: 'Custom Shape', priceModifier: 0.25 }
     ],
     
-    // Size Options (diameter for circles, width for others)
+    // Size Options (base size in inches)
     sizes: [
-      { value: '1x1', label: '1" × 1"', priceModifier: 0.00 },
-      { value: '2x2', label: '2" × 2"', priceModifier: 0.00 },
-      { value: '3x3', label: '3" × 3"', priceModifier: 0.00 },
-      { value: '4x4', label: '4" × 4"', priceModifier: 0.00 },
-      { value: '5x5', label: '5" × 5"', priceModifier: 0.00 },
-      { value: '6x6', label: '6" × 6"', priceModifier: 0.00 }
+      { value: '1', label: '1"', priceModifier: 0.00 },
+      { value: '2', label: '2"', priceModifier: 0.00 },
+      { value: '3', label: '3"', priceModifier: 0.00 },
+      { value: '4', label: '4"', priceModifier: 0.00 },
+      { value: '5', label: '5"', priceModifier: 0.00 },
+      { value: '6', label: '6"', priceModifier: 0.00 }
     ]
+  }
+
+  // Function to calculate dimensions based on shape and size
+  const calculateStickerDimensions = (size, shape) => {
+    const baseSize = parseInt(size)
+    
+    switch (shape) {
+      case 'rectangle':
+        return `${baseSize}" × ${Math.round(baseSize / 2)}"`
+      case 'oval':
+        return `${baseSize}" × ${Math.round(baseSize * 2 / 3)}"`
+      case 'circle':
+      case 'square':
+      case 'triangle':
+      case 'diamond':
+      default:
+        return `${baseSize}" × ${baseSize}"`
+    }
   }
 
   // Sticker Options State - Initialize from order data
@@ -161,7 +179,7 @@ const StickerCheckout = () => {
     material: 'vinyl',
     finish: 'matte',
     shape: 'circle', // Will be overridden from order data
-    size: '3x3', // Will be overridden from order data
+    size: '3', // Will be overridden from order data
     jobName: '',
     showAdvancedOptions: false
   })
@@ -380,7 +398,7 @@ const StickerCheckout = () => {
           material: parsedOrderData.sticker_specs.material || 'vinyl',
           finish: parsedOrderData.sticker_specs.finish || 'matte',
           shape: parsedOrderData.sticker_specs.shape || 'circle',
-          size: parsedOrderData.sticker_specs.size || '3x3'
+          size: parsedOrderData.sticker_specs.size || '3'
         }))
       }
     } catch (error) {
@@ -1020,7 +1038,7 @@ const StickerCheckout = () => {
                       <span className="font-medium text-gray-900">Size</span>
                     </div>
                     <p className="text-lg font-semibold text-gray-800">
-                      {stickerConfig.sizes.find(s => s.value === stickerOptions.size)?.label || '3" × 3"'}
+                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape)}
                     </p>
                     <p className="text-sm text-gray-600">Selected in editor</p>
                   </div>
@@ -1362,7 +1380,7 @@ const StickerCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Size:</span>
                     <span className="font-medium">
-                      {stickerConfig.sizes.find(s => s.value === stickerOptions.size)?.label} (Locked)
+                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape)} (Locked)
                     </span>
                   </div>
                   
@@ -1532,7 +1550,7 @@ const StickerCheckout = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Size:</span>
                     <span className="font-medium">
-                      {stickerConfig.sizes.find(s => s.value === stickerOptions.size)?.label} (Locked)
+                      {calculateStickerDimensions(stickerOptions.size, stickerOptions.shape)} (Locked)
                     </span>
                   </div>
                   

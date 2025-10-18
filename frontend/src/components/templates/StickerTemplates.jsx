@@ -580,5 +580,231 @@ export const stickerTemplates = [
     ],
     canvasSize: { width: 300, height: 300 },
     safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  // Rectangle Sticker Templates
+  {
+    id: 'rectangle-business-logo',
+    name: 'Business Logo Rectangle',
+    description: 'Professional business logo in a horizontal rectangle format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/rectangle-business-logo.jpg',
+    elements: [
+      {
+        id: 'rectangle-logo-bg',
+        type: 'rect',
+        x: 50,
+        y: 100,
+        width: 200,
+        height: 100,
+        fill: '#1e3a8a',
+        stroke: '#ffffff',
+        strokeWidth: 3,
+        cornerRadius: 8
+      },
+      {
+        id: 'rectangle-logo-text',
+        type: 'text',
+        x: 150,
+        y: 150,
+        text: 'YOUR LOGO',
+        fontSize: 24,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 180,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 150 },
+    safeZone: { x: 20, y: 20, width: 260, height: 110 }
+  },
+
+  {
+    id: 'rectangle-contact-info',
+    name: 'Contact Info Rectangle',
+    description: 'Contact information in a horizontal rectangle format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/rectangle-contact-info.jpg',
+    elements: [
+      {
+        id: 'rectangle-contact-bg',
+        type: 'rect',
+        x: 20,
+        y: 20,
+        width: 260,
+        height: 110,
+        fill: '#f8fafc',
+        stroke: '#1e3a8a',
+        strokeWidth: 2,
+        cornerRadius: 6
+      },
+      {
+        id: 'rectangle-contact-name',
+        type: 'text',
+        x: 150,
+        y: 45,
+        text: 'JOHN SMITH',
+        fontSize: 18,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#1e3a8a',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 240,
+        height: 'auto'
+      },
+      {
+        id: 'rectangle-contact-phone',
+        type: 'text',
+        x: 150,
+        y: 70,
+        text: '(555) 123-4567',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 240,
+        height: 'auto'
+      },
+      {
+        id: 'rectangle-contact-email',
+        type: 'text',
+        x: 150,
+        y: 95,
+        text: 'john@company.com',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 240,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 150 },
+    safeZone: { x: 20, y: 20, width: 260, height: 110 }
+  },
+
+  {
+    id: 'rectangle-event-badge',
+    name: 'Event Badge Rectangle',
+    description: 'Event badge in a horizontal rectangle format',
+    category: 'events',
+    thumbnail: '/assets/images/templates/rectangle-event-badge.jpg',
+    elements: [
+      {
+        id: 'rectangle-event-bg',
+        type: 'rect',
+        x: 30,
+        y: 30,
+        width: 240,
+        height: 90,
+        fill: '#dc2626',
+        stroke: '#ffffff',
+        strokeWidth: 3,
+        cornerRadius: 10
+      },
+      {
+        id: 'rectangle-event-text',
+        type: 'text',
+        x: 150,
+        y: 60,
+        text: 'CONFERENCE 2024',
+        fontSize: 20,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 220,
+        height: 'auto'
+      },
+      {
+        id: 'rectangle-event-name',
+        type: 'text',
+        x: 150,
+        y: 90,
+        text: 'ATTENDEE',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 220,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 150 },
+    safeZone: { x: 20, y: 20, width: 260, height: 110 }
+  },
+
+  {
+    id: 'rectangle-warning-label',
+    name: 'Warning Label Rectangle',
+    description: 'Warning label in a horizontal rectangle format',
+    category: 'safety',
+    thumbnail: '/assets/images/templates/rectangle-warning-label.jpg',
+    elements: [
+      {
+        id: 'rectangle-warning-bg',
+        type: 'rect',
+        x: 20,
+        y: 20,
+        width: 260,
+        height: 110,
+        fill: '#fef3c7',
+        stroke: '#f59e0b',
+        strokeWidth: 3,
+        cornerRadius: 8
+      },
+      {
+        id: 'rectangle-warning-icon',
+        type: 'text',
+        x: 50,
+        y: 50,
+        text: '⚠️',
+        fontSize: 24,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#f59e0b',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 40,
+        height: 'auto'
+      },
+      {
+        id: 'rectangle-warning-text',
+        type: 'text',
+        x: 150,
+        y: 50,
+        text: 'CAUTION',
+        fontSize: 18,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 200,
+        height: 'auto'
+      },
+      {
+        id: 'rectangle-warning-desc',
+        type: 'text',
+        x: 150,
+        y: 80,
+        text: 'HOT SURFACE',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 200,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 150 },
+    safeZone: { x: 20, y: 20, width: 260, height: 110 }
   }
 ]

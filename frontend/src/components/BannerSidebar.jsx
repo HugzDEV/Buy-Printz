@@ -1367,16 +1367,16 @@ const BannerSidebar = ({
                   <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3">
                     <div className="text-sm font-medium text-gray-800 mb-3">Size</div>
                     <select 
-                      value={stickerSpecs?.size || '2x2'}
+                      value={stickerSpecs?.size || '3'}
                       onChange={(e) => onStickerSpecChange?.({...stickerSpecs, size: e.target.value})}
                       className="w-full px-3 py-2 bg-white/50 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     >
-                      <option value="1x1">1" x 1"</option>
-                      <option value="2x2">2" x 2"</option>
-                      <option value="3x3">3" x 3"</option>
-                      <option value="4x4">4" x 4"</option>
-                      <option value="5x5">5" x 5"</option>
-                      <option value="6x6">6" x 6"</option>
+                      <option value="1">1"</option>
+                      <option value="2">2"</option>
+                      <option value="3">3"</option>
+                      <option value="4">4"</option>
+                      <option value="5">5"</option>
+                      <option value="6">6"</option>
                     </select>
                   </div>
 
@@ -1871,7 +1871,7 @@ const BannerSidebar = ({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Size:</span>
-                      <span className="font-medium text-gray-800">{stickerSpecs?.size || '2x2'}</span>
+                      <span className="font-medium text-gray-800">{stickerSpecs?.size || '3'}"</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Properties:</span>

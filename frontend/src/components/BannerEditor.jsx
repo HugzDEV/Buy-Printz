@@ -501,7 +501,7 @@ const BannerEditorNew = () => {
         material: 'vinyl',
         finish: 'matte',
         shape: 'circle',
-        size: '3x3',
+        size: '3',
         printingMethod: 'digital',
         waterproof: true,
         uvResistant: true,
@@ -597,12 +597,12 @@ const BannerEditorNew = () => {
             name: 'Custom Sticker',
             defaultSize: { width: 300, height: 300 }, // Circle sticker default - 3x3 most popular
       sizes: [
-        { name: '1" Circle', width: 100, height: 100, orientation: 'square', category: 'small' },
-        { name: '2" Circle', width: 200, height: 200, orientation: 'square', category: 'medium' },
-        { name: '3" Circle', width: 300, height: 300, orientation: 'square', category: 'large' },
-        { name: '4" Circle', width: 400, height: 400, orientation: 'square', category: 'large' },
-        { name: '5" Circle', width: 500, height: 500, orientation: 'square', category: 'large' },
-        { name: '6" Circle', width: 600, height: 600, orientation: 'square', category: 'large' }
+        { name: '1"', width: 100, height: 100, orientation: 'square', category: 'small' },
+        { name: '2"', width: 200, height: 200, orientation: 'square', category: 'medium' },
+        { name: '3"', width: 300, height: 300, orientation: 'square', category: 'large' },
+        { name: '4"', width: 400, height: 400, orientation: 'square', category: 'large' },
+        { name: '5"', width: 500, height: 500, orientation: 'square', category: 'large' },
+        { name: '6"', width: 600, height: 600, orientation: 'square', category: 'large' }
       ],
       description: 'Professional vinyl stickers with custom graphics',
       // Safe zone for circle stickers - circular clipping area
@@ -654,7 +654,7 @@ const BannerEditorNew = () => {
             material: 'vinyl',
             finish: 'matte',
             shape: 'circle',
-            size: '3x3',
+            size: '3',
             printingMethod: 'digital',
             waterproof: true,
             uvResistant: true,
@@ -3248,7 +3248,7 @@ const BannerEditorNew = () => {
               if (orderData.tent_specs) {
                 setTentSpecs(orderData.tent_specs)
                 console.log('🎨 Restored tent specs (fallback):', orderData.tent_specs)
-              }
+            }
               
               // Restore sticker specs if available
               if (orderData.sticker_specs) {
@@ -3477,23 +3477,49 @@ const BannerEditorNew = () => {
 
   // Update canvas size when sticker specs change
   useEffect(() => {
-    if (productType === 'sticker' && stickerSpecs?.size) {
+    if (productType === 'sticker' && stickerSpecs?.size && stickerSpecs?.shape) {
       const sizeMap = {
-        '1x1': { width: 100, height: 100 },
-        '2x2': { width: 200, height: 200 },
-        '3x3': { width: 300, height: 300 },
-        '4x4': { width: 400, height: 400 },
-        '5x5': { width: 500, height: 500 },
-        '6x6': { width: 600, height: 600 }
+        '1': { width: 100, height: 100 },
+        '2': { width: 200, height: 200 },
+        '3': { width: 300, height: 300 },
+        '4': { width: 400, height: 400 },
+        '5': { width: 500, height: 500 },
+        '6': { width: 600, height: 600 }
       }
       
-      const newSize = sizeMap[stickerSpecs.size]
-      if (newSize) {
+      const baseSize = sizeMap[stickerSpecs.size]
+      if (baseSize) {
+        let newSize = { ...baseSize }
+        
+        // Adjust canvas size based on shape
+        if (stickerSpecs.shape === 'rectangle') {
+          // Rectangle: make it 2:1 aspect ratio (landscape)
+          newSize.height = Math.round(baseSize.width / 2)
+        } else if (stickerSpecs.shape === 'oval') {
+          // Oval: make it 3:2 aspect ratio (landscape)
+          newSize.height = Math.round(baseSize.width * 2 / 3)
+        } else if (stickerSpecs.shape === 'triangle') {
+          // Triangle: keep square for equilateral triangle
+          // No change needed
+        } else if (stickerSpecs.shape === 'diamond') {
+          // Diamond: keep square for diamond shape
+          // No change needed
+        }
+        // Circle and square keep the same dimensions
+        
         setCanvasSize(newSize)
-        setCanvasOrientation('square') // Stickers are always square
+        
+        // Set orientation based on final dimensions
+        if (newSize.width > newSize.height) {
+          setCanvasOrientation('landscape')
+        } else if (newSize.height > newSize.width) {
+          setCanvasOrientation('portrait')
+        } else {
+          setCanvasOrientation('square')
+        }
       }
     }
-  }, [productType, stickerSpecs?.size]) // Run when productType or stickerSpecs.size changes
+  }, [productType, stickerSpecs?.size, stickerSpecs?.shape]) // Run when productType, size, or shape changes
 
   // Glass UI Header Component
   const GlassHeader = () => (
