@@ -1475,5 +1475,232 @@ export const stickerTemplates = [
     ],
     canvasSize: { width: 300, height: 300 },
     safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  // Star Sticker Templates
+  {
+    id: 'star-business-logo',
+    name: 'Business Logo Star',
+    description: 'Professional business logo in a star format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/star-business-logo.jpg',
+    elements: [
+      {
+        id: 'star-logo-bg',
+        type: 'star',
+        x: 150,
+        y: 150,
+        numPoints: 5,
+        innerRadius: 40,
+        outerRadius: 80,
+        fill: '#1e3a8a',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'star-logo-text',
+        type: 'text',
+        x: 150,
+        y: 150,
+        text: 'YOUR LOGO',
+        fontSize: 16,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'star-contact-info',
+    name: 'Contact Info Star',
+    description: 'Contact information in a star format',
+    category: 'business',
+    thumbnail: '/assets/images/templates/star-contact-info.jpg',
+    elements: [
+      {
+        id: 'star-contact-bg',
+        type: 'star',
+        x: 150,
+        y: 150,
+        numPoints: 5,
+        innerRadius: 40,
+        outerRadius: 80,
+        fill: '#f8fafc',
+        stroke: '#1e3a8a',
+        strokeWidth: 2
+      },
+      {
+        id: 'star-contact-name',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: 'JOHN SMITH',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#1e3a8a',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      },
+      {
+        id: 'star-contact-phone',
+        type: 'text',
+        x: 150,
+        y: 150,
+        text: '(555) 123-4567',
+        fontSize: 10,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      },
+      {
+        id: 'star-contact-email',
+        type: 'text',
+        x: 150,
+        y: 170,
+        text: 'john@company.com',
+        fontSize: 10,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#374151',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'star-event-badge',
+    name: 'Event Badge Star',
+    description: 'Event badge in a star format',
+    category: 'events',
+    thumbnail: '/assets/images/templates/star-event-badge.jpg',
+    elements: [
+      {
+        id: 'star-event-bg',
+        type: 'star',
+        x: 150,
+        y: 150,
+        numPoints: 5,
+        innerRadius: 40,
+        outerRadius: 80,
+        fill: '#dc2626',
+        stroke: '#ffffff',
+        strokeWidth: 3
+      },
+      {
+        id: 'star-event-text',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: 'CONFERENCE 2024',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      },
+      {
+        id: 'star-event-name',
+        type: 'text',
+        x: 150,
+        y: 170,
+        text: 'ATTENDEE',
+        fontSize: 10,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
+  },
+
+  {
+    id: 'star-warning-label',
+    name: 'Warning Label Star',
+    description: 'Warning label in a star format',
+    category: 'safety',
+    thumbnail: '/assets/images/templates/star-warning-label.jpg',
+    elements: [
+      {
+        id: 'star-warning-bg',
+        type: 'star',
+        x: 150,
+        y: 150,
+        numPoints: 5,
+        innerRadius: 40,
+        outerRadius: 80,
+        fill: '#fef3c7',
+        stroke: '#f59e0b',
+        strokeWidth: 3
+      },
+      {
+        id: 'star-warning-icon',
+        type: 'text',
+        x: 150,
+        y: 130,
+        text: '⚠️',
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#f59e0b',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 40,
+        height: 'auto'
+      },
+      {
+        id: 'star-warning-text',
+        type: 'text',
+        x: 150,
+        y: 150,
+        text: 'CAUTION',
+        fontSize: 12,
+        fontFamily: 'Arial, sans-serif',
+        fontStyle: 'bold',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      },
+      {
+        id: 'star-warning-desc',
+        type: 'text',
+        x: 150,
+        y: 170,
+        text: 'HOT SURFACE',
+        fontSize: 8,
+        fontFamily: 'Arial, sans-serif',
+        fill: '#92400e',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: 120,
+        height: 'auto'
+      }
+    ],
+    canvasSize: { width: 300, height: 300 },
+    safeZone: { x: 30, y: 30, width: 240, height: 240 }
   }
 ]

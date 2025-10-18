@@ -1359,6 +1359,7 @@ const BannerSidebar = ({
                       <option value="oval">Oval</option>
                       <option value="triangle">Triangle</option>
                       <option value="diamond">Diamond</option>
+                      <option value="star">Star</option>
                       <option value="custom">Custom</option>
                     </select>
                   </div>

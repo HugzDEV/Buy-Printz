@@ -141,6 +141,27 @@ const BannerCanvas = forwardRef(({
           }
         }
         ctx.closePath()
+      } else if (stickerShape === 'star') {
+        // Star clipping for star stickers
+        const centerX = canvasSize.width / 2
+        const centerY = canvasSize.height / 2
+        const outerRadius = Math.min(canvasSize.width, canvasSize.height) / 2 - margin
+        const innerRadius = outerRadius * 0.5 // Star inner radius
+        
+        ctx.beginPath()
+        // Draw 5-pointed star
+        for (let i = 0; i < 10; i++) {
+          const angle = (i * Math.PI) / 5 - Math.PI / 2 // Start from top point
+          const radius = i % 2 === 0 ? outerRadius : innerRadius
+          const x = centerX + radius * Math.cos(angle)
+          const y = centerY + radius * Math.sin(angle)
+          if (i === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+        ctx.closePath()
       } else {
         // Rectangular clipping for square, rectangle, custom
         const clipX = margin
@@ -2947,6 +2968,40 @@ const BannerCanvas = forwardRef(({
                                   sides={4}
                                   radius={size}
                                   rotation={Math.PI / 4}
+                                  stroke="#dc2626"
+                                  strokeWidth={1}
+                                  dash={[2, 2]}
+                                  listening={false}
+                                />
+                              </>
+                            )
+                          } else if (stickerShape === 'star') {
+                            // Star safe zone for star stickers
+                            const centerX = canvasSize.width / 2
+                            const centerY = canvasSize.height / 2
+                            const outerRadius = Math.min(canvasSize.width, canvasSize.height) / 2 - margin
+                            const innerRadius = outerRadius * 0.5 // Star inner radius
+                            
+                            return (
+                              <>
+                                <Star
+                                  x={centerX}
+                                  y={centerY}
+                                  numPoints={5}
+                                  innerRadius={innerRadius}
+                                  outerRadius={outerRadius}
+                                  stroke="#dc2626"
+                                  strokeWidth={2}
+                                  dash={[8, 4]}
+                                  lineCap="round"
+                                  listening={false}
+                                />
+                                <Star
+                                  x={centerX}
+                                  y={centerY}
+                                  numPoints={5}
+                                  innerRadius={innerRadius}
+                                  outerRadius={outerRadius}
                                   stroke="#dc2626"
                                   strokeWidth={1}
                                   dash={[2, 2]}
