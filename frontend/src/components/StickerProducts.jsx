@@ -12,7 +12,7 @@ const StickerProducts = () => {
       name: "Standard Shape Stickers",
       price: "$0.25 - $0.50",
       description: "Professional vinyl stickers in 7 standard shapes with die-cut or kiss-cut options. Perfect for branding, events, and promotional use.",
-      image: "/assets/images/standard-shapes-stickers-buyprintz.jpg",
+      image: "/assets/images/sticker_samples/stickers_standard_shapes.jpg",
       features: [
         "7 Standard Shapes: Circle, Square, Rectangle, Oval, Triangle, Diamond, Star",
         "Die-cut or Kiss-cut options",
@@ -69,7 +69,7 @@ const StickerProducts = () => {
       name: "Custom Gang Sheet Stickers",
       price: "$15.00 - $25.00",
       description: "Large 20\" x 20\" gang sheets for custom die-cutting. Perfect for unique shapes, large quantities, and complex designs.",
-      image: "/assets/images/custom-gang-sheet-buyprintz.jpg",
+      image: "/assets/images/sticker_samples/gang_sheet_sample.jpg",
       features: [
         "20\" x 20\" gang sheet with 17\" x 17\" printable area",
         "Custom die-cutting for any shape",
@@ -365,9 +365,16 @@ const StickerProducts = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-primary-800/90 backdrop-blur-sm">
-          <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-white/10 to-transparent"></div>
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src="/assets/images/sticker_samples/printer_backdrop.jpg" 
+            alt="Professional sticker printing equipment"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-600/20 to-primary-800/30 backdrop-blur-sm">
+            <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-white/5 to-transparent"></div>
+          </div>
         </div>
         
         <div className="relative container mx-auto px-4">
