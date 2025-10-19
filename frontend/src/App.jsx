@@ -6,6 +6,7 @@ import AllProducts from './components/AllProducts'
 import Products from './components/Products'
 import TinProducts from './components/TinProducts'
 import TentProducts from './components/TentProducts'
+import TentProductDetail from './components/TentProductDetail'
 import StickerProducts from './components/StickerProducts'
 import StickerProductDetail from './components/StickerProductDetail'
 import ProductDetail from './components/ProductDetail'
@@ -164,6 +165,14 @@ function App() {
           <>
             <Header />
             <TentProducts />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/tent-product/:id" element={
+          <>
+            <Header />
+            <TentProductDetail />
             <Footer />
           </>
         } />

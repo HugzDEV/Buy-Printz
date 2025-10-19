@@ -19,23 +19,87 @@ const TentProducts = () => {
       size: 'canopy-only',
       name: "10x10 Complete Tent (Canopy Only)",
       price: "$325.00 - $599.00",
-      description: "Complete tent package with frame and canopy. Perfect starter option with professional aluminum frame and custom dye sublimated canopy graphics.",
+      description: "The 10x10 Event Tent is the next level in outdoor advertising. Achieve 360 degrees of branding with a custom full fabric dye sub canopy and hardware package. Canopy is printed and sewn weather resistant tent polyester. Print your brand message on each of the four peaks and valance panels.",
       image: "/assets/images/Tent_only-buyprintz.jpg",
-      features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Dye sublimated graphics", "Complete accessories included"],
+      features: [
+        "360° Branding Coverage - Print on all four peaks and valance panels",
+        "Heavy Duty 40mm Aluminum Hex Frame - Extra strength for outdoor exhibitions",
+        "6oz Weatherproof Tent Fabric - 600x600 denier polyester construction",
+        "Dye-Sublimation Graphics - Seam to seam full color printing",
+        "Telescopic Legs - Adjustable height with crank handle operation",
+        "Complete Hardware Package - Ropes, stakes, and carrying bag included"
+      ],
       bestseller: true,
-      specs: {
-        material: "6oz Tent Fabric (600x600 denier)",
-        frame: "40mm Aluminum Hex Hardware",
-        print: "Dye-Sublimation Graphic",
-        durability: "Weather resistant (waterproof coated fabric)",
-        weight: "51 lbs (Full Package)",
-        dimensions: "120\"w x 120\"d x 124.5\"-137\"h"
-      },
+      materials: [
+        {
+          name: "6oz Tent Fabric",
+          description: "600x600 denier polyester with weather resistant coating. Professional-grade fabric designed for outdoor durability and vibrant graphics.",
+          bestFor: "Outdoor events, trade shows, festivals"
+        },
+        {
+          name: "40mm Aluminum Hex Hardware",
+          description: "Heavy duty aluminum frame with 1mm wall thickness. Hex shape provides extra strength compared to steel frames that bend easily.",
+          bestFor: "Long-term outdoor use, windy conditions"
+        }
+      ],
+      printingOptions: [
+        {
+          name: "Dye-Sublimation Graphics",
+          description: "Full color printing with scratch and weather resistance. Waterproof coated fabric ensures graphics stay vibrant outdoors.",
+          bestFor: "High-quality branding, outdoor durability"
+        }
+      ],
+      specifications: [
+        {
+          category: "Size and Weight",
+          details: [
+            "Assembled (shortest): 120\"w x 120\"d x 124.5\"h",
+            "Assembled (tallest): 120\"w x 120\"d x 137\"h", 
+            "Weight: 43 lbs (Hardware) + 8 lbs (Canopy) = 51 lbs total",
+            "Interior lattice expands with crank handle operation"
+          ]
+        },
+        {
+          category: "File Setup Requirements",
+          details: [
+            "Accepted Formats: JPEG or PDF (single page only)",
+            "Color Space: CMYK",
+            "Resolution: 150dpi for raster images",
+            "Max File Size: 300MB",
+            "Submit artwork built to ordered size"
+          ]
+        },
+        {
+          category: "Design Tips",
+          details: [
+            "Do not include crop marks or bleeds",
+            "Convert Pantones/Spot Colors to CMYK",
+            "Convert live fonts to outlines",
+            "Use provided design templates when available"
+          ]
+        }
+      ],
       accessories: [
-        "Standard Carrying Bag (FREE)",
-        "Sandbags (FREE - Sand not included)", 
-        "Ropes & Stakes (FREE)",
-        "Carrying Bag w/ Wheels (Upgrade)"
+        {
+          name: "Standard Carrying Bag",
+          description: "Included with every tent package for easy transport and storage.",
+          price: "FREE"
+        },
+        {
+          name: "Sandbags", 
+          description: "Additional weight for extra stability in windy conditions. Sand not included.",
+          price: "FREE"
+        },
+        {
+          name: "Ropes & Stakes",
+          description: "Complete anchoring system for secure outdoor installation.",
+          price: "FREE"
+        },
+        {
+          name: "Carrying Bag w/ Wheels",
+          description: "Upgraded transport solution with wheels for easier movement.",
+          price: "Upgrade Available"
+        }
       ]
     },
     {
@@ -43,23 +107,87 @@ const TentProducts = () => {
       size: 'with-walls',
       name: "10x10 Complete Tent + Walls",
       price: "$750.00 - $900.00",
-      description: "Complete tent with frame, canopy, and wall options. Enhanced coverage with sidewalls and/or backwall for maximum branding and protection.",
+      description: "Complete tent with frame, canopy, and wall options. Enhanced coverage with sidewalls and/or backwall for maximum branding and protection. Achieve complete 360° branding with custom graphics on canopy and walls.",
       image: "/assets/images/tent_complete-buyprintz.jpg",
-      features: ["Heavy duty aluminum hex frame", "6oz weatherproof fabric", "Canopy + wall graphics", "Complete package with accessories"],
+      features: [
+        "Complete 360° Branding - Canopy + wall graphics for maximum impact",
+        "Heavy Duty 40mm Aluminum Hex Frame - Professional-grade construction",
+        "6oz Weatherproof Tent Fabric - 600x600 denier polyester",
+        "Dye-Sublimation Graphics - Full color printing on all surfaces",
+        "Enhanced Coverage - Sidewalls and/or backwall options",
+        "Complete Package - All accessories and hardware included"
+      ],
       premium: true,
-      specs: {
-        material: "6oz Tent Fabric (600x600 denier)",
-        frame: "40mm Aluminum Hex Hardware",
-        print: "Dye-Sublimation Graphic",
-        durability: "Weather resistant (waterproof coated fabric)",
-        weight: "58-65 lbs (depending on walls)",
-        dimensions: "120\"w x 120\"d x 124.5\"-137\"h with walls"
-      },
+      materials: [
+        {
+          name: "6oz Tent Fabric",
+          description: "600x600 denier polyester with weather resistant coating. Professional-grade fabric for canopy and wall applications.",
+          bestFor: "Complete tent packages, maximum branding coverage"
+        },
+        {
+          name: "40mm Aluminum Hex Hardware",
+          description: "Heavy duty aluminum frame with 1mm wall thickness. Hex shape provides extra strength for complete tent systems.",
+          bestFor: "Full tent packages, enhanced stability"
+        }
+      ],
+      printingOptions: [
+        {
+          name: "Dye-Sublimation Graphics",
+          description: "Full color printing on canopy and walls with scratch and weather resistance. Complete branding solution.",
+          bestFor: "Maximum branding impact, professional appearance"
+        }
+      ],
+      specifications: [
+        {
+          category: "Size and Weight",
+          details: [
+            "Assembled (shortest): 120\"w x 120\"d x 124.5\"h",
+            "Assembled (tallest): 120\"w x 120\"d x 137\"h",
+            "Weight: 58-65 lbs (depending on wall configuration)",
+            "Enhanced interior space with wall options"
+          ]
+        },
+        {
+          category: "Wall Options",
+          details: [
+            "Sidewalls - Left and/or right side coverage",
+            "Backwall - Rear coverage for complete enclosure",
+            "Custom graphics on all wall surfaces",
+            "Same dye-sublimation printing quality"
+          ]
+        },
+        {
+          category: "File Setup Requirements",
+          details: [
+            "Accepted Formats: JPEG or PDF (single page only)",
+            "Color Space: CMYK",
+            "Resolution: 150dpi for raster images",
+            "Max File Size: 300MB",
+            "Submit artwork built to ordered size"
+          ]
+        }
+      ],
       accessories: [
-        "Standard Carrying Bag (FREE)",
-        "Sandbags (FREE - Sand not included)",
-        "Ropes & Stakes (FREE)", 
-        "Carrying Bag w/ Wheels (Upgrade)"
+        {
+          name: "Standard Carrying Bag",
+          description: "Included with every tent package for easy transport and storage.",
+          price: "FREE"
+        },
+        {
+          name: "Sandbags",
+          description: "Additional weight for extra stability in windy conditions. Sand not included.",
+          price: "FREE"
+        },
+        {
+          name: "Ropes & Stakes",
+          description: "Complete anchoring system for secure outdoor installation.",
+          price: "FREE"
+        },
+        {
+          name: "Carrying Bag w/ Wheels",
+          description: "Upgraded transport solution with wheels for easier movement.",
+          price: "Upgrade Available"
+        }
       ]
     }
   ]
@@ -134,7 +262,7 @@ const TentProducts = () => {
             "url": "https://www.buyprintz.com"
           },
           "category": "Tradeshow Equipment > Tents & Canopies",
-          "material": tent.specs.material,
+          "material": "6oz Tent Fabric (600x600 denier)",
           "color": "Custom",
           "offers": {
             "@type": "Offer",
@@ -232,22 +360,22 @@ const TentProducts = () => {
             {
               "@type": "PropertyValue",
               "name": "Frame Material",
-              "value": tent.specs.frame
+              "value": "40mm Aluminum Hex Hardware"
             },
             {
               "@type": "PropertyValue",
               "name": "Print Method",
-              "value": tent.specs.print
+              "value": "Dye-Sublimation Graphics"
             },
             {
               "@type": "PropertyValue",
               "name": "Weight",
-              "value": tent.specs.weight
+              "value": tent.id === 'tent-canopy-only' ? '51 lbs total' : '58-65 lbs'
             },
             {
               "@type": "PropertyValue",
               "name": "Dimensions",
-              "value": tent.specs.dimensions
+              "value": "120\"w x 120\"d x 124.5\"-137\"h"
             },
             {
               "@type": "PropertyValue",
@@ -479,19 +607,21 @@ const TentProducts = () => {
                       </div>
                     </div>
                     
-                    {/* Specifications */}
+                    {/* Quick Specifications */}
                     <div className="mb-6 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50">
-                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Specifications</h4>
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Quick Specs</h4>
                       <div className="text-xs text-gray-600 space-y-1">
-                        <div><strong>Material:</strong> {product.specs.material}</div>
-                        <div><strong>Weight:</strong> {product.specs.weight}</div>
-                        <div><strong>Dimensions:</strong> {product.specs.dimensions}</div>
+                        <div><strong>Material:</strong> 6oz Tent Fabric (600x600 denier)</div>
+                        <div><strong>Frame:</strong> 40mm Aluminum Hex Hardware</div>
+                        <div><strong>Print:</strong> Dye-Sublimation Graphics</div>
+                        <div><strong>Weight:</strong> {product.id === 'tent-canopy-only' ? '51 lbs total' : '58-65 lbs'}</div>
+                        <div><strong>Dimensions:</strong> 120"w x 120"d x 124.5"-137"h</div>
                       </div>
                     </div>
                     
                     <div className="flex gap-2 mt-auto">
                       <Link 
-                        to={`/product/${product.id}`}
+                        to={`/tent-product/${product.id}`}
                         className="flex-1 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                       >
                         View Details
