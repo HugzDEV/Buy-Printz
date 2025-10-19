@@ -29,11 +29,21 @@ const AllProducts = () => {
       name: "Tradeshow Tents",
       price: "From $325.00",
       description: "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
-      image: "/assets/images/tent_complete-buyprintz.jpg",
+      image: "/assets/images/Tent_images/Tent_Tradeshow.jpg",
       link: "/tradeshow-tents",
       badge: "New",
       badgeColor: "bg-purple-500",
       icon: <Layers className="w-8 h-8" />
+    },
+    {
+      name: "Custom Stickers",
+      price: "From $0.25",
+      description: "Professional vinyl stickers in 8 shapes with Roland premium materials. Die-cut, kiss-cut, and custom gang sheets available.",
+      image: "/assets/images/sticker_samples/stickers_standard_shapes.jpg",
+      link: "/stickers",
+      badge: "New",
+      badgeColor: "bg-blue-500",
+      icon: <Sparkles className="w-8 h-8" />
     }
   ]
 
@@ -56,7 +66,7 @@ const AllProducts = () => {
               Our Business Branding Solutions
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-4xl mx-auto drop-shadow-md">
-              Professional banners, premium business card tins, tradeshow tents, and Tin Skinz candy tins - everything you need for complete business branding
+              Professional banners, premium business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins - everything you need for complete business branding
             </p>
           </div>
         </section>
@@ -69,11 +79,11 @@ const AllProducts = () => {
                 Choose Your Product Category
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                From outdoor banners to premium packaging, event displays, and pre-designed candy tins, we have the perfect solution for your business branding needs
+                From outdoor banners to premium packaging, event displays, custom stickers, and pre-designed candy tins, we have the perfect solution for your business branding needs
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 max-w-7xl mx-auto">
               {featuredProducts.map((product, index) => (
                 <div key={index} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[550px]">
                   <div className="relative overflow-hidden rounded-t-3xl">

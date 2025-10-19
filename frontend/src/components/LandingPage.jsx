@@ -28,14 +28,14 @@ const LandingPage = () => {
     }
   ]
 
-  // Showcase our three main services
+  // Showcase our four main services
   const featuredProducts = [
     {
       name: "Vinyl Banners",
       price: "From $1.60/sqft",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
-      features: ["Weather resistant", "Full color printing", "Grommets included"],
+      hoverImage: "/assets/images/banner_assets/banner_image_2.jpg", // Different banner angle
       badge: "Best Seller",
       category: "banner",
       link: "/banner-products"
@@ -45,7 +45,7 @@ const LandingPage = () => {
       price: "From $399.99",
       description: "Premium aluminum tins with custom vinyl stickers - perfect for memorable networking (100 unit minimum)",
       image: "/assets/images/Tins_BC_v2_new%20phone%20number.png",
-      features: ["Premium aluminum", "Custom vinyl stickers", "100 unit minimum"],
+      hoverImage: "/assets/images/Tins_BC_v2_new%20phone%20number.png", // You can add a different tin image here
       badge: "New",
       category: "tin",
       link: "/business-card-tins"
@@ -54,11 +54,21 @@ const LandingPage = () => {
       name: "Tradeshow Tents",
       price: "From $325.00",
       description: "Professional tradeshow tents with custom graphics for maximum event impact (canopy-only option available)",
-      image: "/assets/images/tent_complete-buyprintz.jpg",
-      features: ["10x10 & 10x20 sizes", "Custom graphics", "Canopy-only option"],
+      image: "/assets/images/Tent_images/Tent_Tradeshow.jpg",
+      hoverImage: "/assets/images/Tent_images/tent_mockup_2.jpg", // Different tent angle
       badge: "New",
       category: "tent",
       link: "/tradeshow-tents"
+    },
+    {
+      name: "Custom Stickers",
+      price: "From $0.25",
+      description: "Professional vinyl stickers in 8 shapes with Roland premium materials. Die-cut, kiss-cut, and custom gang sheets available.",
+      image: "/assets/images/sticker_samples/stickers_standard_shapes.jpg",
+      hoverImage: "/assets/images/sticker_samples/gang_sheet_sample.jpg", // Gang sheet on hover
+      badge: "New",
+      category: "sticker",
+      link: "/stickers"
     }
   ]
 
@@ -193,20 +203,34 @@ const LandingPage = () => {
               Our Business Branding Solutions
             </h2>
             <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-              Professional banners, premium business card tins, and tradeshow tents - everything you need for complete business branding
+              Professional banners, premium business card tins, tradeshow tents, and custom stickers - everything you need for complete business branding
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-7xl mx-auto">
             {featuredProducts.map((product, index) => (
-              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[550px]">
+              <div key={index} className="backdrop-blur-md bg-white/20 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/30 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[450px]">
                 <div className="relative overflow-hidden rounded-t-3xl">
+                  {/* Primary Image */}
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className={`w-full h-80 object-cover group-hover:opacity-0 transition-all duration-500 ${
+                      product.category === 'tin' ? 'object-contain bg-gray-100' : ''
+                    }`}
                     onError={(e) => {
                       e.target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&sig=${index}`
+                    }}
+                  />
+                  {/* Hover Image */}
+                  <img 
+                    src={product.hoverImage} 
+                    alt={`${product.name} - Hover view`}
+                    className={`absolute top-0 left-0 w-full h-80 object-cover opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ${
+                      product.category === 'tin' ? 'object-contain bg-gray-100' : ''
+                    }`}
+                    onError={(e) => {
+                      e.target.src = product.image // Fallback to primary image
                     }}
                   />
                   <div className="absolute top-3 right-3 flex flex-col gap-2">
@@ -233,24 +257,9 @@ const LandingPage = () => {
                     {product.price}
                   </div>
                   
-                  <p className="text-white/80 mb-4 leading-relaxed text-base">
+                  <p className="text-white/80 mb-6 leading-relaxed text-base flex-grow">
                     {product.description}
                   </p>
-                  
-                  {/* Features */}
-                  <div className="mb-6 flex-grow">
-                    <div className="flex flex-wrap gap-2">
-                      {product.features.map((feature, featureIndex) => (
-                        <span 
-                          key={featureIndex}
-                          className="backdrop-blur-sm bg-white/20 border border-white/30 inline-flex items-center text-white text-xs px-3 py-1.5 rounded-full"
-                        >
-                          <CheckCircle className="w-3 h-3 mr-1 text-buyprint-brand" />
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
                   
                   <Link 
                     to={product.link} 
