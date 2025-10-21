@@ -1019,6 +1019,15 @@ const StickerCheckout = () => {
                   <Package className="w-4 h-4 text-blue-600" />
                   Quantity
                 </h4>
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">Pricing includes all surcharges</p>
+                      <p>Final pricing with size, material, and finish surcharges is shown in the order summary on the right.</p>
+                    </div>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {stickerConfig.quantities.map((option) => (
                     <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 active:scale-95 cursor-pointer transition-all duration-200 transform hover:scale-105 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2">
@@ -1032,7 +1041,6 @@ const StickerCheckout = () => {
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{option.label}</p>
-                        <p className="text-sm text-green-600 font-medium">${option.basePrice}</p>
                       </div>
                     </label>
                   ))}
@@ -1614,6 +1622,15 @@ const StickerCheckout = () => {
                   <ShoppingCart className="w-5 h-5" />
                   Order Summary
                 </h3>
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-green-800">
+                      <p className="font-medium mb-1">Final pricing with all surcharges</p>
+                      <p>Includes size, material, finish, and quantity-based pricing.</p>
+                    </div>
+                  </div>
+                </div>
                 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
