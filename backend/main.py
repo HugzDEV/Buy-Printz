@@ -84,6 +84,15 @@ except ImportError as e:
     BUSINESS_CARD_TIN_API_AVAILABLE = False
     print(f"❌ Business Card Tin API failed to load: {e}")
 
+# Import Sticker Pricing API routes
+try:
+    from backend.sticker_pricing_api import router as sticker_pricing_router
+    STICKER_PRICING_API_AVAILABLE = True
+    print("✅ Sticker Pricing API loaded successfully")
+except ImportError as e:
+    STICKER_PRICING_API_AVAILABLE = False
+    print(f"❌ Sticker Pricing API failed to load: {e}")
+
 # Simple in-memory cache
 class SimpleCache:
     def __init__(self, default_ttl=300):  # 5 minutes default
@@ -263,6 +272,13 @@ if BUSINESS_CARD_TIN_API_AVAILABLE:
     logger.info("Business Card Tin API routes loaded successfully")
 else:
     logger.warning("Business Card Tin API routes not available")
+
+# Include Sticker Pricing API routes if available
+if STICKER_PRICING_API_AVAILABLE:
+    app.include_router(sticker_pricing_router)
+    logger.info("Sticker Pricing API routes loaded successfully")
+else:
+    logger.warning("Sticker Pricing API routes not available")
 
 # Note: Static file serving removed - using Supabase Storage for all file uploads
 # This ensures cloud-based persistence and eliminates Railway container restart issues

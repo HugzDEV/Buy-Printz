@@ -90,69 +90,118 @@ const StickerCheckout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
   
-  // Sticker Configuration - Based on sticker specifications
-  const stickerConfig = {
-    // Quantity Options
-    quantities: [
-      { value: 50, label: '50 Stickers', basePrice: 29.99 },
-      { value: 100, label: '100 Stickers', basePrice: 49.99 },
-      { value: 250, label: '250 Stickers', basePrice: 99.99 },
-      { value: 500, label: '500 Stickers', basePrice: 179.99 },
-      { value: 1000, label: '1000 Stickers', basePrice: 299.99 }
-    ],
-    
-    // Material Options
-    materials: [
-      { value: 'vinyl', label: 'Vinyl', priceModifier: 0.00, description: 'Standard vinyl stickers' },
-      { value: 'paper', label: 'Paper', priceModifier: -0.10, description: 'Paper stickers (indoor use)' },
-      { value: 'clear', label: 'Clear Vinyl', priceModifier: 0.15, description: 'Transparent vinyl stickers' }
-    ],
-    
-    // Finish Options
-    finishes: [
-      { 
-        value: 'matte', 
-        label: 'Matte Finish', 
-        priceModifier: 0.00, 
-        description: 'Indoor/outdoor use',
-        properties: { waterproof: false, uvResistant: false, removable: false }
-      },
-      { 
-        value: 'glossy', 
-        label: 'Glossy Finish', 
-        priceModifier: 0.05, 
-        description: 'Waterproof, UV resistant, permanent',
-        properties: { waterproof: true, uvResistant: true, removable: false }
-      },
-      { 
-        value: 'satin', 
-        label: 'Satin Finish', 
-        priceModifier: 0.03, 
-        description: 'Semi-gloss finish',
-        properties: { waterproof: false, uvResistant: false, removable: false }
-      }
-    ],
-    
-    // Shape Options
-    shapes: [
-      { value: 'circle', label: 'Circle', priceModifier: 0.00 },
-      { value: 'square', label: 'Square', priceModifier: 0.00 },
-      { value: 'rectangle', label: 'Rectangle', priceModifier: 0.00 },
-      { value: 'oval', label: 'Oval', priceModifier: 0.00 },
-      { value: 'triangle', label: 'Triangle', priceModifier: 0.00 },
-      { value: 'diamond', label: 'Diamond', priceModifier: 0.00 },
-      { value: 'custom', label: 'Custom Shape', priceModifier: 0.25 }
-    ],
-    
-    // Size Options (base size in inches)
-    sizes: [
-      { value: '1', label: '1"', priceModifier: 0.00 },
-      { value: '2', label: '2"', priceModifier: 0.00 },
-      { value: '3', label: '3"', priceModifier: 0.00 },
-      { value: '4', label: '4"', priceModifier: 0.00 },
-      { value: '5', label: '5"', priceModifier: 0.00 },
-      { value: '6', label: '6"', priceModifier: 0.00 }
-    ]
+  // Sticker Configuration - Will be loaded from database
+  const [stickerConfig, setStickerConfig] = useState({
+    quantities: [],
+    materials: [],
+    finishes: [],
+    shapes: [],
+    sizes: []
+  })
+  
+  // Loading state for configuration
+  const [configLoading, setConfigLoading] = useState(true)
+
+  // Load sticker configuration from database
+  const loadStickerConfig = async () => {
+    try {
+      setConfigLoading(true)
+      
+      // Load all configuration data in parallel
+      const [quantitiesRes, materialsRes, finishesRes, shapesRes, sizesRes] = await Promise.all([
+        authService.authenticatedRequest('/api/stickers/quantity-tiers'),
+        authService.authenticatedRequest('/api/stickers/materials'),
+        authService.authenticatedRequest('/api/stickers/finishes'),
+        authService.authenticatedRequest('/api/stickers/shapes'),
+        authService.authenticatedRequest('/api/stickers/sizes')
+      ])
+      
+      const quantities = quantitiesRes.ok ? await quantitiesRes.json() : []
+      const materials = materialsRes.ok ? await materialsRes.json() : []
+      const finishes = finishesRes.ok ? await finishesRes.json() : []
+      const shapes = shapesRes.ok ? await shapesRes.json() : []
+      const sizes = sizesRes.ok ? await sizesRes.json() : []
+      
+      // Transform data to match frontend format
+      setStickerConfig({
+        quantities: quantities.map(q => ({
+          value: q.quantity,
+          label: `${q.quantity} Stickers`,
+          basePrice: parseFloat(q.base_price)
+        })),
+        materials: materials.map(m => ({
+          value: m.material_code,
+          label: m.name,
+          priceModifier: parseFloat(m.price_modifier),
+          description: m.description,
+          durability_months: m.durability_months,
+          indoor_outdoor: m.indoor_outdoor
+        })),
+        finishes: finishes.map(f => ({
+          value: f.finish_code,
+          label: f.name,
+          priceModifier: parseFloat(f.price_modifier),
+          description: f.description,
+          properties: f.properties
+        })),
+        shapes: shapes.map(s => ({
+          value: s.shape_code,
+          label: s.name,
+          priceModifier: parseFloat(s.price_modifier),
+          supports_orientation: s.supports_orientation
+        })),
+        sizes: sizes.map(s => ({
+          value: s.size_code,
+          label: s.name,
+          baseSizeInches: parseFloat(s.base_size_inches),
+          priceModifier: parseFloat(s.price_modifier)
+        }))
+      })
+      
+    } catch (error) {
+      console.error('Failed to load sticker configuration:', error)
+      // Fallback to default configuration
+      setStickerConfig({
+        quantities: [
+          { value: 50, label: '50 Stickers', basePrice: 29.99 },
+          { value: 100, label: '100 Stickers', basePrice: 49.99 },
+          { value: 250, label: '250 Stickers', basePrice: 99.99 },
+          { value: 500, label: '500 Stickers', basePrice: 179.99 },
+          { value: 1000, label: '1000 Stickers', basePrice: 299.99 }
+        ],
+        materials: [
+          { value: 'vinyl', label: 'Vinyl', priceModifier: 0.00, description: 'Standard vinyl stickers' },
+          { value: 'paper', label: 'Paper', priceModifier: -0.10, description: 'Paper stickers (indoor use)' },
+          { value: 'clear-vinyl', label: 'Clear Vinyl', priceModifier: 0.15, description: 'Transparent vinyl stickers' }
+        ],
+        finishes: [
+          { value: 'matte', label: 'Matte Finish', priceModifier: 0.00, description: 'Indoor/outdoor use' },
+          { value: 'glossy', label: 'Glossy Finish', priceModifier: 0.05, description: 'Waterproof, UV resistant, permanent' },
+          { value: 'satin', label: 'Satin Finish', priceModifier: 0.03, description: 'Semi-gloss finish' }
+        ],
+        shapes: [
+          { value: 'circle', label: 'Circle', priceModifier: 0.00, supports_orientation: false },
+          { value: 'square', label: 'Square', priceModifier: 0.00, supports_orientation: false },
+          { value: 'rectangle', label: 'Rectangle', priceModifier: 0.00, supports_orientation: true },
+          { value: 'oval', label: 'Oval', priceModifier: 0.00, supports_orientation: true },
+          { value: 'triangle', label: 'Triangle', priceModifier: 0.00, supports_orientation: false },
+          { value: 'diamond', label: 'Diamond', priceModifier: 0.00, supports_orientation: false },
+          { value: 'star', label: 'Star', priceModifier: 0.00, supports_orientation: false },
+          { value: 'custom', label: 'Custom Shape', priceModifier: 0.25, supports_orientation: false }
+        ],
+        sizes: [
+          { value: '1', label: '1"', baseSizeInches: 1.00, priceModifier: 0.00 },
+          { value: '2', label: '2"', baseSizeInches: 2.00, priceModifier: 0.00 },
+          { value: '3', label: '3"', baseSizeInches: 3.00, priceModifier: 0.00 },
+          { value: '4', label: '4"', baseSizeInches: 4.00, priceModifier: 0.00 },
+          { value: '5', label: '5"', baseSizeInches: 5.00, priceModifier: 0.00 },
+          { value: '6', label: '6"', baseSizeInches: 6.00, priceModifier: 0.00 },
+          { value: 'custom', label: 'Custom Gang Sheet', baseSizeInches: 20.00, priceModifier: 0.00 }
+        ]
+      })
+    } finally {
+      setConfigLoading(false)
+    }
   }
 
   // Function to calculate dimensions based on shape, size, and orientation
@@ -350,45 +399,60 @@ const StickerCheckout = () => {
     }
   }
 
-  // Calculate sticker pricing
-  const calculateStickerPrice = () => {
-    const baseQuantity = stickerConfig.quantities.find(q => q.value === stickerOptions.quantity)
-    const material = stickerConfig.materials.find(m => m.value === stickerOptions.material)
-    const finish = stickerConfig.finishes.find(f => f.value === stickerOptions.finish)
-    const shape = stickerConfig.shapes.find(s => s.value === stickerOptions.shape)
-    const size = stickerConfig.sizes.find(s => s.value === stickerOptions.size)
-    
-    if (!baseQuantity || !material || !finish || !shape || !size) {
+  // Calculate sticker pricing using database API
+  const [pricingData, setPricingData] = useState(null)
+  const [pricingLoading, setPricingLoading] = useState(false)
+  
+  const calculateStickerPrice = async () => {
+    if (!stickerOptions.quantity || !stickerOptions.material || !stickerOptions.finish || !stickerOptions.shape || !stickerOptions.size) {
       return 0
     }
     
-    let totalPrice = baseQuantity.basePrice
-    
-    // Add material modifier (per unit)
-    totalPrice += (material.priceModifier * stickerOptions.quantity)
-    
-    // Add finish modifier (per unit)
-    totalPrice += (finish.priceModifier * stickerOptions.quantity)
-    
-    // Add shape modifier (per unit)
-    totalPrice += (shape.priceModifier * stickerOptions.quantity)
-    
-    return totalPrice
+    try {
+      setPricingLoading(true)
+      
+      const response = await authService.authenticatedRequest('/api/stickers/pricing', {
+        method: 'POST',
+        body: JSON.stringify({
+          quantity: stickerOptions.quantity,
+          material_code: stickerOptions.material,
+          finish_code: stickerOptions.finish,
+          shape_code: stickerOptions.shape,
+          size_code: stickerOptions.size
+        })
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setPricingData(data)
+        return data.subtotal
+      } else {
+        console.error('Failed to calculate pricing')
+        return 0
+      }
+    } catch (error) {
+      console.error('Error calculating pricing:', error)
+      return 0
+    } finally {
+      setPricingLoading(false)
+    }
   }
   
-  const stickerBasePrice = calculateStickerPrice()
+  // Use pricing data from API or fallback to 0
+  const stickerBasePrice = pricingData?.subtotal || 0
   const shippingCost = shippingOptions.find(opt => opt.type === shippingOption)?.cost || 0
   
   // Calculate marketplace template costs
   const marketplaceCost = orderData?.marketplace_templates ? 
     orderData.marketplace_templates.reduce((total, template) => total + (template.price || 0), 0) : 0
   
-  // Calculate tax (MA 6.25%)
-  const subtotal = stickerBasePrice + marketplaceCost
-  const taxRate = 0.0625
-  const taxAmount = subtotal * taxRate
+  // Calculate tax (MA 6.25%) - use API pricing data if available
+  const subtotal = pricingData ? pricingData.subtotal + marketplaceCost : stickerBasePrice + marketplaceCost
+  const taxAmount = pricingData ? pricingData.tax_amount : (subtotal * 0.0625)
   
-  const totalAmount = Math.round((subtotal + taxAmount + shippingCost) * 100) / 100
+  const totalAmount = pricingData ? 
+    Math.round((pricingData.total_amount + marketplaceCost + shippingCost) * 100) / 100 :
+    Math.round((subtotal + taxAmount + shippingCost) * 100) / 100
 
   useEffect(() => {
     const savedOrderData = sessionStorage.getItem('orderData')
@@ -444,6 +508,18 @@ const StickerCheckout = () => {
     
     checkAuth()
   }, [navigate])
+
+  // Load sticker configuration on component mount
+  useEffect(() => {
+    loadStickerConfig()
+  }, [])
+
+  // Recalculate pricing when sticker options change
+  useEffect(() => {
+    if (stickerOptions.quantity && stickerOptions.material && stickerOptions.finish && stickerOptions.shape && stickerOptions.size) {
+      calculateStickerPrice()
+    }
+  }, [stickerOptions.quantity, stickerOptions.material, stickerOptions.finish, stickerOptions.shape, stickerOptions.size])
 
   // Get shipping rates when customer info or sticker options change
   useEffect(() => {
@@ -786,6 +862,18 @@ const StickerCheckout = () => {
         <div className="backdrop-blur-xl bg-white/20 rounded-2xl p-8 border border-white/30 shadow-xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
         </div>
+      </div>
+    )
+  }
+
+  if (configLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <GlassCard className="max-w-md w-full p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Loading Sticker Options</h2>
+          <p className="text-gray-600">Please wait while we load the latest pricing and options...</p>
+        </GlassCard>
       </div>
     )
   }
