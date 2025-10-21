@@ -1,5 +1,2 @@
-# Netlify and other static hosting fallback
+# Railway hosting - SPA fallback
 /*    /index.html   200
-
-# API routes should not be rewritten (if using Netlify Functions)
-/api/*  /api/:splat  200
