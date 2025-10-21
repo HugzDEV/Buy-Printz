@@ -265,7 +265,11 @@ const LandingPage = () => {
                     to={product.link} 
                     className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 border border-green-500 hover:border-green-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
                   >
-                    View Products
+                    {product.category === 'banner' ? 'View Banner Products' :
+                     product.category === 'tin' ? 'View Tin Products' :
+                     product.category === 'tent' ? 'View Tent Products' :
+                     product.category === 'sticker' ? 'View Sticker Products' :
+                     'View Products'}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
