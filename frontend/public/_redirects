@@ -1,2 +1,6 @@
-# Railway hosting - SPA fallback
+# Vercel redirects - Force www subdomain for SEO consistency
+https://buyprintz.com/*  https://www.buyprintz.com/:splat  301
+http://buyprintz.com/*   https://www.buyprintz.com/:splat  301
+
+# Vercel SPA fallback
 /*    /index.html   200
