@@ -1,9 +1,9 @@
 import { Helmet } from 'react-helmet-async'
 
 const SEOHead = ({ 
-  title = "BuyPrintz - Business Card Tins, Tradeshow Tents & Banner Printing | 2-3 Day Delivery",
-  description = "Premium Business Card Tins, professional Tradeshow Tents, and custom banner printing with lightning-fast 2-3 business day delivery. Revolutionary networking tools and trade show displays.",
-  keywords = "business card tins, business cards, custom business cards, tradeshow tents, banner printing, custom tins, trade show displays, networking tools, promotional products, business card printing, fast printing",
+  title = "BuyPrintz - Business Cards, Stickers, Banners & Tents | Custom Printing | 2-3 Day Delivery",
+  description = "Professional business cards, custom vinyl stickers, banners, and tradeshow tents with lightning-fast 2-3 business day delivery. Online design tool with blind dropshipping available.",
+  keywords = "business cards, custom business cards, business card printing, business card design, vinyl stickers, custom stickers, sticker printing, vinyl decals, banners, custom banners, banner printing, vinyl banners, tents, tradeshow tents, canopy tents, pop-up tents, trade show displays, professional printing, same day printing, fast printing, custom printing, print on demand, online design tool, canvas editor, blind dropshipping, business branding, promotional products, marketing materials, networking tools, professional services, fast delivery, next day shipping",
   image = "https://buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png",
   url = "https://buyprintz.com",
   type = "website",
@@ -62,16 +62,16 @@ const SEOHead = ({
 // Predefined SEO configurations for different pages
 export const seoConfigs = {
   home: {
-    title: "BuyPrintz - Business Card Tins, Tradeshow Tents & Banner Printing | 2-3 Day Delivery",
-    description: "Revolutionary Business Card Tins with fresh mints, professional Tradeshow Tents, and custom banner printing with lightning-fast 2-3 business day delivery. Premium networking tools and trade show displays.",
-    keywords: "business card tins, business cards, custom business cards, tradeshow tents, banner printing, custom tins, trade show displays, networking tools, promotional products, business card printing, business card design, business card templates, fresh mints, aluminum tins, fast printing",
+    title: "BuyPrintz - Business Cards, Stickers, Banners & Tents | Custom Printing | 2-3 Day Delivery",
+    description: "Professional business cards, custom vinyl stickers, banners, and tradeshow tents with lightning-fast 2-3 business day delivery. Online design tool with blind dropshipping available.",
+    keywords: "business cards, custom business cards, business card printing, business card design, vinyl stickers, custom stickers, sticker printing, vinyl decals, banners, custom banners, banner printing, vinyl banners, tents, tradeshow tents, canopy tents, pop-up tents, trade show displays, professional printing, same day printing, fast printing, custom printing, print on demand, online design tool, canvas editor, blind dropshipping, business branding, promotional products, marketing materials, networking tools, professional services, fast delivery, next day shipping",
     url: "https://www.buyprintz.com"
   },
   
   products: {
-    title: "All Products - Business Card Tins, Tradeshow Tents & Banners | BuyPrintz",
-    description: "Browse our complete catalog: Revolutionary Business Card Tins, professional Tradeshow Tents, and custom banner printing. Premium networking tools and trade show displays with fast 2-3 day delivery.",
-    keywords: "business card tins, business cards, custom business cards, tradeshow tents, banner products, custom tins, trade show displays, networking tools, promotional products, business card printing, business card design, aluminum tins, fast printing",
+    title: "All Products - Business Cards, Stickers, Banners & Tents | BuyPrintz",
+    description: "Browse our complete catalog: Professional business cards, custom vinyl stickers, banners, and tradeshow tents. Premium printing services with fast 2-3 day delivery.",
+    keywords: "business cards, custom business cards, business card printing, business card design, vinyl stickers, custom stickers, sticker printing, vinyl decals, banners, custom banners, banner printing, vinyl banners, tents, tradeshow tents, canopy tents, pop-up tents, trade show displays, professional printing, same day printing, fast printing, custom printing, print on demand, online design tool, canvas editor, blind dropshipping, business branding, promotional products, marketing materials, networking tools, professional services, fast delivery, next day shipping",
     url: "https://www.buyprintz.com/products"
   },
   
@@ -83,16 +83,16 @@ export const seoConfigs = {
   },
   
   tradeshowTents: {
-    title: "Tradeshow Tents - Custom Pop-Up Displays | BuyPrintz",
-    description: "Professional tradeshow tents and pop-up displays for trade shows, events, and exhibitions. Custom graphics, durable construction, and easy setup. Perfect for trade shows, farmers markets, and outdoor events.",
-    keywords: "tradeshow tents, pop-up displays, trade show booths, custom tents, exhibition displays, event tents, trade show marketing, pop-up tents",
+    title: "Tradeshow Tents - Custom Canopy Tents & Pop-Up Displays | BuyPrintz",
+    description: "Professional tradeshow tents, canopy tents, and pop-up displays for trade shows, events, and exhibitions. Custom graphics, durable construction, and easy setup. Perfect for trade shows, farmers markets, and outdoor events.",
+    keywords: "tradeshow tents, canopy tents, pop-up displays, trade show booths, custom tents, exhibition displays, event tents, trade show marketing, pop-up tents, canopy, tradeshow, trade show, exhibition tents, custom canopy, professional tents, event displays, outdoor tents, trade show displays, exhibition booths, custom canopy tents, professional canopy, tradeshow canopy, trade show canopy, event canopy, outdoor canopy, custom pop-up tents, professional pop-up displays, trade show graphics, exhibition graphics, custom tent graphics, professional tent printing, tradeshow printing, trade show printing, canopy printing, tent printing, fast tent delivery, same day tent printing",
     url: "https://www.buyprintz.com/tradeshow-tents"
   },
   
   stickers: {
-    title: "Custom Stickers - Vinyl Stickers & Decals | BuyPrintz",
-    description: "Professional custom stickers and vinyl decals. Weather-resistant, durable stickers for business, events, and personal use. Fast 2-3 day delivery.",
-    keywords: "custom stickers, vinyl stickers, decals, custom decals, sticker printing, vinyl decals, business stickers, promotional stickers",
+    title: "Custom Stickers - Vinyl Stickers, Decals & Sticker Printing | BuyPrintz",
+    description: "Professional custom vinyl stickers, decals, and sticker printing. Weather-resistant, durable stickers for business, events, and personal use. 8 shapes, Roland premium materials, die-cut and kiss-cut options. Fast 2-3 day delivery.",
+    keywords: "custom stickers, vinyl stickers, sticker printing, vinyl decals, custom decals, die cut stickers, kiss cut stickers, gang sheet stickers, roland premium vinyl, sticker design, business stickers, promotional stickers, custom sticker printing, vinyl sticker printing, professional stickers, weather resistant stickers, durable stickers, custom decal printing, vinyl decal printing, sticker shapes, custom sticker shapes, professional sticker printing, fast sticker delivery, same day sticker printing",
     url: "https://www.buyprintz.com/stickers"
   },
   
