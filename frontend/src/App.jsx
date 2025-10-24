@@ -41,6 +41,8 @@ import TinSkinzDemo from './components/TinSkinzDemo'
 import TinSkinzCheckout from './components/TinSkinzCheckout'
 import TinSkinzSuccess from './components/TinSkinzSuccess'
 import CreatorProfile from './components/CreatorProfile'
+import ZodiacTinSkinz from './components/ZodiacTinSkinz'
+import ZodiacSignPage from './components/ZodiacSignPage'
 import authService from './services/auth'
 
 // Protected Route Component with Optimized Mobile Handling
@@ -229,6 +231,22 @@ function App() {
           <>
             <Header />
             <TinSkinzMarketplace />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/zodiac-tin-skinz" element={
+          <>
+            <Header />
+            <ZodiacTinSkinz />
+            <Footer />
+          </>
+        } />
+        
+        <Route path="/zodiac-tin-skinz/:sign" element={
+          <>
+            <Header />
+            <ZodiacSignPage />
             <Footer />
           </>
         } />

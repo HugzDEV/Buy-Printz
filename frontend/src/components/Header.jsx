@@ -53,7 +53,13 @@ const Header = () => {
     { name: 'Business Card Tins', href: '/business-card-tins' },
     { name: 'Tradeshow Tents', href: '/tradeshow-tents' },
     { name: 'Custom Stickers', href: '/stickers' },
-    { name: 'Tin Skinz', href: '/tin-skinz' }
+    { 
+      name: 'Tin Skinz', 
+      href: '/tin-skinz',
+      submenu: [
+        { name: 'Zodiac Tin Skinz', href: '/zodiac-tin-skinz' }
+      ]
+    }
   ]
 
   const navigation = [
@@ -115,16 +121,27 @@ const Header = () => {
               </button>
               
               {productDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                   {productOptions.map((option) => (
-                    <Link
-                      key={option.name}
-                      to={option.href}
-                      onClick={() => setProductDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      {option.name}
-                    </Link>
+                    <div key={option.name}>
+                      <Link
+                        to={option.href}
+                        onClick={() => setProductDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        {option.name}
+                      </Link>
+                      {option.submenu && option.submenu.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          to={subItem.href}
+                          onClick={() => setProductDropdownOpen(false)}
+                          className="block px-4 py-2 pl-8 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
                   ))}
                 </div>
               )}
@@ -205,18 +222,33 @@ const Header = () => {
               <div className="pt-2 border-t border-blue-600">
                 <div className="text-sm font-semibold text-gray-300 mb-2 px-2">Products</div>
                 {productOptions.map((option) => (
-                  <Link
-                    key={option.name}
-                    to={option.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`block text-sm font-medium transition-colors ml-4 py-1 ${
-                      location.pathname === option.href
-                        ? 'text-white font-semibold'
-                        : 'text-gray-300 hover:text-white'
-                    }`}
-                  >
-                    {option.name}
-                  </Link>
+                  <div key={option.name}>
+                    <Link
+                      to={option.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`block text-sm font-medium transition-colors ml-4 py-1 ${
+                        location.pathname === option.href
+                          ? 'text-white font-semibold'
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      {option.name}
+                    </Link>
+                    {option.submenu && option.submenu.map((subItem) => (
+                      <Link
+                        key={subItem.name}
+                        to={subItem.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`block text-xs font-medium transition-colors ml-8 py-1 ${
+                          location.pathname === subItem.href
+                            ? 'text-white font-semibold'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {subItem.name}
+                      </Link>
+                    ))}
+                  </div>
                 ))}
               </div>
               

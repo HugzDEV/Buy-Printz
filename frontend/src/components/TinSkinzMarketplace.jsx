@@ -404,7 +404,7 @@ const candyOptions = [
 
 const TinSkinzMarketplace = () => {
   const [searchParams] = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState('abstract-art');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'abstract-art');
   const [selectedDesigns, setSelectedDesigns] = useState({}); // { designId: { design, quantity, candyId, customMessage } }
   const [selectedDesign, setSelectedDesign] = useState(null); // For live preview
   const [isLoading, setIsLoading] = useState(false);
