@@ -236,65 +236,65 @@ const ZodiacTinSkinz = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-90"></div>
-        <div className="relative max-w-7xl mx-auto px-4 py-20">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
+        <div className="relative max-w-7xl mx-auto px-4 py-8 md:py-16 lg:py-20">
+          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
             {/* Left Content */}
             <div className="lg:w-1/2 text-center lg:text-left">
-              <div className="flex items-center gap-4 mb-6 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row items-center gap-3 mb-4 justify-center lg:justify-start">
                 <img
                   src="/assets/tin-skinz/Tin Skinz_logo_full color_Secondary logo.png"
                   alt="Tin Skinz Logo"
-                  className="h-20 w-auto"
+                  className="h-12 sm:h-16 lg:h-20 w-auto"
                 />
-                <h1 className="text-4xl md:text-5xl font-bold text-white">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white">
                   Zodiac Collection
                 </h1>
               </div>
-              <p className="text-xl text-white/90 mb-8">
+              <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-4 lg:mb-6">
                 Personalized astrology tins featuring all 12 zodiac signs. Perfect for birthday gifts, 
                 party favors, and stocking stuffers that celebrate the stars.
               </p>
               
               {/* Feature Grid */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Gift className="w-5 h-5 text-white" />
-                    <p className="text-white/80 text-sm font-semibold">Perfect Gifts</p>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 mb-4 lg:mb-6">
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                    <Gift className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    <p className="text-white/80 text-xs sm:text-sm font-semibold">Perfect Gifts</p>
                   </div>
-                  <p className="text-white text-sm">Birthday & party favors</p>
+                  <p className="text-white text-xs sm:text-sm">Birthday & party favors</p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="w-5 h-5 text-white" />
-                    <p className="text-white/80 text-sm font-semibold">12 Zodiac Signs</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                    <Star className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    <p className="text-white/80 text-xs sm:text-sm font-semibold">12 Zodiac Signs</p>
                   </div>
-                  <p className="text-white text-sm">All astrological signs</p>
+                  <p className="text-white text-xs sm:text-sm">All astrological signs</p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-white" />
-                    <p className="text-white/80 text-sm font-semibold">Premium Design</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    <p className="text-white/80 text-xs sm:text-sm font-semibold">Premium Design</p>
                   </div>
-                  <p className="text-white text-sm">Custom zodiac artwork</p>
+                  <p className="text-white text-xs sm:text-sm">Custom zodiac artwork</p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-5 h-5 text-white" />
-                    <p className="text-white/80 text-sm font-semibold">Personalized</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    <p className="text-white/80 text-xs sm:text-sm font-semibold">Personalized</p>
                   </div>
-                  <p className="text-white text-sm">Add custom messages</p>
+                  <p className="text-white text-xs sm:text-sm">Add custom messages</p>
                 </div>
               </div>
               
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link
                   to="/tin-skinz?category=zodiac"
-                  className="bg-white text-purple-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2"
+                  className="bg-white text-purple-600 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2"
                 >
                   Browse Zodiac Tin Skinz
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
                 <button
                   onClick={() => {
@@ -303,7 +303,7 @@ const ZodiacTinSkinz = () => {
                       block: 'start'
                     })
                   }}
-                  className="bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/30 transition-colors inline-flex items-center justify-center gap-2"
+                  className="bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:bg-white/30 transition-colors inline-flex items-center justify-center gap-2"
                 >
                   Explore All Signs
                 </button>
@@ -312,30 +312,30 @@ const ZodiacTinSkinz = () => {
             
             {/* Right Content - Current Month Zodiac */}
             {currentSign && (
-              <div className="lg:w-1/2">
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-                  <div className="text-center mb-4">
-                    <p className="text-white/80 text-sm mb-2">Current Month's Sign</p>
-                    <h2 className="text-3xl font-bold text-white">{currentZodiac}</h2>
-                    <p className="text-white/90 text-sm">{currentSign.dates}</p>
+              <div className="lg:w-1/2 w-full">
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8">
+                  <div className="text-center mb-3 sm:mb-4">
+                    <p className="text-white/80 text-xs sm:text-sm mb-1 sm:mb-2">Current Month's Sign</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white">{currentZodiac}</h2>
+                    <p className="text-white/90 text-xs sm:text-sm">{currentSign.dates}</p>
                   </div>
-                  <div className="mb-4 flex items-center justify-center">
+                  <div className="mb-3 sm:mb-4 flex items-center justify-center">
                     <TinSkinzMockupViewer
                       selectedDesign={{
                         designUrl: currentSign.designUrl
                       }}
-                      displayWidth={400}
-                      displayHeight={400}
+                      displayWidth={280}
+                      displayHeight={280}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 text-center">
                       <p className="text-white/80 text-xs mb-1">Element</p>
-                      <p className="text-white font-semibold text-sm">{currentSign.element}</p>
+                      <p className="text-white font-semibold text-xs sm:text-sm">{currentSign.element}</p>
                     </div>
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-center">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 text-center">
                       <p className="text-white/80 text-xs mb-1">Traits</p>
-                      <p className="text-white font-semibold text-sm">{currentSign.traits.split(',')[0]}</p>
+                      <p className="text-white font-semibold text-xs sm:text-sm">{currentSign.traits.split(',')[0]}</p>
                     </div>
                   </div>
                 </div>

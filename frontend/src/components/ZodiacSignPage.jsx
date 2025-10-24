@@ -318,76 +318,76 @@ const ZodiacSignPage = () => {
         {/* Hero Section */}
         <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-90"></div>
-          <div className="relative max-w-7xl mx-auto px-4 py-20">
+          <div className="relative max-w-7xl mx-auto px-4 py-6 md:py-12 lg:py-20">
             <Link
               to="/zodiac-tin-skinz"
-              className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-6 transition-colors"
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4 md:mb-6 transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
-              Back to Zodiac Collection
+              <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-sm md:text-base">Back to Zodiac Collection</span>
             </Link>
-            <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="lg:w-1/2">
-              <div className="flex items-center gap-4 mb-6">
+            <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
+            <div className="lg:w-1/2 w-full">
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                 <img
                   src="/assets/tin-skinz/Tin Skinz_logo_full color_Secondary logo.png"
                   alt="Tin Skinz Logo"
-                  className="h-20 w-auto"
+                  className="h-12 sm:h-16 lg:h-20 w-auto"
                 />
-                <h1 className="text-4xl md:text-5xl font-bold text-white">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white text-center sm:text-left">
                   {currentSign.name} Tin Skinz
                 </h1>
               </div>
-              <p className="text-xl text-white/90 mb-6">
+              <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-4 sm:mb-6 text-center sm:text-left">
                 {currentSign.description}
               </p>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <p className="text-white/80 text-sm">Dates</p>
-                  <p className="text-white font-semibold">{currentSign.dates}</p>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 mb-4 sm:mb-6 lg:mb-8">
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <p className="text-white/80 text-xs sm:text-sm">Dates</p>
+                  <p className="text-white font-semibold text-xs sm:text-sm lg:text-base">{currentSign.dates}</p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <p className="text-white/80 text-sm">Element</p>
-                  <p className="text-white font-semibold">{currentSign.element}</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <p className="text-white/80 text-xs sm:text-sm">Element</p>
+                  <p className="text-white font-semibold text-xs sm:text-sm lg:text-base">{currentSign.element}</p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <p className="text-white/80 text-sm">Ruling Planet</p>
-                  <p className="text-white font-semibold">{currentSign.rulingPlanet}</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <p className="text-white/80 text-xs sm:text-sm">Ruling Planet</p>
+                  <p className="text-white font-semibold text-xs sm:text-sm lg:text-base">{currentSign.rulingPlanet}</p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <p className="text-white/80 text-sm">Quality</p>
-                  <p className="text-white font-semibold">{currentSign.quality}</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 sm:p-3 lg:p-4">
+                  <p className="text-white/80 text-xs sm:text-sm">Quality</p>
+                  <p className="text-white font-semibold text-xs sm:text-sm lg:text-base">{currentSign.quality}</p>
                 </div>
               </div>
               <Link
                 to="/tin-skinz?category=zodiac"
-                className="bg-white text-purple-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors inline-flex items-center gap-2"
+                className="bg-white text-purple-600 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 Browse Zodiac Tin Skinz
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </Link>
             </div>
-            <div className="lg:w-1/2">
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-                <div className="mb-6 flex items-center justify-center">
+            <div className="lg:w-1/2 w-full">
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8">
+                <div className="mb-4 sm:mb-6 flex items-center justify-center">
                   <TinSkinzMockupViewer
                     selectedDesign={{
                       designUrl: currentSign.designUrl
                     }}
-                    displayWidth={500}
-                    displayHeight={500}
+                    displayWidth={280}
+                    displayHeight={280}
                   />
                 </div>
                 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between items-center pt-4 border-t border-white/20">
+                <div className="flex justify-between items-center pt-3 sm:pt-4 border-t border-white/20">
                   {prevSign ? (
                     <Link
                       to={`/zodiac-tin-skinz/${prevSign.name.toLowerCase()}`}
-                      className="flex items-center gap-2 text-white/90 hover:text-white transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors"
                     >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span className="text-sm">{prevSign.name}</span>
+                      <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="text-xs sm:text-sm">{prevSign.name}</span>
                     </Link>
                   ) : (
                     <div></div>
@@ -396,10 +396,10 @@ const ZodiacSignPage = () => {
                   {nextSign ? (
                     <Link
                       to={`/zodiac-tin-skinz/${nextSign.name.toLowerCase()}`}
-                      className="flex items-center gap-2 text-white/90 hover:text-white transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors"
                     >
-                      <span className="text-sm">{nextSign.name}</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">{nextSign.name}</span>
+                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Link>
                   ) : (
                     <div></div>
