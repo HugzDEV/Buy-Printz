@@ -18,7 +18,16 @@ import time
 # Import our modules
 from backend.database import db_manager
 from backend.auth import auth_manager, get_current_user
-from backend.ai_agent_adapter import ai_agent_adapter
+
+# Import AI agent adapter
+try:
+    from backend.ai_agent_adapter import ai_agent_adapter
+    AI_AGENT_AVAILABLE = True
+    print("✅ AI Agent adapter loaded successfully")
+except ImportError as e:
+    AI_AGENT_AVAILABLE = False
+    ai_agent_adapter = None
+    print(f"⚠️ AI Agent adapter not available: {e}")
 
 # Import creator marketplace routes
 try:
@@ -1492,6 +1501,10 @@ async def get_user_stats(current_user: dict = Depends(get_current_user)):
 async def ai_chat_endpoint(request: AIQuery, current_user: dict = Depends(get_current_user)):
     """AI Chat endpoint for general assistance"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1513,6 +1526,10 @@ async def ai_chat_endpoint(request: AIQuery, current_user: dict = Depends(get_cu
 async def design_assistance_endpoint(request: DesignAssistanceRequest, current_user: dict = Depends(get_current_user)):
     """Design assistance endpoint"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1539,6 +1556,10 @@ async def design_assistance_endpoint(request: DesignAssistanceRequest, current_u
 async def order_assistance_endpoint(request: OrderQuery, current_user: dict = Depends(get_current_user)):
     """Order assistance endpoint"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1564,6 +1585,10 @@ async def order_assistance_endpoint(request: OrderQuery, current_user: dict = De
 async def banner_recommendations_endpoint(request: BannerRecommendationRequest, current_user: dict = Depends(get_current_user)):
     """Banner recommendations endpoint"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1585,6 +1610,13 @@ async def banner_recommendations_endpoint(request: BannerRecommendationRequest, 
 async def ai_agent_health():
     """AI Agent health check endpoint"""
     try:
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            return {
+                "status": "unavailable",
+                "error": "AI Agent adapter not loaded",
+                "service": "ai_agent_adapter"
+            }
+        
         health = await ai_agent_adapter.get_health()
         return health
     except Exception as e:
@@ -1599,6 +1631,10 @@ async def ai_agent_health():
 async def generate_banner_endpoint(request: BannerGenerationRequest, current_user: dict = Depends(get_current_user)):
     """Generate a complete banner design from a text prompt"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1621,6 +1657,10 @@ async def generate_banner_endpoint(request: BannerGenerationRequest, current_use
 async def modify_design_endpoint(request: DesignModificationRequest, current_user: dict = Depends(get_current_user)):
     """Modify an existing banner design"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1642,6 +1682,10 @@ async def modify_design_endpoint(request: DesignModificationRequest, current_use
 async def add_element_endpoint(request: ElementAdditionRequest, current_user: dict = Depends(get_current_user)):
     """Add a new element to a banner design"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1663,6 +1707,10 @@ async def add_element_endpoint(request: ElementAdditionRequest, current_user: di
 async def create_design_endpoint(design_spec: Dict[str, Any], current_user: dict = Depends(get_current_user)):
     """Create a new banner design programmatically"""
     try:
+        # Check if AI agent is available
+        if not AI_AGENT_AVAILABLE or ai_agent_adapter is None:
+            raise HTTPException(status_code=503, detail="AI Agent service not available")
+        
         # Initialize AI agent adapter if not already done
         if not hasattr(ai_agent_adapter, '_initialized'):
             initialized = await ai_agent_adapter.initialize()
@@ -1699,8 +1747,11 @@ async def health_check():
         
         # Check AI agent health
         try:
-            ai_health = await ai_agent_adapter.get_health()
-            ai_agent_healthy = ai_health.get("status") == "healthy"
+            if AI_AGENT_AVAILABLE and ai_agent_adapter is not None:
+                ai_health = await ai_agent_adapter.get_health()
+                ai_agent_healthy = ai_health.get("status") == "healthy"
+            else:
+                ai_agent_healthy = False
         except:
             ai_agent_healthy = False
         
