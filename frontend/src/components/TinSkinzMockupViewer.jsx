@@ -29,7 +29,7 @@ const TinSkinzMockupViewer = ({
           height={TIN_SKINZ_CONFIG.CANVAS_SIZE}
           scaleX={displayWidth / TIN_SKINZ_CONFIG.CANVAS_SIZE}
           scaleY={displayHeight / TIN_SKINZ_CONFIG.CANVAS_SIZE}
-          className="rounded-3xl shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)] bg-gradient-to-br from-amber-100/80 to-yellow-100/80"
+          className="rounded-3xl shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.7),inset_2px_2px_4px_rgba(0,0,0,0.1)]"
           style={{ 
             width: displayWidth, 
             height: displayHeight,

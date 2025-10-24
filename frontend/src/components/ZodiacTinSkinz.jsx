@@ -13,6 +13,7 @@ import {
   Zap
 } from 'lucide-react'
 import SEOHead from './SEOHead'
+import TinSkinzMockupViewer from './TinSkinzMockupViewer'
 
 const ZodiacTinSkinz = () => {
   const [currentMonth, setCurrentMonth] = useState('')
@@ -51,6 +52,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Red, orange, bright colors',
       image: '/assets/tin-skinz/designs/Zodiac Final/10_Aries_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/10_Aries_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/10_Aries_Cancer_Double_Both.png',
       description: 'The ram leads with courage and determination. Perfect for the natural-born leader in your life.'
     },
     {
@@ -61,6 +63,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Green, earth tones, pastels',
       image: '/assets/tin-skinz/designs/Zodiac Final/2_Taurus_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/2_Taurus_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/2_Taurus_Double_Both.png',
       description: 'The bull values stability and comfort. Ideal for those who appreciate the finer things in life.'
     },
     {
@@ -71,6 +74,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Yellow, silver, light blue',
       image: '/assets/tin-skinz/designs/Zodiac Final/9_Gemini_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/9_Gemini_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/9_Gemini_Double_Both.png',
       description: 'The twins bring wit and versatility. Perfect for the social butterfly who loves to chat.'
     },
     {
@@ -81,6 +85,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Silver, white, sea green',
       image: '/assets/tin-skinz/designs/Zodiac Final/1_Cancer_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/1_Cancer_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/1_Cancer_Double_Both.png',
       description: 'The crab is deeply emotional and caring. Ideal for the family-oriented soul.'
     },
     {
@@ -91,6 +96,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Gold, orange, bright yellow',
       image: '/assets/tin-skinz/designs/Zodiac Final/5_Leo_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/5_Leo_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/5_Leo_Double_Both.png',
       description: 'The lion rules with charisma and warmth. Perfect for the natural performer.'
     },
     {
@@ -101,6 +107,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Brown, navy, muted tones',
       image: '/assets/tin-skinz/designs/Zodiac Final/11_Virgo_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/11_Virgo_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/11_Virgo_Double_Both.png',
       description: 'The maiden brings order and precision. Ideal for the detail-oriented perfectionist.'
     },
     {
@@ -111,6 +118,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Pink, blue, pastels',
       image: '/assets/tin-skinz/designs/Zodiac Final/7_Libra_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/7_Libra_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/7_Libra_Double_Both.png',
       description: 'The scales seek harmony and beauty. Perfect for the peacemaker and aesthete.'
     },
     {
@@ -121,6 +129,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Deep red, black, burgundy',
       image: '/assets/tin-skinz/designs/Zodiac Final/12_Scorpio_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/12_Scorpio_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/12_Scorpio_Double_Both.png',
       description: 'The scorpion brings depth and transformation. Ideal for the intense and passionate soul.'
     },
     {
@@ -131,6 +140,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Purple, turquoise, bright colors',
       image: '/assets/tin-skinz/designs/Zodiac Final/8_Sagittarius_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/8_Sagittarius_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/8_Sagittarius_Double_Both.png',
       description: 'The archer seeks truth and adventure. Perfect for the free-spirited explorer.'
     },
     {
@@ -141,6 +151,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Brown, black, dark green',
       image: '/assets/tin-skinz/designs/Zodiac Final/3_Capricornus_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/3_Capricornus_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/3_Capricornus_Double_Both.png',
       description: 'The goat climbs with determination. Ideal for the ambitious achiever.'
     },
     {
@@ -151,6 +162,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Electric blue, silver, bright colors',
       image: '/assets/tin-skinz/designs/Zodiac Final/6_Aquarius_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/6_Aquarius_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/6_Aquarius_Double_Both.png',
       description: 'The water bearer brings innovation and progress. Perfect for the forward-thinking individual.'
     },
     {
@@ -161,6 +173,7 @@ const ZodiacTinSkinz = () => {
       colors: 'Sea green, lavender, soft pastels',
       image: '/assets/tin-skinz/designs/Zodiac Final/4_Pisces_Front.png',
       backImage: '/assets/tin-skinz/designs/Zodiac Final/4_Pisces_Back.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/4_Pisces_Double_Both.png',
       description: 'The fish swims in dreams and intuition. Ideal for the creative and empathetic soul.'
     }
   ]
@@ -300,22 +313,19 @@ const ZodiacTinSkinz = () => {
             {/* Right Content - Current Month Zodiac */}
             {currentSign && (
               <div className="lg:w-1/2">
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8 group">
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
                   <div className="text-center mb-4">
                     <p className="text-white/80 text-sm mb-2">Current Month's Sign</p>
                     <h2 className="text-3xl font-bold text-white">{currentZodiac}</h2>
                     <p className="text-white/90 text-sm">{currentSign.dates}</p>
                   </div>
-                  <div className="relative w-full h-96 mb-4">
-                    <img
-                      src={currentSign.image}
-                      alt={`${currentSign.name} zodiac tin front`}
-                      className="w-full h-full object-contain absolute inset-0 transition-opacity duration-300 group-hover:opacity-0"
-                    />
-                    <img
-                      src={currentSign.backImage}
-                      alt={`${currentSign.name} zodiac tin back`}
-                      className="w-full h-full object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  <div className="mb-4 flex items-center justify-center">
+                    <TinSkinzMockupViewer
+                      selectedDesign={{
+                        designUrl: currentSign.designUrl
+                      }}
+                      displayWidth={400}
+                      displayHeight={400}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">

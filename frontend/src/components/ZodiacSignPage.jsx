@@ -12,9 +12,8 @@ import {
   Award,
   CheckCircle
 } from 'lucide-react'
-import Header from './Header'
-import Footer from './Footer'
 import SEOHead from './SEOHead'
+import TinSkinzMockupViewer from './TinSkinzMockupViewer'
 
 const ZodiacSignPage = () => {
   const { sign } = useParams()
@@ -30,6 +29,7 @@ const ZodiacSignPage = () => {
       traits: 'Bold, energetic, pioneering',
       colors: 'Red, orange, bright colors',
       image: '/assets/tin-skinz/designs/Zodiac Final/10_Aries_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/10_Aries_Cancer_Double_Both.png',
       description: 'The ram leads with courage and determination. Perfect for the natural-born leader in your life.',
       personality: 'Aries are natural leaders who love to take charge. They are bold, energetic, and always ready for a new adventure.',
       giftIdeas: 'Perfect for the Aries who loves to lead and inspire others.',
@@ -46,6 +46,7 @@ const ZodiacSignPage = () => {
       traits: 'Reliable, practical, sensual',
       colors: 'Green, earth tones, pastels',
       image: '/assets/tin-skinz/designs/Zodiac Final/2_Taurus_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/2_Taurus_Double_Both.png',
       description: 'The bull values stability and comfort. Ideal for those who appreciate the finer things in life.',
       personality: 'Taurus individuals are known for their reliability and love of comfort. They appreciate beauty and have a strong connection to nature.',
       giftIdeas: 'Perfect for the Taurus who values quality and comfort.',
@@ -62,6 +63,7 @@ const ZodiacSignPage = () => {
       traits: 'Curious, adaptable, communicative',
       colors: 'Yellow, silver, light blue',
       image: '/assets/tin-skinz/designs/Zodiac Final/9_Gemini_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/9_Gemini_Double_Both.png',
       description: 'The twins bring wit and versatility. Perfect for the social butterfly who loves to chat.',
       personality: 'Gemini are known for their quick wit and adaptability. They love to communicate and are always curious about the world around them.',
       giftIdeas: 'Perfect for the Gemini who loves to learn and share ideas.',
@@ -78,6 +80,7 @@ const ZodiacSignPage = () => {
       traits: 'Intuitive, protective, nurturing',
       colors: 'Silver, white, sea green',
       image: '/assets/tin-skinz/designs/Zodiac Final/1_Cancer_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/1_Cancer_Double_Both.png',
       description: 'The crab is deeply emotional and caring. Ideal for the family-oriented soul.',
       personality: 'Cancer individuals are deeply intuitive and protective of their loved ones. They have a strong connection to home and family.',
       giftIdeas: 'Perfect for the Cancer who values family and emotional connections.',
@@ -94,6 +97,7 @@ const ZodiacSignPage = () => {
       traits: 'Confident, generous, dramatic',
       colors: 'Gold, orange, bright yellow',
       image: '/assets/tin-skinz/designs/Zodiac Final/5_Leo_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/5_Leo_Double_Both.png',
       description: 'The lion rules with charisma and warmth. Perfect for the natural performer.',
       personality: 'Leo individuals are natural performers who love to be the center of attention. They are generous, confident, and have a big heart.',
       giftIdeas: 'Perfect for the Leo who loves to shine and be appreciated.',
@@ -110,6 +114,7 @@ const ZodiacSignPage = () => {
       traits: 'Analytical, practical, perfectionist',
       colors: 'Brown, navy, muted tones',
       image: '/assets/tin-skinz/designs/Zodiac Final/11_Virgo_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/11_Virgo_Double_Both.png',
       description: 'The maiden brings order and precision. Ideal for the detail-oriented perfectionist.',
       personality: 'Virgo individuals are known for their attention to detail and practical approach to life. They are analytical and always strive for perfection.',
       giftIdeas: 'Perfect for the Virgo who appreciates quality and attention to detail.',
@@ -126,6 +131,7 @@ const ZodiacSignPage = () => {
       traits: 'Diplomatic, charming, balanced',
       colors: 'Pink, blue, pastels',
       image: '/assets/tin-skinz/designs/Zodiac Final/7_Libra_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/7_Libra_Double_Both.png',
       description: 'The scales seek harmony and beauty. Perfect for the peacemaker and aesthete.',
       personality: 'Libra individuals are natural diplomats who seek balance and harmony in all relationships. They have a strong appreciation for beauty and art.',
       giftIdeas: 'Perfect for the Libra who values beauty and harmony.',
@@ -142,6 +148,7 @@ const ZodiacSignPage = () => {
       traits: 'Intense, passionate, mysterious',
       colors: 'Deep red, black, burgundy',
       image: '/assets/tin-skinz/designs/Zodiac Final/12_Scorpio_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/12_Scorpio_Double_Both.png',
       description: 'The scorpion brings depth and transformation. Ideal for the intense and passionate soul.',
       personality: 'Scorpio individuals are known for their intensity and passion. They are mysterious, transformative, and have a deep understanding of life.',
       giftIdeas: 'Perfect for the Scorpio who values depth and transformation.',
@@ -158,6 +165,7 @@ const ZodiacSignPage = () => {
       traits: 'Adventurous, optimistic, philosophical',
       colors: 'Purple, turquoise, bright colors',
       image: '/assets/tin-skinz/designs/Zodiac Final/8_Sagittarius_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/8_Sagittarius_Double_Both.png',
       description: 'The archer seeks truth and adventure. Perfect for the free-spirited explorer.',
       personality: 'Sagittarius individuals are natural explorers who love adventure and learning. They are optimistic, philosophical, and always seeking truth.',
       giftIdeas: 'Perfect for the Sagittarius who loves adventure and learning.',
@@ -174,6 +182,7 @@ const ZodiacSignPage = () => {
       traits: 'Ambitious, disciplined, practical',
       colors: 'Brown, black, dark green',
       image: '/assets/tin-skinz/designs/Zodiac Final/3_Capricornus_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/3_Capricornus_Double_Both.png',
       description: 'The goat climbs with determination. Ideal for the ambitious achiever.',
       personality: 'Capricorn individuals are known for their ambition and discipline. They are practical, hardworking, and always striving for success.',
       giftIdeas: 'Perfect for the Capricorn who values achievement and quality.',
@@ -190,6 +199,7 @@ const ZodiacSignPage = () => {
       traits: 'Independent, innovative, humanitarian',
       colors: 'Electric blue, silver, bright colors',
       image: '/assets/tin-skinz/designs/Zodiac Final/6_Aquarius_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/6_Aquarius_Double_Both.png',
       description: 'The water bearer brings innovation and progress. Perfect for the forward-thinking individual.',
       personality: 'Aquarius individuals are innovative and independent thinkers. They are humanitarian, progressive, and always looking toward the future.',
       giftIdeas: 'Perfect for the Aquarius who values innovation and progress.',
@@ -206,6 +216,7 @@ const ZodiacSignPage = () => {
       traits: 'Compassionate, artistic, intuitive',
       colors: 'Sea green, lavender, soft pastels',
       image: '/assets/tin-skinz/designs/Zodiac Final/4_Pisces_Front.png',
+      designUrl: '/assets/tin-skinz/designs/Zodiac Final/4_Pisces_Double_Both.png',
       description: 'The fish swims in dreams and intuition. Ideal for the creative and empathetic soul.',
       personality: 'Pisces individuals are deeply intuitive and compassionate. They are artistic, dreamy, and have a strong connection to the spiritual realm.',
       giftIdeas: 'Perfect for the Pisces who values creativity and intuition.',
@@ -358,11 +369,15 @@ const ZodiacSignPage = () => {
             </div>
             <div className="lg:w-1/2">
               <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-                <img
-                  src={currentSign.image}
-                  alt={`${currentSign.name} zodiac tin`}
-                  className="w-full h-96 object-contain mb-6"
-                />
+                <div className="mb-6 flex items-center justify-center">
+                  <TinSkinzMockupViewer
+                    selectedDesign={{
+                      designUrl: currentSign.designUrl
+                    }}
+                    displayWidth={500}
+                    displayHeight={500}
+                  />
+                </div>
                 
                 {/* Navigation Buttons */}
                 <div className="flex justify-between items-center pt-4 border-t border-white/20">
