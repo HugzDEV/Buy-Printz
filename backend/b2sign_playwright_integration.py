@@ -1285,23 +1285,21 @@ class B2SignPlaywrightIntegration:
             logger.warning(f"⚠️ Error opening and filling address modal: {e}")
     
     async def _extract_all_shipping_options_workflow(self):
-        """Extract all shipping options using proven workflow - MUST GET ALL 5 OPTIONS"""
+        """Extract all shipping options using proven workflow"""
         try:
-            logger.info("SHIPPING EXTRACTION: Extracting ALL shipping options (expecting 5)...")
+            logger.info("🚚 Extracting all shipping options...")
             
-            # Wait longer for shipping dropdown to fully load
-            await self.page.wait_for_timeout(5000)
+            # Wait for shipping dropdown to appear
+            await self.page.wait_for_timeout(3000)
             
-            # Look for shipping method dropdown - try multiple approaches
+            # Look for shipping method dropdown
             shipping_dropdown = None
             dropdown_selectors = [
                 'button:has-text("Ground")',
                 'button:has-text("$")',
                 '.MuiSelect-button',
                 'button[class*="select"]',
-                'button[role="button"]',
-                '[role="combobox"]',
-                'button[aria-haspopup="listbox"]'
+                'button[role="button"]'
             ]
             
             for selector in dropdown_selectors:
@@ -1309,73 +1307,62 @@ class B2SignPlaywrightIntegration:
                     dropdown = await self.page.query_selector(selector)
                     if dropdown:
                         dropdown_text = await dropdown.inner_text()
-                        if '$' in dropdown_text and ('ground' in dropdown_text.lower() or 'shipping' in dropdown_text.lower() or 'day' in dropdown_text.lower()):
+                        if '$' in dropdown_text and ('ground' in dropdown_text.lower() or 'shipping' in dropdown_text.lower()):
                             shipping_dropdown = dropdown
-                            logger.info(f"FOUND DROPDOWN: {dropdown_text}")
+                            logger.info(f"✅ Found shipping dropdown: {dropdown_text}")
                             break
                 except:
                     continue
             
             if shipping_dropdown:
-                # Click the dropdown to reveal ALL options
-                logger.info("CLICKING DROPDOWN: Revealing all shipping options...")
+                # Click the dropdown to reveal all options
                 await shipping_dropdown.click()
-                await self.page.wait_for_timeout(3000)  # Wait for dropdown to fully open
+                logger.info("✅ Clicked shipping dropdown to reveal all options")
+                await self.page.wait_for_timeout(2000)
                 
-                # Extract all shipping options - try multiple selectors
+                # Extract all shipping options
                 shipping_options = []
                 option_selectors = [
+                    '.MuiOption-root',
                     '[role="option"]',
                     'li[role="option"]',
-                    '.MuiOption-root',
-                    '.MuiMenuItem-root',
-                    '.MuiSelect-listbox li',
-                    'ul[role="listbox"] li'
+                    '.MuiSelect-listbox li'
                 ]
                 
                 for selector in option_selectors:
                     try:
                         options = await self.page.query_selector_all(selector)
                         if options:
-                            logger.info(f"FOUND {len(options)} OPTIONS with selector: {selector}")
+                            logger.info(f"🔍 Found {len(options)} options with selector: {selector}")
                             
                             for i, option in enumerate(options):
                                 try:
                                     option_text = await option.inner_text()
-                                    logger.info(f"  RAW OPTION {i+1}: '{option_text.strip()}'")
-                                    
                                     if option_text.strip() and '$' in option_text:
                                         parsed_option = self._parse_shipping_option_text(option_text)
                                         if parsed_option:
                                             shipping_options.append(parsed_option)
-                                            logger.info(f"  PARSED OPTION {i+1}: {parsed_option['name']} - {parsed_option['cost']}")
-                                except Exception as e:
-                                    logger.warning(f"  Error parsing option {i+1}: {e}")
+                                            logger.info(f"  Option {i+1}: {option_text.strip()}")
+                                except:
                                     continue
                             
                             if shipping_options:
-                                logger.info(f"SUCCESS: Extracted {len(shipping_options)} shipping options with selector: {selector}")
                                 break
-                    except Exception as e:
-                        logger.warning(f"Selector {selector} failed: {e}")
+                    except:
                         continue
                 
                 if shipping_options:
-                    logger.info(f"FINAL RESULT: Found {len(shipping_options)} shipping options")
-                    if len(shipping_options) < 5:
-                        logger.warning(f"WARNING: Only found {len(shipping_options)} options, expected 5!")
+                    logger.info(f"🎉 SUCCESS! Found {len(shipping_options)} shipping options")
                     return shipping_options
                 else:
-                    logger.error("ERROR: No shipping options found in dropdown!")
+                    logger.warning("❌ No shipping options found in dropdown")
                     return []
             else:
-                logger.error("ERROR: Could not find shipping dropdown!")
+                logger.warning("❌ Could not find shipping dropdown")
                 return []
                 
         except Exception as e:
-            logger.error(f"ERROR in shipping extraction: {e}")
-            import traceback
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.warning(f"⚠️ Error extracting shipping options: {e}")
             return []
     
     async def _extract_tax_from_subtotal_box(self):
@@ -1743,48 +1730,30 @@ class B2SignPlaywrightIntegration:
             return None
     
     def _parse_shipping_option_text(self, option_text):
-        """Parse shipping option text to extract name, cost, and delivery date
-        
-        Expected formats:
-        - Ground $14.58 Oct 29
-        - 3 Day Select $24.67 Oct 30
-        - 2nd Day Air $27.22 Oct 29
-        - Next Day $30.22 Oct 28
-        - Next Day (Early AM) $134.78 Oct 28
-        """
+        """Parse shipping option text to extract name, cost, and delivery date"""
         try:
             import re
             
-            logger.info(f"PARSING: '{option_text}'")
-            
-            # Extract price (e.g., $14.58)
+            # Extract price (e.g., $14.04)
             price_matches = re.findall(r'\$[\d,]+\.?\d*', option_text)
             cost = price_matches[0] if price_matches else "Contact for Quote"
-            logger.info(f"  COST: {cost}")
             
-            # Extract delivery date (e.g., Oct 29)
+            # Extract delivery date (e.g., Sep 14)
             date_matches = re.findall(r'[A-Za-z]{3}\s+\d{1,2}', option_text)
             delivery_date = date_matches[0] if date_matches else None
-            logger.info(f"  DATE: {delivery_date}")
             
             # Extract shipping method name (everything before the price)
             name_part = option_text.split('$')[0].strip()
             if not name_part:
-                # Fallback: try splitting by date
-                if delivery_date:
-                    name_part = option_text.split(delivery_date)[0].replace('$', '').strip()
-                else:
-                    name_part = option_text.strip()
+                name_part = option_text.split('Sep')[0].strip() if 'Sep' in option_text else option_text.strip()
             
-            # Clean up the name - remove extra whitespace and newlines
-            name = ' '.join(name_part.split())
-            logger.info(f"  NAME: {name}")
+            # Clean up the name
+            name = name_part.replace('\n', ' ').strip()
             
             # Determine estimated days based on shipping method
             estimated_days = self._estimate_delivery_days(name)
-            logger.info(f"  ESTIMATED DAYS: {estimated_days}")
             
-            result = {
+            return {
                 "name": name,
                 "type": "standard",
                 "cost": cost,
@@ -1793,13 +1762,8 @@ class B2SignPlaywrightIntegration:
                 "description": f"B2Sign {name.lower()}: {cost}" + (f" (delivery: {delivery_date})" if delivery_date else "")
             }
             
-            logger.info(f"  RESULT: {result}")
-            return result
-            
         except Exception as e:
-            logger.error(f"ERROR parsing shipping option text '{option_text}': {e}")
-            import traceback
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.warning(f"⚠️ Error parsing shipping option text '{option_text}': {e}")
             return None
     
     def _estimate_delivery_days(self, shipping_name):
