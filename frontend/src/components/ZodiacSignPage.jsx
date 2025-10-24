@@ -319,13 +319,13 @@ const ZodiacSignPage = () => {
         <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-90"></div>
           <div className="relative max-w-7xl mx-auto px-4 py-6 md:py-12 lg:py-20">
-            <Link
+              <Link 
               to="/zodiac-tin-skinz"
               className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4 md:mb-6 transition-colors"
-            >
+              >
               <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
               <span className="text-sm md:text-base">Back to Zodiac Collection</span>
-            </Link>
+              </Link>
             <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
             <div className="lg:w-1/2 w-full">
               <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
@@ -380,29 +380,35 @@ const ZodiacSignPage = () => {
                 </div>
                 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between items-center pt-3 sm:pt-4 border-t border-white/20">
+                <div className="flex justify-between items-center pt-3 sm:pt-4 border-t border-white/20 gap-4 relative z-10">
                   {prevSign ? (
                     <Link
                       to={`/zodiac-tin-skinz/${prevSign.name.toLowerCase()}`}
-                      className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg min-w-[80px] sm:min-w-[100px] cursor-pointer"
+                      onClick={(e) => {
+                        console.log('Prev clicked:', prevSign.name);
+                      }}
                     >
-                      <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="text-xs sm:text-sm">{prevSign.name}</span>
+                      <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-medium">{prevSign.name}</span>
                     </Link>
                   ) : (
-                    <div></div>
+                    <div className="w-[80px] sm:w-[100px]"></div>
                   )}
                   
                   {nextSign ? (
                     <Link
                       to={`/zodiac-tin-skinz/${nextSign.name.toLowerCase()}`}
-                      className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg min-w-[80px] sm:min-w-[100px] justify-end cursor-pointer"
+                      onClick={(e) => {
+                        console.log('Next clicked:', nextSign.name);
+                      }}
                     >
-                      <span className="text-xs sm:text-sm">{nextSign.name}</span>
-                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="text-xs sm:text-sm font-medium">{nextSign.name}</span>
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     </Link>
                   ) : (
-                    <div></div>
+                    <div className="w-[80px] sm:w-[100px]"></div>
                   )}
                 </div>
               </div>
@@ -412,28 +418,28 @@ const ZodiacSignPage = () => {
       </div>
 
       {/* Complete Zodiac Guide */}
-      <div className="py-20 bg-white">
+      <div className="py-12 md:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <div className="text-center mb-8 md:mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 lg:mb-6">
               The Complete {currentSign.name} Zodiac Guide
               </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4">
               Discover everything about the {currentSign.name} zodiac sign - from personality traits to compatibility, 
               ruling planets to key characteristics. Born between {currentSign.dates}.
             </p>
           </div>
 
           {/* Astrological Details Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center gap-3 mb-3">
-                <Sparkles className="w-6 h-6 text-buyprint-brand" />
-                <h3 className="text-lg font-bold text-gray-900">Element</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-12 lg:mb-16">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-buyprint-brand flex-shrink-0" />
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900">Element</h3>
               </div>
-              <p className="text-2xl font-bold text-buyprint-brand mb-2">{currentSign.element}</p>
-              <p className="text-gray-600 text-sm">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-buyprint-brand mb-1 sm:mb-2">{currentSign.element}</p>
+              <p className="text-gray-600 text-xs sm:text-sm">
                 {currentSign.element} signs are known for their {
                   currentSign.element === 'Fire' ? 'passion, enthusiasm, and dynamic energy' :
                   currentSign.element === 'Earth' ? 'practicality, stability, and grounded nature' :
@@ -443,24 +449,24 @@ const ZodiacSignPage = () => {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center gap-3 mb-3">
-                <Star className="w-6 h-6 text-buyprint-brand" />
-                <h3 className="text-lg font-bold text-gray-900">Ruling Planet</h3>
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-buyprint-brand flex-shrink-0" />
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900">Ruling Planet</h3>
               </div>
-              <p className="text-2xl font-bold text-buyprint-brand mb-2">{currentSign.rulingPlanet}</p>
-              <p className="text-gray-600 text-sm">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-buyprint-brand mb-1 sm:mb-2">{currentSign.rulingPlanet}</p>
+              <p className="text-gray-600 text-xs sm:text-sm">
                 {currentSign.rulingPlanet} governs {currentSign.name}, influencing their core characteristics and life approach.
               </p>
             </div>
             
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center gap-3 mb-3">
-                <Award className="w-6 h-6 text-buyprint-brand" />
-                <h3 className="text-lg font-bold text-gray-900">Quality</h3>
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-buyprint-brand flex-shrink-0" />
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900">Quality</h3>
               </div>
-              <p className="text-2xl font-bold text-buyprint-brand mb-2">{currentSign.quality}</p>
-              <p className="text-gray-600 text-sm">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-buyprint-brand mb-1 sm:mb-2">{currentSign.quality}</p>
+              <p className="text-gray-600 text-xs sm:text-sm">
                 {currentSign.quality} signs are {
                   currentSign.quality === 'Cardinal' ? 'initiators who start new cycles' :
                   currentSign.quality === 'Fixed' ? 'stable and determined maintainers' :
@@ -469,21 +475,21 @@ const ZodiacSignPage = () => {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center gap-3 mb-3">
-                <Calendar className="w-6 h-6 text-buyprint-brand" />
-                <h3 className="text-lg font-bold text-gray-900">Season</h3>
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-buyprint-brand flex-shrink-0" />
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900">Season</h3>
               </div>
-              <p className="text-2xl font-bold text-buyprint-brand mb-2">{currentSign.season}</p>
-              <p className="text-gray-600 text-sm">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-buyprint-brand mb-1 sm:mb-2">{currentSign.season}</p>
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Born during {currentSign.season.toLowerCase()}, embodying the energies of this time.
               </p>
             </div>
           </div>
 
           {/* Personality & Compatibility */}
-          <div className="grid lg:grid-cols-2 gap-12 mb-16">
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 mb-8 md:mb-12 lg:mb-16">
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
               <h3 className="text-3xl font-bold text-gray-900 mb-6">
                 {currentSign.name} Personality & Traits
               </h3>

@@ -346,26 +346,26 @@ const ZodiacTinSkinz = () => {
       </div>
 
       {/* All Zodiac Signs */}
-      <div id="zodiac-signs" className="py-20 bg-gray-50">
+      <div id="zodiac-signs" className="py-12 md:py-16 lg:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+          <div className="text-center mb-8 md:mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 lg:mb-6">
               Zodiac Tinz - The Thoughtful Gift
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4">
               Choose your zodiac sign and give a gift that shows you truly know someone. 
               Perfect for birthdays, celebrations, and anyone who loves astrology.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
             {zodiacSigns.map((sign, index) => (
               <Link
                 key={sign.name}
                 to={`/zodiac-tin-skinz/${sign.name.toLowerCase()}`}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group block"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group block"
               >
-                <div className="aspect-square bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4 relative overflow-hidden">
+                <div className="aspect-square bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-2 sm:p-3 md:p-4 relative overflow-hidden">
                   <img
                     src={sign.image}
                     alt={`${sign.name} zodiac tin front`}
@@ -377,9 +377,9 @@ const ZodiacTinSkinz = () => {
                     className="w-[120%] h-[120%] object-contain absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   />
                 </div>
-                <div className="p-6 text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{sign.name}</h3>
-                  <p className="text-sm text-gray-600">{sign.dates}</p>
+                <div className="p-3 sm:p-4 md:p-6 text-center">
+                  <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{sign.name}</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">{sign.dates}</p>
                 </div>
               </Link>
             ))}
@@ -388,95 +388,95 @@ const ZodiacTinSkinz = () => {
       </div>
 
       {/* Use Cases */}
-      <div className="py-20 bg-white">
+      <div className="py-12 md:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+          <div className="text-center mb-8 md:mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 lg:mb-6">
               Perfect For Every Occasion
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4">
               Zodiac tin-skinz are versatile gifts that work for any celebration or special moment.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-gray-100 rounded-full p-3">
-                  <Gift className="w-6 h-6 text-gray-700" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 mb-3 sm:mb-4">
+                <div className="bg-gray-100 rounded-full p-2 sm:p-2.5 lg:p-3">
+                  <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Birthday Gifts</h3>
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Birthday Gifts</h3>
               </div>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
                 Celebrate someone's special day with their zodiac sign. A personalized gift 
                 that shows you know their astrological identity.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Personalized zodiac design
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Personalized zodiac design</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Perfect for any age
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Perfect for any age</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Memorable keepsake
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Memorable keepsake</span>
                 </li>
               </ul>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-gray-100 rounded-full p-3">
-                  <Sparkles className="w-6 h-6 text-gray-700" />
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 mb-3 sm:mb-4">
+                <div className="bg-gray-100 rounded-full p-2 sm:p-2.5 lg:p-3">
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Party Favors</h3>
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Party Favors</h3>
               </div>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
                 Make your astrology-themed party unforgettable with zodiac tin-skinz as 
                 unique party favors for your guests.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Customizable for each guest
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Customizable for each guest</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Great conversation starters
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Great conversation starters</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Practical keepsakes
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Practical keepsakes</span>
                 </li>
               </ul>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-gray-100 rounded-full p-3">
-                  <Calendar className="w-6 h-6 text-gray-700" />
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 mb-3 sm:mb-4">
+                <div className="bg-gray-100 rounded-full p-2 sm:p-2.5 lg:p-3">
+                  <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Stocking Stuffers</h3>
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Stocking Stuffers</h3>
               </div>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
                 Fill stockings with zodiac tin-skinz for astrology lovers. Small, 
                 meaningful gifts that bring joy during the holidays.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Perfect stocking size
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Perfect stocking size</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Affordable gift option
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Affordable gift option</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-buyprint-brand" />
-                  Thoughtful surprise
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-buyprint-brand flex-shrink-0" />
+                  <span>Thoughtful surprise</span>
                 </li>
               </ul>
             </div>
@@ -485,20 +485,20 @@ const ZodiacTinSkinz = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 py-20">
+      <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 py-12 md:py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 lg:mb-6">
             Ready to Get Your Zodiac Tin Skinz?
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-base sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8">
             Browse our complete zodiac collection and personalize your tin with custom messages and candy choices.
           </p>
           <Link
             to="/tin-skinz?category=zodiac"
-            className="bg-white text-purple-600 px-10 py-5 rounded-lg font-bold text-xl hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2"
+            className="bg-white text-purple-600 px-6 py-3 sm:px-8 sm:py-4 lg:px-10 lg:py-5 rounded-lg font-bold text-base sm:text-lg lg:text-xl hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto max-w-md sm:max-w-none mx-auto"
           >
             Browse Zodiac Tin Skinz
-            <ArrowRight className="w-6 h-6" />
+            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Link>
         </div>
       </div>

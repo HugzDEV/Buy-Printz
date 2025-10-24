@@ -57,75 +57,75 @@ const AllProducts = () => {
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         {/* Hero Section */}
-        <section className="relative py-24 overflow-hidden">
+        <section className="relative py-10 md:py-16 lg:py-24 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800"></div>
           <div className="absolute inset-0 bg-black/20"></div>
           
           <div className="relative container mx-auto px-4 text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 drop-shadow-lg">
               Our Business Branding Solutions
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-4xl mx-auto drop-shadow-md">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 mb-6 sm:mb-8 max-w-4xl mx-auto drop-shadow-md px-4">
               Professional banners, premium business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins - everything you need for complete business branding
             </p>
           </div>
         </section>
 
         {/* Products Section */}
-        <section className="py-24">
+        <section className="py-12 md:py-16 lg:py-24">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <div className="text-center mb-8 md:mb-12 lg:mb-20">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 lg:mb-6">
                 Choose Your Product Category
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4">
                 From outdoor banners to premium packaging, event displays, custom stickers, and pre-designed candy tins, we have the perfect solution for your business branding needs
               </p>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
               {featuredProducts.map((product, index) => (
-                <div key={index} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[550px]">
+                <div key={index} className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col min-h-[400px] sm:min-h-[450px] lg:min-h-[550px]">
                   <div className="relative overflow-hidden rounded-t-3xl">
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-48 sm:h-64 lg:h-80 xl:h-96 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute top-4 right-4">
-                      <span className={`${product.badgeColor} text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg`}>
+                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4">
+                      <span className={`${product.badgeColor} text-white px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-semibold shadow-lg`}>
                         {product.badge}
                       </span>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   
-                  <div className="p-8 flex flex-col flex-grow">
-                    <div className="flex items-center mb-4">
-                      <div className="text-blue-600 mr-3">
+                  <div className="p-4 sm:p-6 lg:p-8 flex flex-col flex-grow">
+                    <div className="flex items-center mb-3 sm:mb-4">
+                      <div className="text-blue-600 mr-2 sm:mr-3">
                         {product.icon}
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900">{product.name}</h3>
+                      <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{product.name}</h3>
                     </div>
                     
-                    <div className="text-3xl font-bold text-blue-600 mb-4">
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-3 sm:mb-4">
                       {product.price}
                     </div>
                     
-                    <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
+                    <p className="text-gray-600 mb-4 sm:mb-6 flex-grow leading-relaxed text-sm sm:text-base">
                       {product.description}
                     </p>
                     
                     <Link
                       to={product.link}
-                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 border border-green-500 hover:border-green-600 w-full text-center py-3 px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-base shadow-lg mt-auto"
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 border border-green-500 hover:border-green-600 w-full text-center py-2.5 sm:py-3 px-4 sm:px-6 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 hover:shadow-2xl text-sm sm:text-base shadow-lg mt-auto"
                     >
                       {product.name === 'Vinyl Banners' ? 'View Banner Products' :
                        product.name === 'Business Card Tins' ? 'View Tin Products' :
                        product.name === 'Tradeshow Tents' ? 'View Tent Products' :
                        product.name === 'Custom Stickers' ? 'View Sticker Products' :
                        'View Products'}
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Link>
                   </div>
                 </div>
