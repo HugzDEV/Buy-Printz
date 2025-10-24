@@ -1,174 +1,292 @@
 #!/usr/bin/env python3
 """
-Test script for B2Sign integration.
-This script tests the shipping integration with b2sign.com.
+Test script for B2Sign Playwright Integration
+This script tests the complete workflow for extracting shipping costs from B2Sign.
 """
 
-import os
-import sys
 import asyncio
 import logging
-from dotenv import load_dotenv
-
-# Add the backend directory to the path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from shipping_service import ShippingService
-from site_mapper import SiteMapper
+import sys
+import json
+from datetime import datetime
 
 # Setup logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(f'b2sign_test_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log')
+    ]
+)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
-
-async def test_b2sign_site_mapping():
-    """Test B2Sign site mapping functionality."""
-    logger.info("🔍 Testing B2Sign site mapping...")
-    
+async def test_basic_initialization():
+    """Test 1: Basic browser initialization"""
     try:
-        # Initialize site mapper
-        mapper = SiteMapper('https://b2sign.com')
+        logger.info("=" * 80)
+        logger.info("TEST 1: Basic Browser Initialization")
+        logger.info("=" * 80)
         
-        # Test authentication and site mapping
-        login_result = mapper.authenticate(
-            'https://b2sign.com/login',
-            'order@buyprintz.com',
-            '$AG@BuyPr!n1z'
-        )
+        from b2sign_playwright_integration import B2SignPlaywrightIntegration
         
-        if login_result:
-            logger.info("✅ B2Sign authentication successful")
-            
-            # Map quote form
-            quote_form = mapper.map_quote_form('https://b2sign.com/quote')
-            if quote_form:
-                logger.info("✅ B2Sign quote form mapped successfully")
-                logger.info(f"📋 Found {len(quote_form['fields'])} form fields")
-                
-                # Save site map
-                mapper.save_site_map('b2sign_test_map.json')
-                logger.info("💾 Site map saved successfully")
-                
-                return True
-            else:
-                logger.error("❌ Failed to map B2Sign quote form")
-                return False
-        else:
-            logger.error("❌ B2Sign authentication failed")
-            return False
-            
-    except Exception as e:
-        logger.error(f"❌ B2Sign site mapping failed: {e}")
-        return False
-
-async def test_b2sign_shipping_quote():
-    """Test B2Sign shipping quote functionality."""
-    logger.info("🚚 Testing B2Sign shipping quote...")
-    
-    try:
-        # Initialize shipping service
-        shipping_service = ShippingService()
+        integration = B2SignPlaywrightIntegration()
+        initialized = await integration.initialize()
         
-        # Test product details
-        product_details = {
-            'width': 24,
-            'height': 36,
-            'material': 'vinyl',
-            'quantity': 1,
-            'zip_code': '10001',
-            'product_type': 'banner'
-        }
-        
-        # Get shipping quote
-        result = shipping_service.get_shipping_quote(product_details, 'b2sign')
-        
-        if result.get('success'):
-            logger.info("✅ B2Sign shipping quote successful")
-            logger.info(f"💰 Shipping cost: ${result.get('shipping_cost', 'N/A')}")
-            logger.info(f"🏢 Partner: {result.get('partner_name', 'N/A')}")
+        if initialized:
+            logger.info("✅ TEST 1 PASSED: Browser initialized successfully")
+            await integration.cleanup()
             return True
         else:
-            logger.error(f"❌ B2Sign shipping quote failed: {result.get('error', 'Unknown error')}")
+            logger.error("❌ TEST 1 FAILED: Browser initialization failed")
             return False
             
     except Exception as e:
-        logger.error(f"❌ B2Sign shipping quote test failed: {e}")
+        logger.error(f"❌ TEST 1 FAILED with exception: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
-async def test_b2sign_partner_status():
-    """Test B2Sign partner status check."""
-    logger.info("📊 Testing B2Sign partner status...")
-    
+async def test_login():
+    """Test 2: Login to B2Sign"""
     try:
-        shipping_service = ShippingService()
-        status = shipping_service.get_partner_status('b2sign')
+        logger.info("=" * 80)
+        logger.info("TEST 2: B2Sign Login")
+        logger.info("=" * 80)
         
-        logger.info("📋 B2Sign Partner Status:")
-        logger.info(f"  - Name: {status.get('partner_name', 'N/A')}")
-        logger.info(f"  - Has Site Map: {status.get('has_site_map', False)}")
-        logger.info(f"  - Has Credentials: {status.get('has_credentials', False)}")
-        logger.info(f"  - Base URL: {status.get('base_url', 'N/A')}")
+        from b2sign_playwright_integration import B2SignPlaywrightIntegration
         
-        if status.get('has_site_map'):
-            logger.info(f"  - Site Map Age: {status.get('site_map_age_hours', 0):.1f} hours")
-            logger.info(f"  - Needs Update: {status.get('site_map_needs_update', False)}")
+        integration = B2SignPlaywrightIntegration()
+        await integration.initialize()
         
-        return True
+        login_success = await integration.login()
         
+        if login_success:
+            logger.info("✅ TEST 2 PASSED: Login successful")
+            await integration.cleanup()
+            return True
+        else:
+            logger.error("❌ TEST 2 FAILED: Login failed")
+            await integration.cleanup()
+            return False
+            
     except Exception as e:
-        logger.error(f"❌ B2Sign partner status test failed: {e}")
+        logger.error(f"❌ TEST 2 FAILED with exception: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
-async def main():
-    """Run all B2Sign integration tests."""
-    logger.info("🚀 Starting B2Sign integration tests...")
-    
-    tests = [
-        ("Site Mapping", test_b2sign_site_mapping),
-        ("Partner Status", test_b2sign_partner_status),
-        ("Shipping Quote", test_b2sign_shipping_quote)
-    ]
-    
-    results = []
-    
-    for test_name, test_func in tests:
-        logger.info(f"\n{'='*50}")
-        logger.info(f"Running test: {test_name}")
-        logger.info(f"{'='*50}")
+async def test_banner_navigation():
+    """Test 3: Navigate to banner product page"""
+    try:
+        logger.info("=" * 80)
+        logger.info("TEST 3: Banner Product Page Navigation")
+        logger.info("=" * 80)
         
-        try:
-            result = await test_func()
-            results.append((test_name, result))
-        except Exception as e:
-            logger.error(f"❌ Test {test_name} crashed: {e}")
-            results.append((test_name, False))
+        from b2sign_playwright_integration import B2SignPlaywrightIntegration
+        
+        integration = B2SignPlaywrightIntegration()
+        await integration.initialize()
+        await integration.login()
+        
+        # Navigate to 13oz vinyl banner page
+        await integration.page.goto("https://www.b2sign.com/13oz-vinyl-banner", wait_until='networkidle')
+        await integration.page.wait_for_timeout(3000)
+        
+        current_url = integration.page.url
+        if '13oz-vinyl-banner' in current_url:
+            logger.info(f"✅ TEST 3 PASSED: Navigated to banner page: {current_url}")
+            await integration.cleanup()
+            return True
+        else:
+            logger.error(f"❌ TEST 3 FAILED: Wrong URL: {current_url}")
+            await integration.cleanup()
+            return False
+            
+    except Exception as e:
+        logger.error(f"❌ TEST 3 FAILED with exception: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+async def test_banner_shipping_extraction():
+    """Test 4: Complete banner workflow with shipping extraction"""
+    try:
+        logger.info("=" * 80)
+        logger.info("TEST 4: Complete Banner Workflow with Shipping Extraction")
+        logger.info("=" * 80)
+        
+        from b2sign_playwright_integration import B2SignPlaywrightIntegration
+        
+        integration = B2SignPlaywrightIntegration()
+        await integration.initialize()
+        await integration.login()
+        
+        # Test order data
+        order_data = {
+            'product_type': 'banner',
+            'material': '13oz-vinyl',
+            'dimensions': {
+                'width': 3,
+                'height': 6
+            },
+            'quantity': 1,
+            'print_options': {
+                'sides': 2,
+                'pole_pockets': 'No Pole Pockets',
+                'hem': 'All Sides',
+                'grommets': "Every 2' All Sides"
+            },
+            'customer_info': {
+                'name': 'Test Customer',
+                'company': 'BuyPrintz Test',
+                'phone': '617-505-0603',
+                'address': '123 Test Street',
+                'suburb': '',
+                'city': 'Boston',
+                'state': 'MA',
+                'zipCode': '02108'
+            }
+        }
+        
+        logger.info(f"📋 Test order data: {json.dumps(order_data, indent=2)}")
+        
+        # Get shipping costs
+        result = await integration.get_banner_shipping_costs(order_data)
+        
+        logger.info(f"📦 Result: {json.dumps(result, indent=2)}")
+        
+        if result.get('success') and result.get('shipping_options'):
+            logger.info(f"✅ TEST 4 PASSED: Extracted {len(result['shipping_options'])} shipping options")
+            for i, option in enumerate(result['shipping_options'], 1):
+                logger.info(f"  {i}. {option['name']}: {option['cost']} (Tax: {option.get('tax', 'N/A')})")
+            await integration.cleanup()
+            return True
+        else:
+            logger.error(f"❌ TEST 4 FAILED: {result.get('errors', ['Unknown error'])}")
+            await integration.cleanup()
+            return False
+            
+    except Exception as e:
+        logger.error(f"❌ TEST 4 FAILED with exception: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+async def test_get_shipping_costs_function():
+    """Test 5: Test the standalone get_shipping_costs_playwright function"""
+    try:
+        logger.info("=" * 80)
+        logger.info("TEST 5: Standalone get_shipping_costs_playwright Function")
+        logger.info("=" * 80)
+        
+        from b2sign_playwright_integration import get_shipping_costs_playwright
+        
+        # Test order data
+        order_data = {
+            'product_type': 'banner',
+            'material': '13oz-vinyl',
+            'dimensions': {
+                'width': 2,
+                'height': 4
+            },
+            'quantity': 1,
+            'print_options': {
+                'sides': 2
+            },
+            'customer_info': {
+                'name': 'Test Customer',
+                'company': 'BuyPrintz Test',
+                'phone': '617-505-0603',
+                'address': '123 Test Street',
+                'city': 'Boston',
+                'state': 'MA',
+                'zipCode': '02108'
+            }
+        }
+        
+        logger.info(f"📋 Test order data: {json.dumps(order_data, indent=2)}")
+        
+        # Get shipping costs
+        result = await get_shipping_costs_playwright(order_data)
+        
+        logger.info(f"📦 Result: {json.dumps(result, indent=2)}")
+        
+        if result.get('success') and result.get('shipping_options'):
+            logger.info(f"✅ TEST 5 PASSED: Extracted {len(result['shipping_options'])} shipping options")
+            for i, option in enumerate(result['shipping_options'], 1):
+                logger.info(f"  {i}. {option['name']}: {option['cost']}")
+            return True
+        else:
+            logger.error(f"❌ TEST 5 FAILED: {result.get('errors', ['Unknown error'])}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"❌ TEST 5 FAILED with exception: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+async def run_all_tests():
+    """Run all tests sequentially"""
+    logger.info("🚀 Starting B2Sign Playwright Integration Tests")
+    logger.info(f"⏰ Test started at: {datetime.now().isoformat()}")
     
-    # Print summary
-    logger.info(f"\n{'='*50}")
+    results = {
+        'test_1_initialization': False,
+        'test_2_login': False,
+        'test_3_navigation': False,
+        'test_4_shipping_extraction': False,
+        'test_5_standalone_function': False
+    }
+    
+    # Test 1: Basic initialization
+    results['test_1_initialization'] = await test_basic_initialization()
+    await asyncio.sleep(2)
+    
+    # Test 2: Login
+    results['test_2_login'] = await test_login()
+    await asyncio.sleep(2)
+    
+    # Test 3: Navigation
+    results['test_3_navigation'] = await test_banner_navigation()
+    await asyncio.sleep(2)
+    
+    # Test 4: Complete workflow
+    results['test_4_shipping_extraction'] = await test_banner_shipping_extraction()
+    await asyncio.sleep(2)
+    
+    # Test 5: Standalone function
+    results['test_5_standalone_function'] = await test_get_shipping_costs_function()
+    
+    # Summary
+    logger.info("=" * 80)
     logger.info("TEST SUMMARY")
-    logger.info(f"{'='*50}")
+    logger.info("=" * 80)
     
-    passed = 0
+    passed = sum(1 for result in results.values() if result)
     total = len(results)
     
-    for test_name, result in results:
+    for test_name, result in results.items():
         status = "✅ PASSED" if result else "❌ FAILED"
         logger.info(f"{test_name}: {status}")
-        if result:
-            passed += 1
     
-    logger.info(f"\nResults: {passed}/{total} tests passed")
-    
-    if passed == total:
-        logger.info("🎉 All tests passed! B2Sign integration is working correctly.")
-    else:
-        logger.warning("⚠️  Some tests failed. Check the logs above for details.")
+    logger.info("=" * 80)
+    logger.info(f"TOTAL: {passed}/{total} tests passed")
+    logger.info(f"⏰ Test completed at: {datetime.now().isoformat()}")
+    logger.info("=" * 80)
     
     return passed == total
 
 if __name__ == "__main__":
-    # Run the tests
-    success = asyncio.run(main())
-    sys.exit(0 if success else 1)
+    try:
+        success = asyncio.run(run_all_tests())
+        sys.exit(0 if success else 1)
+    except KeyboardInterrupt:
+        logger.info("\n⚠️ Tests interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"❌ Test suite failed with exception: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        sys.exit(1)
