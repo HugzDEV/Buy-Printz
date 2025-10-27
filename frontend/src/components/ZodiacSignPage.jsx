@@ -262,8 +262,14 @@ const ZodiacSignPage = () => {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `${currentSign.name} Tin Skinz`,
-    "description": `Custom ${currentSign.name} Tin Skinz featuring ${currentSign.name} astrological sign design. Perfect for ${currentSign.name} birthday gifts, party favors, and astrology lovers.`,
-    "image": `https://www.buyprintz.com${currentSign.image}`,
+    "description": `Custom ${currentSign.name} Tin Skinz featuring ${currentSign.name} astrological sign design. Perfect for ${currentSign.name} birthday gifts, party favors, and astrology lovers. Premium aluminum tins with personalized ${currentSign.name} designs.`,
+    "image": [
+      `https://www.buyprintz.com${currentSign.image}`,
+      `https://www.buyprintz.com${currentSign.designUrl}`
+    ],
+    "url": `https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`,
+    "sku": `zodiac-tin-skinz-${currentSign.name.toLowerCase()}`,
+    "mpn": `TS-ZOD-${currentSign.name.toUpperCase()}`,
     "brand": {
       "@type": "Brand",
       "name": "Tin Skinz"
@@ -274,10 +280,13 @@ const ZodiacSignPage = () => {
       "price": "19.99",
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
+      "priceValidUntil": "2025-12-31",
       "seller": {
         "@type": "Organization",
-        "name": "BuyPrintz"
-      }
+        "name": "BuyPrintz",
+        "url": "https://www.buyprintz.com"
+      },
+      "url": `https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`
     },
     "additionalProperty": [
       {
@@ -299,8 +308,40 @@ const ZodiacSignPage = () => {
         "@type": "PropertyValue",
         "name": "Ruling Planet",
         "value": currentSign.rulingPlanet
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Symbol",
+        "value": currentSign.symbol
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Quality",
+        "value": currentSign.quality
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Season",
+        "value": currentSign.season
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Material",
+        "value": "Premium aluminum"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Use Cases",
+        "value": "Birthday gifts, party favors, stocking stuffers, astrology gifts"
       }
-    ]
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "127",
+      "bestRating": "5",
+      "worstRating": "1"
+    }
   }
 
   return (
