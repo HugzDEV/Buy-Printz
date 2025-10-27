@@ -245,7 +245,7 @@ const ZodiacTinSkinz = () => {
         image="https://www.buyprintz.com/assets/tin-skinz/designs/Zodiac Final/10_Aries_Front.png"
         url="https://www.buyprintz.com/zodiac-tin-skinz"
         type="product"
-        structuredData={structuredData}
+        structuredData={null}
       />
       
       {/* Hero Section */}

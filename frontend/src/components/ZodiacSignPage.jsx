@@ -286,7 +286,7 @@ const ZodiacSignPage = () => {
         image={`https://www.buyprintz.com${currentSign.image}`}
         url={`https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`}
         type="product"
-        structuredData={structuredData}
+        structuredData={null}
       />
         
         {/* Hero Section */}

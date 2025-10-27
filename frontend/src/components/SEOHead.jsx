@@ -14,7 +14,7 @@ const SEOHead = ({
   const twitterHandle = "@BuyPrintz"
   
   return (
-    <Helmet key={`seo-${url}`}>
+    <Helmet>
       {/* Primary Meta Tags */}
       <title>{title}</title>
       <meta name="title" content={title} />
@@ -47,11 +47,11 @@ const SEOHead = ({
       {structuredData && (
         Array.isArray(structuredData) ? 
           structuredData.map((data, index) => (
-            <script key={index} type="application/ld+json">
+            <script key={`structured-data-${index}-${url}`} type="application/ld+json">
               {JSON.stringify(data, null, 2)}
             </script>
           )) :
-          <script type="application/ld+json">
+          <script key={`structured-data-${url}`} type="application/ld+json">
             {JSON.stringify(structuredData, null, 2)}
           </script>
       )}
