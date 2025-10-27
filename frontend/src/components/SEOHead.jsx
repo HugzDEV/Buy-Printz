@@ -55,6 +55,9 @@ const SEOHead = ({
             {JSON.stringify(structuredData, null, 2)}
           </script>
       )}
+      
+      {/* Debug: Log structured data */}
+      {structuredData && console.log('SEOHead - structuredData received:', structuredData)}
     </Helmet>
   )
 }

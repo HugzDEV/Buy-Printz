@@ -243,22 +243,8 @@ const ZodiacSignPage = () => {
     }
   }, [sign])
 
-  if (!currentSign) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Zodiac Sign Not Found</h1>
-          <p className="text-gray-600 mb-8">The zodiac sign you're looking for doesn't exist.</p>
-          <Link to="/zodiac-tin-skinz" className="text-blue-600 hover:text-blue-800 underline">
-            Back to Zodiac Tin Skinz
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
-  // Generate structured data for specific zodiac sign
-  const structuredData = {
+  // Generate structured data for specific zodiac sign (even if currentSign is null)
+  const structuredData = currentSign ? {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `${currentSign.name} Tin Skinz`,
@@ -342,6 +328,24 @@ const ZodiacSignPage = () => {
       "bestRating": "5",
       "worstRating": "1"
     }
+  } : null
+
+  // Debug: Log structured data
+  console.log('ZodiacSignPage - currentSign:', currentSign?.name)
+  console.log('ZodiacSignPage - structuredData:', structuredData)
+
+  if (!currentSign) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Zodiac Sign Not Found</h1>
+          <p className="text-gray-600 mb-8">The zodiac sign you're looking for doesn't exist.</p>
+          <Link to="/zodiac-tin-skinz" className="text-blue-600 hover:text-blue-800 underline">
+            Back to Zodiac Tin Skinz
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
