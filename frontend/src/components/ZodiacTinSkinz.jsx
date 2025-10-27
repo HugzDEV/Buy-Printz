@@ -180,58 +180,59 @@ const ZodiacTinSkinz = () => {
 
   const currentSign = zodiacSigns.find(sign => sign.name === currentZodiac)
 
-  // Generate structured data for zodiac tin-skinz
+  // Generate structured data following the exact pattern of working StickerProducts (CollectionPage)
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    "@id": "https://www.buyprintz.com/zodiac-tin-skinz#collection",
+    "@type": "CollectionPage",
     "name": "Tin Skinz Zodiac Collection - Personalized Astrology Tins",
     "description": "Custom Tin Skinz zodiac collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs.",
-    "image": zodiacSigns.map(sign => `https://www.buyprintz.com${sign.image}`),
     "url": "https://www.buyprintz.com/zodiac-tin-skinz",
-    "sku": "zodiac-tin-skinz-collection",
-    "mpn": "TS-ZOD-COLLECTION",
-    "brand": {
-      "@type": "Brand",
-      "name": "Tin Skinz"
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Zodiac Tin Skinz",
+          "item": "https://www.buyprintz.com/zodiac-tin-skinz"
+        }
+      ]
     },
-    "category": "Personalized Gifts",
-    "offers": {
-      "@type": "Offer",
-      "price": "19.99",
-      "priceCurrency": "USD",
-      "availability": "https://schema.org/InStock",
-      "priceValidUntil": "2025-12-31",
-      "seller": {
-        "@type": "Organization",
-        "name": "BuyPrintz",
-        "url": "https://www.buyprintz.com"
-      },
-      "url": "https://www.buyprintz.com/zodiac-tin-skinz"
-    },
-    "additionalProperty": [
-      {
-        "@type": "PropertyValue",
-        "name": "Zodiac Signs",
-        "value": "All 12 astrological signs available"
-      },
-      {
-        "@type": "PropertyValue", 
-        "name": "Material",
-        "value": "Premium aluminum"
-      },
-      {
-        "@type": "PropertyValue",
-        "name": "Use Cases",
-        "value": "Birthday gifts, party favors, stocking stuffers, astrology gifts"
-      }
-    ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "127",
-      "bestRating": "5",
-      "worstRating": "1"
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": zodiacSigns.length,
+      "itemListElement": zodiacSigns.map((sign, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Product",
+          "name": `${sign.name} Tin Skinz`,
+          "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
+          "image": `https://www.buyprintz.com${sign.image}`,
+          "brand": {
+            "@type": "Brand",
+            "name": "Tin Skinz"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "19.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          }
+        }
+      }))
     }
   }
 
