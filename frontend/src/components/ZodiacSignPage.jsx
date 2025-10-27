@@ -247,6 +247,7 @@ const ZodiacSignPage = () => {
   const structuredData = currentSign ? {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}#product`,
     "name": `${currentSign.name} Tin Skinz`,
     "description": `Custom ${currentSign.name} Tin Skinz featuring ${currentSign.name} astrological sign design. Perfect for ${currentSign.name} birthday gifts, party favors, and astrology lovers. Premium aluminum tins with personalized ${currentSign.name} designs.`,
     "image": [
@@ -330,9 +331,6 @@ const ZodiacSignPage = () => {
     }
   } : null
 
-  // Debug: Log structured data
-  console.log('ZodiacSignPage - currentSign:', currentSign?.name)
-  console.log('ZodiacSignPage - structuredData:', structuredData)
 
   if (!currentSign) {
     return (

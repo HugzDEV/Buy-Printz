@@ -184,6 +184,7 @@ const ZodiacTinSkinz = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": "https://www.buyprintz.com/zodiac-tin-skinz#collection",
     "name": "Tin Skinz Zodiac Collection - Personalized Astrology Tins",
     "description": "Custom Tin Skinz zodiac collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs.",
     "image": zodiacSigns.map(sign => `https://www.buyprintz.com${sign.image}`),

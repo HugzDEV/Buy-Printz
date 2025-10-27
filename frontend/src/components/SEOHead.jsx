@@ -14,7 +14,7 @@ const SEOHead = ({
   const twitterHandle = "@BuyPrintz"
   
   return (
-    <Helmet>
+    <Helmet key={`seo-${url}`}>
       {/* Primary Meta Tags */}
       <title>{title}</title>
       <meta name="title" content={title} />
@@ -55,9 +55,6 @@ const SEOHead = ({
             {JSON.stringify(structuredData, null, 2)}
           </script>
       )}
-      
-      {/* Debug: Log structured data */}
-      {structuredData && console.log('SEOHead - structuredData received:', structuredData)}
     </Helmet>
   )
 }
