@@ -208,13 +208,38 @@ const ZodiacTinSkinz = () => {
             "name": `${sign.name} Tin Skinz`,
             "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
             "image": `https://www.buyprintz.com${sign.image}`,
+            "sku": `zodiac-tin-skinz-${sign.name.toLowerCase()}`,
+            "mpn": `TS-ZOD-${sign.name.toUpperCase()}`,
             "brand": { "@type": "Brand", "name": "Tin Skinz" },
             "offers": {
               "@type": "Offer",
-              "price": "19.99",
+              "price": "9.99",
               "priceCurrency": "USD",
               "availability": "https://schema.org/InStock",
-              "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`
+              "itemCondition": "https://schema.org/NewCondition",
+              "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
+              "seller": {
+                "@type": "Organization",
+                "@id": "https://www.buyprintz.com/#organization",
+                "name": "BuyPrintz"
+              },
+              "hasMerchantReturnPolicy": {
+                "@type": "MerchantReturnPolicy",
+                "applicableCountry": "US",
+                "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
+              },
+              "shippingDetails": {
+                "@type": "OfferShippingDetails",
+                "shippingRate": {
+                  "@type": "MonetaryAmount",
+                  "value": "4.99",
+                  "currency": "USD"
+                },
+                "shippingDestination": {
+                  "@type": "DefinedRegion",
+                  "addressCountry": "US"
+                }
+              }
             }
           }
         }))
