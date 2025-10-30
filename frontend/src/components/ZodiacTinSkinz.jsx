@@ -199,57 +199,85 @@ const ZodiacTinSkinz = () => {
       "url": "https://www.buyprintz.com/zodiac-tin-skinz",
       "mainEntity": {
         "@type": "ItemList",
-        "numberOfItems": zodiacSigns.length,
         "itemListElement": zodiacSigns.map((sign, index) => ({
-          "@type": "ListItem",
-          "position": index + 1,
-          "item": {
-            "@type": "Product",
-            "name": `${sign.name} Tin Skinz`,
-            "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
-            "image": `https://www.buyprintz.com${sign.image}`,
-            "sku": `zodiac-tin-skinz-${sign.name.toLowerCase()}`,
-            "mpn": `TS-ZOD-${sign.name.toUpperCase()}`,
+          "@type": "Product",
+          "@id": `https://www.buyprintz.com/zodiac-tin-skinz#${sign.name.toLowerCase()}`,
+          "name": `${sign.name} Tin Skinz`,
+          "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
+          "image": [
+            `https://www.buyprintz.com${sign.image}`,
+            `https://www.buyprintz.com${sign.designUrl}`
+          ],
+          "sku": `zodiac-tin-skinz-${sign.name.toLowerCase()}`,
+          "gtin": `0085001234${String(index + 103).padStart(3, '0')}`,
+          "mpn": `TS-ZOD-${sign.name.toUpperCase()}`,
+          "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
+          "brand": {
+            "@type": "Brand",
+            "name": "Tin Skinz",
+            "logo": "https://www.buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+          },
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "BuyPrintz",
+            "url": "https://www.buyprintz.com"
+          },
+          "category": "Zodiac Gifts & Astrology",
+          "material": "Aluminum",
+          "color": "Custom Zodiac Design",
+          "offers": {
+            "@type": "Offer",
+            "price": 9.99,
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": "2026-12-31",
             "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
-            "brand": { "@type": "Brand", "name": "Tin Skinz" },
-            "offers": {
-              "@type": "Offer",
-              "price": 9.99,
-              "priceCurrency": "USD",
-              "availability": "https://schema.org/InStock",
-              "itemCondition": "https://schema.org/NewCondition",
-              "priceValidUntil": "2026-12-31",
-              "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
-              "seller": {
-                "@type": "Organization",
-                "@id": "https://www.buyprintz.com/#organization",
-                "name": "BuyPrintz"
+            "seller": {
+              "@type": "Organization",
+              "@id": "https://www.buyprintz.com/#organization",
+              "name": "BuyPrintz"
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "US",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+              "returnMethod": "https://schema.org/ReturnByMail"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "4.99",
+                "currency": "USD"
               },
-              "hasMerchantReturnPolicy": {
-                "@type": "MerchantReturnPolicy",
-                "applicableCountry": "US",
-                "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
               },
-              "shippingDetails": {
-                "@type": "OfferShippingDetails",
-                "shippingRate": {
-                  "@type": "MonetaryAmount",
-                  "value": "4.99",
-                  "currency": "USD"
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
                 },
-                "shippingDestination": {
-                  "@type": "DefinedRegion",
-                  "addressCountry": "US"
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
                 }
               }
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "reviewCount": "25",
-              "bestRating": "5",
-              "worstRating": "1"
             }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "25",
+            "bestRating": "5",
+            "worstRating": "1"
           }
         }))
       }
