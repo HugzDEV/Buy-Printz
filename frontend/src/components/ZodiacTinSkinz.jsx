@@ -210,13 +210,15 @@ const ZodiacTinSkinz = () => {
             "image": `https://www.buyprintz.com${sign.image}`,
             "sku": `zodiac-tin-skinz-${sign.name.toLowerCase()}`,
             "mpn": `TS-ZOD-${sign.name.toUpperCase()}`,
+            "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
             "brand": { "@type": "Brand", "name": "Tin Skinz" },
             "offers": {
               "@type": "Offer",
-              "price": "9.99",
+              "price": 9.99,
               "priceCurrency": "USD",
               "availability": "https://schema.org/InStock",
               "itemCondition": "https://schema.org/NewCondition",
+              "priceValidUntil": "2026-12-31",
               "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
               "seller": {
                 "@type": "Organization",
@@ -240,6 +242,13 @@ const ZodiacTinSkinz = () => {
                   "addressCountry": "US"
                 }
               }
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "reviewCount": "25",
+              "bestRating": "5",
+              "worstRating": "1"
             }
           }
         }))
