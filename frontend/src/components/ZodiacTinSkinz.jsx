@@ -180,61 +180,47 @@ const ZodiacTinSkinz = () => {
 
   const currentSign = zodiacSigns.find(sign => sign.name === currentZodiac)
 
-  // Generate structured data following the exact pattern of working StickerProducts (CollectionPage)
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "Tin Skinz Zodiac Collection - Personalized Astrology Tins",
-    "description": "Custom Tin Skinz zodiac collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs.",
-    "url": "https://www.buyprintz.com/zodiac-tin-skinz",
-    "breadcrumb": {
+  // Structured data: Breadcrumbs + CollectionPage with ItemList of Products (with offers)
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.buyprintz.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Products",
-          "item": "https://www.buyprintz.com/all-products"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Zodiac Tin Skinz",
-          "item": "https://www.buyprintz.com/zodiac-tin-skinz"
-        }
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.buyprintz.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://www.buyprintz.com/all-products" },
+        { "@type": "ListItem", "position": 3, "name": "Zodiac Tin Skinz", "item": "https://www.buyprintz.com/zodiac-tin-skinz" }
       ]
     },
-    "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": zodiacSigns.length,
-      "itemListElement": zodiacSigns.map((sign, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
-          "@type": "Product",
-          "name": `${sign.name} Tin Skinz`,
-          "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
-          "image": `https://www.buyprintz.com${sign.image}`,
-          "brand": {
-            "@type": "Brand",
-            "name": "Tin Skinz"
-          },
-          "offers": {
-            "@type": "Offer",
-            "price": "19.99",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Tin Skinz Zodiac Collection - Personalized Astrology Tins",
+      "description": "Custom Tin Skinz zodiac collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs.",
+      "url": "https://www.buyprintz.com/zodiac-tin-skinz",
+      "mainEntity": {
+        "@type": "ItemList",
+        "numberOfItems": zodiacSigns.length,
+        "itemListElement": zodiacSigns.map((sign, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "Product",
+            "name": `${sign.name} Tin Skinz`,
+            "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
+            "image": `https://www.buyprintz.com${sign.image}`,
+            "brand": { "@type": "Brand", "name": "Tin Skinz" },
+            "offers": {
+              "@type": "Offer",
+              "price": "19.99",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`
+            }
           }
-        }
-      }))
+        }))
+      }
     }
-  }
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
