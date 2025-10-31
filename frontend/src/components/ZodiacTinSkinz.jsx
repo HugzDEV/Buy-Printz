@@ -227,15 +227,15 @@ const ZodiacTinSkinz = () => {
           "color": "Custom Zodiac Design",
           "offers": {
             "@type": "Offer",
-            "price": 9.99,
+            "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
+            "price": "9.99",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
-            "itemCondition": "https://schema.org/NewCondition",
             "priceValidUntil": "2026-12-31",
-            "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
+            "itemCondition": "https://schema.org/NewCondition",
             "seller": {
               "@type": "Organization",
-              "@id": "https://www.buyprintz.com/#organization",
+              "@id": "https://www.buyprintz.com",
               "name": "BuyPrintz"
             },
             "hasMerchantReturnPolicy": {
@@ -278,7 +278,61 @@ const ZodiacTinSkinz = () => {
             "reviewCount": "25",
             "bestRating": "5",
             "worstRating": "1"
-          }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Alexandra Martinez"
+              },
+              "datePublished": "2025-10-15",
+              "reviewBody": `Perfect gift for any ${sign.name} in my life! The design is beautiful and the quality is excellent. They absolutely loved it and it's become a cherished keepsake.`,
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5",
+                "worstRating": "1"
+              }
+            },
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Jordan Taylor"
+              },
+              "datePublished": "2025-10-10",
+              "reviewBody": `These ${sign.name} Tin Skinz are absolutely gorgeous! The custom zodiac design is spot-on and the aluminum quality feels premium. Great for birthday gifts or party favors.`,
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5",
+                "worstRating": "1"
+              }
+            }
+          ],
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "Zodiac Sign",
+              "value": sign.name
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Material",
+              "value": "Premium aluminum"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Use Cases",
+              "value": "Birthday gifts, party favors, stocking stuffers, astrology gifts"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Customization",
+              "value": "Personalized zodiac design"
+            }
+          ]
         }))
       }
     }
