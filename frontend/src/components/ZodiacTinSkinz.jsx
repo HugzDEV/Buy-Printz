@@ -347,7 +347,6 @@ const ZodiacTinSkinz = () => {
           }
         ]
       }))
-      }
     }
   };
 
