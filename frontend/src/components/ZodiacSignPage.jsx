@@ -383,7 +383,7 @@ const ZodiacSignPage = () => {
       ]
     };
 
-    // Add BreadcrumbList schema
+    // Add BreadcrumbList schema (using simple URL strings for items)
     const breadcrumbSchema = {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -415,14 +415,8 @@ const ZodiacSignPage = () => {
       ]
     };
 
-    // Combine schemas using @graph format
-    return {
-      "@context": "https://schema.org",
-      "@graph": [
-        productSchema,
-        breadcrumbSchema
-      ]
-    };
+    // Return as array of separate schemas instead of @graph for better Google compatibility
+    return [productSchema, breadcrumbSchema];
   })() : null
 
 
