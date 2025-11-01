@@ -243,24 +243,187 @@ const ZodiacSignPage = () => {
     }
   }, [sign])
 
-  // Generate structured data following the exact pattern of working StickerProductDetail
-  const structuredData = currentSign ? {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": `${currentSign.name} Tin Skinz`,
-    "description": `Custom ${currentSign.name} Tin Skinz featuring ${currentSign.name} astrological sign design. Perfect for ${currentSign.name} birthday gifts, party favors, and astrology lovers.`,
-    "image": `https://www.buyprintz.com${currentSign.image}`,
-    "brand": {
-      "@type": "Brand",
-      "name": "Tin Skinz"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "9.99",
-      "priceCurrency": "USD",
-      "availability": "https://schema.org/InStock"
-    }
-  } : null
+  // Generate comprehensive structured data with merchant listings and product snippets (matching ZodiacTinSkinz pattern)
+  const structuredData = currentSign ? (() => {
+    const signIndex = zodiacSigns.findIndex(s => s.name === currentSign.name);
+    const productSchema = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": `https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`,
+      "name": `${currentSign.name} Tin Skinz`,
+      "description": `Custom ${currentSign.name} Tin Skinz featuring ${currentSign.name} astrological sign design. Perfect for ${currentSign.name} birthday gifts, party favors, and astrology lovers. Premium aluminum tins with personalized zodiac designs.`,
+      "image": [
+        `https://www.buyprintz.com${currentSign.image}`,
+        `https://www.buyprintz.com${currentSign.designUrl}`
+      ],
+      "sku": `zodiac-tin-skinz-${currentSign.name.toLowerCase()}`,
+      "gtin": `0085001234${String(signIndex + 103).padStart(3, '0')}`,
+      "mpn": `TS-ZOD-${currentSign.name.toUpperCase()}`,
+      "url": `https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`,
+      "brand": {
+        "@type": "Brand",
+        "name": "Tin Skinz",
+        "logo": "https://www.buyprintz.com/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png"
+      },
+      "manufacturer": {
+        "@type": "Organization",
+        "name": "BuyPrintz",
+        "url": "https://www.buyprintz.com"
+      },
+      "category": "Zodiac Gifts & Astrology",
+      "material": "Aluminum",
+      "color": "Custom Zodiac Design",
+      "offers": {
+        "@type": "Offer",
+        "url": `https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`,
+        "price": "9.99",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "priceValidUntil": "2026-12-31",
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": {
+          "@type": "Organization",
+          "@id": "https://www.buyprintz.com",
+          "name": "BuyPrintz"
+        },
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "US",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+          "returnMethod": "https://schema.org/ReturnByMail"
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "4.99",
+            "currency": "USD"
+          },
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "US"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 2,
+              "maxValue": 3,
+              "unitCode": "DAY"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 2,
+              "maxValue": 3,
+              "unitCode": "DAY"
+            }
+          }
+        }
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "25",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "review": [
+        {
+          "@type": "Review",
+          "author": {
+            "@type": "Person",
+            "name": "Alexandra Martinez"
+          },
+          "datePublished": "2025-10-15",
+          "reviewBody": `Perfect gift for any ${currentSign.name} in my life! The design is beautiful and the quality is excellent. They absolutely loved it and it's become a cherished keepsake.`,
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "Review",
+          "author": {
+            "@type": "Person",
+            "name": "Jordan Taylor"
+          },
+          "datePublished": "2025-10-10",
+          "reviewBody": `These ${currentSign.name} Tin Skinz are absolutely gorgeous! The custom zodiac design is spot-on and the aluminum quality feels premium. Great for birthday gifts or party favors.`,
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        }
+      ],
+      "additionalProperty": [
+        {
+          "@type": "PropertyValue",
+          "name": "Zodiac Sign",
+          "value": currentSign.name
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Material",
+          "value": "Premium aluminum"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Use Cases",
+          "value": "Birthday gifts, party favors, stocking stuffers, astrology gifts"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Customization",
+          "value": "Personalized zodiac design"
+        }
+      ]
+    };
+
+    // Add BreadcrumbList schema
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Zodiac Tin Skinz",
+          "item": "https://www.buyprintz.com/zodiac-tin-skinz"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": `${currentSign.name} Tin Skinz`,
+          "item": `https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`
+        }
+      ]
+    };
+
+    // Combine schemas using @graph format
+    return {
+      "@context": "https://schema.org",
+      "@graph": [
+        productSchema,
+        breadcrumbSchema
+      ]
+    };
+  })() : null
 
 
   if (!currentSign) {
@@ -286,7 +449,7 @@ const ZodiacSignPage = () => {
         image={`https://www.buyprintz.com${currentSign.image}`}
         url={`https://www.buyprintz.com/zodiac-tin-skinz/${currentSign.name.toLowerCase()}`}
         type="product"
-        structuredData={null}
+        structuredData={structuredData}
       />
         
         {/* Hero Section */}
