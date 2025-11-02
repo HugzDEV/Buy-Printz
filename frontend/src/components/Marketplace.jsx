@@ -179,18 +179,20 @@ const Marketplace = () => {
     "@type": "CollectionPage",
     "name": "Creator Marketplace - Professional Banner Templates",
     "description": "Browse and purchase professional banner templates from our creator marketplace. High-quality designs for business, events, and promotional use.",
-    "url": "https://buyprintz.com/marketplace",
+    "url": "https://www.buyprintz.com/marketplace",
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": totalTemplates,
       "itemListElement": templates.slice(0, 10).map((template, index) => ({
         "@type": "Product",
+        "@id": `https://www.buyprintz.com/marketplace/template/${template.id}`,
         "position": index + 1,
         "name": template.name,
         "description": template.description,
         "image": template.thumbnail_url ? 
-          (template.thumbnail_url.startsWith('http') ? template.thumbnail_url : `https://buyprintz.com${template.thumbnail_url}`) :
-          "https://buyprintz.com/assets/images/marketplace-placeholder.jpg",
+          (template.thumbnail_url.startsWith('http') ? template.thumbnail_url : `https://www.buyprintz.com${template.thumbnail_url}`) :
+          "https://www.buyprintz.com/assets/images/marketplace-placeholder.jpg",
+        "url": `https://www.buyprintz.com/marketplace/template/${template.id}`,
         "offers": {
           "@type": "Offer",
           "price": template.price,
@@ -213,11 +215,7 @@ const Marketplace = () => {
           "ratingValue": template.rating || "4.5",
           "reviewCount": template.download_count || "10",
           "bestRating": "5",
-          "worstRating": "1",
-          "itemReviewed": {
-            "@type": "Product",
-            "name": template.name
-          }
+          "worstRating": "1"
         },
         "review": [
           {
@@ -228,10 +226,26 @@ const Marketplace = () => {
             },
             "datePublished": "2025-09-15",
             "reviewBody": "Great template design! Easy to customize and perfect for our business needs.",
+            "itemReviewed": {
+              "@type": "Product",
+              "@id": `https://www.buyprintz.com/marketplace/template/${template.id}`,
+              "name": template.name,
+              "url": `https://www.buyprintz.com/marketplace/template/${template.id}`,
+              "image": template.thumbnail_url ? 
+                (template.thumbnail_url.startsWith('http') ? template.thumbnail_url : `https://www.buyprintz.com${template.thumbnail_url}`) :
+                "https://www.buyprintz.com/assets/images/marketplace-placeholder.jpg",
+              "offers": {
+                "@type": "Offer",
+                "price": template.price,
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock"
+              }
+            },
             "reviewRating": {
               "@type": "Rating",
               "ratingValue": "5",
-              "bestRating": "5"
+              "bestRating": "5",
+              "worstRating": "1"
             }
           }
         ],
