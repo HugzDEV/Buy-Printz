@@ -258,7 +258,7 @@ class B2SignPlaywrightIntegration:
             await self._select_blind_drop_ship()
             
             # Step 5: Open address modal and fill customer address
-            await self._open_and_fill_address_modal(zip_code, customer_info)
+            await self._open_and_fill_address_modal(self.page, zip_code, customer_info)
             
             # Step 6: Extract all shipping options and tax
             shipping_options = await self._extract_all_shipping_options_workflow()
@@ -289,7 +289,7 @@ class B2SignPlaywrightIntegration:
         except:
             return 5
     
-    async def _create_mock_order_and_get_shipping(self, page, product_type, dimensions, quantity, print_options, accessories, zip_code):
+    async def _create_mock_order_and_get_shipping(self, page, product_type, dimensions, quantity, print_options, accessories, zip_code, customer_info=None):
         """Create a mock order on B2Sign and extract the calculated shipping cost"""
         try:
             logger.info("🛒 Creating mock order on B2Sign...")
@@ -299,14 +299,14 @@ class B2SignPlaywrightIntegration:
             height = dimensions.get('height', 4)
             
             # Fill dimensions in feet and inches format
-            await self._fill_dimensions(page, width, height)
+            await self._fill_banner_dimensions(page, width, height)
             
             # Fill job details
             await self._fill_job_details(page, product_type, width, height, quantity)
             
-            # Handle product-specific options first
+            # Handle product-specific options first - use the new workflow method
             if product_type in ['banner', 'banners']:
-                await self._fill_banner_options(page, print_options, accessories)
+                await self._fill_banner_options_workflow(page, print_options)
             elif product_type in ['tent', 'tents', 'tradeshow_tent']:
                 await self._fill_tent_options(page, print_options, accessories)
             
@@ -315,7 +315,10 @@ class B2SignPlaywrightIntegration:
             await page.wait_for_timeout(3000)
             
             # Set shipping to Blind Drop Ship (this triggers shipping options to appear)
-            await self._set_shipping_options(page, zip_code)
+            await self._select_blind_drop_ship(page)
+            
+            # Open address modal and fill customer address to get all shipping options
+            await self._open_and_fill_address_modal(page, zip_code, customer_info)
             
             # Wait for shipping options to appear after Blind Drop Ship is selected
             logger.info("⏳ Waiting for shipping options dropdown to appear...")
@@ -937,7 +940,7 @@ class B2SignPlaywrightIntegration:
         }
         return state_mapping.get(state_code.upper(), [state_code.lower()])
 
-    async def _fill_banner_dimensions(self, width, height):
+    async def _fill_banner_dimensions(self, page, width, height):
         """Fill banner dimensions using improved precision field detection"""
         try:
             logger.info(f"📏 Filling banner dimensions: {width}ft x {height}ft")
@@ -950,14 +953,14 @@ class B2SignPlaywrightIntegration:
             height_in = int((height - height_ft) * 12) if height > height_ft else 0
             
             # Look for MUI input fields for dimensions
-            mui_inputs = await self.page.query_selector_all('.MuiInput-input')
+            mui_inputs = await page.query_selector_all('.MuiInput-input')
             logger.info(f"Found {len(mui_inputs)} MUI input fields total")
             
             # Look for dimension-specific input fields - BE MORE SPECIFIC
             dimension_inputs = []
             
             # Method 1: Look for inputs with specific attributes that suggest dimensions
-            all_inputs = await self.page.query_selector_all('input')
+            all_inputs = await page.query_selector_all('input')
             logger.info(f"🔍 Found {len(all_inputs)} total input elements")
             
             for i, input_elem in enumerate(all_inputs):
@@ -1050,65 +1053,259 @@ class B2SignPlaywrightIntegration:
         except Exception as e:
             logger.warning(f"⚠️ Error filling banner job details: {e}")
     
-    async def _fill_banner_options_workflow(self, print_options):
+    async def _fill_banner_options_workflow(self, page, print_options):
         """Fill banner options using proven workflow"""
         try:
             logger.info("🎨 Filling banner options...")
             
-            # Select 2 Sides (proven workflow)
-            dropdowns = await self.page.query_selector_all('.MuiSelect-button')
-            if len(dropdowns) > 0:
-                await dropdowns[0].click()
-                await self.page.wait_for_timeout(1000)
-                two_sides_option = await self.page.query_selector('text="2 Sides"')
-                if two_sides_option:
-                    await two_sides_option.click()
-                    logger.info("✅ Selected dropdown option: 2 Sides")
-                    await self.page.wait_for_timeout(2000)
+            # Handle number of sides dropdown
+            sides = print_options.get('sides', 1)
+            await self._select_dropdown_option(page, f"{sides} Side" if sides == 1 else f"{sides} Sides")
+            
+            # Handle pole pockets dropdown
+            pole_pockets = print_options.get('polePockets', 'none')
+            if pole_pockets != 'none':
+                await self._select_dropdown_option(page, pole_pockets)
+            
+            # Handle hem dropdown
+            hem = print_options.get('hem', 'no-hem')
+            if hem != 'no-hem':
+                await self._select_dropdown_option(page, hem)
+            
+            # Handle grommet dropdown
+            grommets = print_options.get('grommets', 'every-2ft-all-sides')
+            if grommets != 'none':
+                await self._select_dropdown_option(page, grommets)
+            
+            # Select turnaround time (default to Next Day for free shipping)
+            turnaround = print_options.get('turnaround', 'next-day')
+            await self._select_turnaround(page, 'Next Day' if turnaround == 'next-day' else 'Same Day')
                         
         except Exception as e:
             logger.warning(f"⚠️ Error filling banner options: {e}")
     
-    async def _select_blind_drop_ship(self):
+    async def _select_blind_drop_ship(self, page):
         """Select Blind Drop Ship using proven workflow"""
         try:
             logger.info("🚚 Selecting Blind Drop Ship...")
             
-            # Use proven method from test_complete_banner_workflow.py
-            all_elements = await self.page.query_selector_all('*')
-            for element in all_elements:
+            # Wait for page to stabilize without scrolling
+            await page.wait_for_timeout(2000)
+            
+            # Look for radio buttons specifically
+            radio_buttons = await page.query_selector_all('input[type="radio"]')
+            logger.info(f"Found {len(radio_buttons)} radio buttons")
+            
+            blind_drop_selected = False
+            
+            # Method 1: Look for radio buttons with "Blind Drop Ship" text
+            for i, radio in enumerate(radio_buttons):
                 try:
-                    text = await element.inner_text()
-                    if 'blind drop' in text.lower() and 'ship' in text.lower():
-                        await element.click()
-                        logger.info("✅ Clicked Blind Drop Ship")
-                        await self.page.wait_for_timeout(3000)
-                        break
-                except:
+                    # Check if this radio button is for Blind Drop Ship
+                    parent = await radio.query_selector('xpath=..')
+                    if parent:
+                        parent_text = await parent.inner_text()
+                        logger.info(f"Radio button {i+1} parent text: '{parent_text.strip()}'")
+                        
+                        if 'blind drop' in parent_text.lower() and 'ship' in parent_text.lower():
+                            logger.info(f"Found Blind Drop Ship radio button {i+1}")
+                            
+                            # Check if it's already selected
+                            is_checked = await radio.is_checked()
+                            logger.info(f"Radio button {i+1} is_checked: {is_checked}")
+                            
+                            if not is_checked:
+                                # Try multiple approaches to select the radio button
+                                
+                                # Approach 1: Click the radio button directly
+                                try:
+                                    await radio.click()
+                                    logger.info("✅ Clicked Blind Drop Ship radio button directly")
+                                    await page.wait_for_timeout(2000)
+                                    
+                                    is_checked_after = await radio.is_checked()
+                                    logger.info(f"Radio button {i+1} is_checked after direct click: {is_checked_after}")
+                                    
+                                    if is_checked_after:
+                                        logger.info("✅ Blind Drop Ship is now selected (direct click)")
+                                        blind_drop_selected = True
+                                        break
+                                except Exception as e:
+                                    logger.warning(f"Direct click failed: {e}")
+                                
+                                # Approach 2: Click the parent element
+                                if not blind_drop_selected:
+                                    try:
+                                        await parent.click()
+                                        logger.info("✅ Clicked Blind Drop Ship parent element")
+                                        await page.wait_for_timeout(2000)
+                                        
+                                        is_checked_after_parent = await radio.is_checked()
+                                        logger.info(f"Radio button {i+1} is_checked after parent click: {is_checked_after_parent}")
+                                        
+                                        if is_checked_after_parent:
+                                            logger.info("✅ Blind Drop Ship is now selected (parent click)")
+                                            blind_drop_selected = True
+                                            break
+                                    except Exception as e:
+                                        logger.warning(f"Parent click failed: {e}")
+                                
+                                # Approach 3: Use JavaScript to set the radio button
+                                if not blind_drop_selected:
+                                    try:
+                                        await page.evaluate('''(radio) => {
+                                            radio.checked = true;
+                                            radio.dispatchEvent(new Event('change', { bubbles: true }));
+                                            radio.dispatchEvent(new Event('click', { bubbles: true }));
+                                        }''', radio)
+                                        logger.info("✅ Set Blind Drop Ship radio button via JavaScript")
+                                        await page.wait_for_timeout(2000)
+                                        
+                                        is_checked_after_js = await radio.is_checked()
+                                        logger.info(f"Radio button {i+1} is_checked after JS: {is_checked_after_js}")
+                                        
+                                        if is_checked_after_js:
+                                            logger.info("✅ Blind Drop Ship is now selected (JavaScript)")
+                                            blind_drop_selected = True
+                                            break
+                                    except Exception as e:
+                                        logger.warning(f"JavaScript approach failed: {e}")
+                                
+                                # Approach 4: Try clicking the label or text
+                                if not blind_drop_selected:
+                                    try:
+                                        # Look for the label element
+                                        label = await radio.query_selector('xpath=../label')
+                                        if label:
+                                            await label.click()
+                                            logger.info("✅ Clicked Blind Drop Ship label")
+                                            await page.wait_for_timeout(2000)
+                                            
+                                            is_checked_after_label = await radio.is_checked()
+                                            logger.info(f"Radio button {i+1} is_checked after label click: {is_checked_after_label}")
+                                            
+                                            if is_checked_after_label:
+                                                logger.info("✅ Blind Drop Ship is now selected (label click)")
+                                                blind_drop_selected = True
+                                                break
+                                    except Exception as e:
+                                        logger.warning(f"Label click failed: {e}")
+                                        
+                            else:
+                                logger.info("✅ Blind Drop Ship is already selected")
+                                blind_drop_selected = True
+                                break
+                except Exception as e:
+                    logger.warning(f"Error checking radio button {i+1}: {e}")
                     continue
+            
+            # Method 2: If radio buttons didn't work, try clicking by text content
+            if not blind_drop_selected:
+                logger.info("🔍 Trying alternative approach - clicking by text content...")
+                
+                # Look for any element containing "Blind Drop Ship" text
+                all_elements = await page.query_selector_all('*')
+                for element in all_elements:
+                    try:
+                        text = await element.inner_text()
+                        if 'blind drop' in text.lower() and 'ship' in text.lower() and len(text.strip()) < 50:
+                            logger.info(f"Found Blind Drop Ship text element: '{text.strip()}'")
+                            await element.click()
+                            logger.info("✅ Clicked Blind Drop Ship text element")
+                            await page.wait_for_timeout(2000)
+                            
+                            # Verify the selection worked by checking if any radio button is now selected
+                            radio_buttons_after = await page.query_selector_all('input[type="radio"]')
+                            for radio in radio_buttons_after:
+                                try:
+                                    is_checked = await radio.is_checked()
+                                    if is_checked:
+                                        logger.info("✅ Blind Drop Ship radio button is now selected")
+                                        blind_drop_selected = True
+                                        break
+                                except:
+                                    continue
+                            
+                            if blind_drop_selected:
+                                break
+                    except:
+                        continue
+            
+            if not blind_drop_selected:
+                logger.warning("⚠️ Could not select Blind Drop Ship radio button")
+                return False
+            else:
+                logger.info("✅ Blind Drop Ship selection completed successfully")
+                return True
                     
         except Exception as e:
             logger.warning(f"⚠️ Error selecting Blind Drop Ship: {e}")
+            return False
     
-    async def _open_and_fill_address_modal(self, zip_code, customer_info=None):
+    async def _open_and_fill_address_modal(self, page, zip_code, customer_info=None):
         """Open address modal and fill customer address using proven workflow"""
         try:
             logger.info("📝 Opening and filling address modal...")
             
-            # Step 1: Click pencil icon to open modal
-            svgs = await self.page.query_selector_all('svg')
+            # Step 1: Click pencil icon to open modal - try multiple approaches
+            modal_opened = False
+            
+            # Method 1: Look for SVG icons near "Ship to" text
+            svgs = await page.query_selector_all('svg')
             for i, svg in enumerate(svgs):
                 try:
                     parent = await svg.query_selector('xpath=..')
                     parent_text = await parent.inner_text() if parent else ""
                     
-                    if 'ship to different location' in parent_text.lower():
+                    # Look for "Ship to" text in parent
+                    if 'ship to' in parent_text.lower():
                         await svg.click()
-                        logger.info("✅ Clicked pencil icon to open modal")
-                        await self.page.wait_for_timeout(2000)
+                        logger.info("✅ Clicked pencil icon to open modal (SVG method)")
+                        await page.wait_for_timeout(2000)
+                        modal_opened = True
                         break
                 except:
                     continue
+            
+            # Method 2: Look for edit buttons near "Ship to" text
+            if not modal_opened:
+                buttons = await self.page.query_selector_all('button')
+                for button in buttons:
+                    try:
+                        parent = await button.query_selector('xpath=..')
+                        parent_text = await parent.inner_text() if parent else ""
+                        
+                        # Look for buttons near "Ship to" text
+                        if 'ship to' in parent_text.lower():
+                            await button.click()
+                            logger.info("✅ Clicked edit button to open modal (button method)")
+                            await self.page.wait_for_timeout(2000)
+                            modal_opened = True
+                            break
+                    except:
+                        continue
+            
+            # Method 3: Look for any clickable element near "Ship to" text
+            if not modal_opened:
+                all_elements = await self.page.query_selector_all('*')
+                for element in all_elements:
+                    try:
+                        text = await element.inner_text()
+                        if 'ship to' in text.lower() and len(text.strip()) < 50:  # Short text likely to be a button
+                            # Check if this element is clickable
+                            tag_name = await element.evaluate('el => el.tagName.toLowerCase()')
+                            if tag_name in ['button', 'div', 'span']:
+                                await element.click()
+                                logger.info("✅ Clicked element near 'Ship to' text to open modal")
+                                await self.page.wait_for_timeout(2000)
+                                modal_opened = True
+                                break
+                    except:
+                        continue
+            
+            if not modal_opened:
+                logger.warning("⚠️ Could not find Ship to edit button - trying to continue without address modal")
+                return
             
             # Step 2: Fill address fields using customer info
             if not customer_info:
@@ -1508,31 +1705,62 @@ class B2SignPlaywrightIntegration:
             logger.warning(f"⚠️ Error filling banner options: {e}")
     
     async def _select_dropdown_option(self, page, option_text):
-        """Select an option from a dropdown by text"""
+        """Select an option from a dropdown by text - NO SCROLLING to prevent doom scroll"""
         try:
+            logger.info(f"🔍 Selecting dropdown option: {option_text}")
+            
             # Use exact MUI selector from page analysis
             dropdowns = await page.query_selector_all('.MuiSelect-button')
+            logger.info(f"Found {len(dropdowns)} MUI dropdowns")
             
-            for dropdown in dropdowns:
+            option_selected = False
+            
+            for i, dropdown in enumerate(dropdowns):
                 try:
-                    # Try to click the dropdown to open it
+                    # Check if this dropdown is already showing the desired option
+                    current_text = await dropdown.inner_text()
+                    if option_text.lower() in current_text.lower():
+                        logger.info(f"✅ Dropdown {i+1} already shows '{option_text}' - skipping")
+                        option_selected = True
+                        break
+                    
+                    # Click dropdown without any scrolling
                     await dropdown.click()
-                    await page.wait_for_timeout(1000)
+                    await page.wait_for_timeout(500)
                     
                     # Look for the option in the dropdown
                     options = await page.query_selector_all('option, [role="option"], .MuiMenuItem-root')
+                    logger.info(f"Found {len(options)} options in dropdown {i+1}")
+                    
                     for option in options:
                         try:
                             option_text_content = await option.inner_text()
                             if option_text.lower() in option_text_content.lower():
+                                # Click the option without any scrolling
                                 await option.click()
                                 logger.info(f"✅ Selected dropdown option: {option_text}")
-                                await page.wait_for_timeout(1000)
-                                return True
+                                await page.wait_for_timeout(500)
+                                option_selected = True
+                                break
                         except:
                             continue
-                except:
+                    
+                    if option_selected:
+                        break
+                    
+                    # Close dropdown if option not found
+                    await page.keyboard.press('Escape')
+                    await page.wait_for_timeout(200)
+                    
+                except Exception as e:
+                    logger.warning(f"⚠️ Error with dropdown {i+1}: {e}")
                     continue
+            
+            if not option_selected:
+                logger.warning(f"⚠️ Could not select dropdown option '{option_text}'")
+                return False
+                
+            return True
                     
         except Exception as e:
             logger.warning(f"⚠️ Could not select dropdown option '{option_text}': {e}")
@@ -2063,7 +2291,7 @@ async def get_shipping_costs_playwright(order_data: Dict[str, Any]) -> Dict[str,
             # Create an instance of the integration class to use its methods
             integration = B2SignPlaywrightIntegration()
             shipping_options = await integration._create_mock_order_and_get_shipping(
-                page, product_type, dimensions, quantity, print_options, accessories, zip_code
+                page, product_type, dimensions, quantity, print_options, accessories, zip_code, customer_info
             )
             
             if shipping_options:

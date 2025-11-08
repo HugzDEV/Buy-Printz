@@ -198,6 +198,67 @@ class UPSShippingService:
             
             logger.info(f"📦 Sticker weight calculation: {total_quantity} stickers, {total_weight:.3f}lbs total")
             
+        elif product_type == 'banner':
+            # Banner weight and dimensions
+            dimensions = order_data.get('dimensions', {})
+            width_ft = dimensions.get('width', 3.0)
+            height_ft = dimensions.get('height', 6.0)
+            
+            # Banners are rolled and shipped in tubes or flat boxes
+            # Weight: approximately 0.5 lbs per square foot for vinyl banners
+            banner_area_sqft = width_ft * height_ft * total_quantity
+            total_weight = max(0.5, banner_area_sqft * 0.5)  # Minimum 0.5 lbs
+            
+            # Calculate package dimensions based on banner size
+            # Banners are typically rolled in tubes or shipped flat
+            if banner_area_sqft <= 20:
+                # Small banner: rolled in tube
+                package_length = max(36.0, height_ft * 12)  # Tube length = banner height
+                package_width = 6.0  # Tube diameter
+                package_height = 6.0
+            elif banner_area_sqft <= 50:
+                # Medium banner: larger tube or flat box
+                package_length = max(48.0, height_ft * 12)
+                package_width = max(12.0, width_ft * 12)
+                package_height = 3.0
+            else:
+                # Large banner: flat box
+                package_length = max(60.0, height_ft * 12)
+                package_width = max(24.0, width_ft * 12)
+                package_height = 3.0
+            
+            logger.info(f"📦 Banner weight calculation: {total_quantity} banner(s), {width_ft}x{height_ft}ft each, {total_weight:.3f}lbs total")
+            
+        elif product_type == 'tent':
+            # Tent weight and dimensions
+            dimensions = order_data.get('dimensions', {})
+            tent_size = order_data.get('tent_size', '10x10')
+            
+            # Tents are heavy - approximately 15-30 lbs depending on size
+            # 10x10 tent: ~15 lbs, 10x20 tent: ~25 lbs, 20x20 tent: ~30 lbs
+            if '10x10' in tent_size.lower():
+                total_weight = 15.0 * total_quantity
+            elif '10x20' in tent_size.lower() or '20x10' in tent_size.lower():
+                total_weight = 25.0 * total_quantity
+            elif '20x20' in tent_size.lower():
+                total_weight = 30.0 * total_quantity
+            else:
+                # Default to 20 lbs for other sizes
+                total_weight = 20.0 * total_quantity
+            
+            # Use provided dimensions or calculate from tent size
+            if dimensions and 'width' in dimensions and 'height' in dimensions:
+                package_length = dimensions.get('length', dimensions.get('height', 24.0))
+                package_width = dimensions.get('width', 24.0)
+                package_height = dimensions.get('height', dimensions.get('length', 6.0))
+            else:
+                # Default dimensions for tent packages
+                package_length = 36.0
+                package_width = 36.0
+                package_height = 12.0
+            
+            logger.info(f"📦 Tent weight calculation: {total_quantity} tent(s), {tent_size}, {total_weight:.3f}lbs total")
+            
         else:
             # Tin Skinz weight and dimensions (existing logic)
             tin_weight_empty = 0.074  # lbs per empty tin (1.18oz)
@@ -251,7 +312,7 @@ class UPSShippingService:
                 "Request": {
                     "RequestOption": "Shop",
                     "TransactionReference": {
-                        "CustomerContext": f"Tin Skinz Order {total_quantity} tins"
+                        "CustomerContext": f"{product_type.title()} Order {total_quantity} unit(s)"
                     }
                 },
                 "Shipment": {
@@ -712,7 +773,7 @@ class UPSShippingService:
             }
 
     def _calculate_package_details(self, order_data: Dict[str, Any]) -> tuple:
-        """Calculate package dimensions and weight for Tin Skinz or Sticker orders"""
+        """Calculate package dimensions and weight for various product types"""
         try:
             total_quantity = order_data.get('total_quantity', 1)
             selected_designs = order_data.get('selected_designs', [])
@@ -721,7 +782,65 @@ class UPSShippingService:
             # Calculate total weight based on product type
             total_weight = 0.0
             
-            if product_type == 'custom-sticker':
+            if product_type == 'banner':
+                # Banner weight and dimensions
+                dimensions = order_data.get('dimensions', {})
+                width_ft = dimensions.get('width', 3.0)
+                height_ft = dimensions.get('height', 6.0)
+                
+                # Banners are rolled and shipped in tubes or flat boxes
+                # Weight: approximately 0.5 lbs per square foot for vinyl banners
+                banner_area_sqft = width_ft * height_ft * total_quantity
+                total_weight = max(0.5, banner_area_sqft * 0.5)  # Minimum 0.5 lbs
+                
+                # Calculate package dimensions based on banner size
+                if banner_area_sqft <= 20:
+                    # Small banner: rolled in tube
+                    package_length = max(36.0, height_ft * 12)
+                    package_width = 6.0
+                    package_height = 6.0
+                elif banner_area_sqft <= 50:
+                    # Medium banner: larger tube or flat box
+                    package_length = max(48.0, height_ft * 12)
+                    package_width = max(12.0, width_ft * 12)
+                    package_height = 3.0
+                else:
+                    # Large banner: flat box
+                    package_length = max(60.0, height_ft * 12)
+                    package_width = max(24.0, width_ft * 12)
+                    package_height = 3.0
+                
+                logger.info(f"📦 Banner package details: {total_quantity} banner(s), {total_weight:.3f} lbs, {package_length}x{package_width}x{package_height} inches")
+                
+            elif product_type == 'tent':
+                # Tent weight and dimensions
+                dimensions = order_data.get('dimensions', {})
+                tent_size = order_data.get('tent_size', '10x10')
+                
+                # Tents are heavy - approximately 15-30 lbs depending on size
+                if '10x10' in tent_size.lower():
+                    total_weight = 15.0 * total_quantity
+                elif '10x20' in tent_size.lower() or '20x10' in tent_size.lower():
+                    total_weight = 25.0 * total_quantity
+                elif '20x20' in tent_size.lower():
+                    total_weight = 30.0 * total_quantity
+                else:
+                    total_weight = 20.0 * total_quantity
+                
+                # Use provided dimensions or calculate from tent size
+                if dimensions and 'width' in dimensions and 'height' in dimensions:
+                    package_length = dimensions.get('length', dimensions.get('height', 24.0))
+                    package_width = dimensions.get('width', 24.0)
+                    package_height = dimensions.get('height', dimensions.get('length', 6.0))
+                else:
+                    # Default dimensions for tent packages
+                    package_length = 36.0
+                    package_width = 36.0
+                    package_height = 12.0
+                
+                logger.info(f"📦 Tent package details: {total_quantity} tent(s), {total_weight:.3f} lbs, {package_length}x{package_width}x{package_height} inches")
+                
+            elif product_type == 'custom-sticker':
                 # Sticker weight calculation
                 sticker_weight_per_unit = 0.001  # 0.001 lbs per sticker (very light)
                 total_weight = total_quantity * sticker_weight_per_unit

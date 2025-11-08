@@ -38,12 +38,21 @@ class ShippingService {
       console.log('📋 Customer info:', JSON.stringify(requestData.customer_info))
       
       // Make API request to our print partner shipping costs endpoint
-      // Print partner integration takes 60-300 seconds, so we need a longer timeout
+      // UPS API is fast (2-5 seconds), but keep timeout for safety
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 300000) // 300 second timeout (5 minutes)
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout (UPS is much faster than Playwright)
       
-      // Use dedicated tent endpoint for tent products, general endpoint for banners
-      const endpoint = orderData.product_type === 'tent' ? '/api/shipping-costs/tent' : '/api/shipping-costs/get'
+      // Use new UPS-based endpoints for banners and tents
+      let endpoint
+      if (orderData.product_type === 'tent' || orderData.product_type === 'tradeshow_tent') {
+        endpoint = '/api/tents/shipping/get-rates'
+      } else if (orderData.product_type === 'banner' || orderData.product_type === 'banners') {
+        endpoint = '/api/banners/shipping/get-rates'
+      } else {
+        // Fallback to old endpoint for other product types
+        endpoint = '/api/shipping-costs/get'
+      }
+      
       const response = await fetch(`${this.baseURL}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -87,11 +96,11 @@ class ShippingService {
 
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.error('⏰ Print partner API request timed out after 300 seconds')
+        console.error('⏰ UPS API request timed out after 30 seconds')
         throw new Error('Shipping cost request timed out. Please try again.')
       }
       
-      console.error('❌ Error getting print partner shipping costs:', error)
+      console.error('❌ Error getting UPS shipping costs:', error)
       throw error
     }
   }
@@ -270,7 +279,7 @@ class ShippingService {
    * Prepare shipping costs request data
    */
   prepareShippingCostsRequest(orderData, customerInfo) {
-    // For tent requests, use the dedicated tent endpoint format
+    // For tent requests, use the new UPS API format
     if (orderData.product_type === 'tent' || orderData.product_type === 'tradeshow_tent') {
       return {
         tentSize: orderData.print_options?.tent_size || '10x10',
@@ -283,7 +292,18 @@ class ShippingService {
       }
     }
 
-    // For banner and other requests, use the general format
+    // For banner requests, use the new UPS API format
+    if (orderData.product_type === 'banner' || orderData.product_type === 'banners') {
+      return {
+        dimensions: orderData.dimensions || { width: 2, height: 4 },
+        quantity: orderData.quantity || 1,
+        material: orderData.material,
+        print_options: orderData.print_options || {},
+        customer_info: customerInfo
+      }
+    }
+
+    // For other product types, use the general format (fallback)
     const request = {
       product_type: orderData.product_type || 'banner',
       dimensions: orderData.dimensions || { width: 2, height: 4 },

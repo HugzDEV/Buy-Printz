@@ -45,18 +45,33 @@ except ImportError:
     CREATOR_FOLLOWER_AVAILABLE = False
     print("Warning: Creator follower module not available")
 
-# Old shipping API routes removed - using Playwright integration only
+# Import Banner Shipping API routes (UPS integration)
+try:
+    from backend.banner_shipping_api import router as banner_shipping_router
+    BANNER_SHIPPING_API_AVAILABLE = True
+    print("✅ Banner Shipping API (UPS) loaded successfully")
+except ImportError as e:
+    BANNER_SHIPPING_API_AVAILABLE = False
+    print(f"❌ Banner Shipping API failed to load: {e}")
 
+# Import Tent Shipping API routes (UPS integration)
+try:
+    from backend.tent_shipping_api import router as tent_shipping_router
+    TENT_SHIPPING_API_AVAILABLE = True
+    print("✅ Tent Shipping API (UPS) loaded successfully")
+except ImportError as e:
+    TENT_SHIPPING_API_AVAILABLE = False
+    print(f"❌ Tent Shipping API failed to load: {e}")
+
+# Old B2Sign Playwright integration - DEPRECATED (kept for backward compatibility but not used)
 # Import shipping costs API routes - B2Sign integration with Playwright
 try:
     from backend.shipping_costs_api import router as shipping_costs_router
     SHIPPING_COSTS_API_AVAILABLE = True
-    print("✅ B2Sign Shipping Costs API (Playwright) loaded successfully")
+    print("⚠️ B2Sign Shipping Costs API (Playwright) loaded but DEPRECATED - using UPS instead")
 except ImportError as e:
     SHIPPING_COSTS_API_AVAILABLE = False
-    print(f"❌ B2Sign Shipping Costs API failed to load: {e}")
-    print("❌ Cannot deploy without real shipping costs - would cause financial losses")
-    raise ImportError(f"B2Sign shipping integration is required: {e}")
+    print(f"⚠️ B2Sign Shipping Costs API not available (deprecated): {e}")
 
 # Import Tin Skinz API routes
 try:
@@ -245,14 +260,25 @@ if CREATOR_FOLLOWER_AVAILABLE:
 else:
     logger.warning("Creator follower routes not available - module not found")
 
-# Old shipping API routes removed - using Playwright integration only
+# Include new UPS-based shipping APIs
+if BANNER_SHIPPING_API_AVAILABLE:
+    app.include_router(banner_shipping_router)
+    logger.info("Banner Shipping API routes loaded successfully")
+else:
+    logger.warning("Banner Shipping API routes not available - module not found")
 
-# Include shipping costs API routes if available
+if TENT_SHIPPING_API_AVAILABLE:
+    app.include_router(tent_shipping_router)
+    logger.info("Tent Shipping API routes loaded successfully")
+else:
+    logger.warning("Tent Shipping API routes not available - module not found")
+
+# Old B2Sign Playwright integration - DEPRECATED (kept for backward compatibility but not used)
 if SHIPPING_COSTS_API_AVAILABLE:
     app.include_router(shipping_costs_router)
-    logger.info("Shipping Costs API routes loaded successfully")
+    logger.info("B2Sign Shipping Costs API routes loaded (DEPRECATED - using UPS instead)")
 else:
-    logger.warning("Shipping Costs API routes not available - module not found")
+    logger.warning("B2Sign Shipping Costs API routes not available (deprecated)")
 
 # Include Tin Skinz API routes if available
 if TIN_SKINZ_API_AVAILABLE:
