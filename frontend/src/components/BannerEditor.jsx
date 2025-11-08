@@ -363,10 +363,10 @@ const BannerEditorNew = () => {
         }
         
         // For tent canopy surfaces, export only the design area (1110px wide) centered in canvas (1160px)
-        // This matches the pattern used for tin and ensures proper centering like backwall/sidewall
+        // This matches the proven tin pattern and ensures proper centering like backwall/sidewall
         if (productType === 'tent' && currentSurface && currentSurface.startsWith('canopy_')) {
-          console.log('🎨 Tent canopy detected - exporting design area (1110px) centered like tin/backwall/sidewall')
-          const tentDesignWidth = 1110  // Actual design width (matches sidewall/backwall)
+          console.log('🎨 Tent canopy detected - exporting design area (1110px) centered using proven tin method')
+          const tentDesignWidth = 1110  // Actual design width (matches sidewall/backwall exactly)
           const tentDesignHeight = 1049 // Full height (canopy + valence)
           const offsetX = (canvasSize.width - tentDesignWidth) / 2  // Center horizontally: (1160-1110)/2 = 25px
           const offsetY = 0  // No vertical offset needed - design starts at top
