@@ -377,37 +377,24 @@ const InlinePrintPreview = ({
                   />
                 </div>
               ) : productType === 'tent' ? (
-                // Tent Preview - Using proven centering method from tin preview
+                // Tent Preview - Proper alignment and sizing like tin preview
                 <div className="relative w-full h-full flex items-center justify-center">
-                  {/* Design Image - Centered using proven absolute positioning method */}
-                  <div 
-                    className="absolute"
+                  <img
+                    src={previewImage}
+                    alt="Tent Design Preview"
+                    className="max-w-full max-h-full object-contain bg-white"
                     style={{
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
+                      // Tent canvas is 1160x1049px - ensure proper aspect ratio and centering
+                      width: 'auto',
+                      height: 'auto',
                       maxWidth: '100%',
-                      maxHeight: '100%'
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                      objectPosition: 'center'
                     }}
-                  >
-                    <img
-                      src={previewImage}
-                      alt="Tent Design Preview"
-                      className="max-w-full max-h-full bg-white"
-                      style={{
-                        // Use object-contain to maintain aspect ratio while fitting container
-                        width: 'auto',
-                        height: 'auto',
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        objectFit: 'contain',
-                        display: 'block'
-                      }}
-                      draggable={false}
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
-                  </div>
-                  {/* Watermark Overlay */}
+                    draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
                   <div
                     className="pointer-events-none absolute inset-0"
                     style={{

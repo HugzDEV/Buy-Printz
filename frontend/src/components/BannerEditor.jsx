@@ -362,30 +362,7 @@ const BannerEditorNew = () => {
           return imageData
         }
         
-        // For tent canopy surfaces, export only the design area (1110px wide) centered in canvas (1160px)
-        // This matches the proven tin pattern and ensures proper centering like backwall/sidewall
-        if (productType === 'tent' && currentSurface && currentSurface.startsWith('canopy_')) {
-          console.log('🎨 Tent canopy detected - exporting design area (1110px) centered using proven tin method')
-          const tentDesignWidth = 1110  // Actual design width (matches sidewall/backwall exactly)
-          const tentDesignHeight = 1049 // Full height (canopy + valence)
-          const offsetX = (canvasSize.width - tentDesignWidth) / 2  // Center horizontally: (1160-1110)/2 = 25px
-          const offsetY = 0  // No vertical offset needed - design starts at top
-          
-          const imageData = stageRef.current.toDataURL({
-            pixelRatio: 3, // Higher quality export for better print quality
-            mimeType: 'image/png',
-            quality: 1.0, // Maximum quality for print
-            // Export only the design area (1110x1049) centered horizontally
-            x: offsetX,
-            y: offsetY,
-            width: tentDesignWidth,  // 1110 - actual design width (matches sidewall/backwall)
-            height: tentDesignHeight // 1049 - full height
-          })
-          console.log('🎨 Tent canopy design area exported (1110x1049) at offset x:', offsetX, 'y:', offsetY, 'length:', imageData.length)
-          return imageData
-        }
-        
-        // Standard export for other products (backwall/sidewall work perfectly because canvas size = export size)
+        // Standard export for other products
         const imageData = stageRef.current.toDataURL({
           pixelRatio: 3, // Higher quality export for better print quality
           mimeType: 'image/png',
@@ -443,7 +420,7 @@ const BannerEditorNew = () => {
       console.error('Failed to generate canvas image:', error)
       return null
     }
-  }, [stageRef, productType, canvasSize, currentSurface])
+  }, [stageRef, productType, canvasSize])
 
   // Triangular clipping function for tent canopy
   const getTentCanopyClipFunc = () => {

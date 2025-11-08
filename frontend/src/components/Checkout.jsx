@@ -846,12 +846,12 @@ const Checkout = () => {
                     canvas_data: orderData.canvas_data,
                     surface_elements: orderData.surface_elements,
                     marketplace_templates: orderData.marketplace_templates,
-                    product_type: orderData.product_type,
-                    design_option: orderData.design_option,
-                    tent_design_option: orderData.tent_design_option,
-                    tin_surface_coverage: orderData.tin_surface_coverage,
-                    banner_type: orderData.banner_type,
-                    tin_options: orderData.tin_options,
+                      product_type: orderData.product_type,
+                      design_option: orderData.design_option,
+                      tent_design_option: orderData.tent_design_option,
+                      tin_surface_coverage: orderData.tin_surface_coverage,
+                      banner_type: orderData.banner_type,
+                      tin_options: orderData.tin_options,
                     tent_size: orderData.tent_size
                   }
                   sessionStorage.setItem('cancelledOrder', JSON.stringify(restorationData))
