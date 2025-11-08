@@ -362,7 +362,29 @@ const BannerEditorNew = () => {
           return imageData
         }
         
-        // Standard export for other products
+        // For tent canopy surfaces, export centered design area matching sidewall/backwall width
+        if (productType === 'tent' && currentSurface && currentSurface.startsWith('canopy_')) {
+          console.log('🎨 Tent canopy detected - exporting centered design area (1110px wide)')
+          const tentDesignWidth = 1110   // Match sidewall/backwall width
+          const tentDesignHeight = 1049  // Full height (canopy + valence)
+          const offsetX = (canvasSize.width - tentDesignWidth) / 2  // Center horizontally: (1160-1110)/2 = 25px
+          const offsetY = 0  // No vertical offset - design starts at top
+          
+          const imageData = stageRef.current.toDataURL({
+            pixelRatio: 3, // Higher quality export for better print quality
+            mimeType: 'image/png',
+            quality: 1.0, // Maximum quality for print
+            // Export only the centered design area (1110x1049) to match sidewall/backwall
+            x: offsetX,
+            y: offsetY,
+            width: tentDesignWidth,  // 1110 - match sidewall/backwall width
+            height: tentDesignHeight // 1049 - full height
+          })
+          console.log('🎨 Tent canopy centered design area (1110x1049) exported at offset x:', offsetX)
+          return imageData
+        }
+        
+        // Standard export for other products (sidewalls, backwall, banners, stickers)
         const imageData = stageRef.current.toDataURL({
           pixelRatio: 3, // Higher quality export for better print quality
           mimeType: 'image/png',
@@ -420,7 +442,7 @@ const BannerEditorNew = () => {
       console.error('Failed to generate canvas image:', error)
       return null
     }
-  }, [stageRef, productType, canvasSize])
+  }, [stageRef, productType, canvasSize, currentSurface])
 
   // Triangular clipping function for tent canopy
   const getTentCanopyClipFunc = () => {
