@@ -362,7 +362,50 @@ const BannerEditorNew = () => {
           return imageData
         }
         
-        // Standard export for other products (tents, sidewalls, backwall, banners, stickers)
+        // For tent sidewalls and backwall, export only the safe print area (centered, like tins)
+        if (productType === 'tent' && currentSurface) {
+          if (currentSurface === 'sidewall_left' || currentSurface === 'sidewall_right') {
+            console.log('🎨 Tent sidewall detected - exporting safe print area (centered)')
+            const printWidth = 1110
+            const printHeight = 390
+            const offsetX = (canvasSize.width - printWidth) / 2  // (1150-1110)/2 = 20px
+            const offsetY = (canvasSize.height - printHeight) / 2 // (430-390)/2 = 20px
+            
+            const imageData = stageRef.current.toDataURL({
+              pixelRatio: 3,
+              mimeType: 'image/png',
+              quality: 1.0,
+              x: offsetX,
+              y: offsetY,
+              width: printWidth,
+              height: printHeight
+            })
+            console.log('🎨 Sidewall safe print area exported (1110x390) at offset:', offsetX, offsetY)
+            return imageData
+          }
+          
+          if (currentSurface === 'backwall') {
+            console.log('🎨 Tent backwall detected - exporting safe print area (centered)')
+            const printWidth = 1110
+            const printHeight = 780
+            const offsetX = (canvasSize.width - printWidth) / 2  // (1150-1110)/2 = 20px
+            const offsetY = (canvasSize.height - printHeight) / 2 // (820-780)/2 = 20px
+            
+            const imageData = stageRef.current.toDataURL({
+              pixelRatio: 3,
+              mimeType: 'image/png',
+              quality: 1.0,
+              x: offsetX,
+              y: offsetY,
+              width: printWidth,
+              height: printHeight
+            })
+            console.log('🎨 Backwall safe print area exported (1110x780) at offset:', offsetX, offsetY)
+            return imageData
+          }
+        }
+        
+        // Standard export for other products (canopy, banners, stickers)
         const imageData = stageRef.current.toDataURL({
           pixelRatio: 3, // Higher quality export for better print quality
           mimeType: 'image/png',
@@ -420,7 +463,7 @@ const BannerEditorNew = () => {
       console.error('Failed to generate canvas image:', error)
       return null
     }
-  }, [stageRef, productType, canvasSize])
+  }, [stageRef, productType, canvasSize, currentSurface])
 
   // Triangular clipping function for tent canopy
   const getTentCanopyClipFunc = () => {
@@ -828,11 +871,13 @@ const BannerEditorNew = () => {
     // Update canvas size based on tent surface
     if (productType === 'tent') {
       if (surface === 'sidewall_left' || surface === 'sidewall_right') {
-        // Sidewalls: same width, half height (1110 x 390 for full wall, 1110 x 185 for half wall)
-        setCanvasSize({ width: 1110, height: 390 })
+        // Sidewalls: Add 40px padding (20px each side) for safe zone margins like tins
+        // Print area: 1110x390, Canvas: 1150x430
+        setCanvasSize({ width: 1150, height: 430 })
       } else if (surface === 'backwall') {
-        // Backwall: original size (1110 x 780 for full wall, 1110 x 370 for half wall)
-        setCanvasSize({ width: 1110, height: 780 })
+        // Backwall: Add 40px padding (20px each side) for safe zone margins like tins
+        // Print area: 1110x780, Canvas: 1150x820
+        setCanvasSize({ width: 1150, height: 820 })
       } else if (surface.startsWith('canopy_')) {
         // Canopy surfaces: triangular canopy + rectangular valence below
         // Total height: canopy height (789px) + gap (20px) + valence height (200px) + bottom padding (40px) = 1049px
@@ -1878,12 +1923,12 @@ const BannerEditorNew = () => {
         templateSurfaceKeys.forEach(surfaceKey => {
           const surfaceData = template.surfaces[surfaceKey]
           if (surfaceData && surfaceData.elements) {
-            // Get the correct canvas size for this surface type
+            // Get the correct canvas size for this surface type (with margins for safe zones)
             let surfaceCanvasSize = canvasSize
             if (surfaceKey === 'sidewall_left' || surfaceKey === 'sidewall_right') {
-              surfaceCanvasSize = { width: 1110, height: 390 }
+              surfaceCanvasSize = { width: 1150, height: 430 } // Added 40px margin (20px each side)
             } else if (surfaceKey === 'backwall') {
-              surfaceCanvasSize = { width: 1110, height: 780 }
+              surfaceCanvasSize = { width: 1150, height: 820 } // Added 40px margin (20px each side)
             } else if (surfaceKey.startsWith('canopy_')) {
               surfaceCanvasSize = { width: 1160, height: 1049 }
             }
