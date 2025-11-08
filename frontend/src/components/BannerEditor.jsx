@@ -362,6 +362,28 @@ const BannerEditorNew = () => {
           return imageData
         }
         
+        // For tent canopy surfaces, export only the design area (1110px wide) centered in canvas (1160px)
+        // This removes the 25px padding on each side that causes left alignment issues
+        if (productType === 'tent' && currentSurface && currentSurface.startsWith('canopy_')) {
+          console.log('🎨 Tent canopy detected - exporting design area (1110px) for proper centering')
+          const tentDesignWidth = 1110  // Actual design width (matches sidewall/backwall)
+          const tentDesignHeight = 1049 // Full height (canopy + valence)
+          const offsetX = (canvasSize.width - tentDesignWidth) / 2  // Center horizontally: (1160-1110)/2 = 25px
+          
+          const imageData = stageRef.current.toDataURL({
+            pixelRatio: 3, // Higher quality export for better print quality
+            mimeType: 'image/png',
+            quality: 1.0, // Maximum quality for print
+            // Export only the design area (1110x1049) centered in canvas, removing side padding
+            x: offsetX,
+            y: 0,  // Start from top
+            width: tentDesignWidth,  // 1110 - actual design width
+            height: tentDesignHeight // 1049 - full height
+          })
+          console.log('🎨 Tent canopy design area exported (1110x1049), length:', imageData.length)
+          return imageData
+        }
+        
         // Standard export for other products
         const imageData = stageRef.current.toDataURL({
           pixelRatio: 3, // Higher quality export for better print quality
@@ -420,7 +442,7 @@ const BannerEditorNew = () => {
       console.error('Failed to generate canvas image:', error)
       return null
     }
-  }, [stageRef, productType, canvasSize])
+  }, [stageRef, productType, canvasSize, currentSurface])
 
   // Triangular clipping function for tent canopy
   const getTentCanopyClipFunc = () => {
