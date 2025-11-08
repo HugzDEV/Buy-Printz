@@ -364,26 +364,34 @@ const BannerEditorNew = () => {
         
         // For tent canopy surfaces, export only the design area (1110px wide) centered in canvas (1160px)
         // This removes the 25px padding on each side that causes left alignment issues
-        // Adjusted: moved 100px right and 50px down for proper positioning
+        // Adjusted: move export window RIGHT and DOWN to bring design into frame (opposite of going left/up)
         if (productType === 'tent' && currentSurface && currentSurface.startsWith('canopy_')) {
           console.log('🎨 Tent canopy detected - exporting design area (1110px) with positioning offset')
           const tentDesignWidth = 1110  // Actual design width (matches sidewall/backwall)
           const tentDesignHeight = 1049 // Full height (canopy + valence)
           const baseOffsetX = (canvasSize.width - tentDesignWidth) / 2  // Center horizontally: (1160-1110)/2 = 25px
-          const offsetX = baseOffsetX + 100  // Move 100px to the right
-          const offsetY = 50  // Move 50px down
+          // Move export window RIGHT to capture design and prevent it from going left out of frame
+          const offsetX = baseOffsetX + 100  // Move 100px right (125px from left)
+          // Move export window DOWN to capture design and prevent it from going up out of frame
+          const offsetY = 50  // Move 50px down from top
+          
+          // Ensure we don't go outside canvas bounds
+          const maxX = canvasSize.width - tentDesignWidth
+          const maxY = canvasSize.height - tentDesignHeight
+          const clampedX = Math.min(offsetX, maxX)
+          const clampedY = Math.min(offsetY, maxY)
           
           const imageData = stageRef.current.toDataURL({
             pixelRatio: 3, // Higher quality export for better print quality
             mimeType: 'image/png',
             quality: 1.0, // Maximum quality for print
             // Export only the design area (1110x1049) with positioning offset
-            x: offsetX,
-            y: offsetY,
+            x: clampedX,
+            y: clampedY,
             width: tentDesignWidth,  // 1110 - actual design width
             height: tentDesignHeight // 1049 - full height
           })
-          console.log('🎨 Tent canopy design area exported (1110x1049) at offset x:', offsetX, 'y:', offsetY, 'length:', imageData.length)
+          console.log('🎨 Tent canopy design area exported (1110x1049) at offset x:', clampedX, 'y:', clampedY, 'length:', imageData.length)
           return imageData
         }
         
