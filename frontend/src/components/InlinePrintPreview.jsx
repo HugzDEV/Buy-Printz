@@ -377,21 +377,12 @@ const InlinePrintPreview = ({
                   />
                 </div>
               ) : productType === 'tent' ? (
-                // Tent Preview - Proper alignment and sizing like tin preview
-                <div className="relative w-full h-full flex items-center justify-center">
+                // Tent Preview - Same styling as stickers/banners for consistent display
+                <>
                   <img
                     src={previewImage}
                     alt="Tent Design Preview"
-                    className="max-w-full max-h-full object-contain bg-white"
-                    style={{
-                      // Tent canvas is 1160x1049px - ensure proper aspect ratio and centering
-                      width: 'auto',
-                      height: 'auto',
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'contain',
-                      objectPosition: 'center'
-                    }}
+                    className="w-full h-full object-contain bg-white"
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
                   />
@@ -411,7 +402,7 @@ const InlinePrintPreview = ({
                       e.target.style.display = 'none'
                     }}
                   />
-                </div>
+                </>
               ) : (
                 // Standard Preview for Banners
                 <>
