@@ -302,8 +302,20 @@ const TentCheckout = () => {
   const selectedShippingQuote = shippingQuotes.find(quote => {
     return quote.name === selectedShippingOption || quote.type === selectedShippingOption
   })
-  const shippingCost = selectedShippingQuote ? parseFloat(selectedShippingQuote.cost?.replace('$', '') || '0') : 0
-  const taxAmount = selectedShippingQuote ? parseFloat(selectedShippingQuote.tax?.replace('$', '') || '0') : 0
+  // Handle both string ($14.50) and number (14.50) formats from different APIs
+  const rawCost = selectedShippingQuote?.cost
+  const shippingCost = selectedShippingQuote 
+    ? (typeof rawCost === 'string' 
+        ? parseFloat(rawCost.replace('$', '').replace(',', '') || '0') || 0
+        : (typeof rawCost === 'number' ? rawCost : 0))
+    : 0
+  // Handle both string ($14.50) and number (14.50) formats for tax
+  const rawTax = selectedShippingQuote?.tax
+  const taxAmount = selectedShippingQuote 
+    ? (typeof rawTax === 'string' 
+        ? parseFloat(rawTax.replace('$', '').replace(',', '') || '0') || 0
+        : (typeof rawTax === 'number' ? rawTax : 0))
+    : 0
   
   // Add a state variable to force re-render when shipping option changes
   const [shippingUpdateTrigger, setShippingUpdateTrigger] = useState(0)

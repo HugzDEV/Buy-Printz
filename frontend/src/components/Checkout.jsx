@@ -438,7 +438,11 @@ const Checkout = () => {
     try {
       // Calculate current total including shipping
       const selectedShippingQuote = shippingQuotes.find(q => q.name === shippingOption)
-      const shippingCost = parseFloat(selectedShippingQuote?.cost?.replace('$', '') || '0') || 0
+      // Handle both string ($14.50) and number (14.50) formats from different APIs
+      const rawCost = selectedShippingQuote?.cost
+      const shippingCost = typeof rawCost === 'string' 
+        ? parseFloat(rawCost.replace('$', '').replace(',', '') || '0') || 0
+        : (typeof rawCost === 'number' ? rawCost : 0)
       const currentTotal = subtotal + shippingCost
       
       console.log('🔄 Creating payment intent with amount:', currentTotal)
@@ -747,7 +751,11 @@ const Checkout = () => {
   const windSlitCost = bannerOptionsConfig.windslits.find(opt => opt.value === bannerOptions.windslits)?.price || 0
   const turnaroundCost = bannerOptionsConfig.turnaround.find(opt => opt.value === bannerOptions.turnaround)?.price || 0
   const selectedShippingQuote = shippingQuotes.find(q => q.name === shippingOption)
-  const shippingCost = parseFloat(selectedShippingQuote?.cost?.replace('$', '') || '0') || 0
+  // Handle both string ($14.50) and number (14.50) formats from different APIs
+  const rawCost = selectedShippingQuote?.cost
+  const shippingCost = typeof rawCost === 'string' 
+    ? parseFloat(rawCost.replace('$', '').replace(',', '') || '0') || 0
+    : (typeof rawCost === 'number' ? rawCost : 0)
   
   // Calculate proper tax (6.25% for Massachusetts)
   const TAX_RATE = 0.0625 // 6.25%
