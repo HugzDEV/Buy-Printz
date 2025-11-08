@@ -1845,39 +1845,18 @@ const BannerEditorNew = () => {
         console.log('🎨 Tent template surfaces:', Object.keys(template.surfaces))
         console.log('🎨 Current tent specs:', tentSpecs)
         
-        // IMPORTANT: Respect current tent specifications - don't change them
-        // Only load surfaces that match the user's current tent specs
+        // IMPORTANT: Load ALL template surfaces regardless of current tent specs
+        // This ensures that if user enables sidewalls/backwall later, the template data is already available
+        // The surfaces will only be visible/available based on tent specs (controlled by availableSurfaces)
         if (!tentSpecs) {
           console.warn('🎨 No tent specs available, cannot load template surfaces')
           return
         }
         
-        // Filter template surfaces to only include those allowed by current tent specs
-        const allowedSurfaces = []
+        // Load ALL surfaces from template - don't filter based on current tent specs
+        // The tent specs control visibility/availability, not what gets loaded
         const templateSurfaceKeys = Object.keys(template.surfaces)
-        
-        // Canopy surfaces are always allowed if canopy is enabled
-        if (tentSpecs.surfaces?.canopy) {
-          allowedSurfaces.push(...templateSurfaceKeys.filter(key => key.startsWith('canopy_')))
-        }
-        
-        // Sidewall surfaces only if sidewalls are enabled
-        if (tentSpecs.surfaces?.sidewalls) {
-          allowedSurfaces.push(...templateSurfaceKeys.filter(key => key === 'sidewall_left' || key === 'sidewall_right'))
-        }
-        
-        // Backwall only if backwall is enabled
-        if (tentSpecs.surfaces?.backwall) {
-          allowedSurfaces.push(...templateSurfaceKeys.filter(key => key === 'backwall'))
-        }
-        
-        console.log('🎨 Allowed surfaces based on current tent specs:', allowedSurfaces)
-        console.log('🎨 Template surfaces that will be loaded:', allowedSurfaces)
-        
-        if (allowedSurfaces.length === 0) {
-          console.warn('🎨 No template surfaces match current tent specifications')
-          // Still show a message or handle this case
-        }
+        console.log('🎨 Loading all template surfaces (will be filtered by tent specs for visibility):', templateSurfaceKeys)
         
         // Clear existing surface elements for all surfaces
         setSurfaceElements({
@@ -1894,17 +1873,27 @@ const BannerEditorNew = () => {
           backwall: []
         })
         
-        // Load elements ONLY for surfaces that match current tent specs
+        // Load elements for ALL surfaces in the template
         const newSurfaceElements = {}
-        allowedSurfaces.forEach(surfaceKey => {
+        templateSurfaceKeys.forEach(surfaceKey => {
           const surfaceData = template.surfaces[surfaceKey]
           if (surfaceData && surfaceData.elements) {
+            // Get the correct canvas size for this surface type
+            let surfaceCanvasSize = canvasSize
+            if (surfaceKey === 'sidewall_left' || surfaceKey === 'sidewall_right') {
+              surfaceCanvasSize = { width: 1110, height: 390 }
+            } else if (surfaceKey === 'backwall') {
+              surfaceCanvasSize = { width: 1110, height: 780 }
+            } else if (surfaceKey.startsWith('canopy_')) {
+              surfaceCanvasSize = { width: 1160, height: 1049 }
+            }
+            
             // Scale elements for the current surface
             const scaledElements = scaleTemplateElements(
               surfaceData.elements,
-              canvasSize.width,
-              canvasSize.height,
-              canvasSize // Use current canvas size for tent surfaces
+              surfaceCanvasSize.width,
+              surfaceCanvasSize.height,
+              surfaceData.canvasSize || surfaceCanvasSize // Use template's original canvas size if available
             ).map(element => {
               // Generate new ID for each element to avoid conflicts
               const elementWithId = {
@@ -1916,7 +1905,7 @@ const BannerEditorNew = () => {
             })
             
             newSurfaceElements[surfaceKey] = scaledElements
-            console.log(`🎨 Loaded ${scaledElements.length} elements for surface: ${surfaceKey} (matches tent specs)`)
+            console.log(`🎨 Loaded ${scaledElements.length} elements for surface: ${surfaceKey}`)
           }
         })
         
@@ -1925,7 +1914,7 @@ const BannerEditorNew = () => {
           ...newSurfaceElements
         }))
         setSelectedId(null)
-        console.log(`🎨 Loaded tent template: ${template.name} (respecting current tent specifications)`)
+        console.log(`🎨 Loaded tent template: ${template.name} - All template surfaces loaded (visibility controlled by tent specs)`)
         return
       }
       
