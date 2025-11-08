@@ -840,51 +840,22 @@ const Checkout = () => {
           <div className="flex items-center justify-between">
             <button
               onClick={() => {
-                // Use the same efficient approach as Marketplace.jsx - store only essential navigation data
                 if (orderData) {
-                  try {
-                    // Store only essential navigation metadata - no canvas data, no large objects
-                    const navigationData = {
-                      product_type: orderData.product_type,
-                      design_option: orderData.design_option,
-                      tent_design_option: orderData.tent_design_option,
-                      tin_surface_coverage: orderData.tin_surface_coverage,
-                      banner_type: orderData.banner_type,
-                      tin_options: orderData.tin_options,
-                      tent_size: orderData.tent_size,
-                      // Add timestamp for cache management
-                      timestamp: Date.now()
-                    }
-                    
-                    // Clear existing data first (same pattern as Marketplace)
-                    sessionStorage.removeItem('cancelledOrder')
-                    
-                    // Store only essential navigation data
-                    const dataString = JSON.stringify(navigationData)
-                    
-                    // Additional safety check for data size
-                    if (dataString.length > 1024) { // 1KB limit for navigation data
-                      console.warn('Navigation data too large, storing minimal data only')
-                      const minimalData = {
-                        product_type: orderData.product_type,
-                        banner_type: orderData.banner_type,
-                        timestamp: Date.now()
-                      }
-                      sessionStorage.setItem('cancelledOrder', JSON.stringify(minimalData))
-                    } else {
-                      sessionStorage.setItem('cancelledOrder', dataString)
-                    }
-                    
-                    console.log('Saved navigation data for editor restoration')
-                  } catch (error) {
-                    console.warn('Storage quota exceeded, continuing without saving:', error.message)
-                    // Clear any existing data and continue
-                    try {
-                      sessionStorage.removeItem('cancelledOrder')
-                    } catch (clearError) {
-                      console.warn('Failed to clear storage:', clearError.message)
-                    }
+                  // Store only essential data for canvas restoration, not the large images
+                  const restorationData = {
+                    canvas_data: orderData.canvas_data,
+                    surface_elements: orderData.surface_elements,
+                    marketplace_templates: orderData.marketplace_templates,
+                    product_type: orderData.product_type,
+                    design_option: orderData.design_option,
+                    tent_design_option: orderData.tent_design_option,
+                    tin_surface_coverage: orderData.tin_surface_coverage,
+                    banner_type: orderData.banner_type,
+                    tin_options: orderData.tin_options,
+                    tent_size: orderData.tent_size
                   }
+                  sessionStorage.setItem('cancelledOrder', JSON.stringify(restorationData))
+                  console.log('Saved cancelled banner order data for restoration')
                 }
                 // Route back to banner editor with product parameter
                 const productParam = orderData?.banner_type ? `?product=${orderData.banner_type}` : ''
