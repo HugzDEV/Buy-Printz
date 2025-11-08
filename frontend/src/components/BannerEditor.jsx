@@ -364,23 +364,26 @@ const BannerEditorNew = () => {
         
         // For tent canopy surfaces, export only the design area (1110px wide) centered in canvas (1160px)
         // This removes the 25px padding on each side that causes left alignment issues
+        // Adjusted: moved 100px right and 50px down for proper positioning
         if (productType === 'tent' && currentSurface && currentSurface.startsWith('canopy_')) {
-          console.log('🎨 Tent canopy detected - exporting design area (1110px) for proper centering')
+          console.log('🎨 Tent canopy detected - exporting design area (1110px) with positioning offset')
           const tentDesignWidth = 1110  // Actual design width (matches sidewall/backwall)
           const tentDesignHeight = 1049 // Full height (canopy + valence)
-          const offsetX = (canvasSize.width - tentDesignWidth) / 2  // Center horizontally: (1160-1110)/2 = 25px
+          const baseOffsetX = (canvasSize.width - tentDesignWidth) / 2  // Center horizontally: (1160-1110)/2 = 25px
+          const offsetX = baseOffsetX + 100  // Move 100px to the right
+          const offsetY = 50  // Move 50px down
           
           const imageData = stageRef.current.toDataURL({
             pixelRatio: 3, // Higher quality export for better print quality
             mimeType: 'image/png',
             quality: 1.0, // Maximum quality for print
-            // Export only the design area (1110x1049) centered in canvas, removing side padding
+            // Export only the design area (1110x1049) with positioning offset
             x: offsetX,
-            y: 0,  // Start from top
+            y: offsetY,
             width: tentDesignWidth,  // 1110 - actual design width
             height: tentDesignHeight // 1049 - full height
           })
-          console.log('🎨 Tent canopy design area exported (1110x1049), length:', imageData.length)
+          console.log('🎨 Tent canopy design area exported (1110x1049) at offset x:', offsetX, 'y:', offsetY, 'length:', imageData.length)
           return imageData
         }
         
