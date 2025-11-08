@@ -1843,28 +1843,43 @@ const BannerEditorNew = () => {
       else if (productType === 'tent' && template.surfaces) {
         console.log('🎨 Loading tent template:', template.name)
         console.log('🎨 Tent template surfaces:', Object.keys(template.surfaces))
+        console.log('🎨 Current tent specs:', tentSpecs)
         
-        // Update tent specs based on template surfaces
-        const templateSurfaceKeys = Object.keys(template.surfaces)
-        const hasSidewalls = templateSurfaceKeys.includes('sidewall_left') || templateSurfaceKeys.includes('sidewall_right')
-        const hasBackwall = templateSurfaceKeys.includes('backwall')
-        
-        // Update tent specs to match template surfaces
-        const updatedTentSpecs = {
-          tentSize: '10x10',
-          surfaces: {
-            canopy: true, // Always true for canopy surfaces
-            sidewalls: hasSidewalls,
-            backwall: hasBackwall
-          },
-          withFrame: true,
-          reinforcedStripColor: 'white'
+        // IMPORTANT: Respect current tent specifications - don't change them
+        // Only load surfaces that match the user's current tent specs
+        if (!tentSpecs) {
+          console.warn('🎨 No tent specs available, cannot load template surfaces')
+          return
         }
         
-        console.log('🎨 Updating tent specs for template:', updatedTentSpecs)
-        setTentSpecs(updatedTentSpecs)
+        // Filter template surfaces to only include those allowed by current tent specs
+        const allowedSurfaces = []
+        const templateSurfaceKeys = Object.keys(template.surfaces)
         
-        // Clear existing surface elements
+        // Canopy surfaces are always allowed if canopy is enabled
+        if (tentSpecs.surfaces?.canopy) {
+          allowedSurfaces.push(...templateSurfaceKeys.filter(key => key.startsWith('canopy_')))
+        }
+        
+        // Sidewall surfaces only if sidewalls are enabled
+        if (tentSpecs.surfaces?.sidewalls) {
+          allowedSurfaces.push(...templateSurfaceKeys.filter(key => key === 'sidewall_left' || key === 'sidewall_right'))
+        }
+        
+        // Backwall only if backwall is enabled
+        if (tentSpecs.surfaces?.backwall) {
+          allowedSurfaces.push(...templateSurfaceKeys.filter(key => key === 'backwall'))
+        }
+        
+        console.log('🎨 Allowed surfaces based on current tent specs:', allowedSurfaces)
+        console.log('🎨 Template surfaces that will be loaded:', allowedSurfaces)
+        
+        if (allowedSurfaces.length === 0) {
+          console.warn('🎨 No template surfaces match current tent specifications')
+          // Still show a message or handle this case
+        }
+        
+        // Clear existing surface elements for all surfaces
         setSurfaceElements({
           front: [],
           back: [],
@@ -1879,9 +1894,9 @@ const BannerEditorNew = () => {
           backwall: []
         })
         
-        // Load elements for each surface
+        // Load elements ONLY for surfaces that match current tent specs
         const newSurfaceElements = {}
-        Object.keys(template.surfaces).forEach(surfaceKey => {
+        allowedSurfaces.forEach(surfaceKey => {
           const surfaceData = template.surfaces[surfaceKey]
           if (surfaceData && surfaceData.elements) {
             // Scale elements for the current surface
@@ -1901,13 +1916,16 @@ const BannerEditorNew = () => {
             })
             
             newSurfaceElements[surfaceKey] = scaledElements
-            console.log(`🎨 Loaded ${scaledElements.length} elements for surface: ${surfaceKey}`)
+            console.log(`🎨 Loaded ${scaledElements.length} elements for surface: ${surfaceKey} (matches tent specs)`)
           }
         })
         
-        setSurfaceElements(newSurfaceElements)
+        setSurfaceElements(prev => ({
+          ...prev,
+          ...newSurfaceElements
+        }))
         setSelectedId(null)
-        console.log(`🎨 Loaded tent template: ${template.name}`)
+        console.log(`🎨 Loaded tent template: ${template.name} (respecting current tent specifications)`)
         return
       }
       

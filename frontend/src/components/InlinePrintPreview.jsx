@@ -64,6 +64,26 @@ const InlinePrintPreview = ({
         { key: 'sidewall_right', name: 'Right Sidewall' },
         { key: 'backwall', name: 'Back Wall' }
       ]
+      
+      // Use tent_specs if available (new surface-based system), otherwise fall back to design_option
+      const tentSpecs = orderDetails?.tent_specs
+      if (tentSpecs && tentSpecs.surfaces) {
+        // Filter surfaces based on tent specs
+        return allSurfaces.filter(surface => {
+          if (surface.key.startsWith('canopy_')) {
+            return tentSpecs.surfaces.canopy === true // Canopy is always included if true
+          }
+          if (surface.key === 'sidewall_left' || surface.key === 'sidewall_right') {
+            return tentSpecs.surfaces.sidewalls === true
+          }
+          if (surface.key === 'backwall') {
+            return tentSpecs.surfaces.backwall === true
+          }
+          return false
+        })
+      }
+      
+      // Fallback to old design_option system for backward compatibility
       const designOption = orderDetails?.design_option || orderDetails?.tent_design_option || 'canopy-only'
       if (designOption === 'canopy-only') return allSurfaces.filter(s => s.key.startsWith('canopy_'))
       if (designOption === 'canopy-backwall') return allSurfaces.filter(s => s.key.startsWith('canopy_') || s.key === 'backwall')
@@ -356,8 +376,44 @@ const InlinePrintPreview = ({
                     }}
                   />
                 </div>
+              ) : productType === 'tent' ? (
+                // Tent Preview - Proper alignment and sizing like tin preview
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <img
+                    src={previewImage}
+                    alt="Tent Design Preview"
+                    className="max-w-full max-h-full object-contain bg-white"
+                    style={{
+                      // Tent canvas is 1160x1049px - ensure proper aspect ratio and centering
+                      width: 'auto',
+                      height: 'auto',
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                      objectPosition: 'center'
+                    }}
+                    draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      backgroundImage: "url('/assets/images/BuyPrintz_Watermark_1200px_72dpi.png')",
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center',
+                      backgroundSize: 'cover',
+                      opacity: 0.3,
+                      mixBlendMode: 'multiply',
+                      zIndex: 9999
+                    }}
+                    onError={(e) => {
+                      console.warn('🎨 Watermark failed to load in production')
+                      e.target.style.display = 'none'
+                    }}
+                  />
+                </div>
               ) : (
-                // Standard Preview for Banners and Tents
+                // Standard Preview for Banners
                 <>
                   <img
                     src={previewImage}
@@ -365,12 +421,9 @@ const InlinePrintPreview = ({
                     className="w-full h-full object-contain bg-white"
                     style={{
                       // Only apply scaling transforms on mobile (screen width < 640px)
-                      // Desktop views were already perfect, so leave them untouched
-                      transform: window.innerWidth < 640 ? (
-                        productType === 'tent' 
-                          ? 'scale(2.8) translate(25%, 30%)' // reduced scale from 3.48 to 2.8, adjusted positioning
-                          : 'scale(1.8) translate(20%, 20%)' // reduced scale from 2.375 to 1.8, adjusted positioning
-                      ) : 'none',
+                      transform: window.innerWidth < 640 
+                        ? 'scale(1.8) translate(20%, 20%)' 
+                        : 'none',
                       transformOrigin: 'center center',
                       position: 'relative'
                     }}
