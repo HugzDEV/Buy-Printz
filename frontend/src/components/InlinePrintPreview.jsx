@@ -297,25 +297,35 @@ const InlinePrintPreview = ({
             <div className="text-xs text-gray-500 mt-1 sm:hidden">Refresh page after rotating device for optimal positioning</div>
           </div>
           {surfaces.length > 1 && (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <button onClick={handlePrev} className="px-2 py-1 border rounded">Prev</button>
-              <span>{currentSurfaceIndex + 1} of {surfaces.length}</span>
-              <button onClick={handleNext} className="px-2 py-1 border rounded">Next</button>
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+              <button 
+                onClick={handlePrev} 
+                className="px-3 py-2 sm:px-2 sm:py-1 border rounded hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+              >
+                Prev
+              </button>
+              <span className="font-medium">{currentSurfaceIndex + 1} of {surfaces.length}</span>
+              <button 
+                onClick={handleNext} 
+                className="px-3 py-2 sm:px-2 sm:py-1 border rounded hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+              >
+                Next
+              </button>
             </div>
           )}
         </div>
-        <div className="relative w-full h-[300px] sm:h-[500px] lg:h-[600px] bg-white rounded-md overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-[350px] sm:h-[500px] lg:h-[600px] bg-white rounded-md overflow-hidden flex items-center justify-center p-2 sm:p-4">
           {previewImage ? (
             <>
               {productType === 'tin' ? (
-                // Realistic Tin Preview - Display design at exact tin surface dimensions
+                // Realistic Tin Preview - Responsive for mobile and desktop
                 <div className="relative w-full h-full flex items-center justify-center">
                   {/* Base Tin Surface Image */}
                   <img
                     src={`/assets/images/Tin Surfaces/Tin_${
                       selectedSurface === 'back' ? 'Back' : 
-                      selectedSurface === 'inside' ? 'Front' : // Use Front for inside as fallback
-                      selectedSurface === 'lid' ? 'Front' : // Use Front for lid as fallback
+                      selectedSurface === 'inside' ? 'Front' : 
+                      selectedSurface === 'lid' ? 'Front' : 
                       'Front'
                     }.png`}
                     alt={`Tin ${selectedSurface === 'back' ? 'Back' : 'Front'} Surface`}
@@ -324,19 +334,20 @@ const InlinePrintPreview = ({
                     onContextMenu={(e) => e.preventDefault()}
                   />
                   
-                  {/* Design Overlay with Tin Surface Clipping Mask */}
+                  {/* Design Overlay with Tin Surface Clipping Mask - Responsive sizing */}
                   <div 
                     className="absolute"
                     style={{
-                      // Increase canvas size by 1% more to show more design area
-                      width: '464px', // 459px + 1% = 463.59px ≈ 464px
-                      height: '289px', // 286px + 1% = 288.86px ≈ 289px
+                      // Responsive sizing using max-width to scale down on mobile
+                      width: 'min(464px, 90vw)',
+                      height: 'min(289px, 55vw)',
+                      maxWidth: '464px',
+                      maxHeight: '289px',
                       top: '50%',
                       left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      // Apply tin surface clipping mask with rounded corners
-                      clipPath: 'inset(0 round 31px)',
-                      WebkitClipPath: 'inset(0 round 31px)',
+                      clipPath: 'inset(0 round min(31px, 6.7vw))',
+                      WebkitClipPath: 'inset(0 round min(31px, 6.7vw))',
                       backgroundColor: 'transparent',
                       overflow: 'hidden'
                     }}
@@ -344,14 +355,9 @@ const InlinePrintPreview = ({
                     <img
                       src={previewImage}
                       alt="Design Preview"
+                      className="w-full h-full"
                       style={{
-                        // The preview image is exactly 374x225 pixels from canvas export
-                        // Display at native size and let the clipping mask handle the boundaries
-                        transform: 'none',
-                        transformOrigin: 'center center',
-                        objectFit: 'fill', // Fill the container completely so clipping works properly
-                        width: '100%',
-                        height: '100%'
+                        objectFit: 'fill'
                       }}
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}
@@ -377,12 +383,17 @@ const InlinePrintPreview = ({
                   />
                 </div>
               ) : productType === 'tent' ? (
-                // Tent Preview - Same styling as stickers/banners for consistent display
-                <>
+                // Tent Preview - Optimized for mobile with proper aspect ratio
+                <div className="relative w-full h-full flex items-center justify-center">
                   <img
                     src={previewImage}
                     alt="Tent Design Preview"
-                    className="w-full h-full object-contain bg-white"
+                    className="max-w-full max-h-full object-contain bg-white"
+                    style={{
+                      // Ensure optimal display on both mobile and desktop
+                      width: 'auto',
+                      height: 'auto'
+                    }}
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
                   />
@@ -402,22 +413,14 @@ const InlinePrintPreview = ({
                       e.target.style.display = 'none'
                     }}
                   />
-                </>
+                </div>
               ) : (
-                // Standard Preview for Banners
-                <>
+                // Standard Preview for Banners - Improved mobile display
+                <div className="relative w-full h-full flex items-center justify-center">
                   <img
                     src={previewImage}
                     alt="Design Preview"
-                    className="w-full h-full object-contain bg-white"
-                    style={{
-                      // Only apply scaling transforms on mobile (screen width < 640px)
-                      transform: window.innerWidth < 640 
-                        ? 'scale(1.8) translate(20%, 20%)' 
-                        : 'none',
-                      transformOrigin: 'center center',
-                      position: 'relative'
-                    }}
+                    className="max-w-full max-h-full object-contain bg-white"
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
                   />
@@ -437,7 +440,7 @@ const InlinePrintPreview = ({
                       e.target.style.display = 'none'
                     }}
                   />
-                </>
+                </div>
               )}
             </>
           ) : (
@@ -471,13 +474,21 @@ const InlinePrintPreview = ({
       )}
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <button onClick={handleDownloadPdf} disabled={!previewImage || isGenerating} className="w-full sm:w-auto px-4 py-2 border rounded flex items-center gap-2 justify-center">
-          <Download className="w-4 h-4" />
-          {isGenerating ? 'Generating PDF...' : 'Download PDF'}
+        <button 
+          onClick={handleDownloadPdf} 
+          disabled={!previewImage || isGenerating} 
+          className="w-full sm:w-auto px-4 py-3 sm:py-2 border rounded flex items-center gap-2 justify-center hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
+        >
+          <Download className="w-5 h-5 sm:w-4 sm:h-4" />
+          <span className="text-base sm:text-sm">{isGenerating ? 'Generating PDF...' : 'Download PDF'}</span>
         </button>
-        <button onClick={handleApprove} disabled={!previewImage} className="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center gap-2 justify-center">
-          <CheckCircle className="w-4 h-4" />
-          Approve Design
+        <button 
+          onClick={handleApprove} 
+          disabled={!previewImage} 
+          className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded flex items-center gap-2 justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium shadow-sm"
+        >
+          <CheckCircle className="w-5 h-5 sm:w-4 sm:h-4" />
+          <span className="text-base sm:text-sm">Approve Design</span>
         </button>
       </div>
     </div>
