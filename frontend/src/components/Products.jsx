@@ -24,7 +24,7 @@ const Products = () => {
       image: "/assets/images/13oz Vinyl Banner.jpg",
       features: ["Weather resistant", "Full color printing", "Grommets included", "UV resistant"],
       bestseller: true,
-      gtin: "0085001231000",
+      gtin: "0085001231004",
       specs: {
         material: "13oz Scrim Vinyl",
         finish: "Matte",
@@ -41,7 +41,7 @@ const Products = () => {
       image: "/assets/images/blockout Banner -BuyPrintz.jpg",
       features: ["Single or double sided printing", "Free hemming and grommets", "Additional finishing available", "Welded oversized banners available"],
       premium: true,
-      gtin: "0085001231017",
+      gtin: "0085001231011",
       specs: {
         material: "18oz Matte Blockout Vinyl",
         finish: "Full color UV printed",
@@ -58,7 +58,7 @@ const Products = () => {
       image: "/assets/images/Mesh Banner - BuyPrintz.jpg",
       features: ["Wind resistant", "70% air flow", "Fade resistant", "Lightweight"],
       popular: true,
-      gtin: "0085001231024",
+      gtin: "0085001231028",
       specs: {
         material: "Mesh Vinyl",
         finish: "Perforated",
@@ -74,7 +74,7 @@ const Products = () => {
       description: "Full and smooth surface vinyl - great for indoor displays and presentations",
       image: "/assets/images/Indoor Banner - BuyPrintz.jpg",
       features: ["Smooth surface", "Vivid colors", "Easy to install", "Lightweight"],
-      gtin: "0085001231031",
+      gtin: "0085001231035",
       specs: {
         material: "Smooth Vinyl",
         finish: "Gloss/Matte",
@@ -90,7 +90,7 @@ const Products = () => {
       description: "Durable fit banners ready to install with complete hardware kit included",
       image: "/assets/images/Pole Banner - BuyPrintz.jpg",
       features: ["Hardware included", "Easy installation", "Professional look", "Weather resistant"],
-      gtin: "0085001231048",
+      gtin: "0085001231042",
       specs: {
         material: "18oz Vinyl",
         finish: "Pole pockets & hardware",
@@ -106,7 +106,7 @@ const Products = () => {
       description: "Lightweight fabric banner with vibrant dye sublimation printing for premium presentations",
       image: "/assets/images/9oz Fabric Banner - BuyPrintz.jpg",
       features: ["Lightweight fabric", "Vibrant colors", "Wrinkle resistant", "Professional finish"],
-      gtin: "0085001231055",
+      gtin: "0085001231059",
       specs: {
         material: "9oz Polyester Fabric",
         finish: "Dye sublimation",
@@ -140,7 +140,7 @@ const Products = () => {
       image: "/assets/images/Tension Fabric - Buy Printz.jpg",
       features: ["3-way stretch", "Kiosk ready", "Professional display", "Seamless fit"],
       premium: true,
-      gtin: "0085001231062",
+      gtin: "0085001231066",
       specs: {
         material: "Stretch Polyester",
         finish: "Dye sublimation",
@@ -156,7 +156,7 @@ const Products = () => {
       description: "18oz translucent vinyl for illuminated signage with even light distribution",
       image: "/assets/images/Backlit Banner -BuyPrintz.jpg", 
       features: ["Translucent material", "LED compatible", "Even light distribution", "Durable"],
-      gtin: "0085001231079",
+      gtin: "0085001231073",
       specs: {
         material: "Translucent Vinyl",
         finish: "Backlit compatible",
