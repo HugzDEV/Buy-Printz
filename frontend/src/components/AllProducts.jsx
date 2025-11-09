@@ -78,37 +78,57 @@ const AllProducts = () => {
           {
             "@type": "ListItem",
             "position": 1,
-            "url": "https://www.buyprintz.com/banner-products",
-            "name": "Vinyl Banners",
-            "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors"
+            "item": {
+              "@type": "Thing",
+              "@id": "https://www.buyprintz.com/banner-products",
+              "name": "Vinyl Banners",
+              "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors",
+              "url": "https://www.buyprintz.com/banner-products"
+            }
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "url": "https://www.buyprintz.com/business-card-tins",
-            "name": "Business Card Tins",
-            "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging"
+            "item": {
+              "@type": "Thing",
+              "@id": "https://www.buyprintz.com/business-card-tins",
+              "name": "Business Card Tins",
+              "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
+              "url": "https://www.buyprintz.com/business-card-tins"
+            }
           },
           {
             "@type": "ListItem",
             "position": 3,
-            "url": "https://www.buyprintz.com/tradeshow-tents",
-            "name": "Tradeshow Tents",
-            "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames"
+            "item": {
+              "@type": "Thing",
+              "@id": "https://www.buyprintz.com/tradeshow-tents",
+              "name": "Tradeshow Tents",
+              "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
+              "url": "https://www.buyprintz.com/tradeshow-tents"
+            }
           },
           {
             "@type": "ListItem",
             "position": 4,
-            "url": "https://www.buyprintz.com/stickers",
-            "name": "Custom Stickers",
-            "description": "Professional vinyl stickers in 8 shapes with Roland premium materials"
+            "item": {
+              "@type": "Thing",
+              "@id": "https://www.buyprintz.com/stickers",
+              "name": "Custom Stickers",
+              "description": "Professional vinyl stickers in 8 shapes with Roland premium materials",
+              "url": "https://www.buyprintz.com/stickers"
+            }
           },
           {
             "@type": "ListItem",
             "position": 5,
-            "url": "https://www.buyprintz.com/tin-skinz",
-            "name": "Tin Skinz",
-            "description": "Pre-designed tins filled with candy for every occasion - weddings, birthdays, holidays, and special events"
+            "item": {
+              "@type": "Thing",
+              "@id": "https://www.buyprintz.com/tin-skinz",
+              "name": "Tin Skinz",
+              "description": "Pre-designed tins filled with candy for every occasion - weddings, birthdays, holidays, and special events",
+              "url": "https://www.buyprintz.com/tin-skinz"
+            }
           }
         ]
       }
