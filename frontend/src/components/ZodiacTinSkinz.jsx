@@ -205,6 +205,22 @@ const ZodiacTinSkinz = () => {
       ]
   }
 
+  // Valid GTIN-13 mapping for each zodiac sign (with correct check digits)
+  const zodiacGTINs = {
+    'aries': '0085001234081',
+    'taurus': '0085001234098',
+    'gemini': '0085001234104',
+    'cancer': '0085001234111',
+    'leo': '0085001234128',
+    'virgo': '0085001234135',
+    'libra': '0085001234142',
+    'scorpio': '0085001234159',
+    'sagittarius': '0085001234166',
+    'capricorn': '0085001234173',
+    'aquarius': '0085001234180',
+    'pisces': '0085001234197'
+  }
+
   // Product Collection Schema - ItemList with Products
   const productListSchema = {
     "@type": "ItemList",
@@ -225,7 +241,7 @@ const ZodiacTinSkinz = () => {
           `https://www.buyprintz.com${sign.designUrl}`
         ],
         "sku": `zodiac-tins-${sign.name.toLowerCase()}`,
-        "gtin": `0085001234${String(index + 103).padStart(3, '0')}`,
+        "gtin": zodiacGTINs[sign.name.toLowerCase()],
         "mpn": `TS-ZOD-${sign.name.toUpperCase()}`,
         "url": `https://www.buyprintz.com/zodiac-tins/${sign.name.toLowerCase()}`,
         "brand": {
