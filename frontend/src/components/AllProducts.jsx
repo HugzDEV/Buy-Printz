@@ -47,93 +47,94 @@ const AllProducts = () => {
     }
   ]
 
-  // Structured Data for All Products Collection Page (flat @graph structure)
-  const structuredData = {
+  // Structured Data - separate schemas (not @graph) to avoid Google parsing issues
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
-    "@graph": [
+    "@type": "BreadcrumbList",
+    "itemListElement": [
       {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://www.buyprintz.com/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "All Products",
-            "item": "https://www.buyprintz.com/all-products"
-          }
-        ]
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.buyprintz.com/"
       },
       {
-        "@type": "ItemList",
-        "name": "BuyPrintz Product Categories",
-        "description": "Complete range of professional business branding solutions including vinyl banners, business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins.",
-        "url": "https://www.buyprintz.com/all-products",
-        "numberOfItems": 5,
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "item": {
-              "@type": "Thing",
-              "@id": "https://www.buyprintz.com/banner-products",
-              "name": "Vinyl Banners",
-              "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors",
-              "url": "https://www.buyprintz.com/banner-products"
-            }
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "item": {
-              "@type": "Thing",
-              "@id": "https://www.buyprintz.com/business-card-tins",
-              "name": "Business Card Tins",
-              "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
-              "url": "https://www.buyprintz.com/business-card-tins"
-            }
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "item": {
-              "@type": "Thing",
-              "@id": "https://www.buyprintz.com/tradeshow-tents",
-              "name": "Tradeshow Tents",
-              "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
-              "url": "https://www.buyprintz.com/tradeshow-tents"
-            }
-          },
-          {
-            "@type": "ListItem",
-            "position": 4,
-            "item": {
-              "@type": "Thing",
-              "@id": "https://www.buyprintz.com/stickers",
-              "name": "Custom Stickers",
-              "description": "Professional vinyl stickers in 8 shapes with Roland premium materials",
-              "url": "https://www.buyprintz.com/stickers"
-            }
-          },
-          {
-            "@type": "ListItem",
-            "position": 5,
-            "item": {
-              "@type": "Thing",
-              "@id": "https://www.buyprintz.com/tin-skinz",
-              "name": "Tin Skinz",
-              "description": "Pre-designed tins filled with candy for every occasion - weddings, birthdays, holidays, and special events",
-              "url": "https://www.buyprintz.com/tin-skinz"
-            }
-          }
-        ]
+        "@type": "ListItem",
+        "position": 2,
+        "name": "All Products",
+        "item": "https://www.buyprintz.com/all-products"
       }
     ]
   }
+
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "BuyPrintz Product Categories",
+    "description": "Complete range of professional business branding solutions including vinyl banners, business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins.",
+    "url": "https://www.buyprintz.com/all-products",
+    "numberOfItems": 5,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "Thing",
+          "@id": "https://www.buyprintz.com/banner-products",
+          "name": "Vinyl Banners",
+          "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors",
+          "url": "https://www.buyprintz.com/banner-products"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "Thing",
+          "@id": "https://www.buyprintz.com/business-card-tins",
+          "name": "Business Card Tins",
+          "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
+          "url": "https://www.buyprintz.com/business-card-tins"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@type": "Thing",
+          "@id": "https://www.buyprintz.com/tradeshow-tents",
+          "name": "Tradeshow Tents",
+          "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
+          "url": "https://www.buyprintz.com/tradeshow-tents"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "item": {
+          "@type": "Thing",
+          "@id": "https://www.buyprintz.com/stickers",
+          "name": "Custom Stickers",
+          "description": "Professional vinyl stickers in 8 shapes with Roland premium materials",
+          "url": "https://www.buyprintz.com/stickers"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "item": {
+          "@type": "Thing",
+          "@id": "https://www.buyprintz.com/tin-skinz",
+          "name": "Tin Skinz",
+          "description": "Pre-designed tins filled with candy for every occasion - weddings, birthdays, holidays, and special events",
+          "url": "https://www.buyprintz.com/tin-skinz"
+        }
+      }
+    ]
+  }
+
+  // Pass as array to create separate <script> tags for each schema
+  const structuredData = [breadcrumbSchema, itemListSchema]
 
   return (
     <>
