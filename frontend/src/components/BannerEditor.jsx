@@ -3595,22 +3595,22 @@ const BannerEditorNew = () => {
 
   // Glass UI Header Component
   const GlassHeader = () => (
-    <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 p-3 md:p-4">
+    <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 p-3 lg:p-4">
       <div className="flex items-center justify-between">
         
         {/* Left Section */}
-        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+        <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
           <button
             onClick={() => navigate(cameFromTemplate ? '/dashboard?tab=templates' : '/dashboard')}
-            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg md:rounded-xl transition-all duration-200"
+            className="flex items-center gap-1 lg:gap-2 px-2 lg:px-4 py-1.5 lg:py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg lg:rounded-xl transition-all duration-200"
           >
-            <ChevronLeft className="w-4 h-4 md:w-4 md:h-4" />
-            <span className="hidden md:inline text-sm font-medium">
+            <ChevronLeft className="w-4 h-4 lg:w-4 lg:h-4" />
+            <span className="hidden lg:inline text-sm font-medium">
               {cameFromTemplate ? 'Templates' : 'Dashboard'}
             </span>
           </button>
           
-          <div className="hidden md:block w-px h-6 bg-white/30" />
+          <div className="hidden lg:block w-px h-6 bg-white/30" />
           
           {/* BuyPrintz Logo - Clickable to Homepage */}
           <button
@@ -3620,20 +3620,20 @@ const BannerEditorNew = () => {
             <img 
               src="/assets/images/BuyPrintz_LOGO_Final-Social Media_Transparent.png" 
               alt="BuyPrintz" 
-              className="h-16 md:h-24 w-auto"
+              className="h-16 lg:h-24 w-auto"
             />
           </button>
         </div>
 
         {/* Center Section - Product Type Selector */}
-        <div className="flex items-center gap-2 md:gap-2 flex-shrink-0">
-          <label className="text-xs font-medium text-gray-700 hidden md:block">
+        <div className="flex items-center gap-2 lg:gap-2 flex-shrink-0">
+          <label className="text-xs font-medium text-gray-700 hidden lg:block">
             Product:
           </label>
           <select
             value={productType}
             onChange={(e) => handleProductTypeChange(e.target.value)}
-            className="product-selector px-2 md:px-3 py-1.5 md:py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-w-0"
+            className="product-selector px-2 lg:px-3 py-1.5 lg:py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 text-xs lg:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-w-0"
             data-tour="product-selector"
           >
             <option value="banner">🏷️ Banner</option>
@@ -3644,10 +3644,10 @@ const BannerEditorNew = () => {
         </div>
 
         {/* Right Section */}
-        <div className="action-buttons flex items-center gap-2 md:gap-3 flex-shrink-0">
+        <div className="action-buttons flex items-center gap-2 lg:gap-3 flex-shrink-0">
           <button
             onClick={saveAsTemplate}
-            className="px-2 md:px-4 py-1.5 md:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-lg md:rounded-xl transition-all duration-200 font-medium text-xs md:text-sm"
+            className="px-2 lg:px-4 py-1.5 lg:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 border border-purple-400/30 backdrop-blur-sm rounded-lg lg:rounded-xl transition-all duration-200 font-medium text-xs lg:text-sm"
           >
             <span className="hidden sm:inline">Save as Template</span>
             <span className="sm:hidden">Save</span>
@@ -3655,9 +3655,9 @@ const BannerEditorNew = () => {
           
           <button
             onClick={() => createOrder()}
-            className="px-2 md:px-4 py-1.5 md:py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-lg md:rounded-xl transition-all duration-200 font-medium flex items-center gap-1 md:gap-2 text-xs md:text-sm"
+            className="px-2 lg:px-4 py-1.5 lg:py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-700 border border-blue-400/30 backdrop-blur-sm rounded-lg lg:rounded-xl transition-all duration-200 font-medium flex items-center gap-1 lg:gap-2 text-xs lg:text-sm"
           >
-            <ShoppingCart className="w-3 h-3 md:w-4 md:h-4" />
+            <ShoppingCart className="w-3 h-3 lg:w-4 lg:h-4" />
             <span className="hidden sm:inline">Create Order</span>
             <span className="sm:hidden">Order</span>
           </button>
@@ -3665,7 +3665,7 @@ const BannerEditorNew = () => {
           {/* Mobile Hamburger - After action buttons */}
           <button
             onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-            className="mobile-hamburger md:hidden p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center z-50 relative flex-shrink-0"
+            className="mobile-hamburger lg:hidden p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center z-50 relative flex-shrink-0"
             data-tour="mobile-hamburger"
           >
             {isMobileSidebarOpen ? <X className="w-4 h-4 text-gray-800" /> : <Menu className="w-4 h-4 text-gray-800" />}
@@ -3689,7 +3689,7 @@ const BannerEditorNew = () => {
         <div className={`
           sidebar-tools
           ${isMobileSidebarOpen ? 'fixed inset-0 z-50' : 'hidden'}
-          md:block md:relative md:inset-auto md:z-auto
+          lg:block lg:relative lg:inset-auto lg:z-auto
           transition-all duration-300 ease-in-out
           data-tour="sidebar-tools"
         `}>
@@ -3743,8 +3743,8 @@ const BannerEditorNew = () => {
         <div className={`
           canvas-container flex-1 relative
           ${isMobileSidebarOpen ? 'hidden' : 'block'}
-          md:block
-          z-0 md:z-auto
+          lg:block
+          z-0 lg:z-auto
           transition-all duration-300 ease-in-out
         `}>
           <BannerCanvas
@@ -3770,7 +3770,7 @@ const BannerEditorNew = () => {
           
                 {/* Mobile Overlay when sidebar is open */}
       {isMobileSidebarOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/20 z-20" onClick={() => setIsMobileSidebarOpen(false)} />
+        <div className="lg:hidden fixed inset-0 bg-black/20 z-20" onClick={() => setIsMobileSidebarOpen(false)} />
       )}
       </div>
     </div>

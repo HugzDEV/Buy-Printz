@@ -2088,7 +2088,7 @@ const BannerCanvas = forwardRef(({
           {/* Left Section - Zoom Controls */}
           <div className="zoom-controls flex items-center gap-1" data-tour="zoom-controls">
             {/* Desktop: Undo/Redo + Surface Navigation for Tins/Tents OR Undo/Redo for Banners */}
-            <div className="hidden sm:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1">
               {/* Undo/Redo Controls - Available for all product types */}
               <GlassButton onClick={undo} disabled={historyStep <= 0} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center" title="Undo">
                 <Undo2 className="w-3.5 h-3.5" />
@@ -2135,7 +2135,7 @@ const BannerCanvas = forwardRef(({
             </div>
             
             {/* Desktop: Full Zoom Controls */}
-            <div className="hidden sm:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1">
               <GlassButton onClick={zoomOut} className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center">
                 <ZoomOut className="w-3.5 h-3.5" />
             </GlassButton>
@@ -2153,7 +2153,7 @@ const BannerCanvas = forwardRef(({
           </div>
 
           {/* Center Section - Canvas Info (Desktop Only) */}
-          <div className="hidden sm:block text-center">
+          <div className="hidden lg:block text-center">
             <p className="text-sm text-gray-600">
               {canvasSize.width} × {canvasSize.height}px
               <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
@@ -2163,9 +2163,9 @@ const BannerCanvas = forwardRef(({
           </div>
 
           {/* Right Section - Action Buttons */}
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none">
-            {/* Mobile: Organized toolbar with better UX - 3 rows */}
-            <div className="sm:hidden flex flex-col gap-2 min-w-0 flex-shrink-0 flex-1 justify-end">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 lg:flex-none">
+            {/* Mobile/Tablet: Organized toolbar with better UX - 3 rows */}
+            <div className="lg:hidden flex flex-col gap-2 min-w-0 flex-shrink-0 flex-1 justify-end">
               {/* Row 1: Surface Navigation - Only for Tins/Tents */}
               {(productType === 'tin' || productType === 'tent') && (
                 <div className="flex items-center gap-1 justify-center">
@@ -2289,7 +2289,7 @@ const BannerCanvas = forwardRef(({
             </div>
             
             {/* Desktop: Full controls */}
-            <div className="hidden sm:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1">
             <GlassButton 
               onClick={() => setAutoScaling(!autoScaling)} 
               variant={autoScaling ? "primary" : "default"}
@@ -2349,32 +2349,32 @@ const BannerCanvas = forwardRef(({
         </GlassPanel>
       </div>
 
-      {/* Canvas Area - Mobile Optimized */}
-      <div className={`element-selection absolute top-16 sm:top-20 left-0 right-0 bottom-0 flex items-start justify-center p-1 sm:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
+      {/* Canvas Area - Mobile/Tablet Optimized */}
+      <div className={`element-selection absolute top-16 lg:top-20 left-0 right-0 bottom-0 flex items-start justify-center p-1 lg:p-2 overflow-hidden transition-all duration-300 ease-in-out`}>
         <GlassPanel className="relative max-w-full max-h-full w-full h-full flex items-center justify-center">
           
           
 
-          {/* Safe Print Zone Legend - Top Left, Mobile Responsive */}
-          <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
-            <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-lg max-w-[200px] sm:max-w-none">
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <div className="w-3 sm:w-4 h-0.5 bg-red-500 border-t-2 border-dashed border-red-500"></div>
+          {/* Safe Print Zone Legend - Top Left, Mobile/Tablet Responsive */}
+          <div className="absolute top-2 lg:top-4 left-2 lg:left-4 z-10">
+            <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 lg:px-3 py-1.5 lg:py-2 shadow-lg max-w-[200px] lg:max-w-none">
+              <div className="flex items-center gap-1.5 lg:gap-2">
+                <div className="w-3 lg:w-4 h-0.5 bg-red-500 border-t-2 border-dashed border-red-500"></div>
                 <span className="text-xs font-medium text-gray-700">
                   Safe Print Zone
                 </span>
               </div>
-              <p className="text-xs text-gray-600 mt-1 hidden sm:block">
+              <p className="text-xs text-gray-600 mt-1 hidden lg:block">
                 Keep designs within the red dotted lines
               </p>
             </div>
           </div>
 
-          {/* Surface Indicator for Tins and Tents - Top Left, below Safe Print Zone, Mobile Responsive */}
+          {/* Surface Indicator for Tins and Tents - Top Left, below Safe Print Zone, Mobile/Tablet Responsive */}
           {(productType === 'tin' || productType === 'tent') && (
-            <div className="absolute top-16 sm:top-20 left-2 sm:left-4 z-10">
-              <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-lg">
-                <div className="text-xs sm:text-sm font-medium text-gray-800">
+            <div className="absolute top-16 lg:top-20 left-2 lg:left-4 z-10">
+              <div className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 lg:px-3 py-1.5 lg:py-2 shadow-lg">
+                <div className="text-xs lg:text-sm font-medium text-gray-800">
                   Editing: <span className="text-blue-600 capitalize">
                     {productType === 'tin' 
                       ? currentSurface 
@@ -3245,39 +3245,39 @@ const BannerCanvas = forwardRef(({
         </GlassPanel>
       </div>
 
-      {/* Compact Status Bar - Mobile: Top Right Corner, Desktop: Right Side */}
+      {/* Compact Status Bar - Mobile/Tablet: Top Right Corner, Desktop: Right Side */}
       <div 
         className={`
-          status-bar absolute top-16 right-4 sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 z-50
+          status-bar absolute top-16 right-4 lg:top-1/2 lg:right-2 lg:transform lg:-translate-y-1/2 z-50
           transition-all duration-300 ease-in-out
           ${(selectedId || selectedIds.length > 0) ? 'opacity-100 visible' : 'opacity-0 invisible'}
         `}
       >
         <div className="
           bg-white/90 backdrop-blur-xl border border-white/30
-          rounded-2xl shadow-2xl p-2 sm:p-4 max-w-[240px] sm:max-w-xs
+          rounded-2xl shadow-2xl p-2 lg:p-4 max-w-[240px] lg:max-w-xs
           neumorphic-compact
         ">
           {/* Header with Close Button */}
-          <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Properties</h3>
+          <div className="flex items-center justify-between mb-2 lg:mb-3">
+            <h3 className="text-xs lg:text-sm font-semibold text-gray-800">Properties</h3>
             <button
               onClick={() => {
                 setSelectedId(null);
                 setSelectedIds([]);
               }}
-              className="p-1 sm:p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-1 lg:p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               title="Close"
             >
-              <EyeOff className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+              <EyeOff className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" />
             </button>
           </div>
           {/* DPI Info - Compact */}
           {selectedId && getSelectedElementDPI() && (
-            <div className="mb-2 sm:mb-3 p-1.5 sm:p-2 bg-gray-50 rounded-lg">
+            <div className="mb-2 lg:mb-3 p-1.5 lg:p-2 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-gray-600">DPI:</span>
-                <span className={`text-xs sm:text-sm font-bold ${
+                <span className={`text-xs lg:text-sm font-bold ${
                   getSelectedElementDPI().dpi >= 300 ? 'text-green-600' :
                   getSelectedElementDPI().dpi >= 150 ? 'text-yellow-600' :
                   getSelectedElementDPI().dpi >= 72 ? 'text-orange-600' : 'text-red-600'
@@ -3300,32 +3300,32 @@ const BannerCanvas = forwardRef(({
           
           {/* Text Properties - Compact */}
           {selectedId && selectedElement?.type === 'text' && (
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-2 lg:space-y-3">
               {/* Color and Size Row */}
-              <div className="flex items-center justify-between gap-2 sm:gap-3">
-                <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center justify-between gap-2 lg:gap-3">
+                <div className="flex items-center gap-1 lg:gap-2">
                   <span className="text-xs font-medium text-gray-600">Color:</span>
                   <input
                     type="color"
                     value={selectedElement?.fill || '#000000'}
                     onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                    className="w-5 h-5 lg:w-6 lg:h-6 rounded border border-gray-300 cursor-pointer"
                     title="Choose text color"
                   />
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleElementChange(selectedId, { fontSize: Math.max(8, (selectedElement?.fontSize || 24) - 2) })}
-                    className="w-4 h-4 sm:w-5 sm:h-5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-4 h-4 lg:w-5 lg:h-5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                   >
                     -
                   </button>
-                  <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] sm:min-w-[2rem] text-center">
+                  <span className="text-xs font-medium text-gray-700 min-w-[1.5rem] lg:min-w-[2rem] text-center">
                     {selectedElement?.fontSize || 24}
                   </span>
                   <button
                     onClick={() => handleElementChange(selectedId, { fontSize: Math.min(200, (selectedElement?.fontSize || 24) + 2) })}
-                    className="w-4 h-4 sm:w-5 sm:h-5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-4 h-4 lg:w-5 lg:h-5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                   >
                     +
                   </button>
@@ -3333,12 +3333,12 @@ const BannerCanvas = forwardRef(({
               </div>
               
               {/* Font Family */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Font:</span>
                 <select
                   value={selectedElement?.fontFamily || 'Arial'}
                   onChange={(e) => handleElementChange(selectedId, { fontFamily: e.target.value })}
-                  className="flex-1 px-1 sm:px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-1 lg:px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                 >
                   {/* Sans-serif Fonts */}
                   <optgroup label="Sans-serif">
@@ -3423,7 +3423,7 @@ const BannerCanvas = forwardRef(({
               </div>
               
               {/* Text Alignment - Matching sidebar exactly */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Align:</span>
                 <div className="flex gap-1">
                   {[
@@ -3434,7 +3434,7 @@ const BannerCanvas = forwardRef(({
                     <button
                       key={align.value}
                       onClick={() => handleElementChange(selectedId, { align: align.value })}
-                      className={`w-5 h-5 sm:w-6 sm:h-6 rounded text-xs transition-colors duration-200 ${
+                      className={`w-5 h-5 lg:w-6 lg:h-6 rounded text-xs transition-colors duration-200 ${
                         (selectedElement?.align || 'left') === align.value
                           ? 'bg-blue-500 text-white'
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -3448,7 +3448,7 @@ const BannerCanvas = forwardRef(({
               </div>
               
               {/* Text Style - Matching sidebar with Normal option */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Style:</span>
                 <div className="flex gap-1">
                   {[
@@ -3498,7 +3498,7 @@ const BannerCanvas = forwardRef(({
                           
                           handleElementChange(selectedId, { fontStyle: newFontStyle })
                         }}
-                        className={`px-1.5 sm:px-2 py-1 rounded text-xs transition-colors duration-200 ${
+                        className={`px-1.5 lg:px-2 py-1 rounded text-xs transition-colors duration-200 ${
                           isSelected
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -3513,7 +3513,7 @@ const BannerCanvas = forwardRef(({
               </div>
               
               {/* Text Outline Controls */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Outline:</span>
                 <div className="flex items-center gap-1">
                   <button
@@ -3525,7 +3525,7 @@ const BannerCanvas = forwardRef(({
                         handleElementChange(selectedId, { stroke: '#000000', strokeWidth: 2 })
                       }
                     }}
-                    className={`w-5 h-5 sm:w-6 sm:h-6 rounded text-xs transition-colors duration-200 ${
+                    className={`w-5 h-5 lg:w-6 lg:h-6 rounded text-xs transition-colors duration-200 ${
                       selectedElement?.stroke && selectedElement?.strokeWidth > 0
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -3541,7 +3541,7 @@ const BannerCanvas = forwardRef(({
                       type="color"
                       value={selectedElement?.stroke || '#000000'}
                       onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                      className="w-5 h-5 lg:w-6 lg:h-6 rounded border border-gray-300 cursor-pointer"
                       title="Choose outline color"
                     />
                   )}
@@ -3549,26 +3549,26 @@ const BannerCanvas = forwardRef(({
               </div>
               
               {/* Text Rotation Controls */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Rotate:</span>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) - 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                     title="Rotate Left 15°"
                   >
                     ↶
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) + 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                     title="Rotate Right 15°"
                   >
                     ↷
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: 0 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                     title="Reset Rotation"
                   >
                     ↺
@@ -3580,7 +3580,7 @@ const BannerCanvas = forwardRef(({
               <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
                 <button
                   onClick={() => handleTextEdit(selectedId)}
-                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors"
+                  className="px-2 lg:px-3 py-1 lg:py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors"
                   title="Edit Text"
                 >
                   ✏️ Edit
@@ -3591,21 +3591,21 @@ const BannerCanvas = forwardRef(({
           
           {/* Shape Properties - Fill Color and Stroke Controls */}
           {selectedId && selectedElement?.type && ['rect', 'circle', 'triangle', 'hexagon', 'octagon', 'polygon', 'line'].includes(selectedElement.type) && (
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-2 lg:space-y-3">
               {/* Fill Color */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Fill:</span>
                 <input
                   type="color"
                   value={selectedElement?.fill || '#666666'}
                   onChange={(e) => handleElementChange(selectedId, { fill: e.target.value })}
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                  className="w-5 h-5 lg:w-6 lg:h-6 rounded border border-gray-300 cursor-pointer"
                   title="Choose fill color"
                 />
               </div>
               
               {/* Stroke Controls */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Outline:</span>
                 <div className="flex items-center gap-1">
                   <button
@@ -3617,7 +3617,7 @@ const BannerCanvas = forwardRef(({
                         handleElementChange(selectedId, { stroke: '#000000', strokeWidth: 2 })
                       }
                     }}
-                    className={`w-5 h-5 sm:w-6 sm:h-6 rounded text-xs transition-colors duration-200 ${
+                    className={`w-5 h-5 lg:w-6 lg:h-6 rounded text-xs transition-colors duration-200 ${
                       selectedElement?.stroke && selectedElement?.strokeWidth > 0
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -3633,7 +3633,7 @@ const BannerCanvas = forwardRef(({
                       type="color"
                       value={selectedElement?.stroke || '#000000'}
                       onChange={(e) => handleElementChange(selectedId, { stroke: e.target.value })}
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-gray-300 cursor-pointer"
+                      className="w-5 h-5 lg:w-6 lg:h-6 rounded border border-gray-300 cursor-pointer"
                       title="Choose outline color"
                     />
                   )}
@@ -3641,26 +3641,26 @@ const BannerCanvas = forwardRef(({
               </div>
               
               {/* Rotation Controls */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Rotate:</span>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) - 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                     title="Rotate Left 15°"
                   >
                     ↶
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: (selectedElement?.rotation || 0) + 15 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                     title="Rotate Right 15°"
                   >
                     ↷
                   </button>
                   <button
                     onClick={() => handleElementChange(selectedId, { rotation: 0 })}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs font-bold"
                     title="Reset Rotation"
                   >
                     ↺
@@ -3673,13 +3673,13 @@ const BannerCanvas = forwardRef(({
           
           {/* Universal Action Buttons - Apply to all element types */}
           {(selectedId || selectedIds.length > 0) && (
-            <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 border-t border-gray-200">
+            <div className="space-y-2 lg:space-y-3 pt-2 lg:pt-3 border-t border-gray-200">
               {/* Action Buttons */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 {/* Duplicate Button */}
                 <button
                   onClick={duplicateSelected}
-                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded transition-colors"
+                  className="px-2 lg:px-3 py-1 lg:py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded transition-colors"
                   title="Duplicate"
                 >
                   📋 Copy
@@ -3688,7 +3688,7 @@ const BannerCanvas = forwardRef(({
                 {/* Delete Button */}
                 <button
                   onClick={deleteSelected}
-                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors"
+                  className="px-2 lg:px-3 py-1 lg:py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors"
                   title="Delete"
                 >
                   🗑️ Delete
@@ -3696,19 +3696,19 @@ const BannerCanvas = forwardRef(({
               </div>
               
               {/* Layer Controls */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 lg:gap-2">
                 <span className="text-xs font-medium text-gray-600">Layer:</span>
                 <div className="flex gap-1">
                   <button
                     onClick={sendToBack}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs"
                     title="Send to Back"
                   >
                     ⬇️
                   </button>
                   <button
                     onClick={bringToFront}
-                    className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs"
+                    className="w-5 h-5 lg:w-6 lg:h-6 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded flex items-center justify-center text-xs"
                     title="Bring to Front"
                   >
                     ⬆️
