@@ -203,43 +203,44 @@ const TentProducts = () => {
     return matchesSize && matchesSearch
   })
 
-  // Enhanced Product Collection Schema with proper Google Shopping support
-  const tentProductsStructuredData = {
+  // Breadcrumb Schema
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
-    "@type": "CollectionPage",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.buyprintz.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Products",
+        "item": "https://www.buyprintz.com/all-products"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Tradeshow Tents",
+        "item": "https://www.buyprintz.com/tradeshow-tents"
+      }
+    ]
+  }
+
+  // Product Collection Schema - ItemList with Products
+  const productListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
     "name": "Tradeshow Tents - Professional Custom Tents",
     "description": "Professional tradeshow tents with custom graphics and heavy-duty aluminum frames. Starting at $325.00 for canopy-only, up to $900.00 for complete tent packages with walls. Fast 2-3 day delivery.",
     "url": "https://www.buyprintz.com/tradeshow-tents",
-    "breadcrumb": {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.buyprintz.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Products",
-          "item": "https://www.buyprintz.com/all-products"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Tradeshow Tents",
-          "item": "https://www.buyprintz.com/tradeshow-tents"
-        }
-      ]
-    },
-    "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": tentProducts.length,
-      "itemListElement": tentProducts.map((tent, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
+    "numberOfItems": tentProducts.length,
+    "itemListElement": tentProducts.map((tent, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
           "@type": "Product",
           "@id": `https://www.buyprintz.com/tradeshow-tents#${tent.id}`,
           "name": tent.name,
@@ -385,7 +386,6 @@ const TentProducts = () => {
           ]
         }
       }))
-    }
   }
 
   // FAQ Schema removed to avoid duplication with global FAQPage in index.html
@@ -436,8 +436,15 @@ const TentProducts = () => {
     ]
   }
 
-  // Use only the main structured data to avoid duplicates
-  const combinedSchema = tentProductsStructuredData
+  // Combine schemas
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      breadcrumbSchema,
+      productListSchema,
+      howToSchema
+    ]
+  }
 
   return (
     <>

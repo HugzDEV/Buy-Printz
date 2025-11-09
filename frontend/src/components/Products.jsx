@@ -168,43 +168,44 @@ const Products = () => {
     return matchesCategory && matchesSearch
   })
 
-  // Enhanced Product Collection Schema with proper Google Shopping support
-  const productCollectionStructuredData = {
+  // Breadcrumb Schema
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
-    "@type": "CollectionPage",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.buyprintz.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Products",
+        "item": "https://www.buyprintz.com/all-products"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Banner Products",
+        "item": "https://www.buyprintz.com/banner-products"
+      }
+    ]
+  }
+
+  // Product Collection Schema - ItemList with Products
+  const productListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
     "name": "Professional Banner Products - Custom Printing Solutions",
     "description": "Premium quality banners and signage solutions for every application. Vinyl banners from $1.60/sqft, fabric banners from $2.75/sqft, specialty banners available. Fast 2-3 day delivery on all orders.",
     "url": "https://www.buyprintz.com/banner-products",
-    "breadcrumb": {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.buyprintz.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Products",
-          "item": "https://www.buyprintz.com/all-products"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Banner Products",
-          "item": "https://www.buyprintz.com/banner-products"
-        }
-      ]
-    },
-    "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": allProducts.length,
-      "itemListElement": allProducts.map((product, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
+    "numberOfItems": allProducts.length,
+    "itemListElement": allProducts.map((product, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
           "@type": "Product",
           "@id": `https://www.buyprintz.com/banner-products#${product.id}`,
           "name": product.name,
@@ -342,7 +343,6 @@ const Products = () => {
           ]
         }
       }))
-    }
   }
 
   // FAQ Schema removed to avoid duplication with global FAQPage in index.html
@@ -397,7 +397,8 @@ const Products = () => {
   const combinedSchema = {
     "@context": "https://schema.org",
     "@graph": [
-      productCollectionStructuredData,
+      breadcrumbSchema,
+      productListSchema,
       howToSchema
     ]
   }

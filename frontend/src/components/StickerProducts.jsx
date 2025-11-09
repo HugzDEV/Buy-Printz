@@ -116,43 +116,44 @@ const StickerProducts = () => {
   ]
 
 
-  // Enhanced Product Collection Schema with proper Google Shopping support
-  const stickerProductsStructuredData = {
+  // Breadcrumb Schema
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
-    "@type": "CollectionPage",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.buyprintz.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Products",
+        "item": "https://www.buyprintz.com/all-products"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Custom Stickers",
+        "item": "https://www.buyprintz.com/stickers"
+      }
+    ]
+  }
+
+  // Product Collection Schema - ItemList with Products
+  const productListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
     "name": "Custom Stickers - Vinyl Stickers & Decals",
     "description": "Professional custom stickers and vinyl decals. Weather-resistant, durable stickers for business, events, and personal use. Starting at $0.25 per sticker. Fast 2-3 day delivery.",
     "url": "https://www.buyprintz.com/stickers",
-    "breadcrumb": {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.buyprintz.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Products",
-          "item": "https://www.buyprintz.com/all-products"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Custom Stickers",
-          "item": "https://www.buyprintz.com/stickers"
-        }
-      ]
-    },
-    "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": stickerProducts.length,
-      "itemListElement": stickerProducts.map((sticker, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
+    "numberOfItems": stickerProducts.length,
+    "itemListElement": stickerProducts.map((sticker, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
           "@type": "Product",
           "@id": `https://www.buyprintz.com/stickers#${sticker.id}`,
           "name": sticker.name,
@@ -295,7 +296,6 @@ const StickerProducts = () => {
           ]
         }
       }))
-    }
   }
 
   // How-To Schema for ordering stickers
@@ -353,8 +353,10 @@ const StickerProducts = () => {
 
   // Combine schemas
   const combinedSchema = {
+    "@context": "https://schema.org",
     "@graph": [
-      stickerProductsStructuredData,
+      breadcrumbSchema,
+      productListSchema,
       howToSchema
     ]
   }
