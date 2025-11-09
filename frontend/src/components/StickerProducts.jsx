@@ -116,44 +116,42 @@ const StickerProducts = () => {
   ]
 
 
-  // Breadcrumb Schema
+  // Breadcrumb Schema (no @context here - defined in parent @graph)
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.buyprintz.com/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Products",
-        "item": "https://www.buyprintz.com/all-products"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": "Custom Stickers",
-        "item": "https://www.buyprintz.com/stickers"
-      }
-    ]
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Custom Stickers",
+          "item": "https://www.buyprintz.com/stickers"
+        }
+      ]
   }
 
-  // Product Collection Schema - ItemList with Products
+  // Product Collection Schema - ItemList with Products (no @context here - defined in parent @graph)
   const productListSchema = {
-    "@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Custom Stickers - Vinyl Stickers & Decals",
     "description": "Professional custom stickers and vinyl decals. Weather-resistant, durable stickers for business, events, and personal use. Starting at $0.25 per sticker. Fast 2-3 day delivery.",
     "url": "https://www.buyprintz.com/stickers",
-    "numberOfItems": stickerProducts.length,
-    "itemListElement": stickerProducts.map((sticker, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "item": {
+      "numberOfItems": stickerProducts.length,
+      "itemListElement": stickerProducts.map((sticker, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
           "@type": "Product",
           "@id": `https://www.buyprintz.com/stickers#${sticker.id}`,
           "name": sticker.name,
@@ -300,7 +298,6 @@ const StickerProducts = () => {
 
   // How-To Schema for ordering stickers
   const howToSchema = {
-    "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "How to Order Custom Stickers",
     "description": "Step-by-step guide to ordering custom stickers from BuyPrintz with 8 shapes and Roland premium materials",

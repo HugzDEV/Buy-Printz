@@ -76,9 +76,8 @@ const TinProducts = () => {
     }
   ]
 
-  // Breadcrumb Schema
+  // Breadcrumb Schema (no @context here - defined in parent @graph)
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
       {
@@ -102,18 +101,17 @@ const TinProducts = () => {
     ]
   }
 
-  // Product Collection Schema - ItemList with Products
+  // Product Collection Schema - ItemList with Products (no @context here - defined in parent @graph)
   const productListSchema = {
-    "@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Business Card Tins - Custom Aluminum Tins with Mints",
     "description": "Premium aluminum business card tins with custom vinyl stickers and fresh mints. Perfect for professional networking and memorable first impressions. 100 unit minimum orders.",
     "url": "https://www.buyprintz.com/business-card-tins",
     "numberOfItems": tinFinishes.length,
-    "itemListElement": tinFinishes.map((tin, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "item": {
+      "itemListElement": tinFinishes.map((tin, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
           "@type": "Product",
           "@id": `https://www.buyprintz.com/business-card-tins#${tin.id}`,
           "name": `${tin.name} Business Card Tin`,
@@ -250,9 +248,8 @@ const TinProducts = () => {
 
   // FAQ Schema removed to avoid duplication with global FAQPage in index.html
 
-  // How-To Schema for designing business card tins
+  // How-To Schema for designing business card tins (no @context here - defined in parent @graph)
   const howToSchema = {
-    "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "How to Order Custom Business Card Tins",
     "description": "Step-by-step guide to ordering custom business card tins from BuyPrintz",

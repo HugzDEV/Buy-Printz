@@ -170,42 +170,40 @@ const Products = () => {
 
   // Breadcrumb Schema
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.buyprintz.com/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Products",
-        "item": "https://www.buyprintz.com/all-products"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": "Banner Products",
-        "item": "https://www.buyprintz.com/banner-products"
-      }
-    ]
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Banner Products",
+          "item": "https://www.buyprintz.com/banner-products"
+        }
+      ]
   }
 
   // Product Collection Schema - ItemList with Products
   const productListSchema = {
-    "@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Professional Banner Products - Custom Printing Solutions",
     "description": "Premium quality banners and signage solutions for every application. Vinyl banners from $1.60/sqft, fabric banners from $2.75/sqft, specialty banners available. Fast 2-3 day delivery on all orders.",
     "url": "https://www.buyprintz.com/banner-products",
-    "numberOfItems": allProducts.length,
-    "itemListElement": allProducts.map((product, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "item": {
+      "numberOfItems": allProducts.length,
+      "itemListElement": allProducts.map((product, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
           "@type": "Product",
           "@id": `https://www.buyprintz.com/banner-products#${product.id}`,
           "name": product.name,
@@ -349,7 +347,6 @@ const Products = () => {
 
   // How-To Schema for ordering banners
   const howToSchema = {
-    "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "How to Order Custom Banners",
     "description": "Step-by-step guide to ordering custom banners from BuyPrintz",

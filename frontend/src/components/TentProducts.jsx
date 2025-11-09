@@ -205,7 +205,6 @@ const TentProducts = () => {
 
   // Breadcrumb Schema
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
       {
@@ -231,7 +230,6 @@ const TentProducts = () => {
 
   // Product Collection Schema - ItemList with Products
   const productListSchema = {
-    "@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Tradeshow Tents - Professional Custom Tents",
     "description": "Professional tradeshow tents with custom graphics and heavy-duty aluminum frames. Starting at $325.00 for canopy-only, up to $900.00 for complete tent packages with walls. Fast 2-3 day delivery.",
@@ -392,7 +390,6 @@ const TentProducts = () => {
 
   // How-To Schema for ordering tents
   const howToSchema = {
-    "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "How to Order Custom Tradeshow Tents",
     "description": "Step-by-step guide to ordering custom tradeshow tents from BuyPrintz",

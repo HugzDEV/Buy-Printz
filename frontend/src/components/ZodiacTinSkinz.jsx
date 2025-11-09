@@ -182,39 +182,37 @@ const ZodiacTinSkinz = () => {
 
   // Breadcrumb Schema
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.buyprintz.com/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Products",
-        "item": "https://www.buyprintz.com/all-products"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": "Zodiac Tin Skinz",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Zodiac Tin Skinz",
         "item": "https://www.buyprintz.com/zodiac-tins"
-      }
-    ]
+        }
+      ]
   }
 
   // Product Collection Schema - ItemList with Products
   const productListSchema = {
-    "@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Tin Skinz Zodiac Collection - Personalized Astrology Tins",
     "description": "Custom Tin Skinz zodiac collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs.",
     "url": "https://www.buyprintz.com/zodiac-tins",
     "numberOfItems": zodiacSigns.length,
-    "itemListElement": zodiacSigns.map((sign, index) => ({
+      "itemListElement": zodiacSigns.map((sign, index) => ({
       "@type": "ListItem",
       "position": index + 1,
       "item": {
@@ -352,7 +350,7 @@ const ZodiacTinSkinz = () => {
           }
         ]
       }
-    }))
+      }))
   };
 
   // Combine all schemas using @graph format
