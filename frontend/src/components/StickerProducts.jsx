@@ -13,7 +13,7 @@ const StickerProducts = () => {
       price: "$0.25 - $0.50",
       description: "Professional vinyl stickers in 7 standard shapes with die-cut or kiss-cut options. Perfect for branding, events, and promotional use.",
       image: "/assets/images/sticker_samples/stickers_standard_shapes.jpg",
-      gtin: "0085001236001",
+      gtin: "0085001236005",
       features: [
         "7 Standard Shapes: Circle, Square, Rectangle, Oval, Triangle, Diamond, Star",
         "Die-cut or Kiss-cut options",
@@ -71,7 +71,7 @@ const StickerProducts = () => {
       price: "$15.00 - $25.00",
       description: "Large 20\" x 20\" gang sheets for custom die-cutting. Perfect for unique shapes, large quantities, and complex designs.",
       image: "/assets/images/sticker_samples/gang_sheet_sample.jpg",
-      gtin: "0085001236018",
+      gtin: "0085001236012",
       features: [
         "20\" x 20\" gang sheet with 17\" x 17\" printable area",
         "Custom die-cutting for any shape",
