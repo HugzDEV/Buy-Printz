@@ -21,7 +21,7 @@ const TentProducts = () => {
       price: "$325.00 - $599.00",
       description: "The 10x10 Event Tent is the next level in outdoor advertising. Achieve 360 degrees of branding with a custom full fabric dye sub canopy and hardware package. Canopy is printed and sewn weather resistant tent polyester. Print your brand message on each of the four peaks and valance panels.",
       image: "/assets/images/Tent_only-buyprintz.jpg",
-      gtin: "0085001240008",
+      gtin: "0085001240006",
       features: [
         "360° Branding Coverage - Print on all four peaks and valance panels",
         "Heavy Duty 40mm Aluminum Hex Frame - Extra strength for outdoor exhibitions",
@@ -110,7 +110,7 @@ const TentProducts = () => {
       price: "$750.00 - $900.00",
       description: "Complete tent with frame, canopy, and wall options. Enhanced coverage with sidewalls and/or backwall for maximum branding and protection. Achieve complete 360° branding with custom graphics on canopy and walls.",
       image: "/assets/images/tent_complete-buyprintz.jpg",
-      gtin: "0085001240015",
+      gtin: "0085001240013",
       features: [
         "Complete 360° Branding - Canopy + wall graphics for maximum impact",
         "Heavy Duty 40mm Aluminum Hex Frame - Professional-grade construction",
