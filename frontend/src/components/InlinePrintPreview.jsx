@@ -16,6 +16,18 @@ const InlinePrintPreview = ({
   const [currentSurfaceIndex, setCurrentSurfaceIndex] = useState(0)
   const [previewImage, setPreviewImage] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Track mobile breakpoint for responsive rendering
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640) // sm breakpoint
+    }
+    
+    checkMobile() // Check on mount
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Ensure transparent regions render over white in previews
   const normalizePreviewImage = (dataUrl) => {
@@ -339,13 +351,13 @@ const InlinePrintPreview = ({
                     className="absolute"
                     style={{
                       // Mobile: scale to 70% of viewport, Desktop: fixed 464px (perfect)
-                      width: window.innerWidth < 768 ? 'min(464px, 70vw)' : '464px',
-                      height: window.innerWidth < 768 ? 'min(289px, 43vw)' : '289px',
+                      width: isMobile ? 'min(464px, 70vw)' : '464px',
+                      height: isMobile ? 'min(289px, 43vw)' : '289px',
                       top: '50%',
                       left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      clipPath: window.innerWidth < 768 ? 'inset(0 round min(31px, 5vw))' : 'inset(0 round 31px)',
-                      WebkitClipPath: window.innerWidth < 768 ? 'inset(0 round min(31px, 5vw))' : 'inset(0 round 31px)',
+                      clipPath: isMobile ? 'inset(0 round min(31px, 5vw))' : 'inset(0 round 31px)',
+                      WebkitClipPath: isMobile ? 'inset(0 round min(31px, 5vw))' : 'inset(0 round 31px)',
                       backgroundColor: 'transparent',
                       overflow: 'hidden'
                     }}
@@ -386,11 +398,13 @@ const InlinePrintPreview = ({
                   <img
                     src={previewImage}
                     alt="Tent Design Preview"
-                    className="sm:max-w-full sm:max-h-full object-contain bg-white"
+                    className="object-contain bg-white"
                     style={{
                       // Mobile: fill container, Desktop: natural responsive sizing
-                      width: window.innerWidth < 640 ? '100%' : 'auto',
-                      height: window.innerWidth < 640 ? '100%' : 'auto'
+                      width: isMobile ? '100%' : 'auto',
+                      height: isMobile ? '100%' : 'auto',
+                      maxWidth: isMobile ? '100%' : '100%',
+                      maxHeight: isMobile ? '100%' : '100%'
                     }}
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
@@ -418,11 +432,13 @@ const InlinePrintPreview = ({
                   <img
                     src={previewImage}
                     alt="Design Preview"
-                    className="sm:max-w-full sm:max-h-full object-contain bg-white"
+                    className="object-contain bg-white"
                     style={{
                       // Mobile: fill container (like stickers), Desktop: natural responsive sizing
-                      width: window.innerWidth < 640 ? '100%' : 'auto',
-                      height: window.innerWidth < 640 ? '100%' : 'auto'
+                      width: isMobile ? '100%' : 'auto',
+                      height: isMobile ? '100%' : 'auto',
+                      maxWidth: isMobile ? '100%' : '100%',
+                      maxHeight: isMobile ? '100%' : '100%'
                     }}
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
