@@ -338,16 +338,14 @@ const InlinePrintPreview = ({
                   <div 
                     className="absolute"
                     style={{
-                      // Responsive sizing using max-width to scale down on mobile
-                      width: 'min(464px, 90vw)',
-                      height: 'min(289px, 55vw)',
-                      maxWidth: '464px',
-                      maxHeight: '289px',
+                      // Mobile: scale to 70% of viewport, Desktop: fixed 464px (perfect)
+                      width: window.innerWidth < 768 ? 'min(464px, 70vw)' : '464px',
+                      height: window.innerWidth < 768 ? 'min(289px, 43vw)' : '289px',
                       top: '50%',
                       left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      clipPath: 'inset(0 round min(31px, 6.7vw))',
-                      WebkitClipPath: 'inset(0 round min(31px, 6.7vw))',
+                      clipPath: window.innerWidth < 768 ? 'inset(0 round min(31px, 5vw))' : 'inset(0 round 31px)',
+                      WebkitClipPath: window.innerWidth < 768 ? 'inset(0 round min(31px, 5vw))' : 'inset(0 round 31px)',
                       backgroundColor: 'transparent',
                       overflow: 'hidden'
                     }}
@@ -383,16 +381,16 @@ const InlinePrintPreview = ({
                   />
                 </div>
               ) : productType === 'tent' ? (
-                // Tent Preview - Optimized for mobile with proper aspect ratio
+                // Tent Preview - Mobile fills container, Desktop uses natural size
                 <div className="relative w-full h-full flex items-center justify-center">
                   <img
                     src={previewImage}
                     alt="Tent Design Preview"
-                    className="max-w-full max-h-full object-contain bg-white"
+                    className="sm:max-w-full sm:max-h-full object-contain bg-white"
                     style={{
-                      // Ensure optimal display on both mobile and desktop
-                      width: 'auto',
-                      height: 'auto'
+                      // Mobile: fill container, Desktop: natural responsive sizing
+                      width: window.innerWidth < 640 ? '100%' : 'auto',
+                      height: window.innerWidth < 640 ? '100%' : 'auto'
                     }}
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
@@ -415,12 +413,17 @@ const InlinePrintPreview = ({
                   />
                 </div>
               ) : (
-                // Standard Preview for Banners - Improved mobile display
+                // Standard Preview for Banners/Stickers - Mobile fills container, Desktop natural size
                 <div className="relative w-full h-full flex items-center justify-center">
                   <img
                     src={previewImage}
                     alt="Design Preview"
-                    className="max-w-full max-h-full object-contain bg-white"
+                    className="sm:max-w-full sm:max-h-full object-contain bg-white"
+                    style={{
+                      // Mobile: fill container (like stickers), Desktop: natural responsive sizing
+                      width: window.innerWidth < 640 ? '100%' : 'auto',
+                      height: window.innerWidth < 640 ? '100%' : 'auto'
+                    }}
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
                   />
