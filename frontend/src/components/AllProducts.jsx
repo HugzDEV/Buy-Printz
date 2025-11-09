@@ -47,7 +47,7 @@ const AllProducts = () => {
     }
   ]
 
-  // Structured Data for All Products Collection Page
+  // Structured Data for All Products Collection Page (flat @graph structure)
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -69,51 +69,48 @@ const AllProducts = () => {
         ]
       },
       {
-        "@type": "CollectionPage",
+        "@type": "ItemList",
         "name": "BuyPrintz Product Categories",
         "description": "Complete range of professional business branding solutions including vinyl banners, business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins.",
         "url": "https://www.buyprintz.com/all-products",
-        "mainEntity": {
-          "@type": "ItemList",
-          "numberOfItems": 5,
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "url": "https://www.buyprintz.com/banner-products",
-              "name": "Vinyl Banners",
-              "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors"
-            },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "url": "https://www.buyprintz.com/business-card-tins",
-              "name": "Business Card Tins",
-              "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging"
-            },
-            {
-              "@type": "ListItem",
-              "position": 3,
-              "url": "https://www.buyprintz.com/tradeshow-tents",
-              "name": "Tradeshow Tents",
-              "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames"
-            },
-            {
-              "@type": "ListItem",
-              "position": 4,
-              "url": "https://www.buyprintz.com/stickers",
-              "name": "Custom Stickers",
-              "description": "Professional vinyl stickers in 8 shapes with Roland premium materials"
-            },
-            {
-              "@type": "ListItem",
-              "position": 5,
-              "url": "https://www.buyprintz.com/tin-skinz",
-              "name": "Tin Skinz",
-              "description": "Pre-designed tins filled with candy for every occasion - weddings, birthdays, holidays, and special events"
-            }
-          ]
-        }
+        "numberOfItems": 5,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "url": "https://www.buyprintz.com/banner-products",
+            "name": "Vinyl Banners",
+            "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "url": "https://www.buyprintz.com/business-card-tins",
+            "name": "Business Card Tins",
+            "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "url": "https://www.buyprintz.com/tradeshow-tents",
+            "name": "Tradeshow Tents",
+            "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "url": "https://www.buyprintz.com/stickers",
+            "name": "Custom Stickers",
+            "description": "Professional vinyl stickers in 8 shapes with Roland premium materials"
+          },
+          {
+            "@type": "ListItem",
+            "position": 5,
+            "url": "https://www.buyprintz.com/tin-skinz",
+            "name": "Tin Skinz",
+            "description": "Pre-designed tins filled with candy for every occasion - weddings, birthdays, holidays, and special events"
+          }
+        ]
       }
     ]
   }
