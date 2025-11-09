@@ -362,50 +362,7 @@ const BannerEditorNew = () => {
           return imageData
         }
         
-        // For tent sidewalls and backwall, export only the safe print area (centered, like tins)
-        if (productType === 'tent' && currentSurface) {
-          if (currentSurface === 'sidewall_left' || currentSurface === 'sidewall_right') {
-            console.log('🎨 Tent sidewall detected - exporting safe print area (centered)')
-            const printWidth = 1110
-            const printHeight = 390
-            const offsetX = (canvasSize.width - printWidth) / 2  // (1150-1110)/2 = 20px
-            const offsetY = (canvasSize.height - printHeight) / 2 // (430-390)/2 = 20px
-            
-            const imageData = stageRef.current.toDataURL({
-              pixelRatio: 3,
-              mimeType: 'image/png',
-              quality: 1.0,
-              x: offsetX,
-              y: offsetY,
-              width: printWidth,
-              height: printHeight
-            })
-            console.log('🎨 Sidewall safe print area exported (1110x390) at offset:', offsetX, offsetY)
-            return imageData
-          }
-          
-          if (currentSurface === 'backwall') {
-            console.log('🎨 Tent backwall detected - exporting safe print area (centered)')
-            const printWidth = 1110
-            const printHeight = 780
-            const offsetX = (canvasSize.width - printWidth) / 2  // (1150-1110)/2 = 20px
-            const offsetY = (canvasSize.height - printHeight) / 2 // (820-780)/2 = 20px
-            
-            const imageData = stageRef.current.toDataURL({
-              pixelRatio: 3,
-              mimeType: 'image/png',
-              quality: 1.0,
-              x: offsetX,
-              y: offsetY,
-              width: printWidth,
-              height: printHeight
-            })
-            console.log('🎨 Backwall safe print area exported (1110x780) at offset:', offsetX, offsetY)
-            return imageData
-          }
-        }
-        
-        // Standard export for other products (canopy, banners, stickers)
+        // Standard export for all tent surfaces, banners, stickers (full canvas including bleed)
         const imageData = stageRef.current.toDataURL({
           pixelRatio: 3, // Higher quality export for better print quality
           mimeType: 'image/png',
