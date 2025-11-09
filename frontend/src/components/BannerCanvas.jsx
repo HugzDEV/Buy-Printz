@@ -885,9 +885,15 @@ const BannerCanvas = forwardRef(({
       layer.batchDraw()
     }
 
+    // Subtract margin offset for sidewalls/backwall when saving position
+    // Elements are rendered with offset, but stored positions should be without offset
+    const marginOffset = (productType === 'tent' && 
+      (currentSurface === 'sidewall_left' || currentSurface === 'sidewall_right' || currentSurface === 'backwall')) 
+      ? 20 : 0
+
     handleElementChange(id, {
-      x: node.x(),
-      y: node.y()
+      x: node.x() - marginOffset,
+      y: node.y() - marginOffset
     })
   }
 
@@ -1571,10 +1577,16 @@ const BannerCanvas = forwardRef(({
     // Ensure element has all required properties
     const safeElement = ensureElementProperties({ ...element })
     
+    // Apply margin offset for sidewalls and backwall to center designs within safe print zone
+    // Sidewalls and backwall canvas sizes were increased by 40px (20px each side) for margins
+    const marginOffset = (productType === 'tent' && 
+      (currentSurface === 'sidewall_left' || currentSurface === 'sidewall_right' || currentSurface === 'backwall')) 
+      ? 20 : 0
+    
     const commonProps = {
       id: safeElement.id,
-      x: safeElement.x || 0,
-      y: safeElement.y || 0,
+      x: (safeElement.x || 0) + marginOffset,
+      y: (safeElement.y || 0) + marginOffset,
       draggable: true,
       onClick: (e) => {
         handleSelect(safeElement.id)
