@@ -221,6 +221,7 @@ const TentProductDetail = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "priceValidUntil": "2026-12-31",
+            "offerCount": "25",
             "url": `https://www.buyprintz.com/tent-product/${product.id}`
           },
           "aggregateRating": {

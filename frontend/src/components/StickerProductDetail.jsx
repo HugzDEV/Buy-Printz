@@ -154,6 +154,7 @@ const StickerProductDetail = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "priceValidUntil": "2026-12-31",
+            "offerCount": "50",
             "url": `https://www.buyprintz.com/sticker-product/${product.id}`
           },
           "aggregateRating": {
