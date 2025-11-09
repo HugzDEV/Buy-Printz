@@ -457,7 +457,7 @@ const TinSkinzMarketplace = () => {
             "https://www.buyprintz.com/assets/images/tin-skinz-showcase.jpg"
           ],
           "sku": "TIN-BC-001",
-          "gtin": "0085001234001",
+          "gtin": "0085001234067",
           "mpn": "TINBC001",
           "brand": {
             "@type": "Brand",
@@ -591,7 +591,7 @@ const TinSkinzMarketplace = () => {
             "https://www.buyprintz.com/assets/images/tin-skinz-showcase.jpg"
           ],
           "sku": "TIN-CANDY-001",
-          "gtin": "0085001234002",
+          "gtin": "0085001234074",
           "mpn": "TINCANDY001",
           "brand": {
             "@type": "Brand",
