@@ -186,7 +186,7 @@ const ZodiacTinSkinz = () => {
     "@type": "CollectionPage",
     "name": "Tin Skinz Zodiac Collection - Personalized Astrology Tins",
     "description": "Custom Tin Skinz zodiac collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs.",
-    "url": "https://www.buyprintz.com/zodiac-tin-skinz",
+    "url": "https://www.buyprintz.com/zodiac-tins",
     "breadcrumb": {
       "@type": "BreadcrumbList",
       "itemListElement": [
@@ -206,7 +206,7 @@ const ZodiacTinSkinz = () => {
           "@type": "ListItem",
           "position": 3,
           "name": "Zodiac Tin Skinz",
-          "item": "https://www.buyprintz.com/zodiac-tin-skinz"
+          "item": "https://www.buyprintz.com/zodiac-tins"
         }
       ]
     },
@@ -214,17 +214,17 @@ const ZodiacTinSkinz = () => {
       "@type": "ItemList",
       "itemListElement": zodiacSigns.map((sign, index) => ({
         "@type": "Product",
-        "@id": `https://www.buyprintz.com/zodiac-tin-skinz#${sign.name.toLowerCase()}`,
+        "@id": `https://www.buyprintz.com/zodiac-tins#${sign.name.toLowerCase()}`,
         "name": `${sign.name} Tin Skinz`,
         "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
         "image": [
           `https://www.buyprintz.com${sign.image}`,
           `https://www.buyprintz.com${sign.designUrl}`
         ],
-        "sku": `zodiac-tin-skinz-${sign.name.toLowerCase()}`,
+        "sku": `zodiac-tins-${sign.name.toLowerCase()}`,
         "gtin": `0085001234${String(index + 103).padStart(3, '0')}`,
         "mpn": `TS-ZOD-${sign.name.toUpperCase()}`,
-        "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
+        "url": `https://www.buyprintz.com/zodiac-tins/${sign.name.toLowerCase()}`,
         "brand": {
           "@type": "Brand",
           "name": "Tin Skinz",
@@ -240,7 +240,7 @@ const ZodiacTinSkinz = () => {
         "color": "Custom Zodiac Design",
         "offers": {
           "@type": "Offer",
-          "url": `https://www.buyprintz.com/zodiac-tin-skinz/${sign.name.toLowerCase()}`,
+          "url": `https://www.buyprintz.com/zodiac-tins/${sign.name.toLowerCase()}`,
           "price": "9.99",
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock",
@@ -365,7 +365,7 @@ const ZodiacTinSkinz = () => {
         description="Discover the Tin Skinz Zodiac Collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs."
         keywords="tin skinz zodiac, zodiac tins, astrology gifts, personalized zodiac, zodiac signs, astrology tins, birthday gifts, party favors, stocking stuffers, custom zodiac, astrology lovers, horoscope gifts, zodiac collection, astrology merchandise, personalized astrology, zodiac party favors, astrology stocking stuffers, zodiac birthday gifts, custom astrology tins, zodiac gift ideas, astrology party supplies"
         image="https://www.buyprintz.com/assets/tin-skinz/designs/Zodiac Final/10_Aries_Front.png"
-        url="https://www.buyprintz.com/zodiac-tin-skinz"
+        url="https://www.buyprintz.com/zodiac-tins"
         type="product"
         structuredData={combinedSchema}
       />
@@ -499,7 +499,7 @@ const ZodiacTinSkinz = () => {
             {zodiacSigns.map((sign, index) => (
               <Link
                 key={sign.name}
-                to={`/zodiac-tin-skinz/${sign.name.toLowerCase()}`}
+                to={`/zodiac-tins/${sign.name.toLowerCase()}`}
                 className="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group block"
               >
                 <div className="aspect-square bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-2 sm:p-3 md:p-4 relative overflow-hidden">

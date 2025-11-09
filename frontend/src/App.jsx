@@ -235,7 +235,7 @@ function App() {
           </>
         } />
         
-        <Route path="/zodiac-tin-skinz" element={
+        <Route path="/zodiac-tins" element={
           <>
             <Header />
             <ZodiacTinSkinz />
@@ -243,7 +243,7 @@ function App() {
           </>
         } />
         
-        <Route path="/zodiac-tin-skinz/:sign" element={
+        <Route path="/zodiac-tins/:sign" element={
           <>
             <Header />
             <ZodiacSignPage />

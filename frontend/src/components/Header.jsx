@@ -57,7 +57,7 @@ const Header = () => {
       name: 'Tin Skinz', 
       href: '/tin-skinz',
       submenu: [
-        { name: 'Zodiac Tin Skinz', href: '/zodiac-tin-skinz' }
+        { name: 'Zodiac Tin Skinz', href: '/zodiac-tins' }
       ]
     }
   ]
