@@ -2427,7 +2427,18 @@ const BannerEditorNew = () => {
             // Temporarily switch to surface for accurate capture
             setCurrentSurface(surface)
             
-            // Wait for Konva stage to update with new surface elements
+            // IMPORTANT: Update canvas size for the surface (same logic as handleSurfaceChange)
+            if (productType === 'tent') {
+              if (surface === 'sidewall_left' || surface === 'sidewall_right') {
+                setCanvasSize({ width: 1150, height: 430 })
+              } else if (surface === 'backwall') {
+                setCanvasSize({ width: 1150, height: 820 })
+              } else if (surface.startsWith('canopy_')) {
+                setCanvasSize({ width: 1160, height: 1049 })
+              }
+            }
+            
+            // Wait for Konva stage to update with new surface elements AND canvas size
             await new Promise(resolve => setTimeout(resolve, 400)) // Slightly longer for reliability
             
             // Capture using Konva (same method as auto-capture)
@@ -2442,6 +2453,18 @@ const BannerEditorNew = () => {
           
           // Restore original surface (minimize UI disruption)
           setCurrentSurface(originalSurface)
+          
+          // IMPORTANT: Restore canvas size for original surface
+          if (productType === 'tent') {
+            if (originalSurface === 'sidewall_left' || originalSurface === 'sidewall_right') {
+              setCanvasSize({ width: 1150, height: 430 })
+            } else if (originalSurface === 'backwall') {
+              setCanvasSize({ width: 1150, height: 820 })
+            } else if (originalSurface.startsWith('canopy_')) {
+              setCanvasSize({ width: 1160, height: 1049 })
+            }
+          }
+          
           console.log('🛡️ QUALITY CONTROL: Restored original surface:', originalSurface)
           
           // Wait for UI to stabilize
