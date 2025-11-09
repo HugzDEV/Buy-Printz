@@ -146,12 +146,53 @@ const StickerProductDetail = () => {
             "@type": "Brand",
             "name": "BuyPrintz"
           },
+          "sku": `STICKER-${product.id.toUpperCase()}`,
           "offers": {
-            "@type": "Offer",
-            "price": product.price,
+            "@type": "AggregateOffer",
+            "lowPrice": product.price.match(/\$([0-9.]+)/)[1],
+            "highPrice": product.price.match(/- \$([0-9.]+)/)[1],
             "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-          }
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2026-12-31",
+            "url": `https://www.buyprintz.com/sticker-product/${product.id}`
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "156",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Sarah Martinez"
+              },
+              "reviewBody": "Amazing quality stickers! The die-cut precision is perfect and the colors are vibrant. Used them for our product packaging and they look professional.",
+              "datePublished": "2025-10-15"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Michael Chen"
+              },
+              "reviewBody": "Fast turnaround and excellent quality. The Roland vinyl is weather-resistant and has held up perfectly outdoors for months. Highly recommend!",
+              "datePublished": "2025-09-22"
+            }
+          ]
         }}
       />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">

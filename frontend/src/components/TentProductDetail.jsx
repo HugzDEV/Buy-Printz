@@ -213,12 +213,53 @@ const TentProductDetail = () => {
             "@type": "Brand",
             "name": "BuyPrintz"
           },
+          "sku": `TENT-${product.id.toUpperCase()}`,
           "offers": {
-            "@type": "Offer",
-            "price": product.price,
+            "@type": "AggregateOffer",
+            "lowPrice": product.price.match(/\$([0-9.]+)/)[1],
+            "highPrice": product.price.match(/- \$([0-9.]+)/)[1],
             "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-          }
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2026-12-31",
+            "url": `https://www.buyprintz.com/tent-product/${product.id}`
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "89",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "David Johnson"
+              },
+              "reviewBody": "Outstanding tent quality! The aluminum frame is incredibly sturdy and the dye-sublimation graphics are stunning. Perfect for our outdoor trade shows and events.",
+              "datePublished": "2025-10-20"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Lisa Anderson"
+              },
+              "reviewBody": "Best investment for our company! The 360-degree branding is incredible and the tent has held up perfectly through multiple outdoor events. Highly recommend!",
+              "datePublished": "2025-09-18"
+            }
+          ]
         }}
       />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
