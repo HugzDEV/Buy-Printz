@@ -63,14 +63,14 @@
   
   <!-- Tent Product Detail Pages -->
   <url>
-    <loc>https://www.buyprintz.com/tent-product/10x10-complete-tent</loc>
+    <loc>https://www.buyprintz.com/tent-product/tent-canopy-only</loc>
     <lastmod>2025-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://www.buyprintz.com/tent-product/10x10-complete-tent-walls</loc>
+    <loc>https://www.buyprintz.com/tent-product/tent-with-walls</loc>
     <lastmod>2025-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
