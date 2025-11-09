@@ -76,43 +76,44 @@ const TinProducts = () => {
     }
   ]
 
-  // Enhanced Product Collection Schema with proper Google Shopping support
-  const tinProductsStructuredData = {
+  // Breadcrumb Schema
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
-    "@type": "CollectionPage",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.buyprintz.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Products",
+        "item": "https://www.buyprintz.com/all-products"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Business Card Tins",
+        "item": "https://www.buyprintz.com/business-card-tins"
+      }
+    ]
+  }
+
+  // Product Collection Schema - ItemList with Products
+  const productListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
     "name": "Business Card Tins - Custom Aluminum Tins with Mints",
     "description": "Premium aluminum business card tins with custom vinyl stickers and fresh mints. Perfect for professional networking and memorable first impressions. 100 unit minimum orders.",
     "url": "https://www.buyprintz.com/business-card-tins",
-    "breadcrumb": {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.buyprintz.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Products",
-          "item": "https://www.buyprintz.com/all-products"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Business Card Tins",
-          "item": "https://www.buyprintz.com/business-card-tins"
-        }
-      ]
-    },
-    "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": tinFinishes.length,
-      "itemListElement": tinFinishes.map((tin, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
+    "numberOfItems": tinFinishes.length,
+    "itemListElement": tinFinishes.map((tin, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
           "@type": "Product",
           "@id": `https://www.buyprintz.com/business-card-tins#${tin.id}`,
           "name": `${tin.name} Business Card Tin`,
@@ -245,7 +246,6 @@ const TinProducts = () => {
           ]
         }
       }))
-    }
   }
 
   // FAQ Schema removed to avoid duplication with global FAQPage in index.html
@@ -300,7 +300,8 @@ const TinProducts = () => {
   const combinedSchema = {
     "@context": "https://schema.org",
     "@graph": [
-      tinProductsStructuredData,
+      breadcrumbSchema,
+      productListSchema,
       howToSchema
     ]
   }
