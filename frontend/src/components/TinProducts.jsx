@@ -388,15 +388,12 @@ const TinProducts = () => {
                   key={finish.id} 
                   id={finish.id}
                   className="backdrop-blur-md bg-white/80 border border-white/30 shadow-xl rounded-3xl group hover:bg-white/90 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col"
-                  itemScope 
-                  itemType="https://schema.org/Product"
                 >
                   <div className="relative overflow-hidden rounded-t-3xl">
                     <img 
                       src={finish.image} 
                       alt={`${finish.name} Business Card Tin - Premium ${finish.name} Aluminum with Custom Vinyl Stickers`}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                      itemProp="image"
                       loading="lazy"
                     />
                     <div className="absolute top-4 right-4">
@@ -424,12 +421,12 @@ const TinProducts = () => {
                       <div className="text-blue-600 mr-3">
                         {finish.icon}
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900" itemProp="name">
+                      <h3 className="text-2xl font-bold text-gray-900">
                         {finish.name} Business Card Tin
                       </h3>
                     </div>
                     
-                    <p className="text-gray-600 mb-4 flex-grow" itemProp="description">
+                    <p className="text-gray-600 mb-4 flex-grow">
                       {finish.description}
                     </p>
                     
@@ -443,19 +440,13 @@ const TinProducts = () => {
                     </div>
                     
                     <div className="flex items-center justify-between mb-6">
-                      <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
-                        <meta itemProp="priceCurrency" content="USD" />
-                        <meta itemProp="price" content={finish.priceValue} />
-                        <meta itemProp="availability" content="https://schema.org/InStock" />
-                        <meta itemProp="priceValidUntil" content="2026-12-31" />
-                        <div className="text-3xl font-bold text-blue-600" itemProp="priceDisplay">
+                      <div>
+                        <div className="text-3xl font-bold text-blue-600">
                           {finish.price}
                         </div>
                         <div className="text-sm text-gray-500 font-medium">{finish.priceNote}</div>
                       </div>
-                      <div className="flex items-center gap-1 text-yellow-500" itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
-                        <meta itemProp="ratingValue" content="4.9" />
-                        <meta itemProp="reviewCount" content="127" />
+                      <div className="flex items-center gap-1 text-yellow-500">
                         {[...Array(5)].map((_, i) => (
                           <Star key={i} className="w-4 h-4 fill-current" />
                         ))}
@@ -473,13 +464,7 @@ const TinProducts = () => {
                     </Link>
                   </div>
                   
-                  {/* Hidden SEO data */}
-                  <meta itemProp="sku" content={finish.sku} />
-                  <meta itemProp="mpn" content={finish.mpn} />
-                  <meta itemProp="gtin" content={finish.gtin} />
-                  <div itemProp="brand" itemScope itemType="https://schema.org/Brand" className="hidden">
-                    <meta itemProp="name" content="BuyPrintz" />
-                  </div>
+                  {/* Microdata removed - using JSON-LD only to prevent duplicate detection */}
                 </article>
               ))}
             </div>
