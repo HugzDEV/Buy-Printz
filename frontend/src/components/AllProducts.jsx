@@ -303,23 +303,7 @@ const AllProducts = () => {
             "@type": "AggregateRating",
             "ratingValue": "4.7",
             "reviewCount": "78"
-          },
-          "review": [
-            {
-              "@type": "Review",
-              "reviewRating": {
-                "@type": "Rating",
-                "ratingValue": "5",
-                "bestRating": "5"
-              },
-              "author": {
-                "@type": "Person",
-                "name": "Emily S."
-              },
-              "reviewBody": "Perfect party favors! The candy tins are adorable and my guests loved the personalized designs.",
-              "datePublished": "2025-10-25"
-            }
-          ]
+          }
         }
       },
       {
@@ -382,23 +366,7 @@ const AllProducts = () => {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
             "reviewCount": "342"
-          },
-          "review": [
-            {
-              "@type": "Review",
-              "reviewRating": {
-                "@type": "Rating",
-                "ratingValue": "5",
-                "bestRating": "5"
-              },
-              "author": {
-                "@type": "Person",
-                "name": "Lisa K."
-              },
-              "reviewBody": "Bought zodiac tins as birthday gifts for all my friends. They absolutely love them! Unique and thoughtful.",
-              "datePublished": "2025-10-22"
-            }
-          ]
+          }
         }
       }
     ]
