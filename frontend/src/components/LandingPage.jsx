@@ -48,7 +48,7 @@ const LandingPage = () => {
       hoverImage: "/assets/images/Tins_BC_v2_new%20phone%20number.png", // You can add a different tin image here
       badge: "New",
       category: "tin",
-      link: "/business-card-tins"
+      link: "/business-cards"
     },
     {
       name: "Tradeshow Tents",

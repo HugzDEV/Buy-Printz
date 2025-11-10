@@ -784,7 +784,7 @@ The key to success is strategic content distribution across all surfaces, consis
 
 Remember: Your business card tin is not just a contact method—it's a complete brand experience that recipients will remember, share, and keep for years to come.
 
-Ready to revolutionize your networking with business card tins? <Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Start designing your custom business card tins with BuyPrintz</Link> and experience the future of professional networking with same-day printing and next-day delivery.`,
+Ready to revolutionize your networking with business card tins? <Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Start designing your custom business card tins with BuyPrintz</Link> and experience the future of professional networking with same-day printing and next-day delivery.`,
       author: "BuyPrintz Team",
       date: "2025-01-15",
       readTime: "8 min read",
@@ -920,7 +920,7 @@ In an era where consumers increasingly value environmental responsibility, your 
 
 Don't let your marketing contribute to the waste problem. Make the switch to sustainable networking tools that work harder, last longer, and align with modern values.
 
-Ready to make your marketing more sustainable? <Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link> today to discuss your eco-friendly design. Let's create marketing tools that your contacts will keep, use, and remember.`,
+Ready to make your marketing more sustainable? <Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link> today to discuss your eco-friendly design. Let's create marketing tools that your contacts will keep, use, and remember.`,
       author: "BuyPrintz Team",
       date: "2025-09-22",
       readTime: "6 min read",
@@ -1006,7 +1006,7 @@ Getting Started
 
 Ready to build your startup's marketing foundation? Here's your action plan:
 
-1. Start with <Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Business Card Tins</Link>: Test your branding with a small order
+1. Start with <Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Business Card Tins</Link>: Test your branding with a small order
 2. Invest in a <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">Trade Show Tent</Link>: Choose a design that reflects your brand
 3. Create Essential <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">Banners</Link>: Grand opening, promotion, and event banners
 4. Plan Your Launch: Use all three tools together for maximum impact
@@ -1017,7 +1017,7 @@ While digital marketing has its place, physical marketing tools create the found
 
 Don't let your startup get lost in the digital noise. Invest in physical marketing tools that create real connections and lasting impressions.
 
-Ready to get started? <Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link>, <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">trade show tents</Link>, and <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">banner solutions</Link> today. Let's build the foundation for your business success.`,
+Ready to get started? <Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link>, <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">trade show tents</Link>, and <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">banner solutions</Link> today. Let's build the foundation for your business success.`,
       author: "BuyPrintz Team",
       date: "2025-09-21",
       readTime: "7 min read",
@@ -1243,7 +1243,7 @@ For printing companies and professionals ready to make lasting impressions, cust
 
 Ready to Transform Your Networking Game?
 
-<Link to="/business-card-tins" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link> today to discuss creating custom solutions that reflect your brand's innovation and environmental consciousness. Let's design networking tools that your contacts will remember, use, and talk about.`,
+<Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link> today to discuss creating custom solutions that reflect your brand's innovation and environmental consciousness. Let's design networking tools that your contacts will remember, use, and talk about.`,
       author: "BuyPrintz Team",
       date: "2025-09-09",
       readTime: "8 min read",
@@ -1426,7 +1426,7 @@ Ready to Transform Your Networking Game?
               </h3>
               <div className="grid md:grid-cols-3 gap-6">
                 <Link 
-                  to="/business-card-tins"
+                  to="/business-cards"
                   className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   <div className="flex items-start gap-4">
@@ -1508,7 +1508,7 @@ Ready to Transform Your Networking Game?
                   Get a Quote
                 </Link>
                 <Link
-                  to="/business-card-tins"
+                  to="/business-cards"
                   className="bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 px-6 py-3 rounded-lg font-medium transition-colors text-center"
                 >
                   View Tin Products

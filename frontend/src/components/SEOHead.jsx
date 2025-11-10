@@ -76,10 +76,10 @@ export const seoConfigs = {
   },
   
   businessCardTins: {
-    title: "Business Card Tins - Custom Aluminum Tins with Mints | BuyPrintz",
-    description: "Revolutionary Business Card Tins with custom vinyl stickers and fresh mints. Premium aluminum tins that make lasting impressions. Perfect for networking, events, and professional marketing. 100 unit minimum orders.",
-    keywords: "business card tins, business cards, custom business cards, aluminum business cards, business card printing, business card design, business card templates, business card ideas, business card alternatives, networking cards, professional business cards, custom business card tins, promotional business cards, business card holders, business card storage, business card cases, custom tins, aluminum tins, fresh mints, networking tools, promotional tins, professional networking, custom vinyl stickers",
-    url: "https://www.buyprintz.com/business-card-tins"
+    title: "Custom Business Cards That Get Kept | Unique Business Cards | BuyPrintz",
+    description: "Unique business cards that get kept, not thrown away. Premium aluminum tins with custom designs and fresh mints. Stand out from traditional paper cards. 10x retention vs paper. Perfect for networking and memorable first impressions. 100 unit minimum.",
+    keywords: "business cards, custom business cards, unique business cards, memorable business cards, business card alternatives, networking cards, professional business cards, business card printing, business card design, aluminum business cards, reusable business cards, eco-friendly business cards, promotional business cards, networking tools, professional networking, custom tins, fresh mints",
+    url: "https://www.buyprintz.com/business-cards"
   },
   
   tradeshowTents: {

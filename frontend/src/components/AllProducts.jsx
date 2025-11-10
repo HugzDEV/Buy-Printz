@@ -20,7 +20,7 @@ const AllProducts = () => {
       price: "From $399.99",
       description: "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging (100 unit minimum)",
       image: "/assets/images/Tins_BC_v2_new%20phone%20number.png",
-      link: "/business-card-tins",
+      link: "/business-cards",
       badge: "New",
       badgeColor: "bg-green-500",
       icon: <Crown className="w-8 h-8" />
@@ -91,10 +91,10 @@ const AllProducts = () => {
         "position": 2,
         "item": {
           "@type": "Thing",
-          "@id": "https://www.buyprintz.com/business-card-tins",
+          "@id": "https://www.buyprintz.com/business-cards",
           "name": "Business Card Tins",
           "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
-          "url": "https://www.buyprintz.com/business-card-tins"
+          "url": "https://www.buyprintz.com/business-cards"
         }
       },
       {

@@ -78,42 +78,42 @@ const TinProducts = () => {
 
   // Breadcrumb Schema (no @context here - defined in parent @graph)
   const breadcrumbSchema = {
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.buyprintz.com/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Products",
-        "item": "https://www.buyprintz.com/all-products"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": "Business Card Tins",
-        "item": "https://www.buyprintz.com/business-card-tins"
-      }
-    ]
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.buyprintz.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://www.buyprintz.com/all-products"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Business Card Tins",
+          "item": "https://www.buyprintz.com/business-cards"
+        }
+      ]
   }
 
   // Product Collection Schema - ItemList with Products (no @context here - defined in parent @graph)
   const productListSchema = {
-    "@type": "ItemList",
+      "@type": "ItemList",
     "name": "Business Card Tins - Custom Aluminum Tins with Mints",
     "description": "Premium aluminum business card tins with custom vinyl stickers and fresh mints. Perfect for professional networking and memorable first impressions. 100 unit minimum orders.",
-    "url": "https://www.buyprintz.com/business-card-tins",
-    "numberOfItems": tinFinishes.length,
+    "url": "https://www.buyprintz.com/business-cards",
+      "numberOfItems": tinFinishes.length,
       "itemListElement": tinFinishes.map((tin, index) => ({
         "@type": "ListItem",
         "position": index + 1,
         "item": {
           "@type": "Product",
-          "@id": `https://www.buyprintz.com/business-card-tins#${tin.id}`,
+          "@id": `https://www.buyprintz.com/business-cards#${tin.id}`,
           "name": `${tin.name} Business Card Tin`,
           "description": tin.description,
           "image": [
@@ -138,7 +138,7 @@ const TinProducts = () => {
           "color": tin.name,
           "offers": {
             "@type": "Offer",
-            "url": `https://www.buyprintz.com/business-card-tins#${tin.id}`,
+            "url": `https://www.buyprintz.com/business-cards#${tin.id}`,
             "price": tin.priceValue,
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
@@ -260,14 +260,14 @@ const TinProducts = () => {
         "position": 1,
         "name": "Choose Your Finish",
         "text": "Select from Silver, Black, or Gold aluminum finishes based on your brand aesthetic and budget.",
-        "url": "https://www.buyprintz.com/business-card-tins"
+        "url": "https://www.buyprintz.com/business-cards"
       },
       {
         "@type": "HowToStep",
         "position": 2,
         "name": "Select Quantity",
         "text": "Choose 100, 250, or 500 units based on your business needs. 100 unit minimum required.",
-        "url": "https://www.buyprintz.com/business-card-tins"
+        "url": "https://www.buyprintz.com/business-cards"
       },
       {
         "@type": "HowToStep",
@@ -288,7 +288,7 @@ const TinProducts = () => {
         "position": 5,
         "name": "Receive Your Tins",
         "text": "Your custom tins will be produced in 5-7 business days and shipped with professional packaging.",
-        "url": "https://www.buyprintz.com/business-card-tins"
+        "url": "https://www.buyprintz.com/business-cards"
       }
     ]
   }
@@ -326,10 +326,10 @@ const TinProducts = () => {
               {/* Text Content */}
               <div className="text-center lg:text-left">
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-                  Business Card Tins
+                  Custom Business Cards That Get Kept
                 </h1>
                 <p className="text-xl md:text-2xl text-blue-100 mb-8 drop-shadow-md">
-                  Premium aluminum tins with custom vinyl stickers - perfect for memorable networking and professional branding
+                  Unique alternatives to paper cards. Premium aluminum tins with custom designs and fresh mints that people actually keep and reuse.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-6">
                   <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">

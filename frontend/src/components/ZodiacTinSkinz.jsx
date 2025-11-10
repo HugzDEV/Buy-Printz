@@ -182,7 +182,7 @@ const ZodiacTinSkinz = () => {
 
   // Breadcrumb Schema
   const breadcrumbSchema = {
-    "@type": "BreadcrumbList",
+      "@type": "BreadcrumbList",
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -200,7 +200,7 @@ const ZodiacTinSkinz = () => {
           "@type": "ListItem",
           "position": 3,
           "name": "Zodiac Tin Skinz",
-        "item": "https://www.buyprintz.com/zodiac-tins"
+        "item": "https://www.buyprintz.com/zodiac"
         }
       ]
   }
@@ -223,17 +223,17 @@ const ZodiacTinSkinz = () => {
 
   // Product Collection Schema - ItemList with Products
   const productListSchema = {
-    "@type": "ItemList",
+      "@type": "ItemList",
     "name": "Tin Skinz Zodiac Collection - Personalized Astrology Tins",
     "description": "Custom Tin Skinz zodiac collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs.",
-    "url": "https://www.buyprintz.com/zodiac-tins",
+    "url": "https://www.buyprintz.com/zodiac",
     "numberOfItems": zodiacSigns.length,
       "itemListElement": zodiacSigns.map((sign, index) => ({
       "@type": "ListItem",
       "position": index + 1,
       "item": {
         "@type": "Product",
-        "@id": `https://www.buyprintz.com/zodiac-tins#${sign.name.toLowerCase()}`,
+        "@id": `https://www.buyprintz.com/zodiac#${sign.name.toLowerCase()}`,
         "name": `${sign.name} Tin Skinz`,
         "description": `Custom ${sign.name} Tin Skinz featuring ${sign.name} astrological sign design. Perfect for ${sign.name} birthday gifts, party favors, and astrology lovers.`,
         "image": [
@@ -243,7 +243,7 @@ const ZodiacTinSkinz = () => {
         "sku": `zodiac-tins-${sign.name.toLowerCase()}`,
         "gtin": zodiacGTINs[sign.name.toLowerCase()],
         "mpn": `TS-ZOD-${sign.name.toUpperCase()}`,
-        "url": `https://www.buyprintz.com/zodiac-tins/${sign.name.toLowerCase()}`,
+        "url": `https://www.buyprintz.com/zodiac/${sign.name.toLowerCase()}`,
         "brand": {
           "@type": "Brand",
           "name": "Tin Skinz",
@@ -259,7 +259,7 @@ const ZodiacTinSkinz = () => {
         "color": "Custom Zodiac Design",
         "offers": {
           "@type": "Offer",
-          "url": `https://www.buyprintz.com/zodiac-tins/${sign.name.toLowerCase()}`,
+          "url": `https://www.buyprintz.com/zodiac/${sign.name.toLowerCase()}`,
           "price": "9.99",
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock",
@@ -381,11 +381,11 @@ const ZodiacTinSkinz = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
       <SEOHead
-        title="Tin Skinz Zodiac Collection - Personalized Astrology Tins | Custom Zodiac Gifts"
-        description="Discover the Tin Skinz Zodiac Collection featuring all 12 astrological signs. Perfect for astrology lovers, birthday gifts, party favors, and stocking stuffers. Premium aluminum tins with custom zodiac designs."
-        keywords="tin skinz zodiac, zodiac tins, astrology gifts, personalized zodiac, zodiac signs, astrology tins, birthday gifts, party favors, stocking stuffers, custom zodiac, astrology lovers, horoscope gifts, zodiac collection, astrology merchandise, personalized astrology, zodiac party favors, astrology stocking stuffers, zodiac birthday gifts, custom astrology tins, zodiac gift ideas, astrology party supplies"
+        title="Zodiac Gifts | Personalized Astrology Gifts by Sign | BuyPrintz"
+        description="Personalized zodiac gifts for all 12 astrological signs. Perfect astrology gifts, horoscope gifts, and birthday gifts by zodiac sign. Premium candy tins with custom zodiac designs. Aries to Pisces."
+        keywords="zodiac gifts, astrology gifts, horoscope gifts, birthday gifts by zodiac sign, personalized zodiac gifts, zodiac birthday gifts, astrology birthday gifts, zodiac sign gifts, personalized astrology, custom zodiac, zodiac collection, astrology lovers, horoscope birthday gifts, zodiac party favors, astrology merchandise, birthday gifts, party favors, stocking stuffers, zodiac signs, all 12 zodiac signs"
         image="https://www.buyprintz.com/assets/tin-skinz/designs/Zodiac Final/10_Aries_Front.png"
-        url="https://www.buyprintz.com/zodiac-tins"
+        url="https://www.buyprintz.com/zodiac"
         type="product"
         structuredData={combinedSchema}
       />
@@ -404,7 +404,7 @@ const ZodiacTinSkinz = () => {
                   className="h-12 sm:h-16 lg:h-20 w-auto"
                 />
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white">
-                  Zodiac Collection
+                  Zodiac Gifts | Personalized Astrology Gifts by Sign
                 </h1>
               </div>
               <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-4 lg:mb-6">
@@ -519,7 +519,7 @@ const ZodiacTinSkinz = () => {
             {zodiacSigns.map((sign, index) => (
               <Link
                 key={sign.name}
-                to={`/zodiac-tins/${sign.name.toLowerCase()}`}
+                to={`/zodiac/${sign.name.toLowerCase()}`}
                 className="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group block"
               >
                 <div className="aspect-square bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-2 sm:p-3 md:p-4 relative overflow-hidden">

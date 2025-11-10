@@ -264,7 +264,7 @@ const ZodiacSignPage = () => {
     const productSchema = {
       "@context": "https://schema.org",
       "@type": "Product",
-      "@id": `https://www.buyprintz.com/zodiac-tins/${currentSign.name.toLowerCase()}`,
+      "@id": `https://www.buyprintz.com/zodiac/${currentSign.name.toLowerCase()}`,
       "name": `${currentSign.name} Tin Skinz`,
       "description": `Custom ${currentSign.name} Tin Skinz featuring ${currentSign.name} astrological sign design. Perfect for ${currentSign.name} birthday gifts, party favors, and astrology lovers. Premium aluminum tins with personalized zodiac designs.`,
       "image": [
@@ -274,7 +274,7 @@ const ZodiacSignPage = () => {
       "sku": `zodiac-tins-${currentSign.name.toLowerCase()}`,
       "gtin": zodiacGTINs[currentSign.name.toLowerCase()],
       "mpn": `TS-ZOD-${currentSign.name.toUpperCase()}`,
-      "url": `https://www.buyprintz.com/zodiac-tins/${currentSign.name.toLowerCase()}`,
+      "url": `https://www.buyprintz.com/zodiac/${currentSign.name.toLowerCase()}`,
       "brand": {
         "@type": "Brand",
         "name": "Tin Skinz",
@@ -290,7 +290,7 @@ const ZodiacSignPage = () => {
       "color": "Custom Zodiac Design",
       "offers": {
         "@type": "Offer",
-        "url": `https://www.buyprintz.com/zodiac-tins/${currentSign.name.toLowerCase()}`,
+        "url": `https://www.buyprintz.com/zodiac/${currentSign.name.toLowerCase()}`,
         "price": "9.99",
         "priceCurrency": "USD",
         "availability": "https://schema.org/InStock",
@@ -419,13 +419,13 @@ const ZodiacSignPage = () => {
           "@type": "ListItem",
           "position": 3,
           "name": "Zodiac Tin Skinz",
-          "item": "https://www.buyprintz.com/zodiac-tins"
+          "item": "https://www.buyprintz.com/zodiac"
         },
         {
           "@type": "ListItem",
           "position": 4,
           "name": `${currentSign.name} Tin Skinz`,
-          "item": `https://www.buyprintz.com/zodiac-tins/${currentSign.name.toLowerCase()}`
+          "item": `https://www.buyprintz.com/zodiac/${currentSign.name.toLowerCase()}`
         }
       ]
     };
@@ -441,7 +441,7 @@ const ZodiacSignPage = () => {
         <div className="max-w-4xl mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Zodiac Sign Not Found</h1>
           <p className="text-gray-600 mb-8">The zodiac sign you're looking for doesn't exist.</p>
-          <Link to="/zodiac-tins" className="text-blue-600 hover:text-blue-800 underline">
+          <Link to="/zodiac" className="text-blue-600 hover:text-blue-800 underline">
             Back to Zodiac Tin Skinz
           </Link>
         </div>
@@ -456,7 +456,7 @@ const ZodiacSignPage = () => {
         description={`Custom ${currentSign.name} Tin Skinz featuring ${currentSign.name} astrological sign design. Perfect for ${currentSign.name} birthday gifts, party favors, and astrology lovers. Premium aluminum tins with personalized ${currentSign.name} designs.`}
         keywords={`${currentSign.name} tin skinz, ${currentSign.name} gifts, ${currentSign.name} birthday gifts, ${currentSign.name} zodiac tins, ${currentSign.name} party favors, ${currentSign.name} astrology gifts, ${currentSign.name} personalized gifts, ${currentSign.name} stocking stuffers, ${currentSign.name} horoscope gifts, ${currentSign.name} zodiac collection`}
         image={`https://www.buyprintz.com${currentSign.image}`}
-        url={`https://www.buyprintz.com/zodiac-tins/${currentSign.name.toLowerCase()}`}
+        url={`https://www.buyprintz.com/zodiac/${currentSign.name.toLowerCase()}`}
         type="product"
         structuredData={structuredData}
       />
@@ -466,7 +466,7 @@ const ZodiacSignPage = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-90"></div>
           <div className="relative max-w-7xl mx-auto px-4 py-6 md:py-12 lg:py-20">
               <Link 
-              to="/zodiac-tins"
+              to="/zodiac"
               className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4 md:mb-6 transition-colors"
               >
               <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
@@ -529,7 +529,7 @@ const ZodiacSignPage = () => {
                 <div className="flex justify-between items-center pt-3 sm:pt-4 border-t border-white/20 gap-4 relative z-10">
                   {prevSign ? (
                     <Link
-                      to={`/zodiac-tins/${prevSign.name.toLowerCase()}`}
+                      to={`/zodiac/${prevSign.name.toLowerCase()}`}
                       className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg min-w-[80px] sm:min-w-[100px] cursor-pointer"
                       onClick={(e) => {
                         console.log('Prev clicked:', prevSign.name);
@@ -544,7 +544,7 @@ const ZodiacSignPage = () => {
                   
                   {nextSign ? (
                     <Link
-                      to={`/zodiac-tins/${nextSign.name.toLowerCase()}`}
+                      to={`/zodiac/${nextSign.name.toLowerCase()}`}
                       className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg min-w-[80px] sm:min-w-[100px] justify-end cursor-pointer"
                       onClick={(e) => {
                         console.log('Next clicked:', nextSign.name);
@@ -739,7 +739,7 @@ const ZodiacSignPage = () => {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              to="/zodiac-tins"
+              to="/zodiac"
               className="bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/30 transition-colors"
             >
               View All Zodiac Signs

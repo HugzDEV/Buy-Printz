@@ -120,7 +120,7 @@ const StickerProducts = () => {
 
   // Breadcrumb Schema (no @context here - defined in parent @graph)
   const breadcrumbSchema = {
-    "@type": "BreadcrumbList",
+      "@type": "BreadcrumbList",
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -145,7 +145,7 @@ const StickerProducts = () => {
 
   // Product Collection Schema - ItemList with Products (no @context here - defined in parent @graph)
   const productListSchema = {
-    "@type": "ItemList",
+      "@type": "ItemList",
     "name": "Custom Stickers - Vinyl Stickers & Decals",
     "description": "Professional custom stickers and vinyl decals. Weather-resistant, durable stickers for business, events, and personal use. Starting at $0.25 per sticker. Fast 2-3 day delivery.",
     "url": "https://www.buyprintz.com/stickers",

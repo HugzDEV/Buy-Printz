@@ -50,14 +50,14 @@ const Header = () => {
   const productOptions = [
     { name: 'All Products', href: '/all-products' },
     { name: 'Vinyl Banners', href: '/banner-products' },
-    { name: 'Business Card Tins', href: '/business-card-tins' },
+    { name: 'Business Cards', href: '/business-cards' },
     { name: 'Tradeshow Tents', href: '/tradeshow-tents' },
     { name: 'Custom Stickers', href: '/stickers' },
     { 
       name: 'Tin Skinz', 
       href: '/tin-skinz',
       submenu: [
-        { name: 'Zodiac Tin Skinz', href: '/zodiac-tins' }
+        { name: 'Zodiac Gifts', href: '/zodiac' }
       ]
     }
   ]

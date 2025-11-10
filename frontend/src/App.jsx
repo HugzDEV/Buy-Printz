@@ -155,13 +155,16 @@ function App() {
           </>
         } />
         
-        <Route path="/business-card-tins" element={
+        <Route path="/business-cards" element={
           <>
             <Header />
             <TinProducts />
             <Footer />
           </>
         } />
+        
+        {/* Redirect old URL to new competitive URL */}
+        <Route path="/business-card-tins" element={<Navigate to="/business-cards" replace />} />
         
         <Route path="/tradeshow-tents" element={
           <>
@@ -235,7 +238,7 @@ function App() {
           </>
         } />
         
-        <Route path="/zodiac-tins" element={
+        <Route path="/zodiac" element={
           <>
             <Header />
             <ZodiacTinSkinz />
@@ -243,13 +246,17 @@ function App() {
           </>
         } />
         
-        <Route path="/zodiac-tins/:sign" element={
+        <Route path="/zodiac/:sign" element={
           <>
             <Header />
             <ZodiacSignPage />
             <Footer />
           </>
         } />
+        
+        {/* Redirect old zodiac URLs to new competitive URLs */}
+        <Route path="/zodiac-tins" element={<Navigate to="/zodiac" replace />} />
+        <Route path="/zodiac-tins/:sign" element={<Navigate to="/zodiac/:sign" replace />} />
         
         <Route path="/tin-skinz-demo" element={
           <>

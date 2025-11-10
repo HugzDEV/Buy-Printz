@@ -179,7 +179,7 @@ const Products = () => {
 
   // Breadcrumb Schema
   const breadcrumbSchema = {
-    "@type": "BreadcrumbList",
+      "@type": "BreadcrumbList",
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -204,7 +204,7 @@ const Products = () => {
 
   // Product Collection Schema - ItemList with Products
   const productListSchema = {
-    "@type": "ItemList",
+      "@type": "ItemList",
     "name": "Professional Banner Products - Custom Printing Solutions",
     "description": "Premium quality banners and signage solutions for every application. Vinyl banners from $1.60/sqft, fabric banners from $2.75/sqft, specialty banners available. Fast 2-3 day delivery on all orders.",
     "url": "https://www.buyprintz.com/banner-products",
