@@ -51,7 +51,7 @@ const Header = () => {
     { name: 'All Products', href: '/all-products' },
     { name: 'Banners', href: '/banners' },
     { name: 'Business Cards', href: '/business-cards' },
-    { name: 'Tradeshow Tents', href: '/tradeshow-tents' },
+    { name: 'Tents', href: '/tents' },
     { name: 'Custom Stickers', href: '/stickers' },
     { 
       name: 'Tin Skinz', 

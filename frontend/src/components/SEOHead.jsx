@@ -89,11 +89,11 @@ export const seoConfigs = {
     url: "https://www.buyprintz.com/banners"
   },
   
-  tradeshowTents: {
-    title: "Tradeshow Tents - Custom Canopy Tents & Pop-Up Displays | BuyPrintz",
-    description: "Professional tradeshow tents, canopy tents, and pop-up displays for trade shows, events, and exhibitions. Custom graphics, durable construction, and easy setup. Perfect for trade shows, farmers markets, and outdoor events.",
-    keywords: "tradeshow tents, canopy tents, pop-up displays, trade show booths, custom tents, exhibition displays, event tents, trade show marketing, pop-up tents, canopy, tradeshow, trade show, exhibition tents, custom canopy, professional tents, event displays, outdoor tents, trade show displays, exhibition booths, custom canopy tents, professional canopy, tradeshow canopy, trade show canopy, event canopy, outdoor canopy, custom pop-up tents, professional pop-up displays, trade show graphics, exhibition graphics, custom tent graphics, professional tent printing, tradeshow printing, trade show printing, canopy printing, tent printing, fast tent delivery, same day tent printing",
-    url: "https://www.buyprintz.com/tradeshow-tents"
+  tents: {
+    title: "Custom Tents | Pop Up Tents & Canopy Tents | BuyPrintz",
+    description: "Custom printed tents for events, trade shows, and outdoor vendors. Pop-up canopy tents with vibrant graphics. Perfect for festivals, markets, and business displays. Fast setup, weather-resistant, professional branding.",
+    keywords: "tents, custom tents, pop up tents, canopy tents, event tents, pop-up canopy, outdoor tents, vendor tents, market tents, festival tents, custom canopy, printed tents, branded tents, trade show tents, display tents, portable tents, commercial tents, business tents, custom pop up tents, canopy tent printing, tent graphics, promotional tents, 10x10 tents, 10x20 tents",
+    url: "https://www.buyprintz.com/tents"
   },
   
   stickers: {

@@ -30,7 +30,7 @@ const AllProducts = () => {
       price: "From $325.00",
       description: "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
       image: "/assets/images/Tent_images/Tent_Tradeshow.jpg",
-      link: "/tradeshow-tents",
+      link: "/tents",
       badge: "New",
       badgeColor: "bg-purple-500",
       icon: <Layers className="w-8 h-8" />
@@ -102,10 +102,10 @@ const AllProducts = () => {
         "position": 3,
         "item": {
           "@type": "Thing",
-          "@id": "https://www.buyprintz.com/tradeshow-tents",
+          "@id": "https://www.buyprintz.com/tents",
           "name": "Tradeshow Tents",
           "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
-          "url": "https://www.buyprintz.com/tradeshow-tents"
+          "url": "https://www.buyprintz.com/tents"
         }
       },
       {

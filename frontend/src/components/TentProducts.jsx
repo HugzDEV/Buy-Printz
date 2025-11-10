@@ -225,7 +225,7 @@ const TentProducts = () => {
         "@type": "ListItem",
         "position": 3,
         "name": "Tradeshow Tents",
-        "item": "https://www.buyprintz.com/tradeshow-tents"
+        "item": "https://www.buyprintz.com/tents"
       }
     ]
   }
@@ -235,14 +235,14 @@ const TentProducts = () => {
     "@type": "ItemList",
     "name": "Tradeshow Tents - Professional Custom Tents",
     "description": "Professional tradeshow tents with custom graphics and heavy-duty aluminum frames. Starting at $325.00 for canopy-only, up to $900.00 for complete tent packages with walls. Fast 2-3 day delivery.",
-    "url": "https://www.buyprintz.com/tradeshow-tents",
+    "url": "https://www.buyprintz.com/tents",
     "numberOfItems": tentProducts.length,
     "itemListElement": tentProducts.map((tent, index) => ({
       "@type": "ListItem",
       "position": index + 1,
       "item": {
           "@type": "Product",
-          "@id": `https://www.buyprintz.com/tradeshow-tents#${tent.id}`,
+          "@id": `https://www.buyprintz.com/tents#${tent.id}`,
           "name": tent.name,
           "description": tent.description,
           "image": [
@@ -267,7 +267,7 @@ const TentProducts = () => {
           "color": "Custom",
           "offers": {
             "@type": "Offer",
-            "url": `https://www.buyprintz.com/tradeshow-tents#${tent.id}`,
+            "url": `https://www.buyprintz.com/tents#${tent.id}`,
             "price": (() => {
               const match = tent.price.match(/\$(\d+\.?\d*)/);
               return match ? match[1] : "325.00";
@@ -402,7 +402,7 @@ const TentProducts = () => {
         "position": 1,
         "name": "Choose Your Tent Package",
         "text": "Select canopy-only ($325-$599) or complete tent with walls ($750-$900) based on your coverage needs and budget.",
-        "url": "https://www.buyprintz.com/tradeshow-tents"
+        "url": "https://www.buyprintz.com/tents"
       },
       {
         "@type": "HowToStep",
@@ -416,7 +416,7 @@ const TentProducts = () => {
         "position": 3,
         "name": "Select Accessories",
         "text": "Choose from carrying bags, sandbags, ropes & stakes, and other accessories to complete your tent package.",
-        "url": "https://www.buyprintz.com/tradeshow-tents"
+        "url": "https://www.buyprintz.com/tents"
       },
       {
         "@type": "HowToStep",
@@ -430,7 +430,7 @@ const TentProducts = () => {
         "position": 5,
         "name": "Receive Your Tent",
         "text": "Your custom tent will be produced in 5-7 business days and shipped with professional packaging and setup instructions.",
-        "url": "https://www.buyprintz.com/tradeshow-tents"
+        "url": "https://www.buyprintz.com/tents"
       }
     ]
   }
@@ -447,7 +447,7 @@ const TentProducts = () => {
 
   return (
     <>
-      <SEOHead {...seoConfigs.tradeshowTents} structuredData={combinedSchema} />
+      <SEOHead {...seoConfigs.tents} structuredData={combinedSchema} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">
@@ -470,10 +470,10 @@ const TentProducts = () => {
           
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">
-              Tradeshow Tents
+              Custom Tents | Pop Up Tents & Canopy Tents
             </h1>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto drop-shadow-md">
-              Professional tradeshow tents with custom graphics - starting at $325.00 for canopy-only, up to $900.00 for full wall coverage
+              Custom printed tents for events, trade shows, and outdoor vendors. Pop-up canopy tents with vibrant graphics. Fast setup, weather-resistant, professional branding.
             </p>
           </div>
           

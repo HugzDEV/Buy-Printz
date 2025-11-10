@@ -169,13 +169,16 @@ function App() {
         {/* Redirect old URL to new competitive URL */}
         <Route path="/business-card-tins" element={<Navigate to="/business-cards" replace />} />
         
-        <Route path="/tradeshow-tents" element={
+        <Route path="/tents" element={
           <>
             <Header />
             <TentProducts />
             <Footer />
           </>
         } />
+        
+        {/* Redirect old URL to new competitive URL */}
+        <Route path="/tradeshow-tents" element={<Navigate to="/tents" replace />} />
         
         <Route path="/tent-product/:id" element={
           <>

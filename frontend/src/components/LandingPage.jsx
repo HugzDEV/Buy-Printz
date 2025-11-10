@@ -58,7 +58,7 @@ const LandingPage = () => {
       hoverImage: "/assets/images/Tent_images/tent_mockup_2.jpg", // Different tent angle
       badge: "New",
       category: "tent",
-      link: "/tradeshow-tents"
+      link: "/tents"
     },
     {
       name: "Custom Stickers",

@@ -190,7 +190,7 @@ const TentProductDetail = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
-          <Link to="/tradeshow-tents" className="text-primary-600 hover:text-primary-700">
+          <Link to="/tents" className="text-primary-600 hover:text-primary-700">
             Back to Tradeshow Tents
           </Link>
         </div>
@@ -274,7 +274,7 @@ const TentProductDetail = () => {
             {/* Back Button */}
             <div className="mb-6">
               <Link 
-                to="/tradeshow-tents" 
+                to="/tents" 
                 className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors duration-200 group"
               >
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
@@ -452,7 +452,7 @@ const TentProductDetail = () => {
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link 
-                  to="/tradeshow-tents"
+                  to="/tents"
                   className="bg-transparent border-2 border-white/50 text-white hover:bg-white/10 text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
                 >
                   View All Tents
