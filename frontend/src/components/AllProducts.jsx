@@ -79,55 +79,143 @@ const AllProducts = () => {
         "@type": "ListItem",
         "position": 1,
         "item": {
-          "@type": "Thing",
-          "@id": "https://www.buyprintz.com/banners",
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/banners#product",
           "name": "Vinyl Banners",
           "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors",
-          "url": "https://www.buyprintz.com/banners"
+          "url": "https://www.buyprintz.com/banners",
+          "image": "https://www.buyprintz.com/assets/images/13oz Vinyl Banner.jpg",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz"
+          },
+          "offers": {
+            "@type": "AggregateOffer",
+            "lowPrice": "25.00",
+            "highPrice": "500.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "offerCount": "9"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.7",
+            "reviewCount": "89"
+          }
         }
       },
       {
         "@type": "ListItem",
         "position": 2,
         "item": {
-          "@type": "Thing",
-          "@id": "https://www.buyprintz.com/business-cards",
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/business-cards#product",
           "name": "Business Card Tins",
           "description": "Premium metal tins with custom vinyl graphics - perfect for business cards, promotional items, and premium packaging",
-          "url": "https://www.buyprintz.com/business-cards"
+          "url": "https://www.buyprintz.com/business-cards",
+          "image": "https://www.buyprintz.com/assets/images/Tins_BC_v2_new%20phone%20number.png",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz"
+          },
+          "offers": {
+            "@type": "AggregateOffer",
+            "lowPrice": "399.99",
+            "highPrice": "899.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "offerCount": "3"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "127"
+          }
         }
       },
       {
         "@type": "ListItem",
         "position": 3,
         "item": {
-          "@type": "Thing",
-          "@id": "https://www.buyprintz.com/tents",
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/tents#product",
           "name": "Tradeshow Tents",
           "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
-          "url": "https://www.buyprintz.com/tents"
+          "url": "https://www.buyprintz.com/tents",
+          "image": "https://www.buyprintz.com/assets/images/Tent_images/Tent_Tradeshow.jpg",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz"
+          },
+          "offers": {
+            "@type": "AggregateOffer",
+            "lowPrice": "325.00",
+            "highPrice": "900.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "offerCount": "2"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "56"
+          }
         }
       },
       {
         "@type": "ListItem",
         "position": 4,
         "item": {
-          "@type": "Thing",
-          "@id": "https://www.buyprintz.com/stickers",
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/stickers#product",
           "name": "Custom Stickers",
           "description": "Professional vinyl stickers in 8 shapes with Roland premium materials",
-          "url": "https://www.buyprintz.com/stickers"
+          "url": "https://www.buyprintz.com/stickers",
+          "image": "https://www.buyprintz.com/assets/images/sticker_samples/stickers_standard_shapes.jpg",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz"
+          },
+          "offers": {
+            "@type": "AggregateOffer",
+            "lowPrice": "0.25",
+            "highPrice": "500.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "offerCount": "2"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "234"
+          }
         }
       },
       {
         "@type": "ListItem",
         "position": 5,
         "item": {
-          "@type": "Thing",
-          "@id": "https://www.buyprintz.com/tin-skinz",
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/tin-skinz#product",
           "name": "Tin Skinz",
           "description": "Pre-designed tins filled with candy for every occasion - weddings, birthdays, holidays, and special events",
-          "url": "https://www.buyprintz.com/tin-skinz"
+          "url": "https://www.buyprintz.com/tin-skinz",
+          "image": "https://www.buyprintz.com/assets/images/silvertin-buyprintz.jpg",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "12.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.7",
+            "reviewCount": "78"
+          }
         }
       }
     ]
