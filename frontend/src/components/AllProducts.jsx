@@ -54,6 +54,7 @@ const AllProducts = () => {
       {
         "@type": "BreadcrumbList",
         "@id": "https://www.buyprintz.com/all-products#breadcrumb",
+        "name": "All Products Breadcrumb",
         "itemListElement": [
           {
             "@type": "ListItem",
