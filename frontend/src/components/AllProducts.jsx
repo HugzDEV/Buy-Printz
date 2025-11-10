@@ -47,33 +47,41 @@ const AllProducts = () => {
     }
   ]
 
-  // Structured Data - separate schemas (not @graph) to avoid Google parsing issues
-  const breadcrumbSchema = {
+  // Structured Data - Use @graph to ensure both schemas are detected
+  const combinedSchema = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
+    "@graph": [
       {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.buyprintz.com/"
+        "@type": "BreadcrumbList",
+        "@id": "https://www.buyprintz.com/all-products#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": {
+              "@id": "https://www.buyprintz.com/",
+              "name": "Home"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "All Products",
+            "item": {
+              "@id": "https://www.buyprintz.com/all-products",
+              "name": "All Products"
+            }
+          }
+        ]
       },
       {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "All Products",
-        "item": "https://www.buyprintz.com/all-products"
-      }
-    ]
-  }
-
-  const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "BuyPrintz Product Categories",
-    "description": "Complete range of professional business branding solutions including vinyl banners, business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins.",
-    "url": "https://www.buyprintz.com/all-products",
-    "numberOfItems": 6,
+        "@type": "ItemList",
+        "@id": "https://www.buyprintz.com/all-products#productlist",
+        "name": "BuyPrintz Product Categories",
+        "description": "Complete range of professional business branding solutions including vinyl banners, business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins.",
+        "url": "https://www.buyprintz.com/all-products",
+        "numberOfItems": 6,
     "itemListElement": [
       {
         "@type": "ListItem",
@@ -298,10 +306,9 @@ const AllProducts = () => {
         }
       }
     ]
+      }
+    ]
   }
-
-  // Pass as array to create separate <script> tags for each schema
-  const structuredData = [breadcrumbSchema, itemListSchema]
 
   return (
     <>
@@ -309,7 +316,7 @@ const AllProducts = () => {
         title="All Products - BuyPrintz"
         description="Explore our complete range of professional business branding solutions: vinyl banners, business card tins, tradeshow tents, and Tin Skinz pre-designed candy tins."
         keywords="business branding, vinyl banners, business card tins, tradeshow tents, tin skinz, custom printing, promotional products, candy tins"
-        structuredData={structuredData}
+        structuredData={combinedSchema}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
