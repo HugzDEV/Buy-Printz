@@ -180,6 +180,7 @@ const Products = () => {
   // Breadcrumb Schema
   const breadcrumbSchema = {
       "@type": "BreadcrumbList",
+      "name": "Banner Products Breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",

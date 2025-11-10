@@ -79,6 +79,7 @@ const TinProducts = () => {
   // Breadcrumb Schema (no @context here - defined in parent @graph)
   const breadcrumbSchema = {
       "@type": "BreadcrumbList",
+      "name": "Business Card Tins Breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",

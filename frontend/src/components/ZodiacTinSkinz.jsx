@@ -183,6 +183,7 @@ const ZodiacTinSkinz = () => {
   // Breadcrumb Schema
   const breadcrumbSchema = {
       "@type": "BreadcrumbList",
+      "name": "Zodiac Gifts Breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",

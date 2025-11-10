@@ -207,8 +207,9 @@ const TentProducts = () => {
 
   // Breadcrumb Schema
   const breadcrumbSchema = {
-    "@type": "BreadcrumbList",
-    "itemListElement": [
+      "@type": "BreadcrumbList",
+      "name": "Tent Products Breadcrumb",
+      "itemListElement": [
       {
         "@type": "ListItem",
         "position": 1,

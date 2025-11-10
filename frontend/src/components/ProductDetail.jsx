@@ -756,6 +756,7 @@ const ProductDetail = () => {
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    "name": "Product Detail Breadcrumb",
     "itemListElement": [
       {
         "@type": "ListItem",

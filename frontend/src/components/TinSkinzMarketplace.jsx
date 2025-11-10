@@ -423,6 +423,7 @@ const TinSkinzMarketplace = () => {
     "url": "https://www.buyprintz.com/tin-skinz",
     "breadcrumb": {
       "@type": "BreadcrumbList",
+      "name": "Tin Skinz Marketplace Breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",

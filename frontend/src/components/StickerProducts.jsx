@@ -121,6 +121,7 @@ const StickerProducts = () => {
   // Breadcrumb Schema (no @context here - defined in parent @graph)
   const breadcrumbSchema = {
       "@type": "BreadcrumbList",
+      "name": "Sticker Products Breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",

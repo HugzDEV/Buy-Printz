@@ -402,6 +402,7 @@ const ZodiacSignPage = () => {
     const breadcrumbSchema = {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
+      "name": "Zodiac Sign Breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
