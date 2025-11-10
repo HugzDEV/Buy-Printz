@@ -38,7 +38,7 @@ const LandingPage = () => {
       hoverImage: "/assets/images/banner_assets/banner_image_2.jpg", // Different banner angle
       badge: "Best Seller",
       category: "banner",
-      link: "/banner-products"
+      link: "/banners"
     },
     {
       name: "Business Card Tins",

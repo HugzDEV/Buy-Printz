@@ -733,10 +733,10 @@ const ProductDetail = () => {
 
   // Determine the correct back route based on product type
   const getBackRoute = () => {
-    if (!product) return "/banner-products"
+    if (!product) return "/banners"
     if (productId?.startsWith('tent-')) return "/tradeshow-tents"
     if (productId?.startsWith('tin-')) return "/business-cards"
-    return "/banner-products"
+    return "/banners"
   }
 
   if (!product) {
@@ -767,7 +767,7 @@ const ProductDetail = () => {
         "@type": "ListItem",
         "position": 2,
         "name": "Products",
-        "item": "https://buyprintz.com/banner-products"
+        "item": "https://buyprintz.com/banners"
       },
       {
         "@type": "ListItem",

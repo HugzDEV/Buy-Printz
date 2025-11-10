@@ -147,13 +147,16 @@ function App() {
           </>
         } />
         
-        <Route path="/banner-products" element={
+        <Route path="/banners" element={
           <>
             <Header />
             <Products />
             <Footer />
           </>
         } />
+        
+        {/* Redirect old URL to new competitive URL */}
+        <Route path="/banner-products" element={<Navigate to="/banners" replace />} />
         
         <Route path="/business-cards" element={
           <>

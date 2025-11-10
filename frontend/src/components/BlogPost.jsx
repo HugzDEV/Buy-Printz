@@ -370,7 +370,7 @@ Professional banner design is both an art and a science, requiring careful consi
 
 The key to success is understanding your specific needs, choosing the right materials and production methods, and continuously measuring and optimizing your results. With the right approach, professional banners can become one of your most valuable marketing assets.
 
-Ready to create professional banners that make an impact? <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our banner printing services</Link> and discover how custom banners can transform your brand visibility and marketing effectiveness.`,
+Ready to create professional banners that make an impact? <Link to="/banners" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our banner printing services</Link> and discover how custom banners can transform your brand visibility and marketing effectiveness.`,
       author: "BuyPrintz Team",
       date: "2025-10-22",
       readTime: "8 min read",
@@ -1008,7 +1008,7 @@ Ready to build your startup's marketing foundation? Here's your action plan:
 
 1. Start with <Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Business Card Tins</Link>: Test your branding with a small order
 2. Invest in a <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">Trade Show Tent</Link>: Choose a design that reflects your brand
-3. Create Essential <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">Banners</Link>: Grand opening, promotion, and event banners
+3. Create Essential <Link to="/banners" className="text-blue-600 hover:text-blue-800 font-semibold underline">Banners</Link>: Grand opening, promotion, and event banners
 4. Plan Your Launch: Use all three tools together for maximum impact
 
 The Bottom Line
@@ -1017,7 +1017,7 @@ While digital marketing has its place, physical marketing tools create the found
 
 Don't let your startup get lost in the digital noise. Invest in physical marketing tools that create real connections and lasting impressions.
 
-Ready to get started? <Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link>, <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">trade show tents</Link>, and <Link to="/banner-products" className="text-blue-600 hover:text-blue-800 font-semibold underline">banner solutions</Link> today. Let's build the foundation for your business success.`,
+Ready to get started? <Link to="/business-cards" className="text-blue-600 hover:text-blue-800 font-semibold underline">Explore our Business Card Tins</Link>, <Link to="/tradeshow-tents" className="text-blue-600 hover:text-blue-800 font-semibold underline">trade show tents</Link>, and <Link to="/banners" className="text-blue-600 hover:text-blue-800 font-semibold underline">banner solutions</Link> today. Let's build the foundation for your business success.`,
       author: "BuyPrintz Team",
       date: "2025-09-21",
       readTime: "7 min read",
@@ -1470,7 +1470,7 @@ Ready to Transform Your Networking Game?
                 </Link>
                 
                 <Link 
-                  to="/banner-products"
+                  to="/banners"
                   className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   <div className="flex items-start gap-4">

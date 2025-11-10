@@ -197,7 +197,7 @@ const Products = () => {
           "@type": "ListItem",
           "position": 3,
           "name": "Banner Products",
-          "item": "https://www.buyprintz.com/banner-products"
+          "item": "https://www.buyprintz.com/banners"
         }
       ]
   }
@@ -207,14 +207,14 @@ const Products = () => {
       "@type": "ItemList",
     "name": "Professional Banner Products - Custom Printing Solutions",
     "description": "Premium quality banners and signage solutions for every application. Vinyl banners from $1.60/sqft, fabric banners from $2.75/sqft, specialty banners available. Fast 2-3 day delivery on all orders.",
-    "url": "https://www.buyprintz.com/banner-products",
+    "url": "https://www.buyprintz.com/banners",
       "numberOfItems": allProducts.length,
       "itemListElement": allProducts.map((product, index) => ({
         "@type": "ListItem",
         "position": index + 1,
         "item": {
           "@type": "Product",
-          "@id": `https://www.buyprintz.com/banner-products#${product.id}`,
+          "@id": `https://www.buyprintz.com/banners#${product.id}`,
           "name": product.name,
           "description": product.description,
           "image": [
@@ -239,7 +239,7 @@ const Products = () => {
           "color": "Custom",
           "offers": {
             "@type": "Offer",
-            "url": `https://www.buyprintz.com/banner-products#${product.id}`,
+            "url": `https://www.buyprintz.com/banners#${product.id}`,
             "price": product.price.replace(/[^\d.]/g, ''),
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
@@ -366,7 +366,7 @@ const Products = () => {
         "position": 1,
         "name": "Choose Your Banner Type",
         "text": "Select from vinyl, fabric, or specialty banners based on your application needs and budget.",
-        "url": "https://www.buyprintz.com/banner-products"
+        "url": "https://www.buyprintz.com/banners"
       },
       {
         "@type": "HowToStep",
@@ -411,7 +411,7 @@ const Products = () => {
 
   return (
     <>
-      <SEOHead {...seoConfigs.products} structuredData={combinedSchema} />
+      <SEOHead {...seoConfigs.banners} structuredData={combinedSchema} />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header Section */}
       <section className="relative py-16 overflow-hidden">
@@ -434,10 +434,10 @@ const Products = () => {
           
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg">
-              Professional Banner Products
+              Custom Banners | Vinyl Banner Printing
             </h1>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto drop-shadow-md">
-              Premium quality banners and signage solutions for every application - from outdoor advertising to trade show displays
+              Professional banners for indoor and outdoor use. Weather-resistant vinyl, vibrant colors, same-day printing. Perfect for events, trade shows, and business signage.
             </p>
           </div>
           

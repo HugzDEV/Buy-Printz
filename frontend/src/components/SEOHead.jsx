@@ -82,6 +82,13 @@ export const seoConfigs = {
     url: "https://www.buyprintz.com/business-cards"
   },
   
+  banners: {
+    title: "Custom Banners | Vinyl Banners & Banner Printing | BuyPrintz",
+    description: "Professional custom banners and vinyl banners for indoor and outdoor use. Weather-resistant, vibrant colors, same-day printing. Perfect for events, trade shows, retail, and business signage. Fast 2-3 day delivery.",
+    keywords: "banners, custom banners, vinyl banners, banner printing, outdoor banners, indoor banners, vinyl banner printing, custom vinyl banners, trade show banners, event banners, business banners, promotional banners, retail banners, banner signs, banner design, large format printing, mesh banners, fabric banners, backlit banners, pole banners",
+    url: "https://www.buyprintz.com/banners"
+  },
+  
   tradeshowTents: {
     title: "Tradeshow Tents - Custom Canopy Tents & Pop-Up Displays | BuyPrintz",
     description: "Professional tradeshow tents, canopy tents, and pop-up displays for trade shows, events, and exhibitions. Custom graphics, durable construction, and easy setup. Perfect for trade shows, farmers markets, and outdoor events.",

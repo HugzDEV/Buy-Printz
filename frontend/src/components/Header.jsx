@@ -49,7 +49,7 @@ const Header = () => {
 
   const productOptions = [
     { name: 'All Products', href: '/all-products' },
-    { name: 'Vinyl Banners', href: '/banner-products' },
+    { name: 'Banners', href: '/banners' },
     { name: 'Business Cards', href: '/business-cards' },
     { name: 'Tradeshow Tents', href: '/tradeshow-tents' },
     { name: 'Custom Stickers', href: '/stickers' },

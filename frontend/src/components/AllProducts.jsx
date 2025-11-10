@@ -10,7 +10,7 @@ const AllProducts = () => {
       price: "From $2.25/sqft",
       description: "Professional outdoor and indoor banners with weather resistance and vibrant colors",
       image: "/assets/images/13oz Vinyl Banner.jpg",
-      link: "/banner-products",
+      link: "/banners",
       badge: "Best Seller",
       badgeColor: "bg-red-500",
       icon: <Package className="w-8 h-8" />
@@ -80,10 +80,10 @@ const AllProducts = () => {
         "position": 1,
         "item": {
           "@type": "Thing",
-          "@id": "https://www.buyprintz.com/banner-products",
+          "@id": "https://www.buyprintz.com/banners",
           "name": "Vinyl Banners",
           "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors",
-          "url": "https://www.buyprintz.com/banner-products"
+          "url": "https://www.buyprintz.com/banners"
         }
       },
       {
