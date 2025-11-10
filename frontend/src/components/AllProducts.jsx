@@ -73,7 +73,7 @@ const AllProducts = () => {
     "name": "BuyPrintz Product Categories",
     "description": "Complete range of professional business branding solutions including vinyl banners, business card tins, tradeshow tents, custom stickers, and Tin Skinz candy tins.",
     "url": "https://www.buyprintz.com/all-products",
-    "numberOfItems": 5,
+    "numberOfItems": 6,
     "itemListElement": [
       {
         "@type": "ListItem",
@@ -81,7 +81,7 @@ const AllProducts = () => {
         "item": {
           "@type": "Product",
           "@id": "https://www.buyprintz.com/banners#product",
-          "name": "Vinyl Banners",
+          "name": "Custom Banners",
           "description": "Professional outdoor and indoor banners with weather resistance and vibrant colors",
           "url": "https://www.buyprintz.com/banners",
           "image": "https://www.buyprintz.com/assets/images/13oz Vinyl Banner.jpg",
@@ -96,11 +96,6 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "9"
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.7",
-            "reviewCount": "89"
           }
         }
       },
@@ -125,11 +120,6 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "3"
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "reviewCount": "127"
           }
         }
       },
@@ -139,7 +129,7 @@ const AllProducts = () => {
         "item": {
           "@type": "Product",
           "@id": "https://www.buyprintz.com/tents#product",
-          "name": "Tradeshow Tents",
+          "name": "Custom Tents",
           "description": "Professional event tents with canopy-only option and 360-degree branding coverage with heavy-duty aluminum frames",
           "url": "https://www.buyprintz.com/tents",
           "image": "https://www.buyprintz.com/assets/images/Tent_images/Tent_Tradeshow.jpg",
@@ -154,11 +144,6 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "2"
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "reviewCount": "56"
           }
         }
       },
@@ -183,11 +168,6 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "2"
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "234"
           }
         }
       },
@@ -207,14 +187,113 @@ const AllProducts = () => {
           },
           "offers": {
             "@type": "Offer",
-            "price": "12.99",
+            "price": "9.99",
             "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2026-12-31",
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "USD"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 1,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
+                }
+              }
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "US",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": 30,
+              "returnMethod": "https://schema.org/ReturnByMail",
+              "returnFees": "https://schema.org/FreeReturn"
+            }
           },
           "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.7",
             "reviewCount": "78"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "item": {
+          "@type": "Product",
+          "@id": "https://www.buyprintz.com/zodiac#product",
+          "name": "Zodiac Gifts",
+          "description": "Personalized zodiac-themed gifts for all 12 astrological signs. Perfect birthday gifts and astrology presents.",
+          "url": "https://www.buyprintz.com/zodiac",
+          "image": "https://www.buyprintz.com/assets/images/zodiac-tins-preview.jpg",
+          "brand": {
+            "@type": "Brand",
+            "name": "BuyPrintz"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "9.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2026-12-31",
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "USD"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 1,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 3,
+                  "unitCode": "DAY"
+                }
+              }
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "US",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": 30,
+              "returnMethod": "https://schema.org/ReturnByMail",
+              "returnFees": "https://schema.org/FreeReturn"
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "342"
           }
         }
       }
