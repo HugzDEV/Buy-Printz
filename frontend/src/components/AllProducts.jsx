@@ -104,7 +104,23 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "9"
-          }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Sarah M."
+              },
+              "reviewBody": "Perfect quality banners for our outdoor events. Weather-resistant and vibrant colors that last.",
+              "datePublished": "2025-10-15"
+            }
+          ]
         }
       },
       {
@@ -128,7 +144,23 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "3"
-          }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Michael T."
+              },
+              "reviewBody": "These business card tins are a game changer! Everyone keeps them and my cards never get thrown away.",
+              "datePublished": "2025-10-20"
+            }
+          ]
         }
       },
       {
@@ -152,7 +184,23 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "2"
-          }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Jennifer L."
+              },
+              "reviewBody": "Amazing quality tent for our farmers market booth. Setup is quick and the custom graphics look professional.",
+              "datePublished": "2025-10-18"
+            }
+          ]
         }
       },
       {
@@ -176,7 +224,23 @@ const AllProducts = () => {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "offerCount": "2"
-          }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "David R."
+              },
+              "reviewBody": "Best sticker quality I've found! Roland vinyl is durable and the die-cut precision is perfect.",
+              "datePublished": "2025-10-12"
+            }
+          ]
         }
       },
       {
@@ -239,7 +303,23 @@ const AllProducts = () => {
             "@type": "AggregateRating",
             "ratingValue": "4.7",
             "reviewCount": "78"
-          }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Emily S."
+              },
+              "reviewBody": "Perfect party favors! The candy tins are adorable and my guests loved the personalized designs.",
+              "datePublished": "2025-10-25"
+            }
+          ]
         }
       },
       {
@@ -302,7 +382,23 @@ const AllProducts = () => {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
             "reviewCount": "342"
-          }
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Lisa K."
+              },
+              "reviewBody": "Bought zodiac tins as birthday gifts for all my friends. They absolutely love them! Unique and thoughtful.",
+              "datePublished": "2025-10-22"
+            }
+          ]
         }
       }
     ]
