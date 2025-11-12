@@ -304,6 +304,11 @@ const AllProducts = () => {
             "@type": "AggregateRating",
             "ratingValue": "4.7",
             "reviewCount": "78"
+          },
+          "weight": {
+            "@type": "QuantitativeValue",
+            "value": "0.088",
+            "unitCode": "KGM"
           }
         }
       },
@@ -367,6 +372,11 @@ const AllProducts = () => {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
             "reviewCount": "342"
+          },
+          "weight": {
+            "@type": "QuantitativeValue",
+            "value": "0.088",
+            "unitCode": "KGM"
           }
         }
       }

@@ -292,7 +292,12 @@ const LandingPage = () => {
               "returnFees": "https://schema.org/FreeReturn"
             }
           },
-          "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.7", "reviewCount": "78" }
+          "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.7", "reviewCount": "78" },
+          "weight": {
+            "@type": "QuantitativeValue",
+            "value": "0.088",
+            "unitCode": "KGM"
+          }
         }
       }
     ]

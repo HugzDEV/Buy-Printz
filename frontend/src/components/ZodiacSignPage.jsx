@@ -374,6 +374,11 @@ const ZodiacSignPage = () => {
           }
         }
       ],
+      "weight": {
+        "@type": "QuantitativeValue",
+        "value": "0.088",
+        "unitCode": "KGM"
+      },
       "additionalProperty": [
         {
           "@type": "PropertyValue",
