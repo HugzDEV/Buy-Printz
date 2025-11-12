@@ -134,8 +134,8 @@ async def calculate_price(
         
         pricing = result.data[0]
         
-        # Calculate tax (assuming 8.5% tax rate)
-        tax_rate = 0.085
+        # Calculate tax (6.25% Massachusetts state tax)
+        tax_rate = 0.0625
         subtotal = float(pricing["total_price"])
         tax_amount = subtotal * tax_rate
         total_amount = subtotal + tax_amount
