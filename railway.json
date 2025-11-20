@@ -1,13 +1,23 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "cd backend && pip install -r requirements.txt"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "ENVIRONMENT": "production",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+        "B2SIGN_USERNAME": "order@buyprintz.com",
+        "B2SIGN_PASSWORD": "$AG@BuyPr!n1z"
+      }
+    }
   }
 }
-
